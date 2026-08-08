@@ -235,24 +235,17 @@ export interface Placed {
   y: number
 }
 
-/** Découpe une rangée trop large en sous-rangées. */
-const chunk = <T,>(items: T[], size: number): T[][] => {
-  if (!Number.isFinite(size) || size < 1) return [items]
-  const out: T[][] = []
-  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size))
-  return out
-}
-
 /**
- * @param maxPerRow nombre de cartes tenant dans la largeur disponible. Une
- *   profondeur qui en porte davantage se replie sur plusieurs sous-rangées :
- *   sans quoi huit pages sœurs feraient deux mille pixels de large et le
- *   défilement latéral remplacerait simplement celui qu'on venait d'éliminer.
+ * La disposition ne dépend plus de la place disponible.
+ *
+ * Une profondeur trop large pour la fenêtre se repliait en sous-rangées. Des
+ * pages à un clic de l'accueil se retrouvaient alors sur deux lignes — soit
+ * exactement l'image de deux niveaux différents, c'est-à-dire le contraire de
+ * ce que la carte existe pour montrer. Une rangée large déborde donc
+ * volontairement : c'est le zoom du canevas qui la ramène à l'écran, et
+ * dézoomer ne prétend rien sur la structure.
  */
-export function layoutGraph(
-  pages: Page[],
-  maxPerRow = Infinity,
-): { placed: Placed[]; width: number; height: number } {
+export function layoutGraph(pages: Page[]): { placed: Placed[]; width: number; height: number } {
   if (pages.length === 0) return { placed: [], width: 0, height: 0 }
 
   const byRoute = new Map(pages.map(p => [p.route, p]))
@@ -285,22 +278,18 @@ export function layoutGraph(
   }
 
   const ordered = [...rows.entries()].sort((a, b) => a[0] - b[0])
-  const chunked = ordered.map(([d, row]) => [d, chunk(row, maxPerRow)] as const)
-
-  const widest = Math.max(...chunked.flatMap(([, parts]) => parts.map(p => p.length)))
+  const widest = Math.max(...ordered.map(([, row]) => row.length))
   const placed: Placed[] = []
 
   let y = 0
-  for (const [d, parts] of chunked) {
-    for (const part of parts) {
-      // Sous-rangée centrée : le graphe reste lisible quand une profondeur
-      // porte une seule page et la suivante en porte six.
-      const offset = ((widest - part.length) * COL_STEP) / 2
-      part.forEach((page, i) => {
-        placed.push({ page, depth: d, x: offset + i * COL_STEP, y })
-      })
-      y += ROW_STEP
-    }
+  for (const [d, row] of ordered) {
+    // Rangée centrée : le graphe reste lisible quand une profondeur porte une
+    // seule page et la suivante en porte six.
+    const offset = ((widest - row.length) * COL_STEP) / 2
+    row.forEach((page, i) => {
+      placed.push({ page, depth: d, x: offset + i * COL_STEP, y })
+    })
+    y += ROW_STEP
   }
 
   return {

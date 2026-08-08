@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   CARD_H,
-  COL_STEP,
   CARD_W,
   frDate,
   frDateShort,
@@ -11,7 +10,6 @@ import {
   layoutGraph,
   pageName,
   plansForPage,
-  ROW_STEP,
   shotRatio,
   scanFailed,
   shotDate,
@@ -23,7 +21,7 @@ import {
 import { Lightbox } from '../Lightbox'
 import { s, useHover } from '../style'
 import { Divider, useResizable } from '../useResizable'
-import { useMeasure } from '../useMeasure'
+import { usePanZoom } from '../usePanZoom'
 import type { Layout } from '../Terminal'
 
 /** Onglet Produit — maquette l. 85-274. */
@@ -44,19 +42,27 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
     invert: true,
   })
 
-  // La zone du graphe est mesurée : le nombre de cartes par rangée suit la
-  // place réelle, qui change avec la fenêtre, la barre latérale et la
-  // disposition du terminal.
-  const area = useMeasure<HTMLDivElement>()
-  const scale = layout === 'side' ? 0.82 : 1
-  const maxPerRow = area.width > 0 ? Math.max(1, Math.floor(area.width / scale / COL_STEP)) : 4
+  // La disposition ne dépend plus de la place : une rangée par profondeur,
+  // toujours. C'est le canevas qui s'ajuste.
+  const canvas = usePanZoom()
+  const { placed, width, height } = layoutGraph(pages)
 
-  const { placed, width, height } = layoutGraph(pages, maxPerRow)
   const current = pages.find(p => p.route === selected) ?? pages[0] ?? null
   const linkCount = pages.reduce((total, page) => total + page.links.length, 0)
   const failed = scanFailed(snapshot.scans)
 
   const side = layout === 'side'
+
+  // Changer de projet rend la main à l'ajustement automatique : le graphe
+  // suivant n'a aucune raison d'hériter du zoom choisi pour le précédent.
+  useEffect(() => canvas.release(), [snapshot.root])
+
+  // Recadrage tant que l'utilisateur n'a pas pris la main. Dépend de la taille
+  // du viewport, donc suit la fenêtre, la barre latérale et la disposition du
+  // terminal — ce que faisait l'ancien `scale(0.82)`, en mieux.
+  useEffect(() => {
+    if (canvas.untouched()) canvas.fit(width, height, false)
+  }, [canvas.width, canvas.height, width, height])
 
   if (pages.length === 0) {
     return (
@@ -74,36 +80,53 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
 
   return (
     <div style={s('flex: 1; display: flex; min-width: 0; position: relative;')}>
-      <div ref={area.ref} style={s('flex: 1; padding: 20px 22px; overflow: auto; min-width: 0;')}>
-        <div style={s('display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;')}>
-          <h1 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
-            Graphe de navigation
-          </h1>
-          <span style={s('font-size: 12px; color: var(--color-neutral-500);')}>
-            {pages.length} page{pages.length > 1 ? 's' : ''} · {linkCount} lien
-            {linkCount > 1 ? 's' : ''} · reconstruit au commit
-          </span>
+      <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
+        <div style={s('flex: none; padding: 20px 22px 0;')}>
+          <div style={s('display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;')}>
+            <h1 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
+              Graphe de navigation
+            </h1>
+            <span style={s('font-size: 12px; color: var(--color-neutral-500);')}>
+              {pages.length} page{pages.length > 1 ? 's' : ''} · {linkCount} lien
+              {linkCount > 1 ? 's' : ''} · reconstruit au commit
+            </span>
+          </div>
+
+          <Legend />
+
+          {failed && (
+            <div
+              style={s(
+                'display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 8px 11px; border-radius: 6px; background: var(--color-accent-900); border: 1px solid var(--color-accent-800); font-size: 12px; color: var(--color-accent-200);',
+              )}
+            >
+              Dernier scan échoué le {frDate(lastScan(snapshot.scans)?.date)} — les captures
+              ci-dessous sont plus anciennes que le dernier commit.
+            </div>
+          )}
         </div>
 
-        <Legend />
+        {/* Le canevas. `overflow: hidden` et non `auto` : le déplacement passe
+            par la transformation, pas par les barres de défilement — deux
+            mécanismes de déplacement se battraient sur le même geste.
 
-        {failed && (
+            En disposition « Côté », le rail de détail recouvre le canevas au
+            lieu de le pousser. Un remplissage à droite retire cette bande de la
+            largeur mesurée — sans quoi l'ajustement centrerait le graphe dans
+            une place dont une partie est cachée, et la moitié droite passerait
+            sous le rail. */}
+        <div
+          ref={canvas.ref}
+          style={s(
+            // `user-select: none` : sans lui, glisser le canevas surligne les
+            // titres des cartes au passage.
+            `flex: 1; position: relative; overflow: hidden; min-height: 0; touch-action: none; user-select: none; padding-right: ${side && panel ? rail.size : 0}px; ` +
+              (canvas.panning ? 'cursor: grabbing;' : 'cursor: grab;'),
+          )}
+        >
           <div
             style={s(
-              'display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 8px 11px; border-radius: 6px; background: var(--color-accent-900); border: 1px solid var(--color-accent-800); font-size: 12px; color: var(--color-accent-200);',
-            )}
-          >
-            Dernier scan échoué le {frDate(lastScan(snapshot.scans)?.date)} — les captures ci-dessous
-            sont plus anciennes que le dernier commit.
-          </div>
-        )}
-
-        <div style={s(side ? `width: ${width * 0.82}px; height: ${height * 0.82}px;` : `width: ${width}px; height: ${height}px;`)}>
-          <div
-            style={s(
-              side
-                ? `position: relative; width: ${width}px; height: ${height}px; transform: scale(0.82); transform-origin: top left;`
-                : `position: relative; width: ${width}px; height: ${height}px;`,
+              `position: absolute; top: 0; left: 0; width: ${width}px; height: ${height}px; transform: translate(${canvas.pan.x}px, ${canvas.pan.y}px) scale(${canvas.zoom}); transform-origin: 0 0;`,
             )}
           >
             <Edges placed={placed} width={width} height={height} />
@@ -127,10 +150,16 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
               />
             ))}
           </div>
+
+          <Controls
+            zoom={canvas.zoom}
+            onZoom={canvas.zoomBy}
+            onReset={canvas.reset}
+            onFit={() => canvas.fit(width, height)}
+          />
         </div>
 
-        {Object.keys(redirects).length > 0 && <Redirects redirects={redirects} />}
-        {orphans.length > 0 && <Orphans slugs={orphans} />}
+        <Footnotes redirects={redirects} orphans={orphans} />
       </div>
 
       {panel && current ? (
@@ -192,6 +221,54 @@ function Legend() {
 }
 
 /**
+ * Commandes du canevas, en surimpression.
+ *
+ * Le zoom se fait au trackpad la plupart du temps ; ces boutons existent pour
+ * la souris, et surtout pour que « ajuster » soit atteignable — un graphe perdu
+ * hors cadre après un déplacement trop franc doit se retrouver sans tâtonner.
+ */
+function Controls({
+  zoom,
+  onZoom,
+  onReset,
+  onFit,
+}: {
+  zoom: number
+  onZoom: (factor: number) => void
+  onReset: () => void
+  onFit: () => void
+}) {
+  const button =
+    'cursor: pointer; font-family: var(--font-body); font-size: 11px; padding: 4px 9px; border-radius: 5px; border: 1px solid var(--color-neutral-800); background: rgba(19,20,31,.86); color: var(--color-neutral-400);'
+
+  return (
+    <div
+      style={s(
+        'position: absolute; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 4px; z-index: 4;',
+      )}
+    >
+      <button type="button" title="Dézoomer" onClick={() => onZoom(1 / 1.2)} style={s(button)}>
+        −
+      </button>
+      <button
+        type="button"
+        title="Revenir à 100 %"
+        onClick={onReset}
+        style={s(button + ' min-width: 52px; font-variant-numeric: tabular-nums;')}
+      >
+        {Math.round(zoom * 100)} %
+      </button>
+      <button type="button" title="Zoomer" onClick={() => onZoom(1.2)} style={s(button)}>
+        +
+      </button>
+      <button type="button" title="Ajuster à la fenêtre" onClick={onFit} style={s(button)}>
+        ⤢
+      </button>
+    </div>
+  )
+}
+
+/**
  * Arêtes orthogonales en L, dans le sens vertical.
  *
  * **Une arête = une descente d'un niveau.** Seul un lien vers la profondeur
@@ -209,6 +286,10 @@ function Legend() {
  * latéralement. Ce qui est gagné : ce qui reste à l'écran est vrai. Un enfant
  * atteint depuis deux parents garde bien ses deux arêtes — on ne réduit pas à
  * l'arbre du parcours.
+ *
+ * Une profondeur occupe désormais une seule rangée : une arête descend donc
+ * toujours d'exactement un `ROW_STEP`, et le détour par une voie latérale qui
+ * contournait les sous-rangées n'a plus lieu d'être.
  */
 function Edges({ placed, width, height }: { placed: Placed[]; width: number; height: number }) {
   const byRoute = new Map(placed.map(item => [item.page.route, item]))
@@ -219,29 +300,13 @@ function Edges({ placed, width, height }: { placed: Placed[]; width: number; hei
       const to = byRoute.get(link)
       if (!to || to.depth !== from.depth + 1) continue
 
+      // Bas du centre → haut du centre, avec un décrochement horizontal à
+      // mi-hauteur.
+      const x1 = from.x + CARD_W / 2
+      const y1 = from.y + CARD_H
       const x2 = to.x + CARD_W / 2
       const y2 = to.y
-
-      if (to.y - from.y === ROW_STEP) {
-        // Rangée immédiatement dessous : bas du centre → haut du centre, avec
-        // un décrochement horizontal à mi-hauteur.
-        const x1 = from.x + CARD_W / 2
-        const y1 = from.y + CARD_H
-        forward.push(`M ${x1} ${y1} V ${y1 + (y2 - y1) / 2} H ${x2} V ${y2}`)
-        continue
-      }
-
-      // Une profondeur trop large pour la fenêtre est repliée en sous-rangées
-      // (`layoutGraph`) : la cible est alors deux rangées plus bas, et un trait
-      // droit passerait derrière les cartes intercalées. Il en ressortirait
-      // juste au-dessus de la cible — exactement l'image d'une page qui
-      // découlerait de sa voisine, que ce composant existe pour ne plus
-      // produire. Le détour passe donc à l'écart de toutes les cartes.
-      const x1 = from.x + CARD_W
-      const y1 = from.y + CARD_H / 2
-      const lane = width + 18
-      const gutter = y2 - (ROW_STEP - CARD_H) / 2
-      forward.push(`M ${x1} ${y1} H ${lane} V ${gutter} H ${x2} V ${y2}`)
+      forward.push(`M ${x1} ${y1} V ${y1 + (y2 - y1) / 2} H ${x2} V ${y2}`)
     }
   }
 
@@ -533,12 +598,61 @@ const Empty = ({ text }: { text: string }) => (
 )
 
 /**
+ * Ce que la carte ne peut pas dessiner : routes protégées, captures orphelines.
+ *
+ * Ces deux blocs vivaient sous le graphe, dans le même défilement. Le canevas
+ * prend maintenant toute la hauteur, et les faire défiler avec lui n'a plus de
+ * sens. Repliés, ils tiennent en une ligne qui dit leur compte — assez pour
+ * qu'on sache qu'il y a quelque chose à lire, pas assez pour encombrer.
+ */
+function Footnotes({
+  redirects,
+  orphans,
+}: {
+  redirects: Record<string, string>
+  orphans: string[]
+}) {
+  const [open, setOpen] = useState(false)
+  const routes = Object.keys(redirects).length
+
+  if (routes === 0 && orphans.length === 0) return null
+
+  const counts = [
+    routes > 0 ? `${routes} route${routes > 1 ? 's' : ''} protégée${routes > 1 ? 's' : ''}` : null,
+    orphans.length > 0
+      ? `${orphans.length} capture${orphans.length > 1 ? 's' : ''} sans page`
+      : null,
+  ].filter(Boolean)
+
+  return (
+    <div style={s('flex: none; border-top: 1px solid var(--color-divider); background: #13141f;')}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        style={s(
+          'display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; background: transparent; border: 0; padding: 8px 22px; cursor: pointer; font-family: var(--font-body); font-size: 11.5px; color: var(--color-neutral-500);',
+        )}
+      >
+        <span style={s('color: var(--color-neutral-600);')}>{open ? '▾' : '▸'}</span>
+        {counts.join(' · ')}
+      </button>
+      {open && (
+        <div style={s('max-height: 34vh; overflow: auto; padding: 0 22px 16px;')}>
+          {routes > 0 && <Redirects redirects={redirects} />}
+          {orphans.length > 0 && <Orphans slugs={orphans} />}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/**
  * Captures qui ne correspondent à aucune page actuelle. Les taire les ferait
  * passer pour des écrans du produit auprès de qui ouvre le dossier.
  */
 function Orphans({ slugs }: { slugs: string[] }) {
   return (
-    <div style={s('margin-top: 22px;')}>
+    <div style={s('margin-top: 14px;')}>
       <div
         style={s(
           'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 8px;',
@@ -558,7 +672,7 @@ function Orphans({ slugs }: { slugs: string[] }) {
 /** Une route qui redirige existe et est protégée : c'est une information. */
 function Redirects({ redirects }: { redirects: Record<string, string> }) {
   return (
-    <div style={s('margin-top: 22px;')}>
+    <div style={s('margin-top: 14px;')}>
       <div
         style={s(
           'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;',

@@ -31,6 +31,18 @@
         ".gitignore",
         "hooks/cockpit-post-commit.js"
       ]
+    },
+    {
+      "sha": "4ce8ce9",
+      "date": "2026-08-08",
+      "files": [
+        "crawl/index.js",
+        "crawl/retention.test.js",
+        "crawl/routes.js",
+        "crawl/routes.test.js",
+        "package.json",
+        "pnpm-lock.yaml"
+      ]
     }
   ]
 }

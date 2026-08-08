@@ -57,6 +57,27 @@ function loadConfig() {
   return config
 }
 
+/**
+ * Faut-il rejouer une session enregistrée ?
+ *
+ * Refus si le fichier n'est pas ignoré par git : il contient un jeton valide,
+ * et une fois committé il est dans l'historique pour de bon. Le crawl continue
+ * sans session plutôt que d'encourager la fuite — les pages publiques restent
+ * cartographiées, et la trace du scan dira que les pages protégées manquent.
+ */
+function useStorageState(config) {
+  const relative = config.auth?.storageState
+  if (!relative || !existsSync(join(root, relative))) return false
+
+  try {
+    execFileSync('git', ['check-ignore', '-q', relative], { cwd: root, stdio: 'ignore' })
+    return true
+  } catch {
+    log(`${relative} n'est pas ignoré par git — session non rejouée, pages protégées ignorées`)
+    return false
+  }
+}
+
 const shortSha = () => {
   try {
     return execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
@@ -162,22 +183,37 @@ async function visitAll(page, config) {
   const queue = config.entryRoutes.map(route => new URL(route, config.baseUrl).href)
   const seen = new Set()
   const visited = []
+  /** chemin demandé → chemin réellement affiché, quand ils diffèrent */
+  const redirects = new Map()
 
   while (queue.length > 0 && visited.length < config.maxPages) {
     const url = queue.shift()
-    const path = pathOf(url)
-    if (seen.has(path) || isIgnored(path, config.ignore)) continue
-    seen.add(path)
+    const requested = pathOf(url)
+    if (seen.has(requested) || isIgnored(requested, config.ignore)) continue
+    seen.add(requested)
 
     try {
       const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 20_000 })
       if (response && response.status() >= 400) {
-        log(`${path} → HTTP ${response.status()}, ignorée`)
+        log(`${requested} → HTTP ${response.status()}, ignorée`)
         continue
       }
     } catch (err) {
-      log(`${path} → injoignable (${err.message.split('\n')[0]})`)
+      log(`${requested} → injoignable (${err.message.split('\n')[0]})`)
       continue
+    }
+
+    // L'identité d'une page est son URL FINALE. Une route protégée redirige
+    // vers la connexion : l'enregistrer sous le chemin demandé donnerait une
+    // page « /dashboard » montrant un formulaire de connexion — un faux
+    // plausible, donc le pire. On garde la redirection comme information : elle
+    // dit que la route existe et qu'elle est protégée.
+    const path = pathOf(page.url())
+    if (path !== requested) {
+      redirects.set(requested, path)
+      log(`${requested} → redirige vers ${path}`)
+      if (seen.has(path)) continue
+      seen.add(path)
     }
 
     const links = await page.$$eval('a[href]', anchors => anchors.map(a => a.href))
@@ -202,7 +238,7 @@ async function visitAll(page, config) {
   if (queue.length > 0) {
     log(`plafond de ${config.maxPages} pages atteint — ${queue.length} lien(s) non suivis`)
   }
-  return visited
+  return { visited, redirects: Object.fromEntries(redirects) }
 }
 
 // --- rétention -------------------------------------------------------------
@@ -261,13 +297,11 @@ async function run() {
     browser = await chromium.launch({ channel: 'chrome', headless: true })
     const context = await browser.newContext({
       viewport: config.viewport,
-      ...(config.auth?.storageState && existsSync(join(root, config.auth.storageState))
-        ? { storageState: join(root, config.auth.storageState) }
-        : {}),
+      ...(useStorageState(config) ? { storageState: join(root, config.auth.storageState) } : {}),
     })
     const page = await context.newPage()
 
-    const visited = await visitAll(page, config)
+    const { visited, redirects } = await visitAll(page, config)
     log(`${visited.length} chemin(s) visité(s)`)
 
     const { routeOf } = normalizeRoutes(visited.map(v => v.path))
@@ -302,9 +336,16 @@ async function run() {
     await browser.close()
     stopApp(app)
 
+    // Les redirections sont exprimées en routes : `/dashboard → /auth` dit que
+    // la route existe mais qu'elle est protégée.
+    const redirectRoutes = Object.fromEntries(
+      Object.entries(redirects).map(([from, to]) => [routeOf(from), routeOf(to)]),
+    )
+
     writeFileNoFollow(
       join(pagesDir, 'pages.json'),
-      JSON.stringify({ date, commit, pages: [...pages.values()] }, null, 2) + '\n',
+      JSON.stringify({ date, commit, pages: [...pages.values()], redirects: redirectRoutes }, null, 2) +
+        '\n',
     )
     recordScan({ date, commit, ok: true, pages: pages.size })
     log(`${pages.size} page(s) écrite(s) dans cockpit/pages/pages.json`)

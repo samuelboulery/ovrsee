@@ -45,6 +45,33 @@ test('normalizeRoutes replie aussi un segment répété qui ne ressemble pas à 
   assert.equal(routeOf('/herbier/prairie-seche'), '/herbier/:id')
 })
 
+test('normalizeRoutes ne replie jamais les écrans de premier niveau', () => {
+  // Cas réel : six écrans nommés à la racine. Les replier en /:id ferait
+  // disparaître cinq pages de la carte.
+  const { routes } = normalizeRoutes([
+    '/',
+    '/auth',
+    '/privacy',
+    '/terms',
+    '/legal',
+    '/cookies',
+  ])
+  assert.deepEqual(routes.sort(), ['/', '/auth', '/cookies', '/legal', '/privacy', '/terms'])
+})
+
+test('normalizeRoutes garde une action nommée à côté des identifiants frères', () => {
+  // /campaigns/new n'est pas une campagne : c'est le formulaire de création.
+  const { routes, routeOf } = normalizeRoutes([
+    '/campaigns',
+    '/campaigns/new',
+    '/campaigns/8f14e45f-ceea-467a-9f2e-1a2b3c4d5e6f',
+    '/campaigns/1c2d3e4f-5a6b-4789-9012-3456789abcde',
+    '/campaigns/9a8b7c6d-5e4f-4321-8765-fedcba987654',
+  ])
+  assert.ok(routes.includes('/campaigns/new'), `new a été replié : ${routes.join(', ')}`)
+  assert.equal(routeOf('/campaigns/8f14e45f-ceea-467a-9f2e-1a2b3c4d5e6f'), '/campaigns/:id')
+})
+
 test('normalizeRoutes ne replie pas deux écrans frères distincts', () => {
   // Deux valeurs seulement, aucune ne ressemble à un identifiant : ce sont
   // deux écrans nommés, pas une collection.

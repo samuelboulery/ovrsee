@@ -25,10 +25,23 @@ const segmentsOf = path => path.split('/').filter(Boolean)
 /**
  * Replie les chemins concrets en routes.
  *
- * Un segment devient un paramètre s'il ressemble à un identifiant, ou si le
- * même préfixe porte au moins trois valeurs distinctes à cette position — le
- * cas des slugs, qui ne ressemblent à rien de reconnaissable mais désignent
- * bien une collection.
+ * Un segment devient un paramètre dans deux cas :
+ *
+ * 1. Il ressemble à un identifiant — nombre, uuid, hexadécimal.
+ * 2. Il est à une profondeur ≥ 1 ET partage sa position avec au moins trois
+ *    autres valeurs qui ne ressemblent pas non plus à des identifiants. C'est
+ *    le cas des slugs (`/blog/mon-article`), reconnaissables seulement au fait
+ *    qu'ils sont nombreux.
+ *
+ * Les deux restrictions de la seconde règle sont chèrement acquises :
+ *
+ * - **Profondeur ≥ 1** : à la racine, les valeurs frères sont des écrans, pas
+ *   une collection. Sans cette borne, `/auth`, `/privacy`, `/terms`, `/legal`
+ *   et `/cookies` se replient en un seul `/:id` et cinq pages disparaissent de
+ *   la carte.
+ * - **Frères non identifiants** : sous `/campaigns`, les frères sont trois
+ *   uuid et le mot `new`. Compter les uuid ferait passer `/campaigns/new` —
+ *   le formulaire de création — pour une campagne parmi d'autres.
  *
  * @param {string[]} paths chemins concrets, sans origine ni query
  * @returns {{routes: string[], routeOf: (path: string) => string}}
@@ -56,8 +69,10 @@ export function normalizeRoutes(paths) {
     let param = 0
     const out = segments.map((segment, i) => {
       const key = segments.slice(0, i).join('/') + `#${i}`
-      const variants = siblings.get(key)?.size ?? 0
-      const dynamic = isDynamicSegment(segment) || variants >= COLLECTION_THRESHOLD
+      const namedSiblings = [...(siblings.get(key) ?? [])].filter(v => !isDynamicSegment(v)).length
+
+      const dynamic =
+        isDynamicSegment(segment) || (i >= 1 && namedSiblings >= COLLECTION_THRESHOLD)
       if (!dynamic) return segment
       param += 1
       return param === 1 ? ':id' : `:id${param}`

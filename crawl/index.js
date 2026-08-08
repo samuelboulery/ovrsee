@@ -350,6 +350,11 @@ async function run() {
         links: [...new Set(entry.links.map(routeOf))].filter(r => r !== route),
         shot: `shots/${slug}/${date}-${commit}.png`,
         shotDate: date,
+        // Enregistré au moment de la prise, jamais deviné à l'affichage : une
+        // vignette au mauvais rapport ne montre qu'une bande de l'écran, et
+        // toutes les pages finissent par se ressembler. Si `viewport` change
+        // dans la configuration, l'interface suit sans qu'on la retouche.
+        shotSize: { ...config.viewport },
       })
     }
 

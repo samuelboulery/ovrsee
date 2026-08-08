@@ -35,6 +35,16 @@
         "pnpm-workspace.yaml",
         "scripts/fix-pty-permissions.js"
       ]
+    },
+    {
+      "sha": "25c1b33",
+      "date": "2026-08-08",
+      "files": [
+        ".gitignore",
+        "README.md",
+        "electron-builder.yml",
+        "package.json"
+      ]
     }
   ]
 }

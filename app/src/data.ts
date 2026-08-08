@@ -99,6 +99,22 @@ export interface Page {
   links: string[]
   shot: string
   shotDate: string
+  /** Taille du viewport au moment de la capture. Absent des scans antérieurs. */
+  shotSize?: { width: number; height: number }
+}
+
+/**
+ * Rapport d'affichage d'une capture, sous la forme attendue par `aspect-ratio`.
+ *
+ * Une capture affichée au mauvais rapport est soit déformée, soit rognée à
+ * l'extrême — et une vignette rognée ne montre qu'une bande du haut de l'écran,
+ * identique d'une page à l'autre. Le rapport vient donc de la taille
+ * enregistrée à la prise ; 16/10 sert de repli pour les scans plus anciens,
+ * qui ne portent pas encore l'information.
+ */
+export function shotRatio(page: Page): string {
+  const { width, height } = page.shotSize ?? {}
+  return width && height ? `${width} / ${height}` : '16 / 10'
 }
 
 export interface Scan {
@@ -165,14 +181,20 @@ export function pageName(page: Page, pages: Page[]): string {
 /**
  * Disposition du graphe de navigation, en couches depuis la page d'entrée.
  *
- * La maquette place ses sept nœuds à la main (l. 124-208) ; ici les positions
- * se calculent, avec la même géométrie : colonnes de 175 px, cartes de 150 px,
- * point d'ancrage des arêtes à 66 px du haut de la carte.
+ * **L'écoulement est vertical** : la profondeur descend, et les pages d'une
+ * même profondeur s'étalent horizontalement. La maquette dessinait ses sept
+ * nœuds à la main de gauche à droite ; au-delà de huit pages, cette direction
+ * sort du cadre et les dernières cartes sont coupées. Un site se lit de haut en
+ * bas, une carte de navigation aussi.
+ *
+ * `CARD_H` est explicite parce que les arêtes s'y ancrent : une hauteur
+ * implicite les décalerait dès qu'un titre passe sur deux lignes. Les cartes
+ * ont donc une hauteur fixe, et leur contenu est borné.
  */
-export const CARD_W = 150
-export const COL_STEP = 175
-export const ROW_STEP = 150
-export const ANCHOR_Y = 66
+export const CARD_W = 220
+export const CARD_H = 210
+export const COL_STEP = 244
+export const ROW_STEP = 250
 
 export interface Placed {
   page: Page
@@ -181,7 +203,24 @@ export interface Placed {
   y: number
 }
 
-export function layoutGraph(pages: Page[]): { placed: Placed[]; width: number; height: number } {
+/** Découpe une rangée trop large en sous-rangées. */
+const chunk = <T,>(items: T[], size: number): T[][] => {
+  if (!Number.isFinite(size) || size < 1) return [items]
+  const out: T[][] = []
+  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size))
+  return out
+}
+
+/**
+ * @param maxPerRow nombre de cartes tenant dans la largeur disponible. Une
+ *   profondeur qui en porte davantage se replie sur plusieurs sous-rangées :
+ *   sans quoi huit pages sœurs feraient deux mille pixels de large et le
+ *   défilement latéral remplacerait simplement celui qu'on venait d'éliminer.
+ */
+export function layoutGraph(
+  pages: Page[],
+  maxPerRow = Infinity,
+): { placed: Placed[]; width: number; height: number } {
   if (pages.length === 0) return { placed: [], width: 0, height: 0 }
 
   const byRoute = new Map(pages.map(p => [p.route, p]))
@@ -205,28 +244,37 @@ export function layoutGraph(pages: Page[]): { placed: Placed[]; width: number; h
   const orphanDepth = Math.max(0, ...depth.values()) + 1
   for (const page of pages) if (!depth.has(page.route)) depth.set(page.route, orphanDepth)
 
-  const columns = new Map<number, Page[]>()
+  // Une rangée par profondeur : toutes les pages à N clics de l'entrée sont
+  // côte à côte, et l'entrée est seule tout en haut.
+  const rows = new Map<number, Page[]>()
   for (const page of pages) {
     const d = depth.get(page.route) ?? 0
-    columns.set(d, [...(columns.get(d) ?? []), page])
+    rows.set(d, [...(rows.get(d) ?? []), page])
   }
 
-  const tallest = Math.max(...[...columns.values()].map(c => c.length))
+  const ordered = [...rows.entries()].sort((a, b) => a[0] - b[0])
+  const chunked = ordered.map(([d, row]) => [d, chunk(row, maxPerRow)] as const)
+
+  const widest = Math.max(...chunked.flatMap(([, parts]) => parts.map(p => p.length)))
   const placed: Placed[] = []
 
-  for (const [d, column] of [...columns.entries()].sort((a, b) => a[0] - b[0])) {
-    // Colonne centrée verticalement : le graphe reste lisible quand les
-    // colonnes ont des tailles très différentes.
-    const offset = ((tallest - column.length) * ROW_STEP) / 2
-    column.forEach((page, i) => {
-      placed.push({ page, depth: d, x: d * COL_STEP, y: offset + i * ROW_STEP })
-    })
+  let y = 0
+  for (const [d, parts] of chunked) {
+    for (const part of parts) {
+      // Sous-rangée centrée : le graphe reste lisible quand une profondeur
+      // porte une seule page et la suivante en porte six.
+      const offset = ((widest - part.length) * COL_STEP) / 2
+      part.forEach((page, i) => {
+        placed.push({ page, depth: d, x: offset + i * COL_STEP, y })
+      })
+      y += ROW_STEP
+    }
   }
 
   return {
     placed,
-    width: columns.size * COL_STEP,
-    height: tallest * ROW_STEP,
+    width: widest * COL_STEP,
+    height: y,
   }
 }
 

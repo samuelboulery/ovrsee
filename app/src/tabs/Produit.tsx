@@ -1,7 +1,8 @@
 import { useState } from 'react'
 
 import {
-  ANCHOR_Y,
+  CARD_H,
+  COL_STEP,
   CARD_W,
   frDate,
   frDateShort,
@@ -10,6 +11,7 @@ import {
   layoutGraph,
   pageName,
   plansForPage,
+  shotRatio,
   scanFailed,
   shotDate,
   shotUrl,
@@ -18,6 +20,7 @@ import {
   type Snapshot,
 } from '../data'
 import { s, useHover } from '../style'
+import { useMeasure } from '../useMeasure'
 import type { Layout } from '../Terminal'
 
 /** Onglet Produit — maquette l. 85-274. */
@@ -28,7 +31,14 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
   const [selected, setSelected] = useState<string | null>(null)
   const [panel, setPanel] = useState(true)
 
-  const { placed, width, height } = layoutGraph(pages)
+  // La zone du graphe est mesurée : le nombre de cartes par rangée suit la
+  // place réelle, qui change avec la fenêtre, la barre latérale et la
+  // disposition du terminal.
+  const area = useMeasure<HTMLDivElement>()
+  const scale = layout === 'side' ? 0.82 : 1
+  const maxPerRow = area.width > 0 ? Math.max(1, Math.floor(area.width / scale / COL_STEP)) : 4
+
+  const { placed, width, height } = layoutGraph(pages, maxPerRow)
   const current = pages.find(p => p.route === selected) ?? pages[0] ?? null
   const linkCount = pages.reduce((total, page) => total + page.links.length, 0)
   const failed = scanFailed(snapshot.scans)
@@ -51,7 +61,7 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
 
   return (
     <div style={s('flex: 1; display: flex; min-width: 0; position: relative;')}>
-      <div style={s('flex: 1; padding: 20px 22px; overflow: auto; min-width: 0;')}>
+      <div ref={area.ref} style={s('flex: 1; padding: 20px 22px; overflow: auto; min-width: 0;')}>
         <div style={s('display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;')}>
           <h1 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
             Graphe de navigation
@@ -169,9 +179,12 @@ function Legend() {
 }
 
 /**
- * Arêtes orthogonales en L, comme les `<path>` dessinés à la main dans la
- * maquette (l. 109-121). Un lien qui revient vers une profondeur déjà
- * atteinte est un retour : trait pointillé gris.
+ * Arêtes orthogonales en L, dans le sens vertical.
+ *
+ * Un lien vers une profondeur plus grande descend : il sort du bas de la carte
+ * et entre par le haut de la suivante. Un lien qui remonte vers une profondeur
+ * déjà atteinte est un retour : il contourne par la droite, en pointillé gris,
+ * pour ne pas se confondre avec le flux principal.
  */
 function Edges({ placed, width, height }: { placed: Placed[]; width: number; height: number }) {
   const byRoute = new Map(placed.map(item => [item.page.route, item]))
@@ -183,18 +196,25 @@ function Edges({ placed, width, height }: { placed: Placed[]; width: number; hei
       const to = byRoute.get(link)
       if (!to || to.page.route === from.page.route) continue
 
-      const x1 = from.x + CARD_W
-      const y1 = from.y + ANCHOR_Y
-      const x2 = to.x
-      const y2 = to.y + ANCHOR_Y
-      const mid = x1 + (x2 - x1) / 2
-
-      const path =
-        to.depth > from.depth
-          ? `M ${x1} ${y1} H ${mid} V ${y2} H ${x2}`
-          : `M ${x1} ${y1} H ${x1 + 12} V ${y2} H ${x2}`
-
-      ;(to.depth > from.depth ? forward : back).push(path)
+      if (to.depth > from.depth) {
+        // Descente : bas du centre → haut du centre, avec un décrochement
+        // horizontal à mi-hauteur.
+        const x1 = from.x + CARD_W / 2
+        const y1 = from.y + CARD_H
+        const x2 = to.x + CARD_W / 2
+        const y2 = to.y
+        const mid = y1 + (y2 - y1) / 2
+        forward.push(`M ${x1} ${y1} V ${mid} H ${x2} V ${y2}`)
+      } else {
+        // Retour : sortie par le flanc droit, remontée à l'écart des cartes,
+        // entrée par le flanc droit de la cible.
+        const x1 = from.x + CARD_W
+        const y1 = from.y + CARD_H / 2
+        const x2 = to.x + CARD_W
+        const y2 = to.y + CARD_H / 2
+        const lane = Math.max(x1, x2) + 18
+        back.push(`M ${x1} ${y1} H ${lane} V ${y2} H ${x2}`)
+      }
     }
   }
 
@@ -246,7 +266,9 @@ function PageCard({
   const plans = plansForPage(snapshot.plans, page)
   const shots = snapshot.shots[page.slug] ?? []
 
-  const base = `position: absolute; left: ${x}px; top: ${y}px; width: ${CARD_W}px; padding: 11px 13px; border-radius: 8px; background: var(--color-surface); border: 1px solid var(--color-neutral-800); cursor: pointer;`
+  // Hauteur fixe : les arêtes s'ancrent sur CARD_H, une carte qui grandit avec
+  // son titre les décrocherait.
+  const base = `position: absolute; left: ${x}px; top: ${y}px; width: ${CARD_W}px; height: ${CARD_H}px; overflow: hidden; box-sizing: border-box; display: flex; flex-direction: column; padding: 11px 13px; border-radius: 8px; background: var(--color-surface); border: 1px solid var(--color-neutral-800); cursor: pointer;`
 
   return (
     <div
@@ -276,22 +298,27 @@ function PageCard({
       </div>
 
       {shots.length > 0 ? (
+        // `aspect-ratio` au rapport réel de la prise : sans lui, la vignette
+        // ne montrait qu'une bande du haut de l'écran, identique d'une page à
+        // l'autre.
         <img
           src={shotUrl(snapshot.root, page.shot)}
           alt=""
           style={s(
-            'height: 34px; width: 100%; object-fit: cover; object-position: top; border-radius: 5px; border: 1px solid var(--color-neutral-800); margin-top: 9px; display: block;',
+            `width: 100%; aspect-ratio: ${shotRatio(page)}; object-fit: cover; object-position: top; border-radius: 5px; border: 1px solid var(--color-neutral-800); margin-top: 9px; display: block;`,
           )}
         />
       ) : (
         <div
           style={s(
-            'height: 34px; border-radius: 5px; border: 1px dashed var(--color-neutral-700); margin-top: 9px; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-accent-300);',
+            `width: 100%; aspect-ratio: ${shotRatio(page)}; border-radius: 5px; border: 1px dashed var(--color-neutral-700); margin-top: 9px; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-accent-300);`,
           )}
         >
           scan échoué
         </div>
       )}
+
+      <div style={s('flex: 1;')} />
 
       <div
         style={s(
@@ -356,13 +383,13 @@ function DetailPanel({
           src={shotUrl(snapshot.root, `shots/${page.slug}/${shots[0]}`)}
           alt=""
           style={s(
-            'margin-top: 14px; border-radius: 8px; border: 1px solid var(--color-neutral-800); width: 100%; height: 176px; object-fit: cover; object-position: top; display: block;',
+            `margin-top: 14px; border-radius: 8px; border: 1px solid var(--color-neutral-800); width: 100%; aspect-ratio: ${shotRatio(page)}; object-fit: cover; object-position: top; display: block;`,
           )}
         />
       ) : (
         <div
           style={s(
-            'margin-top: 14px; border-radius: 8px; border: 1px dashed var(--color-neutral-700); height: 176px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--color-neutral-500);',
+            `margin-top: 14px; border-radius: 8px; border: 1px dashed var(--color-neutral-700); width: 100%; aspect-ratio: ${shotRatio(page)}; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--color-neutral-500);`,
           )}
         >
           aucune capture

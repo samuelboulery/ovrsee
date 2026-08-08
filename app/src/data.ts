@@ -20,7 +20,75 @@ export interface Plan {
   opened: string
   closed: string | null
   commits: Commit[]
+  /** Le plan tel qu'il a été approuvé, en markdown. */
+  body: string
 }
+
+const section = (body: string, headings: RegExp): string | null => {
+  const lines = (body ?? '').split('\n')
+  const start = lines.findIndex(line => /^#{1,4}\s/.test(line) && headings.test(line))
+  if (start === -1) return null
+
+  const rest = lines.slice(start + 1)
+  const end = rest.findIndex(line => /^#{1,4}\s/.test(line))
+  const text = (end === -1 ? rest : rest.slice(0, end)).join('\n').trim()
+  return text || null
+}
+
+/**
+ * Retire la syntaxe markdown pour un affichage en texte simple.
+ *
+ * Le corps d'un plan est du markdown écrit pour être lu par Claude ; l'afficher
+ * brut fait apparaître les astérisques et les accents graves à l'écran. On
+ * retire les marques, jamais les mots : le sens n'est pas touché.
+ */
+export function stripMarkdown(text: string): string {
+  return (text ?? '')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/^\s*[-*]\s+/gm, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+const firstParagraph = (text: string): string =>
+  text
+    .split('\n\n')
+    .map(p => p.trim())
+    .find(p => p && !p.startsWith('#') && !p.startsWith('|')) ?? ''
+
+/**
+ * L'intention derrière un plan : le « pourquoi », pas le « quoi ».
+ *
+ * Extrait de la section Contexte / Problème / Intention, et réduit à son
+ * premier paragraphe — celui qui pose le problème. On ne résume JAMAIS : un
+ * résumé généré serait exactement la documentation fausse que ce projet existe
+ * pour éviter. On coupe, ce qui est vérifiable ; on ne reformule pas.
+ */
+export function planWhy(plan: Plan): string {
+  const found = section(plan.body, /contexte|probl[eè]me|intention|pourquoi/i)
+  const raw = firstParagraph(found ?? plan.body ?? '')
+  return raw ? stripMarkdown(raw) : 'Aucune intention écrite dans ce plan.'
+}
+
+/**
+ * L'alternative explicitement écartée.
+ *
+ * C'est le critère qui distingue une décision d'une simple trace : une
+ * décision ferme une porte. Un plan sans alternative écartée n'en avait pas.
+ */
+export function planRejected(plan: Plan): string | null {
+  const found = section(plan.body, /[ée]cart|alternative|rejet|au lieu de|pourquoi pas/i)
+  const raw = found ? firstParagraph(found) || found : null
+  return raw ? stripMarkdown(raw) : null
+}
+
+/** Fichiers sources touchés par un plan, tous commits confondus. */
+export const planFiles = (plan: Plan): string[] => [
+  ...new Set(plan.commits.flatMap(commit => commit.files ?? [])),
+]
 
 export interface Page {
   route: string
@@ -46,12 +114,118 @@ export interface Project {
   name: string
 }
 
+export interface PackageJson {
+  dependencies?: Record<string, string>
+  devDependencies?: Record<string, string>
+}
+
 export interface Snapshot {
   root: string
   plans: Plan[]
-  pages: { date: string; commit: string; pages: Page[] } | null
+  packageJson: PackageJson | null
+  pages: {
+    date: string
+    commit: string
+    pages: Page[]
+    /** route demandée → route réellement affichée. Dit qu'une route est protégée. */
+    redirects?: Record<string, string>
+  } | null
   scans: Scan[]
   graph: GraphifyGraph | null
+  /** slug de page → captures successives, de la plus récente à la plus ancienne */
+  shots: Record<string, string[]>
+}
+
+/** `2026-07-18-d2f1a3.png` → `2026-07-18`. */
+export const shotDate = (file: string): string => file.slice(0, 10)
+
+/**
+ * Nom lisible d'une page.
+ *
+ * Le titre du document ne sert que s'il distingue la page des autres. Dans une
+ * application à page unique, `document.title` est souvent le même partout :
+ * l'afficher sur les huit cartes du graphe remplirait l'écran sans rien
+ * apprendre. On se rabat alors sur la route, qui, elle, distingue toujours.
+ */
+export function pageName(page: Page, pages: Page[]): string {
+  const title = page.title?.trim()
+  const distinctive = title && pages.filter(p => p.title?.trim() === title).length === 1
+  if (distinctive) return title
+
+  const segments = page.route.split('/').filter(Boolean)
+  if (segments.length === 0) return 'Accueil'
+
+  const last = segments.at(-1) as string
+  const label = last.startsWith(':') ? (segments.at(-2) ?? last) : last
+  return label.charAt(0).toUpperCase() + label.slice(1).replace(/-/g, ' ')
+}
+
+/**
+ * Disposition du graphe de navigation, en couches depuis la page d'entrée.
+ *
+ * La maquette place ses sept nœuds à la main (l. 124-208) ; ici les positions
+ * se calculent, avec la même géométrie : colonnes de 175 px, cartes de 150 px,
+ * point d'ancrage des arêtes à 66 px du haut de la carte.
+ */
+export const CARD_W = 150
+export const COL_STEP = 175
+export const ROW_STEP = 150
+export const ANCHOR_Y = 66
+
+export interface Placed {
+  page: Page
+  depth: number
+  x: number
+  y: number
+}
+
+export function layoutGraph(pages: Page[]): { placed: Placed[]; width: number; height: number } {
+  if (pages.length === 0) return { placed: [], width: 0, height: 0 }
+
+  const byRoute = new Map(pages.map(p => [p.route, p]))
+  const entry = byRoute.get('/') ?? pages[0]
+
+  // Parcours en largeur : la profondeur d'une page est sa distance à l'entrée.
+  const depth = new Map<string, number>([[entry.route, 0]])
+  const queue = [entry]
+  while (queue.length > 0) {
+    const page = queue.shift() as Page
+    for (const link of page.links) {
+      const next = byRoute.get(link)
+      if (!next || depth.has(next.route)) continue
+      depth.set(next.route, (depth.get(page.route) ?? 0) + 1)
+      queue.push(next)
+    }
+  }
+
+  // Une page qu'aucun lien n'atteint existe quand même : on la range au bout
+  // plutôt que de la faire disparaître de la carte.
+  const orphanDepth = Math.max(0, ...depth.values()) + 1
+  for (const page of pages) if (!depth.has(page.route)) depth.set(page.route, orphanDepth)
+
+  const columns = new Map<number, Page[]>()
+  for (const page of pages) {
+    const d = depth.get(page.route) ?? 0
+    columns.set(d, [...(columns.get(d) ?? []), page])
+  }
+
+  const tallest = Math.max(...[...columns.values()].map(c => c.length))
+  const placed: Placed[] = []
+
+  for (const [d, column] of [...columns.entries()].sort((a, b) => a[0] - b[0])) {
+    // Colonne centrée verticalement : le graphe reste lisible quand les
+    // colonnes ont des tailles très différentes.
+    const offset = ((tallest - column.length) * ROW_STEP) / 2
+    column.forEach((page, i) => {
+      placed.push({ page, depth: d, x: d * COL_STEP, y: offset + i * ROW_STEP })
+    })
+  }
+
+  return {
+    placed,
+    width: columns.size * COL_STEP,
+    height: tallest * ROW_STEP,
+  }
 }
 
 /**
@@ -192,6 +366,14 @@ export function frDate(date: string | null | undefined): string {
   return `${d} ${MONTHS[m - 1]} ${y}`
 }
 
+/** `2026-07-18` → `18 juil.` — le pied des cartes du graphe est étroit. */
+export function frDateShort(date: string | null | undefined): string {
+  if (!date) return '—'
+  const [, m, d] = String(date).split('-').map(Number)
+  if (!m || !d) return String(date)
+  return `${d} ${MONTHS[m - 1]}`
+}
+
 // --- lecture du graphe Graphify -------------------------------------------
 
 export interface TableRow {
@@ -264,24 +446,26 @@ export interface StackRow {
  * justification plausible serait précisément la documentation fausse que ce
  * projet existe pour éviter.
  */
-export function stackFrom(
-  packageJson: { dependencies?: Record<string, string>; devDependencies?: Record<string, string> } | null,
-  plans: Plan[],
-  planBodies: Record<string, string> = {},
-): StackRow[] {
+export function stackFrom(packageJson: PackageJson | null, plans: Plan[]): StackRow[] {
   const all = { ...(packageJson?.dependencies ?? {}), ...(packageJson?.devDependencies ?? {}) }
-  const closed = history(plans)
+
+  // Tous les plans, pas seulement les clos : un plan encore ouvert qui
+  // mentionne une dépendance en est tout autant la raison. Du plus récent au
+  // plus ancien, pour que la dernière décision l'emporte.
+  const byRecency = [...plans].sort((a, b) =>
+    (b.closed ?? b.opened ?? '').localeCompare(a.closed ?? a.opened ?? ''),
+  )
 
   return Object.entries(all).map(([name, version]) => {
-    const source = closed.find(plan =>
-      (planBodies[plan.file] ?? '').toLowerCase().includes(name.toLowerCase()),
+    const source = byRecency.find(plan =>
+      (plan.body ?? '').toLowerCase().includes(name.toLowerCase()),
     )
-    return {
-      name,
-      version,
-      why: source
-        ? `${source.title} — plan du ${frDate(source.closed)}.`
-        : 'Aucune raison tracée : ni plan, ni commentaire # WHY:.',
+    if (!source) {
+      return { name, version, why: 'Aucune raison tracée : ni plan, ni commentaire # WHY:.' }
     }
+    const when = source.closed
+      ? `plan du ${frDate(source.closed)}`
+      : `plan ouvert le ${frDate(source.opened)}`
+    return { name, version, why: `${source.title} — ${when}.` }
   })
 }

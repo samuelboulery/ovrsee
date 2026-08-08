@@ -43,6 +43,20 @@
         "package.json",
         "pnpm-lock.yaml"
       ]
+    },
+    {
+      "sha": "abee9ee",
+      "date": "2026-08-08",
+      "files": [
+        "app/src/data.ts",
+        "crawl/auth.js",
+        "crawl/index.js",
+        "crawl/routes.js",
+        "crawl/routes.test.js",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vite.config.js"
+      ]
     }
   ]
 }

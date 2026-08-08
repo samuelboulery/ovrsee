@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cockpit</title>
+    <style>
+      body { margin: 0; background: #0e0f18; }
+      a { color: var(--color-accent-300); text-decoration: none; }
+      a:hover { color: var(--color-accent-200); }
+      @keyframes blink { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
+      * { scrollbar-width: thin; scrollbar-color: #3f424d #13141f; }
+      ::-webkit-scrollbar { width: 10px; height: 10px; }
+      ::-webkit-scrollbar-track { background: #13141f; }
+      ::-webkit-scrollbar-thumb { background: #3f424d; border-radius: 5px; border: 2px solid #13141f; }
+      ::-webkit-scrollbar-thumb:hover { background: #595d6c; }
+      ::-webkit-scrollbar-corner { background: #13141f; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

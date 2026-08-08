@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, createReadStream } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, createReadStream } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, normalize } from 'node:path'
 
@@ -28,7 +28,8 @@ const projects = () => {
 /** Tout ce que l'interface doit lire pour un projet, en une réponse. */
 const snapshot = root => ({
   root,
-  plans: readPlans(join(root, 'cockpit')).map(p => ({ file: p.file, ...p.meta })),
+  plans: readPlans(join(root, 'cockpit')).map(p => ({ file: p.file, ...p.meta, body: p.body })),
+  packageJson: readJson(join(root, 'package.json')),
   pages: readJson(join(root, 'cockpit', 'pages', 'pages.json')),
   scans: (() => {
     try {
@@ -41,7 +42,27 @@ const snapshot = root => ({
     }
   })(),
   graph: readJson(join(root, 'graphify-out', 'graph.json')),
+  // Captures successives par page. C'est l'historique d'un écran : une image
+  // datée est honnête là où une phrase peut mentir sans prévenir.
+  shots: shotsByPage(root),
 })
+
+function shotsByPage(root) {
+  const base = join(root, 'cockpit', 'pages', 'shots')
+  const out = {}
+  try {
+    for (const slug of readdirSync(base)) {
+      const files = readdirSync(join(base, slug))
+        .filter(f => f.endsWith('.png'))
+        .sort()
+        .reverse()
+      if (files.length > 0) out[slug] = files
+    }
+  } catch {
+    // Aucun crawl n'a encore tourné.
+  }
+  return out
+}
 
 /**
  * Sert les données du cockpit au dev server. Pas de backend : le cockpit lit

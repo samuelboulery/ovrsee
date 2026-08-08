@@ -12,3 +12,6 @@ dist/
 # lui — les versionner ne ferait que du bruit dans les diffs.
 graphify-out/cache/
 graphify-out/graph.html
+
+# Build de l app, reconstruit a la demande.
+app/dist/

@@ -1,15 +1,80 @@
 {
   "date": "2026-08-08",
-  "commit": "a5777a4",
+  "commit": "94886c2",
   "pages": [
     {
       "route": "/",
       "slug": "accueil",
       "title": "Cockpit",
       "sample": "/",
-      "excerpt": "Cockpit — cockpit\nscan échoué · 8 août 2026 · commit 2014e6e\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nGraphe de navigation\nAucune page cartographiée. Le crawl tourne au commit — lancez-le une fois avec node crawl/index.js.\nTERMINAL · CLAUDE\nDISPOSITION\nBas\nCôté\nPl",
-      "links": [],
-      "shot": "shots/accueil/2026-08-08-a5777a4.png",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 94886c2\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nGraphe de navigation\n1 page · 0 lien · reconstruit au commit\nLIEN DIRECT\nRETOUR\nENTRÉE DE L'APP\nCockpit\n/\naucun plan\n8 août\nPAGE SÉLECTIONNÉE\nFermer\nCockpit\n/\nCo",
+      "links": [
+        "/historique",
+        "/backlog",
+        "/donnees",
+        "/stack"
+      ],
+      "shot": "shots/accueil/2026-08-08-94886c2.png",
+      "shotDate": "2026-08-08"
+    },
+    {
+      "route": "/historique",
+      "slug": "historique",
+      "title": "Cockpit",
+      "sample": "/historique",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 94886c2\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nAucun plan clos. L'historique se remplira au premier commit qui exécute un plan.\nTERMINAL · CLAUDE\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\n$ claude\n◆ Contexte lisible",
+      "links": [
+        "/",
+        "/backlog",
+        "/donnees",
+        "/stack"
+      ],
+      "shot": "shots/historique/2026-08-08-94886c2.png",
+      "shotDate": "2026-08-08"
+    },
+    {
+      "route": "/backlog",
+      "slug": "backlog",
+      "title": "Cockpit",
+      "sample": "/backlog",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 94886c2\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nPlans ouverts\nApprouvés, jamais clos par un commit. Le backlog n'est pas saisi : il est calculé.\nCockpit — plan de construction (v0.1 → v0.3)\nouvert aujourd'hui\n",
+      "links": [
+        "/",
+        "/historique",
+        "/donnees",
+        "/stack"
+      ],
+      "shot": "shots/backlog/2026-08-08-94886c2.png",
+      "shotDate": "2026-08-08"
+    },
+    {
+      "route": "/donnees",
+      "slug": "donnees",
+      "title": "Cockpit",
+      "sample": "/donnees",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 94886c2\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nTables\nlu depuis Graphify\nAucun schéma de base détecté par Graphify dans ce projet.\nCe n'est pas une panne : ce projet n'a pas de base à cartographier.\nTERMINAL ",
+      "links": [
+        "/",
+        "/historique",
+        "/backlog",
+        "/stack"
+      ],
+      "shot": "shots/donnees/2026-08-08-94886c2.png",
+      "shotDate": "2026-08-08"
+    },
+    {
+      "route": "/stack",
+      "slug": "stack",
+      "title": "Cockpit",
+      "sample": "/stack",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 94886c2\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nStack\nCe qui est utilisé, et pourquoi — chaque ligne remonte à un commentaire # WHY: ou à un plan.\n@types/react\n^19.2.18\nAucune raison tracée : ni plan, ni comme",
+      "links": [
+        "/",
+        "/historique",
+        "/backlog",
+        "/donnees"
+      ],
+      "shot": "shots/stack/2026-08-08-94886c2.png",
       "shotDate": "2026-08-08"
     }
   ],

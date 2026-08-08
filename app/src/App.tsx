@@ -19,15 +19,41 @@ import { Donnees } from './tabs/Donnees'
 import { Stack } from './tabs/Stack'
 import { Terminal, type Layout } from './Terminal'
 
+/**
+ * Chaque onglet a sa route.
+ *
+ * Ce n'est pas du confort : un crawler découvre les écrans en suivant les
+ * `<a href>`. Tant que les onglets vivaient dans un état React, Cockpit
+ * produisait une carte à une seule page de lui-même — exactement la limite
+ * relevée sur `associa`. Produit reste sur `/` : pas de redirection, donc pas
+ * de page fantôme, et la page d'entrée du graphe garde son sens.
+ */
 const TABS = [
-  ['produit', 'Produit'],
-  ['historique', 'Historique'],
-  ['backlog', 'Backlog'],
-  ['donnees', 'Données'],
-  ['stack', 'Stack'],
+  ['produit', 'Produit', '/'],
+  ['historique', 'Historique', '/historique'],
+  ['backlog', 'Backlog', '/backlog'],
+  ['donnees', 'Données', '/donnees'],
+  ['stack', 'Stack', '/stack'],
 ] as const
 
 type TabId = (typeof TABS)[number][0]
+
+const tabForPath = (pathname: string): TabId =>
+  TABS.find(([, , path]) => path === pathname)?.[0] ?? 'produit'
+
+/**
+ * Le projet courant vit dans la requête, pas dans le chemin.
+ *
+ * `pathOf()` de crawl/routes.js ignore la requête : la carte n'est donc pas
+ * multipliée par le nombre de projets. Effet secondaire utile — un
+ * rechargement de page retrouve le projet sélectionné.
+ */
+const projectFromUrl = () => new URLSearchParams(window.location.search).get('p')
+
+function pushUrl(path: string, project: string | null) {
+  const query = project ? `?p=${encodeURIComponent(project)}` : ''
+  window.history.pushState(null, '', path + query)
+}
 
 export function App() {
   const [projects, setProjects] = useState<Project[]>([])
@@ -35,15 +61,28 @@ export function App() {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const [tab, setTab] = useState<TabId>('produit')
+  const [tab, setTab] = useState<TabId>(() => tabForPath(window.location.pathname))
   const [layout, setLayout] = useState<Layout>('bottom')
   const [terminal, setTerminal] = useState(true)
+
+  // Précédent/Suivant du navigateur : l'URL fait foi, l'état la suit.
+  useEffect(() => {
+    const onPop = () => {
+      setTab(tabForPath(window.location.pathname))
+      setCurrent(projectFromUrl())
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
 
   useEffect(() => {
     fetchProjects()
       .then(list => {
         setProjects(list)
-        setCurrent(list[0]?.path ?? null)
+        // Le projet demandé par l'URL l'emporte, s'il existe encore.
+        const asked = projectFromUrl()
+        const known = list.find(p => p.path === asked)?.path
+        setCurrent(known ?? list[0]?.path ?? null)
       })
       .catch(err => setError(String(err.message ?? err)))
   }, [])
@@ -98,7 +137,10 @@ export function App() {
           <Sidebar
             projects={projects}
             current={current}
-            onPick={setCurrent}
+            onPick={path => {
+              setCurrent(path)
+              pushUrl(window.location.pathname, path)
+            }}
             density={density(plans)}
           />
 
@@ -109,23 +151,34 @@ export function App() {
                 'height: 44px; flex: none; display: flex; align-items: stretch; gap: 2px; padding: 0 12px; border-bottom: 1px solid var(--color-divider); background: #171927;',
               )}
             >
-              {TABS.map(([id, label]) => (
-                <button
+              {TABS.map(([id, label, path]) => (
+                // Un vrai lien, pas un bouton : c'est ce que lit
+                // `page.$$eval('a[href]')` dans crawl/index.js. Le href doit
+                // exister pour que l'onglet soit découvrable.
+                <a
                   key={id}
-                  type="button"
-                  onClick={() => {
+                  href={path}
+                  onClick={event => {
+                    // Laisser passer cmd-clic, ctrl-clic et clic molette :
+                    // ouvrir un onglet dans une nouvelle fenêtre reste possible.
+                    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
+                    event.preventDefault()
                     setTab(id)
                     setLayout(l => (l === 'full' ? 'bottom' : l))
+                    pushUrl(path, current)
                   }}
                   style={s(
-                    'background: transparent; border: 0; cursor: pointer; font-family: var(--font-body); font-size: 13px; padding: 0 14px; letter-spacing: .01em; ' +
+                    // `display: flex; align-items: center; text-decoration: none`
+                    // rattrape la mise en forme par défaut d'un lien ; le reste
+                    // est copié de la maquette l. 75-79.
+                    'display: flex; align-items: center; text-decoration: none; background: transparent; border: 0; cursor: pointer; font-family: var(--font-body); font-size: 13px; padding: 0 14px; letter-spacing: .01em; ' +
                       (tab === id
                         ? 'color: var(--color-text); box-shadow: inset 0 -2px 0 var(--color-accent);'
                         : 'color: var(--color-neutral-500);'),
                   )}
                 >
                   {label}
-                </button>
+                </a>
               ))}
             </div>
 

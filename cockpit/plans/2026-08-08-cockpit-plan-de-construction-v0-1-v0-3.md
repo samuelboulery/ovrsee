@@ -95,6 +95,19 @@
         "app/src/tabs/Produit.tsx",
         "crawl/index.js"
       ]
+    },
+    {
+      "sha": "94886c2",
+      "date": "2026-08-08",
+      "files": [
+        "README.md",
+        "cockpit.config.json",
+        "hooks/brief.js",
+        "hooks/brief.test.js",
+        "hooks/cockpit-session-start.js",
+        "hooks/install.js",
+        "package.json"
+      ]
     }
   ]
 }

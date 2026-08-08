@@ -72,7 +72,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L9",
       "id": "support_getreact",
-      "community": 5,
+      "community": 10,
       "norm_label": "getreact()"
     },
     {
@@ -90,7 +90,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L24",
       "id": "support_parsedcdocument",
-      "community": 10,
+      "community": 5,
       "norm_label": "parsedcdocument()"
     },
     {
@@ -99,7 +99,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L38",
       "id": "support_parsedctext",
-      "community": 10,
+      "community": 5,
       "norm_label": "parsedctext()"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L56",
       "id": "support_parsedataprops",
-      "community": 10,
+      "community": 5,
       "norm_label": "parsedataprops()"
     },
     {
@@ -441,7 +441,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L842",
       "id": "support_evaldclogic",
-      "community": 5,
+      "community": 10,
       "norm_label": "evaldclogic()"
     },
     {
@@ -477,7 +477,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L888",
       "id": "support_createcomponentfactory",
-      "community": 5,
+      "community": 10,
       "norm_label": "createcomponentfactory()"
     },
     {
@@ -3549,8 +3549,8 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Backlog.tsx",
       "source_location": "L33",
       "weight": 1.0,
-      "_src": "backlog_s",
-      "_tgt": "data_planwhy",
+      "_src": "data_planwhy",
+      "_tgt": "backlog_s",
       "source": "data_planwhy",
       "target": "backlog_s"
     },
@@ -3561,8 +3561,8 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Produit.tsx",
       "source_location": "L269",
       "weight": 1.0,
-      "_src": "produit_s",
-      "_tgt": "data_pagename",
+      "_src": "data_pagename",
+      "_tgt": "produit_s",
       "source": "data_pagename",
       "target": "produit_s"
     },

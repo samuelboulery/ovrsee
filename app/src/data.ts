@@ -129,6 +129,8 @@ export interface Snapshot {
     pages: Page[]
     /** route demandée → route réellement affichée. Dit qu'une route est protégée. */
     redirects?: Record<string, string>
+    /** dossiers de captures ne correspondant à aucune page du scan courant */
+    orphanShots?: string[]
   } | null
   scans: Scan[]
   graph: GraphifyGraph | null

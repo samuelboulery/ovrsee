@@ -274,6 +274,26 @@ export function retainable(files, now = new Date()) {
   return keep
 }
 
+/**
+ * Dossiers de captures qui ne correspondent à aucune page du scan courant.
+ *
+ * Deux causes, indiscernables de l'extérieur : une page a disparu de
+ * l'application, ou un scan antérieur a mal nommé sa route. Dans les deux cas
+ * ce sont des images qu'un lecteur prendrait pour des écrans actuels.
+ *
+ * On les signale, on ne les supprime PAS : effacer serait irréversible, et une
+ * capture d'une page réellement supprimée reste un morceau d'histoire. Le
+ * cockpit dit ce qu'il sait — « ces images ne correspondent à rien d'actuel » —
+ * et laisse l'arbitrage à celui qui peut le faire.
+ */
+function orphanShots(knownSlugs) {
+  try {
+    return readdirSync(shotsDir).filter(slug => !knownSlugs.includes(slug))
+  } catch {
+    return []
+  }
+}
+
 function pruneShots(dir) {
   const files = readdirSync(dir).filter(f => f.endsWith('.png'))
   const keep = retainable(files)
@@ -342,10 +362,18 @@ async function run() {
       Object.entries(redirects).map(([from, to]) => [routeOf(from), routeOf(to)]),
     )
 
+    const orphans = orphanShots([...pages.values()].map(p => p.slug))
+    if (orphans.length > 0) {
+      log(`${orphans.length} dossier(s) de captures sans page correspondante : ${orphans.join(', ')}`)
+    }
+
     writeFileNoFollow(
       join(pagesDir, 'pages.json'),
-      JSON.stringify({ date, commit, pages: [...pages.values()], redirects: redirectRoutes }, null, 2) +
-        '\n',
+      JSON.stringify(
+        { date, commit, pages: [...pages.values()], redirects: redirectRoutes, orphanShots: orphans },
+        null,
+        2,
+      ) + '\n',
     )
     recordScan({ date, commit, ok: true, pages: pages.size })
     log(`${pages.size} page(s) écrite(s) dans cockpit/pages/pages.json`)

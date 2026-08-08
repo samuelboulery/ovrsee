@@ -24,6 +24,7 @@ import type { Layout } from '../Terminal'
 export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layout }) {
   const pages = snapshot.pages?.pages ?? []
   const redirects = snapshot.pages?.redirects ?? {}
+  const orphans = snapshot.pages?.orphanShots ?? []
   const [selected, setSelected] = useState<string | null>(null)
   const [panel, setPanel] = useState(true)
 
@@ -106,6 +107,7 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
         </div>
 
         {Object.keys(redirects).length > 0 && <Redirects redirects={redirects} />}
+        {orphans.length > 0 && <Orphans slugs={orphans} />}
       </div>
 
       {panel && current ? (
@@ -449,6 +451,29 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 const Empty = ({ text }: { text: string }) => (
   <div style={s('font-size: 11px; color: var(--color-neutral-600);')}>{text}</div>
 )
+
+/**
+ * Captures qui ne correspondent à aucune page actuelle. Les taire les ferait
+ * passer pour des écrans du produit auprès de qui ouvre le dossier.
+ */
+function Orphans({ slugs }: { slugs: string[] }) {
+  return (
+    <div style={s('margin-top: 22px;')}>
+      <div
+        style={s(
+          'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 8px;',
+        )}
+      >
+        Captures sans page correspondante
+      </div>
+      <div style={s('font-size: 11px; color: var(--color-neutral-600); line-height: 1.5; max-width: 62ch;')}>
+        {slugs.join(', ')} — ces images viennent d'un scan antérieur. Soit la page a disparu de
+        l'application, soit un scan plus ancien a mal nommé sa route. Le cockpit ne les supprime pas :
+        il ne peut pas trancher, et effacer serait irréversible.
+      </div>
+    </div>
+  )
+}
 
 /** Une route qui redirige existe et est protégée : c'est une information. */
 function Redirects({ redirects }: { redirects: Record<string, string> }) {

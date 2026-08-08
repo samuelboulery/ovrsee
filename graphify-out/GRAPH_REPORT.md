@@ -1,7 +1,7 @@
 # Graph Report - /Users/sam/code/cockpit  (2026-08-08)
 
 ## Corpus Check
-- 27 files · ~48,051 words
+- 27 files · ~50,008 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -54,8 +54,8 @@
 ## Surprising Connections (you probably didn't know these)
 - `snapshot()` --calls--> `readPlans()`  [INFERRED]
   /Users/sam/code/cockpit/vite.config.js → /Users/sam/code/cockpit/hooks/plans.js
-- `s()` --calls--> `planWhy()`  [INFERRED]
-  /Users/sam/code/cockpit/app/src/tabs/Backlog.tsx → /Users/sam/code/cockpit/app/src/data.ts
+- `planWhy()` --calls--> `s()`  [INFERRED]
+  /Users/sam/code/cockpit/app/src/data.ts → /Users/sam/code/cockpit/app/src/tabs/Backlog.tsx
 - `main()` --calls--> `log()`  [INFERRED]
   /Users/sam/code/cockpit/crawl/auth.js → /Users/sam/code/cockpit/crawl/index.js
 - `run()` --calls--> `pageSlug()`  [INFERRED]
@@ -87,7 +87,7 @@ Nodes (13): collectProps(), compileAttr(), contentKey(), isDeckMountTag(), walk(
 
 ### Community 5 - "Community 5"
 Cohesion: 0.25
-Nodes (8): boot(), createComponentFactory(), dcNameFromPath(), evalDcLogic(), getReact(), getReactDOM(), rootNameForDocument(), safeDecode()
+Nodes (8): boot(), dcNameFromPath(), getReactDOM(), parseDataProps(), parseDcDocument(), parseDcText(), rootNameForDocument(), safeDecode()
 
 ### Community 6 - "Community 6"
 Cohesion: 0.29
@@ -107,7 +107,7 @@ Nodes (4): attachCommit(), changedFiles(), git(), isSafePlanFileName()
 
 ### Community 10 - "Community 10"
 Cohesion: 0.67
-Nodes (3): parseDataProps(), parseDcDocument(), parseDcText()
+Nodes (3): createComponentFactory(), evalDcLogic(), getReact()
 
 ### Community 11 - "Community 11"
 Cohesion: 0.67

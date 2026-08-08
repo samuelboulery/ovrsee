@@ -78,6 +78,14 @@
         "tsconfig.json",
         "vite.config.js"
       ]
+    },
+    {
+      "sha": "3ca38af",
+      "date": "2026-08-08",
+      "files": [
+        "README.md",
+        "package.json"
+      ]
     }
   ]
 }

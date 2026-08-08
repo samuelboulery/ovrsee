@@ -1,12 +1,12 @@
 # Graph Report - /Users/sam/code/cockpit  (2026-08-08)
 
 ## Corpus Check
-- 30 files · ~54,728 words
+- 30 files · ~74,773 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 190 nodes · 289 edges · 30 communities detected
-- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 19 edges (avg confidence: 0.8)
+- 194 nodes · 295 edges · 30 communities detected
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 19 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -93,47 +93,47 @@ Nodes (8): age(), buildBrief(), closedPlans(), frDate(), intention(), openPlans(
 
 ### Community 6 - "Community 6"
 Cohesion: 0.25
-Nodes (8): boot(), createComponentFactory(), dcNameFromPath(), evalDcLogic(), getReact(), getReactDOM(), rootNameForDocument(), safeDecode()
+Nodes (8): boot(), createComponentFactory(), evalDcLogic(), getReact(), getReactDOM(), parseDataProps(), parseDcDocument(), parseDcText()
 
 ### Community 7 - "Community 7"
 Cohesion: 0.29
-Nodes (7): createExternalModules(), createHelmetManager(), createPseudoSheet(), createRegistry(), createRuntime(), createStreamTracker(), init()
+Nodes (7): cdnScriptFor(), findTopLevelEquality(), loadReactUmd(), loadScript(), parensWrapWhole(), resolve(), resolvePath()
 
 ### Community 8 - "Community 8"
 Cohesion: 0.29
-Nodes (7): cdnScriptFor(), findTopLevelEquality(), loadReactUmd(), loadScript(), parensWrapWhole(), resolve(), resolvePath()
+Nodes (7): createExternalModules(), createHelmetManager(), createPseudoSheet(), createRegistry(), createRuntime(), createStreamTracker(), init()
 
 ### Community 9 - "Community 9"
+Cohesion: 0.47
+Nodes (3): onPop(), projectFromUrl(), tabForPath()
+
+### Community 10 - "Community 10"
 Cohesion: 0.53
 Nodes (4): projects(), readJson(), shotsByPage(), snapshot()
 
-### Community 10 - "Community 10"
+### Community 11 - "Community 11"
 Cohesion: 0.5
 Nodes (2): backlog(), s()
 
-### Community 11 - "Community 11"
-Cohesion: 0.67
-Nodes (3): parseDataProps(), parseDcDocument(), parseDcText()
-
 ### Community 12 - "Community 12"
-Cohesion: 1.0
-Nodes (3): importantify(), scanUnquotedUrl(), stripComments()
-
-### Community 13 - "Community 13"
 Cohesion: 0.67
 Nodes (3): compileTemplate(), encodeCamelAttrs(), encodeCase()
 
+### Community 13 - "Community 13"
+Cohesion: 0.67
+Nodes (3): dcNameFromPath(), rootNameForDocument(), safeDecode()
+
 ### Community 14 - "Community 14"
+Cohesion: 1.0
+Nodes (3): importantify(), scanUnquotedUrl(), stripComments()
+
+### Community 15 - "Community 15"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 15 - "Community 15"
-Cohesion: 1.0
-Nodes (2): assertIgnored(), main()
-
 ### Community 16 - "Community 16"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (2): assertIgnored(), main()
 
 ### Community 17 - "Community 17"
 Cohesion: 1.0
@@ -188,8 +188,6 @@ Cohesion: 1.0
 Nodes (0): 
 
 ## Knowledge Gaps
-- **Thin community `Community 16`** (2 nodes): `s()`, `App.tsx`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 17`** (2 nodes): `confStyle()`, `Donnees.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 18`** (2 nodes): `shot()`, `retention.test.js`
@@ -221,11 +219,11 @@ Nodes (0):
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `run()` connect `Community 2` to `Community 1`?**
-  _High betweenness centrality (0.076) - this node is a cross-community bridge._
+  _High betweenness centrality (0.073) - this node is a cross-community bridge._
 - **Why does `writeFileNoFollow()` connect `Community 1` to `Community 2`?**
-  _High betweenness centrality (0.071) - this node is a cross-community bridge._
-- **Why does `readPlans()` connect `Community 1` to `Community 9`, `Community 5`?**
-  _High betweenness centrality (0.052) - this node is a cross-community bridge._
+  _High betweenness centrality (0.068) - this node is a cross-community bridge._
+- **Why does `readPlans()` connect `Community 1` to `Community 10`, `Community 5`?**
+  _High betweenness centrality (0.049) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `run()` (e.g. with `normalizeRoutes()` and `pageSlug()`) actually correct?**
   _`run()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 3 inferred relationships involving `main()` (e.g. with `planFileName()` and `writeFileNoFollow()`) actually correct?**

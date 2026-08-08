@@ -1,20 +1,20 @@
 {
   "date": "2026-08-08",
-  "commit": "94886c2",
+  "commit": "6dcfba6",
   "pages": [
     {
       "route": "/",
       "slug": "accueil",
       "title": "Cockpit",
       "sample": "/",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 94886c2\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nGraphe de navigation\n1 page · 0 lien · reconstruit au commit\nLIEN DIRECT\nRETOUR\nENTRÉE DE L'APP\nCockpit\n/\naucun plan\n8 août\nPAGE SÉLECTIONNÉE\nFermer\nCockpit\n/\nCo",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 94886c2\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nGraphe de navigation\n5 pages · 20 liens · reconstruit au commit\nLIEN DIRECT\nRETOUR\nENTRÉE DE L'APP\nAccueil\n/\naucun plan\n8 août\nHistorique\n/historique\naucun plan\n",
       "links": [
         "/historique",
         "/backlog",
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/accueil/2026-08-08-94886c2.png",
+      "shot": "shots/accueil/2026-08-08-6dcfba6.png",
       "shotDate": "2026-08-08"
     },
     {
@@ -29,7 +29,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/historique/2026-08-08-94886c2.png",
+      "shot": "shots/historique/2026-08-08-6dcfba6.png",
       "shotDate": "2026-08-08"
     },
     {
@@ -44,7 +44,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/backlog/2026-08-08-94886c2.png",
+      "shot": "shots/backlog/2026-08-08-6dcfba6.png",
       "shotDate": "2026-08-08"
     },
     {
@@ -59,7 +59,7 @@
         "/backlog",
         "/stack"
       ],
-      "shot": "shots/donnees/2026-08-08-94886c2.png",
+      "shot": "shots/donnees/2026-08-08-6dcfba6.png",
       "shotDate": "2026-08-08"
     },
     {
@@ -74,7 +74,7 @@
         "/backlog",
         "/donnees"
       ],
-      "shot": "shots/stack/2026-08-08-94886c2.png",
+      "shot": "shots/stack/2026-08-08-6dcfba6.png",
       "shotDate": "2026-08-08"
     }
   ],

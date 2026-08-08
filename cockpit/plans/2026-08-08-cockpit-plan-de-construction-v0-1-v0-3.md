@@ -108,6 +108,13 @@
         "hooks/install.js",
         "package.json"
       ]
+    },
+    {
+      "sha": "6dcfba6",
+      "date": "2026-08-08",
+      "files": [
+        "app/src/App.tsx"
+      ]
     }
   ]
 }

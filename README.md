@@ -3,7 +3,7 @@
 Une vue en lecture seule sur un projet développé en vibecoding : ce qui a été fait,
 pourquoi, ce qui reste ouvert, et à quoi l'application ressemblait à chaque commit.
 
-**Le cockpit lit, il n'exécute jamais.** La vérité vit dans `<repo>/cockpit/`, en
+**Le cockpit lit ; il n'exécute que le terminal qu'on lui demande.** La vérité vit dans `<repo>/cockpit/`, en
 markdown et en images, versionnée par git. L'application n'est qu'une vue : si elle
 disparaît, rien n'est perdu.
 
@@ -33,6 +33,12 @@ pnpm package                            # DMG dans release/
 Le terminal intégré n'existe que dans l'application : il passe par IPC, qu'un
 navigateur n'a pas. C'est délibéré — l'exposer par une socket locale
 l'ouvrirait à tout processus tournant sous le même compte.
+
+C'est un terminal complet : le pty ouvre un shell de connexion et y lance
+`claude`. Quitter Claude laisse le shell, on peut y taper autre chose. Le shell
+de connexion n'est pas un confort : sans lui, une application lancée depuis le
+Finder n'a qu'un PATH minimal, et les hooks de Claude Code échouent sur
+`node: command not found`.
 
 Les deux hooks Claude Code (affichés par `cockpit:install`) ferment la boucle :
 l'un capture chaque plan approuvé, l'autre réinjecte l'état du projet au

@@ -1,60 +1,65 @@
 /**
  * Sessions de terminal.
  *
- * **Le programme lancé est décidé ici, jamais par le rendu.** La surface
- * exposée dans `preload.js` accepte un chemin de projet et rien d'autre : il
- * n'existe aucun chemin de code par lequel l'interface pourrait faire exécuter
- * un programme arbitraire. C'est la traduction du principe du cadrage — le
- * cockpit n'exécute jamais, sauf la session Claude elle-même.
+ * Le panneau est un vrai terminal : le pty ouvre un **shell de connexion**,
+ * puis le cockpit y tape `claude` une fois. Quitter Claude rend la main au
+ * shell au lieu de tuer le panneau.
+ *
+ * Le shell de connexion n'est pas un confort, c'est la condition pour que ça
+ * marche : une application graphique lancée depuis le Finder hérite d'un PATH
+ * minimal, où ni `claude` ni `node` n'existent — les hooks de Claude Code
+ * échouaient sur `/bin/sh: node: command not found`. Le shell source
+ * `~/.zprofile` / `~/.zshrc` et reconstruit le vrai environnement.
+ *
+ * La surface exposée dans `preload.cjs` n'accepte toujours aucun nom de
+ * programme : elle prend un chemin de projet, et c'est ici que le shell est
+ * choisi. Ce que l'utilisateur tape ensuite dans le terminal le regarde — comme
+ * dans Terminal.app.
  */
 
 import { spawn } from 'node-pty'
-import { execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import { homedir } from 'node:os'
 import { join } from 'node:path'
 
-/** Le seul programme que ce module sait lancer. */
-const PROGRAM = 'claude'
+/** Tapé une fois par session, dans le shell qui vient de s'ouvrir. */
+const STARTUP_COMMAND = 'claude\n'
+
+const FALLBACK_SHELL = '/bin/zsh'
+
+/** Shell de connexion de l'utilisateur, ou zsh. */
+function loginShell() {
+  const shell = process.env.SHELL
+  return typeof shell === 'string' && existsSync(shell) ? shell : FALLBACK_SHELL
+}
 
 /**
- * Emplacements habituels, essayés avant de déranger un shell.
- * Une application graphique lancée depuis le Finder n'hérite pas du PATH du
- * terminal : `claude` y est introuvable alors qu'il fonctionne parfaitement
- * dans un shell. C'est la cause du `posix_spawnp failed`.
- */
-const CANDIDATES = [
-  join(homedir(), '.local', 'bin', PROGRAM),
-  `/opt/homebrew/bin/${PROGRAM}`,
-  `/usr/local/bin/${PROGRAM}`,
-]
-
-let resolved = null
-
-/**
- * Chemin absolu du binaire, ou null.
+ * Environnement du shell.
  *
- * Résolu une seule fois, au premier besoin. Le recours au shell de connexion
- * est un appel sans aucune entrée extérieure : la commande est écrite ici en
- * dur, rien de ce que fournit le rendu ne l'atteint.
+ * Trois nettoyages, tous pour la même raison — ce qui traîne dans
+ * l'environnement du cockpit n'a rien à faire dans une session Claude neuve :
+ *
+ * - `ELECTRON_RUN_AS_NODE` et `NODE_OPTIONS` : posés par Electron, ils cassent
+ *   tout `node` lancé depuis le terminal.
+ * - `CLAUDE*` : si le cockpit a lui-même été lancé depuis une session Claude
+ *   Code, il en hérite les marqueurs (`CLAUDE_CODE_CHILD_SESSION`,
+ *   `CLAUDE_CODE_SESSION_ID`, `CLAUDE_CODE_MESSAGING_SOCKET`…). La session du
+ *   panneau se croit alors fille d'une autre et cesse d'enregistrer son
+ *   transcript. Le shell de connexion réexporte ce que l'utilisateur met dans
+ *   son `~/.zshrc` : seuls les marqueurs de session disparaissent.
+ * - `LANG` manque souvent aux applications graphiques, et sans lui les cadres
+ *   dessinés par Claude sortent en charabia.
  */
-function findProgram() {
-  if (resolved !== null) return resolved
-
-  resolved = CANDIDATES.find(existsSync) ?? null
-  if (resolved) return resolved
-
-  try {
-    const found = execFileSync('/bin/zsh', ['-lic', `command -v ${PROGRAM}`], {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-      timeout: 5000,
-    }).trim()
-    resolved = found && existsSync(found) ? found : null
-  } catch {
-    resolved = null
+function sessionEnv() {
+  const { ELECTRON_RUN_AS_NODE, NODE_OPTIONS, ...rest } = process.env
+  const env = Object.fromEntries(
+    Object.entries(rest).filter(([key]) => !key.startsWith('CLAUDE')),
+  )
+  return {
+    ...env,
+    TERM: 'xterm-256color',
+    COLORTERM: 'truecolor',
+    LANG: process.env.LANG ?? 'fr_FR.UTF-8',
   }
-  return resolved
 }
 
 /** @type {Map<string, {pty: import('node-pty').IPty, project: string}>} */
@@ -76,31 +81,34 @@ export function openSession(sender, projectPath) {
     return { error: "ce dossier n'est pas un projet suivi par le cockpit" }
   }
 
-  const program = findProgram()
-  if (!program) {
-    return {
-      error: `${PROGRAM} introuvable. Cherché dans ${CANDIDATES.join(', ')} puis dans le PATH du shell de connexion.`,
-    }
-  }
-
+  const shell = loginShell()
   const id = `pty-${++counter}`
 
   let pty
   try {
-    pty = spawn(program, [], {
-      name: 'xterm-color',
+    pty = spawn(shell, ['-l'], {
+      // C'est `name` qui pose `TERM`, pas l'environnement : le laisser à
+      // `xterm-color` limiterait le terminal à huit couleurs.
+      name: 'xterm-256color',
       cols: 80,
       rows: 24,
       cwd: projectPath,
-      env: { ...process.env, TERM: 'xterm-256color' },
+      env: sessionEnv(),
     })
   } catch (err) {
-    // `claude` absent du PATH, par exemple. Le dire vaut mieux qu'un panneau
-    // muet.
-    return { error: `impossible de lancer ${PROGRAM} : ${err?.message ?? err}` }
+    // Le dire vaut mieux qu'un panneau muet.
+    return { error: `impossible d'ouvrir un shell (${shell}) : ${err?.message ?? err}` }
   }
 
+  // `claude` est tapé au premier signe de vie du shell, pas avant : écrit trop
+  // tôt, un prompt élaboré (instant prompt, autosuggestions) avale la ligne.
+  let primed = false
+
   pty.onData(data => {
+    if (!primed) {
+      primed = true
+      pty.write(STARTUP_COMMAND)
+    }
     if (!sender.isDestroyed()) sender.send('pty:data', id, data)
   })
   pty.onExit(({ exitCode }) => {

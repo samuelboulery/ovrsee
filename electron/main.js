@@ -57,7 +57,29 @@ async function serveUi(pathname) {
 
   try {
     return new Response(await readFile(target), {
-      headers: { 'Content-Type': MIME[extname(target)] ?? 'application/octet-stream' },
+      headers: {
+        'Content-Type': MIME[extname(target)] ?? 'application/octet-stream',
+        // Le rendu ne charge que ses propres ressources. `unsafe-inline` pour
+        // les styles est nécessaire : toute la mise en forme du port est en
+        // attributs `style`, copiés de la maquette. Aucune source distante
+        // n'est autorisée, et le schéma n'est pas joignable de l'extérieur.
+        'Content-Security-Policy': [
+          "default-src 'self'",
+          "script-src 'self'",
+          // `unsafe-inline` pour les styles est nécessaire : toute la mise en
+          // forme du port est en attributs `style`, copiés de la maquette.
+          // Les deux origines Google servent la police Inter, importée par le
+          // design system Nocturne. Aucun script distant n'est autorisé.
+          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+          'font-src https://fonts.gstatic.com',
+          "img-src 'self' data:",
+          "connect-src 'self'",
+          "object-src 'none'",
+          "base-uri 'none'",
+          "frame-ancestors 'none'",
+        ].join('; '),
+        'X-Content-Type-Options': 'nosniff',
+      },
     })
   } catch {
     return new Response('introuvable', { status: 404 })
@@ -82,6 +104,18 @@ function createWindow() {
       nodeIntegration: false,
       sandbox: true,
     },
+  })
+
+  // Les erreurs du rendu remontent sur la sortie du processus principal.
+  // Sans cela, une exception dans l'interface ne se manifeste que par une
+  // fenêtre vide, sans le moindre indice.
+  window.webContents.on('console-message', event => {
+    if (event.level === 'error' || event.level === 'warning') {
+      process.stderr.write(`[rendu] ${event.message} (${event.sourceId}:${event.lineNumber})\n`)
+    }
+  })
+  window.webContents.on('render-process-gone', (_event, details) => {
+    process.stderr.write(`[rendu] processus perdu : ${details.reason}\n`)
   })
 
   // Un lien externe s'ouvre dans le navigateur, jamais dans la fenêtre : le

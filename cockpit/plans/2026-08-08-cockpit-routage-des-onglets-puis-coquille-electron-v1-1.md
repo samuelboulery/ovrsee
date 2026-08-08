@@ -45,6 +45,17 @@
         "electron-builder.yml",
         "package.json"
       ]
+    },
+    {
+      "sha": "2654b64",
+      "date": "2026-08-08",
+      "files": [
+        "app/src/data.ts",
+        "app/src/tabs/Produit.tsx",
+        "app/src/useMeasure.ts",
+        "crawl/index.js",
+        "hooks/install.js"
+      ]
     }
   ]
 }

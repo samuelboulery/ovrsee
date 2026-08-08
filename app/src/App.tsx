@@ -18,6 +18,7 @@ import { Backlog } from './tabs/Backlog'
 import { Donnees } from './tabs/Donnees'
 import { Stack } from './tabs/Stack'
 import { Terminal, type Layout } from './Terminal'
+import { Divider, useResizable } from './useResizable'
 
 /**
  * Chaque onglet a sa route.
@@ -64,6 +65,14 @@ export function App() {
   const [tab, setTab] = useState<TabId>(() => tabForPath(window.location.pathname))
   const [layout, setLayout] = useState<Layout>('bottom')
   const [terminal, setTerminal] = useState(true)
+
+  const sidebar = useResizable({
+    key: 'sidebar',
+    initial: 236,
+    min: 180,
+    max: 420,
+    axis: 'x',
+  })
 
   // Précédent/Suivant du navigateur : l'URL fait foi, l'état la suit.
   useEffect(() => {
@@ -132,12 +141,14 @@ export function App() {
           <Sidebar
             projects={projects}
             current={current}
+            width={sidebar.size}
             onPick={path => {
               setCurrent(path)
               pushUrl(window.location.pathname, path)
             }}
             density={density(plans)}
           />
+          <Divider axis="x" resizable={sidebar} />
 
           <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0;')}>
             {/* Onglets — maquette l. 75-79 */}
@@ -282,11 +293,13 @@ function Message({ text }: { text: string }) {
 function Sidebar({
   projects,
   current,
+  width,
   onPick,
   density: bars,
 }: {
   projects: Project[]
   current: string | null
+  width: number
   onPick: (path: string) => void
   density: number[]
 }) {
@@ -295,7 +308,7 @@ function Sidebar({
   return (
     <div
       style={s(
-        'width: 236px; flex: none; display: flex; flex-direction: column; background: #13141f; border-right: 1px solid var(--color-divider); padding: 14px 0;',
+        `width: ${width}px; flex: none; display: flex; flex-direction: column; background: #13141f; border-right: 1px solid var(--color-divider); padding: 14px 0;`,
       )}
     >
       <div

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { backlog, frDate, lastScan, type Snapshot } from './data'
 import { s } from './style'
 import { useTerminal } from './useTerminal'
+import { Divider, useResizable } from './useResizable'
 
 export type Layout = 'bottom' | 'side' | 'full'
 
@@ -12,25 +13,33 @@ const LAYOUTS: Array<[Layout, string]> = [
   ['full', 'Plein'],
 ]
 
-const PANEL: Record<Layout, string> = {
-  bottom:
-    'height: 244px; flex: none; border-top: 1px solid var(--color-divider); background: #101120; display: flex; flex-direction: column; min-height: 0;',
-  side: 'width: 468px; flex: none; border-left: 1px solid var(--color-divider); background: #101120; display: flex; flex-direction: column; min-height: 0;',
-  full: 'flex: 1; background: #101120; display: flex; flex-direction: column; min-height: 0; min-width: 0;',
+/**
+ * Le panneau se dimensionne selon sa disposition.
+ *
+ * « Plein » n'a pas de taille propre : il prend tout. Les deux autres ont leur
+ * séparateur, avec une clé de conservation distincte — une hauteur de 244 px
+ * et une largeur de 468 px ne se mélangent pas.
+ */
+const panelStyle = (layout: Layout, size: number): string => {
+  if (layout === 'full') {
+    return 'flex: 1; background: #101120; display: flex; flex-direction: column; min-height: 0; min-width: 0;'
+  }
+  if (layout === 'side') {
+    return `width: ${size}px; flex: none; border-left: 1px solid var(--color-divider); background: #101120; display: flex; flex-direction: column; min-height: 0;`
+  }
+  return `height: ${size}px; flex: none; border-top: 1px solid var(--color-divider); background: #101120; display: flex; flex-direction: column; min-height: 0;`
 }
 
 /**
  * Panneau terminal — maquette l. 374-418.
  *
- * La disposition et les trois modes sont portés à l'identique, mais le
- * terminal n'est pas branché : xterm.js et le pseudo-terminal arrivent en v1.1,
- * volontairement en dernier parce que c'est la seule brique qui ne produit
- * aucune donnée.
+ * Une vraie session `claude` tourne derrière, par IPC, dans le dossier du
+ * projet sélectionné ; les boutons d'injection y écrivent.
  *
- * En attendant, les boutons d'injection copient le contexte dans le
- * presse-papier. Un bouton qui prétend écrire dans une session inexistante
- * serait un mensonge d'interface ; un bouton qui copie fait vraiment ce qu'il
- * annonce.
+ * Dans un navigateur il n'y a pas d'IPC, donc pas de session : le panneau le
+ * dit et les boutons se rabattent sur le presse-papier. Un bouton qui
+ * prétendrait écrire dans une session inexistante serait un mensonge
+ * d'interface ; un bouton qui copie fait ce qu'il annonce.
  */
 export function Terminal({
   layout,
@@ -45,6 +54,27 @@ export function Terminal({
 }) {
   const [notice, setNotice] = useState<string | null>(null)
   const { host, error, inject, available } = useTerminal(snapshot?.root ?? null)
+
+  // Tirer vers le haut agrandit le panneau du bas ; tirer vers la gauche
+  // agrandit celui du côté. D'où `invert` dans les deux cas.
+  const height = useResizable({
+    key: 'terminal.bottom',
+    initial: 244,
+    min: 120,
+    max: () => window.innerHeight * 0.7,
+    axis: 'y',
+    invert: true,
+  })
+  const widthSide = useResizable({
+    key: 'terminal.side',
+    initial: 468,
+    min: 320,
+    max: () => window.innerWidth * 0.7,
+    axis: 'x',
+    invert: true,
+  })
+
+  const sizing = layout === 'side' ? widthSide : height
 
   /**
    * Un clic injecte dans la session quand elle existe, et copie sinon.
@@ -70,7 +100,9 @@ export function Terminal({
   const injections = buildInjections(snapshot)
 
   return (
-    <div style={s(PANEL[layout])}>
+    <>
+      {layout !== 'full' && <Divider axis={layout === 'side' ? 'x' : 'y'} resizable={sizing} />}
+      <div style={s(panelStyle(layout, sizing.size))}>
       <div
         style={s(
           'height: 34px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid var(--color-divider);',
@@ -201,7 +233,8 @@ export function Terminal({
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

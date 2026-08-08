@@ -20,6 +20,7 @@ import {
   type Snapshot,
 } from '../data'
 import { s, useHover } from '../style'
+import { Divider, useResizable } from '../useResizable'
 import { useMeasure } from '../useMeasure'
 import type { Layout } from '../Terminal'
 
@@ -30,6 +31,16 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
   const orphans = snapshot.pages?.orphanShots ?? []
   const [selected, setSelected] = useState<string | null>(null)
   const [panel, setPanel] = useState(true)
+
+  // Tirer vers la gauche agrandit le rail, qui est à droite.
+  const rail = useResizable({
+    key: 'produit.rail',
+    initial: 330,
+    min: 260,
+    max: 560,
+    axis: 'x',
+    invert: true,
+  })
 
   // La zone du graphe est mesurée : le nombre de cartes par rangée suit la
   // place réelle, qui change avec la fenêtre, la barre latérale et la
@@ -121,13 +132,17 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
       </div>
 
       {panel && current ? (
-        <DetailPanel
-          page={current}
-          pages={pages}
-          snapshot={snapshot}
-          side={side}
-          onClose={() => setPanel(false)}
-        />
+        <>
+          <Divider axis="x" resizable={rail} />
+          <DetailPanel
+            page={current}
+            pages={pages}
+            snapshot={snapshot}
+            side={side}
+            width={rail.size}
+            onClose={() => setPanel(false)}
+          />
+        </>
       ) : (
         <div
           style={s(
@@ -339,12 +354,14 @@ function DetailPanel({
   pages,
   snapshot,
   side,
+  width,
   onClose,
 }: {
   page: Page
   pages: Page[]
   snapshot: Snapshot
   side: boolean
+  width: number
   onClose: () => void
 }) {
   const shots = snapshot.shots[page.slug] ?? []
@@ -354,8 +371,8 @@ function DetailPanel({
     <div
       style={s(
         side
-          ? 'position: absolute; top: 0; right: 0; bottom: 0; width: 300px; border-left: 1px solid var(--color-divider); background: #13141f; padding: 20px; overflow: auto; box-shadow: -22px 0 44px rgba(0,0,0,0.55); z-index: 5;'
-          : 'width: 330px; flex: none; border-left: 1px solid var(--color-divider); background: #13141f; padding: 20px; overflow: auto;',
+          ? `position: absolute; top: 0; right: 0; bottom: 0; width: ${width}px; border-left: 1px solid var(--color-divider); background: #13141f; padding: 20px; overflow: auto; box-shadow: -22px 0 44px rgba(0,0,0,0.55); z-index: 5;`
+          : `width: ${width}px; flex: none; border-left: 1px solid var(--color-divider); background: #13141f; padding: 20px; overflow: auto;`,
       )}
     >
       <div style={s('display: flex; align-items: center; gap: 8px;')}>

@@ -9,5 +9,8 @@
     "cockpit:capture": "node hooks/cockpit-capture-plan.js",
     "cockpit:crawl": "node crawl/index.js",
     "test": "node --test hooks/*.test.js"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.62.1"
   }
 }

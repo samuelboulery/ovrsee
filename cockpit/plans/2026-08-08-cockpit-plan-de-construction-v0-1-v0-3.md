@@ -23,6 +23,14 @@
         "graphify-out/graph.html",
         "graphify-out/graph.json"
       ]
+    },
+    {
+      "sha": "2014e6e",
+      "date": "2026-08-08",
+      "files": [
+        ".gitignore",
+        "hooks/cockpit-post-commit.js"
+      ]
     }
   ]
 }

@@ -135,7 +135,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L366",
       "id": "support_encodecamelattrs",
-      "community": 7,
+      "community": 9,
       "norm_label": "encodecamelattrs()"
     },
     {
@@ -144,7 +144,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L372",
       "id": "support_encodecase",
-      "community": 7,
+      "community": 9,
       "norm_label": "encodecase()"
     },
     {
@@ -153,7 +153,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L388",
       "id": "support_kebabtocamel",
-      "community": 9,
+      "community": 7,
       "norm_label": "kebabtocamel()"
     },
     {
@@ -162,7 +162,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L391",
       "id": "support_csstoobj",
-      "community": 9,
+      "community": 7,
       "norm_label": "csstoobj()"
     },
     {
@@ -189,7 +189,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L457",
       "id": "support_hostpositionstyle",
-      "community": 9,
+      "community": 7,
       "norm_label": "hostpositionstyle()"
     },
     {
@@ -198,7 +198,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L467",
       "id": "support_compiletemplate",
-      "community": 7,
+      "community": 9,
       "norm_label": "compiletemplate()"
     },
     {
@@ -628,7 +628,7 @@
       "label": "changedFiles()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
-      "source_location": "L31",
+      "source_location": "L33",
       "id": "cockpit_post_commit_changedfiles",
       "community": 6,
       "norm_label": "changedfiles()"
@@ -637,7 +637,7 @@
       "label": "attachCommit()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
-      "source_location": "L41",
+      "source_location": "L43",
       "id": "cockpit_post_commit_attachcommit",
       "community": 6,
       "norm_label": "attachcommit()"
@@ -646,7 +646,7 @@
       "label": "spawnCrawl()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
-      "source_location": "L71",
+      "source_location": "L73",
       "id": "cockpit_post_commit_spawncrawl",
       "community": 6,
       "norm_label": "spawncrawl()"
@@ -2370,7 +2370,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
-      "source_location": "L31",
+      "source_location": "L33",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_cockpit_post_commit_js",
       "_tgt": "cockpit_post_commit_changedfiles",
@@ -2382,7 +2382,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
-      "source_location": "L41",
+      "source_location": "L43",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_cockpit_post_commit_js",
       "_tgt": "cockpit_post_commit_attachcommit",
@@ -2394,7 +2394,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
-      "source_location": "L71",
+      "source_location": "L73",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_cockpit_post_commit_js",
       "_tgt": "cockpit_post_commit_spawncrawl",
@@ -2406,7 +2406,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
-      "source_location": "L33",
+      "source_location": "L35",
       "weight": 1.0,
       "_src": "cockpit_post_commit_changedfiles",
       "_tgt": "cockpit_post_commit_git",
@@ -2418,7 +2418,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
-      "source_location": "L51",
+      "source_location": "L53",
       "weight": 1.0,
       "_src": "cockpit_post_commit_attachcommit",
       "_tgt": "cockpit_post_commit_git",
@@ -2430,7 +2430,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
-      "source_location": "L55",
+      "source_location": "L57",
       "weight": 1.0,
       "_src": "cockpit_post_commit_attachcommit",
       "_tgt": "cockpit_post_commit_changedfiles",

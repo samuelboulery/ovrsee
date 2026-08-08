@@ -232,7 +232,9 @@ export function App() {
                   {!error && snapshot && !unequipped && (
                     <>
                       {tab === 'produit' && <Produit snapshot={snapshot} layout={layout} />}
-                      {tab === 'historique' && <Historique plans={plans} />}
+                      {tab === 'historique' && (
+                        <Historique plans={plans} timeline={snapshot.timeline ?? []} />
+                      )}
                       {tab === 'backlog' && <Backlog plans={backlog(plans)} />}
                       {tab === 'donnees' && <Donnees graph={snapshot.graph} />}
                       {tab === 'stack' && <Stack snapshot={snapshot} />}
@@ -246,6 +248,7 @@ export function App() {
                   layout={layout}
                   onLayout={setLayout}
                   onToggle={() => setTerminal(false)}
+                  onReload={reload}
                   snapshot={snapshot}
                 />
               )}

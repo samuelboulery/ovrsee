@@ -117,6 +117,32 @@ export function shotRatio(page: Page): string {
   return width && height ? `${width} / ${height}` : '16 / 10'
 }
 
+/** Un commit tel que `git log` le rend — sans les fichiers, que porte le plan. */
+export interface GitCommit {
+  sha: string
+  /** ISO complet, heure comprise : deux commits d'un même jour restent ordonnés. */
+  date: string
+  subject: string
+}
+
+/**
+ * Une ligne de la frise : soit une bande de plan, soit un commit hors plan.
+ *
+ * Calculée par `hooks/timeline.js`, jamais dans le rendu — voir le commentaire
+ * de ce module pour le pourquoi.
+ */
+export type TimelineEntry =
+  | {
+      kind: 'plan'
+      date: string
+      /** Nom de fichier du plan, clé de recherche dans `snapshot.plans`. */
+      plan: string
+      title: string
+      status: 'open' | 'closed'
+      commits: GitCommit[]
+    }
+  | { kind: 'commit'; date: string; commit: GitCommit }
+
 export interface Scan {
   date: string
   commit: string
@@ -156,6 +182,8 @@ export interface Snapshot {
   graph: GraphifyGraph | null
   /** slug de page → captures successives, de la plus récente à la plus ancienne */
   shots: Record<string, string[]>
+  /** Commits et plans mêlés, du plus récent au plus ancien. */
+  timeline: TimelineEntry[]
 }
 
 /** `2026-07-18-d2f1a3.png` → `2026-07-18`. */

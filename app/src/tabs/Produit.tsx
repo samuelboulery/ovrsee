@@ -20,6 +20,7 @@ import {
   type Placed,
   type Snapshot,
 } from '../data'
+import { Lightbox } from '../Lightbox'
 import { s, useHover } from '../style'
 import { Divider, useResizable } from '../useResizable'
 import { useMeasure } from '../useMeasure'
@@ -370,6 +371,10 @@ function DetailPanel({
   const shots = snapshot.shots[page.slug] ?? []
   const plans = plansForPage(snapshot.plans, page)
 
+  // Index de la capture agrandie, ou null. Toutes les captures sont
+  // atteignables depuis la visionneuse, pas seulement les cinq du rail.
+  const [zoom, setZoom] = useState<number | null>(null)
+
   return (
     <div
       style={s(
@@ -402,8 +407,10 @@ function DetailPanel({
         <img
           src={shotUrl(snapshot.root, `shots/${page.slug}/${shots[0]}`)}
           alt=""
+          title="Agrandir"
+          onClick={() => setZoom(0)}
           style={s(
-            `margin-top: 14px; border-radius: 8px; border: 1px solid var(--color-neutral-800); width: 100%; aspect-ratio: ${shotRatio(page)}; object-fit: cover; object-position: top; display: block;`,
+            `margin-top: 14px; border-radius: 8px; border: 1px solid var(--color-neutral-800); width: 100%; aspect-ratio: ${shotRatio(page)}; object-fit: cover; object-position: top; display: block; cursor: zoom-in;`,
           )}
         />
       ) : (
@@ -425,22 +432,36 @@ function DetailPanel({
 
       <Section title="Captures précédentes">
         {shots.length > 1 ? (
-          <div style={s('display: flex; gap: 8px;')}>
-            {shots.slice(1, 5).map(file => (
-              <div key={file} style={s('flex: 1;')}>
-                <img
-                  src={shotUrl(snapshot.root, `shots/${page.slug}/${file}`)}
-                  alt=""
-                  style={s(
-                    'height: 44px; width: 100%; object-fit: cover; object-position: top; border-radius: 5px; border: 1px solid var(--color-neutral-800); display: block;',
-                  )}
-                />
-                <div style={s('font-size: 9.5px; color: var(--color-neutral-600); margin-top: 4px;')}>
-                  {frDate(shotDate(file))}
+          <>
+            {/* Le rail reste étroit : quatre miniatures. La visionneuse, elle,
+                donne accès à toute la série. */}
+            <div style={s('display: flex; gap: 8px;')}>
+              {shots.slice(1, 5).map((file, i) => (
+                <div key={file} style={s('flex: 1;')}>
+                  <img
+                    src={shotUrl(snapshot.root, `shots/${page.slug}/${file}`)}
+                    alt=""
+                    title="Agrandir"
+                    onClick={() => setZoom(i + 1)}
+                    style={s(
+                      'height: 44px; width: 100%; object-fit: cover; object-position: top; border-radius: 5px; border: 1px solid var(--color-neutral-800); display: block; cursor: zoom-in;',
+                    )}
+                  />
+                  <div style={s('font-size: 9.5px; color: var(--color-neutral-600); margin-top: 4px;')}>
+                    {frDate(shotDate(file))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setZoom(0)}
+              className="btn btn-ghost"
+              style={s('font-size: 11px; padding: 4px 9px; margin-top: 9px;')}
+            >
+              Voir les {shots.length} captures en grand
+            </button>
+          </>
         ) : (
           <Empty text="Une seule capture pour l'instant." />
         )}
@@ -476,6 +497,18 @@ function DetailPanel({
           <Empty text="Aucun plan — cette page n'a pas bougé depuis sa création." />
         )}
       </Section>
+
+      {zoom !== null && (
+        <Lightbox
+          root={snapshot.root}
+          slug={page.slug}
+          files={shots}
+          index={zoom}
+          onIndex={setZoom}
+          onClose={() => setZoom(null)}
+          label={`${pageName(page, pages)} · ${page.route}`}
+        />
+      )}
     </div>
   )
 }

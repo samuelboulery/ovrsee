@@ -33,8 +33,9 @@ const panelStyle = (layout: Layout, size: number): string => {
 /**
  * Panneau terminal — maquette l. 374-418.
  *
- * Une vraie session `claude` tourne derrière, par IPC, dans le dossier du
- * projet sélectionné ; les boutons d'injection y écrivent.
+ * Un vrai shell tourne derrière, par IPC, dans le dossier du projet
+ * sélectionné, avec `claude` lancé d'office ; les boutons d'injection y
+ * écrivent. Quitter Claude laisse le shell — le panneau reste utilisable.
  *
  * Dans un navigateur il n'y a pas d'IPC, donc pas de session : le panneau le
  * dit et les boutons se rabattent sur le presse-papier. Un bouton qui
@@ -45,11 +46,14 @@ export function Terminal({
   layout,
   onLayout,
   onToggle,
+  onReload,
   snapshot,
 }: {
   layout: Layout
   onLayout: (layout: Layout) => void
   onToggle: () => void
+  /** Relit `cockpit/` — après un scan, l'interface ne se met pas à jour seule. */
+  onReload: () => void
   snapshot: Snapshot | null
 }) {
   const [notice, setNotice] = useState<string | null>(null)
@@ -99,6 +103,23 @@ export function Terminal({
 
   const injections = buildInjections(snapshot)
 
+  /**
+   * Les actions rapides écrivent une commande dans la session — elles ne
+   * l'exécutent pas depuis le cockpit.
+   *
+   * ponytail: le pty ouvre un shell puis y tape `claude` (electron/pty.js:25),
+   * donc la session est *dans* Claude : `!` est son préfixe bash, `/graphify`
+   * sa commande. Quitter Claude rend un shell nu, où ces deux formes ne veulent
+   * plus rien dire — d'où le libellé « Envoyer à la session Claude », qui ne
+   * promet rien d'autre. Plafond connu ; l'alternative serait un canal IPC qui
+   * lance le crawl lui-même, écartée parce qu'elle rompt « le cockpit
+   * n'exécute jamais ».
+   */
+  const actions = [
+    { label: '⟳ Relancer un scan', text: '!pnpm cockpit:crawl' },
+    { label: '◆ Regénérer le graphe', text: '/graphify' },
+  ]
+
   return (
     <>
       {layout !== 'full' && <Divider axis={layout === 'side' ? 'x' : 'y'} resizable={sizing} />}
@@ -116,7 +137,7 @@ export function Terminal({
           Terminal · claude
         </span>
         <span
-          title={available ? 'Session claude en cours' : 'Terminal disponible dans l’application'}
+          title={available ? 'Session en cours' : 'Terminal disponible dans l’application'}
           style={s(
             available && !error
               ? 'width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent); display: block;'
@@ -204,6 +225,36 @@ export function Terminal({
               'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);',
             )}
           >
+            Envoyer à la session Claude
+          </div>
+          <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
+            {actions.map(({ label, text }) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => activate(label, text)}
+                className="btn btn-primary btn-block"
+                style={s('font-size: 11.5px; padding: 5px 10px;')}
+              >
+                {label}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={onReload}
+              className="btn btn-secondary btn-block"
+              style={s('font-size: 11.5px; padding: 5px 10px;')}
+              title="Relit cockpit/ — à faire après un scan"
+            >
+              ↻ Rafraîchir le cockpit
+            </button>
+          </div>
+
+          <div
+            style={s(
+              'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-top: 18px;',
+            )}
+          >
             {available ? 'Injecter dans la session' : 'Copier pour la session'}
           </div>
           <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
@@ -228,7 +279,7 @@ export function Terminal({
               (error
                 ? error
                 : available
-                  ? "Un clic écrit dans la session. Le cockpit ne lance rien d'autre que claude."
+                  ? 'Un clic écrit dans la session Claude.'
                   : "Un clic copie le contexte. Le cockpit n'exécute jamais.")}
           </div>
         </div>

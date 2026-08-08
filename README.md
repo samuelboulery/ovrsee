@@ -31,3 +31,15 @@ disparaît, rien n'est perdu.
 
 Backlog, historique et densité d'activité ne sont pas stockés : ils se calculent
 à partir des plans.
+
+## Un plan capturé est versionné en clair
+
+`cockpit/plans/` part dans git avec le reste du dépôt — c'est le but : c'est ce
+qui rend le raisonnement récupérable trois semaines plus tard. Conséquence
+directe : **un secret collé dans un plan approuvé se retrouve dans l'historique
+git**, et l'y retirer demande une réécriture d'historique.
+
+Ne pas l'ignorer via `.gitignore` : un plan non versionné ne sert à rien. La
+parade est en amont — ne pas coller de clé, de jeton ni de mot de passe dans un
+plan. Les identifiants vivent dans un gestionnaire de mots de passe et dans un
+`ACCESS.md` non versionné (cadrage §3).

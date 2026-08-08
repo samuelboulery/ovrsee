@@ -1,0 +1,7 @@
+{
+  "dev": "pnpm dev",
+  "baseUrl": "http://localhost:5180",
+  "readyTimeoutMs": 60000,
+  "entryRoutes": ["/"],
+  "ignore": []
+}

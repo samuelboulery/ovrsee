@@ -1,0 +1,18 @@
+{
+  "date": "2026-08-08",
+  "commit": "a5777a4",
+  "pages": [
+    {
+      "route": "/",
+      "slug": "accueil",
+      "title": "Cockpit",
+      "sample": "/",
+      "excerpt": "Cockpit — cockpit\nscan échoué · 8 août 2026 · commit 2014e6e\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nGraphe de navigation\nAucune page cartographiée. Le crawl tourne au commit — lancez-le une fois avec node crawl/index.js.\nTERMINAL · CLAUDE\nDISPOSITION\nBas\nCôté\nPl",
+      "links": [],
+      "shot": "shots/accueil/2026-08-08-a5777a4.png",
+      "shotDate": "2026-08-08"
+    }
+  ],
+  "redirects": {},
+  "orphanShots": []
+}

@@ -1,11 +1,11 @@
 # Graph Report - /Users/sam/code/cockpit  (2026-08-08)
 
 ## Corpus Check
-- 27 files · ~50,008 words
+- 27 files · ~50,314 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 177 nodes · 270 edges · 28 communities detected
+- 178 nodes · 272 edges · 28 communities detected
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 17 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -40,7 +40,7 @@
 - [[_COMMUNITY_Community 27|Community 27]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `run()` - 13 edges
+1. `run()` - 14 edges
 2. `main()` - 9 edges
 3. `walkChildren()` - 7 edges
 4. `walk()` - 7 edges
@@ -70,8 +70,8 @@ Cohesion: 0.09
 Nodes (15): s(), fetchProjects(), fetchSnapshot(), firstParagraph(), history(), json(), lastScan(), pageName() (+7 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.17
-Nodes (19): assertPortFree(), isIgnored(), loadConfig(), log(), pathOf(), pruneShots(), recordScan(), retainable() (+11 more)
+Cohesion: 0.16
+Nodes (20): assertPortFree(), isIgnored(), loadConfig(), log(), orphanShots(), pathOf(), pruneShots(), recordScan() (+12 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.15
@@ -87,7 +87,7 @@ Nodes (13): collectProps(), compileAttr(), contentKey(), isDeckMountTag(), walk(
 
 ### Community 5 - "Community 5"
 Cohesion: 0.25
-Nodes (8): boot(), dcNameFromPath(), getReactDOM(), parseDataProps(), parseDcDocument(), parseDcText(), rootNameForDocument(), safeDecode()
+Nodes (8): boot(), createComponentFactory(), dcNameFromPath(), evalDcLogic(), getReact(), getReactDOM(), rootNameForDocument(), safeDecode()
 
 ### Community 6 - "Community 6"
 Cohesion: 0.29
@@ -107,15 +107,15 @@ Nodes (4): attachCommit(), changedFiles(), git(), isSafePlanFileName()
 
 ### Community 10 - "Community 10"
 Cohesion: 0.67
-Nodes (3): createComponentFactory(), evalDcLogic(), getReact()
-
-### Community 11 - "Community 11"
-Cohesion: 0.67
 Nodes (3): cssToObj(), hostPositionStyle(), kebabToCamel()
 
-### Community 12 - "Community 12"
+### Community 11 - "Community 11"
 Cohesion: 1.0
 Nodes (3): importantify(), scanUnquotedUrl(), stripComments()
+
+### Community 12 - "Community 12"
+Cohesion: 0.67
+Nodes (3): parseDataProps(), parseDcDocument(), parseDcText()
 
 ### Community 13 - "Community 13"
 Cohesion: 0.67
@@ -209,9 +209,9 @@ Nodes (0):
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `run()` connect `Community 1` to `Community 2`?**
-  _High betweenness centrality (0.066) - this node is a cross-community bridge._
+  _High betweenness centrality (0.068) - this node is a cross-community bridge._
 - **Why does `writeFileNoFollow()` connect `Community 2` to `Community 1`?**
-  _High betweenness centrality (0.060) - this node is a cross-community bridge._
+  _High betweenness centrality (0.061) - this node is a cross-community bridge._
 - **Why does `readPlans()` connect `Community 2` to `Community 8`?**
   _High betweenness centrality (0.022) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `run()` (e.g. with `normalizeRoutes()` and `pageSlug()`) actually correct?**

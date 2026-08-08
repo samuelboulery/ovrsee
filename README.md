@@ -25,7 +25,13 @@ pnpm cockpit:crawl /chemin/du/projet
 
 # 3. Lire
 pnpm dev                                # http://localhost:5180
+pnpm cockpit:brief                      # ou en texte, depuis le terminal
 ```
+
+Les deux hooks Claude Code (affichés par `cockpit:install`) ferment la boucle :
+l'un capture chaque plan approuvé, l'autre réinjecte l'état du projet au
+démarrage d'une session — Claude Code sait où en est le projet sans qu'on le
+lui explique.
 
 Exemple de `cockpit.config.json`, à la racine du projet observé :
 

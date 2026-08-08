@@ -65,7 +65,7 @@ chmodSync(hookPath, 0o755)
 
 console.log(`post-commit : bloc cockpit installé dans ${hookPath}`)
 console.log(`
-Reste à activer la capture des plans approuvés. À ajouter dans
+Reste à brancher les deux hooks Claude Code. À ajouter dans
 ~/.claude/settings.json, sous "hooks" :
 
   "PostToolUse": [
@@ -75,5 +75,15 @@ Reste à activer la capture des plans approuvés. À ajouter dans
         { "type": "command", "command": "node ${join(HERE, 'cockpit-capture-plan.js')}" }
       ]
     }
+  ],
+  "SessionStart": [
+    {
+      "hooks": [
+        { "type": "command", "command": "node ${join(HERE, 'cockpit-session-start.js')}" }
+      ]
+    }
   ]
+
+Le premier capture les plans approuvés — c'est le seul contenu périssable.
+Le second réinjecte l'état du projet au démarrage d'une session.
 `)

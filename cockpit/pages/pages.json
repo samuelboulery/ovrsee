@@ -1,20 +1,20 @@
 {
   "date": "2026-08-08",
-  "commit": "6dcfba6",
+  "commit": "c8b826f",
   "pages": [
     {
       "route": "/",
       "slug": "accueil",
       "title": "Cockpit",
       "sample": "/",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 94886c2\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nGraphe de navigation\n5 pages · 20 liens · reconstruit au commit\nLIEN DIRECT\nRETOUR\nENTRÉE DE L'APP\nAccueil\n/\naucun plan\n8 août\nHistorique\n/historique\naucun plan\n",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 6dcfba6\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nGraphe de navigation\n5 pages · 20 liens · reconstruit au commit\nLIEN DIRECT\nRETOUR\nENTRÉE DE L'APP\nAccueil\n/\naucun plan\n8 août\nHistorique\n/historique\naucun plan\n",
       "links": [
         "/historique",
         "/backlog",
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/accueil/2026-08-08-6dcfba6.png",
+      "shot": "shots/accueil/2026-08-08-c8b826f.png",
       "shotDate": "2026-08-08"
     },
     {
@@ -22,14 +22,14 @@
       "slug": "historique",
       "title": "Cockpit",
       "sample": "/historique",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 94886c2\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nAucun plan clos. L'historique se remplira au premier commit qui exécute un plan.\nTERMINAL · CLAUDE\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\n$ claude\n◆ Contexte lisible",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 6dcfba6\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nAucun plan clos. L'historique se remplira au premier commit qui exécute un plan.\nTERMINAL · CLAUDE\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\n$ claude\n◆ Contexte lisible",
       "links": [
         "/",
         "/backlog",
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/historique/2026-08-08-6dcfba6.png",
+      "shot": "shots/historique/2026-08-08-c8b826f.png",
       "shotDate": "2026-08-08"
     },
     {
@@ -37,14 +37,14 @@
       "slug": "backlog",
       "title": "Cockpit",
       "sample": "/backlog",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 94886c2\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nPlans ouverts\nApprouvés, jamais clos par un commit. Le backlog n'est pas saisi : il est calculé.\nCockpit — plan de construction (v0.1 → v0.3)\nouvert aujourd'hui\n",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 6dcfba6\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nPlans ouverts\nApprouvés, jamais clos par un commit. Le backlog n'est pas saisi : il est calculé.\nCockpit — plan de construction (v0.1 → v0.3)\nouvert aujourd'hui\n",
       "links": [
         "/",
         "/historique",
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/backlog/2026-08-08-6dcfba6.png",
+      "shot": "shots/backlog/2026-08-08-c8b826f.png",
       "shotDate": "2026-08-08"
     },
     {
@@ -52,14 +52,14 @@
       "slug": "donnees",
       "title": "Cockpit",
       "sample": "/donnees",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 94886c2\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nTables\nlu depuis Graphify\nAucun schéma de base détecté par Graphify dans ce projet.\nCe n'est pas une panne : ce projet n'a pas de base à cartographier.\nTERMINAL ",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 6dcfba6\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nTables\nlu depuis Graphify\nAucun schéma de base détecté par Graphify dans ce projet.\nCe n'est pas une panne : ce projet n'a pas de base à cartographier.\nTERMINAL ",
       "links": [
         "/",
         "/historique",
         "/backlog",
         "/stack"
       ],
-      "shot": "shots/donnees/2026-08-08-6dcfba6.png",
+      "shot": "shots/donnees/2026-08-08-c8b826f.png",
       "shotDate": "2026-08-08"
     },
     {
@@ -67,14 +67,14 @@
       "slug": "stack",
       "title": "Cockpit",
       "sample": "/stack",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 94886c2\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nStack\nCe qui est utilisé, et pourquoi — chaque ligne remonte à un commentaire # WHY: ou à un plan.\n@types/react\n^19.2.18\nAucune raison tracée : ni plan, ni comme",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 6dcfba6\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nStack\nCe qui est utilisé, et pourquoi — chaque ligne remonte à un commentaire # WHY: ou à un plan.\n@types/react\n^19.2.18\nAucune raison tracée : ni plan, ni comme",
       "links": [
         "/",
         "/historique",
         "/backlog",
         "/donnees"
       ],
-      "shot": "shots/stack/2026-08-08-6dcfba6.png",
+      "shot": "shots/stack/2026-08-08-c8b826f.png",
       "shotDate": "2026-08-08"
     }
   ],

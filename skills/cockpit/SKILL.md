@@ -53,6 +53,23 @@ node hooks/cockpit-cli.js capture <plan.md>      # capture un plan que le hook a
 node hooks/cockpit-cli.js close                  # clôt les plans ouverts portant un commit
 ```
 
+## Le piège de lecture principal
+
+**Le corps d'un plan `open` décrit une intention, pas une liste de tâches
+restantes.** Un plan ouvert portant des commits décrit du travail *en cours* :
+une partie est faite, et les `commits[].files` disent laquelle. Lire son corps
+comme un inventaire de choses non commencées est l'erreur naturelle, et elle
+mène à des conclusions fausses — « tel fichier n'existe pas encore » alors
+qu'il est écrit et testé.
+
+Avant de conclure que quelque chose reste à faire :
+
+1. Regarder `commits` du plan. Zéro commit = approuvé mais jamais commencé.
+   Des commits = du travail a eu lieu, et `files` dit lequel.
+2. Croiser avec la date : `closed` renseigné signifie que le plan est terminé,
+   quoi qu'en dise son corps.
+3. En cas de doute, le dire plutôt que d'affirmer qu'une brique manque.
+
 ## Limites à énoncer plutôt qu'à masquer
 
 - Une page qui affiche zéro plan n'est pas une erreur : elle n'a pas bougé

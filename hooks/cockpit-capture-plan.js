@@ -21,13 +21,7 @@ import { readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, join } from 'node:path'
 
-import {
-  serializePlan,
-  planFileName,
-  readPlans,
-  writeFileNoFollow,
-  updatePlanMeta,
-} from './plans.js'
+import { serializePlan, planFileName, writeFileNoFollow, closeOpenPlans } from './plans.js'
 
 const REGISTRY = join(homedir(), '.claude', 'cockpit', 'projects.json')
 
@@ -66,34 +60,6 @@ function titleOf(planText) {
   return 'Plan sans titre'
 }
 
-/**
- * Clôt les plans encore ouverts qui portent au moins un commit.
- *
- * ponytail: un plan se ferme à l'approbation du suivant, pas au premier
- * commit — un plan est une intention, et une intention prend souvent
- * plusieurs commits. Un plan ouvert sans aucun commit n'est pas clos : c'est
- * du backlog, il a été approuvé puis abandonné. Si les plans s'empilent,
- * basculer sur une clôture explicite via `/cockpit close`.
- */
-function closePreviousPlans(cockpitDir) {
-  for (const plan of readPlans(cockpitDir)) {
-    const commits = plan.meta.commits ?? []
-    if (plan.meta.status !== 'open' || commits.length === 0) continue
-
-    updatePlanMeta(cockpitDir, plan.file, meta => {
-      // Un plan clos sans date de clôture serait incohérent, et il se
-      // trierait n'importe où dans la chronologie. Mieux vaut le laisser
-      // ouvert que d'écrire une clôture sans date.
-      const closed = commits.at(-1)?.date
-      if (!closed) {
-        process.stderr.write(`[cockpit] ${plan.file} : dernier commit sans date, laissé ouvert\n`)
-        return null
-      }
-      return { ...meta, status: 'closed', closed }
-    })
-  }
-}
-
 /** Enregistre le projet pour la barre latérale multi-projets. */
 function registerProject(root) {
   let projects = []
@@ -129,7 +95,7 @@ function main() {
   if (!root) return // Hors dépôt git : rien à capturer, sortie silencieuse.
 
   const cockpitDir = join(root, 'cockpit')
-  closePreviousPlans(cockpitDir)
+  closeOpenPlans(cockpitDir, message => process.stderr.write(`[cockpit] ${message}\n`))
 
   const title = titleOf(planText)
   const now = new Date()

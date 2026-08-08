@@ -221,6 +221,47 @@ export function writeFileNoFollow(path, content) {
 }
 
 /**
+ * Clôt les plans ouverts qui portent au moins un commit.
+ *
+ * Un plan se ferme à l'ouverture du suivant, pas au premier commit : un plan
+ * est une intention, et une intention prend souvent plusieurs commits. Un plan
+ * ouvert SANS commit n'est pas clos — c'est du backlog, approuvé puis
+ * abandonné.
+ *
+ * Vit ici, et non dans le hook, parce que le chemin manuel (`/cockpit
+ * capture`) doit se comporter exactement comme le chemin automatique. Deux
+ * règles de clôture différentes produiraient deux historiques différents selon
+ * la façon dont le plan a été capturé.
+ *
+ * @returns {string[]} fichiers effectivement clos
+ */
+export function closeOpenPlans(cockpitDir, log = () => {}) {
+  const closed = []
+
+  for (const plan of readPlans(cockpitDir)) {
+    const commits = plan.meta.commits ?? []
+    if (plan.meta.status !== 'open' || commits.length === 0) continue
+
+    const date = commits.at(-1)?.date
+    if (!date) {
+      // Un plan clos sans date de clôture se trierait n'importe où dans la
+      // chronologie. Mieux vaut le laisser ouvert que d'écrire une date fausse.
+      log(`${plan.file} : dernier commit sans date, laissé ouvert`)
+      continue
+    }
+
+    const written = updatePlanMeta(cockpitDir, plan.file, meta => ({
+      ...meta,
+      status: 'closed',
+      closed: date,
+    }))
+    if (written) closed.push(plan.file)
+  }
+
+  return closed
+}
+
+/**
  * Un nom de fichier de plan est-il sûr à recoller à un chemin ?
  * Utilisé sur le contenu de `.active-plan`, seule valeur relue depuis le
  * disque et réinjectée dans un chemin.

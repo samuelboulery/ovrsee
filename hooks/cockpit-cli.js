@@ -23,7 +23,7 @@ import {
   serializePlan,
   planFileName,
   writeFileNoFollow,
-  updatePlanMeta,
+  closeOpenPlans,
 } from './plans.js'
 
 const root = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
@@ -51,24 +51,21 @@ const commands = {
   },
 
   close() {
-    const open = backlog(readPlans(cockpitDir)).filter(p => (p.meta.commits ?? []).length > 0)
-    if (open.length === 0) {
+    const closed = closeOpenPlans(cockpitDir, console.error)
+    if (closed.length === 0) {
       console.log('aucun plan ouvert portant un commit — rien à clore')
       return
     }
-    for (const p of open) {
-      const closed = p.meta.commits.at(-1)?.date
-      if (!closed) {
-        console.error(`${p.file} : dernier commit sans date, laissé ouvert`)
-        continue
-      }
-      updatePlanMeta(cockpitDir, p.file, meta => ({ ...meta, status: 'closed', closed }))
-      console.log(`clos : ${p.file}`)
-    }
+    for (const file of closed) console.log(`clos : ${file}`)
   },
 
   capture(path) {
     if (!path) throw new Error('usage : cockpit-cli.js capture <fichier-de-plan.md>')
+
+    // Même règle que le hook automatique : ouvrir un plan ferme le précédent.
+    for (const file of closeOpenPlans(cockpitDir, console.error)) {
+      console.log(`clos : ${file}`)
+    }
 
     const text = readFileSync(path, 'utf8')
     const title = /^#{1,3}\s+(.*\S)/m.exec(text)?.[1]?.trim() ?? 'Plan sans titre'

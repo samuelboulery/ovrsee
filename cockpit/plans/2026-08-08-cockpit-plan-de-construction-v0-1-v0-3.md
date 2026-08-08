@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Cockpit — plan de construction (v0.1 → v0.3)",
   "opened": "2026-08-08",
-  "closed": null,
+  "closed": "2026-08-08",
   "commits": [
     {
       "sha": "7bfa1f2",
@@ -114,6 +114,16 @@
       "date": "2026-08-08",
       "files": [
         "app/src/App.tsx"
+      ]
+    },
+    {
+      "sha": "c8b826f",
+      "date": "2026-08-08",
+      "files": [
+        "hooks/snapshot.js",
+        "server/api.js",
+        "server/api.test.js",
+        "vite.config.js"
       ]
     }
   ]

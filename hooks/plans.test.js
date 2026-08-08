@@ -16,6 +16,7 @@ import {
   writeFileNoFollow,
   isSafePlanFileName,
   updatePlanMeta,
+  closeOpenPlans,
 } from './plans.js'
 
 // --- parsePlan -------------------------------------------------------------
@@ -291,6 +292,75 @@ test('writeFileNoFollow ne laisse pas de fichier temporaire derrière lui', () =
   const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
   writeFileNoFollow(join(dir, 'a.md'), 'contenu')
   assert.deepEqual(readdirSync(dir), ['a.md'])
+})
+
+// --- clôture, règle partagée par le hook et le CLI -------------------------
+
+const cockpitWithPlans = entries => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  mkdirSync(join(dir, 'plans'), { recursive: true })
+  for (const [file, meta] of entries) {
+    writeFileSync(join(dir, 'plans', file), serializePlan(meta, 'corps\n'))
+  }
+  return dir
+}
+
+test('closeOpenPlans clôt un plan ouvert portant un commit, à la date du dernier', () => {
+  const dir = cockpitWithPlans([
+    [
+      'a.md',
+      {
+        status: 'open',
+        title: 'A',
+        opened: '2026-07-01',
+        commits: [
+          { sha: 'aaa', date: '2026-07-02', files: [] },
+          { sha: 'bbb', date: '2026-07-09', files: [] },
+        ],
+      },
+    ],
+  ])
+
+  assert.deepEqual(closeOpenPlans(dir), ['a.md'])
+  const plan = readPlans(dir)[0]
+  assert.equal(plan.meta.status, 'closed')
+  assert.equal(plan.meta.closed, '2026-07-09', 'la clôture porte la date du DERNIER commit')
+})
+
+test('closeOpenPlans laisse ouvert un plan sans commit — c’est du backlog, pas du travail fait', () => {
+  const dir = cockpitWithPlans([['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [] }]])
+
+  assert.deepEqual(closeOpenPlans(dir), [])
+  assert.equal(readPlans(dir)[0].meta.status, 'open')
+})
+
+test('closeOpenPlans ne retouche pas un plan déjà clos', () => {
+  const dir = cockpitWithPlans([
+    [
+      'a.md',
+      {
+        status: 'closed',
+        title: 'A',
+        opened: '2026-07-01',
+        closed: '2026-07-02',
+        commits: [{ sha: 'aaa', date: '2026-07-09', files: [] }],
+      },
+    ],
+  ])
+
+  assert.deepEqual(closeOpenPlans(dir), [])
+  assert.equal(readPlans(dir)[0].meta.closed, '2026-07-02', 'la date d’origine est préservée')
+})
+
+test('closeOpenPlans signale et laisse ouvert un plan dont le dernier commit n’a pas de date', () => {
+  const dir = cockpitWithPlans([
+    ['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [{ sha: 'aaa', files: [] }] }],
+  ])
+
+  const messages = []
+  assert.deepEqual(closeOpenPlans(dir, m => messages.push(m)), [])
+  assert.equal(readPlans(dir)[0].meta.status, 'open')
+  assert.match(messages.join(' '), /sans date/)
 })
 
 // --- validation du pointeur .active-plan -----------------------------------

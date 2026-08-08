@@ -15,3 +15,6 @@ graphify-out/graph.html
 
 # Build de l app, reconstruit a la demande.
 app/dist/
+
+# Applications empaquetées, reconstruites à la demande.
+release/

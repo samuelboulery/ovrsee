@@ -1,0 +1,36 @@
+appId: com.samboulery.cockpit
+productName: Cockpit
+copyright: Sam Boulery
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - electron/**
+  - server/**
+  - hooks/**
+  - app/dist/**
+  - package.json
+  # Les modules réellement chargés par le processus principal. Le reste
+  # (Vite, React, Playwright, TypeScript) ne sert qu'au développement.
+  - node_modules/node-pty/**
+
+# Un binaire natif ne peut pas être chargé depuis une archive asar : il doit
+# exister comme fichier sur le disque. `spawn-helper` doit en plus conserver
+# son bit d'exécution — c'est le point de rupture classique de l'empaquetage,
+# et il ne se voit qu'à l'exécution de l'application livrée.
+asar: true
+asarUnpack:
+  - node_modules/node-pty/**
+
+mac:
+  category: public.app-category.developer-tools
+  target:
+    - target: dmg
+      arch: [arm64]
+  darkModeSupport: true
+  # Pas de signature ni de notarisation pour l'instant : usage personnel, et
+  # Gatekeeper se contourne au premier lancement. Elles deviendront
+  # obligatoires le jour d'une distribution publique.
+  identity: null

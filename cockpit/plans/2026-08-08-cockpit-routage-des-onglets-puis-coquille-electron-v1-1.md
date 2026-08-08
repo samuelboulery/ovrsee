@@ -15,6 +15,26 @@
         "hooks/plans.test.js",
         "skills/cockpit/SKILL.md"
       ]
+    },
+    {
+      "sha": "761ee35",
+      "date": "2026-08-08",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/useTerminal.ts",
+        "electron/main.js",
+        "electron/preload.cjs",
+        "electron/pty.js",
+        "hooks/cockpit-capture-plan.js",
+        "hooks/cockpit-cli.js",
+        "hooks/plans.js",
+        "hooks/snapshot.js",
+        "package.json",
+        "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
+        "scripts/fix-pty-permissions.js"
+      ]
     }
   ]
 }

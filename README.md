@@ -24,9 +24,15 @@ pnpm cockpit:auth /chemin/du/projet    # facultatif : pages protégées
 pnpm cockpit:crawl /chemin/du/projet
 
 # 3. Lire
-pnpm dev                                # http://localhost:5180
+pnpm electron                           # l'application, terminal claude compris
+pnpm dev                                # ou dans un navigateur, sans terminal
 pnpm cockpit:brief                      # ou en texte, depuis le terminal
+pnpm package                            # DMG dans release/
 ```
+
+Le terminal intégré n'existe que dans l'application : il passe par IPC, qu'un
+navigateur n'a pas. C'est délibéré — l'exposer par une socket locale
+l'ouvrirait à tout processus tournant sous le même compte.
 
 Les deux hooks Claude Code (affichés par `cockpit:install`) ferment la boucle :
 l'un capture chaque plan approuvé, l'autre réinjecte l'état du projet au

@@ -8,22 +8,33 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.json && vite build",
-    "test": "node --test hooks/*.test.js crawl/*.test.js",
+    "test": "node --test hooks/*.test.js crawl/*.test.js server/*.test.js",
     "typecheck": "tsc -p tsconfig.json",
     "cockpit:install": "node hooks/install.js",
     "cockpit:status": "node hooks/cockpit-cli.js status",
     "cockpit:brief": "node hooks/cockpit-session-start.js",
     "cockpit:crawl": "node crawl/index.js",
-    "cockpit:auth": "node crawl/auth.js"
+    "cockpit:auth": "node crawl/auth.js",
+    "electron": "pnpm build:ui && electron .",
+    "build:ui": "vite build",
+    "postinstall": "node scripts/fix-pty-permissions.js"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",
+    "electron": "43.3.0",
+    "electron-builder": "^26.15.3",
     "playwright-core": "^1.62.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "typescript": "^7.0.2",
     "vite": "^8.2.1"
-  }
+  },
+  "dependencies": {
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "6.0.0",
+    "node-pty": "1.1.0"
+  },
+  "main": "electron/main.js"
 }

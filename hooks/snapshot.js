@@ -24,17 +24,25 @@ const readJson = path => {
 }
 
 /**
- * Projets connus. Le dépôt courant vient toujours en tête, même s'il n'a
- * jamais été enregistré : on ne veut pas d'un cockpit vide au premier
- * lancement.
+ * Projets connus, le dépôt courant en tête.
  *
- * @param {string} [cwd] dépôt courant
+ * Le préfixage n'a lieu que si `cwd` porte vraiment un `cockpit/` : au dev
+ * server lancé depuis le dépôt, cela évite un cockpit vide au premier
+ * lancement ; dans l'application empaquetée, il n'y a pas de dépôt courant et
+ * la liste vient alors uniquement du registre. Ajouter le dossier de
+ * lancement d'une application de bureau à la liste des projets n'aurait aucun
+ * sens.
+ *
+ * @param {string|null} [cwd]
  */
 export function projects(cwd = process.cwd()) {
   const listed = Array.isArray(readJson(REGISTRY)) ? readJson(REGISTRY) : []
-  const here = { path: cwd, name: basename(cwd) }
+  const known = listed.filter(p => p?.path)
 
-  return [here, ...listed.filter(p => p?.path && p.path !== here.path)]
+  if (!cwd || !existsSync(join(cwd, 'cockpit'))) return known
+
+  const here = { path: cwd, name: basename(cwd) }
+  return [here, ...known.filter(p => p.path !== here.path)]
 }
 
 /** Captures successives par page, de la plus récente à la plus ancienne. */

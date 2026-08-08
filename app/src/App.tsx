@@ -100,38 +100,33 @@ export function App() {
   const contentVisible = !(layout === 'full' && terminal)
 
   return (
+    // La maquette dessinait une fausse fenêtre — pastilles, ombre portée,
+    // 1320×860 posés sur un fond dégradé — parce qu'elle montrait à quoi
+    // l'application ressemblerait une fois empaquetée. La vraie fenêtre
+    // existe maintenant : redessiner son chrome à l'intérieur ferait deux
+    // barres de titre l'une dans l'autre. L'interface occupe donc toute la
+    // fenêtre, et macOS fournit le chrome.
     <div
       style={s(
-        'min-height: 100vh; overflow: auto; display: flex; align-items: safe center; justify-content: safe center; padding: 40px; background: radial-gradient(120% 90% at 50% 0%, #1b1d2e 0%, #0e0f18 70%); font-family: var(--font-body); color: var(--color-text);',
+        'height: 100vh; overflow: hidden; display: flex; flex-direction: column; background: var(--color-bg); font-family: var(--font-body); color: var(--color-text);',
       )}
     >
+      {/* Bande de titre : elle remplace le chrome dessiné de la maquette
+          (l. 29-41) et sert de zone de déplacement de la vraie fenêtre. Le
+          retrait à gauche laisse la place aux pastilles du système. */}
       <div
         style={s(
-          'width: 1320px; height: 860px; flex: none; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; background: var(--color-bg); box-shadow: 0 0 0 1px #3f424d, 0 40px 90px rgba(0,0,0,0.7);',
+          'height: 44px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 82px; background: #1b1d2b; border-bottom: 1px solid var(--color-divider); -webkit-app-region: drag;',
         )}
       >
-        {/* Chrome de fenêtre — maquette l. 29-41 */}
-        <div
-          style={s(
-            'height: 40px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px; background: #1b1d2b; border-bottom: 1px solid var(--color-divider);',
-          )}
-        >
-          <div style={s('display: flex; gap: 8px;')}>
-            {[0, 1, 2].map(i => (
-              <span
-                key={i}
-                style={s(
-                  'width: 11px; height: 11px; border-radius: 50%; background: #5b5f70; display: block;',
-                )}
-              />
-            ))}
-          </div>
-          <div style={s('font-size: 12.5px; color: var(--color-neutral-400); letter-spacing: .02em;')}>
-            Cockpit — {projects.find(p => p.path === current)?.name ?? '…'}
-          </div>
-          <div style={s('flex: 1;')} />
-          <ScanBadge scan={scan} />
+        <div style={s('font-size: 12.5px; color: var(--color-neutral-400); letter-spacing: .02em;')}>
+          Cockpit — {projects.find(p => p.path === current)?.name ?? '…'}
         </div>
+        <div style={s('flex: 1;')} />
+        <ScanBadge scan={scan} />
+      </div>
+
+      <div style={s('flex: 1; display: flex; flex-direction: column; min-height: 0;')}>
 
         <div style={s('flex: 1; display: flex; min-height: 0;')}>
           <Sidebar

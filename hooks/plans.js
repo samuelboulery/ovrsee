@@ -12,7 +12,8 @@
  */
 
 import { lstatSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { homedir } from 'node:os'
+import { basename, dirname, join } from 'node:path'
 
 const FENCE = '---'
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
@@ -218,6 +219,33 @@ export function writeFileNoFollow(path, content) {
   const tmp = `${path}.tmp-${process.pid}`
   writeFileSync(tmp, content, 'utf8')
   renameSync(tmp, path)
+}
+
+/**
+ * Enregistre un projet pour la barre latérale multi-projets.
+ *
+ * Vit ici pour la même raison que `closeOpenPlans` : le hook automatique et le
+ * CLI de secours doivent produire exactement le même état. Un projet capturé à
+ * la main qui n'apparaîtrait pas dans la liste serait un cockpit qui ment sur
+ * ce qu'il connaît.
+ */
+export function registerProject(root) {
+  const registry = join(homedir(), '.claude', 'cockpit', 'projects.json')
+
+  let projects = []
+  try {
+    const parsed = JSON.parse(readFileSync(registry, 'utf8'))
+    if (Array.isArray(parsed)) projects = parsed
+  } catch {
+    // Registre absent ou corrompu : on repart d'une liste vide plutôt que
+    // d'abandonner la capture.
+  }
+
+  if (projects.some(p => p?.path === root)) return false
+
+  projects.push({ path: root, name: basename(root) })
+  writeFileNoFollow(registry, JSON.stringify(projects, null, 2) + '\n')
+  return true
 }
 
 /**

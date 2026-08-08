@@ -18,12 +18,15 @@
 
 import { execFileSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
-import { homedir } from 'node:os'
-import { basename, join } from 'node:path'
+import { join } from 'node:path'
 
-import { serializePlan, planFileName, writeFileNoFollow, closeOpenPlans } from './plans.js'
-
-const REGISTRY = join(homedir(), '.claude', 'cockpit', 'projects.json')
+import {
+  serializePlan,
+  planFileName,
+  writeFileNoFollow,
+  closeOpenPlans,
+  registerProject,
+} from './plans.js'
 
 function readStdin() {
   try {
@@ -58,23 +61,6 @@ function titleOf(planText) {
     if (line.trim()) return line.trim().slice(0, 120)
   }
   return 'Plan sans titre'
-}
-
-/** Enregistre le projet pour la barre latérale multi-projets. */
-function registerProject(root) {
-  let projects = []
-  try {
-    const parsed = JSON.parse(readFileSync(REGISTRY, 'utf8'))
-    if (Array.isArray(parsed)) projects = parsed
-  } catch {
-    // Registre absent ou corrompu : on repart d'une liste vide plutôt que
-    // d'abandonner la capture.
-  }
-
-  if (projects.some(p => p?.path === root)) return
-
-  projects.push({ path: root, name: basename(root) })
-  writeFileNoFollow(REGISTRY, JSON.stringify(projects, null, 2) + '\n')
 }
 
 function main() {

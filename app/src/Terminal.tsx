@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { backlog, frDate, lastScan, type Snapshot } from './data'
 import { s } from './style'
+import { useTerminal } from './useTerminal'
 
 export type Layout = 'bottom' | 'side' | 'full'
 
@@ -42,16 +43,28 @@ export function Terminal({
   onToggle: () => void
   snapshot: Snapshot | null
 }) {
-  const [copied, setCopied] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+  const { host, error, inject, available } = useTerminal(snapshot?.root ?? null)
 
-  const copy = async (label: string, text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopied(label)
-      setTimeout(() => setCopied(null), 2000)
-    } catch {
-      setCopied('copie refusée par le navigateur')
+  /**
+   * Un clic injecte dans la session quand elle existe, et copie sinon.
+   *
+   * Le repli n'est pas un pis-aller déguisé : le libellé du panneau change
+   * aussi, pour que le bouton ne prétende jamais écrire dans une session
+   * inexistante.
+   */
+  const activate = async (label: string, text: string) => {
+    if (inject(text + '\n')) {
+      setNotice(`« ${label} » injecté`)
+    } else {
+      try {
+        await navigator.clipboard.writeText(text)
+        setNotice(`« ${label} » copié`)
+      } catch {
+        setNotice('copie refusée par le navigateur')
+      }
     }
+    setTimeout(() => setNotice(null), 2000)
   }
 
   const injections = buildInjections(snapshot)
@@ -71,9 +84,11 @@ export function Terminal({
           Terminal · claude
         </span>
         <span
-          title="Le terminal intégré arrive en v1.1"
+          title={available ? 'Session claude en cours' : 'Terminal disponible dans l’application'}
           style={s(
-            'width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--color-neutral-600); display: block;',
+            available && !error
+              ? 'width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent); display: block;'
+              : 'width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--color-neutral-600); display: block;',
           )}
         />
         <div style={s('flex: 1;')} />
@@ -118,7 +133,18 @@ export function Terminal({
             : 'flex: 1; display: flex; min-height: 0;',
         )}
       >
+        {available && (
+          // Session réelle : xterm occupe la zone, `claude` tourne derrière.
+          <div style={s('flex: 1; min-width: 0; min-height: 0; padding: 8px 4px 8px 10px;')}>
+            <div ref={host} style={s('width: 100%; height: 100%;')} />
+          </div>
+        )}
+
+        {/* Sans passerelle IPC — c'est-à-dire dans un navigateur — pas de
+            terminal. On le dit, plutôt que d'afficher une invite qui ne
+            répondrait jamais. */}
         <div
+          hidden={available}
           style={s(
             'flex: 1; overflow: auto; padding: 12px 14px; font-family: ui-monospace, SFMono-Regular, monospace; font-size: 12px; line-height: 1.75; min-width: 0;',
           )}
@@ -130,7 +156,7 @@ export function Terminal({
           ))}
           <div style={s('display: flex; align-items: center; gap: 7px; color: var(--color-neutral-600);')}>
             <span style={s('color: var(--color-neutral-700);')}>›</span>
-            <span>terminal intégré — v1.1</span>
+            <span>terminal disponible dans l'application, pas dans le navigateur</span>
           </div>
         </div>
 
@@ -146,14 +172,14 @@ export function Terminal({
               'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);',
             )}
           >
-            Copier pour la session
+            {available ? 'Injecter dans la session' : 'Copier pour la session'}
           </div>
           <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
             {injections.map(({ label, text }) => (
               <button
                 key={label}
                 type="button"
-                onClick={() => copy(label, text)}
+                onClick={() => activate(label, text)}
                 className="btn btn-secondary btn-block"
                 style={s('font-size: 11.5px; padding: 5px 10px;')}
               >
@@ -166,7 +192,12 @@ export function Terminal({
               'font-size: 11px; color: var(--color-neutral-600); margin-top: 13px; line-height: 1.5;',
             )}
           >
-            {copied ? `« ${copied} » copié.` : "Un clic copie le contexte. Le cockpit n'exécute jamais."}
+            {notice ??
+              (error
+                ? error
+                : available
+                  ? "Un clic écrit dans la session. Le cockpit ne lance rien d'autre que claude."
+                  : "Un clic copie le contexte. Le cockpit n'exécute jamais.")}
           </div>
         </div>
       </div>

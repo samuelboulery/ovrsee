@@ -4,7 +4,19 @@
   "title": "Cockpit — routage des onglets, puis coquille Electron (v1.1)",
   "opened": "2026-08-08",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "196e38f",
+      "date": "2026-08-08",
+      "files": [
+        "hooks/cockpit-capture-plan.js",
+        "hooks/cockpit-cli.js",
+        "hooks/plans.js",
+        "hooks/plans.test.js",
+        "skills/cockpit/SKILL.md"
+      ]
+    }
+  ]
 }
 ---
 

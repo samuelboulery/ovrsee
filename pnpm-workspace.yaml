@@ -1,0 +1,9 @@
+# pnpm ≥ 10 bloque par défaut les scripts d'installation des dépendances.
+# C'est une protection, pas une gêne : c'est le vecteur qu'a emprunté le ver
+# ChainDrop. On autorise donc nommément, et uniquement, les paquets qui ont
+# réellement besoin de compiler.
+#
+# node-pty est un module natif : sans son script de compilation, il n'y a pas
+# de binaire, donc pas de terminal.
+onlyBuiltDependencies:
+  - node-pty

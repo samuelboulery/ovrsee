@@ -24,6 +24,7 @@ import {
   planFileName,
   writeFileNoFollow,
   closeOpenPlans,
+  registerProject,
 } from './plans.js'
 
 const root = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
@@ -81,6 +82,7 @@ const commands = {
     }
     writeFileNoFollow(join(cockpitDir, 'plans', file), serializePlan(meta, text))
     writeFileNoFollow(join(cockpitDir, '.active-plan'), file + '\n')
+    if (registerProject(root)) console.log(`projet enregistré : ${root}`)
     console.log(`capturé : cockpit/plans/${file}`)
   },
 }

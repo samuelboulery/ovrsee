@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Cockpit — gestion des projets dans la barre latérale, et graphe par niveaux",
   "opened": "2026-08-08",
-  "closed": null,
+  "closed": "2026-08-08",
   "commits": [
     {
       "sha": "7fd02d8",
@@ -11,6 +11,11 @@
       "files": [
         "hooks/cockpit-capture-plan.js"
       ]
+    },
+    {
+      "sha": "51461bf",
+      "date": "2026-08-08",
+      "files": []
     }
   ]
 }

@@ -1,20 +1,20 @@
 {
   "date": "2026-08-08",
-  "commit": "b34bf11",
+  "commit": "f18104f",
   "pages": [
     {
       "route": "/",
       "slug": "accueil",
       "title": "Cockpit",
       "sample": "/",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 2654b64\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nGraphe de navigation\n5 pages · 20 liens · reconstruit au commit\nLIEN DIRECT\nRETOUR\nENTRÉE DE L'APP\nAccueil\n/\naucun plan\n8 août\nHistorique\n/historique\n1 plan\n8 ao",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit fb8a466\nPROJETS\ncockpit\n2 ouverts\naujourd'hui\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nGraphe de navigation\n5 pages · 20 liens · reconstruit au commit\nMÈNE À\nENTRÉE DE L'APP\nAccueil\n/\naucun plan\n8 août\nHistorique\n/historique\n1 plan\n8 août\nBacklog\n/backlog\n1 plan\n8 août\nDonnees\n/donnees\n1 plan\n8 août\nSt",
       "links": [
         "/historique",
         "/backlog",
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/accueil/2026-08-08-b34bf11.png",
+      "shot": "shots/accueil/2026-08-08-f18104f.png",
       "shotDate": "2026-08-08",
       "shotSize": {
         "width": 1280,
@@ -26,14 +26,14 @@
       "slug": "historique",
       "title": "Cockpit",
       "sample": "/historique",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 2654b64\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nChronologie des plans exécutés\nQuand, quoi, pourquoi, quels fichiers. Un plan est clos par le commit qui l'exécute.\n8 août 2026\nc8b826f\nCockpit — plan de constru",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit fb8a466\nPROJETS\ncockpit\n2 ouverts\naujourd'hui\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nChronologie du projet\nChaque commit, dans l'ordre, et les plans qui les expliquent. Un plan est clos par le commit qui l'exécute.\n8 AOÛT 2026\nPLAN\nProduit — le graphe passe dans un canevas zoomable\nouvert\n▸\nf18104f\nf",
       "links": [
         "/",
         "/backlog",
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/historique/2026-08-08-b34bf11.png",
+      "shot": "shots/historique/2026-08-08-f18104f.png",
       "shotDate": "2026-08-08",
       "shotSize": {
         "width": 1280,
@@ -45,14 +45,14 @@
       "slug": "backlog",
       "title": "Cockpit",
       "sample": "/backlog",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 2654b64\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nPlans ouverts\nApprouvés, jamais clos par un commit. Le backlog n'est pas saisi : il est calculé.\nCockpit — routage des onglets, puis coquille Electron (v1.1)\nouv",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit fb8a466\nPROJETS\ncockpit\n2 ouverts\naujourd'hui\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nPlans ouverts\nApprouvés, jamais clos par un commit. Le backlog n'est pas saisi : il est calculé.\nProduit — le graphe passe dans un canevas zoomable\nouvert aujourd'hui\nLe graphe de navigation est aujourd'hui responsiv",
       "links": [
         "/",
         "/historique",
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/backlog/2026-08-08-b34bf11.png",
+      "shot": "shots/backlog/2026-08-08-f18104f.png",
       "shotDate": "2026-08-08",
       "shotSize": {
         "width": 1280,
@@ -64,14 +64,14 @@
       "slug": "donnees",
       "title": "Cockpit",
       "sample": "/donnees",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 2654b64\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nTables\nlu depuis Graphify\nAucun schéma de base détecté par Graphify dans ce projet.\nCe n'est pas une panne : ce projet n'a pas de base à cartographier.\nTERMINAL ",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit fb8a466\nPROJETS\ncockpit\n2 ouverts\naujourd'hui\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nTables\nlu depuis Graphify\nAucun schéma de base détecté par Graphify dans ce projet.\nCe n'est pas une panne : ce projet n'a pas de base à cartographier.\nTERMINAL · CLAUDE\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\n$ claude\n◆ ",
       "links": [
         "/",
         "/historique",
         "/backlog",
         "/stack"
       ],
-      "shot": "shots/donnees/2026-08-08-b34bf11.png",
+      "shot": "shots/donnees/2026-08-08-f18104f.png",
       "shotDate": "2026-08-08",
       "shotSize": {
         "width": 1280,
@@ -83,14 +83,14 @@
       "slug": "stack",
       "title": "Cockpit",
       "sample": "/stack",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit 2654b64\nPROJETS\ncockpit\n1 ouvert\naujourd'hui\nhumankindr-platform\nà jour\njamais\nassocia\nà jour\njamais\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nStack\nCe qui est utilisé, et pourquoi — chaque ligne remonte à un commentaire # WHY: ou à un plan.\n@xterm/addon-fit\n^0.11.0\nAucune raison tracée : ni plan, ni co",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 8 août 2026 · commit fb8a466\nPROJETS\ncockpit\n2 ouverts\naujourd'hui\nDENSITÉ D'ACTIVITÉ\n16 semaines\naujourd'hui\nProduit\nHistorique\nBacklog\nDonnées\nStack\nStack\nCe qui est utilisé, et pourquoi — chaque ligne remonte à un commentaire # WHY: ou à un plan.\n@xterm/addon-fit\n^0.11.0\nAucune raison tracée : ni plan, ni commentaire # WHY:.\n@xterm/xterm\n6.0.0\nCockpit — routage ",
       "links": [
         "/",
         "/historique",
         "/backlog",
         "/donnees"
       ],
-      "shot": "shots/stack/2026-08-08-b34bf11.png",
+      "shot": "shots/stack/2026-08-08-f18104f.png",
       "shotDate": "2026-08-08",
       "shotSize": {
         "width": 1280,

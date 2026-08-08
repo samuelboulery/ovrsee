@@ -4,7 +4,16 @@
   "title": "Terminal du cockpit : vrai shell au lieu de `claude` seul",
   "opened": "2026-08-08",
   "closed": "2026-08-08",
-  "commits": []
+  "commits": [
+    {
+      "sha": "83e6c53",
+      "date": "2026-08-08",
+      "files": [
+        "README.md",
+        "electron/pty.js"
+      ]
+    }
+  ]
 }
 ---
 

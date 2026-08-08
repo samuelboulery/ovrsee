@@ -4,11 +4,12 @@
  *
  *   node hooks/install.js [chemin-du-dépôt]
  *
- * Deux choses :
+ * Trois choses :
  *
- * 1. un bloc délimité dans `.git/hooks/post-commit`, en préservant ce qui s'y
+ * 1. le dossier `cockpit/plans/`, seul endroit que lit `readPlans` ;
+ * 2. un bloc délimité dans `.git/hooks/post-commit`, en préservant ce qui s'y
  *    trouve déjà (Graphify installe son propre bloc au même endroit) ;
- * 2. les deux hooks Claude Code dans `~/.claude/settings.json`.
+ * 3. les deux hooks Claude Code dans `~/.claude/settings.json`.
  *
  * Réexécutable sans effet cumulatif : les blocs sont repérés et remplacés,
  * jamais empilés.
@@ -16,10 +17,21 @@
  * L'écriture dans la configuration globale est annoncée, sauvegardée avant, et
  * relue après. Les entrées existantes — DetachIsland, caveman — sont
  * conservées : on ajoute au tableau, on ne le remplace jamais.
+ *
+ * Module *et* script : l'interface appelle `install()` pour équiper un projet
+ * qu'on vient d'ouvrir, sans lancer de processus. Une seconde implémentation
+ * de l'installation finirait par diverger de celle-ci.
  */
 
 import { execFileSync } from 'node:child_process'
-import { chmodSync, copyFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+  chmodSync,
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -27,13 +39,7 @@ import { fileURLToPath } from 'node:url'
 const HERE = dirname(fileURLToPath(import.meta.url))
 const START = '# cockpit-hook-start'
 const END = '# cockpit-hook-end'
-
-const target = resolve(process.argv[2] ?? process.cwd())
-
-const root = execFileSync('git', ['rev-parse', '--show-toplevel'], {
-  cwd: target,
-  encoding: 'utf8',
-}).trim()
+const SETTINGS = join(homedir(), '.claude', 'settings.json')
 
 /**
  * Échappement shell : guillemets simples, avec la séquence de sortie standard
@@ -45,41 +51,59 @@ const root = execFileSync('git', ['rev-parse', '--show-toplevel'], {
  */
 const shq = value => `'${String(value).replaceAll("'", `'\\''`)}'`
 
-const hookPath = join(root, '.git', 'hooks', 'post-commit')
-const block = [
-  START,
-  '# Rattache le commit au plan actif de cockpit/. Installé par: node hooks/install.js',
-  `${shq(process.execPath)} ${shq(join(HERE, 'cockpit-post-commit.js'))} || true`,
-  END,
-].join('\n')
+/**
+ * La ligne qui lance `cockpit-post-commit.js` à chaque commit.
+ *
+ * Depuis l'application empaquetée, deux pièges se combinent : `process.execPath`
+ * est le binaire Cockpit et non `node` — l'écrire tel quel ferait ouvrir la
+ * fenêtre à chaque commit — et le script est resté dans `app.asar`, que `node`
+ * ne sait pas lire. `ELECTRON_RUN_AS_NODE=1` résout les deux d'un coup : le même
+ * binaire se comporte alors en node, et lui seul sait ouvrir l'archive.
+ */
+function commandFor(scriptName) {
+  const script = shq(join(HERE, scriptName))
+  const runtime = shq(process.execPath)
 
-let existing = existsSync(hookPath) ? readFileSync(hookPath, 'utf8') : '#!/bin/sh\n'
-
-const start = existing.indexOf(START)
-if (start !== -1) {
-  // Remplace le bloc précédent, sans toucher au reste du fichier.
-  const end = existing.indexOf(END, start)
-  const cut = end === -1 ? existing.length : end + END.length
-  existing = existing.slice(0, start) + block + existing.slice(cut)
-} else {
-  if (!existing.endsWith('\n')) existing += '\n'
-  existing += '\n' + block + '\n'
+  return process.versions.electron
+    ? `ELECTRON_RUN_AS_NODE=1 ${runtime} ${script}`
+    : `${runtime} ${script}`
 }
 
-writeFileSync(hookPath, existing, 'utf8')
-chmodSync(hookPath, 0o755)
+/** Le bloc cockpit du `post-commit`, installé ou remplacé sans toucher au reste. */
+function installPostCommit(root, done) {
+  const hookPath = join(root, '.git', 'hooks', 'post-commit')
+  const block = [
+    START,
+    '# Rattache le commit au plan actif de cockpit/. Installé par: node hooks/install.js',
+    `${commandFor('cockpit-post-commit.js')} || true`,
+    END,
+  ].join('\n')
 
-console.log(`post-commit : bloc cockpit installé dans ${hookPath}`)
-// --- hooks Claude Code ------------------------------------------------------
+  let existing = existsSync(hookPath) ? readFileSync(hookPath, 'utf8') : '#!/bin/sh\n'
 
-const SETTINGS = join(homedir(), '.claude', 'settings.json')
+  const start = existing.indexOf(START)
+  if (start !== -1) {
+    // Remplace le bloc précédent, sans toucher au reste du fichier.
+    const end = existing.indexOf(END, start)
+    const cut = end === -1 ? existing.length : end + END.length
+    existing = existing.slice(0, start) + block + existing.slice(cut)
+  } else {
+    if (!existing.endsWith('\n')) existing += '\n'
+    existing += '\n' + block + '\n'
+  }
+
+  writeFileSync(hookPath, existing, 'utf8')
+  chmodSync(hookPath, 0o755)
+
+  done.push(`post-commit : bloc cockpit installé dans ${hookPath}`)
+}
 
 /** Une entrée est-elle déjà celle du cockpit ? */
 const isCockpit = (entry, script) => JSON.stringify(entry).includes(script)
 
-function installClaudeHooks() {
+function installClaudeHooks(done) {
   if (!existsSync(SETTINGS)) {
-    console.log(`\n${SETTINGS} absent — hooks Claude Code non installés.`)
+    done.push(`${SETTINGS} absent — hooks Claude Code non installés.`)
     return
   }
 
@@ -89,7 +113,7 @@ function installClaudeHooks() {
   try {
     settings = JSON.parse(original)
   } catch (err) {
-    console.error(`\n${SETTINGS} illisible (${err.message}) — laissé intact.`)
+    done.push(`${SETTINGS} illisible (${err.message}) — laissé intact.`)
     return
   }
 
@@ -102,7 +126,7 @@ function installClaudeHooks() {
       hooks: [
         {
           type: 'command',
-          command: `node "${join(HERE, 'cockpit-session-start.js')}"`,
+          command: commandFor('cockpit-session-start.js'),
           timeout: 5,
           statusMessage: 'Lecture du cockpit...',
         },
@@ -115,13 +139,13 @@ function installClaudeHooks() {
   if (!postToolUse.some(e => isCockpit(e, 'cockpit-capture-plan'))) {
     postToolUse.push({
       matcher: 'ExitPlanMode',
-      hooks: [{ type: 'command', command: `node "${join(HERE, 'cockpit-capture-plan.js')}"` }],
+      hooks: [{ type: 'command', command: commandFor('cockpit-capture-plan.js') }],
     })
     added.push('PostToolUse/ExitPlanMode — capture des plans approuvés')
   }
 
   if (added.length === 0) {
-    console.log('\nHooks Claude Code : déjà installés.')
+    done.push('Hooks Claude Code : déjà installés.')
     return
   }
 
@@ -138,12 +162,41 @@ function installClaudeHooks() {
     JSON.parse(readFileSync(SETTINGS, 'utf8'))
   } catch (err) {
     writeFileSync(SETTINGS, original, 'utf8')
-    console.error(`\nÉcriture invalide (${err.message}) — configuration restaurée.`)
+    done.push(`Écriture invalide (${err.message}) — configuration restaurée.`)
     return
   }
 
-  console.log(`\nHooks Claude Code installés (sauvegarde : ${backup}) :`)
-  for (const line of added) console.log(`  + ${line}`)
+  done.push(`Hooks Claude Code installés (sauvegarde : ${backup}) :`)
+  for (const line of added) done.push(`  + ${line}`)
 }
 
-installClaudeHooks()
+/**
+ * Équipe un dépôt. Rend la liste de ce qui a été fait, ligne par ligne — c'est
+ * ce que le CLI affiche et ce que l'interface montre après un « Initialiser ».
+ *
+ * @param {string} target dossier quelconque à l'intérieur du dépôt
+ * @returns {string[]}
+ * @throws si `target` n'est pas dans un dépôt git : le rattachement des commits
+ *   aux plans n'a alors aucun sens, et le dire vaut mieux qu'installer à moitié.
+ */
+export function install(target) {
+  const root = execFileSync('git', ['rev-parse', '--show-toplevel'], {
+    cwd: resolve(target),
+    encoding: 'utf8',
+  }).trim()
+
+  const done = []
+
+  mkdirSync(join(root, 'cockpit', 'plans'), { recursive: true })
+  done.push(`cockpit/plans/ prêt dans ${root}`)
+
+  installPostCommit(root, done)
+  installClaudeHooks(done)
+
+  return done
+}
+
+// Exécution directe seulement : importé, ce fichier n'écrit rien.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  for (const line of install(process.argv[2] ?? process.cwd())) console.log(line)
+}

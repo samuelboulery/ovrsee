@@ -11,7 +11,7 @@
  * puisque ce même processus peut charger la page servie et l'y lire.
  */
 
-import { app, BrowserWindow, ipcMain, protocol, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, protocol, shell } from 'electron'
 import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, extname, join, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -133,6 +133,11 @@ function createWindow() {
   // `COCKPIT_CAPTURE=/chemin.png` : la fenêtre se photographie puis quitte.
   // Une interface graphique doit pouvoir se vérifier sans qu'un humain la
   // regarde — sinon elle n'est jamais vérifiée automatiquement.
+  //
+  // Le délai s'ajuste par `COCKPIT_CAPTURE_DELAY` : sur un démarrage à froid,
+  // 2,5 s ne suffisent pas toujours et la capture rend une image vide — le
+  // seul résultat pire qu'une absence de vérification est une vérification qui
+  // ment.
   const capture = process.env.COCKPIT_CAPTURE
   if (capture) {
     window.webContents.once('did-finish-load', () => {
@@ -140,7 +145,7 @@ function createWindow() {
         const image = await window.webContents.capturePage()
         await writeFile(capture, image.toPNG())
         app.quit()
-      }, 2500) // laisser les données arriver et le terminal s'ouvrir
+      }, Number(process.env.COCKPIT_CAPTURE_DELAY ?? 2500))
     })
   }
 
@@ -148,12 +153,15 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  protocol.handle(SCHEME, request => {
+  protocol.handle(SCHEME, async request => {
     const url = new URL(request.url)
     // `server/api.js` décide ; ici on ne fait que router. Pas de dépôt
     // courant dans une application empaquetée : la liste des projets vient
     // entièrement du registre.
-    return fetchHandler(url, null) ?? serveUi(url.pathname)
+    //
+    // `await` avant le `??` : une promesse est toujours vraie, et sans lui
+    // l'interface ne serait plus jamais servie.
+    return (await fetchHandler(url, null, request)) ?? serveUi(url.pathname)
   })
 
   // Surface du terminal. Elle n'accepte jamais de nom de programme : le
@@ -162,6 +170,18 @@ app.whenReady().then(() => {
   ipcMain.handle('pty:write', (_event, id, data) => writeTo(id, data))
   ipcMain.handle('pty:resize', (_event, id, cols, rows) => resize(id, cols, rows))
   ipcMain.handle('pty:close', (_event, id) => closeSession(id))
+
+  // Choisir un dossier. Le seul geste qui ne peut pas passer par `/api` : une
+  // page web n'a pas le droit de connaître un chemin du disque tant que
+  // l'utilisateur ne l'a pas désigné lui-même. Aucun argument venu du rendu —
+  // ce qui est ouvert est ce qui a été cliqué, rien d'autre.
+  ipcMain.handle('projects:pick', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: 'Ouvrir un projet',
+      properties: ['openDirectory'],
+    })
+    return canceled ? null : (filePaths[0] ?? null)
+  })
 
   createWindow()
 

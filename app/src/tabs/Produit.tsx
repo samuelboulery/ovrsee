@@ -11,6 +11,7 @@ import {
   layoutGraph,
   pageName,
   plansForPage,
+  ROW_STEP,
   shotRatio,
   scanFailed,
   shotDate,
@@ -175,11 +176,7 @@ function Legend() {
     >
       <span style={s('display: flex; align-items: center; gap: 6px;')}>
         <span style={s('width: 20px; height: 1px; background: var(--color-accent); display: block;')} />
-        lien direct
-      </span>
-      <span style={s('display: flex; align-items: center; gap: 6px;')}>
-        <span style={s('width: 20px; height: 0; border-top: 1px dashed var(--color-neutral-600); display: block;')} />
-        retour
+        mène à
       </span>
       <span style={s('display: flex; align-items: center; gap: 6px;')}>
         <span
@@ -196,40 +193,54 @@ function Legend() {
 /**
  * Arêtes orthogonales en L, dans le sens vertical.
  *
- * Un lien vers une profondeur plus grande descend : il sort du bas de la carte
- * et entre par le haut de la suivante. Un lien qui remonte vers une profondeur
- * déjà atteinte est un retour : il contourne par la droite, en pointillé gris,
- * pour ne pas se confondre avec le flux principal.
+ * **Une arête = une descente d'un niveau.** Seul un lien vers la profondeur
+ * immédiatement suivante est tracé : il sort du bas de la carte et entre par le
+ * haut de la suivante.
+ *
+ * Tout le reste est écarté, et c'est le fond du problème que cette règle
+ * corrige. Une barre de navigation met sur chaque page un lien vers toutes les
+ * autres : les cinq pages du cockpit produisent vingt liens, dont seize entre
+ * frères de même niveau. Tracés, ils donnaient à `/stack` l'air de découler de
+ * `/donnees`. Un lien frère ne dit rien de la structure — il dit qu'il y a un
+ * menu. Un lien qui remonte non plus : toute page ramène à l'accueil.
+ *
+ * Ce qui est perdu : on ne voit plus qu'une page en atteint une autre
+ * latéralement. Ce qui est gagné : ce qui reste à l'écran est vrai. Un enfant
+ * atteint depuis deux parents garde bien ses deux arêtes — on ne réduit pas à
+ * l'arbre du parcours.
  */
 function Edges({ placed, width, height }: { placed: Placed[]; width: number; height: number }) {
   const byRoute = new Map(placed.map(item => [item.page.route, item]))
   const forward: string[] = []
-  const back: string[] = []
 
   for (const from of placed) {
     for (const link of from.page.links) {
       const to = byRoute.get(link)
-      if (!to || to.page.route === from.page.route) continue
+      if (!to || to.depth !== from.depth + 1) continue
 
-      if (to.depth > from.depth) {
-        // Descente : bas du centre → haut du centre, avec un décrochement
-        // horizontal à mi-hauteur.
+      const x2 = to.x + CARD_W / 2
+      const y2 = to.y
+
+      if (to.y - from.y === ROW_STEP) {
+        // Rangée immédiatement dessous : bas du centre → haut du centre, avec
+        // un décrochement horizontal à mi-hauteur.
         const x1 = from.x + CARD_W / 2
         const y1 = from.y + CARD_H
-        const x2 = to.x + CARD_W / 2
-        const y2 = to.y
-        const mid = y1 + (y2 - y1) / 2
-        forward.push(`M ${x1} ${y1} V ${mid} H ${x2} V ${y2}`)
-      } else {
-        // Retour : sortie par le flanc droit, remontée à l'écart des cartes,
-        // entrée par le flanc droit de la cible.
-        const x1 = from.x + CARD_W
-        const y1 = from.y + CARD_H / 2
-        const x2 = to.x + CARD_W
-        const y2 = to.y + CARD_H / 2
-        const lane = Math.max(x1, x2) + 18
-        back.push(`M ${x1} ${y1} H ${lane} V ${y2} H ${x2}`)
+        forward.push(`M ${x1} ${y1} V ${y1 + (y2 - y1) / 2} H ${x2} V ${y2}`)
+        continue
       }
+
+      // Une profondeur trop large pour la fenêtre est repliée en sous-rangées
+      // (`layoutGraph`) : la cible est alors deux rangées plus bas, et un trait
+      // droit passerait derrière les cartes intercalées. Il en ressortirait
+      // juste au-dessus de la cible — exactement l'image d'une page qui
+      // découlerait de sa voisine, que ce composant existe pour ne plus
+      // produire. Le détour passe donc à l'écart de toutes les cartes.
+      const x1 = from.x + CARD_W
+      const y1 = from.y + CARD_H / 2
+      const lane = width + 18
+      const gutter = y2 - (ROW_STEP - CARD_H) / 2
+      forward.push(`M ${x1} ${y1} H ${lane} V ${gutter} H ${x2} V ${y2}`)
     }
   }
 
@@ -244,17 +255,9 @@ function Edges({ placed, width, height }: { placed: Placed[]; width: number; hei
         <marker id="na" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#796cbf" />
         </marker>
-        <marker id="nab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#595d6c" />
-        </marker>
       </defs>
       <g fill="none" stroke="#796cbf" strokeWidth="1.25" markerEnd="url(#na)">
         {forward.map((d, i) => (
-          <path key={i} d={d} />
-        ))}
-      </g>
-      <g fill="none" stroke="#595d6c" strokeWidth="1" strokeDasharray="4 4" markerEnd="url(#nab)">
-        {back.map((d, i) => (
           <path key={i} d={d} />
         ))}
       </g>

@@ -22,7 +22,11 @@ export interface TerminalBridge {
 
 declare global {
   interface Window {
-    cockpit?: { terminal: TerminalBridge }
+    cockpit?: {
+      terminal: TerminalBridge
+      /** Sélecteur de dossier du système. Rend null si l'utilisateur annule. */
+      projects: { pick: () => Promise<string | null> }
+    }
   }
 }
 
@@ -59,7 +63,9 @@ export function useTerminal(projectPath: string | null) {
     if (!bridge || !host.current || !projectPath) return
 
     const xterm = new XTerm({
-      fontFamily: 'ui-monospace, SFMono-Regular, monospace',
+      // Menlo d'abord : SF Mono rend mal les caractères de cadre dont Claude
+      // se sert pour ses encadrés.
+      fontFamily: 'Menlo, ui-monospace, SFMono-Regular, monospace',
       fontSize: 12,
       lineHeight: 1.35,
       cursorBlink: true,

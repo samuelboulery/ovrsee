@@ -8,12 +8,9 @@
  */
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
-import { homedir } from 'node:os'
 import { basename, join, normalize } from 'node:path'
 
-import { readPlans } from './plans.js'
-
-const REGISTRY = join(homedir(), '.claude', 'cockpit', 'projects.json')
+import { readPlans, readRegistry } from './plans.js'
 
 const readJson = path => {
   try {
@@ -24,25 +21,33 @@ const readJson = path => {
 }
 
 /**
- * Projets connus, le dépôt courant en tête.
+ * Projets connus, du dernier ouvert au plus ancien.
  *
- * Le préfixage n'a lieu que si `cwd` porte vraiment un `cockpit/` : au dev
- * server lancé depuis le dépôt, cela évite un cockpit vide au premier
- * lancement ; dans l'application empaquetée, il n'y a pas de dépôt courant et
- * la liste vient alors uniquement du registre. Ajouter le dossier de
- * lancement d'une application de bureau à la liste des projets n'aurait aucun
- * sens.
+ * L'ordre est celui de l'usage, pas celui de l'insertion : on retourne à un
+ * projet bien plus souvent qu'on n'en ajoute, et le chercher en bas d'une liste
+ * qui s'allonge est du travail pour rien. Une entrée sans `lastOpened` vient
+ * d'un registre écrit avant cette date — elle passe en fin de liste, dans son
+ * ordre d'origine, plutôt que de prétendre à une fraîcheur qu'on ne connaît pas.
+ *
+ * Le dépôt courant est ajouté en tête s'il porte un `cockpit/` sans être
+ * enregistré : au dev server lancé depuis le dépôt, cela évite un cockpit vide
+ * au premier lancement. S'il est enregistré, c'est l'usage qui le classe.
+ * Dans l'application empaquetée, il n'y a pas de dépôt courant et la liste vient
+ * entièrement du registre.
  *
  * @param {string|null} [cwd]
  */
 export function projects(cwd = process.cwd()) {
-  const listed = Array.isArray(readJson(REGISTRY)) ? readJson(REGISTRY) : []
-  const known = listed.filter(p => p?.path)
+  const known = readRegistry()
 
-  if (!cwd || !existsSync(join(cwd, 'cockpit'))) return known
+  // Tri stable : `sort` l'est en JavaScript moderne, donc deux entrées sans
+  // date gardent leur ordre d'écriture.
+  const ordered = [...known].sort((a, b) => (b.lastOpened ?? '').localeCompare(a.lastOpened ?? ''))
 
-  const here = { path: cwd, name: basename(cwd) }
-  return [here, ...known.filter(p => p.path !== here.path)]
+  if (!cwd || !existsSync(join(cwd, 'cockpit'))) return ordered
+  if (ordered.some(p => p.path === cwd)) return ordered
+
+  return [{ path: cwd, name: basename(cwd) }, ...ordered]
 }
 
 /** Captures successives par page, de la plus récente à la plus ancienne. */
@@ -85,6 +90,10 @@ function scans(root) {
 export function snapshot(root) {
   return {
     root,
+    // Un fait, pas une déduction : un `cockpit/` vide et un `cockpit/` absent
+    // se ressemblent une fois les plans lus, et l'interface ne doit pas
+    // proposer d'initialiser ce qui l'est déjà.
+    equipped: existsSync(join(root, 'cockpit')),
     plans: readPlans(join(root, 'cockpit')).map(p => ({ file: p.file, ...p.meta, body: p.body })),
     packageJson: readJson(join(root, 'package.json')),
     pages: readJson(join(root, 'cockpit', 'pages', 'pages.json')),

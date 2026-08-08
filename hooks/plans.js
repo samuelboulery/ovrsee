@@ -222,29 +222,86 @@ export function writeFileNoFollow(path, content) {
 }
 
 /**
+ * Le registre des projets connus, partagé par les hooks et l'interface.
+ *
+ * Une seule définition du chemin : `snapshot.js` l'importe d'ici plutôt que de
+ * le recomposer, sans quoi une lecture et une écriture pourraient viser deux
+ * fichiers différents le jour où il bouge.
+ *
+ * `COCKPIT_REGISTRY` existe pour les tests : ils écrivent réellement dans le
+ * registre, et un test qui vide la liste de projets de la machine serait un
+ * test qui casse l'outil qu'il vérifie.
+ */
+export const registryPath = () =>
+  process.env.COCKPIT_REGISTRY ?? join(homedir(), '.claude', 'cockpit', 'projects.json')
+
+/** @returns {Array<{path: string, name: string, lastOpened?: string}>} */
+export function readRegistry() {
+  try {
+    const parsed = JSON.parse(readFileSync(registryPath(), 'utf8'))
+    // Registre absent, corrompu, ou entrées sans chemin : on garde ce qui est
+    // exploitable plutôt que d'abandonner l'opération en cours.
+    return Array.isArray(parsed) ? parsed.filter(p => p?.path) : []
+  } catch {
+    return []
+  }
+}
+
+const writeRegistry = projects =>
+  writeFileNoFollow(registryPath(), JSON.stringify(projects, null, 2) + '\n')
+
+/**
  * Enregistre un projet pour la barre latérale multi-projets.
  *
  * Vit ici pour la même raison que `closeOpenPlans` : le hook automatique et le
  * CLI de secours doivent produire exactement le même état. Un projet capturé à
  * la main qui n'apparaîtrait pas dans la liste serait un cockpit qui ment sur
  * ce qu'il connaît.
+ *
+ * `lastOpened` porte l'ordre de la barre latérale. Un projet qu'on vient
+ * d'ajouter est daté d'aujourd'hui : on vient précisément de s'y intéresser.
  */
-export function registerProject(root) {
-  const registry = join(homedir(), '.claude', 'cockpit', 'projects.json')
+export function registerProject(root, now = new Date()) {
+  const projects = readRegistry()
+  if (projects.some(p => p.path === root)) return false
 
-  let projects = []
-  try {
-    const parsed = JSON.parse(readFileSync(registry, 'utf8'))
-    if (Array.isArray(parsed)) projects = parsed
-  } catch {
-    // Registre absent ou corrompu : on repart d'une liste vide plutôt que
-    // d'abandonner la capture.
-  }
+  writeRegistry([...projects, { path: root, name: basename(root), lastOpened: now.toISOString() }])
+  return true
+}
 
-  if (projects.some(p => p?.path === root)) return false
+/**
+ * Retire un projet de la liste. **Aucun fichier du projet n'est touché** — ni
+ * le dépôt, ni son dossier `cockpit/`. C'est un oubli, pas une suppression :
+ * réenregistrer le même chemin retrouve tout l'historique intact.
+ *
+ * @returns {boolean} vrai si le projet y était
+ */
+export function unregisterProject(root) {
+  const projects = readRegistry()
+  const kept = projects.filter(p => p.path !== root)
+  if (kept.length === projects.length) return false
 
-  projects.push({ path: root, name: basename(root) })
-  writeFileNoFollow(registry, JSON.stringify(projects, null, 2) + '\n')
+  writeRegistry(kept)
+  return true
+}
+
+/**
+ * Note qu'un projet vient d'être ouvert — c'est ce qui le fait remonter en tête
+ * de la barre latérale.
+ *
+ * Sans effet sur un projet inconnu : ouvrir n'est pas enregistrer, et une
+ * ouverture ne doit pas faire entrer dans la liste un chemin que personne n'y a
+ * mis.
+ *
+ * @returns {boolean} vrai si la date a été écrite
+ */
+export function touchProject(root, now = new Date()) {
+  const projects = readRegistry()
+  if (!projects.some(p => p.path === root)) return false
+
+  writeRegistry(
+    projects.map(p => (p.path === root ? { ...p, lastOpened: now.toISOString() } : p)),
+  )
   return true
 }
 

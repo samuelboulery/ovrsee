@@ -7,7 +7,9 @@ import {
   fetchSnapshot,
   frDate,
   humanAge,
+  isUnequipped,
   lastScan,
+  projectAction,
   type Project,
   type Snapshot,
 } from './data'
@@ -102,11 +104,34 @@ export function App() {
     fetchSnapshot(current)
       .then(setSnapshot)
       .catch(err => setError(String(err.message ?? err)))
+
+    // Le projet remonte en tête de la liste — mais au prochain chargement.
+    // Réordonner sous le curseur au moment du clic ferait sauter la ligne
+    // qu'on vient de viser.
+    projectAction('touch', current).catch(() => {})
   }, [current])
+
+  const reload = () => {
+    if (!current) return
+    fetchSnapshot(current)
+      .then(setSnapshot)
+      .catch(err => setError(String(err.message ?? err)))
+  }
+
+  /** Ajout, retrait : la liste vient du serveur, déjà triée. */
+  const applyProjects = (list: Project[], select?: string | null) => {
+    setProjects(list)
+    const next = select ?? (list.some(p => p.path === current) ? current : (list[0]?.path ?? null))
+    if (next !== current) {
+      setCurrent(next)
+      pushUrl(window.location.pathname, next)
+    }
+  }
 
   const plans = snapshot?.plans ?? []
   const scan = lastScan(snapshot?.scans ?? [])
   const contentVisible = !(layout === 'full' && terminal)
+  const unequipped = snapshot ? isUnequipped(snapshot) : false
 
   return (
     // La maquette dessinait une fausse fenêtre — pastilles, ombre portée,
@@ -146,6 +171,8 @@ export function App() {
               setCurrent(path)
               pushUrl(window.location.pathname, path)
             }}
+            onProjects={applyProjects}
+            onError={setError}
             density={density(plans)}
           />
           <Divider axis="x" resizable={sidebar} />
@@ -199,7 +226,10 @@ export function App() {
                 <div style={s('flex: 1; overflow: hidden; display: flex; min-height: 0; min-width: 0;')}>
                   {error && <Message text={`Lecture impossible : ${error}`} />}
                   {!error && !snapshot && <Message text="Lecture de cockpit/…" />}
-                  {!error && snapshot && (
+                  {!error && snapshot && unequipped && (
+                    <Unequipped root={snapshot.root} onDone={reload} onError={setError} />
+                  )}
+                  {!error && snapshot && !unequipped && (
                     <>
                       {tab === 'produit' && <Produit snapshot={snapshot} layout={layout} />}
                       {tab === 'historique' && <Historique plans={plans} />}
@@ -289,21 +319,92 @@ function Message({ text }: { text: string }) {
   )
 }
 
+/**
+ * Un projet qui n'a pas encore de `cockpit/`.
+ *
+ * Il apparaît quand même dans la liste : refuser un dossier parce qu'il n'est
+ * pas encore équipé obligerait à équiper avant d'ouvrir, c'est-à-dire à savoir
+ * d'avance ce que cette page est là pour montrer.
+ */
+function Unequipped({
+  root,
+  onDone,
+  onError,
+}: {
+  root: string
+  onDone: () => void
+  onError: (message: string) => void
+}) {
+  const [busy, setBusy] = useState(false)
+  const [done, setDone] = useState<string[] | null>(null)
+
+  return (
+    <div
+      style={s(
+        'flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center;',
+      )}
+    >
+      <div style={s('font-size: 13px; color: var(--color-neutral-400);')}>
+        Ce dossier n'a pas de <code>cockpit/</code> — aucun plan, aucun scan à lire.
+      </div>
+      <div style={s('font-size: 11.5px; color: var(--color-neutral-600); max-width: 52ch;')}>
+        L'initialiser crée <code>cockpit/plans/</code> et pose le hook <code>post-commit</code> qui
+        rattache les commits au plan actif.
+      </div>
+
+      {done ? (
+        <div style={s('font-size: 11px; color: var(--color-neutral-500); text-align: left;')}>
+          {done.map(line => (
+            <div key={line}>{line}</div>
+          ))}
+        </div>
+      ) : (
+        <button
+          type="button"
+          className="btn"
+          disabled={busy}
+          onClick={() => {
+            setBusy(true)
+            projectAction('init', root)
+              .then(result => {
+                setDone(result.done ?? [])
+                onDone()
+              })
+              .catch(err => onError(String(err.message ?? err)))
+              .finally(() => setBusy(false))
+          }}
+        >
+          {busy ? 'Initialisation…' : 'Initialiser cockpit ici'}
+        </button>
+      )}
+    </div>
+  )
+}
+
 /** Barre latérale — maquette l. 45-71. */
 function Sidebar({
   projects,
   current,
   width,
   onPick,
+  onProjects,
+  onError,
   density: bars,
 }: {
   projects: Project[]
   current: string | null
   width: number
   onPick: (path: string) => void
+  onProjects: (list: Project[], select?: string | null) => void
+  onError: (message: string) => void
   density: number[]
 }) {
   const max = Math.max(1, ...bars)
+
+  // Le sélecteur de dossier n'existe que dans l'application empaquetée. Dans un
+  // navigateur, le bouton est absent plutôt que présent et inerte — même
+  // franchise que pour le terminal.
+  const picker = window.cockpit?.projects
 
   return (
     <div
@@ -313,10 +414,31 @@ function Sidebar({
     >
       <div
         style={s(
-          'padding: 0 14px 10px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);',
+          'padding: 0 14px 10px; display: flex; align-items: center; gap: 8px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);',
         )}
       >
         Projets
+        <div style={s('flex: 1;')} />
+        {picker && (
+          <button
+            type="button"
+            title="Ouvrir un projet"
+            className="btn btn-ghost"
+            onClick={async () => {
+              try {
+                const path = await picker.pick()
+                if (!path) return // sélecteur annulé : rien à dire
+                const { projects: list } = await projectAction('add', path)
+                onProjects(list, path)
+              } catch (err) {
+                onError(String((err as Error).message ?? err))
+              }
+            }}
+            style={s('font-size: 14px; line-height: 1; padding: 2px 7px;')}
+          >
+            +
+          </button>
+        )}
       </div>
       <div style={s('display: flex; flex-direction: column;')}>
         {projects.map(project => (
@@ -325,6 +447,11 @@ function Sidebar({
             project={project}
             active={project.path === current}
             onPick={onPick}
+            onRemove={() => {
+              projectAction('remove', project.path)
+                .then(result => onProjects(result.projects))
+                .catch(err => onError(String(err.message ?? err)))
+            }}
           />
         ))}
       </div>
@@ -378,13 +505,18 @@ function ProjectRow({
   project,
   active,
   onPick,
+  onRemove,
 }: {
   project: Project
   active: boolean
   onPick: (path: string) => void
+  onRemove: () => void
 }) {
   const [open, setOpen] = useState<number | null>(null)
   const [last, setLast] = useState<string | null>(null)
+  const [equipped, setEquipped] = useState(true)
+  const [hover, setHover] = useState(false)
+  const [confirming, setConfirming] = useState(false)
 
   // Chaque projet lit son propre compte de plans ouverts : c'est ce que la
   // barre latérale annonce, et l'annoncer faux serait pire que de ne rien dire.
@@ -392,15 +524,29 @@ function ProjectRow({
     fetchSnapshot(project.path)
       .then(snap => {
         setOpen(backlog(snap.plans).length)
+        setEquipped(!isUnequipped(snap))
         const dates = snap.plans.flatMap(p => p.commits.map(c => c.date)).sort()
         setLast(dates.at(-1) ?? null)
       })
       .catch(() => setOpen(null))
   }, [project.path])
 
+  const badge = !equipped
+    ? 'à initialiser'
+    : open === null
+      ? '—'
+      : open > 0
+        ? `${open} ouvert${open > 1 ? 's' : ''}`
+        : 'à jour'
+
   return (
     <div
       onClick={() => onPick(project.path)}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => {
+        setHover(false)
+        setConfirming(false)
+      }}
       style={s(
         'padding: 9px 14px; cursor: pointer; ' +
           (active
@@ -409,20 +555,54 @@ function ProjectRow({
       )}
     >
       <div style={s('display: flex; align-items: baseline; gap: 8px;')}>
-        <div style={s('font-size: 13px; font-weight: 500;')}>{project.name}</div>
-        <div style={s('flex: 1;')} />
-        <div
-          style={s(
-            'font-size: 10px; padding: 1px 6px; border-radius: 999px; ' +
-              (open
-                ? 'color: var(--color-accent-200); border: 1px solid var(--color-accent-700);'
-                : 'color: var(--color-neutral-600); border: 1px solid var(--color-neutral-800);'),
-          )}
-        >
-          {open === null ? '—' : open > 0 ? `${open} ouvert${open > 1 ? 's' : ''}` : 'à jour'}
+        <div style={s('font-size: 13px; font-weight: 500;')} title={project.path}>
+          {project.name}
         </div>
+        <div style={s('flex: 1;')} />
+
+        {!confirming && (
+          <div
+            title={
+              equipped
+                ? 'Plans approuvés qui ne sont pas encore clos'
+                : "Ce dossier n'a pas encore de cockpit/"
+            }
+            style={s(
+              'font-size: 10px; padding: 1px 6px; border-radius: 999px; ' +
+                (open && equipped
+                  ? 'color: var(--color-accent-200); border: 1px solid var(--color-accent-700);'
+                  : 'color: var(--color-neutral-600); border: 1px solid var(--color-neutral-800);'),
+            )}
+          >
+            {badge}
+          </div>
+        )}
+
+        {/* Confirmation en deux temps, sur place. Pas de `window.confirm` : un
+            dialogue modal bloque la boucle d'événements de la fenêtre. */}
+        {(hover || confirming) && (
+          <button
+            type="button"
+            title="Retirer de la liste — aucun fichier n'est supprimé"
+            onClick={event => {
+              event.stopPropagation()
+              if (confirming) onRemove()
+              else setConfirming(true)
+            }}
+            className="btn btn-ghost"
+            style={s(
+              'font-size: 10px; line-height: 1; padding: 2px 6px; ' +
+                (confirming ? 'color: var(--color-accent-200);' : 'color: var(--color-neutral-500);'),
+            )}
+          >
+            {confirming ? 'retirer ?' : '×'}
+          </button>
+        )}
       </div>
-      <div style={s('font-size: 11px; color: var(--color-neutral-600); margin-top: 3px;')}>
+      <div
+        title="Dernier commit rattaché à un plan"
+        style={s('font-size: 11px; color: var(--color-neutral-600); margin-top: 3px;')}
+      >
         {humanAge(last)}
       </div>
     </div>

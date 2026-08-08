@@ -17,7 +17,13 @@ import {
   isSafePlanFileName,
   updatePlanMeta,
   closeOpenPlans,
+  readRegistry,
+  registerProject,
+  unregisterProject,
+  touchProject,
 } from './plans.js'
+
+import { projects } from './snapshot.js'
 
 // --- parsePlan -------------------------------------------------------------
 
@@ -386,4 +392,85 @@ test('isSafePlanFileName rejette tout ce qui peut sortir du dossier plans', () =
   ]) {
     assert.equal(isSafePlanFileName(mauvais), false, `devrait rejeter ${JSON.stringify(mauvais)}`)
   }
+})
+
+// --- registre des projets ---------------------------------------------------
+
+// Le registre est un vrai fichier dans le dossier personnel : un test qui
+// écrirait dedans effacerait la liste de projets de la machine. On le détourne.
+const withRegistry = () => {
+  process.env.COCKPIT_REGISTRY = join(mkdtempSync(join(tmpdir(), 'cockpit-reg-')), 'projects.json')
+  return process.env.COCKPIT_REGISTRY
+}
+
+test('registerProject ajoute une fois, avec une date d’ouverture', () => {
+  withRegistry()
+
+  assert.equal(registerProject('/tmp/un-projet'), true)
+  assert.equal(registerProject('/tmp/un-projet'), false, 'pas de doublon')
+
+  const [entry] = readRegistry()
+  assert.equal(entry.path, '/tmp/un-projet')
+  assert.equal(entry.name, 'un-projet')
+  assert.match(entry.lastOpened, /^\d{4}-\d{2}-\d{2}T/)
+})
+
+test('unregisterProject retire le projet et rien d’autre', () => {
+  withRegistry()
+  registerProject('/tmp/a')
+  registerProject('/tmp/b')
+
+  assert.equal(unregisterProject('/tmp/a'), true)
+  assert.equal(unregisterProject('/tmp/a'), false, 'un projet absent n’est pas une erreur')
+  assert.deepEqual(
+    readRegistry().map(p => p.path),
+    ['/tmp/b'],
+  )
+})
+
+test('touchProject date un projet connu, ignore un inconnu', () => {
+  withRegistry()
+  registerProject('/tmp/a', new Date('2026-01-01T00:00:00Z'))
+
+  assert.equal(touchProject('/tmp/inconnu'), false)
+  assert.equal(readRegistry().length, 1, 'un inconnu n’entre pas dans la liste par la petite porte')
+
+  assert.equal(touchProject('/tmp/a', new Date('2026-08-08T10:00:00Z')), true)
+  assert.equal(readRegistry()[0].lastOpened, '2026-08-08T10:00:00.000Z')
+})
+
+test('projects() classe du dernier ouvert au plus ancien, les sans-date en fin', () => {
+  const registry = withRegistry()
+  writeFileSync(
+    registry,
+    JSON.stringify([
+      { path: '/tmp/vieux', name: 'vieux', lastOpened: '2026-01-01T00:00:00.000Z' },
+      { path: '/tmp/jamais-date', name: 'jamais-date' },
+      { path: '/tmp/recent', name: 'recent', lastOpened: '2026-08-08T00:00:00.000Z' },
+      { path: '/tmp/jamais-date-2', name: 'jamais-date-2' },
+    ]),
+  )
+
+  // `null` : pas de dépôt courant, comme dans l'application empaquetée.
+  assert.deepEqual(
+    projects(null).map(p => p.path),
+    ['/tmp/recent', '/tmp/vieux', '/tmp/jamais-date', '/tmp/jamais-date-2'],
+  )
+})
+
+test('projects() ajoute le dépôt courant en tête seulement s’il est inconnu', () => {
+  withRegistry()
+
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-cwd-'))
+  mkdirSync(join(dir, 'cockpit'), { recursive: true })
+
+  assert.equal(projects(dir)[0].path, dir, 'inconnu : en tête, sinon premier lancement vide')
+
+  registerProject('/tmp/autre', new Date('2030-01-01T00:00:00Z'))
+  registerProject(dir, new Date('2020-01-01T00:00:00Z'))
+  assert.deepEqual(
+    projects(dir).map(p => p.path),
+    ['/tmp/autre', dir],
+    'enregistré : c’est l’usage qui classe',
+  )
 })

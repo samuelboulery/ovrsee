@@ -128,6 +128,8 @@ export interface Scan {
 export interface Project {
   path: string
   name: string
+  /** Dernière ouverture, en ISO. Absent des registres écrits avant le tri par usage. */
+  lastOpened?: string
 }
 
 export interface PackageJson {
@@ -137,6 +139,8 @@ export interface PackageJson {
 
 export interface Snapshot {
   root: string
+  /** Le dossier `cockpit/` existe-t-il ? Lu sur le disque, pas déduit. */
+  equipped: boolean
   plans: Plan[]
   packageJson: PackageJson | null
   pages: {
@@ -313,6 +317,33 @@ const json = async <T,>(url: string): Promise<T> => {
 }
 
 export const fetchProjects = () => json<Project[]>('/api/projects')
+
+export type ProjectAction = 'add' | 'remove' | 'touch' | 'init'
+
+/**
+ * Ajoute, retire, remonte en tête ou équipe un projet. Rend la liste à jour,
+ * déjà triée — l'interface n'a pas à refaire le tri du serveur.
+ *
+ * `X-Cockpit` n'est pas une authentification : c'est ce qui empêche une page
+ * quelconque ouverte dans le navigateur de poster vers le dev server local.
+ */
+export async function projectAction(
+  action: ProjectAction,
+  path: string,
+): Promise<{ projects: Project[]; done?: string[] }> {
+  const response = await fetch('/api/projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    body: JSON.stringify({ action, path }),
+  })
+
+  const payload = await response.json()
+  if (!response.ok) throw new Error(payload?.error ?? `HTTP ${response.status}`)
+  return payload
+}
+
+/** Un projet sans dossier `cockpit/` : rien à lire, donc rien à montrer. */
+export const isUnequipped = (snapshot: Snapshot): boolean => !snapshot.equipped
 
 export const fetchSnapshot = (path: string) =>
   json<Snapshot>(`/api/project?path=${encodeURIComponent(path)}`)

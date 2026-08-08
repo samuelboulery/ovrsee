@@ -4,7 +4,27 @@
   "title": "Cockpit — plan de construction (v0.1 → v0.3)",
   "opened": "2026-08-08",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "7bfa1f2",
+      "date": "2026-08-08",
+      "files": [
+        "graphify-out/GRAPH_REPORT.md",
+        "graphify-out/cache/166e1a0f40e3ac11667a3f07b89c94e8c39f4a6590565f67c34872593978287d.json",
+        "graphify-out/cache/305fc246565e559a9aeedd718535830b0d7b1b932ff182dc58da9feaa8eeded9.json",
+        "graphify-out/cache/3e406e0c1ed0cb1f0b21be5d84a95b43452437d8d27d82f78495c01e2571a3c9.json",
+        "graphify-out/cache/3e93da89097282da8065cd73d9a944be17eeced597b8965cdf21c1936682c536.json",
+        "graphify-out/cache/72eb4fae16d7303267ced427bd88ce4821f040f3d5dc186441b79d20422a46c2.json",
+        "graphify-out/cache/a130ba36168ab94f49816e0e40074f6105a73e12bf79127e01b7773476061fab.json",
+        "graphify-out/cache/a7690432ee19dc363e61be6abdc00e98756d1694761636e742fd8ffbb6f309b6.json",
+        "graphify-out/cache/a772e34b74cc9193f5efb2075196a284a57bcbbfcd9999cd1eb881bb237447a0.json",
+        "graphify-out/cache/b618ac5800d663c17e15f30322d541d76f57ee3acd0af67dc14d8dcec678a971.json",
+        "graphify-out/cache/ef9b43ea75b14f1afc4fc4fdb8af4c9c5b16dcaa72f6386e2c3b843e01a7981b.json",
+        "graphify-out/graph.html",
+        "graphify-out/graph.json"
+      ]
+    }
+  ]
 }
 ---
 

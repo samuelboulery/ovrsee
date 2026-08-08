@@ -23,16 +23,18 @@ const git = (args, cwd) =>
   execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
 
 /**
- * Fichiers du dernier commit, hors `cockpit/`.
- *
- * Le cockpit s'écrit lui-même à chaque commit ; garder ses propres fichiers
- * ferait apparaître tous les plans comme touchant toutes les pages.
+ * Sorties reconstruites à chaque commit. Ce ne sont pas des sources : les
+ * garder ferait apparaître tous les plans comme touchant toutes les pages, et
+ * la relation plan → fichiers → page ne voudrait plus rien dire.
  */
+const DERIVED = ['cockpit/', 'graphify-out/']
+
+/** Fichiers sources du dernier commit. */
 function changedFiles(root) {
   try {
     return git(['diff-tree', '--no-commit-id', '--name-only', '-r', 'HEAD'], root)
       .split('\n')
-      .filter(f => f && !f.startsWith('cockpit/'))
+      .filter(f => f && !DERIVED.some(prefix => f.startsWith(prefix)))
   } catch {
     return []
   }

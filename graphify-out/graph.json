@@ -18,7 +18,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L9",
       "id": "support_getreact",
-      "community": 7,
+      "community": 8,
       "norm_label": "getreact()"
     },
     {
@@ -135,7 +135,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L366",
       "id": "support_encodecamelattrs",
-      "community": 9,
+      "community": 7,
       "norm_label": "encodecamelattrs()"
     },
     {
@@ -144,7 +144,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L372",
       "id": "support_encodecase",
-      "community": 9,
+      "community": 7,
       "norm_label": "encodecase()"
     },
     {
@@ -153,7 +153,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L388",
       "id": "support_kebabtocamel",
-      "community": 8,
+      "community": 9,
       "norm_label": "kebabtocamel()"
     },
     {
@@ -162,7 +162,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L391",
       "id": "support_csstoobj",
-      "community": 8,
+      "community": 9,
       "norm_label": "csstoobj()"
     },
     {
@@ -189,7 +189,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L457",
       "id": "support_hostpositionstyle",
-      "community": 8,
+      "community": 9,
       "norm_label": "hostpositionstyle()"
     },
     {
@@ -198,7 +198,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L467",
       "id": "support_compiletemplate",
-      "community": 9,
+      "community": 7,
       "norm_label": "compiletemplate()"
     },
     {
@@ -387,7 +387,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L842",
       "id": "support_evaldclogic",
-      "community": 7,
+      "community": 8,
       "norm_label": "evaldclogic()"
     },
     {
@@ -423,7 +423,7 @@
       "source_file": "/Users/sam/code/cockpit/support.js",
       "source_location": "L888",
       "id": "support_createcomponentfactory",
-      "community": 7,
+      "community": 8,
       "norm_label": "createcomponentfactory()"
     },
     {

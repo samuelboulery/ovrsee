@@ -1,7 +1,7 @@
 # Graph Report - /Users/sam/code/cockpit  (2026-08-08)
 
 ## Corpus Check
-- 10 files · ~22,581 words
+- 10 files · ~33,358 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -83,15 +83,15 @@ Nodes (3): attachCommit(), changedFiles(), git()
 
 ### Community 7 - "Community 7"
 Cohesion: 0.67
-Nodes (3): createComponentFactory(), evalDcLogic(), getReact()
+Nodes (3): compileTemplate(), encodeCamelAttrs(), encodeCase()
 
 ### Community 8 - "Community 8"
 Cohesion: 0.67
-Nodes (3): cssToObj(), hostPositionStyle(), kebabToCamel()
+Nodes (3): createComponentFactory(), evalDcLogic(), getReact()
 
 ### Community 9 - "Community 9"
 Cohesion: 0.67
-Nodes (3): compileTemplate(), encodeCamelAttrs(), encodeCase()
+Nodes (3): cssToObj(), hostPositionStyle(), kebabToCamel()
 
 ### Community 10 - "Community 10"
 Cohesion: 1.0

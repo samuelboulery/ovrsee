@@ -1,12 +1,12 @@
 # Graph Report - /Users/sam/code/cockpit  (2026-08-08)
 
 ## Corpus Check
-- 17 files · ~40,205 words
+- 27 files · ~48,051 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 148 nodes · 242 edges · 22 communities detected
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.8)
+- 177 nodes · 270 edges · 28 communities detected
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 17 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -32,6 +32,12 @@
 - [[_COMMUNITY_Community 19|Community 19]]
 - [[_COMMUNITY_Community 20|Community 20]]
 - [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `run()` - 13 edges
@@ -46,34 +52,34 @@
 10. `updatePlanMeta()` - 6 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `run()` --calls--> `pageSlug()`  [INFERRED]
-  /Users/sam/code/cockpit/crawl/index.js → /Users/sam/code/cockpit/crawl/routes.js
-- `attachCommit()` --calls--> `isSafePlanFileName()`  [INFERRED]
-  /Users/sam/code/cockpit/hooks/cockpit-post-commit.js → /Users/sam/code/cockpit/hooks/plans.js
 - `snapshot()` --calls--> `readPlans()`  [INFERRED]
   /Users/sam/code/cockpit/vite.config.js → /Users/sam/code/cockpit/hooks/plans.js
+- `s()` --calls--> `planWhy()`  [INFERRED]
+  /Users/sam/code/cockpit/app/src/tabs/Backlog.tsx → /Users/sam/code/cockpit/app/src/data.ts
 - `main()` --calls--> `log()`  [INFERRED]
   /Users/sam/code/cockpit/crawl/auth.js → /Users/sam/code/cockpit/crawl/index.js
-- `run()` --calls--> `normalizeRoutes()`  [INFERRED]
+- `run()` --calls--> `pageSlug()`  [INFERRED]
   /Users/sam/code/cockpit/crawl/index.js → /Users/sam/code/cockpit/crawl/routes.js
+- `run()` --calls--> `writeFileNoFollow()`  [INFERRED]
+  /Users/sam/code/cockpit/crawl/index.js → /Users/sam/code/cockpit/hooks/plans.js
 
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.11
-Nodes (5): cssToObj(), hostPositionStyle(), isElementClass(), isRenderableType(), kebabToCamel()
+Cohesion: 0.09
+Nodes (15): s(), fetchProjects(), fetchSnapshot(), firstParagraph(), history(), json(), lastScan(), pageName() (+7 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.17
-Nodes (15): closePreviousPlans(), main(), readStdin(), registerProject(), repoRoot(), titleOf(), isSafePlanFileName(), parsePlan() (+7 more)
+Nodes (19): assertPortFree(), isIgnored(), loadConfig(), log(), pathOf(), pruneShots(), recordScan(), retainable() (+11 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.15
-Nodes (8): fetchProjects(), fetchSnapshot(), history(), json(), lastScan(), plansForPage(), scanFailed(), stackFrom()
+Nodes (16): closePreviousPlans(), main(), readStdin(), registerProject(), repoRoot(), titleOf(), backlog(), parsePlan() (+8 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.25
-Nodes (16): assertPortFree(), isIgnored(), loadConfig(), log(), pathOf(), pruneShots(), recordScan(), retainable() (+8 more)
+Cohesion: 0.11
+Nodes (5): compileTemplate(), encodeCamelAttrs(), encodeCase(), isElementClass(), isRenderableType()
 
 ### Community 4 - "Community 4"
 Cohesion: 0.31
@@ -81,31 +87,31 @@ Nodes (13): collectProps(), compileAttr(), contentKey(), isDeckMountTag(), walk(
 
 ### Community 5 - "Community 5"
 Cohesion: 0.25
-Nodes (8): boot(), dcNameFromPath(), getReactDOM(), parseDataProps(), parseDcDocument(), parseDcText(), rootNameForDocument(), safeDecode()
+Nodes (8): boot(), createComponentFactory(), dcNameFromPath(), evalDcLogic(), getReact(), getReactDOM(), rootNameForDocument(), safeDecode()
 
 ### Community 6 - "Community 6"
 Cohesion: 0.29
-Nodes (7): createExternalModules(), createHelmetManager(), createPseudoSheet(), createRegistry(), createRuntime(), createStreamTracker(), init()
+Nodes (7): cdnScriptFor(), findTopLevelEquality(), loadReactUmd(), loadScript(), parensWrapWhole(), resolve(), resolvePath()
 
 ### Community 7 - "Community 7"
 Cohesion: 0.29
-Nodes (7): cdnScriptFor(), findTopLevelEquality(), loadReactUmd(), loadScript(), parensWrapWhole(), resolve(), resolvePath()
+Nodes (7): createExternalModules(), createHelmetManager(), createPseudoSheet(), createRegistry(), createRuntime(), createStreamTracker(), init()
 
 ### Community 8 - "Community 8"
-Cohesion: 0.4
-Nodes (3): normalizeRoutes(), pageSlug(), segmentsOf()
+Cohesion: 0.53
+Nodes (4): projects(), readJson(), shotsByPage(), snapshot()
 
 ### Community 9 - "Community 9"
-Cohesion: 0.6
-Nodes (3): projects(), readJson(), snapshot()
+Cohesion: 0.53
+Nodes (4): attachCommit(), changedFiles(), git(), isSafePlanFileName()
 
 ### Community 10 - "Community 10"
-Cohesion: 0.7
-Nodes (3): attachCommit(), changedFiles(), git()
+Cohesion: 0.67
+Nodes (3): parseDataProps(), parseDcDocument(), parseDcText()
 
 ### Community 11 - "Community 11"
 Cohesion: 0.67
-Nodes (3): createComponentFactory(), evalDcLogic(), getReact()
+Nodes (3): cssToObj(), hostPositionStyle(), kebabToCamel()
 
 ### Community 12 - "Community 12"
 Cohesion: 1.0
@@ -113,7 +119,7 @@ Nodes (3): importantify(), scanUnquotedUrl(), stripComments()
 
 ### Community 13 - "Community 13"
 Cohesion: 0.67
-Nodes (3): compileTemplate(), encodeCamelAttrs(), encodeCase()
+Nodes (0): 
 
 ### Community 14 - "Community 14"
 Cohesion: 1.0
@@ -147,34 +153,72 @@ Nodes (0):
 Cohesion: 1.0
 Nodes (0): 
 
+### Community 22 - "Community 22"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 23 - "Community 23"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 24 - "Community 24"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 25 - "Community 25"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 26 - "Community 26"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 27 - "Community 27"
+Cohesion: 1.0
+Nodes (0): 
+
 ## Knowledge Gaps
-- **Thin community `Community 15`** (2 nodes): `shot()`, `retention.test.js`
+- **Thin community `Community 15`** (2 nodes): `s()`, `App.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 16`** (2 nodes): `shq()`, `install.js`
+- **Thin community `Community 16`** (2 nodes): `confStyle()`, `Donnees.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 17`** (1 nodes): `routes.test.js`
+- **Thin community `Community 17`** (2 nodes): `shot()`, `retention.test.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 18`** (1 nodes): `cockpit-cli.js`
+- **Thin community `Community 18`** (2 nodes): `shq()`, `install.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 19`** (1 nodes): `_ds_bundle.js`
+- **Thin community `Community 19`** (1 nodes): `main.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 20`** (1 nodes): `_ds_bundle.js`
+- **Thin community `Community 20`** (1 nodes): `env.d.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 21`** (1 nodes): `_ds_bundle.js`
+- **Thin community `Community 21`** (1 nodes): `Historique.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 22`** (1 nodes): `Stack.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 23`** (1 nodes): `routes.test.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 24`** (1 nodes): `cockpit-cli.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 25`** (1 nodes): `_ds_bundle.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 26`** (1 nodes): `_ds_bundle.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 27`** (1 nodes): `_ds_bundle.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `run()` connect `Community 3` to `Community 8`, `Community 1`?**
-  _High betweenness centrality (0.085) - this node is a cross-community bridge._
-- **Why does `writeFileNoFollow()` connect `Community 1` to `Community 3`?**
-  _High betweenness centrality (0.076) - this node is a cross-community bridge._
-- **Why does `updatePlanMeta()` connect `Community 1` to `Community 10`?**
-  _High betweenness centrality (0.025) - this node is a cross-community bridge._
+- **Why does `run()` connect `Community 1` to `Community 2`?**
+  _High betweenness centrality (0.066) - this node is a cross-community bridge._
+- **Why does `writeFileNoFollow()` connect `Community 2` to `Community 1`?**
+  _High betweenness centrality (0.060) - this node is a cross-community bridge._
+- **Why does `readPlans()` connect `Community 2` to `Community 8`?**
+  _High betweenness centrality (0.022) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `run()` (e.g. with `normalizeRoutes()` and `pageSlug()`) actually correct?**
   _`run()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 3 inferred relationships involving `main()` (e.g. with `planFileName()` and `writeFileNoFollow()`) actually correct?**
   _`main()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Community 0` be split into smaller, more focused modules?**
+  _Cohesion score 0.09 - nodes in this community are weakly interconnected._
+- **Should `Community 3` be split into smaller, more focused modules?**
   _Cohesion score 0.11 - nodes in this community are weakly interconnected._

@@ -10,6 +10,40 @@ disparaît, rien n'est perdu.
 - Cadrage complet : [`cadrage-cockpit.md`](./cadrage-cockpit.md)
 - Référence visuelle de l'interface : [`Cockpit-A-Nocturne.dc.html`](./Cockpit-A-Nocturne.dc.html)
 
+## Mise en route
+
+```bash
+pnpm install
+
+# 1. Installer la capture dans un dépôt (à faire une fois par projet)
+pnpm cockpit:install /chemin/du/projet
+# puis ajouter le hook PostToolUse affiché à la fin, dans ~/.claude/settings.json
+
+# 2. Cartographier l'application (nécessite un cockpit.config.json à sa racine)
+pnpm cockpit:auth /chemin/du/projet    # facultatif : pages protégées
+pnpm cockpit:crawl /chemin/du/projet
+
+# 3. Lire
+pnpm dev                                # http://localhost:5180
+```
+
+Exemple de `cockpit.config.json`, à la racine du projet observé :
+
+```json
+{
+  "dev": "pnpm dev --port 8099 --strictPort",
+  "baseUrl": "http://localhost:8099",
+  "entryRoutes": ["/", "/login"],
+  "auth": { "storageState": ".cockpit-auth.json" },
+  "ignore": ["/auth/callback"]
+}
+```
+
+Donnez-lui un port dédié : le crawl **refuse de démarrer** si `baseUrl` répond
+déjà. Rien dans une réponse HTTP ne permet de reconnaître son propre serveur, et
+photographier celui d'un autre projet produirait des captures datées
+d'aujourd'hui montrant la mauvaise application.
+
 ## Arborescence
 
 | Dossier | Rôle |

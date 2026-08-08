@@ -57,6 +57,27 @@
         "pnpm-lock.yaml",
         "vite.config.js"
       ]
+    },
+    {
+      "sha": "68bc841",
+      "date": "2026-08-08",
+      "files": [
+        ".gitignore",
+        "app/index.html",
+        "app/src/App.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/data.ts",
+        "app/src/env.d.ts",
+        "app/src/main.tsx",
+        "app/src/style.ts",
+        "app/src/tabs/Backlog.tsx",
+        "app/src/tabs/Donnees.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Produit.tsx",
+        "app/src/tabs/Stack.tsx",
+        "tsconfig.json",
+        "vite.config.js"
+      ]
     }
   ]
 }

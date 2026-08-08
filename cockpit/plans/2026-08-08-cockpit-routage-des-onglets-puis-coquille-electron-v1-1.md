@@ -56,6 +56,17 @@
         "crawl/index.js",
         "hooks/install.js"
       ]
+    },
+    {
+      "sha": "b34bf11",
+      "date": "2026-08-08",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/tabs/Produit.tsx",
+        "app/src/useResizable.tsx",
+        "electron/main.js"
+      ]
     }
   ]
 }

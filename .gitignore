@@ -18,3 +18,7 @@ app/dist/
 
 # Applications empaquetées, reconstruites à la demande.
 release/
+
+# Icône engendrée par scripts/make-icon.js.
+build/icon-1024.png
+build/icon.iconset/

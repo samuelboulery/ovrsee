@@ -1,0 +1,13 @@
+{
+  "name": "cockpit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.12.1",
+  "description": "Vue en lecture seule sur un projet vibecodé : plans capturés, pages crawlées, historique daté.",
+  "scripts": {
+    "cockpit:capture": "node hooks/cockpit-capture-plan.js",
+    "cockpit:crawl": "node crawl/index.js",
+    "test": "node --test hooks/*.test.js"
+  }
+}

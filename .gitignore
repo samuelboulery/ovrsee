@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.DS_Store
+
+# Cookies de session utilisés par le crawl — ne doit jamais être versionné.
+.cockpit-auth.json
+*.cockpit-auth.json
+
+# graphify-out/ est VOLONTAIREMENT versionné : les onglets Données et Stack le
+# lisent, et le cockpit doit rester consultable sur un projet qui ne compile plus.

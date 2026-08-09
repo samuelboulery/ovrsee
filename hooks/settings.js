@@ -26,6 +26,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
  *   bootstrap: string[],
  *   packageManager: string,
  *   sourceGraphe: string,
+ *   customActions: Array<{label: string, text: string}>,
  * }}
  */
 export const DEFAULT_SETTINGS = {
@@ -45,6 +46,7 @@ export const DEFAULT_SETTINGS = {
   bootstrap: ['/project-setup'],
   packageManager: 'pnpm',
   sourceGraphe: 'auto',
+  customActions: [],
 }
 
 /**
@@ -157,6 +159,19 @@ export function validateSettings(partial, defaults = DEFAULT_SETTINGS) {
     if (partial.bootstrap.every(x => typeof x === 'string')) {
       out.bootstrap = partial.bootstrap
     }
+  }
+
+  // Tableau : customActions — chaque action validée individuellement
+  if (Array.isArray(partial.customActions)) {
+    const valides = partial.customActions.filter(action => {
+      if (!action || typeof action !== 'object') return false
+      if (typeof action.label !== 'string' || !action.label.trim()) return false
+      if (typeof action.text !== 'string' || !action.text.trim()) return false
+      // Rejette les actions avec sauts de ligne
+      if (action.text.includes('\n')) return false
+      return true
+    })
+    out.customActions = valides
   }
 
   return out

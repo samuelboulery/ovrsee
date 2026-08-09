@@ -36,6 +36,8 @@ interface Options {
   axis: Axis
   /** true quand tirer vers la gauche/le haut AGRANDIT le panneau. */
   invert?: boolean
+  /** Callback appelée au lieu du localStorage si fourni. */
+  onResize?: (newSize: number) => void
 }
 
 const STORAGE_PREFIX = 'cockpit.size.'
@@ -49,8 +51,8 @@ function restore(key: string, fallback: number): number {
   }
 }
 
-export function useResizable({ key, initial, min, max, axis, invert }: Options): Resizable {
-  const [size, setSize] = useState(() => restore(key, initial))
+export function useResizable({ key, initial, min, max, axis, invert, onResize }: Options): Resizable {
+  const [size, setSize] = useState(() => (onResize ? initial : restore(key, initial)))
   const [dragging, setDragging] = useState(false)
   const origin = useRef({ pointer: 0, size: 0 })
 
@@ -102,12 +104,18 @@ export function useResizable({ key, initial, min, max, axis, invert }: Options):
   }
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_PREFIX + key, String(size))
-    } catch {
-      // Stockage indisponible : la taille vaut pour la session, c'est tout.
+    if (onResize) {
+      // Callback fourni : utilisée pour les préférences
+      onResize(size)
+    } else {
+      // Pas de callback : utiliser localStorage pour la rétrocompatibilité
+      try {
+        localStorage.setItem(STORAGE_PREFIX + key, String(size))
+      } catch {
+        // Stockage indisponible : la taille vaut pour la session, c'est tout.
+      }
     }
-  }, [key, size])
+  }, [key, size, onResize])
 
   // Une fenêtre rétrécie ne doit pas laisser un panneau plus large qu'elle.
   useEffect(() => {

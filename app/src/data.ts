@@ -242,6 +242,11 @@ export interface CockpitConfig {
  * Les défauts sont définis dans `hooks/settings.js`, jamais ici — une valeur
  * par défaut en deux endroits divergerait. Ce type décrit uniquement la forme.
  */
+export interface Action {
+  label: string
+  text: string
+}
+
 export interface SettingsType {
   langue: string
   theme: string
@@ -251,6 +256,7 @@ export interface SettingsType {
   bootstrap: string[]
   packageManager: string
   sourceGraphe: string
+  customActions?: Action[]
 }
 
 export interface Snapshot {
@@ -633,6 +639,22 @@ export async function updateSettings(settings: Partial<SettingsType>): Promise<S
   const result = await response.json()
   if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
   return result
+}
+
+/**
+ * Compose une commande d'exécution adaptée au gestionnaire de paquets configuré.
+ *
+ * Utilisé par B3 pour construire les lignes d'injection dans le terminal.
+ * Le gestionnaire doit être fourni explicitement pour éviter les défauts trompeurs.
+ *
+ * @param {string} script nom du script npm (ex. 'cockpit:crawl')
+ * @param {string} packageManager gestionnaire de paquets ('pnpm', 'npm', 'yarn', 'bun')
+ * @returns {string} commande complète (ex. 'pnpm cockpit:crawl' ou 'npm run cockpit:crawl')
+ */
+export function composerCommande(script: string, packageManager: string): string {
+  const isNpm = packageManager === 'npm'
+  const prefix = isNpm ? 'npm run ' : `${packageManager} `
+  return prefix + script
 }
 
 // --- dérivations -----------------------------------------------------------

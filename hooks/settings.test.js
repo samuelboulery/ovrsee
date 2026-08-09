@@ -219,3 +219,69 @@ test('mergeSettings : fusion partielle conserve globale pour non-surchargés', (
   assert.equal(result.theme, 'dark')
   assert.deepEqual(result.onglets.actifs, ['apercu'])
 })
+
+test('validateSettings : customActions valides acceptées', () => {
+  const result = validateSettings({
+    customActions: [
+      { label: 'Mon test', text: 'pnpm test' },
+      { label: 'Serveur', text: 'pnpm dev' },
+    ],
+  })
+  assert.equal(result.customActions.length, 2)
+  assert.equal(result.customActions[0].label, 'Mon test')
+})
+
+test('validateSettings : customActions avec sauts de ligne rejetées', () => {
+  const result = validateSettings({
+    customActions: [
+      { label: 'Valide', text: 'pnpm test' },
+      { label: 'Invalide', text: 'pnpm test\npnpm build' },
+    ],
+  })
+  // Une action rejetée, une conservée
+  assert.equal(result.customActions.length, 1)
+  assert.equal(result.customActions[0].label, 'Valide')
+})
+
+test('validateSettings : customActions avec label vide rejetées', () => {
+  const result = validateSettings({
+    customActions: [
+      { label: '', text: 'pnpm test' },
+      { label: 'Valide', text: 'pnpm dev' },
+    ],
+  })
+  assert.equal(result.customActions.length, 1)
+  assert.equal(result.customActions[0].label, 'Valide')
+})
+
+test('validateSettings : customActions avec text vide rejetées', () => {
+  const result = validateSettings({
+    customActions: [
+      { label: 'Vide', text: '' },
+      { label: 'Valide', text: 'pnpm test' },
+    ],
+  })
+  assert.equal(result.customActions.length, 1)
+  assert.equal(result.customActions[0].label, 'Valide')
+})
+
+test('validateSettings : customActions non-array → défaut', () => {
+  const result = validateSettings({ customActions: 'pas un array' })
+  assert.deepEqual(result.customActions, [])
+})
+
+test('validateSettings : customActions avec non-objet rejetés', () => {
+  const result = validateSettings({
+    customActions: [
+      { label: 'Valide', text: 'pnpm test' },
+      'pas un objet',
+      { label: 'Aussi valide', text: 'pnpm dev' },
+    ],
+  })
+  assert.equal(result.customActions.length, 2)
+})
+
+test('DEFAULT_SETTINGS.customActions est un tableau vide', () => {
+  assert(Array.isArray(DEFAULT_SETTINGS.customActions))
+  assert.equal(DEFAULT_SETTINGS.customActions.length, 0)
+})

@@ -7,6 +7,20 @@
  * sont stockés nulle part.
  */
 
+/**
+ * La frontière entre ce que le serveur a envoyé et ce que l'interface suppose.
+ *
+ * Les types disent qu'un instantané a des tableaux ; le disque, lui, ne promet
+ * rien — un `pages.json` écrit par un crawl interrompu, un champ ajouté après
+ * coup, un fichier édité à la main. Le 9 août 2026, un champ qui n'était pas
+ * un tableau a vidé toute l'application.
+ *
+ * Chaque dérivation passe donc par ici plutôt que de se fier à sa signature.
+ * Un tableau vide dit « rien à montrer », ce que chaque onglet sait déjà
+ * afficher ; une exception dit « écran noir ».
+ */
+const liste = <T,>(valeur: T[] | null | undefined): T[] => (Array.isArray(valeur) ? valeur : [])
+
 export interface Commit {
   sha: string
   date: string
@@ -117,6 +131,32 @@ export function shotRatio(page: Page): string {
   return width && height ? `${width} / ${height}` : '16 / 10'
 }
 
+/** Un commit tel que `git log` le rend — sans les fichiers, que porte le plan. */
+export interface GitCommit {
+  sha: string
+  /** ISO complet, heure comprise : deux commits d'un même jour restent ordonnés. */
+  date: string
+  subject: string
+}
+
+/**
+ * Une ligne de la frise : soit une bande de plan, soit un commit hors plan.
+ *
+ * Calculée par `hooks/timeline.js`, jamais dans le rendu — voir le commentaire
+ * de ce module pour le pourquoi.
+ */
+export type TimelineEntry =
+  | {
+      kind: 'plan'
+      date: string
+      /** Nom de fichier du plan, clé de recherche dans `snapshot.plans`. */
+      plan: string
+      title: string
+      status: 'open' | 'closed'
+      commits: GitCommit[]
+    }
+  | { kind: 'commit'; date: string; commit: GitCommit }
+
 export interface Scan {
   date: string
   commit: string
@@ -128,17 +168,77 @@ export interface Scan {
 export interface Project {
   path: string
   name: string
+  /** Dernière ouverture, en ISO. Absent des registres écrits avant le tri par usage. */
+  lastOpened?: string
 }
 
 export interface PackageJson {
+  name?: string
+  description?: string
+  /** Les commandes du projet : la réponse à « je tape quoi, déjà ? ». */
+  scripts?: Record<string, string>
   dependencies?: Record<string, string>
   devDependencies?: Record<string, string>
 }
 
+export type Priorite = 'haute' | 'moyenne' | 'basse'
+
+/** De la plus urgente à la moins urgente : l'ordre du tableau est l'ordre du tri. */
+export const PRIORITES: Priorite[] = ['haute', 'moyenne', 'basse']
+
+export interface Colonne {
+  id: string
+  titre: string
+  /** Au-delà, la colonne se signale. Absent = pas de limite. */
+  wip?: number
+}
+
+/**
+ * La seule donnée du cockpit qui se saisit.
+ *
+ * Un fichier par ticket dans `cockpit/tickets/`, écrit aussi bien par cette
+ * interface que par Claude — d'où les noms de champs en français, qui sont
+ * ceux du frontmatter sur le disque.
+ */
+export interface Ticket {
+  file: string
+  id: string
+  titre: string
+  colonne: string
+  priorite: Priorite
+  tags: string[]
+  cree: string
+  maj: string
+  /** Plan lié, s'il existe. Les deux stocks restent indépendants. */
+  plan: string | null
+  corps: string
+}
+
+/**
+ * `cockpit.config.json` — le contrat du crawl, à la racine du dépôt.
+ *
+ * Seuls les champs que l'interface lit sont déclarés : le crawler en connaît
+ * d'autres, et les recopier ici en ferait une deuxième définition à tenir.
+ */
+export interface CockpitConfig {
+  /** Commande qui démarre l'application. Affichée, jamais exécutée. */
+  dev?: string
+  /** Où l'application s'affiche une fois démarrée. */
+  baseUrl?: string
+}
+
 export interface Snapshot {
   root: string
+  board: Colonne[]
+  tickets: Ticket[]
+  /** Le dossier `cockpit/` existe-t-il ? Lu sur le disque, pas déduit. */
+  equipped: boolean
   plans: Plan[]
   packageJson: PackageJson | null
+  /** `cockpit.config.json` du dépôt — celui que lit déjà le crawler. */
+  config: CockpitConfig | null
+  /** `README.md` du dépôt, tel quel. Absent = le dépôt n'en a pas. */
+  readme: string | null
   pages: {
     date: string
     commit: string
@@ -152,6 +252,33 @@ export interface Snapshot {
   graph: GraphifyGraph | null
   /** slug de page → captures successives, de la plus récente à la plus ancienne */
   shots: Record<string, string[]>
+  /** Commits et plans mêlés, du plus récent au plus ancien. */
+  timeline: TimelineEntry[]
+  /**
+   * Nom de paquet → commentaire `WHY:` posé au-dessus de son import.
+   *
+   * La seule source de la colonne « pourquoi » de l'onglet Stack. Absent =
+   * personne n'a écrit de raison, ce qui est une information.
+   */
+  whys?: Record<string, string>
+  /**
+   * Les fichiers de `cockpit/` que la lecture n'a pas su ouvrir.
+   *
+   * Un fichier absent et un fichier illisible produisent le même écran vide, et
+   * seul le second demande une intervention. Les taire faisait passer un
+   * tableau abîmé pour un tableau vide.
+   */
+  illisibles?: Illisible[]
+}
+
+/** Un fichier de `cockpit/` présent sur le disque mais que le cockpit ne sait pas lire. */
+export interface Illisible {
+  /** Chemin relatif à `cockpit/`, par exemple `tickets/T-0004-x.md`. */
+  file: string
+  /** `plan`, `ticket` ou `scan`. */
+  quoi: string
+  /** Pour un journal en append-only : combien de lignes sont perdues. */
+  lignes?: number
 }
 
 /** `2026-07-18-d2f1a3.png` → `2026-07-18`. */
@@ -203,24 +330,20 @@ export interface Placed {
   y: number
 }
 
-/** Découpe une rangée trop large en sous-rangées. */
-const chunk = <T,>(items: T[], size: number): T[][] => {
-  if (!Number.isFinite(size) || size < 1) return [items]
-  const out: T[][] = []
-  for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size))
-  return out
-}
-
 /**
- * @param maxPerRow nombre de cartes tenant dans la largeur disponible. Une
- *   profondeur qui en porte davantage se replie sur plusieurs sous-rangées :
- *   sans quoi huit pages sœurs feraient deux mille pixels de large et le
- *   défilement latéral remplacerait simplement celui qu'on venait d'éliminer.
+ * La disposition ne dépend plus de la place disponible.
+ *
+ * Une profondeur trop large pour la fenêtre se repliait en sous-rangées. Des
+ * pages à un clic de l'accueil se retrouvaient alors sur deux lignes — soit
+ * exactement l'image de deux niveaux différents, c'est-à-dire le contraire de
+ * ce que la carte existe pour montrer. Une rangée large déborde donc
+ * volontairement : c'est le zoom du canevas qui la ramène à l'écran, et
+ * dézoomer ne prétend rien sur la structure.
  */
 export function layoutGraph(
   pages: Page[],
-  maxPerRow = Infinity,
 ): { placed: Placed[]; width: number; height: number } {
+  pages = liste(pages)
   if (pages.length === 0) return { placed: [], width: 0, height: 0 }
 
   const byRoute = new Map(pages.map(p => [p.route, p]))
@@ -253,22 +376,18 @@ export function layoutGraph(
   }
 
   const ordered = [...rows.entries()].sort((a, b) => a[0] - b[0])
-  const chunked = ordered.map(([d, row]) => [d, chunk(row, maxPerRow)] as const)
-
-  const widest = Math.max(...chunked.flatMap(([, parts]) => parts.map(p => p.length)))
+  const widest = Math.max(...ordered.map(([, row]) => row.length))
   const placed: Placed[] = []
 
   let y = 0
-  for (const [d, parts] of chunked) {
-    for (const part of parts) {
-      // Sous-rangée centrée : le graphe reste lisible quand une profondeur
-      // porte une seule page et la suivante en porte six.
-      const offset = ((widest - part.length) * COL_STEP) / 2
-      part.forEach((page, i) => {
-        placed.push({ page, depth: d, x: offset + i * COL_STEP, y })
-      })
-      y += ROW_STEP
-    }
+  for (const [d, row] of ordered) {
+    // Rangée centrée : le graphe reste lisible quand une profondeur porte une
+    // seule page et la suivante en porte six.
+    const offset = ((widest - row.length) * COL_STEP) / 2
+    row.forEach((page, i) => {
+      placed.push({ page, depth: d, x: offset + i * COL_STEP, y })
+    })
+    y += ROW_STEP
   }
 
   return {
@@ -306,29 +425,181 @@ export interface GraphifyGraph {
   links?: GraphLink[]
 }
 
-const json = async <T,>(url: string): Promise<T> => {
-  const response = await fetch(url)
+const json = async <T,>(url: string, signal?: AbortSignal): Promise<T> => {
+  const response = await fetch(url, { signal })
   if (!response.ok) throw new Error(`${url} → HTTP ${response.status}`)
   return response.json() as Promise<T>
 }
 
+/** Une requête abandonnée n'est pas une panne : elle n'a plus de destinataire. */
+export const estAbandon = (err: unknown): boolean =>
+  err instanceof DOMException && err.name === 'AbortError'
+
 export const fetchProjects = () => json<Project[]>('/api/projects')
 
-export const fetchSnapshot = (path: string) =>
-  json<Snapshot>(`/api/project?path=${encodeURIComponent(path)}`)
+export type ProjectAction = 'add' | 'remove' | 'touch' | 'init' | 'export-obsidian'
+
+/**
+ * Ajoute, retire, remonte en tête, équipe un projet ou en exporte le coffre.
+ * Rend la liste à jour, déjà triée — l'interface n'a pas à refaire le tri du
+ * serveur.
+ *
+ * `payload` porte ce qui est propre à un geste — les skills à installer pour
+ * `init`. Les autres n'en ont pas besoin, d'où le paramètre optionnel plutôt
+ * qu'une seconde fonction par action.
+ *
+ * `X-Cockpit` n'est pas une authentification : c'est ce qui empêche une page
+ * quelconque ouverte dans le navigateur de poster vers le dev server local.
+ */
+export async function projectAction(
+  action: ProjectAction,
+  path: string,
+  payload: Record<string, unknown> = {},
+): Promise<{ projects: Project[]; done?: string[] }> {
+  const response = await fetch('/api/projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    body: JSON.stringify({ ...payload, action, path }),
+  })
+
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result
+}
+
+/**
+ * Un skill Claude Code du catalogue, tel que le serveur le rend.
+ *
+ * `bundled` : livré avec le cockpit, donc installable d'un clic. `externe` :
+ * détecté seulement — le cockpit n'exécute pas l'installateur de quelqu'un
+ * d'autre à la place de l'utilisateur.
+ */
+export interface SkillEntry {
+  nom: string
+  source: 'bundled' | 'externe'
+  titre: string
+  resume: string
+  commande?: string
+  url?: string
+  installe: boolean
+  aJour: boolean
+}
+
+export const fetchSkills = () => json<SkillEntry[]>('/api/skills')
+
+export async function installSkills(
+  noms: string[],
+): Promise<{ done: string[]; skills: SkillEntry[] }> {
+  const response = await fetch('/api/skills', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    body: JSON.stringify({ noms }),
+  })
+
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result
+}
+
+export type TicketAction =
+  | 'create'
+  | 'move'
+  | 'update'
+  | 'delete'
+  | 'column-add'
+  | 'column-rename'
+  | 'column-remove'
+  | 'column-reorder'
+
+export interface Tableau {
+  board: Colonne[]
+  tickets: Ticket[]
+}
+
+/**
+ * Écrit un ticket et rend le tableau à jour.
+ *
+ * La réponse ne porte que colonnes et tickets : après un glisser-déposer,
+ * relire le graphe, les captures et le journal git serait payer tout le projet
+ * pour un champ qui change.
+ */
+export async function ticketAction(
+  action: TicketAction,
+  path: string,
+  payload: Record<string, unknown> = {},
+): Promise<Tableau> {
+  const response = await fetch('/api/tickets', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    body: JSON.stringify({ ...payload, action, path }),
+  })
+
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result
+}
+
+/** Un projet sans dossier `cockpit/` : rien à lire, donc rien à montrer. */
+export const isUnequipped = (snapshot: Snapshot): boolean => !snapshot.equipped
+
+/**
+ * L'instantané d'un projet.
+ *
+ * Le `signal` n'est pas un détail : deux clics rapprochés dans la barre
+ * latérale lançaient deux lectures, et la plus lente écrasait la plus récente.
+ * L'écran affichait alors les plans du projet A sous le nom du projet B — le
+ * genre de faux qui ne se remarque pas.
+ */
+export const fetchSnapshot = (path: string, signal?: AbortSignal) =>
+  json<Snapshot>(`/api/project?path=${encodeURIComponent(path)}`, signal)
 
 export const shotUrl = (root: string, file: string) =>
   `/api/shot?path=${encodeURIComponent(root)}&file=${encodeURIComponent(file)}`
 
 // --- dérivations -----------------------------------------------------------
 
-/** Le backlog n'est pas saisi : ce sont les plans jamais clos. */
-export const backlog = (plans: Plan[]): Plan[] =>
-  plans.filter(p => p.status === 'open').sort((a, b) => (b.opened ?? '').localeCompare(a.opened ?? ''))
+/**
+ * Les plans jamais clos.
+ *
+ * Ce n'est plus le backlog — celui-ci se saisit maintenant, ticket par ticket.
+ * C'est l'intention en cours : ce qui a été approuvé et pas encore soldé par un
+ * commit. Les deux listes se répondent sans se confondre.
+ */
+export const plansOuverts = (plans: Plan[]): Plan[] =>
+  liste(plans).filter(p => p.status === 'open').sort((a, b) => (b.opened ?? '').localeCompare(a.opened ?? ''))
+
+/**
+ * Priorité d'abord, puis du plus récent au plus ancien.
+ *
+ * Même règle que `hooks/tickets.js` : le tri est refait ici pour réordonner une
+ * carte déplacée sans attendre le serveur, jamais pour en décider autrement.
+ */
+export const sortTickets = (tickets: Ticket[]): Ticket[] =>
+  [...liste(tickets)].sort(
+    (a, b) =>
+      PRIORITES.indexOf(a.priorite) - PRIORITES.indexOf(b.priorite) ||
+      (b.cree ?? '').localeCompare(a.cree ?? ''),
+  )
+
+/**
+ * La colonne qui vaut « terminé », s'il y en a une.
+ *
+ * Miroir de `colonneFinale` dans `hooks/tickets.js` : la dernière colonne, mais
+ * seulement s'il y en a plusieurs. Sur un tableau à une colonne, la traiter
+ * comme terminale ferait disparaître tous les tickets du compte.
+ */
+export const colonneFinale = (board: Colonne[]): string | null =>
+  liste(board).length > 1 ? (liste(board).at(-1)?.id ?? null) : null
+
+/** Ce qui reste à faire : tout ce qui n'est pas dans la colonne terminale. */
+export const restant = (tickets: Ticket[], board: Colonne[]): number => {
+  const fini = colonneFinale(board)
+  return liste(tickets).filter(t => t.colonne !== fini).length
+}
 
 /** L'historique n'est pas saisi : ce sont les plans clos, par date de clôture. */
 export const history = (plans: Plan[]): Plan[] =>
-  plans
+  liste(plans)
     .filter(p => p.status === 'closed')
     .sort((a, b) => (b.closed ?? '').localeCompare(a.closed ?? ''))
 
@@ -337,7 +608,7 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 /** Densité d'activité : commits par semaine, du plus ancien au plus récent. */
 export function density(plans: Plan[], weeks = 16, now: Date = new Date()): number[] {
   const buckets = new Array(weeks).fill(0)
-  for (const plan of plans) {
+  for (const plan of liste(plans)) {
     for (const commit of plan.commits ?? []) {
       const at = Date.parse(commit.date)
       if (Number.isNaN(at)) continue
@@ -376,7 +647,7 @@ export function plansForPage(plans: Plan[], page: Page): Plan[] {
 }
 
 /** Dernier scan connu, réussi ou non. */
-export const lastScan = (scans: Scan[]): Scan | null => scans.at(-1) ?? null
+export const lastScan = (scans: Scan[]): Scan | null => liste(scans).at(-1) ?? null
 
 /**
  * Une page a-t-elle échoué au dernier scan ?
@@ -482,40 +753,114 @@ export function tablesFrom(graph: GraphifyGraph | null): TableRow[] {
 export interface StackRow {
   name: string
   version: string
-  why: string
+  /** Le commentaire `WHY:` trouvé au-dessus de l'import, ou rien. */
+  why: string | null
 }
 
 /**
  * Stack : les dépendances déclarées, et pourquoi elles sont là.
  *
  * Graphify cartographie le code, pas les dépendances — la liste vient donc du
- * package.json. La raison, elle, vient des plans : le plan clos le plus récent
- * qui mentionne la dépendance est celui qui l'a introduite ou justifiée.
+ * package.json. La raison vient d'un commentaire `WHY:` posé au-dessus de
+ * l'import du paquet, et de rien d'autre : voir `hooks/whys.js`.
  *
- * Une dépendance sans raison tracée le dit franchement. Inventer une
- * justification plausible serait précisément la documentation fausse que ce
- * projet existe pour éviter.
+ * Elle venait des plans, par recherche de sous-chaîne dans leur corps. Un plan
+ * qui citait `node-pty` en passant en devenait la justification affichée —
+ * constaté le 9 août 2026, où le plan d'audit s'est retrouvé présenté comme la
+ * raison d'être de `node-pty`. Une mention n'est pas une justification, et une
+ * fausse raison est pire que pas de raison : c'est ce qui fait cesser de croire
+ * au reste de l'écran.
  */
-export function stackFrom(packageJson: PackageJson | null, plans: Plan[]): StackRow[] {
+export function stackFrom(
+  packageJson: PackageJson | null,
+  whys: Record<string, string> = {},
+): StackRow[] {
   const all = { ...(packageJson?.dependencies ?? {}), ...(packageJson?.devDependencies ?? {}) }
 
-  // Tous les plans, pas seulement les clos : un plan encore ouvert qui
-  // mentionne une dépendance en est tout autant la raison. Du plus récent au
-  // plus ancien, pour que la dernière décision l'emporte.
-  const byRecency = [...plans].sort((a, b) =>
-    (b.closed ?? b.opened ?? '').localeCompare(a.closed ?? a.opened ?? ''),
-  )
+  return Object.entries(all).map(([name, version]) => ({
+    name,
+    version,
+    why: whys[name] ?? null,
+  }))
+}
 
-  return Object.entries(all).map(([name, version]) => {
-    const source = byRecency.find(plan =>
-      (plan.body ?? '').toLowerCase().includes(name.toLowerCase()),
-    )
-    if (!source) {
-      return { name, version, why: 'Aucune raison tracée : ni plan, ni commentaire # WHY:.' }
-    }
-    const when = source.closed
-      ? `plan du ${frDate(source.closed)}`
-      : `plan ouvert le ${frDate(source.opened)}`
-    return { name, version, why: `${source.title} — ${when}.` }
-  })
+/**
+ * Ce que le cockpit sait dire du projet, sans lire une ligne de code.
+ *
+ * Vit ici et pas dans le panneau terminal : c'est une lecture d'instantané, pas
+ * du rendu. Le panneau, lui, importe xterm et sa feuille de style — l'y laisser
+ * rendait ces lignes intestables autrement qu'en démarrant un navigateur.
+ */
+export function briefLines(snapshot: Snapshot | null): Array<{ text: string; style: string }> {
+  const dim = 'color: var(--color-neutral-400);'
+  if (!snapshot) return [{ text: 'lecture de cockpit/…', style: 'color: var(--color-neutral-600);' }]
+
+  const open = plansOuverts(snapshot.plans ?? [])
+  const closed = (snapshot.plans ?? []).length - open.length
+  const pages = snapshot.pages?.pages?.length ?? 0
+  const scan = lastScan(snapshot.scans ?? [])
+
+  const lines = [
+    { text: '$ claude', style: 'color: var(--color-neutral-500);' },
+    {
+      text: `◆ Contexte lisible dans ${snapshot.root}/cockpit — ${pages} page(s), ${closed} plan(s) clos, ${open.length} ouvert(s)`,
+      style: 'color: var(--color-accent-300);',
+    },
+    { text: '', style: '' },
+  ]
+
+  if (scan) {
+    lines.push({
+      text: scan.ok
+        ? `Dernier scan réussi le ${frDate(scan.date)} (commit ${scan.commit}).`
+        : `Dernier scan ÉCHOUÉ le ${frDate(scan.date)} : ${scan.error ?? 'raison non enregistrée'}.`,
+      style: scan.ok ? dim : 'color: var(--color-accent-200);',
+    })
+  } else {
+    lines.push({ text: 'Aucun scan enregistré : la carte des pages est vide.', style: dim })
+  }
+
+  const oldest = open.at(-1)
+  if (oldest) {
+    lines.push({ text: `Le plus ancien plan ouvert porte sur « ${oldest.title} ».`, style: dim })
+  }
+  lines.push({ text: '', style: '' })
+  return lines
+}
+
+/** Les blocs de contexte que les boutons du panneau écrivent dans la session. */
+export function buildInjections(snapshot: Snapshot | null): Array<{ label: string; text: string }> {
+  if (!snapshot) return []
+
+  const open = plansOuverts(snapshot.plans ?? [])
+  const pages = snapshot.pages?.pages ?? []
+
+  return [
+    {
+      label: `Carte des pages (${pages.length})`,
+      text: pages
+        .map(p => `${p.route} — ${p.title} → ${(p.links ?? []).join(', ') || 'aucun lien'}`)
+        .join('\n'),
+    },
+    {
+      label: `${open.length} plan(s) ouvert(s)`,
+      text: open.map(p => `- ${p.title} (ouvert le ${frDate(p.opened)})`).join('\n'),
+    },
+    {
+      label: `Tableau (${snapshot.tickets?.length ?? 0} ticket(s))`,
+      // Colonne par colonne, dans l'ordre du tableau : c'est ce qui permet à
+      // Claude de proposer un déplacement plutôt qu'un ticket de plus.
+      text: (snapshot.board ?? [])
+        .map(colonne => {
+          const dedans = sortTickets((snapshot.tickets ?? []).filter(t => t.colonne === colonne.id))
+          const lignes = dedans.map(t => `  ${t.id} [${t.priorite}] ${t.titre} — ${t.file}`)
+          return [`${colonne.titre} (${dedans.length})`, ...lignes].join('\n')
+        })
+        .join('\n'),
+    },
+    {
+      label: 'Chemin du cockpit',
+      text: `Lis ${snapshot.root}/cockpit/ pour l'état du projet. N'ouvre pas le code.`,
+    },
+  ]
 }

@@ -11,9 +11,19 @@
  * humaine du YAML n'achèterait rien. Passer à YAML si un jour ils s'éditent.
  */
 
-import { lstatSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
+import {
+  lstatSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
+import { randomUUID } from 'node:crypto'
 
 const FENCE = '---'
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
@@ -57,10 +67,14 @@ export function serializePlan(meta, body) {
 /**
  * Lit tous les plans d'un dossier cockpit.
  * @param {string} cockpitDir chemin de `<repo>/cockpit`
+ * @param {Array<{file: string, quoi: string}>} [illisibles] collecteur des
+ *   fichiers que la lecture n'a pas su ouvrir. Sans lui, un plan cassé
+ *   disparaît de l'interface aussi sûrement que s'il n'existait pas, et rien
+ *   ne distingue « aucun plan » de « un plan qu'on ne sait plus lire ».
  * @returns {Array<{file: string, meta: object, body: string}>} du plus récent
- *   au plus ancien. Les fichiers illisibles sont ignorés en silence.
+ *   au plus ancien.
  */
-export function readPlans(cockpitDir) {
+export function readPlans(cockpitDir, illisibles = []) {
   const dir = join(cockpitDir, 'plans')
 
   let names
@@ -77,6 +91,7 @@ export function readPlans(cockpitDir) {
     try {
       raw = readFileSync(join(dir, name), 'utf8')
     } catch {
+      illisibles.push({ file: `plans/${name}`, quoi: 'plan' })
       continue
     }
     const plan = parsePlan(raw)
@@ -86,6 +101,7 @@ export function readPlans(cockpitDir) {
       // Un plan illisible ne doit pas emporter la lecture des autres, mais il
       // ne doit pas disparaître en silence non plus : c'est précisément le
       // contenu qu'on ne peut pas reconstituer.
+      illisibles.push({ file: `plans/${name}`, quoi: 'plan' })
       process.stderr.write(`[cockpit] plan illisible, ignoré : ${name}\n`)
     }
   }
@@ -122,8 +138,15 @@ export function updatePlanMeta(cockpitDir, file, update) {
   return true
 }
 
-/** Le backlog n'est pas saisi : c'est l'ensemble des plans jamais clos. */
-export function backlog(plans) {
+/**
+ * Les plans jamais clos.
+ *
+ * S'appelait `backlog` du temps où le backlog se déduisait des plans. Le
+ * backlog se saisit maintenant, ticket par ticket, dans `cockpit/tickets/` —
+ * ceci reste l'intention approuvée et non soldée, ce qui n'est pas la même
+ * chose.
+ */
+export function plansOuverts(plans) {
   return plans
     .filter(p => p.meta.status === 'open')
     .sort((a, b) => String(b.meta.opened ?? '').localeCompare(String(a.meta.opened ?? '')))
@@ -216,10 +239,51 @@ export function writeFileNoFollow(path, content) {
     throw new Error(`refus d'écrire : ${path} est un lien symbolique`)
   }
 
-  const tmp = `${path}.tmp-${process.pid}`
-  writeFileSync(tmp, content, 'utf8')
-  renameSync(tmp, path)
+  // Nom temporaire unique : pid + uuid pour éviter les collisions entre
+  // écritures concurrentes du même processus vers le même chemin.
+  const tmp = `${path}.tmp-${process.pid}-${randomUUID()}`
+  try {
+    writeFileSync(tmp, content, 'utf8')
+    renameSync(tmp, path)
+  } catch (error) {
+    // Nettoie le fichier temporaire avant de relancer l'erreur
+    try {
+      unlinkSync(tmp)
+    } catch {
+      // Impossible de nettoyer, continuer sans panic
+    }
+    throw error
+  }
 }
+
+/**
+ * Le registre des projets connus, partagé par les hooks et l'interface.
+ *
+ * Une seule définition du chemin : `snapshot.js` l'importe d'ici plutôt que de
+ * le recomposer, sans quoi une lecture et une écriture pourraient viser deux
+ * fichiers différents le jour où il bouge.
+ *
+ * `COCKPIT_REGISTRY` existe pour les tests : ils écrivent réellement dans le
+ * registre, et un test qui vide la liste de projets de la machine serait un
+ * test qui casse l'outil qu'il vérifie.
+ */
+export const registryPath = () =>
+  process.env.COCKPIT_REGISTRY ?? join(homedir(), '.claude', 'cockpit', 'projects.json')
+
+/** @returns {Array<{path: string, name: string, lastOpened?: string}>} */
+export function readRegistry() {
+  try {
+    const parsed = JSON.parse(readFileSync(registryPath(), 'utf8'))
+    // Registre absent, corrompu, ou entrées sans chemin : on garde ce qui est
+    // exploitable plutôt que d'abandonner l'opération en cours.
+    return Array.isArray(parsed) ? parsed.filter(p => p?.path) : []
+  } catch {
+    return []
+  }
+}
+
+const writeRegistry = projects =>
+  writeFileNoFollow(registryPath(), JSON.stringify(projects, null, 2) + '\n')
 
 /**
  * Enregistre un projet pour la barre latérale multi-projets.
@@ -228,23 +292,51 @@ export function writeFileNoFollow(path, content) {
  * CLI de secours doivent produire exactement le même état. Un projet capturé à
  * la main qui n'apparaîtrait pas dans la liste serait un cockpit qui ment sur
  * ce qu'il connaît.
+ *
+ * `lastOpened` porte l'ordre de la barre latérale. Un projet qu'on vient
+ * d'ajouter est daté d'aujourd'hui : on vient précisément de s'y intéresser.
  */
-export function registerProject(root) {
-  const registry = join(homedir(), '.claude', 'cockpit', 'projects.json')
+export function registerProject(root, now = new Date()) {
+  const projects = readRegistry()
+  if (projects.some(p => p.path === root)) return false
 
-  let projects = []
-  try {
-    const parsed = JSON.parse(readFileSync(registry, 'utf8'))
-    if (Array.isArray(parsed)) projects = parsed
-  } catch {
-    // Registre absent ou corrompu : on repart d'une liste vide plutôt que
-    // d'abandonner la capture.
-  }
+  writeRegistry([...projects, { path: root, name: basename(root), lastOpened: now.toISOString() }])
+  return true
+}
 
-  if (projects.some(p => p?.path === root)) return false
+/**
+ * Retire un projet de la liste. **Aucun fichier du projet n'est touché** — ni
+ * le dépôt, ni son dossier `cockpit/`. C'est un oubli, pas une suppression :
+ * réenregistrer le même chemin retrouve tout l'historique intact.
+ *
+ * @returns {boolean} vrai si le projet y était
+ */
+export function unregisterProject(root) {
+  const projects = readRegistry()
+  const kept = projects.filter(p => p.path !== root)
+  if (kept.length === projects.length) return false
 
-  projects.push({ path: root, name: basename(root) })
-  writeFileNoFollow(registry, JSON.stringify(projects, null, 2) + '\n')
+  writeRegistry(kept)
+  return true
+}
+
+/**
+ * Note qu'un projet vient d'être ouvert — c'est ce qui le fait remonter en tête
+ * de la barre latérale.
+ *
+ * Sans effet sur un projet inconnu : ouvrir n'est pas enregistrer, et une
+ * ouverture ne doit pas faire entrer dans la liste un chemin que personne n'y a
+ * mis.
+ *
+ * @returns {boolean} vrai si la date a été écrite
+ */
+export function touchProject(root, now = new Date()) {
+  const projects = readRegistry()
+  if (!projects.some(p => p.path === root)) return false
+
+  writeRegistry(
+    projects.map(p => (p.path === root ? { ...p, lastOpened: now.toISOString() } : p)),
+  )
   return true
 }
 
@@ -253,13 +345,23 @@ export function registerProject(root) {
  *
  * Un plan se ferme à l'ouverture du suivant, pas au premier commit : un plan
  * est une intention, et une intention prend souvent plusieurs commits. Un plan
- * ouvert SANS commit n'est pas clos — c'est du backlog, approuvé puis
+ * ouvert SANS commit n'est pas clos — c'est du travail approuvé puis
  * abandonné.
  *
  * Vit ici, et non dans le hook, parce que le chemin manuel (`/cockpit
  * capture`) doit se comporter exactement comme le chemin automatique. Deux
  * règles de clôture différentes produiraient deux historiques différents selon
  * la façon dont le plan a été capturé.
+ *
+ * **Clore retire `.active-plan`** quand le pointeur désignait un plan qu'on
+ * vient de fermer. Sans cela, le pointeur survivait à son plan et le hook
+ * post-commit rattachait au dernier plan tout ce qui était commité ensuite —
+ * un correctif sans rapport se retrouvait inscrit comme un commit de
+ * l'intention précédente. Clore devient donc le signal de fin de travail :
+ * après, un commit ne se rattache à rien, ce qui est vrai.
+ *
+ * Un plan ouvert sans commit garde son pointeur : c'est du travail approuvé
+ * pas encore commencé, pas du travail terminé.
  *
  * @returns {string[]} fichiers effectivement clos
  */
@@ -286,7 +388,76 @@ export function closeOpenPlans(cockpitDir, log = () => {}) {
     if (written) closed.push(plan.file)
   }
 
+  clearActivePlan(cockpitDir, closed)
   return closed
+}
+
+/**
+ * Rattache un commit à un plan. Rend vrai s'il a été écrit.
+ *
+ * Vit ici, et non dans le hook, pour la même raison que `closeOpenPlans` : la
+ * règle décide de ce que l'historique raconte, et une règle enfouie dans un
+ * script git ne se vérifie qu'en committant pour de vrai.
+ *
+ * Deux refus, tous deux silencieux — il n'y a rien d'anormal à ne rien écrire :
+ *
+ * - **Plan clos.** Le pointeur peut lui survivre : il est effacé à la clôture,
+ *   mais un `.active-plan` écrit avant cette règle, ou remis à la main,
+ *   désignerait encore un plan terminé. Y rattacher les commits suivants
+ *   ferait grossir indéfiniment une intention soldée, et sa date de clôture
+ *   serait antérieure à son dernier commit.
+ * - **Sha déjà présent.** Un hook peut se rejouer ; l'historique ne doit pas
+ *   compter deux fois le même commit.
+ *
+ * @param {string} cockpitDir
+ * @param {string} file nom de fichier du plan, déjà validé
+ * @param {{sha: string, date: string, files: string[]}} commit
+ * @returns {boolean}
+ */
+export function attachCommitToPlan(cockpitDir, file, commit) {
+  return updatePlanMeta(cockpitDir, file, meta => {
+    if (meta.status !== 'open') return null
+
+    const commits = meta.commits ?? []
+    if (commits.some(c => c.sha === commit.sha)) return null
+
+    return { ...meta, commits: [...commits, commit] }
+  })
+}
+
+/**
+ * Retire `.active-plan` s'il désignait l'un des plans qu'on vient de clore.
+ *
+ * L'absence de pointeur n'est pas une panne : c'est l'état normal entre deux
+ * intentions. Un échec d'effacement l'est encore moins — le fichier est déjà
+ * parti, ou n'a jamais existé.
+ */
+function clearActivePlan(cockpitDir, closed) {
+  if (closed.length === 0) return
+
+  const pointer = join(cockpitDir, '.active-plan')
+  try {
+    if (!closed.includes(readFileSync(pointer, 'utf8').trim())) return
+    rmSync(pointer)
+  } catch {
+    // Pas de pointeur, ou illisible : rien à retirer.
+  }
+}
+
+/**
+ * Un slug de page est-il sûr à recoller à un chemin ?
+ * Les slugs viennent de pages.json, jamais édités à la main, mais pages.json
+ * arrive dans le dépôt sans validation.
+ */
+export function isSafeSlug(slug) {
+  return (
+    typeof slug === 'string' &&
+    slug.length > 0 &&
+    !slug.includes('/') &&
+    !slug.includes('\\') &&
+    !slug.includes('\0') &&
+    !slug.startsWith('.')
+  )
 }
 
 /**

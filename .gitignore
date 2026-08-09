@@ -13,8 +13,27 @@ dist/
 graphify-out/cache/
 graphify-out/graph.html
 
+# GRAPH_REPORT.md l'est aussi, pour une raison de plus : il change à CHAQUE
+# reconstruction, même à code identique. Son en-tête compte les mots du corpus,
+# et ce compte grimpe tout seul — 771 k, 778 k, 801 k, 831 k sur quatre commits
+# d'affilée, dont le dernier ne touchait que ce fichier. Le graphe, lui, ne
+# bouge pas d'un nœud (413 nœuds, 675 arêtes à chaque fois). D'où vient la
+# dérive du compte relève de graphify, pas d'ici.
+#
+# Aucun code du cockpit ne lit ce rapport : le versionner ne produisait qu'une
+# ligne perpétuellement modifiée dans `git status`.
+graphify-out/GRAPH_REPORT.md
+
+# Coffre Obsidian : une traduction de cockpit/ et de graphify-out/, réécrite à
+# chaque export. Le versionner mettrait chaque plan et chaque ticket deux fois
+# dans le dépôt, et chaque export ferait un diff qui n'apprend rien.
+cockpit/obsidian/
+
 # Build de l app, reconstruit a la demande.
 app/dist/
+
+# Traduction de app/src en JavaScript, refaite à chaque `pnpm test`.
+app/.test-build/
 
 # Applications empaquetées, reconstruites à la demande.
 release/

@@ -1,0 +1,24 @@
+{
+  // Les tests de `app/src` tournent sous `node --test`, qui ne lit ni le JSX ni
+  // le TypeScript. On compile donc vers `app/.test-build/` avant de lancer les
+  // tests — pas de nouvelle dépendance, pas de second lanceur.
+  //
+  // Sortie en CommonJS, volontairement : le projet est en ESM, et Node exige
+  // alors une extension explicite sur chaque import. `tsc` ne réécrit pas les
+  // chemins ; en CommonJS, `require('./data')` se résout tout seul.
+  // `scripts/test-ui.js` dépose un `package.json` local dans le dossier de
+  // sortie pour que Node y lise du CommonJS malgré le `"type": "module"` du
+  // dépôt.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "app/.test-build",
+    "rootDir": "app/src",
+    "module": "commonjs",
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": false,
+    "esModuleInterop": true,
+    "noUnusedLocals": false
+  },
+  "include": ["app/src"]
+}

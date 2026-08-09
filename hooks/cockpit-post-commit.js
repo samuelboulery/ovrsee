@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Hook git post-commit : rattache le commit au plan actif, puis déclenche le
- * crawl en arrière-plan.
+ * crawl en arrière-plan — mais seulement si le commit a touché du code.
  *
  * Ce qui relie l'historique à la carte des pages, ce sont les fichiers : un
  * plan touche des fichiers, et ces fichiers appartiennent à des pages.
@@ -12,10 +12,10 @@
 
 import { execFileSync, spawn } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { updatePlanMeta, isSafePlanFileName } from './plans.js'
+import { attachCommitToPlan, isSafePlanFileName } from './plans.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 
@@ -40,7 +40,25 @@ function changedFiles(root) {
   }
 }
 
-function attachCommit(cockpitDir, root) {
+/**
+ * Ce commit vaut-il un crawl ?
+ *
+ * `changedFiles()` a déjà retiré `cockpit/` et `graphify-out/` : une liste vide
+ * veut donc dire « ce commit n'a touché que des sorties ». Photographier une
+ * application qui n'a pas bougé produit une fournée de captures, laquelle
+ * demande un commit, lequel relance un crawl — l'arbre de travail ne redevient
+ * alors jamais propre. Constaté le 9 août 2026 : trois commits d'affilée, vingt
+ * et une captures, zéro pixel de différence.
+ *
+ * Une lecture git en échec rend aussi une liste vide, et ne déclenche donc rien.
+ * C'est voulu : si on ne sait pas ce qui a changé, on ne dépense pas plusieurs
+ * minutes de navigateur là-dessus, et le prochain commit de code le fera.
+ *
+ * @param {string[]} sources fichiers sources du dernier commit
+ */
+export const crawlUtile = sources => Array.isArray(sources) && sources.length > 0
+
+function attachCommit(cockpitDir, root, sources) {
   const pointer = join(cockpitDir, '.active-plan')
   if (!existsSync(pointer)) return null
 
@@ -50,20 +68,16 @@ function attachCommit(cockpitDir, root) {
   const file = readFileSync(pointer, 'utf8').trim()
   if (!isSafePlanFileName(file)) return null
 
-  const sha = git(['rev-parse', '--short', 'HEAD'], root)
   const commit = {
-    sha,
+    sha: git(['rev-parse', '--short', 'HEAD'], root),
     date: git(['log', '-1', '--format=%cs'], root),
-    files: changedFiles(root),
+    files: sources,
   }
 
-  const written = updatePlanMeta(cockpitDir, file, meta => {
-    const commits = meta.commits ?? []
-    if (commits.some(c => c.sha === sha)) return null // déjà rattaché
-    return { ...meta, commits: [...commits, commit] }
-  })
-
-  return written ? file : null
+  // La règle — plan clos, sha déjà là — vit dans plans.js : elle décide de ce
+  // que l'historique raconte, et enfouie ici elle ne se vérifierait qu'en
+  // committant pour de vrai.
+  return attachCommitToPlan(cockpitDir, file, commit) ? file : null
 }
 
 /**
@@ -82,16 +96,25 @@ function spawnCrawl(root) {
   child.unref()
 }
 
-try {
-  const root = git(['rev-parse', '--show-toplevel'], process.cwd())
-  const cockpitDir = join(root, 'cockpit')
+/**
+ * Le corps ne tourne que si le fichier est lancé comme hook.
+ *
+ * Sans cette garde, l'importer pour en éprouver une décision lancerait un
+ * crawl — c'est-à-dire une application et un navigateur — à chaque `pnpm test`.
+ */
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try {
+    const root = git(['rev-parse', '--show-toplevel'], process.cwd())
+    const cockpitDir = join(root, 'cockpit')
 
-  if (existsSync(cockpitDir)) {
-    const file = attachCommit(cockpitDir, root)
-    if (file) process.stdout.write(`[cockpit] commit rattaché à ${file}\n`)
-    spawnCrawl(root)
+    if (existsSync(cockpitDir)) {
+      const sources = changedFiles(root)
+      const file = attachCommit(cockpitDir, root, sources)
+      if (file) process.stdout.write(`[cockpit] commit rattaché à ${file}\n`)
+      if (crawlUtile(sources)) spawnCrawl(root)
+    }
+  } catch (err) {
+    process.stderr.write(`[cockpit] post-commit ignoré : ${err?.message ?? err}\n`)
   }
-} catch (err) {
-  process.stderr.write(`[cockpit] post-commit ignoré : ${err?.message ?? err}\n`)
+  process.exit(0)
 }
-process.exit(0)

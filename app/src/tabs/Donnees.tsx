@@ -16,9 +16,9 @@ export function Donnees({ graph }: { graph: GraphifyGraph | null }) {
   return (
     <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
       <div style={s('display: flex; align-items: baseline; gap: 10px;')}>
-        <h1 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
+        <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
           Tables
-        </h1>
+        </h2>
         <span className="tag tag-accent" style={s('font-size: 10.5px;')}>
           lu depuis Graphify
         </span>

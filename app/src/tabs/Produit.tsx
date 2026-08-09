@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   CARD_H,
-  COL_STEP,
   CARD_W,
   frDate,
   frDateShort,
@@ -19,9 +18,10 @@ import {
   type Placed,
   type Snapshot,
 } from '../data'
+import { Lightbox } from '../Lightbox'
 import { s, useHover } from '../style'
 import { Divider, useResizable } from '../useResizable'
-import { useMeasure } from '../useMeasure'
+import { usePanZoom } from '../usePanZoom'
 import type { Layout } from '../Terminal'
 
 /** Onglet Produit — maquette l. 85-274. */
@@ -42,26 +42,34 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
     invert: true,
   })
 
-  // La zone du graphe est mesurée : le nombre de cartes par rangée suit la
-  // place réelle, qui change avec la fenêtre, la barre latérale et la
-  // disposition du terminal.
-  const area = useMeasure<HTMLDivElement>()
-  const scale = layout === 'side' ? 0.82 : 1
-  const maxPerRow = area.width > 0 ? Math.max(1, Math.floor(area.width / scale / COL_STEP)) : 4
+  // La disposition ne dépend plus de la place : une rangée par profondeur,
+  // toujours. C'est le canevas qui s'ajuste.
+  const canvas = usePanZoom()
+  const { placed, width, height } = layoutGraph(pages)
 
-  const { placed, width, height } = layoutGraph(pages, maxPerRow)
   const current = pages.find(p => p.route === selected) ?? pages[0] ?? null
   const linkCount = pages.reduce((total, page) => total + page.links.length, 0)
   const failed = scanFailed(snapshot.scans)
 
   const side = layout === 'side'
 
+  // Changer de projet rend la main à l'ajustement automatique : le graphe
+  // suivant n'a aucune raison d'hériter du zoom choisi pour le précédent.
+  useEffect(() => canvas.release(), [snapshot.root])
+
+  // Recadrage tant que l'utilisateur n'a pas pris la main. Dépend de la taille
+  // du viewport, donc suit la fenêtre, la barre latérale et la disposition du
+  // terminal — ce que faisait l'ancien `scale(0.82)`, en mieux.
+  useEffect(() => {
+    if (canvas.untouched()) canvas.fit(width, height, false)
+  }, [canvas.width, canvas.height, width, height])
+
   if (pages.length === 0) {
     return (
       <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
-        <h1 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
+        <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
           Graphe de navigation
-        </h1>
+        </h2>
         <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
           Aucune page cartographiée. Le crawl tourne au commit — lancez-le une fois avec{' '}
           <span style={s('font-family: ui-monospace, monospace;')}>node crawl/index.js</span>.
@@ -72,36 +80,53 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
 
   return (
     <div style={s('flex: 1; display: flex; min-width: 0; position: relative;')}>
-      <div ref={area.ref} style={s('flex: 1; padding: 20px 22px; overflow: auto; min-width: 0;')}>
-        <div style={s('display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;')}>
-          <h1 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
-            Graphe de navigation
-          </h1>
-          <span style={s('font-size: 12px; color: var(--color-neutral-500);')}>
-            {pages.length} page{pages.length > 1 ? 's' : ''} · {linkCount} lien
-            {linkCount > 1 ? 's' : ''} · reconstruit au commit
-          </span>
+      <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
+        <div style={s('flex: none; padding: 20px 22px 0;')}>
+          <div style={s('display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;')}>
+            <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
+              Graphe de navigation
+            </h2>
+            <span style={s('font-size: 12px; color: var(--color-neutral-500);')}>
+              {pages.length} page{pages.length > 1 ? 's' : ''} · {linkCount} lien
+              {linkCount > 1 ? 's' : ''} · reconstruit au commit
+            </span>
+          </div>
+
+          <Legend />
+
+          {failed && (
+            <div
+              style={s(
+                'display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 8px 11px; border-radius: 6px; background: var(--color-accent-900); border: 1px solid var(--color-accent-800); font-size: 12px; color: var(--color-accent-200);',
+              )}
+            >
+              Dernier scan échoué le {frDate(lastScan(snapshot.scans)?.date)} — les captures
+              ci-dessous sont plus anciennes que le dernier commit.
+            </div>
+          )}
         </div>
 
-        <Legend />
+        {/* Le canevas. `overflow: hidden` et non `auto` : le déplacement passe
+            par la transformation, pas par les barres de défilement — deux
+            mécanismes de déplacement se battraient sur le même geste.
 
-        {failed && (
+            En disposition « Côté », le rail de détail recouvre le canevas au
+            lieu de le pousser. Un remplissage à droite retire cette bande de la
+            largeur mesurée — sans quoi l'ajustement centrerait le graphe dans
+            une place dont une partie est cachée, et la moitié droite passerait
+            sous le rail. */}
+        <div
+          ref={canvas.ref}
+          style={s(
+            // `user-select: none` : sans lui, glisser le canevas surligne les
+            // titres des cartes au passage.
+            `flex: 1; position: relative; overflow: hidden; min-height: 0; touch-action: none; user-select: none; padding-right: ${side && panel ? rail.size : 0}px; ` +
+              (canvas.panning ? 'cursor: grabbing;' : 'cursor: grab;'),
+          )}
+        >
           <div
             style={s(
-              'display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 8px 11px; border-radius: 6px; background: var(--color-accent-900); border: 1px solid var(--color-accent-800); font-size: 12px; color: var(--color-accent-200);',
-            )}
-          >
-            Dernier scan échoué le {frDate(lastScan(snapshot.scans)?.date)} — les captures ci-dessous
-            sont plus anciennes que le dernier commit.
-          </div>
-        )}
-
-        <div style={s(side ? `width: ${width * 0.82}px; height: ${height * 0.82}px;` : `width: ${width}px; height: ${height}px;`)}>
-          <div
-            style={s(
-              side
-                ? `position: relative; width: ${width}px; height: ${height}px; transform: scale(0.82); transform-origin: top left;`
-                : `position: relative; width: ${width}px; height: ${height}px;`,
+              `position: absolute; top: 0; left: 0; width: ${width}px; height: ${height}px; transform: translate(${canvas.pan.x}px, ${canvas.pan.y}px) scale(${canvas.zoom}); transform-origin: 0 0;`,
             )}
           >
             <Edges placed={placed} width={width} height={height} />
@@ -125,10 +150,16 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
               />
             ))}
           </div>
+
+          <Controls
+            zoom={canvas.zoom}
+            onZoom={canvas.zoomBy}
+            onReset={canvas.reset}
+            onFit={() => canvas.fit(width, height)}
+          />
         </div>
 
-        {Object.keys(redirects).length > 0 && <Redirects redirects={redirects} />}
-        {orphans.length > 0 && <Orphans slugs={orphans} />}
+        <Footnotes redirects={redirects} orphans={orphans} />
       </div>
 
       {panel && current ? (
@@ -175,11 +206,7 @@ function Legend() {
     >
       <span style={s('display: flex; align-items: center; gap: 6px;')}>
         <span style={s('width: 20px; height: 1px; background: var(--color-accent); display: block;')} />
-        lien direct
-      </span>
-      <span style={s('display: flex; align-items: center; gap: 6px;')}>
-        <span style={s('width: 20px; height: 0; border-top: 1px dashed var(--color-neutral-600); display: block;')} />
-        retour
+        mène à
       </span>
       <span style={s('display: flex; align-items: center; gap: 6px;')}>
         <span
@@ -194,42 +221,92 @@ function Legend() {
 }
 
 /**
+ * Commandes du canevas, en surimpression.
+ *
+ * Le zoom se fait au trackpad la plupart du temps ; ces boutons existent pour
+ * la souris, et surtout pour que « ajuster » soit atteignable — un graphe perdu
+ * hors cadre après un déplacement trop franc doit se retrouver sans tâtonner.
+ */
+function Controls({
+  zoom,
+  onZoom,
+  onReset,
+  onFit,
+}: {
+  zoom: number
+  onZoom: (factor: number) => void
+  onReset: () => void
+  onFit: () => void
+}) {
+  const button =
+    'cursor: pointer; font-family: var(--font-body); font-size: 11px; padding: 4px 9px; border-radius: 5px; border: 1px solid var(--color-neutral-800); background: rgba(19,20,31,.86); color: var(--color-neutral-400);'
+
+  return (
+    <div
+      style={s(
+        'position: absolute; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 4px; z-index: 4;',
+      )}
+    >
+      <button type="button" title="Dézoomer" onClick={() => onZoom(1 / 1.2)} style={s(button)}>
+        −
+      </button>
+      <button
+        type="button"
+        title="Revenir à 100 %"
+        onClick={onReset}
+        style={s(button + ' min-width: 52px; font-variant-numeric: tabular-nums;')}
+      >
+        {Math.round(zoom * 100)} %
+      </button>
+      <button type="button" title="Zoomer" onClick={() => onZoom(1.2)} style={s(button)}>
+        +
+      </button>
+      <button type="button" title="Ajuster à la fenêtre" onClick={onFit} style={s(button)}>
+        ⤢
+      </button>
+    </div>
+  )
+}
+
+/**
  * Arêtes orthogonales en L, dans le sens vertical.
  *
- * Un lien vers une profondeur plus grande descend : il sort du bas de la carte
- * et entre par le haut de la suivante. Un lien qui remonte vers une profondeur
- * déjà atteinte est un retour : il contourne par la droite, en pointillé gris,
- * pour ne pas se confondre avec le flux principal.
+ * **Une arête = une descente d'un niveau.** Seul un lien vers la profondeur
+ * immédiatement suivante est tracé : il sort du bas de la carte et entre par le
+ * haut de la suivante.
+ *
+ * Tout le reste est écarté, et c'est le fond du problème que cette règle
+ * corrige. Une barre de navigation met sur chaque page un lien vers toutes les
+ * autres : les cinq pages du cockpit produisent vingt liens, dont seize entre
+ * frères de même niveau. Tracés, ils donnaient à `/stack` l'air de découler de
+ * `/donnees`. Un lien frère ne dit rien de la structure — il dit qu'il y a un
+ * menu. Un lien qui remonte non plus : toute page ramène à l'accueil.
+ *
+ * Ce qui est perdu : on ne voit plus qu'une page en atteint une autre
+ * latéralement. Ce qui est gagné : ce qui reste à l'écran est vrai. Un enfant
+ * atteint depuis deux parents garde bien ses deux arêtes — on ne réduit pas à
+ * l'arbre du parcours.
+ *
+ * Une profondeur occupe désormais une seule rangée : une arête descend donc
+ * toujours d'exactement un `ROW_STEP`, et le détour par une voie latérale qui
+ * contournait les sous-rangées n'a plus lieu d'être.
  */
 function Edges({ placed, width, height }: { placed: Placed[]; width: number; height: number }) {
   const byRoute = new Map(placed.map(item => [item.page.route, item]))
   const forward: string[] = []
-  const back: string[] = []
 
   for (const from of placed) {
     for (const link of from.page.links) {
       const to = byRoute.get(link)
-      if (!to || to.page.route === from.page.route) continue
+      if (!to || to.depth !== from.depth + 1) continue
 
-      if (to.depth > from.depth) {
-        // Descente : bas du centre → haut du centre, avec un décrochement
-        // horizontal à mi-hauteur.
-        const x1 = from.x + CARD_W / 2
-        const y1 = from.y + CARD_H
-        const x2 = to.x + CARD_W / 2
-        const y2 = to.y
-        const mid = y1 + (y2 - y1) / 2
-        forward.push(`M ${x1} ${y1} V ${mid} H ${x2} V ${y2}`)
-      } else {
-        // Retour : sortie par le flanc droit, remontée à l'écart des cartes,
-        // entrée par le flanc droit de la cible.
-        const x1 = from.x + CARD_W
-        const y1 = from.y + CARD_H / 2
-        const x2 = to.x + CARD_W
-        const y2 = to.y + CARD_H / 2
-        const lane = Math.max(x1, x2) + 18
-        back.push(`M ${x1} ${y1} H ${lane} V ${y2} H ${x2}`)
-      }
+      // Bas du centre → haut du centre, avec un décrochement horizontal à
+      // mi-hauteur.
+      const x1 = from.x + CARD_W / 2
+      const y1 = from.y + CARD_H
+      const x2 = to.x + CARD_W / 2
+      const y2 = to.y
+      forward.push(`M ${x1} ${y1} V ${y1 + (y2 - y1) / 2} H ${x2} V ${y2}`)
     }
   }
 
@@ -244,17 +321,9 @@ function Edges({ placed, width, height }: { placed: Placed[]; width: number; hei
         <marker id="na" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#796cbf" />
         </marker>
-        <marker id="nab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#595d6c" />
-        </marker>
       </defs>
       <g fill="none" stroke="#796cbf" strokeWidth="1.25" markerEnd="url(#na)">
         {forward.map((d, i) => (
-          <path key={i} d={d} />
-        ))}
-      </g>
-      <g fill="none" stroke="#595d6c" strokeWidth="1" strokeDasharray="4 4" markerEnd="url(#nab)">
-        {back.map((d, i) => (
           <path key={i} d={d} />
         ))}
       </g>
@@ -367,6 +436,10 @@ function DetailPanel({
   const shots = snapshot.shots[page.slug] ?? []
   const plans = plansForPage(snapshot.plans, page)
 
+  // Index de la capture agrandie, ou null. Toutes les captures sont
+  // atteignables depuis la visionneuse, pas seulement les cinq du rail.
+  const [zoom, setZoom] = useState<number | null>(null)
+
   return (
     <div
       style={s(
@@ -399,8 +472,10 @@ function DetailPanel({
         <img
           src={shotUrl(snapshot.root, `shots/${page.slug}/${shots[0]}`)}
           alt=""
+          title="Agrandir"
+          onClick={() => setZoom(0)}
           style={s(
-            `margin-top: 14px; border-radius: 8px; border: 1px solid var(--color-neutral-800); width: 100%; aspect-ratio: ${shotRatio(page)}; object-fit: cover; object-position: top; display: block;`,
+            `margin-top: 14px; border-radius: 8px; border: 1px solid var(--color-neutral-800); width: 100%; aspect-ratio: ${shotRatio(page)}; object-fit: cover; object-position: top; display: block; cursor: zoom-in;`,
           )}
         />
       ) : (
@@ -422,22 +497,36 @@ function DetailPanel({
 
       <Section title="Captures précédentes">
         {shots.length > 1 ? (
-          <div style={s('display: flex; gap: 8px;')}>
-            {shots.slice(1, 5).map(file => (
-              <div key={file} style={s('flex: 1;')}>
-                <img
-                  src={shotUrl(snapshot.root, `shots/${page.slug}/${file}`)}
-                  alt=""
-                  style={s(
-                    'height: 44px; width: 100%; object-fit: cover; object-position: top; border-radius: 5px; border: 1px solid var(--color-neutral-800); display: block;',
-                  )}
-                />
-                <div style={s('font-size: 9.5px; color: var(--color-neutral-600); margin-top: 4px;')}>
-                  {frDate(shotDate(file))}
+          <>
+            {/* Le rail reste étroit : quatre miniatures. La visionneuse, elle,
+                donne accès à toute la série. */}
+            <div style={s('display: flex; gap: 8px;')}>
+              {shots.slice(1, 5).map((file, i) => (
+                <div key={file} style={s('flex: 1;')}>
+                  <img
+                    src={shotUrl(snapshot.root, `shots/${page.slug}/${file}`)}
+                    alt=""
+                    title="Agrandir"
+                    onClick={() => setZoom(i + 1)}
+                    style={s(
+                      'height: 44px; width: 100%; object-fit: cover; object-position: top; border-radius: 5px; border: 1px solid var(--color-neutral-800); display: block; cursor: zoom-in;',
+                    )}
+                  />
+                  <div style={s('font-size: 9.5px; color: var(--color-neutral-600); margin-top: 4px;')}>
+                    {frDate(shotDate(file))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setZoom(0)}
+              className="btn btn-ghost"
+              style={s('font-size: 11px; padding: 4px 9px; margin-top: 9px;')}
+            >
+              Voir les {shots.length} captures en grand
+            </button>
+          </>
         ) : (
           <Empty text="Une seule capture pour l'instant." />
         )}
@@ -473,6 +562,18 @@ function DetailPanel({
           <Empty text="Aucun plan — cette page n'a pas bougé depuis sa création." />
         )}
       </Section>
+
+      {zoom !== null && (
+        <Lightbox
+          root={snapshot.root}
+          slug={page.slug}
+          files={shots}
+          index={zoom}
+          onIndex={setZoom}
+          onClose={() => setZoom(null)}
+          label={`${pageName(page, pages)} · ${page.route}`}
+        />
+      )}
     </div>
   )
 }
@@ -497,12 +598,61 @@ const Empty = ({ text }: { text: string }) => (
 )
 
 /**
+ * Ce que la carte ne peut pas dessiner : routes protégées, captures orphelines.
+ *
+ * Ces deux blocs vivaient sous le graphe, dans le même défilement. Le canevas
+ * prend maintenant toute la hauteur, et les faire défiler avec lui n'a plus de
+ * sens. Repliés, ils tiennent en une ligne qui dit leur compte — assez pour
+ * qu'on sache qu'il y a quelque chose à lire, pas assez pour encombrer.
+ */
+function Footnotes({
+  redirects,
+  orphans,
+}: {
+  redirects: Record<string, string>
+  orphans: string[]
+}) {
+  const [open, setOpen] = useState(false)
+  const routes = Object.keys(redirects).length
+
+  if (routes === 0 && orphans.length === 0) return null
+
+  const counts = [
+    routes > 0 ? `${routes} route${routes > 1 ? 's' : ''} protégée${routes > 1 ? 's' : ''}` : null,
+    orphans.length > 0
+      ? `${orphans.length} capture${orphans.length > 1 ? 's' : ''} sans page`
+      : null,
+  ].filter(Boolean)
+
+  return (
+    <div style={s('flex: none; border-top: 1px solid var(--color-divider); background: #13141f;')}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        style={s(
+          'display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; background: transparent; border: 0; padding: 8px 22px; cursor: pointer; font-family: var(--font-body); font-size: 11.5px; color: var(--color-neutral-500);',
+        )}
+      >
+        <span style={s('color: var(--color-neutral-600);')}>{open ? '▾' : '▸'}</span>
+        {counts.join(' · ')}
+      </button>
+      {open && (
+        <div style={s('max-height: 34vh; overflow: auto; padding: 0 22px 16px;')}>
+          {routes > 0 && <Redirects redirects={redirects} />}
+          {orphans.length > 0 && <Orphans slugs={orphans} />}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/**
  * Captures qui ne correspondent à aucune page actuelle. Les taire les ferait
  * passer pour des écrans du produit auprès de qui ouvre le dossier.
  */
 function Orphans({ slugs }: { slugs: string[] }) {
   return (
-    <div style={s('margin-top: 22px;')}>
+    <div style={s('margin-top: 14px;')}>
       <div
         style={s(
           'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 8px;',
@@ -522,7 +672,7 @@ function Orphans({ slugs }: { slugs: string[] }) {
 /** Une route qui redirige existe et est protégée : c'est une information. */
 function Redirects({ redirects }: { redirects: Record<string, string> }) {
   return (
-    <div style={s('margin-top: 22px;')}>
+    <div style={s('margin-top: 14px;')}>
       <div
         style={s(
           'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;',

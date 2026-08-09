@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Cockpit — routage des onglets, puis coquille Electron (v1.1)",
   "opened": "2026-08-08",
-  "closed": null,
+  "closed": "2026-08-08",
   "commits": [
     {
       "sha": "196e38f",
@@ -67,6 +67,34 @@
         "app/src/useResizable.tsx",
         "electron/main.js"
       ]
+    },
+    {
+      "sha": "3b05ce4",
+      "date": "2026-08-08",
+      "files": [
+        ".gitignore",
+        "build/icon.icns",
+        "build/icon.svg",
+        "scripts/make-icon.js"
+      ]
+    },
+    {
+      "sha": "51dfab0",
+      "date": "2026-08-08",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/data.ts",
+        "app/src/tabs/Produit.tsx",
+        "app/src/useTerminal.ts",
+        "electron/main.js",
+        "electron/preload.cjs",
+        "hooks/install.js",
+        "hooks/plans.js",
+        "hooks/plans.test.js",
+        "hooks/snapshot.js",
+        "server/api.js",
+        "server/api.test.js"
+      ]
     }
   ]
 }
@@ -115,8 +143,17 @@ quitte plus l'application pendant une session de travail.
   Node purs, aucun import Electron. Interface = React, aucun import Node. Une
   seule interface étroite entre les deux. C'est ce qui garde le remplacement de
   la coquille à un après-midi de travail, comme l'annonce le cadrage §7.
-- **Le pty lance `claude` seul**, sans shell intermédiaire. Le cockpit
-  n'exécute jamais, sauf la session Claude elle-même.
+- ~~**Le pty lance `claude` seul**, sans shell intermédiaire. Le cockpit
+  n'exécute jamais, sauf la session Claude elle-même.~~ **Révisé après essai :
+  le pty lance un shell de connexion (`$SHELL -l`) et y tape `claude`.** Lancée
+  depuis le Finder, une application graphique n'hérite que d'un PATH minimal ;
+  `claude` démarrait, mais ses hooks mouraient sur
+  `/bin/sh: node: command not found`, et rien d'autre ne pouvait être lancé
+  depuis le panneau. Le shell de connexion source `~/.zprofile` / `~/.zshrc` et
+  rétablit le vrai environnement. Conséquence assumée : le panneau est un
+  terminal, ce qu'on y tape s'exécute. L'isolation par IPC garde sa raison
+  d'être — empêcher un **autre** processus de la machine de s'y brancher, ce
+  qu'une socket locale aurait permis.
 - **Routage d'abord**, coquille ensuite.
 
 ---

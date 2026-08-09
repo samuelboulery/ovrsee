@@ -1,6 +1,14 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtempSync, mkdirSync, writeFileSync, symlinkSync, readFileSync, readdirSync } from 'node:fs'
+import {
+  existsSync,
+  mkdtempSync,
+  mkdirSync,
+  writeFileSync,
+  symlinkSync,
+  readFileSync,
+  readdirSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -8,16 +16,24 @@ import {
   parsePlan,
   serializePlan,
   readPlans,
-  backlog,
+  plansOuverts,
   history,
   density,
   slugify,
   planFileName,
   writeFileNoFollow,
+  isSafeSlug,
   isSafePlanFileName,
   updatePlanMeta,
+  attachCommitToPlan,
   closeOpenPlans,
+  readRegistry,
+  registerProject,
+  unregisterProject,
+  touchProject,
 } from './plans.js'
+
+import { projects } from './snapshot.js'
 
 // --- parsePlan -------------------------------------------------------------
 
@@ -178,9 +194,9 @@ const SAMPLE = [
   ]),
 ]
 
-test('backlog = les plans ouverts, du plus récent au plus ancien', () => {
+test('plansOuverts = les plans jamais clos, du plus récent au plus ancien', () => {
   assert.deepEqual(
-    backlog(SAMPLE).map(p => p.meta.title),
+    plansOuverts(SAMPLE).map(p => p.meta.title),
     ['Export CSV', 'Mode hors ligne'],
   )
 })
@@ -294,6 +310,37 @@ test('writeFileNoFollow ne laisse pas de fichier temporaire derrière lui', () =
   assert.deepEqual(readdirSync(dir), ['a.md'])
 })
 
+test('writeFileNoFollow nettoie le fichier temporaire quand renameSync échoue', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const path = join(dir, 'a.md')
+
+  // Crée un répertoire à la place du fichier pour forcer l'échec de renameSync
+  mkdirSync(path)
+
+  assert.throws(
+    () => writeFileNoFollow(path, 'contenu'),
+    /EISDIR|is a directory/,
+  )
+
+  // Vérifie qu'aucun fichier .tmp-* n'est laissé derrière
+  const tmpFiles = readdirSync(dir).filter(f => f.startsWith('a.md.tmp-'))
+  assert.equal(tmpFiles.length, 0, 'aucun fichier temporaire ne doit rester après une erreur')
+})
+
+test("deux écritures successives vers le même chemin sans accumuler de fichiers temporaires", () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const path = join(dir, 'a.md')
+
+  // Effectue deux écritures consécutives
+  writeFileNoFollow(path, 'contenu1')
+  writeFileNoFollow(path, 'contenu2')
+
+  // Vérifie qu'il n'y a que le fichier final, pas de fichiers temporaires orphelins
+  const files = readdirSync(dir)
+  assert.deepEqual(files, ['a.md'], 'aucun fichier temporaire ne persiste')
+  assert.equal(readFileSync(path, 'utf8'), 'contenu2', 'le dernier contenu est en place')
+})
+
 // --- clôture, règle partagée par le hook et le CLI -------------------------
 
 const cockpitWithPlans = entries => {
@@ -327,7 +374,7 @@ test('closeOpenPlans clôt un plan ouvert portant un commit, à la date du derni
   assert.equal(plan.meta.closed, '2026-07-09', 'la clôture porte la date du DERNIER commit')
 })
 
-test('closeOpenPlans laisse ouvert un plan sans commit — c’est du backlog, pas du travail fait', () => {
+test('closeOpenPlans laisse ouvert un plan sans commit — c’est une intention, pas du travail fait', () => {
   const dir = cockpitWithPlans([['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [] }]])
 
   assert.deepEqual(closeOpenPlans(dir), [])
@@ -363,7 +410,105 @@ test('closeOpenPlans signale et laisse ouvert un plan dont le dernier commit n�
   assert.match(messages.join(' '), /sans date/)
 })
 
+const planOuvertAvecCommit = (title = 'A') => ({
+  status: 'open',
+  title,
+  opened: '2026-07-01',
+  commits: [{ sha: 'aaa', date: '2026-07-02', files: [] }],
+})
+
+test('clore retire .active-plan : après, un commit ne se rattache plus à rien', () => {
+  const dir = cockpitWithPlans([['a.md', planOuvertAvecCommit()]])
+  writeFileSync(join(dir, '.active-plan'), 'a.md\n')
+
+  assert.deepEqual(closeOpenPlans(dir), ['a.md'])
+  assert.equal(existsSync(join(dir, '.active-plan')), false)
+})
+
+test('clore garde le pointeur s’il désigne un autre plan, encore ouvert', () => {
+  const dir = cockpitWithPlans([
+    ['a.md', planOuvertAvecCommit('A')],
+    ['b.md', { status: 'open', title: 'B', opened: '2026-07-03', commits: [] }],
+  ])
+  writeFileSync(join(dir, '.active-plan'), 'b.md\n')
+
+  // `b.md` n'a pas de commit : il reste ouvert, donc reste l'intention en cours.
+  assert.deepEqual(closeOpenPlans(dir), ['a.md'])
+  assert.equal(readFileSync(join(dir, '.active-plan'), 'utf8').trim(), 'b.md')
+})
+
+test('clore sans pointeur ne panique pas', () => {
+  const dir = cockpitWithPlans([['a.md', planOuvertAvecCommit()]])
+
+  assert.deepEqual(closeOpenPlans(dir), ['a.md'])
+  assert.equal(existsSync(join(dir, '.active-plan')), false)
+})
+
+// --- rattachement d’un commit ----------------------------------------------
+
+const COMMIT = { sha: 'ccc', date: '2026-07-10', files: ['app/x.ts'] }
+
+test('attachCommitToPlan ajoute le commit à un plan ouvert', () => {
+  const dir = cockpitWithPlans([['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [] }]])
+
+  assert.equal(attachCommitToPlan(dir, 'a.md', COMMIT), true)
+  assert.deepEqual(readPlans(dir)[0].meta.commits, [COMMIT])
+})
+
+test('attachCommitToPlan refuse un plan clos — une intention soldée ne grossit plus', () => {
+  const dir = cockpitWithPlans([
+    [
+      'a.md',
+      {
+        status: 'closed',
+        title: 'A',
+        opened: '2026-07-01',
+        closed: '2026-07-02',
+        commits: [{ sha: 'aaa', date: '2026-07-02', files: [] }],
+      },
+    ],
+  ])
+
+  assert.equal(attachCommitToPlan(dir, 'a.md', COMMIT), false)
+  assert.equal(readPlans(dir)[0].meta.commits.length, 1)
+  assert.equal(readPlans(dir)[0].meta.closed, '2026-07-02', 'la clôture ne recule pas')
+})
+
+test('attachCommitToPlan ne compte pas deux fois le même sha', () => {
+  const dir = cockpitWithPlans([
+    ['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [COMMIT] }],
+  ])
+
+  assert.equal(attachCommitToPlan(dir, 'a.md', COMMIT), false)
+  assert.equal(readPlans(dir)[0].meta.commits.length, 1)
+})
+
 // --- validation du pointeur .active-plan -----------------------------------
+
+test('isSafeSlug accepte un slug valide de pages.json', () => {
+  assert.ok(isSafeSlug('accueil'))
+  assert.ok(isSafeSlug('produit'))
+  assert.ok(isSafeSlug('mon-slug-valide'))
+  assert.ok(isSafeSlug('slug_avec_tiret'))
+})
+
+test('isSafeSlug rejette tout ce qui peut sortir du dossier pages', () => {
+  for (const mauvais of [
+    '../../evil',
+    '../secret',
+    'sous/dossier',
+    'sous\\dossier',
+    'a\0b',
+    '.',
+    '..',
+    '',
+    null,
+    undefined,
+    42,
+  ]) {
+    assert.equal(isSafeSlug(mauvais), false, `devrait rejeter ${JSON.stringify(mauvais)}`)
+  }
+})
 
 test('isSafePlanFileName accepte un nom produit par planFileName', () => {
   assert.ok(isSafePlanFileName(planFileName('Notes libres')))
@@ -386,4 +531,85 @@ test('isSafePlanFileName rejette tout ce qui peut sortir du dossier plans', () =
   ]) {
     assert.equal(isSafePlanFileName(mauvais), false, `devrait rejeter ${JSON.stringify(mauvais)}`)
   }
+})
+
+// --- registre des projets ---------------------------------------------------
+
+// Le registre est un vrai fichier dans le dossier personnel : un test qui
+// écrirait dedans effacerait la liste de projets de la machine. On le détourne.
+const withRegistry = () => {
+  process.env.COCKPIT_REGISTRY = join(mkdtempSync(join(tmpdir(), 'cockpit-reg-')), 'projects.json')
+  return process.env.COCKPIT_REGISTRY
+}
+
+test('registerProject ajoute une fois, avec une date d’ouverture', () => {
+  withRegistry()
+
+  assert.equal(registerProject('/tmp/un-projet'), true)
+  assert.equal(registerProject('/tmp/un-projet'), false, 'pas de doublon')
+
+  const [entry] = readRegistry()
+  assert.equal(entry.path, '/tmp/un-projet')
+  assert.equal(entry.name, 'un-projet')
+  assert.match(entry.lastOpened, /^\d{4}-\d{2}-\d{2}T/)
+})
+
+test('unregisterProject retire le projet et rien d’autre', () => {
+  withRegistry()
+  registerProject('/tmp/a')
+  registerProject('/tmp/b')
+
+  assert.equal(unregisterProject('/tmp/a'), true)
+  assert.equal(unregisterProject('/tmp/a'), false, 'un projet absent n’est pas une erreur')
+  assert.deepEqual(
+    readRegistry().map(p => p.path),
+    ['/tmp/b'],
+  )
+})
+
+test('touchProject date un projet connu, ignore un inconnu', () => {
+  withRegistry()
+  registerProject('/tmp/a', new Date('2026-01-01T00:00:00Z'))
+
+  assert.equal(touchProject('/tmp/inconnu'), false)
+  assert.equal(readRegistry().length, 1, 'un inconnu n’entre pas dans la liste par la petite porte')
+
+  assert.equal(touchProject('/tmp/a', new Date('2026-08-08T10:00:00Z')), true)
+  assert.equal(readRegistry()[0].lastOpened, '2026-08-08T10:00:00.000Z')
+})
+
+test('projects() classe du dernier ouvert au plus ancien, les sans-date en fin', () => {
+  const registry = withRegistry()
+  writeFileSync(
+    registry,
+    JSON.stringify([
+      { path: '/tmp/vieux', name: 'vieux', lastOpened: '2026-01-01T00:00:00.000Z' },
+      { path: '/tmp/jamais-date', name: 'jamais-date' },
+      { path: '/tmp/recent', name: 'recent', lastOpened: '2026-08-08T00:00:00.000Z' },
+      { path: '/tmp/jamais-date-2', name: 'jamais-date-2' },
+    ]),
+  )
+
+  // `null` : pas de dépôt courant, comme dans l'application empaquetée.
+  assert.deepEqual(
+    projects(null).map(p => p.path),
+    ['/tmp/recent', '/tmp/vieux', '/tmp/jamais-date', '/tmp/jamais-date-2'],
+  )
+})
+
+test('projects() ajoute le dépôt courant en tête seulement s’il est inconnu', () => {
+  withRegistry()
+
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-cwd-'))
+  mkdirSync(join(dir, 'cockpit'), { recursive: true })
+
+  assert.equal(projects(dir)[0].path, dir, 'inconnu : en tête, sinon premier lancement vide')
+
+  registerProject('/tmp/autre', new Date('2030-01-01T00:00:00Z'))
+  registerProject(dir, new Date('2020-01-01T00:00:00Z'))
+  assert.deepEqual(
+    projects(dir).map(p => p.path),
+    ['/tmp/autre', dir],
+    'enregistré : c’est l’usage qui classe',
+  )
 })

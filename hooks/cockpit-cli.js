@@ -7,6 +7,10 @@
  *   node hooks/cockpit-cli.js status
  *   node hooks/cockpit-cli.js close
  *   node hooks/cockpit-cli.js capture <fichier-de-plan.md>
+ *   node hooks/cockpit-cli.js tickets
+ *   node hooks/cockpit-cli.js ticket new "<titre>" [--colonne pret]
+ *   node hooks/cockpit-cli.js ticket move <fichier.md> <colonne>
+ *   node hooks/cockpit-cli.js ticket import-plans
  *
  * Contrairement aux hooks, cet outil est invoqué explicitement : il a le droit
  * d'échouer bruyamment.
@@ -18,7 +22,7 @@ import { join } from 'node:path'
 
 import {
   readPlans,
-  backlog,
+  plansOuverts,
   history,
   serializePlan,
   planFileName,
@@ -27,13 +31,24 @@ import {
   registerProject,
 } from './plans.js'
 
+import { exportVault } from './obsidian.js'
+
+import {
+  createTicket,
+  importOpenPlans,
+  moveTicket,
+  readBoard,
+  readTickets,
+  sortTickets,
+} from './tickets.js'
+
 const root = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
 const cockpitDir = join(root, 'cockpit')
 
 const commands = {
   status() {
     const plans = readPlans(cockpitDir)
-    const open = backlog(plans)
+    const open = plansOuverts(plans)
     const closed = history(plans)
 
     console.log(`${plans.length} plan(s) — ${open.length} ouvert(s), ${closed.length} clos`)
@@ -84,6 +99,91 @@ const commands = {
     writeFileNoFollow(join(cockpitDir, '.active-plan'), file + '\n')
     if (registerProject(root)) console.log(`projet enregistré : ${root}`)
     console.log(`capturé : cockpit/plans/${file}`)
+  },
+
+  /** Le tableau, colonne par colonne. */
+  tickets() {
+    const colonnes = readBoard(cockpitDir)
+    const tickets = sortTickets(readTickets(cockpitDir, colonnes))
+
+    for (const colonne of colonnes) {
+      const dedans = tickets.filter(t => t.meta.colonne === colonne.id)
+      const alerte = colonne.wip && dedans.length > colonne.wip ? `  ⚠ WIP ${colonne.wip}` : ''
+      console.log(`\n${colonne.titre} (${dedans.length})${alerte}`)
+      for (const t of dedans) {
+        console.log(`  ${t.meta.id}  [${t.meta.priorite}]  ${t.meta.titre}  — ${t.file}`)
+      }
+    }
+  },
+
+  /**
+   * Écriture des tickets depuis la ligne de commande.
+   *
+   *   ticket new "<titre>" [--colonne pret] [--priorite haute] [--corps "..."]
+   *   ticket move <fichier.md> <colonne>
+   *   ticket import-plans
+   */
+  ticket(sub, ...rest) {
+    const flags = {}
+    const args = []
+    for (let i = 0; i < rest.length; i += 1) {
+      if (rest[i].startsWith('--')) {
+        flags[rest[i].slice(2)] = rest[i + 1]
+        i += 1
+      } else {
+        args.push(rest[i])
+      }
+    }
+
+    switch (sub) {
+      case 'new': {
+        if (!args[0]) throw new Error('usage : ticket new "<titre>" [--colonne x] [--priorite haute]')
+        const { file, meta } = createTicket(cockpitDir, {
+          titre: args[0],
+          colonne: flags.colonne,
+          priorite: flags.priorite,
+          corps: flags.corps,
+        })
+        console.log(`créé : ${meta.id} en ${meta.colonne} — cockpit/tickets/${file}`)
+        return
+      }
+
+      case 'move': {
+        if (!args[0] || !args[1]) throw new Error('usage : ticket move <fichier.md> <colonne>')
+        if (!moveTicket(cockpitDir, args[0], args[1])) throw new Error(`ticket introuvable : ${args[0]}`)
+        console.log(`déplacé : ${args[0]} → ${args[1]}`)
+        return
+      }
+
+      case 'import-plans': {
+        const cree = importOpenPlans(cockpitDir)
+        if (cree.length === 0) {
+          console.log('aucun plan ouvert à reprendre — rien à faire')
+          return
+        }
+        for (const t of cree) console.log(`repris : ${t.meta.id} ${t.meta.titre} (${t.meta.colonne})`)
+        return
+      }
+
+      default:
+        throw new Error('sous-commandes : new, move, import-plans')
+    }
+  },
+
+  /**
+   * Écrit le coffre Obsidian du projet.
+   *
+   *   cockpit-cli.js obsidian [--dir <chemin>]
+   *
+   * Même implémentation que le bouton de l'interface : une seconde finirait par
+   * diverger de celle-ci.
+   */
+  obsidian(...rest) {
+    const flag = rest.indexOf('--dir')
+    const dir = flag === -1 ? undefined : rest[flag + 1]
+    if (flag !== -1 && !dir) throw new Error('usage : obsidian [--dir <chemin>]')
+
+    for (const line of exportVault(root, dir)) console.log(line)
   },
 }
 

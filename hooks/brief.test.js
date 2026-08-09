@@ -6,6 +6,7 @@ import { join } from 'node:path'
 
 import { buildBrief, readCockpit } from './brief.js'
 import { serializePlan } from './plans.js'
+import { createTicket } from './tickets.js'
 
 const NOW = new Date('2026-08-08T12:00:00Z')
 
@@ -170,4 +171,56 @@ test('le brief reste court : une session ne doit pas commencer par un mur de tex
 
 test('un cockpit vide rend une chaîne vide plutôt qu’un brief creux', () => {
   assert.equal(buildBrief({ name: 'neuf', pageCount: 0, plans: [], scan: null }, NOW), '')
+})
+
+// --- tickets ---------------------------------------------------------------
+
+test('readCockpit lit le tableau du projet', () => {
+  const dir = cockpitWith({ plans: [] })
+  createTicket(join(dir, 'cockpit'), { titre: 'Un ticket', priorite: 'haute' })
+
+  const state = readCockpit(dir)
+  assert.equal(state.tickets.length, 1)
+  assert.equal(state.tickets[0].titre, 'Un ticket')
+  assert.equal(state.board[0].id, 'backlog')
+})
+
+test('le brief annonce les tickets restants, pas ceux de la dernière colonne', () => {
+  const brief = buildBrief(
+    {
+      name: 'projet',
+      plans: [],
+      pageCount: 0,
+      scan: null,
+      board: [
+        { id: 'backlog', titre: 'Backlog' },
+        { id: 'fait', titre: 'Fait' },
+      ],
+      tickets: [
+        { file: 'T-0001-a.md', id: 'T-0001', titre: 'À faire', colonne: 'backlog', priorite: 'haute' },
+        { file: 'T-0002-b.md', id: 'T-0002', titre: 'Déjà fait', colonne: 'fait', priorite: 'basse' },
+      ],
+    },
+    NOW,
+  )
+
+  assert.match(brief, /1 ticket\(s\) à faire/)
+  assert.match(brief, /T-0001 \[haute\] À faire — Backlog/)
+  assert.doesNotMatch(brief, /Déjà fait/)
+})
+
+test('un cockpit sans plan ni page mais avec un ticket a quelque chose à dire', () => {
+  const brief = buildBrief(
+    {
+      name: 'projet',
+      plans: [],
+      pageCount: 0,
+      scan: null,
+      board: [{ id: 'backlog', titre: 'Backlog' }],
+      tickets: [{ file: 'T-0001-a.md', id: 'T-0001', titre: 'Seul', colonne: 'backlog', priorite: 'moyenne' }],
+    },
+    NOW,
+  )
+
+  assert.match(brief, /T-0001/)
 })

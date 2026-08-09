@@ -1,8 +1,8 @@
 import { useState } from 'react'
 
-import { backlog, frDate, lastScan, type Snapshot } from './data'
+import { briefLines, buildInjections, type Snapshot } from './data'
 import { s } from './style'
-import { useTerminal } from './useTerminal'
+import { useTerminals } from './useTerminal'
 import { Divider, useResizable } from './useResizable'
 
 export type Layout = 'bottom' | 'side' | 'full'
@@ -33,8 +33,9 @@ const panelStyle = (layout: Layout, size: number): string => {
 /**
  * Panneau terminal — maquette l. 374-418.
  *
- * Une vraie session `claude` tourne derrière, par IPC, dans le dossier du
- * projet sélectionné ; les boutons d'injection y écrivent.
+ * Un vrai shell tourne derrière, par IPC, dans le dossier du projet
+ * sélectionné, avec `claude` lancé d'office ; les boutons d'injection y
+ * écrivent. Quitter Claude laisse le shell — le panneau reste utilisable.
  *
  * Dans un navigateur il n'y a pas d'IPC, donc pas de session : le panneau le
  * dit et les boutons se rabattent sur le presse-papier. Un bouton qui
@@ -45,15 +46,21 @@ export function Terminal({
   layout,
   onLayout,
   onToggle,
+  onReload,
   snapshot,
 }: {
   layout: Layout
   onLayout: (layout: Layout) => void
   onToggle: () => void
+  /** Relit `cockpit/` — après un scan, l'interface ne se met pas à jour seule. */
+  onReload: () => void
   snapshot: Snapshot | null
 }) {
   const [notice, setNotice] = useState<string | null>(null)
-  const { host, error, inject, available } = useTerminal(snapshot?.root ?? null)
+  const { sessions, active, setActive, attach, openShell, closeShell, errors, inject, available } =
+    useTerminals(snapshot?.root ?? null)
+
+  const error = active ? (errors[active] ?? null) : null
 
   // Tirer vers le haut agrandit le panneau du bas ; tirer vers la gauche
   // agrandit celui du côté. D'où `invert` dans les deux cas.
@@ -99,6 +106,30 @@ export function Terminal({
 
   const injections = buildInjections(snapshot)
 
+  /**
+   * Les actions rapides écrivent une commande dans la session — elles ne
+   * l'exécutent pas depuis le cockpit.
+   *
+   * ponytail: le pty ouvre un shell puis y tape `claude` (electron/pty.js:25),
+   * donc la session est *dans* Claude : `!` est son préfixe bash, `/graphify`
+   * sa commande. Quitter Claude rend un shell nu, où ces deux formes ne veulent
+   * plus rien dire — d'où le libellé « Envoyer à la session Claude », qui ne
+   * promet rien d'autre. Plafond connu ; l'alternative serait un canal IPC qui
+   * lance le crawl lui-même, écartée parce qu'elle rompt « le cockpit
+   * n'exécute jamais ».
+   */
+  const actions = [
+    { label: '⟳ Relancer un scan', text: '!pnpm cockpit:crawl' },
+    { label: '◆ Regénérer le graphe', text: '/graphify' },
+    // Graphify écrit `index.md` et `graph.canvas` à la racine du dossier qu'on
+    // lui donne. Lui donner le coffre entier écraserait celui qu'écrit
+    // l'export du cockpit — d'où le sous-dossier réservé.
+    {
+      label: '◈ Graphe → coffre Obsidian',
+      text: '/graphify . --obsidian --obsidian-dir cockpit/obsidian/graphe',
+    },
+  ]
+
   return (
     <>
       {layout !== 'full' && <Divider axis={layout === 'side' ? 'x' : 'y'} resizable={sizing} />}
@@ -109,20 +140,68 @@ export function Terminal({
         )}
       >
         <span
-          style={s(
-            'font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--color-neutral-500);',
-          )}
-        >
-          Terminal · claude
-        </span>
-        <span
-          title={available ? 'Session claude en cours' : 'Terminal disponible dans l’application'}
+          title={available ? 'Session en cours' : 'Terminal disponible dans l’application'}
           style={s(
             available && !error
-              ? 'width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent); display: block;'
-              : 'width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--color-neutral-600); display: block;',
+              ? 'width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent); display: block; flex: none;'
+              : 'width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--color-neutral-600); display: block; flex: none;',
           )}
         />
+
+        {/* Une pastille par session. Le shell nu sert à lancer un serveur de
+            dev ou à suivre des logs sans occuper la session Claude. */}
+        <div style={s('display: flex; align-items: center; gap: 2px; min-width: 0; overflow: hidden;')}>
+          {sessions.map(session => (
+            <div
+              key={session.key}
+              style={s(
+                'display: flex; align-items: center; border-radius: 5px; border: 1px solid ' +
+                  (active === session.key
+                    ? 'var(--color-accent-600); background: var(--color-accent-900);'
+                    : 'transparent; background: transparent;'),
+              )}
+            >
+              <button
+                type="button"
+                onClick={() => setActive(session.key)}
+                style={s(
+                  'cursor: pointer; font-family: var(--font-body); font-size: 11px; letter-spacing: .04em; padding: 3px 8px; border: 0; background: transparent; color: ' +
+                    (active === session.key
+                      ? 'var(--color-accent-200);'
+                      : 'var(--color-neutral-500);'),
+                )}
+              >
+                {session.label}
+              </button>
+              {session.kind !== 'claude' && (
+                <button
+                  type="button"
+                  title="Fermer cette session"
+                  aria-label={`Fermer ${session.label}`}
+                  onClick={() => closeShell(session.key)}
+                  style={s(
+                    'cursor: pointer; border: 0; background: transparent; color: var(--color-neutral-600); font-size: 12px; line-height: 1; padding: 3px 6px 3px 0;',
+                  )}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={openShell}
+            title="Ouvrir un shell dans le projet"
+          aria-label="Ouvrir un shell dans le projet"
+            disabled={!available}
+            style={s(
+              'cursor: pointer; font-family: var(--font-body); font-size: 13px; line-height: 1; padding: 3px 8px; border-radius: 5px; border: 1px solid transparent; background: transparent; color: var(--color-neutral-600);',
+            )}
+          >
+            +
+          </button>
+        </div>
+
         <div style={s('flex: 1;')} />
         <span
           style={s(
@@ -167,8 +246,31 @@ export function Terminal({
       >
         {available && (
           // Session réelle : xterm occupe la zone, `claude` tourne derrière.
-          <div style={s('flex: 1; min-width: 0; min-height: 0; padding: 8px 4px 8px 10px;')}>
-            <div ref={host} style={s('width: 100%; height: 100%;')} />
+          //
+          // Les sessions sont empilées et toutes montées, l'inactive rendue
+          // transparente. Pas `display: none` : un conteneur de largeur nulle
+          // fait calculer à FitAddon une grille fausse, et `claude` se
+          // réafficherait de travers au retour sur l'onglet.
+          <div style={s('flex: 1; min-width: 0; min-height: 0; position: relative;')}>
+            {sessions.map(session => (
+              <div
+                key={session.key}
+                ref={attach(session)}
+                // `inert` va avec la transparence : sans lui, la zone de saisie
+                // d'une session cachée reste dans l'ordre de tabulation, et le
+                // clavier traverse des terminaux qu'on ne voit pas. `inert` ne
+                // touche pas à la mise en page, donc FitAddon continue de
+                // mesurer juste — c'est pourquoi on ne peut pas juste passer en
+                // `display: none`.
+                inert={active !== session.key}
+                style={s(
+                  'position: absolute; inset: 8px 4px 8px 10px; ' +
+                    (active === session.key
+                      ? 'opacity: 1; z-index: 1;'
+                      : 'opacity: 0; pointer-events: none; z-index: 0;'),
+                )}
+              />
+            ))}
           </div>
         )}
 
@@ -204,6 +306,36 @@ export function Terminal({
               'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);',
             )}
           >
+            Envoyer à la session Claude
+          </div>
+          <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
+            {actions.map(({ label, text }) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => activate(label, text)}
+                className="btn btn-primary btn-block"
+                style={s('font-size: 11.5px; padding: 5px 10px;')}
+              >
+                {label}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={onReload}
+              className="btn btn-secondary btn-block"
+              style={s('font-size: 11.5px; padding: 5px 10px;')}
+              title="Relit cockpit/ — à faire après un scan"
+            >
+              ↻ Rafraîchir le cockpit
+            </button>
+          </div>
+
+          <div
+            style={s(
+              'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-top: 18px;',
+            )}
+          >
             {available ? 'Injecter dans la session' : 'Copier pour la session'}
           </div>
           <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
@@ -228,7 +360,7 @@ export function Terminal({
               (error
                 ? error
                 : available
-                  ? "Un clic écrit dans la session. Le cockpit ne lance rien d'autre que claude."
+                  ? 'Un clic écrit dans la session Claude.'
                   : "Un clic copie le contexte. Le cockpit n'exécute jamais.")}
           </div>
         </div>
@@ -236,64 +368,4 @@ export function Terminal({
       </div>
     </>
   )
-}
-
-/** Ce que le cockpit sait dire du projet, sans lire une ligne de code. */
-function briefLines(snapshot: Snapshot | null): Array<{ text: string; style: string }> {
-  const dim = 'color: var(--color-neutral-400);'
-  if (!snapshot) return [{ text: 'lecture de cockpit/…', style: 'color: var(--color-neutral-600);' }]
-
-  const open = backlog(snapshot.plans)
-  const closed = snapshot.plans.length - open.length
-  const pages = snapshot.pages?.pages.length ?? 0
-  const scan = lastScan(snapshot.scans)
-
-  const lines = [
-    { text: '$ claude', style: 'color: var(--color-neutral-500);' },
-    {
-      text: `◆ Contexte lisible dans ${snapshot.root}/cockpit — ${pages} page(s), ${closed} plan(s) clos, ${open.length} ouvert(s)`,
-      style: 'color: var(--color-accent-300);',
-    },
-    { text: '', style: '' },
-  ]
-
-  if (scan) {
-    lines.push({
-      text: scan.ok
-        ? `Dernier scan réussi le ${frDate(scan.date)} (commit ${scan.commit}).`
-        : `Dernier scan ÉCHOUÉ le ${frDate(scan.date)} : ${scan.error ?? 'raison non enregistrée'}.`,
-      style: scan.ok ? dim : 'color: var(--color-accent-200);',
-    })
-  } else {
-    lines.push({ text: 'Aucun scan enregistré : la carte des pages est vide.', style: dim })
-  }
-
-  const oldest = open.at(-1)
-  if (oldest) {
-    lines.push({ text: `Le plus ancien plan ouvert porte sur « ${oldest.title} ».`, style: dim })
-  }
-  lines.push({ text: '', style: '' })
-  return lines
-}
-
-function buildInjections(snapshot: Snapshot | null): Array<{ label: string; text: string }> {
-  if (!snapshot) return []
-
-  const open = backlog(snapshot.plans)
-  const pages = snapshot.pages?.pages ?? []
-
-  return [
-    {
-      label: `Carte des pages (${pages.length})`,
-      text: pages.map(p => `${p.route} — ${p.title} → ${p.links.join(', ') || 'aucun lien'}`).join('\n'),
-    },
-    {
-      label: `${open.length} plan(s) ouvert(s)`,
-      text: open.map(p => `- ${p.title} (ouvert le ${frDate(p.opened)})`).join('\n'),
-    },
-    {
-      label: 'Chemin du cockpit',
-      text: `Lis ${snapshot.root}/cockpit/ pour l'état du projet. N'ouvre pas le code.`,
-    },
-  ]
 }

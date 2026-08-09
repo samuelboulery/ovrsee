@@ -6,9 +6,9 @@ dist/
 .cockpit-auth.json
 *.cockpit-auth.json
 
-# graphify-out/graph.json est VOLONTAIREMENT versionné : les onglets Données et
-# Stack le lisent, et le cockpit doit rester consultable sur un projet qui ne
-# compile plus. En revanche le cache et la visualisation se régénèrent depuis
+# graphify-out/graph.json est VOLONTAIREMENT versionné : l'onglet Données le lit,
+# et le cockpit doit rester consultable sur un projet qui ne compile plus. En
+# revanche le cache et la visualisation se régénèrent depuis
 # lui — les versionner ne ferait que du bruit dans les diffs.
 graphify-out/cache/
 graphify-out/graph.html

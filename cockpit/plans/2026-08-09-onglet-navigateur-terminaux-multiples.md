@@ -4,7 +4,23 @@
   "title": "Onglet Navigateur + terminaux multiples",
   "opened": "2026-08-09",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "fb4e8ef",
+      "date": "2026-08-09",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/data.ts",
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/useTerminal.ts",
+        "electron/main.js",
+        "electron/preload.cjs",
+        "electron/pty.js",
+        "hooks/snapshot.js"
+      ]
+    }
+  ]
 }
 ---
 

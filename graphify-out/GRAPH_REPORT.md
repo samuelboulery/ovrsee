@@ -1,12 +1,12 @@
 # Graph Report - /Users/sam/code/cockpit  (2026-08-09)
 
 ## Corpus Check
-- 53 files · ~628,826 words
+- 54 files · ~689,367 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 366 nodes · 614 edges · 40 communities detected
-- Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 79 edges (avg confidence: 0.8)
+- 390 nodes · 648 edges · 39 communities detected
+- Extraction: 87% EXTRACTED · 13% INFERRED · 0% AMBIGUOUS · INFERRED: 83 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -49,7 +49,6 @@
 - [[_COMMUNITY_Community 36|Community 36]]
 - [[_COMMUNITY_Community 37|Community 37]]
 - [[_COMMUNITY_Community 38|Community 38]]
-- [[_COMMUNITY_Community 39|Community 39]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `resolve()` - 14 edges
@@ -66,14 +65,14 @@
 ## Surprising Connections (you probably didn't know these)
 - `resolve()` --calls--> `readSkills()`  [INFERRED]
   /Users/sam/code/cockpit/server/api.js → /Users/sam/code/cockpit/hooks/skills.js
+- `P()` --calls--> `slugify()`  [INFERRED]
+  /Users/sam/code/cockpit/hooks/plans.test.js → /Users/sam/code/cockpit/hooks/plans.js
 - `boot()` --calls--> `render()`  [INFERRED]
   /Users/sam/code/cockpit/support.js → /Users/sam/code/cockpit/scripts/make-icon.js
 - `ecrire()` --calls--> `ticketAction()`  [INFERRED]
   /Users/sam/code/cockpit/app/src/tabs/Tableau.tsx → /Users/sam/code/cockpit/server/api.js
-- `url()` --calls--> `visitAll()`  [INFERRED]
-  /Users/sam/code/cockpit/server/api.test.js → /Users/sam/code/cockpit/crawl/index.js
-- `projectAction()` --calls--> `exportVault()`  [INFERRED]
-  /Users/sam/code/cockpit/server/api.js → /Users/sam/code/cockpit/hooks/obsidian.js
+- `slugify()` --calls--> `normalize()`  [INFERRED]
+  /Users/sam/code/cockpit/hooks/plans.js → /Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx
 
 ## Communities
 
@@ -83,62 +82,62 @@ Nodes (49): boot(), cdnScriptFor(), collectProps(), compileAttr(), compileTempla
 
 ### Community 1 - "Community 1"
 Cohesion: 0.09
-Nodes (31): projectAction(), cockpitWith(), main(), planFrom(), readOrNull(), readStdin(), repoRoot(), titleOf() (+23 more)
+Nodes (30): fetchHandler(), parseBody(), projectAction(), resolve(), post(), postSkills(), postTicket(), projectWithShot() (+22 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.08
 Nodes (19): reload(), colonneFinale(), fetchProjects(), fetchSkills(), fetchSnapshot(), firstParagraph(), history(), installSkills() (+11 more)
 
 ### Community 3 - "Community 3"
+Cohesion: 0.1
+Nodes (21): cockpitWith(), main(), planFrom(), readOrNull(), readStdin(), repoRoot(), titleOf(), attachCommit() (+13 more)
+
+### Community 4 - "Community 4"
 Cohesion: 0.12
 Nodes (23): assertIgnored(), main(), assertPortFree(), isIgnored(), loadConfig(), log(), orphanShots(), pathOf() (+15 more)
 
-### Community 4 - "Community 4"
-Cohesion: 0.13
-Nodes (20): fetchHandler(), parseBody(), resolve(), post(), postSkills(), postTicket(), projectWithShot(), projetEnregistre() (+12 more)
-
 ### Community 5 - "Community 5"
-Cohesion: 0.21
-Nodes (25): ticketAction(), readCockpit(), readJson(), addColumn(), createTicket(), deleteTicket(), importOpenPlans(), isSafeTicketFileName() (+17 more)
+Cohesion: 0.19
+Nodes (27): ticketAction(), readCockpit(), readJson(), slugify(), addColumn(), createTicket(), deleteTicket(), importOpenPlans() (+19 more)
 
 ### Community 6 - "Community 6"
+Cohesion: 0.11
+Nodes (10): describe(), say(), select(), send(), startUrl(), URL_KEY(), injectToClaude(), pasteToClaude() (+2 more)
+
+### Community 7 - "Community 7"
 Cohesion: 0.29
 Nodes (14): pageName(), ecrireIndex(), ecrirePages(), ecrirePlans(), ecrireTickets(), exportVault(), frontmatter(), link() (+6 more)
 
-### Community 7 - "Community 7"
+### Community 8 - "Community 8"
 Cohesion: 0.24
 Nodes (12): commandFor(), install(), installClaudeHooks(), installPostCommit(), shq(), bundledPath(), entree(), installedPath() (+4 more)
 
-### Community 8 - "Community 8"
+### Community 9 - "Community 9"
 Cohesion: 0.23
 Nodes (9): ajouter(), creer(), deplacer(), ecrire(), modifier(), renommer(), reordonner(), retirer() (+1 more)
 
-### Community 9 - "Community 9"
+### Community 10 - "Community 10"
 Cohesion: 0.25
 Nodes (4): fixture(), lire(), vault(), plan()
 
-### Community 10 - "Community 10"
+### Community 11 - "Community 11"
 Cohesion: 0.36
 Nodes (5): applyProjects(), onPop(), projectFromUrl(), pushUrl(), tabForPath()
 
-### Community 11 - "Community 11"
+### Community 12 - "Community 12"
 Cohesion: 0.43
 Nodes (7): age(), buildBrief(), closedPlans(), frDate(), intention(), openPlans(), colonneFinale()
 
-### Community 12 - "Community 12"
+### Community 13 - "Community 13"
 Cohesion: 0.36
 Nodes (5): closeAll(), closeSession(), loginShell(), openSession(), sessionEnv()
 
-### Community 13 - "Community 13"
+### Community 14 - "Community 14"
 Cohesion: 0.5
 Nodes (2): inline(), inlinePattern()
 
-### Community 14 - "Community 14"
-Cohesion: 0.4
-Nodes (0): 
-
 ### Community 15 - "Community 15"
-Cohesion: 0.5
+Cohesion: 0.4
 Nodes (0): 
 
 ### Community 16 - "Community 16"
@@ -146,20 +145,20 @@ Cohesion: 0.5
 Nodes (0): 
 
 ### Community 17 - "Community 17"
-Cohesion: 0.67
-Nodes (2): onKey(), step()
-
-### Community 18 - "Community 18"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 19 - "Community 19"
+### Community 18 - "Community 18"
 Cohesion: 0.67
+Nodes (2): onKey(), step()
+
+### Community 19 - "Community 19"
+Cohesion: 0.5
 Nodes (0): 
 
 ### Community 20 - "Community 20"
-Cohesion: 1.0
-Nodes (2): terminalBridge(), useTerminal()
+Cohesion: 0.67
+Nodes (0): 
 
 ### Community 21 - "Community 21"
 Cohesion: 0.67
@@ -170,7 +169,7 @@ Cohesion: 0.67
 Nodes (0): 
 
 ### Community 23 - "Community 23"
-Cohesion: 0.67
+Cohesion: 1.0
 Nodes (0): 
 
 ### Community 24 - "Community 24"
@@ -233,52 +232,48 @@ Nodes (0):
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 39 - "Community 39"
-Cohesion: 1.0
-Nodes (0): 
-
 ## Knowledge Gaps
-- **Thin community `Community 24`** (2 nodes): `vite.config.js`, `cockpitData()`
+- **Thin community `Community 23`** (2 nodes): `vite.config.js`, `cockpitData()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 25`** (2 nodes): `confStyle()`, `Donnees.tsx`
+- **Thin community `Community 24`** (2 nodes): `confStyle()`, `Donnees.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 26`** (2 nodes): `pluriel()`, `Apercu.tsx`
+- **Thin community `Community 25`** (2 nodes): `pluriel()`, `Apercu.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 27`** (2 nodes): `shot()`, `retention.test.js`
+- **Thin community `Community 26`** (2 nodes): `shot()`, `retention.test.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 28`** (2 nodes): `project()`, `snapshot.test.js`
+- **Thin community `Community 27`** (2 nodes): `project()`, `snapshot.test.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 29`** (2 nodes): `fixture()`, `skills.test.js`
+- **Thin community `Community 28`** (2 nodes): `fixture()`, `skills.test.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 30`** (2 nodes): `findHelpers()`, `fix-pty-permissions.js`
+- **Thin community `Community 29`** (2 nodes): `findHelpers()`, `fix-pty-permissions.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 31`** (1 nodes): `main.tsx`
+- **Thin community `Community 30`** (1 nodes): `main.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 32`** (1 nodes): `env.d.ts`
+- **Thin community `Community 31`** (1 nodes): `env.d.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 33`** (1 nodes): `Stack.tsx`
+- **Thin community `Community 32`** (1 nodes): `Stack.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 34`** (1 nodes): `routes.test.js`
+- **Thin community `Community 33`** (1 nodes): `routes.test.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 35`** (1 nodes): `cockpit-session-start.js`
+- **Thin community `Community 34`** (1 nodes): `cockpit-session-start.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 36`** (1 nodes): `cockpit-cli.js`
+- **Thin community `Community 35`** (1 nodes): `cockpit-cli.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 36`** (1 nodes): `_ds_bundle.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 37`** (1 nodes): `_ds_bundle.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 38`** (1 nodes): `_ds_bundle.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 39`** (1 nodes): `_ds_bundle.js`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `writeFileNoFollow()` connect `Community 6` to `Community 1`, `Community 3`, `Community 5`, `Community 7`?**
-  _High betweenness centrality (0.249) - this node is a cross-community bridge._
-- **Why does `log()` connect `Community 3` to `Community 1`, `Community 7`?**
+- **Why does `log()` connect `Community 4` to `Community 8`, `Community 3`?**
   _High betweenness centrality (0.237) - this node is a cross-community bridge._
-- **Why does `render()` connect `Community 3` to `Community 0`?**
+- **Why does `writeFileNoFollow()` connect `Community 7` to `Community 1`, `Community 3`, `Community 4`, `Community 5`, `Community 8`?**
+  _High betweenness centrality (0.227) - this node is a cross-community bridge._
+- **Why does `render()` connect `Community 4` to `Community 0`?**
   _High betweenness centrality (0.218) - this node is a cross-community bridge._
 - **Are the 10 inferred relationships involving `resolve()` (e.g. with `post()` and `postTicket()`) actually correct?**
   _`resolve()` has 10 INFERRED edges - model-reasoned connections that need verification._

@@ -1,10 +1,27 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Lire un coffre Obsidian comme source de graphe",
   "opened": "2026-08-09",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-09",
+  "commits": [
+    {
+      "sha": "26c3446",
+      "date": "2026-08-09",
+      "files": [
+        "README.md",
+        "app/src/App.tsx",
+        "app/src/data.test.ts",
+        "app/src/data.ts",
+        "app/src/render.test.tsx",
+        "app/src/tabs/Donnees.tsx",
+        "hooks/snapshot.js",
+        "hooks/snapshot.test.js",
+        "hooks/vault.js",
+        "hooks/vault.test.js"
+      ]
+    }
+  ]
 }
 ---
 

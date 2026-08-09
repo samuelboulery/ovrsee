@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { fetchConfigClaude, fetchSkills, type ConfigClaude, type SkillEntry } from './data'
 import { s } from './style'
+import { t } from './i18n'
 import { SkillsList } from './SkillsPanel'
 
 /**
@@ -64,11 +65,11 @@ export function ConfigClaudeModal({ onClose }: { onClose: () => void }) {
               'font-family: var(--font-heading); font-weight: 500; font-size: 16px; margin: 0;'
             )}
           >
-            Ma configuration Claude Code
+            {t('config.title')}
           </h2>
           <div style={s('flex: 1;')} />
           <button type="button" className="btn btn-ghost" onClick={onClose}>
-            Fermer
+            {t('config.close')}
           </button>
         </div>
 
@@ -84,7 +85,7 @@ export function ConfigClaudeModal({ onClose }: { onClose: () => void }) {
 
         {busy && (
           <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
-            Chargement…
+            {t('config.loading')}
           </div>
         )}
 
@@ -119,7 +120,7 @@ export function ConfigClaudeModal({ onClose }: { onClose: () => void }) {
             {activeTab === 'skills' && (
               <div>
                 <div style={s('font-size: 11.5px; color: var(--color-neutral-600); margin-bottom: 12px;')}>
-                  Skills Claude Code installés dans <code>~/.claude/skills/</code>.
+                  {t('config.skills_desc')} <code>~/.claude/skills/</code>.
                 </div>
                 <SkillsList skills={skills} choisis={[]} onChoisis={() => {}} />
               </div>
@@ -128,11 +129,11 @@ export function ConfigClaudeModal({ onClose }: { onClose: () => void }) {
             {activeTab === 'agents' && (
               <div>
                 <div style={s('font-size: 11.5px; color: var(--color-neutral-600); margin-bottom: 12px;')}>
-                  Agents Claude Code dans <code>~/.claude/agents/</code>.
+                  {t('config.agents_desc')} <code>~/.claude/agents/</code>.
                 </div>
                 {config.agents.length === 0 ? (
                   <div style={s('font-size: 11px; color: var(--color-neutral-500);')}>
-                    Aucun agent trouvé.
+                    {t('config.agents_empty')}
                   </div>
                 ) : (
                   <div style={s('display: flex; flex-direction: column; gap: 10px;')}>
@@ -153,12 +154,12 @@ export function ConfigClaudeModal({ onClose }: { onClose: () => void }) {
                         )}
                         {agent.tools && (
                           <div style={s('font-size: 10px; color: var(--color-neutral-600); margin-top: 5px;')}>
-                            Outils : {Array.isArray(agent.tools) ? agent.tools.join(', ') : agent.tools}
+                            {t('config.tools')} {Array.isArray(agent.tools) ? agent.tools.join(', ') : agent.tools}
                           </div>
                         )}
                         {agent.model && (
                           <div style={s('font-size: 10px; color: var(--color-neutral-600);')}>
-                            Modèle : {agent.model}
+                            {t('config.model')} {agent.model}
                           </div>
                         )}
                       </div>
@@ -171,11 +172,11 @@ export function ConfigClaudeModal({ onClose }: { onClose: () => void }) {
             {activeTab === 'commands' && (
               <div>
                 <div style={s('font-size: 11.5px; color: var(--color-neutral-600); margin-bottom: 12px;')}>
-                  Commandes Claude Code dans <code>~/.claude/commands/</code>.
+                  {t('config.commands_desc')} <code>~/.claude/commands/</code>.
                 </div>
                 {config.commands.length === 0 ? (
                   <div style={s('font-size: 11px; color: var(--color-neutral-500);')}>
-                    Aucune commande trouvée.
+                    {t('config.commands_empty')}
                   </div>
                 ) : (
                   <div style={s('display: flex; flex-direction: column; gap: 10px;')}>
@@ -204,11 +205,11 @@ export function ConfigClaudeModal({ onClose }: { onClose: () => void }) {
             {activeTab === 'plugins' && (
               <div>
                 <div style={s('font-size: 11.5px; color: var(--color-neutral-600); margin-bottom: 12px;')}>
-                  Plugins Claude Code depuis <code>~/.claude/plugins/installed_plugins.json</code>.
+                  {t('config.plugins_desc')} <code>~/.claude/plugins/installed_plugins.json</code>.
                 </div>
                 {config.plugins.length === 0 ? (
                   <div style={s('font-size: 11px; color: var(--color-neutral-500);')}>
-                    Aucun plugin trouvé.
+                    {t('config.plugins_empty')}
                   </div>
                 ) : (
                   <div style={s('display: flex; flex-direction: column; gap: 8px;')}>
@@ -239,11 +240,11 @@ export function ConfigClaudeModal({ onClose }: { onClose: () => void }) {
             {activeTab === 'hooks' && (
               <div>
                 <div style={s('font-size: 11.5px; color: var(--color-neutral-600); margin-bottom: 12px;')}>
-                  Hooks Claude Code depuis <code>~/.claude/settings.json</code>.
+                  {t('config.hooks_desc')} <code>~/.claude/settings.json</code>.
                 </div>
                 {Object.keys(config.hooks).length === 0 ? (
                   <div style={s('font-size: 11px; color: var(--color-neutral-500);')}>
-                    Aucun hook configuré.
+                    {t('config.hooks_empty')}
                   </div>
                 ) : (
                   <div style={s('display: flex; flex-direction: column; gap: 8px;')}>
@@ -261,12 +262,12 @@ export function ConfigClaudeModal({ onClose }: { onClose: () => void }) {
                           >
                             {item.matcher && (
                               <div style={s('color: var(--color-neutral-600);')}>
-                                Matcher: <code>{item.matcher}</code>
+                                {t('config.matcher')} <code>{item.matcher}</code>
                               </div>
                             )}
                             {item.hooks && Array.isArray(item.hooks) && (
                               <div style={s('color: var(--color-neutral-500); margin-top: 2px;')}>
-                                {item.hooks.length} hook(s): {item.hooks.map((h: any) => h.type).join(', ')}
+                                {item.hooks.length} {t('config.hooks_label')} {item.hooks.map((h: any) => h.type).join(', ')}
                               </div>
                             )}
                           </div>
@@ -281,11 +282,11 @@ export function ConfigClaudeModal({ onClose }: { onClose: () => void }) {
             {activeTab === 'env' && (
               <div>
                 <div style={s('font-size: 11.5px; color: var(--color-neutral-600); margin-bottom: 12px;')}>
-                  Variables d'environnement depuis <code>~/.claude/settings.json</code>. Les valeurs sont masquées.
+                  {t('config.env_desc')} <code>~/.claude/settings.json</code>. Les valeurs sont masquées.
                 </div>
                 {Object.keys(config.env).length === 0 ? (
                   <div style={s('font-size: 11px; color: var(--color-neutral-500);')}>
-                    Aucune variable d'environnement configurée.
+                    {t('config.env_empty')}
                   </div>
                 ) : (
                   <div style={s('display: flex; flex-direction: column; gap: 6px;')}>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { applyTheme } from './theme'
+import { t, setCurrentLanguage, type TranslationKey } from './i18n'
 import {
   commitsDeLaFrise,
   density,
@@ -21,9 +22,11 @@ import {
   type Tableau as TableauData,
 } from './data'
 import { Garde } from './Garde'
-import { SkillsList, SkillsModal, useSkills } from './SkillsPanel'
+import { SkillsModal } from './SkillsPanel'
 import { ConfigClaudeModal } from './ConfigClaudeModal'
 import { PreferencesModal } from './PreferencesPanel'
+import { Welcome } from './Welcome'
+import { EquipmentPanel } from './EquipmentPanel'
 import { s } from './style'
 import { Apercu } from './tabs/Apercu'
 import { Navigateur } from './tabs/Navigateur'
@@ -51,22 +54,32 @@ import { Divider, useResizable } from './useResizable'
  * images du graphe passeraient pour l'historique visuel d'Aperçu.
  */
 export const TABS = [
-  ['apercu', 'Aperçu', '/'],
-  ['navigateur', 'Navigateur', '/navigateur'],
-  ['produit', 'Produit', '/produit'],
-  ['historique', 'Historique', '/historique'],
-  ['tableau', 'Tableau', '/tableau'],
-  ['donnees', 'Données', '/donnees'],
-  ['stack', 'Stack', '/stack'],
+  ['apercu', 'tabs.apercu', '/'],
+  ['navigateur', 'tabs.navigateur', '/navigateur'],
+  ['produit', 'tabs.produit', '/produit'],
+  ['historique', 'tabs.historique', '/historique'],
+  ['tableau', 'tabs.tableau', '/tableau'],
+  ['donnees', 'tabs.donnees', '/donnees'],
+  ['stack', 'tabs.stack', '/stack'],
 ] as const
 
 export type TabId = (typeof TABS)[number][0]
+
+const tabToKey: Record<TabId, TranslationKey> = {
+  apercu: 'tabs.apercu',
+  navigateur: 'tabs.navigateur',
+  produit: 'tabs.produit',
+  historique: 'tabs.historique',
+  tableau: 'tabs.tableau',
+  donnees: 'tabs.donnees',
+  stack: 'tabs.stack',
+}
 
 const tabForPath = (pathname: string): TabId =>
   TABS.find(([, , path]) => path === pathname)?.[0] ?? 'apercu'
 
 /** Le nom de l'onglet tel que l'utilisateur le lit — pour les messages. */
-export const labelOf = (id: TabId): string => TABS.find(([tab]) => tab === id)?.[1] ?? id
+export const labelOf = (id: TabId): string => t(tabToKey[id])
 
 /**
  * Onglets actifs selon les préférences, dans l'ordre de l'ordre configuré.
@@ -208,6 +221,7 @@ export function App() {
   useEffect(() => {
     fetchSettings()
       .then(s => {
+        setCurrentLanguage(s.langue)
         setSettings(s)
         setTerminalHeight(s.terminal.hauteur)
         setTerminalWidth(s.terminal.largeur)
@@ -421,7 +435,7 @@ export function App() {
                     : ''),
               )}
             >
-              {activeTabsInOrder(settings).map(([id, label, path]) => (
+              {activeTabsInOrder(settings).map(([id, cle, path]) => (
                 // Un vrai lien, pas un bouton : c'est ce que lit
                 // `page.$$eval('a[href]')` dans crawl/index.js. Le href doit
                 // exister pour que l'onglet soit découvrable.
@@ -447,7 +461,7 @@ export function App() {
                         : 'color: var(--color-neutral-500);'),
                   )}
                 >
-                  {label}
+                  {t(cle)}
                 </a>
               ))}
             </nav>
@@ -464,16 +478,17 @@ export function App() {
                   aria-live="polite"
                   style={s('flex: 1; overflow: hidden; display: flex; min-height: 0; min-width: 0;')}
                 >
-                  {error && <Message text={`Lecture impossible : ${error}`} />}
-                  {!error && !snapshot && <Message text="Lecture de cockpit/…" />}
+                  {error && <Message text={`${t('msg.read_error')}: ${error}`} />}
+                  {!error && projects.length === 0 && <Welcome />}
+                  {!error && projects.length > 0 && !snapshot && <Message text={t('msg.loading')} />}
                   {!error && snapshot && unequipped && (
-                    <Unequipped root={snapshot.root} onDone={reload} onError={setError} />
+                    <EquipmentPanel root={snapshot.root} onDone={reload} onError={setError} />
                   )}
                   {!error && snapshot && !unequipped && (
                     // Le garde-fou est remonté à chaque changement d'onglet et
                     // de projet : une panne sur l'un ne doit pas condamner les
                     // autres, et revenir dessus doit réessayer.
-                    <Garde key={`${tab}:${snapshot.root}`} quoi={`l'onglet ${labelOf(tab)}`}>
+                    <Garde key={`${tab}:${snapshot.root}`} quoi={t('garde.tab', { name: labelOf(tab) })}>
                       {tab === 'apercu' && <Apercu snapshot={snapshot} />}
 
                       {/* Le seul onglet qui reste monté quand on le quitte :
@@ -572,7 +587,7 @@ function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
   if (!scan) {
     return (
       <div style={s('font-size: 11.5px; color: var(--color-neutral-600);')}>
-        aucun scan enregistré
+        {t('scan.none')}
       </div>
     )
   }
@@ -589,7 +604,7 @@ function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
             : 'width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--color-neutral-600); display: block;',
         )}
       />
-      {scan.ok ? 'dernier scan' : 'scan échoué'} · {frDate(scan.date)} · commit {scan.commit}
+      {scan.ok ? t('scan.last') : t('scan.failed')} · {frDate(scan.date)} · commit {scan.commit}
     </div>
   )
 }
@@ -606,96 +621,18 @@ function Message({ text }: { text: string }) {
   )
 }
 
-/**
- * Un projet qui n'a pas encore de `cockpit/`.
- *
- * Il apparaît quand même dans la liste : refuser un dossier parce qu'il n'est
- * pas encore équipé obligerait à équiper avant d'ouvrir, c'est-à-dire à savoir
- * d'avance ce que cette page est là pour montrer.
- */
-function Unequipped({
-  root,
-  onDone,
-  onError,
-}: {
-  root: string
-  onDone: () => void
-  onError: (message: string) => void
-}) {
-  const [busy, setBusy] = useState(false)
-  const [done, setDone] = useState<string[] | null>(null)
-  const { skills, choisis, setChoisis } = useSkills()
-
-  return (
-    <div
-      style={s(
-        'flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center;',
-      )}
-    >
-      <div style={s('font-size: 13px; color: var(--color-neutral-400);')}>
-        Ce dossier n'a pas de <code>cockpit/</code> — aucun plan, aucun scan à lire.
-      </div>
-      <div style={s('font-size: 11.5px; color: var(--color-neutral-600); max-width: 52ch;')}>
-        L'initialiser crée <code>cockpit/plans/</code> et pose le hook <code>post-commit</code> qui
-        rattache les commits au plan actif.
-      </div>
-
-      {/* Les skills se choisissent avant d'initialiser, pas après : c'est le
-          seul moment où l'on sait qu'un projet vient d'arriver, et un cockpit
-          que Claude Code ne sait pas remplir reste un dossier vide. */}
-      {!done && skills.length > 0 && (
-        <div style={s('width: min(520px, 100%); margin-top: 4px;')}>
-          <div
-            style={s(
-              'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 8px; text-align: left;',
-            )}
-          >
-            Skills Claude Code
-          </div>
-          <SkillsList skills={skills} choisis={choisis} onChoisis={setChoisis} />
-        </div>
-      )}
-
-      {done ? (
-        <div style={s('font-size: 11px; color: var(--color-neutral-500); text-align: left;')}>
-          {done.map(line => (
-            <div key={line}>{line}</div>
-          ))}
-        </div>
-      ) : (
-        <button
-          type="button"
-          className="btn"
-          disabled={busy}
-          onClick={() => {
-            setBusy(true)
-            projectAction('init', root, { skills: choisis })
-              .then(result => {
-                setDone(result.done ?? [])
-                onDone()
-              })
-              .catch(err => onError(String(err.message ?? err)))
-              .finally(() => setBusy(false))
-          }}
-        >
-          {busy ? 'Initialisation…' : 'Initialiser cockpit ici'}
-        </button>
-      )}
-    </div>
-  )
-}
-
 /** Affiche l'histogramme de densité d'activité (barres verticaless). */
 function DensityHistogram({ bars, fenetre }: { bars: number[]; fenetre: string }) {
   const max = Math.max(1, ...bars)
 
-  const labels: Record<string, string> = {
-    jour: '24 heures',
-    semaine: '7 jours',
-    '3mois': '13 semaines',
-    an: '12 mois',
+  const cles: Record<string, string> = {
+    jour: 'density.window_day',
+    semaine: 'density.window_week',
+    mois: 'density.window_month',
+    '3mois': 'density.window_3months',
+    an: 'density.window_year',
   }
-  const label = labels[fenetre] ?? '16 semaines'
+  const label = t((cles[fenetre] ?? 'density.window_3months') as Parameters<typeof t>[0])
 
   return (
     <>
@@ -725,7 +662,7 @@ function DensityHistogram({ bars, fenetre }: { bars: number[]; fenetre: string }
         )}
       >
         <span>{label}</span>
-        <span>aujourd'hui</span>
+        <span>{t('sidebar.today')}</span>
       </div>
     </>
   )
@@ -834,7 +771,7 @@ function Sidebar({
 
   return (
     <aside
-      aria-label="Projets"
+      aria-label={t('sidebar.projects')}
       style={s(
         `width: ${width}px; flex: none; display: flex; flex-direction: column; background: var(--theme-bg-secondary); border-right: 1px solid var(--color-divider); padding: 14px 0;`,
       )}
@@ -844,7 +781,7 @@ function Sidebar({
           'padding: 0 14px 10px; display: flex; align-items: center; gap: 8px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);',
         )}
       >
-        Projets
+        {t('sidebar.projects')}
         <div style={s('flex: 1;')} />
         {picker && (
           <button
@@ -888,7 +825,7 @@ function Sidebar({
           onClick={() => setSkillsOuverts(true)}
           style={s('font-size: 11px;')}
         >
-          Skills Claude Code
+          {t('sidebar.skills')}
         </button>
         <button
           type="button"
@@ -896,7 +833,7 @@ function Sidebar({
           onClick={() => setPreferencesOuverts(true)}
           style={s('font-size: 11px;')}
         >
-          ⚙ Préférences
+          ⚙ {t('sidebar.preferences')}
         </button>
         {/* La configuration de Claude Code n'est pas celle du cockpit : elle
             vit dans `~/.claude/` et le cockpit ne fait que la lire. Le bouton
@@ -908,7 +845,7 @@ function Sidebar({
           onClick={() => setConfigOuverte(true)}
           style={s('font-size: 11px;')}
         >
-          ⌘ Ma configuration Claude Code
+          ⌘ {t('sidebar.claude_config')}
         </button>
       </div>
       {skillsOuverts && <SkillsModal onClose={() => setSkillsOuverts(false)} />}
@@ -925,7 +862,7 @@ function Sidebar({
             'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 8px;',
           )}
         >
-          Densité d'activité
+          {t('sidebar.activity')}
         </div>
 
         {settings?.densiteActivite.fenetre === 'mois' ? (
@@ -992,12 +929,12 @@ function ProjectRow({
     : { open, equipped, last }
 
   const badge = !vivant.equipped
-    ? 'à initialiser'
+    ? t('project.to_initialize')
     : vivant.open === null
       ? '—'
       : vivant.open > 0
-        ? `${vivant.open} à faire`
-        : 'à jour'
+        ? t('project.to_do', { n: vivant.open })
+        : t('project.up_to_date')
 
   return (
     <div

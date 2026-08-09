@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 
 import { frDate, humanAge, shotDate, shotUrl } from './data'
 import { s } from './style'
+import { t } from './i18n'
 
 /** `2026-08-08-51461bf.png` → `51461bf`. Le sha relie la capture à un commit. */
 const shotSha = (file: string): string => file.slice(11).replace(/\.png$/, '')
@@ -72,14 +73,14 @@ export function Lightbox({
           className="btn btn-ghost"
           style={s('font-size: 12px; padding: 4px 10px;')}
         >
-          ✕ Fermer
+          ✕ {t('lightbox.close')}
         </button>
         <div style={s('font-size: 12.5px; color: var(--color-neutral-400);')}>{label}</div>
         <div style={s('flex: 1;')} />
         <div style={s('font-size: 11px; color: var(--color-neutral-600);')}>
           {/* Compté dans le sens du temps, comme la frise : la dernière
               capture est la n-ième, pas la première. */}
-          {files.length - at} / {files.length} — Échap pour fermer, ← → pour remonter le temps
+          {files.length - at} / {files.length} — {t('lightbox.navigation')}
         </div>
       </div>
 
@@ -88,7 +89,7 @@ export function Lightbox({
         onClick={event => event.stopPropagation()}
         style={s('flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; gap: 14px; padding: 14px 0;')}
       >
-        <Arrow label="‹" title="Capture plus ancienne" disabled={at >= files.length - 1} onClick={() => step(-1)} />
+        <Arrow label="‹" title={t('a11y.older_shot')} disabled={at >= files.length - 1} onClick={() => step(-1)} />
         <img
           src={shotUrl(root, `shots/${slug}/${file}`)}
           alt={`${label} — ${frDate(shotDate(file))}`}
@@ -96,7 +97,7 @@ export function Lightbox({
             'max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; border: 1px solid var(--color-neutral-800); box-shadow: 0 24px 60px rgba(0,0,0,.6); background: var(--theme-bg-lightbox);',
           )}
         />
-        <Arrow label="›" title="Capture plus récente" disabled={at <= 0} onClick={() => step(1)} />
+        <Arrow label="›" title={t('a11y.newer_shot')} disabled={at <= 0} onClick={() => step(1)} />
       </div>
 
       <div

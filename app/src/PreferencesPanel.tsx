@@ -1,7 +1,18 @@
 import { useEffect, useState } from 'react'
 
 import { fetchSettings, updateSettings, type SettingsType } from './data'
+import { t } from './i18n'
 import { s } from './style'
+
+const tabToKey = {
+  apercu: 'tabs.apercu',
+  navigateur: 'tabs.navigateur',
+  produit: 'tabs.produit',
+  historique: 'tabs.historique',
+  tableau: 'tabs.tableau',
+  donnees: 'tabs.donnees',
+  stack: 'tabs.stack',
+} as const
 
 /**
  * Paramètres d'historique : granularité et fenêtre.
@@ -17,11 +28,11 @@ function PreferencesDensity({
 }) {
   // Crans : chaque cran fixe à la fois granularite et fenetre
   const crans = [
-    { label: 'Jour', granularite: 'jour', fenetre: 'jour' },
-    { label: 'Semaine', granularite: 'semaine', fenetre: 'semaine' },
-    { label: 'Mois', granularite: 'mois', fenetre: 'mois' },
-    { label: '3 mois', granularite: 'semaine', fenetre: '3mois' },
-    { label: 'An', granularite: 'mois', fenetre: 'an' },
+    { key: 'pref.density_day' as const, granularite: 'jour', fenetre: 'jour' },
+    { key: 'pref.density_week' as const, granularite: 'semaine', fenetre: 'semaine' },
+    { key: 'pref.density_month' as const, granularite: 'mois', fenetre: 'mois' },
+    { key: 'pref.density_month3' as const, granularite: 'semaine', fenetre: '3mois' },
+    { key: 'pref.density_year' as const, granularite: 'mois', fenetre: 'an' },
   ] as const
 
   // Trouve le cran actuel selon la granularité et fenêtre actuelles
@@ -45,7 +56,7 @@ function PreferencesDensity({
   return (
     <div style={s('display: flex; flex-direction: column; gap: 12px;')}>
       <label style={s('display: block; font-size: 12px; font-weight: 500;')}>
-        Densité d'activité
+        {t('pref.density')}
       </label>
       <div style={s('display: flex; gap: 6px; flex-wrap: wrap;')}>
         {crans.map((cran, i) => (
@@ -56,7 +67,7 @@ function PreferencesDensity({
             className={current === i ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'}
             style={s('font-size: 12px; padding: 4px 12px;')}
           >
-            {cran.label}
+            {t(cran.key)}
           </button>
         ))}
       </div>
@@ -81,22 +92,12 @@ function PreferencesDisplay({
       {/* Onglets */}
       <div>
         <label style={s('display: block; font-size: 12px; font-weight: 500; margin-bottom: 6px;')}>
-          Onglets
+          {t('pref.tabs')}
         </label>
         <div style={s('display: flex; flex-direction: column; gap: 4px;')}>
           {settings.onglets.ordre.map(tabId => {
             const isActive = settings.onglets.actifs.includes(tabId)
-            const label = ['apercu', 'navigateur', 'produit', 'historique', 'tableau', 'donnees', 'stack'].includes(tabId)
-              ? {
-                  apercu: 'Aperçu',
-                  navigateur: 'Navigateur',
-                  produit: 'Produit',
-                  historique: 'Historique',
-                  tableau: 'Tableau',
-                  donnees: 'Données',
-                  stack: 'Stack',
-                }[tabId]
-              : tabId
+            const label = tabId in tabToKey ? t(tabToKey[tabId as keyof typeof tabToKey]) : tabId
             return (
               <label
                 key={tabId}
@@ -141,7 +142,7 @@ function PreferencesDisplay({
       {/* Terminal */}
       <div>
         <label style={s('display: block; font-size: 12px; font-weight: 500; margin-bottom: 6px;')}>
-          Terminal
+          {t('pref.terminal')}
         </label>
         <div style={s('display: flex; flex-direction: column; gap: 8px;')}>
           <label style={s('display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer;')}>
@@ -156,12 +157,12 @@ function PreferencesDisplay({
               }
               style={s('cursor: pointer;')}
             />
-            <span>Afficher le terminal</span>
+            <span>{t('pref.terminal_visible')}</span>
           </label>
 
           <div>
             <label style={s('display: block; font-size: 11px; color: var(--color-neutral-600); margin-bottom: 4px;')}>
-              Disposition
+              {t('pref.terminal_layout')}
             </label>
             <select
               value={settings.terminal.disposition}
@@ -175,9 +176,9 @@ function PreferencesDisplay({
                 'width: 100%; padding: 6px 8px; border: 1px solid var(--color-divider); border-radius: 4px; font-size: 12px;',
               )}
             >
-              <option value="bottom">En bas</option>
-              <option value="side">À droite</option>
-              <option value="full">Plein écran</option>
+              <option value="bottom">{t('pref.terminal_bottom')}</option>
+              <option value="side">{t('pref.terminal_side')}</option>
+              <option value="full">{t('pref.terminal_full')}</option>
             </select>
           </div>
         </div>
@@ -186,11 +187,11 @@ function PreferencesDisplay({
       {/* Thème */}
       <div>
         <label style={s('display: block; font-size: 12px; font-weight: 500; margin-bottom: 6px;')}>
-          Thème
+          {t('pref.theme')}
         </label>
         <div style={s('display: flex; flex-direction: column; gap: 8px;')}>
           {(['auto', 'light', 'dark'] as const).map(theme => {
-            const themeLabel = theme === 'auto' ? 'Système' : theme === 'light' ? 'Clair' : 'Sombre'
+            const themeKey = theme === 'auto' ? 'pref.theme_system' : theme === 'light' ? 'pref.theme_light' : 'pref.theme_dark'
             return (
               <label
                 key={theme}
@@ -208,7 +209,7 @@ function PreferencesDisplay({
                   }}
                   style={s('cursor: pointer;')}
                 />
-                <span>{themeLabel}</span>
+                <span>{t(themeKey as any)}</span>
               </label>
             )
           })}
@@ -429,6 +430,12 @@ function PreferencesActions({
  * À noter : C1 ne fait pas partie de A1 — ce composant reste ici pour la
  * structure, mais ne s'affichera que quand C1 sera implémentée.
  */
+const BOOTSTRAP_STRINGS = {
+  TITLE: 'Commandes de bootstrap',
+  DESCRIPTION: "Commandes posées dans le terminal avant l'initialisation d'un projet neuf (dossier vide ou non git).",
+  ADD_COMMAND: 'Ajouter une commande',
+}
+
 function PreferencesBootstrap({
   settings,
   onSettings,
@@ -436,8 +443,62 @@ function PreferencesBootstrap({
   settings: SettingsType
   onSettings: (settings: SettingsType) => void
 }) {
-  // Placeholder pour C1 : UI bootstrap
-  return <div style={s('padding: 0;')} />
+  const bootstrap = settings.bootstrap || ['/project-setup']
+
+  return (
+    <div style={s('display: flex; flex-direction: column; gap: 12px;')}>
+      <div>
+        <label style={s('display: block; font-size: 12px; font-weight: 500; margin-bottom: 4px;')}>
+          {BOOTSTRAP_STRINGS.TITLE}
+        </label>
+        <p style={s('margin: 0 0 8px; font-size: 10.5px; color: var(--color-neutral-500);')}>
+          {BOOTSTRAP_STRINGS.DESCRIPTION}
+        </p>
+      </div>
+
+      <div style={s('display: flex; flex-direction: column; gap: 6px;')}>
+        {bootstrap.map((cmd, i) => (
+          <div key={i} style={s('display: flex; gap: 6px; align-items: center;')}>
+            <input
+              type="text"
+              value={cmd}
+              onChange={e => {
+                const updated = [...bootstrap]
+                updated[i] = e.target.value
+                onSettings({ ...settings, bootstrap: updated })
+              }}
+              style={s(
+                'flex: 1; padding: 6px 8px; border: 1px solid var(--color-divider); border-radius: 4px; font-size: 11px; font-family: monospace;',
+              )}
+              placeholder="ex: git init"
+            />
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => {
+                const updated = bootstrap.filter((_, j) => j !== i)
+                onSettings({ ...settings, bootstrap: updated })
+              }}
+              style={s('font-size: 12px; padding: 2px 6px;')}
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        className="btn btn-ghost btn-block"
+        onClick={() => {
+          onSettings({ ...settings, bootstrap: [...bootstrap, ''] })
+        }}
+        style={s('font-size: 11px;')}
+      >
+        {BOOTSTRAP_STRINGS.ADD_COMMAND}
+      </button>
+    </div>
+  )
 }
 
 /**

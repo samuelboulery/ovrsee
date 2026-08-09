@@ -14,6 +14,7 @@
 
 import { createReadStream, existsSync, lstatSync, readFileSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'
+import { execFileSync } from 'node:child_process'
 
 import { readConfigClaude } from '../hooks/config-claude.js'
 import { install } from '../hooks/install.js'
@@ -47,6 +48,45 @@ const usableDirectory = path =>
   existsSync(path) &&
   !lstatSync(path).isSymbolicLink() &&
   lstatSync(path).isDirectory()
+
+/**
+ * État détecté d'un dossier : est-ce un dépôt git ? a-t-il un lockfile ?
+ * cockpit.config.json ? Est-ce équipé ?
+ */
+function getFolderState(root) {
+  const hasGit = (() => {
+    try {
+      execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: root, stdio: 'ignore' })
+      return true
+    } catch {
+      return false
+    }
+  })()
+
+  const hasLockfile = ['pnpm-lock.yaml', 'package-lock.json', 'yarn.lock', 'bun.lockb']
+    .some(name => existsSync(join(root, name)))
+
+  const hasConfig = existsSync(join(root, 'cockpit.config.json'))
+
+  try {
+    const snap = snapshot(root)
+    return {
+      isGit: hasGit,
+      hasLockfile,
+      hasConfig,
+      equipped: snap.equipped,
+      hasPackageJson: snap.packageJson !== null,
+    }
+  } catch {
+    return {
+      isGit: hasGit,
+      hasLockfile,
+      hasConfig,
+      equipped: false,
+      hasPackageJson: existsSync(join(root, 'package.json')),
+    }
+  }
+}
 
 /**
  * Ajout, retrait, remontée en tête, initialisation.
@@ -88,6 +128,11 @@ function projectAction(body, cwd) {
       } catch (err) {
         return { status: 400, json: { error: String(err.message ?? err) } }
       }
+    }
+
+    case 'state': {
+      if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
+      return { json: getFolderState(path) }
     }
 
     case 'init': {

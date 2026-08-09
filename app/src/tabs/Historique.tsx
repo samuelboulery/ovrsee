@@ -11,6 +11,7 @@ import {
   type TimelineEntry,
 } from '../data'
 import { Illisibles } from '../Illisibles'
+import { t } from '../i18n'
 import { s } from '../style'
 
 /** `2026-08-08T12:00:00+02:00` → `2026-08-08`. Les plans, eux, datent déjà du jour. */
@@ -43,8 +44,7 @@ export function Historique({
     return (
       <div style={s('flex: 1; padding: 20px 22px; overflow: auto; display: flex; align-items: center; justify-content: center;')}>
         <div style={s('font-size: 12px; color: var(--color-neutral-600); text-align: center; max-width: 46ch; line-height: 1.6;')}>
-          Rien à raconter pour l'instant : aucun commit lu et aucun plan écrit. La chronologie
-          se remplira au premier des deux.
+          {t('apercu.project_timeline_empty')}
         </div>
       </div>
     )
@@ -55,11 +55,10 @@ export function Historique({
   return (
     <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
       <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
-        Chronologie du projet
+        {t('historique.title')}
       </h2>
       <div style={s('font-size: 12px; color: var(--color-neutral-600); margin-bottom: 20px;')}>
-        Chaque commit, dans l'ordre, et les plans qui les expliquent. Un plan est clos par le
-        commit qui l'exécute.
+        {t('historique.subtitle')}
       </div>
 
       <Illisibles entries={illisibles} quoi="plan" />
@@ -151,14 +150,14 @@ function PlanBand({
         )}
       >
         <span style={s('font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-accent-300); flex: none;')}>
-          Plan
+          {t('historique.plan_label')}
         </span>
         <span style={s('font-size: 14px; font-weight: 500; color: var(--color-text);')}>
           {entry.title}
         </span>
         <span style={s('flex: 1;')} />
         <span className="tag tag-outline" style={s('font-size: 10px; flex: none;')}>
-          {entry.status === 'closed' ? 'clos' : 'ouvert'}
+          {entry.status === 'closed' ? t('historique.closed') : t('historique.open')}
         </span>
         <span style={s('font-size: 10.5px; color: var(--color-neutral-600); flex: none;')}>
           {open ? '▾' : '▸'}
@@ -173,7 +172,7 @@ function PlanBand({
           {planRejected(plan) !== null && (
             <div style={s('display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; padding: 9px 11px; border-radius: 6px; background: var(--color-accent-900); border: 1px solid var(--color-accent-800); max-width: 62ch;')}>
               <span style={s('font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-accent-300); flex: none; padding-top: 1px;')}>
-                Écarté
+                {t('historique.rejected')}
               </span>
               <span style={s('font-size: 12px; color: var(--color-accent-200); line-height: 1.5;')}>
                 {planRejected(plan)}
@@ -197,7 +196,7 @@ function PlanBand({
           git, qui, lui, se souvient du commit. */}
       {open && plan === null && (
         <div style={s('margin-top: 9px; font-size: 12px; color: var(--color-neutral-600);')}>
-          Le fichier de ce plan n'est plus dans cockpit/plans/.
+          {t('historique.plan_file_missing')}
         </div>
       )}
 
@@ -206,7 +205,7 @@ function PlanBand({
           entry.commits.map(commit => <CommitRow key={commit.sha} commit={commit} />)
         ) : (
           <div style={s('font-size: 11px; color: var(--color-neutral-600); padding: 4px 0;')}>
-            Aucun commit — ce plan n'a pas encore été commencé.
+            {t('historique.no_commits')}
           </div>
         )}
       </div>

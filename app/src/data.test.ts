@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
+import { setCurrentLanguage } from './i18n'
 import {
   briefLines,
   buildActions,
@@ -31,6 +32,12 @@ import {
   type Ticket,
   type SettingsType,
 } from './data'
+
+// Ces tests comparent du texte : ils épinglent donc la langue, sinon ils
+// dépendraient de `navigator.language`, absent sous `node --test`. Ce qu'ils
+// vérifient est le contenu du brief, pas sa traduction — celle-ci est gardée
+// par `hooks/i18n.test.js`.
+setCurrentLanguage('fr')
 
 /**
  * Un instantané minimal mais valide. Les tests le dégradent champ par champ :
@@ -76,13 +83,13 @@ const plan = (patch: Partial<Plan> = {}): Plan =>
 test('briefLines survit à un pages.json qui est un tableau', () => {
   const snap = snapshot({ pages: [] as unknown as Snapshot['pages'] })
   const lines = briefLines(snap)
-  assert.ok(lines.some(l => l.text.includes('0 page(s)')))
+  assert.ok(lines.some(l => l.text.includes('0 page')))
 })
 
 test('briefLines survit à un pages.json vide, nul ou sans tableau', () => {
   for (const pages of [null, undefined, {}, 'texte'] as unknown[]) {
     const snap = snapshot({ pages: pages as Snapshot['pages'] })
-    assert.ok(briefLines(snap).some(l => l.text.includes('0 page(s)')))
+    assert.ok(briefLines(snap).some(l => l.text.includes('0 page')))
   }
 })
 
@@ -526,7 +533,7 @@ test('buildActions rejette les actions personnalisées avec sauts de ligne', () 
   // Une action rejetée avec erreur
   assert.equal(errors.length, 1)
   assert.equal(errors[0].label, 'Commande invalide')
-  assert.match(errors[0].error, /saut de ligne/)
+  assert.match(errors[0].error, /saut de ligne|line break/)
 })
 
 // --- decideInjection : contexte vs commande ---

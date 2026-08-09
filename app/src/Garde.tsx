@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 
 import { s } from './style'
+import { t } from './i18n'
 
 /**
  * Le garde-fou de rendu.
@@ -69,7 +70,7 @@ export function Panne({ quoi, message }: { quoi: string; message: string }) {
       )}
     >
       <div style={s('font-size: 13px; color: var(--color-text);')}>
-        Rendu impossible — {quoi}.
+        {t('garde.render_failed', { quoi })}
       </div>
       <div
         style={s(
@@ -79,8 +80,7 @@ export function Panne({ quoi, message }: { quoi: string; message: string }) {
         {message}
       </div>
       <div style={s('font-size: 11.5px; color: var(--color-neutral-600); max-width: 56ch;')}>
-        Les autres onglets et les autres projets restent accessibles. C'est
-        presque toujours un fichier de <code>cockpit/</code> que le cockpit ne
+        {t('garde.file_error')} <code>cockpit/</code> que le cockpit ne
         sait pas lire.
       </div>
     </div>

@@ -19,6 +19,7 @@ import {
   type Snapshot,
 } from '../data'
 import { Lightbox } from '../Lightbox'
+import { t } from '../i18n'
 import { s, useHover } from '../style'
 import { Divider, useResizable } from '../useResizable'
 import { usePanZoom } from '../usePanZoom'
@@ -68,10 +69,10 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
     return (
       <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
         <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
-          Graphe de navigation
+          {t('produit.title')}
         </h2>
         <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
-          Aucune page cartographiée. Le crawl tourne au commit — lancez-le une fois avec{' '}
+          {t('produit.no_pages')}{' '}
           <span style={s('font-family: ui-monospace, monospace;')}>node crawl/index.js</span>.
         </div>
       </div>
@@ -84,11 +85,10 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
         <div style={s('flex: none; padding: 20px 22px 0;')}>
           <div style={s('display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;')}>
             <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
-              Graphe de navigation
+              {t('produit.title')}
             </h2>
             <span style={s('font-size: 12px; color: var(--color-neutral-500);')}>
-              {pages.length} page{pages.length > 1 ? 's' : ''} · {linkCount} lien
-              {linkCount > 1 ? 's' : ''} · reconstruit au commit
+              {pages.length} {pages.length > 1 ? t('produit.pages_count_plural', { n: pages.length }) : t('produit.pages_count', { n: 1 })} · {linkCount} {linkCount > 1 ? t('produit.links_count_plural', { n: linkCount }) : t('produit.links_count', { n: 1 })} · {t('produit.rebuilt_at_commit')}
             </span>
           </div>
 
@@ -100,8 +100,7 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
                 'display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 8px 11px; border-radius: 6px; background: var(--color-accent-900); border: 1px solid var(--color-accent-800); font-size: 12px; color: var(--color-accent-200);',
               )}
             >
-              Dernier scan échoué le {frDate(lastScan(snapshot.scans)?.date)} — les captures
-              ci-dessous sont plus anciennes que le dernier commit.
+              {t('produit.last_scan_failed', { date: frDate(lastScan(snapshot.scans)?.date) })}
             </div>
           )}
         </div>
@@ -189,7 +188,7 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
               'background: transparent; border: 1px solid var(--color-neutral-800); border-radius: 6px; color: var(--color-neutral-400); cursor: pointer; font-family: var(--font-body); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; padding: 12px 5px; writing-mode: vertical-rl;',
             )}
           >
-            Détail de la page
+            {t('produit.page_detail')}
           </button>
         </div>
       )}
@@ -206,7 +205,7 @@ function Legend() {
     >
       <span style={s('display: flex; align-items: center; gap: 6px;')}>
         <span style={s('width: 20px; height: 1px; background: var(--color-accent); display: block;')} />
-        mène à
+        {t('produit.leads_to')}
       </span>
       <span style={s('display: flex; align-items: center; gap: 6px;')}>
         <span
@@ -214,7 +213,7 @@ function Legend() {
             'width: 7px; height: 7px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent); display: block;',
           )}
         />
-        entrée de l'app
+        {t('produit.entry_point')}
       </span>
     </div>
   )
@@ -247,21 +246,21 @@ function Controls({
         'position: absolute; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 4px; z-index: 4;',
       )}
     >
-      <button type="button" title="Dézoomer" onClick={() => onZoom(1 / 1.2)} style={s(button)}>
+      <button type="button" title={t('produit.zoom_out')} onClick={() => onZoom(1 / 1.2)} style={s(button)}>
         −
       </button>
       <button
         type="button"
-        title="Revenir à 100 %"
+        title={t('produit.zoom_100')}
         onClick={onReset}
         style={s(button + ' min-width: 52px; font-variant-numeric: tabular-nums;')}
       >
         {Math.round(zoom * 100)} %
       </button>
-      <button type="button" title="Zoomer" onClick={() => onZoom(1.2)} style={s(button)}>
+      <button type="button" title={t('produit.zoom_in')} onClick={() => onZoom(1.2)} style={s(button)}>
         +
       </button>
-      <button type="button" title="Ajuster à la fenêtre" onClick={onFit} style={s(button)}>
+      <button type="button" title={t('produit.fit_window')} onClick={onFit} style={s(button)}>
         ⤢
       </button>
     </div>
@@ -398,7 +397,7 @@ function PageCard({
             `width: 100%; aspect-ratio: ${shotRatio(page)}; border-radius: 5px; border: 1px dashed var(--color-neutral-700); margin-top: 9px; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-accent-300);`,
           )}
         >
-          scan échoué
+          {t('produit.scan_failed')}
         </div>
       )}
 
@@ -409,7 +408,7 @@ function PageCard({
           'display: flex; gap: 8px; margin-top: 9px; font-size: 10px; color: var(--color-neutral-600); white-space: nowrap;',
         )}
       >
-        <span>{plans.length > 0 ? `${plans.length} plan${plans.length > 1 ? 's' : ''}` : 'aucun plan'}</span>
+        <span>{plans.length > 0 ? `${plans.length} ${plans.length > 1 ? t('produit.plan_count_plural', { n: plans.length }) : t('produit.plan_count', { n: 1 })}` : t('produit.no_plans')}</span>
         <span style={s('flex: 1;')} />
         <span>{shots[0] ? frDateShort(shotDate(shots[0])) : '—'}</span>
       </div>
@@ -450,11 +449,11 @@ function DetailPanel({
     >
       <div style={s('display: flex; align-items: center; gap: 8px;')}>
         <div style={s('font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);')}>
-          Page sélectionnée
+          {t('produit.page_selected')}
         </div>
         <div style={s('flex: 1;')} />
         <button type="button" onClick={onClose} className="btn btn-ghost" style={s('font-size: 11px; padding: 3px 9px;')}>
-          Fermer
+          {t('produit.close')}
         </button>
       </div>
 
@@ -465,14 +464,14 @@ function DetailPanel({
         {page.route}
       </div>
       <div style={s('font-size: 12px; color: var(--color-neutral-400); margin-top: 9px; line-height: 1.5; text-wrap: pretty;')}>
-        {page.excerpt?.trim() || 'Aucun texte lisible relevé sur cette page.'}
+        {page.excerpt?.trim() || t('produit.no_excerpt')}
       </div>
 
       {shots[0] ? (
         <img
           src={shotUrl(snapshot.root, `shots/${page.slug}/${shots[0]}`)}
           alt=""
-          title="Agrandir"
+          title={t('produit.zoom')}
           onClick={() => setZoom(0)}
           style={s(
             `margin-top: 14px; border-radius: 8px; border: 1px solid var(--color-neutral-800); width: 100%; aspect-ratio: ${shotRatio(page)}; object-fit: cover; object-position: top; display: block; cursor: zoom-in;`,
@@ -484,7 +483,7 @@ function DetailPanel({
             `margin-top: 14px; border-radius: 8px; border: 1px dashed var(--color-neutral-700); width: 100%; aspect-ratio: ${shotRatio(page)}; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--color-neutral-500);`,
           )}
         >
-          aucune capture
+          {t('produit.no_screenshot')}
         </div>
       )}
 
@@ -492,10 +491,10 @@ function DetailPanel({
         <span style={s('width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent-500); display: block;')} />
         {shots[0]
           ? `capture du ${frDate(shotDate(shots[0]))} — ${humanAge(shotDate(shots[0]))}`
-          : 'jamais photographiée'}
+          : t('produit.never_captured')}
       </div>
 
-      <Section title="Captures précédentes">
+      <Section title={t('produit.previous_screenshots')}>
         {shots.length > 1 ? (
           <>
             {/* Le rail reste étroit : quatre miniatures. La visionneuse, elle,
@@ -506,7 +505,7 @@ function DetailPanel({
                   <img
                     src={shotUrl(snapshot.root, `shots/${page.slug}/${file}`)}
                     alt=""
-                    title="Agrandir"
+                    title={t('produit.zoom')}
                     onClick={() => setZoom(i + 1)}
                     style={s(
                       'height: 44px; width: 100%; object-fit: cover; object-position: top; border-radius: 5px; border: 1px solid var(--color-neutral-800); display: block; cursor: zoom-in;',
@@ -524,15 +523,15 @@ function DetailPanel({
               className="btn btn-ghost"
               style={s('font-size: 11px; padding: 4px 9px; margin-top: 9px;')}
             >
-              Voir les {shots.length} captures en grand
+              {t('produit.view_all_screenshots', { n: shots.length })}
             </button>
           </>
         ) : (
-          <Empty text="Une seule capture pour l'instant." />
+          <Empty text={t('produit.single_screenshot')} />
         )}
       </Section>
 
-      <Section title="Sort de cette page">
+      <Section title={t('produit.page_links')}>
         {page.links.length > 0 ? (
           <div style={s('display: flex; flex-wrap: wrap; gap: 6px;')}>
             {page.links.map(link => (
@@ -542,11 +541,11 @@ function DetailPanel({
             ))}
           </div>
         ) : (
-          <Empty text="Aucun lien sortant relevé." />
+          <Empty text={t('produit.no_outgoing_links')} />
         )}
       </Section>
 
-      <Section title="Plans clos ayant touché ses fichiers">
+      <Section title={t('produit.closed_plans')}>
         {plans.length > 0 ? (
           <div style={s('display: flex; flex-direction: column; gap: 8px;')}>
             {plans.map(plan => (
@@ -559,7 +558,7 @@ function DetailPanel({
             ))}
           </div>
         ) : (
-          <Empty text="Aucun plan — cette page n'a pas bougé depuis sa création." />
+          <Empty text={t('produit.no_related_plans')} />
         )}
       </Section>
 
@@ -618,9 +617,13 @@ function Footnotes({
   if (routes === 0 && orphans.length === 0) return null
 
   const counts = [
-    routes > 0 ? `${routes} route${routes > 1 ? 's' : ''} protégée${routes > 1 ? 's' : ''}` : null,
+    routes > 0
+      ? `${t(routes > 1 ? 'produit.protected_route_count_plural' : 'produit.protected_route_count', { n: routes })} ${t(routes > 1 ? 'produit.protected_route_plural' : 'produit.protected_route')}`
+      : null,
     orphans.length > 0
-      ? `${orphans.length} capture${orphans.length > 1 ? 's' : ''} sans page`
+      ? t(orphans.length > 1 ? 'produit.screenshot_count_plural' : 'produit.screenshot_count', {
+          n: orphans.length,
+        }) + ' ' + t('produit.without_page')
       : null,
   ].filter(Boolean)
 
@@ -658,12 +661,10 @@ function Orphans({ slugs }: { slugs: string[] }) {
           'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 8px;',
         )}
       >
-        Captures sans page correspondante
+        {t('produit.orphan_screenshots')}
       </div>
       <div style={s('font-size: 11px; color: var(--color-neutral-600); line-height: 1.5; max-width: 62ch;')}>
-        {slugs.join(', ')} — ces images viennent d'un scan antérieur. Soit la page a disparu de
-        l'application, soit un scan plus ancien a mal nommé sa route. Le cockpit ne les supprime pas :
-        il ne peut pas trancher, et effacer serait irréversible.
+        {slugs.join(', ')} — {t('produit.orphan_screenshots_help')}
       </div>
     </div>
   )
@@ -678,7 +679,7 @@ function Redirects({ redirects }: { redirects: Record<string, string> }) {
           'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;',
         )}
       >
-        Routes protégées
+        {t('produit.protected_routes')}
       </div>
       <div style={s('display: flex; flex-direction: column; gap: 6px;')}>
         {Object.entries(redirects).map(([from, to]) => (

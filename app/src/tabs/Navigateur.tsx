@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import type { Snapshot } from '../data'
+import { t } from '../i18n'
 import { s } from '../style'
 import { pasteToClaude } from '../useTerminal'
 import { Divider, useResizable } from '../useResizable'
@@ -71,8 +72,8 @@ type Dock = 'bottom' | 'side'
 const DOCK_KEY = 'navigateur.devtools.dock'
 
 const DOCKS: Array<[Dock, string]> = [
-  ['bottom', 'Bas'],
-  ['side', 'Côté'],
+  ['bottom', 'bottom'],
+  ['side', 'side'],
 ]
 
 /**
@@ -329,7 +330,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
       if (detail.isMainFrame === false) return
       // -3 : navigation abandonnée par la page elle-même, pas une panne.
       if (detail.errorCode === -3) return
-      setFailure(detail.errorDescription || 'chargement impossible')
+      setFailure(detail.errorDescription || t('navigateur.loading_failed'))
       setLoading(false)
     }
 
@@ -372,12 +373,12 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
 
   /** Envoie à Claude, ou copie s'il n'y a pas de session — comme le panneau terminal. */
   const send = async (label: string, text: string) => {
-    if (pasteToClaude(text)) return say(`${label} — collé dans la session Claude`)
+    if (pasteToClaude(text)) return say(t('navigateur.sent_to_claude', { label }))
     try {
       await navigator.clipboard.writeText(text)
-      say(`${label} — copié`)
+      say(t('navigateur.copied', { label }))
     } catch {
-      say('copie refusée par le navigateur')
+      say(t('navigateur.copy_failed'))
     }
   }
 
@@ -402,7 +403,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
       const picked = (await element.executeJavaScript(`(${pickElement})()`)) as Picked | null
       if (picked) await send('Élément', describe(picked))
     } catch (err) {
-      say(`sélection impossible : ${err instanceof Error ? err.message : String(err)}`)
+      say(t('navigateur.selection_failed', { error: err instanceof Error ? err.message : String(err) }))
     } finally {
       setPicking(false)
     }
@@ -429,11 +430,11 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
       )
       if (ok === false) {
         setDevtools(false)
-        say('DevTools indisponibles')
+        say(t('navigateur.devtools_unavailable'))
       }
     } catch (err) {
       setDevtools(false)
-      say(`DevTools indisponibles : ${err instanceof Error ? err.message : String(err)}`)
+      say(t('navigateur.devtools_unavailable_error', { error: err instanceof Error ? err.message : String(err) }))
     }
   }, [])
 
@@ -491,11 +492,11 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
           'height: 40px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 12px; border-bottom: 1px solid var(--color-divider);',
         )}
       >
-        <NavButton label="←" title="Précédent" onClick={() => view.current?.goBack()} />
-        <NavButton label="→" title="Suivant" onClick={() => view.current?.goForward()} />
+        <NavButton label="←" title={t('navigateur.previous')} onClick={() => view.current?.goBack()} />
+        <NavButton label="→" title={t('navigateur.next')} onClick={() => view.current?.goForward()} />
         <NavButton
           label={loading ? '×' : '⟳'}
-          title={loading ? 'Arrêter' : 'Recharger'}
+          title={loading ? t('navigateur.stop') : t('navigateur.reload')}
           onClick={() => (loading ? view.current?.stop() : view.current?.reload())}
         />
 
@@ -521,13 +522,9 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
           onClick={select}
           className={picking ? 'btn btn-primary' : 'btn btn-secondary'}
           style={s('font-size: 11.5px; padding: 5px 10px;')}
-          title={
-            picking
-              ? 'Cliquez un élément de la page — ce bouton ou Échap annule'
-              : "Cliquer un élément de la page pour l'envoyer à Claude"
-          }
+          title={picking ? t('navigateur.pick_element') : t('navigateur.pick_element_inactive')}
         >
-          {picking ? '◎ Annuler' : '◎ Sélectionner'}
+          {picking ? t('navigateur.cancel_selection') : t('navigateur.select_element')}
         </button>
         <button
           type="button"
@@ -541,22 +538,25 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
         {/* Le choix ne se pose que quand ils sont ouverts. */}
         {devtools && (
           <div style={s('display: flex; gap: 2px;')}>
-            {DOCKS.map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => moveDock(id)}
-                title={`Ranger les DevTools en ${label.toLowerCase()}`}
-                style={s(
-                  'cursor: pointer; font-family: var(--font-body); font-size: 10.5px; letter-spacing: .06em; padding: 4px 9px; border-radius: 5px; border: 1px solid ' +
-                    (dock === id
-                      ? 'var(--color-accent-600); background: var(--color-accent-900); color: var(--color-accent-200);'
-                      : 'var(--color-neutral-800); background: transparent; color: var(--color-neutral-500);'),
-                )}
-              >
-                {label}
-              </button>
-            ))}
+            {DOCKS.map(([id, label]) => {
+              const displayLabel = id === 'bottom' ? t('pref.terminal_bottom') : t('pref.terminal_side')
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => moveDock(id)}
+                  title={t('navigateur.dock_position', { position: displayLabel.toLowerCase() })}
+                  style={s(
+                    'cursor: pointer; font-family: var(--font-body); font-size: 10.5px; letter-spacing: .06em; padding: 4px 9px; border-radius: 5px; border: 1px solid ' +
+                      (dock === id
+                        ? 'var(--color-accent-600); background: var(--color-accent-900); color: var(--color-accent-200);'
+                        : 'var(--color-neutral-800); background: transparent; color: var(--color-neutral-500);'),
+                  )}
+                >
+                  {displayLabel}
+                </button>
+              )
+            })}
           </div>
         )}
       </div>
@@ -594,7 +594,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
           >
             <div style={s('font-size: 13px; color: var(--color-text);')}>{failure}</div>
             <div style={s('font-size: 12px; color: var(--color-neutral-600); max-width: 460px; line-height: 1.6;')}>
-              Le cockpit ne lance pas le serveur. Ouvrez un shell dans le panneau du bas
+              {t('navigateur.no_server')}
               {snapshot.config?.dev ? (
                 <>
                   {' '}et lancez{' '}
@@ -630,7 +630,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
               className="btn btn-ghost"
               style={s('font-size: 11px; padding: 3px 8px;')}
             >
-              {logsOpen ? '▾' : '▸'} Console — {errors} erreur(s), {logs.length - errors} avertissement(s)
+              {logsOpen ? '▾' : '▸'} {t('navigateur.console_title', { errors, warnings: logs.length - errors })}
             </button>
             <div
               style={s(
@@ -641,16 +641,15 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
             </div>
             <button
               type="button"
-              onClick={() =>
-                send(
-                  'Console',
-                  ['Console de l’aperçu :', ...logs.map(l => `[${l.level}] ${l.message}${l.source ? ` (${l.source})` : ''}`)].join('\n'),
-                )
-              }
+              onClick={() => {
+                const logsText = logs.map(l => '[' + l.level + '] ' + l.message + (l.source ? ' (' + l.source + ')' : '')).join('\n')
+                const output = t('navigateur.console_preview') + '\n' + logsText
+                return send('Console', output)
+              }}
               className="btn btn-secondary"
               style={s('font-size: 11px; padding: 3px 9px;')}
             >
-              Envoyer à Claude
+              {t('navigateur.send_to_claude')}
             </button>
           </div>
           {logsOpen && (
@@ -717,19 +716,18 @@ function HorsApplication() {
       )}
     >
       <div style={s('font-size: 13px; color: var(--color-text);')}>
-        Le navigateur intégré n'existe que dans l'application.
+        {t('navigateur.not_packaged_title')}
       </div>
       <div
         style={s(
           'font-size: 11.5px; color: var(--color-neutral-600); max-width: 56ch; line-height: 1.6;',
         )}
       >
-        Inspecter une page demande une vue native et des DevTools, que la coquille
-        Electron fournit et qu'un onglet de navigateur n'a pas. Lancez{' '}
+        {t('navigateur.not_packaged_desc')}{' '}
         <span style={s('font-family: ui-monospace, monospace; color: var(--color-accent-300);')}>
           pnpm electron
         </span>{' '}
-        pour y accéder — les six autres onglets se lisent aussi bien ici.
+        {t('navigateur.not_packaged_help')}
       </div>
     </div>
   )

@@ -30,6 +30,7 @@ import { fileURLToPath } from 'node:url'
 import { fetchHandler } from '../server/api.js'
 import { projects } from '../hooks/snapshot.js'
 import { buildMenu } from './menu.js'
+import { readSettings } from '../hooks/settings.js'
 import { openSession, writeTo, resize, closeSession, closeAll } from './pty.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -248,7 +249,10 @@ app.whenReady().then(() => {
     credits: 'Vue en lecture seule sur un projet vibecodé.',
   })
 
-  Menu.setApplicationMenu(buildMenu())
+  // Le menu se construit une fois, dans la langue des préférences : le
+  // reconstruire à chaud coûte plus qu'il ne rapporte, et l'écran des
+  // préférences prévient que le changement prend effet au prochain lancement.
+  Menu.setApplicationMenu(buildMenu(readSettings().langue))
 
   protocol.handle(SCHEME, async request => {
     const url = new URL(request.url)

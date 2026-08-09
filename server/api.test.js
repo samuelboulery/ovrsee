@@ -502,3 +502,20 @@ Agent body
 
   delete process.env.COCKPIT_CONFIG_CLAUDE_DIR
 })
+
+test("POST /api/projects action='state' rend l'état d'un dossier non équipé", () => {
+  withRegistry()
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-unequipped-'))
+  post({ action: 'add', path: dir })
+  
+  const result = post({ action: 'state', path: dir })
+  assert.ok(result && result.json, 'state rend une réponse')
+  assert.equal(result.json.equipped, false, 'dossier sans cockpit/ n\'est pas équipé')
+})
+
+test("POST /api/projects action='state' refuse un projet hors registre", () => {
+  withRegistry()
+  const result = post({ action: 'state', path: '/etc' })
+  assert.equal(result.status, 404, 'projet inconnu rend 404')
+  assert.ok(result.json?.error, 'erreur présente')
+})

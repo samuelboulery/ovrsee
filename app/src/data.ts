@@ -7,6 +7,8 @@
  * sont stockés nulle part.
  */
 
+import { t } from './i18n'
+
 /**
  * La frontière entre ce que le serveur a envoyé et ce que l'interface suppose.
  *
@@ -84,7 +86,7 @@ const firstParagraph = (text: string): string =>
 export function planWhy(plan: Plan): string {
   const found = section(plan.body, /contexte|probl[eè]me|intention|pourquoi/i)
   const raw = firstParagraph(found ?? plan.body ?? '')
-  return raw ? stripMarkdown(raw) : 'Aucune intention écrite dans ce plan.'
+  return raw ? stripMarkdown(raw) : t('msg.no_intention')
 }
 
 /**
@@ -522,6 +524,26 @@ export async function projectAction(
   return result
 }
 
+export interface FolderState {
+  isGit: boolean
+  hasLockfile: boolean
+  hasConfig: boolean
+  equipped: boolean
+  hasPackageJson: boolean
+}
+
+export async function getFolderState(path: string): Promise<FolderState> {
+  const response = await fetch('/api/projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    body: JSON.stringify({ action: 'state', path }),
+  })
+
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result
+}
+
 /**
  * Un skill Claude Code du catalogue, tel que le serveur le rend.
  *
@@ -819,35 +841,42 @@ export const lastScan = (scans: Scan[]): Scan | null => liste(scans).at(-1) ?? n
  */
 export const scanFailed = (scans: Scan[]): boolean => lastScan(scans)?.ok === false
 
+/**
+ * Retourne l'abréviation du mois traduit.
+ */
+function getMonth(monthNumber: number): string {
+  const monthKeys = [
+    'months.jan', 'months.feb', 'months.mar', 'months.apr',
+    'months.may', 'months.jun', 'months.jul', 'months.aug',
+    'months.sep', 'months.oct', 'months.nov', 'months.dec',
+  ] as const
+  return t(monthKeys[monthNumber - 1])
+}
+
 /** « il y a 3 semaines » — une date brute ne dit pas si l'information a dérivé. */
 export function humanAge(date: string | null | undefined, now: Date = new Date()): string {
-  if (!date) return 'jamais'
+  if (!date) return t('msg.never')
   const at = Date.parse(date)
   if (Number.isNaN(at)) return String(date)
 
   const days = Math.floor((now.getTime() - at) / (24 * 60 * 60 * 1000))
-  if (days <= 0) return "aujourd'hui"
-  if (days === 1) return 'hier'
-  if (days < 7) return `il y a ${days} jours`
+  if (days <= 0) return t('msg.today')
+  if (days === 1) return t('msg.yesterday')
+  if (days < 7) return t('msg.days_ago', { n: days })
   if (days < 31) {
     const weeks = Math.floor(days / 7)
-    return weeks === 1 ? 'il y a 1 semaine' : `il y a ${weeks} semaines`
+    return weeks === 1 ? t('msg.week_ago') : t('msg.weeks_ago', { n: weeks })
   }
   const months = Math.floor(days / 30)
-  return months === 1 ? 'il y a 1 mois' : `il y a ${months} mois`
+  return months === 1 ? t('msg.month_ago') : t('msg.months_ago', { n: months })
 }
-
-const MONTHS = [
-  'janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin',
-  'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.',
-]
 
 /** `2026-07-18` → `18 juil. 2026`, comme dans la maquette. */
 export function frDate(date: string | null | undefined): string {
   if (!date) return '—'
   const [y, m, d] = String(date).split('-').map(Number)
   if (!y || !m || !d) return String(date)
-  return `${d} ${MONTHS[m - 1]} ${y}`
+  return `${d} ${getMonth(m)} ${y}`
 }
 
 /** `2026-07-18` → `18 juil.` — le pied des cartes du graphe est étroit. */
@@ -855,7 +884,7 @@ export function frDateShort(date: string | null | undefined): string {
   if (!date) return '—'
   const [, m, d] = String(date).split('-').map(Number)
   if (!m || !d) return String(date)
-  return `${d} ${MONTHS[m - 1]}`
+  return `${d} ${getMonth(m)}`
 }
 
 // --- lecture du graphe Graphify -------------------------------------------
@@ -1011,7 +1040,8 @@ export const fetchConfigClaude = () => json<ConfigClaude>('/api/config-claude')
  */
 export function briefLines(snapshot: Snapshot | null): Array<{ text: string; style: string }> {
   const dim = 'color: var(--color-neutral-400);'
-  if (!snapshot) return [{ text: 'lecture de cockpit/…', style: 'color: var(--color-neutral-600);' }]
+  if (!snapshot)
+    return [{ text: t('brief.reading'), style: 'color: var(--color-neutral-600);' }]
 
   const open = plansOuverts(snapshot.plans ?? [])
   const closed = (snapshot.plans ?? []).length - open.length
@@ -1021,7 +1051,7 @@ export function briefLines(snapshot: Snapshot | null): Array<{ text: string; sty
   const lines = [
     { text: '$ claude', style: 'color: var(--color-neutral-500);' },
     {
-      text: `◆ Contexte lisible dans ${snapshot.root}/cockpit — ${pages} page(s), ${closed} plan(s) clos, ${open.length} ouvert(s)`,
+      text: `◆ ${t('brief.readable_in', { root: snapshot.root })} — ${t(pages > 1 ? 'brief.pages_plural' : 'brief.pages', { n: pages })}, ${t(closed > 1 ? 'brief.closed_plural' : 'brief.closed', { n: closed })}, ${t(open.length > 1 ? 'brief.open_plural' : 'brief.open', { n: open.length })}`,
       style: 'color: var(--color-accent-300);',
     },
     { text: '', style: '' },
@@ -1030,17 +1060,20 @@ export function briefLines(snapshot: Snapshot | null): Array<{ text: string; sty
   if (scan) {
     lines.push({
       text: scan.ok
-        ? `Dernier scan réussi le ${frDate(scan.date)} (commit ${scan.commit}).`
-        : `Dernier scan ÉCHOUÉ le ${frDate(scan.date)} : ${scan.error ?? 'raison non enregistrée'}.`,
+        ? t('brief.scan_ok', { date: frDate(scan.date), commit: scan.commit })
+        : t('brief.scan_failed', {
+            date: frDate(scan.date),
+            error: scan.error ?? t('brief.no_reason'),
+          }),
       style: scan.ok ? dim : 'color: var(--color-accent-200);',
     })
   } else {
-    lines.push({ text: 'Aucun scan enregistré : la carte des pages est vide.', style: dim })
+    lines.push({ text: t('brief.no_scan'), style: dim })
   }
 
   const oldest = open.at(-1)
   if (oldest) {
-    lines.push({ text: `Le plus ancien plan ouvert porte sur « ${oldest.title} ».`, style: dim })
+    lines.push({ text: t('brief.oldest_plan', { title: oldest.title }), style: dim })
   }
   lines.push({ text: '', style: '' })
   return lines
@@ -1142,15 +1175,15 @@ export function buildActions(
   // Actions livrées, composées avec le gestionnaire
   const delivered = [
     {
-      label: '⟳ Crawl du projet (! pnpm cockpit:crawl)',
+      label: `⟳ ${t('action.crawl')}`,
       text: `!${composerCommande('cockpit:crawl', packageManager)}`,
     },
     {
-      label: '◆ Graphe complet (/ graphify)',
+      label: `◆ ${t('action.graph')}`,
       text: '/graphify',
     },
     {
-      label: '◈ Graphe → coffre Obsidian (/ graphify . --obsidian ...)',
+      label: `◈ ${t('action.graph_obsidian')}`,
       text: '/graphify . --obsidian --obsidian-dir cockpit/obsidian/graphe',
     },
   ]
@@ -1161,7 +1194,7 @@ export function buildActions(
     if (action.text.includes('\n')) {
       return {
         label: action.label,
-        error: 'Cette action contient un saut de ligne et s\'exécuterait comme plusieurs commandes. Corrigez-la.',
+        error: t('actions.newline_refused'),
       }
     }
     return action

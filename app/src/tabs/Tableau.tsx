@@ -16,6 +16,7 @@ import {
   type Ticket,
 } from '../data'
 import { Illisibles } from '../Illisibles'
+import { t } from '../i18n'
 import { s } from '../style'
 
 /**
@@ -189,7 +190,7 @@ export function Tableau({
       <div style={s('padding: 20px 22px 12px;')}>
         <div style={s('display: flex; align-items: baseline; gap: 10px;')}>
           <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
-            Tableau
+            {t('tableau.title')}
           </h2>
           <div style={s('flex: 1;')} />
           <button
@@ -201,14 +202,14 @@ export function Tableau({
               setEdition(!edition)
             }}
           >
-            {edition ? 'Terminer' : 'Éditer les colonnes'}
+            {edition ? t('tableau.finish_editing') : t('tableau.edit_columns')}
           </button>
         </div>
 
         {filtreEpic && (
           <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: color-mix(in srgb, var(--color-accent) 15%, transparent); border-left: 3px solid var(--color-accent); display: flex; align-items: center; gap: 10px;')}>
             <div style={s('font-size: 12px; color: var(--color-text);')}>
-              Enfants de <span style={s('font-weight: 500;')}>{filtreEpic}</span>
+              {t('tableau.children_of')} <span style={s('font-weight: 500;')}>{filtreEpic}</span>
             </div>
             <div style={s('flex: 1;')} />
             <button
@@ -217,16 +218,14 @@ export function Tableau({
               style={s('font-size: 11.5px; padding: 4px 8px;')}
               onClick={() => setFiltreEpic(null)}
             >
-              Retour
+              {t('tableau.back')}
             </button>
           </div>
         )}
 
         <Illisibles entries={illisibles} quoi="ticket" />
         <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
-          {edition
-            ? 'Renomme sur place, fais glisser une colonne par sa poignée, ajoute-en une en bout de rangée. Un identifiant de colonne ne change jamais : les tickets le citent.'
-            : 'Un fichier par ticket dans cockpit/tickets/, colonnes réglées dans cockpit/board.json. Écrit ici comme depuis le terminal.'}
+          {edition ? t('tableau.edit_mode_help') : t('tableau.read_mode_help')}
         </div>
         {erreur && (
           <div style={s('margin-top: 10px; font-size: 12px; color: var(--color-accent-300); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;')}>
@@ -416,7 +415,7 @@ function ColonneVue({
               // qu'un glissement parti d'une carte ne déplace jamais la colonne.
               if (corps.current) event.dataTransfer.setDragImage(corps.current, 24, 16)
             }}
-            title="Déplacer la colonne"
+            title={t('tableau.drag_column')}
             style={s('cursor: grab; font-size: 12px; color: var(--color-neutral-600); user-select: none; line-height: 1;')}
           >
             ⠿
@@ -452,7 +451,7 @@ function ColonneVue({
         {deborde && !edition && (
           <div
             style={s('font-size: 10.5px; color: var(--color-accent-300);')}
-            title={`Plus de ${colonne.wip} tickets en parallèle dans cette colonne`}
+            title={t('tableau.over_wip', { n: colonne.wip ?? 0 })}
           >
             ⚠ {tickets.length}/{colonne.wip}
           </div>
@@ -465,7 +464,7 @@ function ColonneVue({
               type="number"
               min={1}
               placeholder="—"
-              title="Limite de tickets en parallèle"
+              title={t('tableau.wip_limit_help')}
               defaultValue={colonne.wip ?? ''}
               onBlur={event => {
                 const brut = event.target.value.trim()
@@ -482,7 +481,7 @@ function ColonneVue({
               type="button"
               className="btn btn-ghost"
               style={s('font-size: 12px; padding: 0 5px; line-height: 1;')}
-              title={autres.length === 0 ? 'La dernière colonne ne peut pas être retirée' : 'Retirer la colonne'}
+              title={autres.length === 0 ? t('tableau.cannot_remove_last') : t('tableau.remove_column')}
               disabled={autres.length === 0}
               onClick={() => {
                 setVers(autres[0]?.id ?? '')
@@ -497,8 +496,8 @@ function ColonneVue({
             type="button"
             className="btn btn-ghost"
             style={s('font-size: 14px; padding: 0 6px; line-height: 1;')}
-            title="Nouveau ticket"
-            aria-label={`Nouveau ticket dans ${colonne.titre}`}
+            title={t('tableau.new_ticket')}
+            aria-label={t('tableau.new_ticket_in', { colonne: colonne.titre })}
             onClick={() => setSaisie(saisie === null ? '' : null)}
           >
             +
@@ -508,7 +507,7 @@ function ColonneVue({
 
       {edition && (
         <div style={s('font-size: 10px; color: var(--color-neutral-600); padding: 0 3px;')}>
-          {colonne.id} · {tickets.length} ticket(s){finale ? ' · vaut « terminé »' : ''}
+          {colonne.id} · {tickets.length} ticket(s){finale ? ` · ${t('tableau.final_column')}` : ''}
         </div>
       )}
 
@@ -517,7 +516,7 @@ function ColonneVue({
           className="input"
           autoFocus
           value={saisie}
-          placeholder="Titre du ticket"
+          placeholder={t('tableau.ticket_title_placeholder')}
           onChange={event => setSaisie(event.target.value)}
           onBlur={() => setSaisie(null)}
           onKeyDown={event => {
@@ -537,8 +536,8 @@ function ColonneVue({
         <div style={s('border: 1px solid var(--color-accent-700); border-radius: 8px; padding: 10px; background: var(--color-surface);')}>
           <div style={s('font-size: 11px; color: var(--color-neutral-400); line-height: 1.5;')}>
             {tickets.length > 0
-              ? `${tickets.length} ticket(s) à reloger. Leur fichier sera réécrit.`
-              : 'Colonne vide : rien à reloger.'}
+              ? t('tableau.tickets_to_relocate', { n: tickets.length })
+              : t('tableau.empty_column')}
           </div>
           {tickets.length > 0 && (
             <select
@@ -561,7 +560,7 @@ function ColonneVue({
               style={s('font-size: 11.5px;')}
               onClick={() => setConfirme(false)}
             >
-              Annuler
+              {t('tableau.cancel')}
             </button>
             <button
               type="button"
@@ -572,7 +571,7 @@ function ColonneVue({
                 onRetirer(tickets.length > 0 ? vers : undefined)
               }}
             >
-              Retirer
+              {t('tableau.remove')}
             </button>
           </div>
         </div>
@@ -641,14 +640,14 @@ function TuileAjout({
           style={s('font-size: 12px; width: 100%; justify-content: center;')}
           onClick={() => setSaisie('')}
         >
-          + Ajouter une colonne
+          {t('tableau.add_column')}
         </button>
       ) : (
         <input
           className="input"
           autoFocus
           value={saisie}
-          placeholder="Titre de la colonne"
+          placeholder={t('tableau.column_title_placeholder')}
           onChange={event => setSaisie(event.target.value)}
           onBlur={() => setSaisie(null)}
           onKeyDown={event => {
@@ -705,7 +704,7 @@ function Carte({
       <div style={s('display: flex; align-items: center; gap: 7px;')}>
         <span
           style={s(`width: 7px; height: 7px; border-radius: 50%; flex: none; background: ${COULEUR[ticket.priorite] ?? COULEUR.moyenne};`)}
-          title={`priorité ${ticket.priorite}`}
+          title={`${t('tableau.priority_label')} ${ticket.priorite}`}
         />
         {isEpic && (
           <span
@@ -755,9 +754,9 @@ function Carte({
           <span
             className="tag tag-outline"
             style={s('font-size: 10px;')}
-            title={parentEpic ? `Enfant de ${parentEpic.titre}` : 'Epic parent inexistant'}
+            title={parentEpic ? `${t('tableau.child_of')} ${parentEpic.titre}` : t('tableau.parent_epic_missing')}
           >
-            {parentEpic ? `enfant de ${ticket.epic}` : `orphelin`}
+            {parentEpic ? `${t('tableau.child_of')} ${ticket.epic}` : t('tableau.orphan_ticket')}
           </span>
         )}
       </div>
@@ -773,7 +772,7 @@ function Carte({
               setFiltreEpic(ticket.id)
             }}
           >
-            Voir enfants ({children.length})
+            {t('tableau.view_children', { n: children.length })}
           </button>
         )}
         {ticket.epic && (
@@ -786,7 +785,7 @@ function Carte({
               onModifier({ epic: null } as unknown as Partial<Ticket> & { corps?: string })
             }}
           >
-            Détacher
+            {t('tableau.detach')}
           </button>
         )}
       </div>
@@ -822,7 +821,7 @@ function Detail({
         </div>
         <div style={s('flex: 1;')} />
         <button type="button" className="btn btn-ghost" style={s('font-size: 12px;')} onClick={onFermer}>
-          Fermer
+          {t('tableau.close')}
         </button>
       </div>
 
@@ -864,7 +863,7 @@ function Detail({
       <input
         className="input"
         value={tags}
-        placeholder="tags, séparés par des virgules"
+        placeholder={t('tableau.tags_placeholder')}
         onChange={event => setTags(event.target.value)}
         onBlur={() => onModifier({ tags: tags.split(',').map(t => t.trim()).filter(Boolean) })}
         style={s('font-size: 12px; width: 100%; margin-top: 8px;')}
@@ -873,32 +872,32 @@ function Detail({
       <textarea
         className="input"
         value={corps}
-        placeholder={'## Contexte\n\n## Critères d’acceptation\n- [ ] …'}
-        onChange={event => setCorps(event.target.value)}
-        onBlur={() => corps !== ticket.corps && onModifier({ corps })}
+        placeholder={t('tableau.acceptance_criteria_placeholder')}
+        onChange={(event) => setCorps(event.target.value)}
+        onBlur={() => { if (corps !== ticket.corps) onModifier({ corps }) }}
         style={s('font-size: 12px; width: 100%; margin-top: 8px; min-height: 220px; line-height: 1.55; font-family: var(--font-mono, monospace);')}
       />
 
       <div style={s('font-size: 10.5px; color: var(--color-neutral-600); margin-top: 10px; line-height: 1.6;')}>
-        <div>créé {humanAge(ticket.cree)} · modifié {humanAge(ticket.maj)}</div>
+        <div>{t('tableau.created')} {humanAge(ticket.cree)} · {t('tableau.modified')} {humanAge(ticket.maj)}</div>
         <div>cockpit/tickets/{ticket.file}</div>
-        {ticket.plan && <div>plan lié : {ticket.plan}</div>}
+        {ticket.plan && <div>{t('tableau.linked_plan')} {ticket.plan}</div>}
       </div>
 
       <div style={s('display: flex; justify-content: flex-end; margin-top: 14px;')}>
         {confirme ? (
           <div style={s('display: flex; align-items: center; gap: 8px;')}>
-            <span style={s('font-size: 11px; color: var(--color-neutral-400);')}>Supprimer ce ticket ?</span>
+            <span style={s('font-size: 11px; color: var(--color-neutral-400);')}>{t('tableau.delete_ticket_confirm')}</span>
             <button type="button" className="btn btn-secondary" style={s('font-size: 11.5px;')} onClick={() => setConfirme(false)}>
-              Annuler
+              {t('tableau.cancel')}
             </button>
             <button type="button" className="btn btn-primary" style={s('font-size: 11.5px;')} onClick={onSupprimer}>
-              Supprimer
+              {t('tableau.delete')}
             </button>
           </div>
         ) : (
           <button type="button" className="btn btn-ghost" style={s('font-size: 11.5px;')} onClick={() => setConfirme(true)}>
-            Supprimer
+            {t('tableau.delete')}
           </button>
         )}
       </div>

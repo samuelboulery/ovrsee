@@ -24,6 +24,27 @@ const readJson = path => {
 }
 
 /**
+ * Un fichier texte du dépôt, ou null.
+ *
+ * Le plafond n'est pas de la prudence de principe : le README part dans chaque
+ * réponse `/api/project`, c'est-à-dire à chaque changement de projet et à
+ * chaque rechargement du tableau. Un README généré de plusieurs mégaoctets
+ * ferait payer sa taille à des lectures qui n'en ont que faire. Au-delà, on
+ * coupe et on le dit — un texte tronqué en silence serait un mensonge de plus.
+ */
+const MAX_TEXT = 200_000
+
+const readText = path => {
+  try {
+    const text = readFileSync(path, 'utf8')
+    if (text.length <= MAX_TEXT) return text
+    return `${text.slice(0, MAX_TEXT)}\n\n_(coupé à ${MAX_TEXT} caractères)_\n`
+  } catch {
+    return null
+  }
+}
+
+/**
  * Projets connus, du dernier ouvert au plus ancien.
  *
  * L'ordre est celui de l'usage, pas celui de l'insertion : on retourne à un
@@ -163,6 +184,11 @@ export function snapshot(root) {
     equipped: existsSync(join(root, 'cockpit')),
     plans,
     packageJson: readJson(join(root, 'package.json')),
+    // Le seul texte du cockpit qui ne vient pas de `cockpit/`. Il y a une bonne
+    // raison : c'est le seul endroit du dépôt où quelqu'un a déjà écrit ce que
+    // le projet fait. Le recopier dans `cockpit/` en ferait une deuxième
+    // version à maintenir, donc une version fausse en trois semaines.
+    readme: readText(join(root, 'README.md')),
     pages: readJson(join(root, 'cockpit', 'pages', 'pages.json')),
     scans: scans(root),
     graph: readJson(join(root, 'graphify-out', 'graph.json')),

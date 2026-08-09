@@ -159,6 +159,10 @@ export interface Project {
 }
 
 export interface PackageJson {
+  name?: string
+  description?: string
+  /** Les commandes du projet : la réponse à « je tape quoi, déjà ? ». */
+  scripts?: Record<string, string>
   dependencies?: Record<string, string>
   devDependencies?: Record<string, string>
 }
@@ -204,6 +208,8 @@ export interface Snapshot {
   equipped: boolean
   plans: Plan[]
   packageJson: PackageJson | null
+  /** `README.md` du dépôt, tel quel. Absent = le dépôt n'en a pas. */
+  readme: string | null
   pages: {
     date: string
     commit: string

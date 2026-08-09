@@ -15,6 +15,7 @@ import {
   type Tableau as TableauData,
 } from './data'
 import { s } from './style'
+import { Apercu } from './tabs/Apercu'
 import { Produit } from './tabs/Produit'
 import { Historique } from './tabs/Historique'
 import { Tableau } from './tabs/Tableau'
@@ -29,11 +30,18 @@ import { Divider, useResizable } from './useResizable'
  * Ce n'est pas du confort : un crawler découvre les écrans en suivant les
  * `<a href>`. Tant que les onglets vivaient dans un état React, Cockpit
  * produisait une carte à une seule page de lui-même — exactement la limite
- * relevée sur `associa`. Produit reste sur `/` : pas de redirection, donc pas
- * de page fantôme, et la page d'entrée du graphe garde son sens.
+ * relevée sur `associa`.
+ *
+ * Aperçu tient `/`, sans redirection : ouvrir un projet doit d'abord dire de
+ * quoi il s'agit, et la page d'entrée du graphe est alors celle par où on entre
+ * vraiment. Produit descend sur `/produit` — une vraie route de plus, pas une
+ * page fantôme : la carte gagne un nœud, elle n'en perd aucun. Les captures
+ * déjà prises de l'ancien `/` ont suivi dans `shots/produit/`, sans quoi vingt
+ * images du graphe passeraient pour l'historique visuel d'Aperçu.
  */
 const TABS = [
-  ['produit', 'Produit', '/'],
+  ['apercu', 'Aperçu', '/'],
+  ['produit', 'Produit', '/produit'],
   ['historique', 'Historique', '/historique'],
   ['tableau', 'Tableau', '/tableau'],
   ['donnees', 'Données', '/donnees'],
@@ -43,7 +51,7 @@ const TABS = [
 type TabId = (typeof TABS)[number][0]
 
 const tabForPath = (pathname: string): TabId =>
-  TABS.find(([, , path]) => path === pathname)?.[0] ?? 'produit'
+  TABS.find(([, , path]) => path === pathname)?.[0] ?? 'apercu'
 
 /**
  * Le projet courant vit dans la requête, pas dans le chemin.
@@ -244,6 +252,7 @@ export function App() {
                   )}
                   {!error && snapshot && !unequipped && (
                     <>
+                      {tab === 'apercu' && <Apercu snapshot={snapshot} />}
                       {tab === 'produit' && <Produit snapshot={snapshot} layout={layout} />}
                       {tab === 'historique' && (
                         <Historique plans={plans} timeline={snapshot.timeline ?? []} />

@@ -68,7 +68,7 @@ d'aujourd'hui montrant la mauvaise application.
 |---|---|
 | `hooks/` | Capture des plans approuvés et clôture au commit (v0.1) |
 | `crawl/` | Parcours Playwright de l'app, captures datées (v0.2) |
-| `app/` | Interface Vite + React, cinq onglets en lecture seule (v0.3) |
+| `app/` | Interface Vite + React, six onglets en lecture seule (v0.3) |
 | `_ds/` | Design systems. Nocturne est celui retenu. |
 
 ## Données produites, dans le repo observé

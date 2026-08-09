@@ -1,6 +1,9 @@
 import { useRef, useState } from 'react'
 
 import {
+  childrenOf,
+  colonneFinale,
+  epicProgress,
   humanAge,
   PRIORITES,
   sortTickets,
@@ -65,6 +68,7 @@ export function Tableau({
   const [insertion, setInsertion] = useState<Insertion | null>(null)
   const [ouverte, setOuverte] = useState<string | null>(null)
   const [edition, setEdition] = useState(false)
+  const [filtreEpic, setFiltreEpic] = useState<string | null>(null)
 
   /**
    * Applique une écriture, en montrant le résultat avant la réponse du serveur.
@@ -176,6 +180,9 @@ export function Tableau({
   }
 
   const selection = tickets.find(t => t.file === ouverte) ?? null
+  const ticketsAffichables = filtreEpic
+    ? tickets.filter(t => t.epic === filtreEpic)
+    : tickets.filter(t => !t.type || t.type !== 'epic')
 
   return (
     <div style={s('flex: 1; display: flex; flex-direction: column; overflow: hidden;')}>
@@ -197,6 +204,23 @@ export function Tableau({
             {edition ? 'Terminer' : 'Éditer les colonnes'}
           </button>
         </div>
+
+        {filtreEpic && (
+          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: color-mix(in srgb, var(--color-accent) 15%, transparent); border-left: 3px solid var(--color-accent); display: flex; align-items: center; gap: 10px;')}>
+            <div style={s('font-size: 12px; color: var(--color-text);')}>
+              Enfants de <span style={s('font-weight: 500;')}>{filtreEpic}</span>
+            </div>
+            <div style={s('flex: 1;')} />
+            <button
+              type="button"
+              className="btn btn-ghost"
+              style={s('font-size: 11.5px; padding: 4px 8px;')}
+              onClick={() => setFiltreEpic(null)}
+            >
+              Retour
+            </button>
+          </div>
+        )}
 
         <Illisibles entries={illisibles} quoi="ticket" />
         <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
@@ -224,7 +248,7 @@ export function Tableau({
               colonne={colonne}
               index={index}
               colonnes={board}
-              tickets={sortTickets(tickets.filter(t => t.colonne === colonne.id))}
+              tickets={sortTickets(ticketsAffichables.filter(t => t.colonne === colonne.id))}
               edition={edition}
               finale={index === board.length - 1 && board.length > 1}
               survolee={survolee === colonne.id}
@@ -240,6 +264,11 @@ export function Tableau({
               onOuvrir={setOuverte}
               onRenommer={patch => renommer(colonne.id, patch)}
               onRetirer={vers => retirer(colonne.id, vers)}
+              filtreEpic={filtreEpic}
+              setFiltreEpic={setFiltreEpic}
+              allTickets={tickets}
+              onModifier={modifier}
+              boardColonnes={board}
             />
           ))}
 
@@ -297,6 +326,11 @@ function ColonneVue({
   onOuvrir,
   onRenommer,
   onRetirer,
+  filtreEpic,
+  setFiltreEpic,
+  allTickets,
+  onModifier,
+  boardColonnes,
 }: {
   colonne: Colonne
   index: number
@@ -314,6 +348,11 @@ function ColonneVue({
   onOuvrir: (file: string) => void
   onRenommer: (patch: { titre?: string; wip?: number | null }) => void
   onRetirer: (vers?: string) => void
+  filtreEpic: string | null
+  setFiltreEpic: (epic: string | null) => void
+  allTickets: Ticket[]
+  onModifier: (file: string, patch: Partial<Ticket> & { corps?: string }) => void
+  boardColonnes: Colonne[]
 }) {
   const [saisie, setSaisie] = useState<string | null>(null)
   const [confirme, setConfirme] = useState(false)
@@ -540,7 +579,16 @@ function ColonneVue({
       ) : (
         <div style={s('display: flex; flex-direction: column; gap: 8px; overflow-y: auto;')}>
           {tickets.map(ticket => (
-            <Carte key={ticket.file} ticket={ticket} onOuvrir={onOuvrir} />
+            <Carte
+              key={ticket.file}
+              ticket={ticket}
+              onOuvrir={onOuvrir}
+              filtreEpic={filtreEpic}
+              setFiltreEpic={setFiltreEpic}
+              allTickets={allTickets}
+              onModifier={(patch) => onModifier(ticket.file, patch)}
+              boardColonnes={boardColonnes}
+            />
           ))}
         </div>
       )}
@@ -624,7 +672,29 @@ const COULEUR: Record<Priorite, string> = {
   basse: 'var(--color-neutral-700)',
 }
 
-function Carte({ ticket, onOuvrir }: { ticket: Ticket; onOuvrir: (file: string) => void }) {
+function Carte({
+  ticket,
+  onOuvrir,
+  filtreEpic,
+  setFiltreEpic,
+  allTickets,
+  onModifier,
+  boardColonnes,
+}: {
+  ticket: Ticket
+  onOuvrir: (file: string) => void
+  filtreEpic: string | null
+  setFiltreEpic: (epic: string | null) => void
+  allTickets: Ticket[]
+  onModifier: (patch: Partial<Ticket> & { corps?: string }) => void
+  boardColonnes: Colonne[]
+}) {
+  const isEpic = ticket.type === 'epic'
+  const children = isEpic ? childrenOf(allTickets, ticket.id) : []
+  const finalColumn = colonneFinale(boardColonnes)
+  const progress = isEpic ? epicProgress(children, finalColumn) : null
+  const parentEpic = ticket.epic ? allTickets.find(t => t.id === ticket.epic) : null
+
   return (
     <div
       draggable
@@ -637,6 +707,15 @@ function Carte({ ticket, onOuvrir }: { ticket: Ticket; onOuvrir: (file: string) 
           style={s(`width: 7px; height: 7px; border-radius: 50%; flex: none; background: ${COULEUR[ticket.priorite] ?? COULEUR.moyenne};`)}
           title={`priorité ${ticket.priorite}`}
         />
+        {isEpic && (
+          <span
+            className="tag tag-outline"
+            style={s('font-size: 9px; padding: 2px 6px; margin: 0;')}
+            title="Epic"
+          >
+            epic
+          </span>
+        )}
         <div style={s('font-size: 10px; color: var(--color-neutral-600); font-variant-numeric: tabular-nums;')}>
           {ticket.id}
         </div>
@@ -648,20 +727,69 @@ function Carte({ ticket, onOuvrir }: { ticket: Ticket; onOuvrir: (file: string) 
         {ticket.titre}
       </div>
 
-      {(ticket.tags.length > 0 || ticket.plan) && (
-        <div style={s('display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;')}>
-          {ticket.tags.map(tag => (
-            <span key={tag} className="tag tag-neutral" style={s('font-size: 10px;')}>
-              {tag}
-            </span>
-          ))}
-          {ticket.plan && (
-            <span className="tag tag-outline" style={s('font-size: 10px;')} title={ticket.plan}>
-              plan
-            </span>
-          )}
+      {isEpic && progress && (
+        <div style={s('display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 11px;')}>
+          <div style={s('flex: 1; height: 4px; border-radius: 2px; background: var(--color-neutral-800); overflow: hidden;')}>
+            <div
+              style={s(`height: 100%; background: var(--color-accent-400); width: ${progress.percent}%;`)}
+            />
+          </div>
+          <span style={s('color: var(--color-neutral-600); white-space: nowrap;')}>
+            {progress.done}/{progress.total}
+          </span>
         </div>
       )}
+
+      <div style={s('display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;')}>
+        {ticket.tags.map(tag => (
+          <span key={tag} className="tag tag-neutral" style={s('font-size: 10px;')}>
+            {tag}
+          </span>
+        ))}
+        {ticket.plan && (
+          <span className="tag tag-outline" style={s('font-size: 10px;')} title={ticket.plan}>
+            plan
+          </span>
+        )}
+        {ticket.epic && (
+          <span
+            className="tag tag-outline"
+            style={s('font-size: 10px;')}
+            title={parentEpic ? `Enfant de ${parentEpic.titre}` : 'Epic parent inexistant'}
+          >
+            {parentEpic ? `enfant de ${ticket.epic}` : `orphelin`}
+          </span>
+        )}
+      </div>
+
+      <div style={s('display: flex; gap: 6px; margin-top: 8px;')}>
+        {isEpic && children.length > 0 && (
+          <button
+            type="button"
+            className="btn btn-ghost"
+            style={s('font-size: 10px; padding: 3px 6px; flex: 1;')}
+            onClick={(e) => {
+              e.stopPropagation()
+              setFiltreEpic(ticket.id)
+            }}
+          >
+            Voir enfants ({children.length})
+          </button>
+        )}
+        {ticket.epic && (
+          <button
+            type="button"
+            className="btn btn-ghost"
+            style={s('font-size: 10px; padding: 3px 6px; flex: 1;')}
+            onClick={(e) => {
+              e.stopPropagation()
+              onModifier({ epic: null } as unknown as Partial<Ticket> & { corps?: string })
+            }}
+          >
+            Détacher
+          </button>
+        )}
+      </div>
     </div>
   )
 }

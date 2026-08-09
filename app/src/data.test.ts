@@ -4,6 +4,9 @@ import test from 'node:test'
 import {
   briefLines,
   buildInjections,
+  childrenOf,
+  colonneFinale,
+  epicProgress,
   frDate,
   humanAge,
   lastScan,
@@ -176,6 +179,126 @@ test('restant compte les tickets hors de la dernière colonne', () => {
   assert.equal(restant(tickets, board), 1)
   assert.equal(restant([], board), 0)
   assert.equal(restant(tickets, [] as unknown as Snapshot['board']), 2)
+})
+
+test("childrenOf retourne les enfants d'un epic triés", () => {
+  const tickets = [
+    { id: 'T-1', titre: 'Epic', type: 'epic', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-2', titre: 'Enfant 1', epic: 'T-1', priorite: 'moyenne', cree: '2026-08-02' },
+    { id: 'T-3', titre: 'Enfant 2', epic: 'T-1', priorite: 'haute', cree: '2026-08-03' },
+    { id: 'T-4', titre: 'Autre', priorite: 'basse', cree: '2026-08-01' },
+  ] as unknown as Ticket[]
+
+  const children = childrenOf(tickets, 'T-1')
+  assert.equal(children.length, 2)
+  assert.equal(children[0].id, 'T-3') // T-3 haute en premier
+  assert.equal(children[1].id, 'T-2') // T-2 moyenne en deuxième
+})
+
+test("childrenOf retourne une liste vide si epic inexistant", () => {
+  const tickets = [
+    { id: 'T-1', priorite: 'haute', cree: '2026-08-01' },
+  ] as unknown as Ticket[]
+
+  const children = childrenOf(tickets, 'T-999')
+  assert.deepEqual(children, [])
+})
+
+test("epicProgress calcule la progression des enfants", () => {
+  const board = [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'fait', titre: 'Fait' },
+  ] as Snapshot['board']
+  const fini = colonneFinale(board)
+
+  // Aucun enfant
+  assert.deepEqual(epicProgress([], fini), { done: 0, total: 0, percent: 0 })
+
+  // 1 enfant fini, 2 pas finis
+  const children = [
+    { id: 'T-1', colonne: 'backlog' },
+    { id: 'T-2', colonne: 'fait' },
+    { id: 'T-3', colonne: 'backlog' },
+  ] as unknown as Ticket[]
+  const prog = epicProgress(children, fini)
+  assert.equal(prog.total, 3)
+  assert.equal(prog.done, 1)
+  assert.equal(prog.percent, 33)
+
+  // finalColumn null → pas de comptage
+  assert.deepEqual(epicProgress(children, null), { done: 0, total: 3, percent: 0 })
+})
+
+test("restant avec epics : un epic vide compte pour 1", () => {
+  const board = [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'fait', titre: 'Fait' },
+  ] as Snapshot['board']
+
+  const tickets = [
+    { id: 'T-1', type: 'epic', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-2', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+  ] as unknown as Ticket[]
+
+  // Epic vide (pas d'enfants) + 1 ticket ordinaire = 2 à faire
+  assert.equal(restant(tickets, board), 2)
+})
+
+test("restant avec epics : un epic avec enfants ne compte pas", () => {
+  const board = [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'fait', titre: 'Fait' },
+  ] as Snapshot['board']
+
+  const tickets = [
+    { id: 'T-1', type: 'epic', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-2', epic: 'T-1', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-3', epic: 'T-1', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+  ] as unknown as Ticket[]
+
+  // Epic avec 2 enfants = 2 à faire (epic ne compte pas, ses enfants oui)
+  assert.equal(restant(tickets, board), 2)
+})
+
+test("restant avec epics : un enfant orphelin compte", () => {
+  const board = [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'fait', titre: 'Fait' },
+  ] as Snapshot['board']
+
+  const tickets = [
+    { id: 'T-1', epic: 'T-999', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+  ] as unknown as Ticket[]
+
+  // Enfant orphelin (epic inexistant) compte comme ticket ordinaire
+  assert.equal(restant(tickets, board), 1)
+})
+
+test("restant avec epics : cas complexe", () => {
+  const board = [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'en-cours', titre: 'En cours' },
+    { id: 'fait', titre: 'Fait' },
+  ] as Snapshot['board']
+
+  const tickets = [
+    // Epic 1 avec 3 enfants : 1 fait, 2 en backlog
+    { id: 'T-1', type: 'epic', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-2', epic: 'T-1', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-3', epic: 'T-1', colonne: 'en-cours', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-4', epic: 'T-1', colonne: 'fait', priorite: 'haute', cree: '2026-08-01' },
+
+    // Epic 2 vide
+    { id: 'T-5', type: 'epic', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+
+    // Ticket ordinaire
+    { id: 'T-6', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+  ] as unknown as Ticket[]
+
+  // T-2, T-3 (enfants en backlog et en-cours), T-5 (epic vide), T-6 (ticket ordinaire) = 4
+  // T-4 est en colonne finale, ne compte pas
+  // T-1 a des enfants, ne compte pas
+  assert.equal(restant(tickets, board), 4)
 })
 
 test('layoutGraph encaisse une liste de pages vide', () => {

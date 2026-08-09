@@ -211,6 +211,10 @@ export interface Ticket {
   maj: string
   /** Plan lié, s'il existe. Les deux stocks restent indépendants. */
   plan: string | null
+  /** Type du ticket : "epic" pour les epics, absent pour les tickets ordinaires. */
+  type?: 'epic'
+  /** ID du ticket parent si ce ticket est enfant d'un epic. */
+  epic?: string
   corps: string
 }
 
@@ -657,6 +661,31 @@ export const sortTickets = (tickets: Ticket[]): Ticket[] =>
   )
 
 /**
+ * Les enfants d'un epic, triés par priorité puis date.
+ */
+export const childrenOf = (tickets: Ticket[], epicId: string): Ticket[] =>
+  sortTickets(liste(tickets).filter(t => t.epic === epicId))
+
+/**
+ * Progression d'un epic : nombre d'enfants en colonne finale vs. total.
+ */
+export interface EpicProgress {
+  done: number
+  total: number
+  percent: number
+}
+
+export const epicProgress = (children: Ticket[], finalColumn: string | null): EpicProgress => {
+  if (children.length === 0) return { done: 0, total: 0, percent: 0 }
+  const done = finalColumn ? liste(children).filter(t => t.colonne === finalColumn).length : 0
+  return {
+    done,
+    total: children.length,
+    percent: done === 0 ? 0 : Math.round((done / children.length) * 100),
+  }
+}
+
+/**
  * La colonne qui vaut « terminé », s'il y en a une.
  *
  * Miroir de `colonneFinale` dans `hooks/tickets.js` : la dernière colonne, mais
@@ -666,10 +695,35 @@ export const sortTickets = (tickets: Ticket[]): Ticket[] =>
 export const colonneFinale = (board: Colonne[]): string | null =>
   liste(board).length > 1 ? (liste(board).at(-1)?.id ?? null) : null
 
-/** Ce qui reste à faire : tout ce qui n'est pas dans la colonne terminale. */
+/**
+ * Ce qui reste à faire.
+ *
+ * Compte les tickets à faire, avec une logique spéciale pour les epics :
+ * - Epic AVEC enfants : ne compte pas (ses enfants comptent à sa place)
+ * - Epic SANS enfant : compte pour 1
+ * - Enfant d'un epic existant : compte (les enfants prennent la place de l'epic)
+ * - Enfant orphelin (epic inexistant) : compte comme ticket ordinaire
+ * - Ticket ordinaire : compte toujours
+ */
 export const restant = (tickets: Ticket[], board: Colonne[]): number => {
   const fini = colonneFinale(board)
-  return liste(tickets).filter(t => t.colonne !== fini).length
+  const ticketsList = liste(tickets)
+
+  // Déterminer quels epics ont des enfants
+  const epicsAvecEnfants = new Set(
+    ticketsList
+      .filter(t => t.type === 'epic' && ticketsList.some(ch => ch.epic === t.id))
+      .map(t => t.id)
+  )
+
+  return ticketsList
+    .filter(t => {
+      if (t.colonne === fini) return false // Rien en colonne finale ne compte
+      if (t.type === 'epic' && epicsAvecEnfants.has(t.id)) return false // Epic AVEC enfants ne compte pas
+      // Epic vide, enfant, ou ticket ordinaire → compte (les enfants prennent la place de l'epic)
+      return true
+    })
+    .length
 }
 
 /** L'historique n'est pas saisi : ce sont les plans clos, par date de clôture. */
@@ -918,6 +972,9 @@ export function buildInjections(snapshot: Snapshot | null): Array<{ label: strin
 
   const open = plansOuverts(snapshot.plans ?? [])
   const pages = snapshot.pages?.pages ?? []
+  const tickets = snapshot.tickets ?? []
+  const epicIds = new Set(tickets.filter(t => t.type === 'epic').map(t => t.id))
+  const epicCount = epicIds.size
 
   return [
     {
@@ -931,13 +988,27 @@ export function buildInjections(snapshot: Snapshot | null): Array<{ label: strin
       text: open.map(p => `- ${p.title} (ouvert le ${frDate(p.opened)})`).join('\n'),
     },
     {
-      label: `Tableau (${snapshot.tickets?.length ?? 0} ticket(s))`,
+      label: `Tableau (${tickets.length} ticket(s)${epicCount > 0 ? `, dont ${epicCount} epic(s)` : ''})`,
       // Colonne par colonne, dans l'ordre du tableau : c'est ce qui permet à
       // Claude de proposer un déplacement plutôt qu'un ticket de plus.
+      // Les epics affichent leur progression ; les enfants affichent leur parent.
       text: (snapshot.board ?? [])
         .map(colonne => {
-          const dedans = sortTickets((snapshot.tickets ?? []).filter(t => t.colonne === colonne.id))
-          const lignes = dedans.map(t => `  ${t.id} [${t.priorite}] ${t.titre} — ${t.file}`)
+          const dedans = sortTickets(tickets.filter(t => t.colonne === colonne.id))
+          const lignes = dedans.map(t => {
+            let ligne = `  ${t.id} [${t.priorite}] ${t.titre}`
+            // Si c'est un epic, afficher la progression
+            if (t.type === 'epic') {
+              const children = childrenOf(tickets, t.id)
+              const prog = epicProgress(children, colonneFinale(snapshot.board ?? []))
+              ligne += ` [${prog.done}/${prog.total} fait]`
+            }
+            // Si c'est un enfant, afficher le parent
+            if (t.epic && epicIds.has(t.epic)) {
+              ligne += ` (enfant de ${t.epic})`
+            }
+            return ligne
+          })
           return [`${colonne.titre} (${dedans.length})`, ...lignes].join('\n')
         })
         .join('\n'),

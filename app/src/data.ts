@@ -934,6 +934,52 @@ export function stackFrom(
   }))
 }
 
+// --- Configuration Claude Code -----------------------------------------------
+
+/**
+ * Un agent Claude Code, tel que le serveur le rend.
+ *
+ * Le frontmatter du `.md` est parsé côté serveur, les secrets masqués.
+ */
+export interface Agent {
+  name: string
+  description?: string | string[]
+  tools?: string | string[]
+  model?: string
+  timeout?: string | number
+  [key: string]: unknown
+}
+
+/**
+ * Une commande Claude Code, telle que le serveur la rend.
+ */
+export interface Command {
+  name: string
+  description?: string | string[]
+  [key: string]: unknown
+}
+
+/**
+ * Un plugin Claude Code, depuis `installed_plugins.json`.
+ */
+export interface Plugin {
+  name: string
+  status: string
+}
+
+/**
+ * Configuration complète de Claude Code.
+ */
+export interface ConfigClaude {
+  agents: Agent[]
+  commands: Command[]
+  plugins: Plugin[]
+  hooks: Record<string, { hooks: Array<{ type: string }> }>
+  env: Record<string, string>
+}
+
+export const fetchConfigClaude = () => json<ConfigClaude>('/api/config-claude')
+
 /**
  * Ce que le cockpit sait dire du projet, sans lire une ligne de code.
  *

@@ -414,3 +414,91 @@ test('POST /api/settings partiel préserve les champs non transmis', () => {
 
   delete process.env.COCKPIT_SETTINGS
 })
+
+// --- /api/config-claude ---------------------------------------------------
+
+const configClaudeUrl = (path = '') => url(`/api/config-claude${path}`)
+
+test('GET /api/config-claude rend la configuration', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-config-'))
+  process.env.COCKPIT_CONFIG_CLAUDE_DIR = dir
+
+  const result = resolve(configClaudeUrl())
+
+  assert.ok(result && 'json' in result)
+  assert.ok('agents' in result.json)
+  assert.ok('commands' in result.json)
+  assert.ok('plugins' in result.json)
+  assert.ok('hooks' in result.json)
+  assert.ok('env' in result.json)
+
+  delete process.env.COCKPIT_CONFIG_CLAUDE_DIR
+})
+
+test('POST /api/config-claude est refusé', () => {
+  const result = resolve(configClaudeUrl(), null, { method: 'POST' })
+
+  assert.equal(result.status, 405)
+})
+
+test('GET /api/config-claude masque les valeurs secrètes', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-config-secret-'))
+  process.env.COCKPIT_CONFIG_CLAUDE_DIR = dir
+
+  // Créer un settings.json avec des secrets
+  const settingsPath = join(dir, 'settings.json')
+  writeFileSync(
+    settingsPath,
+    JSON.stringify({
+      env: {
+        'API_KEY': 'secret-12345',
+        'DATABASE_URL': 'postgres://user:pass@host/db',
+      },
+      hooks: {
+        'SessionStart': [{ type: 'command', command: 'echo start' }],
+      },
+    })
+  )
+
+  const result = resolve(configClaudeUrl())
+
+  assert.ok(result && 'json' in result)
+  // Env values must be masked
+  assert.equal(result.json.env['API_KEY'], '****')
+  assert.equal(result.json.env['DATABASE_URL'], '****')
+  // Keys must still be present
+  assert.ok('API_KEY' in result.json.env)
+  assert.ok('DATABASE_URL' in result.json.env)
+
+  delete process.env.COCKPIT_CONFIG_CLAUDE_DIR
+})
+
+test('GET /api/config-claude retourne une réponse sans secrets', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-config-secret2-'))
+  process.env.COCKPIT_CONFIG_CLAUDE_DIR = dir
+
+  // Créer agents avec des secrets dans le frontmatter
+  mkdirSync(join(dir, 'agents'), { recursive: true })
+  writeFileSync(
+    join(dir, 'agents', 'secret-agent.md'),
+    `---
+name: test-agent
+secret_api_key: my-secret-key-12345
+model: sonnet
+---
+
+Agent body
+`
+  )
+
+  const result = resolve(configClaudeUrl())
+  const responseStr = JSON.stringify(result.json)
+
+  // Secret values should never appear in response
+  assert.equal(responseStr.includes('my-secret-key-12345'), false, 'Secret should not appear in response')
+  // But the key name should be masked
+  assert.ok(responseStr.includes('secret_api_key'))
+  assert.ok(responseStr.includes('****'))
+
+  delete process.env.COCKPIT_CONFIG_CLAUDE_DIR
+})

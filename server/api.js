@@ -15,6 +15,7 @@
 import { createReadStream, existsSync, lstatSync, readFileSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'
 
+import { readConfigClaude } from '../hooks/config-claude.js'
 import { install } from '../hooks/install.js'
 import { exportVault } from '../hooks/obsidian.js'
 import { registerProject, touchProject, unregisterProject } from '../hooks/plans.js'
@@ -203,6 +204,17 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
       }
       try {
         return { json: { done: installSkills(body?.noms), skills: readSkills() } }
+      } catch (err) {
+        return { status: 400, json: { error: String(err.message ?? err) } }
+      }
+    }
+
+    case '/api/config-claude': {
+      // Configuration Claude Code : agents, commands, plugins, hooks, env.
+      // Lecture seule, GET uniquement. Masquage des secrets effectué côté serveur.
+      if (method !== 'GET') return { status: 405, json: { error: 'méthode non permise' } }
+      try {
+        return { json: readConfigClaude() }
       } catch (err) {
         return { status: 400, json: { error: String(err.message ?? err) } }
       }

@@ -1,6 +1,14 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtempSync, mkdirSync, writeFileSync, symlinkSync, readFileSync, readdirSync } from 'node:fs'
+import {
+  existsSync,
+  mkdtempSync,
+  mkdirSync,
+  writeFileSync,
+  symlinkSync,
+  readFileSync,
+  readdirSync,
+} from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -16,6 +24,7 @@ import {
   writeFileNoFollow,
   isSafePlanFileName,
   updatePlanMeta,
+  attachCommitToPlan,
   closeOpenPlans,
   readRegistry,
   registerProject,
@@ -367,6 +376,79 @@ test('closeOpenPlans signale et laisse ouvert un plan dont le dernier commit n�
   assert.deepEqual(closeOpenPlans(dir, m => messages.push(m)), [])
   assert.equal(readPlans(dir)[0].meta.status, 'open')
   assert.match(messages.join(' '), /sans date/)
+})
+
+const planOuvertAvecCommit = (title = 'A') => ({
+  status: 'open',
+  title,
+  opened: '2026-07-01',
+  commits: [{ sha: 'aaa', date: '2026-07-02', files: [] }],
+})
+
+test('clore retire .active-plan : après, un commit ne se rattache plus à rien', () => {
+  const dir = cockpitWithPlans([['a.md', planOuvertAvecCommit()]])
+  writeFileSync(join(dir, '.active-plan'), 'a.md\n')
+
+  assert.deepEqual(closeOpenPlans(dir), ['a.md'])
+  assert.equal(existsSync(join(dir, '.active-plan')), false)
+})
+
+test('clore garde le pointeur s’il désigne un autre plan, encore ouvert', () => {
+  const dir = cockpitWithPlans([
+    ['a.md', planOuvertAvecCommit('A')],
+    ['b.md', { status: 'open', title: 'B', opened: '2026-07-03', commits: [] }],
+  ])
+  writeFileSync(join(dir, '.active-plan'), 'b.md\n')
+
+  // `b.md` n'a pas de commit : il reste ouvert, donc reste l'intention en cours.
+  assert.deepEqual(closeOpenPlans(dir), ['a.md'])
+  assert.equal(readFileSync(join(dir, '.active-plan'), 'utf8').trim(), 'b.md')
+})
+
+test('clore sans pointeur ne panique pas', () => {
+  const dir = cockpitWithPlans([['a.md', planOuvertAvecCommit()]])
+
+  assert.deepEqual(closeOpenPlans(dir), ['a.md'])
+  assert.equal(existsSync(join(dir, '.active-plan')), false)
+})
+
+// --- rattachement d’un commit ----------------------------------------------
+
+const COMMIT = { sha: 'ccc', date: '2026-07-10', files: ['app/x.ts'] }
+
+test('attachCommitToPlan ajoute le commit à un plan ouvert', () => {
+  const dir = cockpitWithPlans([['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [] }]])
+
+  assert.equal(attachCommitToPlan(dir, 'a.md', COMMIT), true)
+  assert.deepEqual(readPlans(dir)[0].meta.commits, [COMMIT])
+})
+
+test('attachCommitToPlan refuse un plan clos — une intention soldée ne grossit plus', () => {
+  const dir = cockpitWithPlans([
+    [
+      'a.md',
+      {
+        status: 'closed',
+        title: 'A',
+        opened: '2026-07-01',
+        closed: '2026-07-02',
+        commits: [{ sha: 'aaa', date: '2026-07-02', files: [] }],
+      },
+    ],
+  ])
+
+  assert.equal(attachCommitToPlan(dir, 'a.md', COMMIT), false)
+  assert.equal(readPlans(dir)[0].meta.commits.length, 1)
+  assert.equal(readPlans(dir)[0].meta.closed, '2026-07-02', 'la clôture ne recule pas')
+})
+
+test('attachCommitToPlan ne compte pas deux fois le même sha', () => {
+  const dir = cockpitWithPlans([
+    ['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [COMMIT] }],
+  ])
+
+  assert.equal(attachCommitToPlan(dir, 'a.md', COMMIT), false)
+  assert.equal(readPlans(dir)[0].meta.commits.length, 1)
 })
 
 // --- validation du pointeur .active-plan -----------------------------------

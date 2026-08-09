@@ -1,10 +1,24 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Onglet Aperçu — la page d'arrivée sur un projet",
   "opened": "2026-08-09",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-09",
+  "commits": [
+    {
+      "sha": "68f4136",
+      "date": "2026-08-09",
+      "files": [
+        "README.md",
+        "app/src/App.tsx",
+        "app/src/data.ts",
+        "app/src/markdown.tsx",
+        "app/src/tabs/Apercu.tsx",
+        "hooks/snapshot.js",
+        "hooks/snapshot.test.js"
+      ]
+    }
+  ]
 }
 ---
 

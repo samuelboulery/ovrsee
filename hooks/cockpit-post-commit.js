@@ -15,7 +15,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { updatePlanMeta, isSafePlanFileName } from './plans.js'
+import { attachCommitToPlan, isSafePlanFileName } from './plans.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 
@@ -50,20 +50,16 @@ function attachCommit(cockpitDir, root) {
   const file = readFileSync(pointer, 'utf8').trim()
   if (!isSafePlanFileName(file)) return null
 
-  const sha = git(['rev-parse', '--short', 'HEAD'], root)
   const commit = {
-    sha,
+    sha: git(['rev-parse', '--short', 'HEAD'], root),
     date: git(['log', '-1', '--format=%cs'], root),
     files: changedFiles(root),
   }
 
-  const written = updatePlanMeta(cockpitDir, file, meta => {
-    const commits = meta.commits ?? []
-    if (commits.some(c => c.sha === sha)) return null // déjà rattaché
-    return { ...meta, commits: [...commits, commit] }
-  })
-
-  return written ? file : null
+  // La règle — plan clos, sha déjà là — vit dans plans.js : elle décide de ce
+  // que l'historique raconte, et enfouie ici elle ne se vérifierait qu'en
+  // committant pour de vrai.
+  return attachCommitToPlan(cockpitDir, file, commit) ? file : null
 }
 
 /**

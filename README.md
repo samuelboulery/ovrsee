@@ -28,7 +28,17 @@ pnpm electron                           # l'application, terminal claude compris
 pnpm dev                                # ou dans un navigateur, sans terminal
 pnpm cockpit:brief                      # ou en texte, depuis le terminal
 pnpm package                            # DMG dans release/
+
+# 4. Clore le plan quand son travail est fini
+pnpm cockpit:status                     # quel plan est actif
+pnpm cockpit:close                      # le clore, et lâcher le pointeur
 ```
+
+Clore n'est pas une formalité. Tant qu'un plan est actif, le hook post-commit
+lui rattache **tout** commit — un correctif sans rapport se retrouve inscrit
+comme du travail de l'intention précédente. Clore retire `.active-plan` : après,
+un commit ne se rattache à rien, ce qui est vrai. Capturer un nouveau plan clôt
+le précédent, donc le geste ne se pose que si l'on s'arrête là.
 
 Le terminal intégré n'existe que dans l'application : il passe par IPC, qu'un
 navigateur n'a pas. C'est délibéré — l'exposer par une socket locale

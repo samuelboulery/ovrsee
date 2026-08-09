@@ -11,7 +11,15 @@
  * humaine du YAML n'achèterait rien. Passer à YAML si un jour ils s'éditent.
  */
 
-import { lstatSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
+import {
+  lstatSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 
@@ -325,6 +333,16 @@ export function touchProject(root, now = new Date()) {
  * règles de clôture différentes produiraient deux historiques différents selon
  * la façon dont le plan a été capturé.
  *
+ * **Clore retire `.active-plan`** quand le pointeur désignait un plan qu'on
+ * vient de fermer. Sans cela, le pointeur survivait à son plan et le hook
+ * post-commit rattachait au dernier plan tout ce qui était commité ensuite —
+ * un correctif sans rapport se retrouvait inscrit comme un commit de
+ * l'intention précédente. Clore devient donc le signal de fin de travail :
+ * après, un commit ne se rattache à rien, ce qui est vrai.
+ *
+ * Un plan ouvert sans commit garde son pointeur : c'est du travail approuvé
+ * pas encore commencé, pas du travail terminé.
+ *
  * @returns {string[]} fichiers effectivement clos
  */
 export function closeOpenPlans(cockpitDir, log = () => {}) {
@@ -350,7 +368,60 @@ export function closeOpenPlans(cockpitDir, log = () => {}) {
     if (written) closed.push(plan.file)
   }
 
+  clearActivePlan(cockpitDir, closed)
   return closed
+}
+
+/**
+ * Rattache un commit à un plan. Rend vrai s'il a été écrit.
+ *
+ * Vit ici, et non dans le hook, pour la même raison que `closeOpenPlans` : la
+ * règle décide de ce que l'historique raconte, et une règle enfouie dans un
+ * script git ne se vérifie qu'en committant pour de vrai.
+ *
+ * Deux refus, tous deux silencieux — il n'y a rien d'anormal à ne rien écrire :
+ *
+ * - **Plan clos.** Le pointeur peut lui survivre : il est effacé à la clôture,
+ *   mais un `.active-plan` écrit avant cette règle, ou remis à la main,
+ *   désignerait encore un plan terminé. Y rattacher les commits suivants
+ *   ferait grossir indéfiniment une intention soldée, et sa date de clôture
+ *   serait antérieure à son dernier commit.
+ * - **Sha déjà présent.** Un hook peut se rejouer ; l'historique ne doit pas
+ *   compter deux fois le même commit.
+ *
+ * @param {string} cockpitDir
+ * @param {string} file nom de fichier du plan, déjà validé
+ * @param {{sha: string, date: string, files: string[]}} commit
+ * @returns {boolean}
+ */
+export function attachCommitToPlan(cockpitDir, file, commit) {
+  return updatePlanMeta(cockpitDir, file, meta => {
+    if (meta.status !== 'open') return null
+
+    const commits = meta.commits ?? []
+    if (commits.some(c => c.sha === commit.sha)) return null
+
+    return { ...meta, commits: [...commits, commit] }
+  })
+}
+
+/**
+ * Retire `.active-plan` s'il désignait l'un des plans qu'on vient de clore.
+ *
+ * L'absence de pointeur n'est pas une panne : c'est l'état normal entre deux
+ * intentions. Un échec d'effacement l'est encore moins — le fichier est déjà
+ * parti, ou n'a jamais existé.
+ */
+function clearActivePlan(cockpitDir, closed) {
+  if (closed.length === 0) return
+
+  const pointer = join(cockpitDir, '.active-plan')
+  try {
+    if (!closed.includes(readFileSync(pointer, 'utf8').trim())) return
+    rmSync(pointer)
+  } catch {
+    // Pas de pointeur, ou illisible : rien à retirer.
+  }
 }
 
 /**

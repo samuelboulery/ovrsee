@@ -111,6 +111,60 @@
         "app/src/useTerminal.ts",
         "hooks/couleurs.test.js"
       ]
+    },
+    {
+      "sha": "ff4d651",
+      "date": "2026-08-09",
+      "files": []
+    },
+    {
+      "sha": "1b173b1",
+      "date": "2026-08-09",
+      "files": [
+        "app/src/i18n.test.ts",
+        "app/src/i18n.ts",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/i18n.test.js"
+      ]
+    },
+    {
+      "sha": "566a1b1",
+      "date": "2026-08-09",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/ConfigClaudeModal.tsx",
+        "app/src/EquipmentPanel.tsx",
+        "app/src/Garde.tsx",
+        "app/src/Lightbox.tsx",
+        "app/src/PreferencesPanel.tsx",
+        "app/src/SkillsPanel.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/Welcome.tsx",
+        "app/src/data.test.ts",
+        "app/src/data.ts",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Donnees.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/Produit.tsx",
+        "app/src/tabs/Stack.tsx",
+        "app/src/tabs/Tableau.tsx",
+        "electron/main.js",
+        "electron/menu.js",
+        "server/api.js",
+        "server/api.test.js"
+      ]
+    },
+    {
+      "sha": "c197900",
+      "date": "2026-08-09",
+      "files": [
+        "CLAUDE.md",
+        "README.en.md",
+        "README.md",
+        "hooks/documentation.test.js"
+      ]
     }
   ]
 }

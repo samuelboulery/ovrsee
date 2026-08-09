@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(pnpm test)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm build:ui)",
+      "Bash(pnpm build)",
+      "Bash(pnpm dev)",
+      "Bash(pnpm electron)",
+      "Bash(pnpm cockpit:status)",
+      "Bash(pnpm cockpit:brief)",
+      "Bash(node --test:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git blame:*)",
+      "Bash(lsof -i :5180)",
+      "Bash(ls:*)",
+      "Bash(rg:*)",
+      "Bash(wc:*)"
+    ],
+    "ask": [
+      "Bash(pnpm package)",
+      "Bash(pnpm cockpit:crawl:*)",
+      "Bash(pnpm cockpit:install:*)",
+      "Bash(pnpm cockpit:close)",
+      "Bash(pnpm cockpit:obsidian:*)"
+    ],
+    "deny": [
+      "Read(./.cockpit-auth.json)",
+      "Read(./**/*.cockpit-auth.json)"
+    ]
+  }
+}

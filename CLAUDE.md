@@ -28,15 +28,17 @@ locale. Une socket l'ouvrirait à tout processus tournant sous le même compte.
 |---|---|---|
 | `hooks/` | Capture des plans, clôture au commit, tickets, brief, export Obsidian, skills, CLI | non — `.js` + JSDoc |
 | `crawl/` | Parcours Playwright de l'app observée, captures datées | non — `.js` |
-| `server/api.js` | Routes `/api/*` | non — `.js` |
+| `server/api.js` | Routes `/api/*` pour navigateur et Electron | non — `.js` |
+| `mcp/` | Serveur MCP stdio (JSON-RPC 2.0), même interface que `/api/*` | non — `.js` |
 | `app/src/` | Interface React, 7 onglets | oui — TS strict |
 | `electron/` | Processus principal, preload, pty | non — `.js`/`.cjs` |
 
-**`server/api.js` a deux hôtes, une seule implémentation** : le middleware du dev
-server Vite (`vite.config.js`) et le gestionnaire du protocole `cockpit://` du
-processus principal (`electron/main.js`). Les deux appellent la même fonction pure
-`resolve()`. Dédoubler cette logique est la faute à ne pas commettre — deux
-implémentations divergeraient, et le bug ne se verrait que dans un seul des deux modes.
+**`server/api.js` a trois hôtes, une seule implémentation** : le middleware du dev
+server Vite (`vite.config.js`), le gestionnaire du protocole `cockpit://` du
+processus principal (`electron/main.js`), et le serveur MCP (`mcp/dispatch.js`). 
+Les trois appellent la même fonction pure `resolve()`. Dédoubler cette logique est 
+la faute à ne pas commettre — trois implémentations divergeraient, et les bugs ne 
+se verraient que dans certains modes.
 
 Conséquence pratique : **une route testée dans le navigateur n'est pas une route
 testée dans Electron.** Le protocole custom n'a ni CORS, ni `Origin`, ni les mêmes
@@ -47,10 +49,11 @@ en-têtes. Vérifier les deux.
 ```bash
 pnpm dev          # dev server Vite, port 5180 strict, sans terminal
 pnpm electron     # build:ui puis l'app complète, terminal compris
-pnpm test         # node --test sur hooks/ crawl/ server/, puis app/src compilé
+pnpm test         # node --test sur hooks/ crawl/ server/ mcp/, puis app/src compilé
 pnpm typecheck    # tsc, ne couvre QUE app/src
 pnpm build:ui     # vite build vers app/dist/
 pnpm package      # DMG dans release/ (arm64, non signé)
+pnpm cockpit:mcp  # serveur MCP stdio (JSON-RPC 2.0) pour Claude Desktop
 ```
 
 `pnpm test` n'utilise **aucun framework** : `node:test` et `node:assert` seuls.

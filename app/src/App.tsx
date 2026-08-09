@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 
+import { applyTheme } from './theme'
 import {
+  commitsDeLaFrise,
   density,
   estAbandon,
   fetchProjects,
+  fetchSettings,
   fetchSnapshot,
   frDate,
   humanAge,
@@ -11,12 +14,15 @@ import {
   lastScan,
   projectAction,
   restant,
+  updateSettings,
   type Project,
+  type SettingsType,
   type Snapshot,
   type Tableau as TableauData,
 } from './data'
 import { Garde } from './Garde'
 import { SkillsList, SkillsModal, useSkills } from './SkillsPanel'
+import { ConfigClaudeModal } from './ConfigClaudeModal'
 import { PreferencesModal } from './PreferencesPanel'
 import { s } from './style'
 import { Apercu } from './tabs/Apercu'
@@ -44,7 +50,7 @@ import { Divider, useResizable } from './useResizable'
  * déjà prises de l'ancien `/` ont suivi dans `shots/produit/`, sans quoi vingt
  * images du graphe passeraient pour l'historique visuel d'Aperçu.
  */
-const TABS = [
+export const TABS = [
   ['apercu', 'Aperçu', '/'],
   ['navigateur', 'Navigateur', '/navigateur'],
   ['produit', 'Produit', '/produit'],
@@ -54,13 +60,30 @@ const TABS = [
   ['stack', 'Stack', '/stack'],
 ] as const
 
-type TabId = (typeof TABS)[number][0]
+export type TabId = (typeof TABS)[number][0]
 
 const tabForPath = (pathname: string): TabId =>
   TABS.find(([, , path]) => path === pathname)?.[0] ?? 'apercu'
 
 /** Le nom de l'onglet tel que l'utilisateur le lit — pour les messages. */
-const labelOf = (id: TabId): string => TABS.find(([tab]) => tab === id)?.[1] ?? id
+export const labelOf = (id: TabId): string => TABS.find(([tab]) => tab === id)?.[1] ?? id
+
+/**
+ * Onglets actifs selon les préférences, dans l'ordre de l'ordre configuré.
+ *
+ * Si les préférences ne sont pas chargées, retourne tous les onglets pour
+ * éviter un écran vide au démarrage.
+ *
+ * @param settings préférences chargées (ou null au démarrage)
+ * @returns liste des onglets actifs dans l'ordre configuré
+ */
+const activeTabsInOrder = (settings: SettingsType | null) => {
+  if (!settings) return TABS
+  const active = new Set(settings.onglets.actifs)
+  return TABS.filter(([id]) => active.has(id)).sort(
+    (a, b) => settings.onglets.ordre.indexOf(a[0]) - settings.onglets.ordre.indexOf(b[0]),
+  )
+}
 
 /**
  * Un élément défilant déborde-t-il ?
@@ -130,11 +153,14 @@ export function App() {
   const [projects, setProjects] = useState<Project[]>([])
   const [current, setCurrent] = useState<string | null>(null)
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null)
+  const [settings, setSettings] = useState<SettingsType | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const [tab, setTab] = useState<TabId>(() => tabForPath(window.location.pathname))
   const [layout, setLayout] = useState<Layout>('bottom')
   const [terminal, setTerminal] = useState(true)
+  const [terminalHeight, setTerminalHeight] = useState(244)
+  const [terminalWidth, setTerminalWidth] = useState(468)
 
   const onglets = useDeborde()
 
@@ -156,6 +182,17 @@ export function App() {
     return () => window.removeEventListener('popstate', onPop)
   }, [])
 
+  // Redirection si l'onglet courant devient inactif.
+  // L'onglet Aperçu est toujours actif, donc on y redirige en dernier recours.
+  useEffect(() => {
+    const activeTabs = activeTabsInOrder(settings)
+    if (activeTabs.length > 0 && !activeTabs.some(([id]) => id === tab)) {
+      const target = activeTabs[0]
+      setTab(target[0] as TabId)
+      pushUrl(target[2], current)
+    }
+  }, [settings, tab, current])
+
   useEffect(() => {
     fetchProjects()
       .then(list => {
@@ -167,6 +204,54 @@ export function App() {
       })
       .catch(err => setError(String(err.message ?? err)))
   }, [])
+
+  useEffect(() => {
+    fetchSettings()
+      .then(s => {
+        setSettings(s)
+        setTerminalHeight(s.terminal.hauteur)
+        setTerminalWidth(s.terminal.largeur)
+        setLayout(s.terminal.disposition as Layout)
+        setTerminal(s.terminal.visible)
+        applyTheme(s.theme)
+      })
+      .catch(err => setError(String(err.message ?? err)))
+  }, [])
+
+  // Applique le thème quand il change dans les paramètres
+  useEffect(() => {
+    if (settings) {
+      applyTheme(settings.theme)
+    }
+  }, [settings?.theme])
+
+  /**
+   * Persistance des tailles du terminal, après le geste et pas pendant.
+   *
+   * `useResizable` signale chaque image du glissement : écrire directement
+   * ferait une requête par pixel parcouru. Le report de 300 ms les fond en une.
+   *
+   * La comparaison avec l'état enregistré n'est pas une optimisation : sans
+   * elle, l'arrivée des préférences déclenche l'effet et réécrit au démarrage
+   * ce qu'on vient tout juste de lire.
+   */
+  useEffect(() => {
+    if (!settings) return
+    const inchange =
+      settings.terminal.hauteur === terminalHeight && settings.terminal.largeur === terminalWidth
+    if (inchange) return
+
+    const timer = setTimeout(() => {
+      updateSettings({
+        terminal: {
+          ...settings.terminal,
+          hauteur: terminalHeight,
+          largeur: terminalWidth,
+        },
+      }).catch((err: unknown) => setError(String((err as Error).message ?? err)))
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [terminalHeight, terminalWidth, settings])
 
   // Deux clics rapprochés lancent deux lectures. Sans abandon, la plus lente
   // écrase la plus récente et l'écran affiche les plans du projet précédent
@@ -247,16 +332,17 @@ export function App() {
         return setLayout(disposition as Layout)
       }
 
-      const onglet = TABS.find(([id]) => command === `tab:${id}`)
+      const activeTabs = activeTabsInOrder(settings)
+      const onglet = activeTabs.find(([id]) => command === `tab:${id}`)
       if (onglet) {
-        setTab(onglet[0])
+        setTab(onglet[0] as TabId)
         // Même correction qu'au clic : plein écran est une vue du terminal, on
         // n'y reste pas en changeant d'onglet.
         setLayout(l => (l === 'full' ? 'bottom' : l))
         pushUrl(onglet[2], current)
       }
     })
-  }, [current])
+  }, [current, settings])
 
   const plans = snapshot?.plans ?? []
   const scan = lastScan(snapshot?.scans ?? [])
@@ -280,7 +366,7 @@ export function App() {
           retrait à gauche laisse la place aux pastilles du système. */}
       <header
         style={s(
-          'height: 44px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 82px; background: #1b1d2b; border-bottom: 1px solid var(--color-divider); -webkit-app-region: drag;',
+          'height: 44px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 82px; background: var(--theme-bg-tertiary); border-bottom: 1px solid var(--color-divider); -webkit-app-region: drag;',
         )}
       >
         {/* Le seul `h1` de l'écran : la fenêtre porte le nom du projet, et les
@@ -303,6 +389,7 @@ export function App() {
             projects={projects}
             current={current}
             snapshot={snapshot}
+            settings={settings}
             width={sidebar.size}
             onPick={path => {
               setCurrent(path)
@@ -310,7 +397,9 @@ export function App() {
             }}
             onProjects={applyProjects}
             onError={setError}
-            density={density(plans)}
+            density={density(commitsDeLaFrise(snapshot?.timeline ?? []), {
+              fenetre: settings?.densiteActivite.fenetre,
+            })}
           />
           <Divider axis="x" resizable={sidebar} />
 
@@ -323,7 +412,7 @@ export function App() {
               ref={onglets.ref}
               aria-label="Onglets du projet"
               style={s(
-                'height: 44px; flex: none; display: flex; align-items: stretch; gap: 2px; padding: 0 12px; border-bottom: 1px solid var(--color-divider); background: #171927; overflow-x: auto; overflow-y: hidden; scrollbar-width: none;' +
+                'height: 44px; flex: none; display: flex; align-items: stretch; gap: 2px; padding: 0 12px; border-bottom: 1px solid var(--color-divider); background: var(--theme-bg-quaternary); overflow-x: auto; overflow-y: hidden; scrollbar-width: none;' +
                   // Le dégradé n'apparaît que quand il y a réellement quelque
                   // chose de coupé : posé en permanence, il estomperait le
                   // dernier onglet d'une barre qui tient tout entière.
@@ -332,7 +421,7 @@ export function App() {
                     : ''),
               )}
             >
-              {TABS.map(([id, label, path]) => (
+              {activeTabsInOrder(settings).map(([id, label, path]) => (
                 // Un vrai lien, pas un bouton : c'est ce que lit
                 // `page.$$eval('a[href]')` dans crawl/index.js. Le href doit
                 // exister pour que l'onglet soit découvrable.
@@ -441,6 +530,10 @@ export function App() {
                   onToggle={() => setTerminal(false)}
                   onReload={reload}
                   snapshot={snapshot}
+                  terminalHeight={terminalHeight}
+                  terminalWidth={terminalWidth}
+                  onTerminalHeightChange={setTerminalHeight}
+                  onTerminalWidthChange={setTerminalWidth}
                 />
               )}
             </div>
@@ -448,7 +541,7 @@ export function App() {
             {!terminal && (
               <div
                 style={s(
-                  'height: 32px; flex: none; border-top: 1px solid var(--color-divider); background: #101120; display: flex; align-items: center; gap: 10px; padding: 0 14px;',
+                  'height: 32px; flex: none; border-top: 1px solid var(--color-divider); background: var(--theme-bg-primary); display: flex; align-items: center; gap: 10px; padding: 0 14px;',
                 )}
               >
                 <button
@@ -592,11 +685,127 @@ function Unequipped({
   )
 }
 
+/** Affiche l'histogramme de densité d'activité (barres verticaless). */
+function DensityHistogram({ bars, fenetre }: { bars: number[]; fenetre: string }) {
+  const max = Math.max(1, ...bars)
+
+  const labels: Record<string, string> = {
+    jour: '24 heures',
+    semaine: '7 jours',
+    '3mois': '13 semaines',
+    an: '12 mois',
+  }
+  const label = labels[fenetre] ?? '16 semaines'
+
+  return (
+    <>
+      <div style={s('display: flex; gap: 3px; align-items: flex-end; height: 34px;')}>
+        {bars.map((value, i) => {
+          const height = value === 0 ? 3 : Math.max(4, Math.round((value / max) * 34))
+          const color =
+            value === 0
+              ? 'var(--color-neutral-800)'
+              : value / max > 0.6
+                ? 'var(--color-accent-500)'
+                : 'var(--color-accent-700)'
+          return (
+            <div
+              key={i}
+              title={`${value} commit(s)`}
+              style={s(`flex: 1; height: ${height}px; border-radius: 1px; background: ${color};`)}
+              role="img"
+              aria-label={`seau ${i}: ${value} commits`}
+            />
+          )
+        })}
+      </div>
+      <div
+        style={s(
+          'display: flex; justify-content: space-between; font-size: 10px; color: var(--color-neutral-600); margin-top: 6px;',
+        )}
+      >
+        <span>{label}</span>
+        <span>aujourd'hui</span>
+      </div>
+    </>
+  )
+}
+
+/** Affiche une heatmap de 30 jours (grille 5×6). */
+function DensityHeatmap({ bars }: { bars: number[] }) {
+  const max = Math.max(1, ...bars)
+
+  // Les 30 jours : on suppose que bars[0] = le plus ancien, bars[29] = hier
+  // Construit la grille 5 rangées × 6 colonnes
+  const days = bars.slice(0, 30)
+
+  // Couleurs : 5 paliers sur la rampe accent
+  const colors = [
+    'var(--color-accent-900)', // 0 commits
+    'var(--color-accent-700)', // très peu
+    'var(--color-accent-500)', // moyen
+    'var(--color-accent-300)', // beaucoup
+    'var(--color-accent-100)', // beaucoup beaucoup
+  ]
+
+  const getColor = (value: number): string => {
+    if (value === 0) return colors[0]
+    if (value <= max * 0.2) return colors[1]
+    if (value <= max * 0.4) return colors[2]
+    if (value <= max * 0.6) return colors[3]
+    return colors[4]
+  }
+
+  const now = new Date()
+  const getDateLabel = (daysAgo: number): string => {
+    const d = new Date(now)
+    d.setDate(d.getDate() - (29 - daysAgo)) // 29 - daysAgo car days[0] est le plus ancien
+    const day = d.getDate()
+    const month = d.getMonth() + 1
+    return `${day}/${month}`
+  }
+
+  return (
+    <div
+      style={s(
+        'overflow-x: auto; border: 1px solid var(--color-divider); border-radius: 4px; margin-top: 8px;',
+      )}
+    >
+      <table style={s('width: 100%; border-collapse: collapse; font-size: 10px;')}>
+        <tbody>
+          {Array.from({ length: 5 }).map((_, rowIdx) => (
+            <tr key={rowIdx}>
+              {Array.from({ length: 6 }).map((_, colIdx) => {
+                const idx = rowIdx * 6 + colIdx
+                if (idx >= days.length) return <td key={colIdx} />
+                const value = days[idx]
+                const date = getDateLabel(idx)
+                return (
+                  <td
+                    key={colIdx}
+                    style={s(
+                      `width: 16px; height: 16px; border: 1px solid var(--color-divider); background: ${getColor(value)}; cursor: pointer;`,
+                    )}
+                    title={`${date}: ${value} commits`}
+                    role="img"
+                    aria-label={`${date}: ${value} commits`}
+                  />
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 /** Barre latérale — maquette l. 45-71. */
 function Sidebar({
   projects,
   current,
   snapshot,
+  settings,
   width,
   onPick,
   onProjects,
@@ -607,15 +816,16 @@ function Sidebar({
   current: string | null
   /** L'instantané du projet affiché, pour que sa pastille suive le tableau. */
   snapshot: Snapshot | null
+  settings: SettingsType | null
   width: number
   onPick: (path: string) => void
   onProjects: (list: Project[], select?: string | null) => void
   onError: (message: string) => void
   density: number[]
 }) {
-  const max = Math.max(1, ...bars)
   const [skillsOuverts, setSkillsOuverts] = useState(false)
   const [preferencesOuverts, setPreferencesOuverts] = useState(false)
+  const [configOuverte, setConfigOuverte] = useState(false)
 
   // Le sélecteur de dossier n'existe que dans l'application empaquetée. Dans un
   // navigateur, le bouton est absent plutôt que présent et inerte — même
@@ -626,7 +836,7 @@ function Sidebar({
     <aside
       aria-label="Projets"
       style={s(
-        `width: ${width}px; flex: none; display: flex; flex-direction: column; background: #13141f; border-right: 1px solid var(--color-divider); padding: 14px 0;`,
+        `width: ${width}px; flex: none; display: flex; flex-direction: column; background: var(--theme-bg-secondary); border-right: 1px solid var(--color-divider); padding: 14px 0;`,
       )}
     >
       <div
@@ -688,9 +898,22 @@ function Sidebar({
         >
           ⚙ Préférences
         </button>
+        {/* La configuration de Claude Code n'est pas celle du cockpit : elle
+            vit dans `~/.claude/` et le cockpit ne fait que la lire. Le bouton
+            est ici parce qu'on s'y demande ce qui est installé au même moment
+            qu'on se demande quels skills le sont. */}
+        <button
+          type="button"
+          className="btn btn-ghost btn-block"
+          onClick={() => setConfigOuverte(true)}
+          style={s('font-size: 11px;')}
+        >
+          ⌘ Ma configuration Claude Code
+        </button>
       </div>
       {skillsOuverts && <SkillsModal onClose={() => setSkillsOuverts(false)} />}
       {preferencesOuverts && <PreferencesModal onClose={() => setPreferencesOuverts(false)} />}
+      {configOuverte && <ConfigClaudeModal onClose={() => setConfigOuverte(false)} />}
 
       <div
         style={s(
@@ -704,32 +927,12 @@ function Sidebar({
         >
           Densité d'activité
         </div>
-        <div style={s('display: flex; gap: 3px; align-items: flex-end; height: 34px;')}>
-          {bars.map((value, i) => {
-            const height = value === 0 ? 3 : Math.max(4, Math.round((value / max) * 34))
-            const color =
-              value === 0
-                ? 'var(--color-neutral-800)'
-                : value / max > 0.6
-                  ? 'var(--color-accent-500)'
-                  : 'var(--color-accent-700)'
-            return (
-              <div
-                key={i}
-                title={`${value} commit(s)`}
-                style={s(`flex: 1; height: ${height}px; border-radius: 1px; background: ${color};`)}
-              />
-            )
-          })}
-        </div>
-        <div
-          style={s(
-            'display: flex; justify-content: space-between; font-size: 10px; color: var(--color-neutral-600); margin-top: 6px;',
-          )}
-        >
-          <span>16 semaines</span>
-          <span>aujourd'hui</span>
-        </div>
+
+        {settings?.densiteActivite.fenetre === 'mois' ? (
+          <DensityHeatmap bars={bars} />
+        ) : (
+          <DensityHistogram bars={bars} fenetre={settings?.densiteActivite.fenetre ?? '3mois'} />
+        )}
       </div>
     </aside>
   )

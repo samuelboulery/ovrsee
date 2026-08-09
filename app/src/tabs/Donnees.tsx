@@ -63,7 +63,7 @@ function SourceAlert({
     return (
       <div
         style={s(
-          'background: #3a3a1a; border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
+          'background: var(--theme-bg-alerte); border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
         )}
       >
         <div style={s('font-weight: 500; margin-bottom: 6px;')}>Graphify absent</div>
@@ -80,7 +80,7 @@ function SourceAlert({
       return (
         <div
           style={s(
-            'background: #3a3a1a; border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
+            'background: var(--theme-bg-alerte); border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
           )}
         >
           <div style={s('font-weight: 500; margin-bottom: 6px;')}>Coffre Obsidian non configure</div>
@@ -95,7 +95,7 @@ function SourceAlert({
     return (
       <div
         style={s(
-          'background: #3a3a1a; border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
+          'background: var(--theme-bg-alerte); border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
         )}
       >
         <div style={s('font-weight: 500; margin-bottom: 6px;')}>Coffre Obsidian illisible</div>

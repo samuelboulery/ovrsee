@@ -174,7 +174,7 @@ export function SkillsModal({ onClose }: { onClose: () => void }) {
       <div
         onClick={event => event.stopPropagation()}
         style={s(
-          'width: min(560px, 100%); max-height: 100%; overflow: auto; background: #13141f; border: 1px solid var(--color-divider); border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px;',
+          'width: min(560px, 100%); max-height: 100%; overflow: auto; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px;',
         )}
       >
         <div style={s('display: flex; align-items: baseline; gap: 10px;')}>

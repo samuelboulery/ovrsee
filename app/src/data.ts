@@ -1099,3 +1099,73 @@ export function buildInjections(snapshot: Snapshot | null): Array<{ label: strin
     },
   ]
 }
+
+/**
+ * Décide si un texte est une commande (! ou /) ou du contexte.
+ *
+ * Les commandes s'injectent directement avec `\n` final : elles partent illico
+ * dans le shell. Les contextes passent par le collage encadré (bracket paste) :
+ * littéral, multiligne accepté, sans `\n` final — l'utilisateur relit et valide.
+ *
+ * @param text texte à injecter
+ * @returns objet avec mode ('command' ou 'context') et texte adapté
+ */
+export function decideInjection(text: string): { mode: 'command' | 'context'; text: string } {
+  // Les commandes commencent par ! ou /
+  if (text.startsWith('!') || text.startsWith('/')) {
+    // Commande : ajouter \n pour exécuter immédiatement
+    return { mode: 'command', text: text + '\n' }
+  }
+
+  // Contexte : l'encadrement (bracket paste) sera fait par pasteToClaude()
+  // On ne met pas de \n final — l'utilisateur valide lui-même
+  return { mode: 'context', text }
+}
+
+/**
+ * Actions livrées + actions personnalisées, avec validation des sauts de ligne.
+ *
+ * Les actions livrées demandent le gestionnaire : `!pnpm cockpit:crawl` sur un
+ * projet pnpm, `!npm run cockpit:crawl` sur npm. Les actions perso sont tapées
+ * telles quelles et refusent les sauts de ligne : une action multiligne serait
+ * une commande shell qui s'exécute ligne par ligne, ce qui n'est pas explicite
+ * au clic.
+ *
+ * Une action perso qui contient `\n` retourne une erreur dans le tableau.
+ */
+export function buildActions(
+  snapshot: Snapshot | null,
+  settings: SettingsType,
+): Array<Action | { label: string; error: string }> {
+  const packageManager = settings.packageManager
+
+  // Actions livrées, composées avec le gestionnaire
+  const delivered = [
+    {
+      label: '⟳ Crawl du projet (! pnpm cockpit:crawl)',
+      text: `!${composerCommande('cockpit:crawl', packageManager)}`,
+    },
+    {
+      label: '◆ Graphe complet (/ graphify)',
+      text: '/graphify',
+    },
+    {
+      label: '◈ Graphe → coffre Obsidian (/ graphify . --obsidian ...)',
+      text: '/graphify . --obsidian --obsidian-dir cockpit/obsidian/graphe',
+    },
+  ]
+
+  // Actions personnalisées, validées
+  const custom = (settings.customActions ?? []).map(action => {
+    // Rejette les sauts de ligne
+    if (action.text.includes('\n')) {
+      return {
+        label: action.label,
+        error: 'Cette action contient un saut de ligne et s\'exécuterait comme plusieurs commandes. Corrigez-la.',
+      }
+    }
+    return action
+  })
+
+  return [...delivered, ...custom]
+}

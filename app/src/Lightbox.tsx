@@ -93,7 +93,7 @@ export function Lightbox({
           src={shotUrl(root, `shots/${slug}/${file}`)}
           alt={`${label} — ${frDate(shotDate(file))}`}
           style={s(
-            'max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; border: 1px solid var(--color-neutral-800); box-shadow: 0 24px 60px rgba(0,0,0,.6); background: #0b0c16;',
+            'max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; border: 1px solid var(--color-neutral-800); box-shadow: 0 24px 60px rgba(0,0,0,.6); background: var(--theme-bg-lightbox);',
           )}
         />
         <Arrow label="›" title="Capture plus récente" disabled={at <= 0} onClick={() => step(1)} />

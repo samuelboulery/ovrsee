@@ -178,8 +178,8 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
         <div
           style={s(
             side
-              ? 'position: absolute; top: 0; right: 0; bottom: 0; width: 42px; border-left: 1px solid var(--color-divider); background: #13141f; display: flex; justify-content: center; padding-top: 16px; z-index: 5;'
-              : 'width: 42px; flex: none; border-left: 1px solid var(--color-divider); background: #13141f; display: flex; justify-content: center; padding-top: 16px;',
+              ? 'position: absolute; top: 0; right: 0; bottom: 0; width: 42px; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); display: flex; justify-content: center; padding-top: 16px; z-index: 5;'
+              : 'width: 42px; flex: none; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); display: flex; justify-content: center; padding-top: 16px;',
           )}
         >
           <button
@@ -444,8 +444,8 @@ function DetailPanel({
     <div
       style={s(
         side
-          ? `position: absolute; top: 0; right: 0; bottom: 0; width: ${width}px; border-left: 1px solid var(--color-divider); background: #13141f; padding: 20px; overflow: auto; box-shadow: -22px 0 44px rgba(0,0,0,0.55); z-index: 5;`
-          : `width: ${width}px; flex: none; border-left: 1px solid var(--color-divider); background: #13141f; padding: 20px; overflow: auto;`,
+          ? `position: absolute; top: 0; right: 0; bottom: 0; width: ${width}px; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); padding: 20px; overflow: auto; box-shadow: -22px 0 44px rgba(0,0,0,0.55); z-index: 5;`
+          : `width: ${width}px; flex: none; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); padding: 20px; overflow: auto;`,
       )}
     >
       <div style={s('display: flex; align-items: center; gap: 8px;')}>
@@ -625,7 +625,7 @@ function Footnotes({
   ].filter(Boolean)
 
   return (
-    <div style={s('flex: none; border-top: 1px solid var(--color-divider); background: #13141f;')}>
+    <div style={s('flex: none; border-top: 1px solid var(--color-divider); background: var(--theme-bg-secondary);')}>
       <button
         type="button"
         onClick={() => setOpen(o => !o)}

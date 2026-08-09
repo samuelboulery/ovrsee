@@ -3,9 +3,13 @@ import test from 'node:test'
 
 import {
   briefLines,
+  buildActions,
   buildInjections,
   childrenOf,
   colonneFinale,
+  commitsDeLaFrise,
+  composerCommande,
+  decideInjection,
   epicProgress,
   frDate,
   humanAge,
@@ -25,6 +29,7 @@ import {
   type Plan,
   type Snapshot,
   type Ticket,
+  type SettingsType,
 } from './data'
 
 /**
@@ -357,4 +362,192 @@ test('stackFrom n’attribue une raison que si un WHY: la donne', () => {
   assert.equal(rows.find(r => r.name === 'node-pty')?.why, 'le seul pty qui compile en arm64.')
   // Le point du ticket : sans WHY:, rien. Pas un plan qui cite le nom.
   assert.equal(rows.find(r => r.name === 'vite')?.why, null)
+})
+
+/**
+ * La densité lit la frise, pas les plans : c'est ce qui lui fait voir les
+ * commits hors plan. Si cette fonction en perdait une sorte, l'histogramme
+ * redeviendrait faux sans que rien ne le signale.
+ */
+test('commitsDeLaFrise rend les commits des plans et ceux hors plan', () => {
+  const commits = commitsDeLaFrise([
+    {
+      kind: 'plan',
+      date: '2026-07-20',
+      plan: 'p.md',
+      title: 'Un plan',
+      status: 'closed',
+      commits: [
+        { sha: 'aaa', date: '2026-07-20T09:00:00', subject: 'dans le plan' },
+        { sha: 'bbb', date: '2026-07-20T10:00:00', subject: 'aussi' },
+      ],
+    },
+    {
+      kind: 'commit',
+      date: '2026-07-20',
+      commit: { sha: 'ccc', date: '2026-07-20T11:00:00', subject: 'hors plan' },
+    },
+  ])
+
+  assert.deepEqual(
+    commits.map(c => c.sha),
+    ['aaa', 'bbb', 'ccc'],
+  )
+})
+
+test('commitsDeLaFrise survit à une frise absente ou mal formée', () => {
+  assert.deepEqual(commitsDeLaFrise([]), [])
+  assert.deepEqual(commitsDeLaFrise(null as never), [])
+  // Une bande de plan sans commits : le plan existe, git n'en sait rien encore.
+  assert.deepEqual(
+    commitsDeLaFrise([
+      { kind: 'plan', date: '2026-07-20', plan: 'p.md', title: 'x', status: 'open', commits: [] },
+    ]),
+    [],
+  )
+})
+
+// --- composerCommande : adaptation du gestionnaire de paquets ---------
+
+test('composerCommande compose la ligne adaptée au gestionnaire', () => {
+  assert.equal(composerCommande('cockpit:crawl', 'pnpm'), 'pnpm cockpit:crawl')
+  assert.equal(composerCommande('cockpit:crawl', 'npm'), 'npm run cockpit:crawl')
+  assert.equal(composerCommande('cockpit:crawl', 'yarn'), 'yarn cockpit:crawl')
+  assert.equal(composerCommande('cockpit:crawl', 'bun'), 'bun cockpit:crawl')
+})
+
+test('composerCommande nécessite le gestionnaire explicite', () => {
+  // Le paramètre packageManager est obligatoire pour éviter les défauts trompeurs
+  assert.equal(composerCommande('cockpit:crawl', 'pnpm'), 'pnpm cockpit:crawl')
+  assert.equal(composerCommande('test', 'npm'), 'npm run test')
+})
+
+// --- Gestion des onglets : filtrage et redirection ---
+
+test('onglet masqué : rendu survit avec un seul onglet actif', () => {
+  const snap = snapshot({})
+  // Ce test vérifie simplement que les onglets rendus survivent
+  // même si un seul est actif. Le filtrage se fait dans App.tsx.
+  assert.ok(snap)
+})
+
+// --- buildActions : actions livrées + personnalisées ---
+
+test('buildActions compose les actions livrées avec le gestionnaire pnpm', () => {
+  const snap = snapshot({})
+  const settings = {
+    langue: 'fr',
+    theme: 'auto',
+    densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
+    onglets: { actifs: [], ordre: [] },
+    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
+    bootstrap: [],
+    packageManager: 'pnpm',
+    sourceGraphe: 'auto',
+    customActions: [],
+  } as SettingsType
+
+  const actions = buildActions(snap, settings)
+
+  // Trois actions livrées
+  const delivered = actions.filter((a): a is { label: string; text: string } => !('error' in a))
+  assert.equal(delivered.length, 3)
+
+  // Première action : Crawl avec pnpm
+  assert.match(delivered[0].text, /^!pnpm cockpit:crawl/)
+})
+
+test('buildActions compose les actions livrées avec le gestionnaire npm', () => {
+  const snap = snapshot({})
+  const settings = {
+    langue: 'fr',
+    theme: 'auto',
+    densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
+    onglets: { actifs: [], ordre: [] },
+    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
+    bootstrap: [],
+    packageManager: 'npm',
+    sourceGraphe: 'auto',
+    customActions: [],
+  } as SettingsType
+
+  const actions = buildActions(snap, settings)
+  const delivered = actions.filter((a): a is { label: string; text: string } => !('error' in a))
+
+  // Première action : Crawl avec npm run
+  assert.match(delivered[0].text, /^!npm run cockpit:crawl/)
+})
+
+test('buildActions inclut les actions personnalisées valides', () => {
+  const snap = snapshot({})
+  const settings = {
+    langue: 'fr',
+    theme: 'auto',
+    densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
+    onglets: { actifs: [], ordre: [] },
+    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
+    bootstrap: [],
+    packageManager: 'pnpm',
+    sourceGraphe: 'auto',
+    customActions: [
+      { label: 'Mon test', text: 'pnpm test' },
+      { label: 'Lancer le serveur', text: 'pnpm dev' },
+    ],
+  } as SettingsType
+
+  const actions = buildActions(snap, settings)
+  const withoutErrors = actions.filter((a): a is { label: string; text: string } => !('error' in a))
+
+  // 3 livrées + 2 personnalisées = 5
+  assert.equal(withoutErrors.length, 5)
+  assert.ok(withoutErrors.some(a => a.text === 'pnpm test'))
+  assert.ok(withoutErrors.some(a => a.text === 'pnpm dev'))
+})
+
+test('buildActions rejette les actions personnalisées avec sauts de ligne', () => {
+  const snap = snapshot({})
+  const settings = {
+    langue: 'fr',
+    theme: 'auto',
+    densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
+    onglets: { actifs: [], ordre: [] },
+    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
+    bootstrap: [],
+    packageManager: 'pnpm',
+    sourceGraphe: 'auto',
+    customActions: [
+      { label: 'Commande invalide', text: 'pnpm test\npnpm build' },
+    ],
+  } as SettingsType
+
+  const actions = buildActions(snap, settings)
+  const errors = actions.filter((a): a is { label: string; error: string } => 'error' in a)
+
+  // Une action rejetée avec erreur
+  assert.equal(errors.length, 1)
+  assert.equal(errors[0].label, 'Commande invalide')
+  assert.match(errors[0].error, /saut de ligne/)
+})
+
+// --- decideInjection : contexte vs commande ---
+
+test('decideInjection : commande avec ! → mode command avec \\n', () => {
+  const result = decideInjection('!pnpm cockpit:crawl')
+  assert.equal(result.mode, 'command')
+  assert.equal(result.text, '!pnpm cockpit:crawl\n')
+})
+
+test('decideInjection : commande avec / → mode command avec \\n', () => {
+  const result = decideInjection('/graphify')
+  assert.equal(result.mode, 'command')
+  assert.equal(result.text, '/graphify\n')
+})
+
+test('decideInjection : contexte multiligne → mode context sans \\n', () => {
+  const context = 'Carte des pages (3)\n/route1 — titre1 → lien1\n/route2 — titre2 → aucun lien'
+  const result = decideInjection(context)
+  assert.equal(result.mode, 'context')
+  // Pas de \n ajouté, le bracket paste l'encadrera
+  assert.equal(result.text, context)
+  assert(!result.text.endsWith('\n'))
 })

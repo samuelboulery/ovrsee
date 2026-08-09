@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+
+import { getTerminalTheme } from './theme'
 // WHY: xterm est le terminal de VS Code, pas une imitation. Un rendu maison
 // devrait réimplémenter les séquences ANSI, le défilement et la sélection —
 // et `claude` s'afficherait de travers au premier cas non couvert.
@@ -56,19 +58,10 @@ declare global {
 
 export const terminalBridge = (): TerminalBridge | null => window.cockpit?.terminal ?? null
 
-/** Palette Nocturne, pour que le terminal appartienne à la même interface. */
-const THEME = {
-  background: '#101120',
-  foreground: '#c9cad3',
-  cursor: '#9184d9',
-  selectionBackground: '#353b80',
-  black: '#161826',
-  brightBlack: '#595d6c',
-  white: '#e9e9ed',
-  brightWhite: '#ffffff',
-  magenta: '#9184d9',
-  brightMagenta: '#b3a9e6',
-}
+/**
+ * Palette xterm thématisée, calculée au démarrage.
+ * getTerminalTheme() retourne la palette selon le thème courant.
+ */
 
 /** Un onglet du panneau : ce que l'interface en montre. */
 export interface Session {
@@ -223,7 +216,7 @@ export function useTerminals(projectPath: string | null) {
         // se séparent en bandes.
         lineHeight: 1,
         cursorBlink: true,
-        theme: THEME,
+        theme: getTerminalTheme(),
         allowProposedApi: true,
       })
       const fit = new FitAddon()

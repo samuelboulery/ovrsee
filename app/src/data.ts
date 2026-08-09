@@ -163,8 +163,43 @@ export interface PackageJson {
   devDependencies?: Record<string, string>
 }
 
+export type Priorite = 'haute' | 'moyenne' | 'basse'
+
+/** De la plus urgente à la moins urgente : l'ordre du tableau est l'ordre du tri. */
+export const PRIORITES: Priorite[] = ['haute', 'moyenne', 'basse']
+
+export interface Colonne {
+  id: string
+  titre: string
+  /** Au-delà, la colonne se signale. Absent = pas de limite. */
+  wip?: number
+}
+
+/**
+ * La seule donnée du cockpit qui se saisit.
+ *
+ * Un fichier par ticket dans `cockpit/tickets/`, écrit aussi bien par cette
+ * interface que par Claude — d'où les noms de champs en français, qui sont
+ * ceux du frontmatter sur le disque.
+ */
+export interface Ticket {
+  file: string
+  id: string
+  titre: string
+  colonne: string
+  priorite: Priorite
+  tags: string[]
+  cree: string
+  maj: string
+  /** Plan lié, s'il existe. Les deux stocks restent indépendants. */
+  plan: string | null
+  corps: string
+}
+
 export interface Snapshot {
   root: string
+  board: Colonne[]
+  tickets: Ticket[]
   /** Le dossier `cockpit/` existe-t-il ? Lu sur le disque, pas déduit. */
   equipped: boolean
   plans: Plan[]
@@ -359,6 +394,44 @@ export async function projectAction(
   return payload
 }
 
+export type TicketAction =
+  | 'create'
+  | 'move'
+  | 'update'
+  | 'delete'
+  | 'column-add'
+  | 'column-rename'
+  | 'column-remove'
+  | 'column-reorder'
+
+export interface Tableau {
+  board: Colonne[]
+  tickets: Ticket[]
+}
+
+/**
+ * Écrit un ticket et rend le tableau à jour.
+ *
+ * La réponse ne porte que colonnes et tickets : après un glisser-déposer,
+ * relire le graphe, les captures et le journal git serait payer tout le projet
+ * pour un champ qui change.
+ */
+export async function ticketAction(
+  action: TicketAction,
+  path: string,
+  payload: Record<string, unknown> = {},
+): Promise<Tableau> {
+  const response = await fetch('/api/tickets', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    body: JSON.stringify({ ...payload, action, path }),
+  })
+
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result
+}
+
 /** Un projet sans dossier `cockpit/` : rien à lire, donc rien à montrer. */
 export const isUnequipped = (snapshot: Snapshot): boolean => !snapshot.equipped
 
@@ -370,9 +443,44 @@ export const shotUrl = (root: string, file: string) =>
 
 // --- dérivations -----------------------------------------------------------
 
-/** Le backlog n'est pas saisi : ce sont les plans jamais clos. */
-export const backlog = (plans: Plan[]): Plan[] =>
+/**
+ * Les plans jamais clos.
+ *
+ * Ce n'est plus le backlog — celui-ci se saisit maintenant, ticket par ticket.
+ * C'est l'intention en cours : ce qui a été approuvé et pas encore soldé par un
+ * commit. Les deux listes se répondent sans se confondre.
+ */
+export const plansOuverts = (plans: Plan[]): Plan[] =>
   plans.filter(p => p.status === 'open').sort((a, b) => (b.opened ?? '').localeCompare(a.opened ?? ''))
+
+/**
+ * Priorité d'abord, puis du plus récent au plus ancien.
+ *
+ * Même règle que `hooks/tickets.js` : le tri est refait ici pour réordonner une
+ * carte déplacée sans attendre le serveur, jamais pour en décider autrement.
+ */
+export const sortTickets = (tickets: Ticket[]): Ticket[] =>
+  [...tickets].sort(
+    (a, b) =>
+      PRIORITES.indexOf(a.priorite) - PRIORITES.indexOf(b.priorite) ||
+      (b.cree ?? '').localeCompare(a.cree ?? ''),
+  )
+
+/**
+ * La colonne qui vaut « terminé », s'il y en a une.
+ *
+ * Miroir de `colonneFinale` dans `hooks/tickets.js` : la dernière colonne, mais
+ * seulement s'il y en a plusieurs. Sur un tableau à une colonne, la traiter
+ * comme terminale ferait disparaître tous les tickets du compte.
+ */
+export const colonneFinale = (board: Colonne[]): string | null =>
+  board.length > 1 ? (board.at(-1)?.id ?? null) : null
+
+/** Ce qui reste à faire : tout ce qui n'est pas dans la colonne terminale. */
+export const restant = (tickets: Ticket[], board: Colonne[]): number => {
+  const fini = colonneFinale(board)
+  return tickets.filter(t => t.colonne !== fini).length
+}
 
 /** L'historique n'est pas saisi : ce sont les plans clos, par date de clôture. */
 export const history = (plans: Plan[]): Plan[] =>

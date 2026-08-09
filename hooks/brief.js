@@ -15,6 +15,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
 
 import { readPlans } from './plans.js'
+import { colonneFinale, readBoard, readTickets, sortTickets } from './tickets.js'
 
 // Les plans manipulés ici sont APLATIS (`{status, title, …}`), pas emboîtés
 // dans `meta` comme ceux que rend readPlans : un brief se lit mieux ainsi.
@@ -72,11 +73,15 @@ export function readCockpit(root) {
     scans = []
   }
 
+  const board = readBoard(cockpitDir)
+
   return {
     name: basename(root),
     plans: plans.map(p => ({ file: p.file, ...p.meta, body: p.body })),
     pageCount: Array.isArray(pages?.pages) ? pages.pages.length : 0,
     scan: scans.at(-1) ?? null,
+    board,
+    tickets: sortTickets(readTickets(cockpitDir, board)).map(t => ({ file: t.file, ...t.meta })),
   }
 }
 
@@ -136,7 +141,8 @@ export function buildBrief(state, now = new Date()) {
   const closed = closedPlans(state.plans)
   const lines = []
 
-  if (state.pageCount === 0 && open.length === 0 && closed.length === 0 && !state.scan) {
+  const aucunTicket = (state.tickets ?? []).length === 0
+  if (state.pageCount === 0 && open.length === 0 && closed.length === 0 && !state.scan && aucunTicket) {
     return '' // Un cockpit vide : mieux vaut se taire que produire un brief creux.
   }
 
@@ -171,6 +177,25 @@ export function buildBrief(state, now = new Date()) {
     }
     if (open.length > MAX_LISTED) {
       lines.push(`  … et ${open.length - MAX_LISTED} autre(s), dans cockpit/plans/.`)
+    }
+  }
+
+  // Le tableau, lui, dit ce qui reste à faire — les plans ouverts disent ce qui
+  // a été approuvé. Les deux ne se recouvrent pas, d'où deux blocs distincts.
+  const board = state.board ?? []
+  const fini = colonneFinale(board)
+  const titres = new Map(board.map(c => [c.id, c.titre]))
+  const restants = (state.tickets ?? []).filter(t => t.colonne !== fini)
+
+  if (restants.length > 0) {
+    lines.push(`${restants.length} ticket(s) à faire — tableau dans cockpit/tickets/ :`)
+    for (const ticket of restants.slice(0, MAX_LISTED)) {
+      lines.push(
+        `  - ${ticket.id} [${ticket.priorite}] ${ticket.titre} — ${titres.get(ticket.colonne) ?? ticket.colonne}`,
+      )
+    }
+    if (restants.length > MAX_LISTED) {
+      lines.push(`  … et ${restants.length - MAX_LISTED} autre(s).`)
     }
   }
 

@@ -12,6 +12,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { basename, join, normalize } from 'node:path'
 
 import { readPlans, readRegistry } from './plans.js'
+import { readBoard, readTickets } from './tickets.js'
 import { timeline } from './timeline.js'
 
 const readJson = path => {
@@ -129,12 +130,33 @@ function commits(root, limit = 300) {
   }
 }
 
+/**
+ * Colonnes et tickets d'un projet.
+ *
+ * Extrait de `snapshot()` parce que la route d'écriture des tickets rend cette
+ * moitié-là seule : après un glisser-déposer, relire le graphe, les captures et
+ * le journal git serait du travail pour rien.
+ */
+export function tableau(root) {
+  const cockpitDir = join(root, 'cockpit')
+  const colonnes = readBoard(cockpitDir)
+
+  return {
+    board: colonnes,
+    // Aplati comme les plans : l'interface lit `ticket.titre`, pas
+    // `ticket.meta.titre`. Le corps prend son nom français au passage, pour ne
+    // pas se confondre avec le `body` d'un plan dans les mêmes composants.
+    tickets: readTickets(cockpitDir, colonnes).map(t => ({ file: t.file, ...t.meta, corps: t.body })),
+  }
+}
+
 /** Tout ce que l'interface doit lire pour un projet, en une réponse. */
 export function snapshot(root) {
   const plans = readPlans(join(root, 'cockpit')).map(p => ({ file: p.file, ...p.meta, body: p.body }))
 
   return {
     root,
+    ...tableau(root),
     // Un fait, pas une déduction : un `cockpit/` vide et un `cockpit/` absent
     // se ressemblent une fois les plans lus, et l'interface ne doit pas
     // proposer d'initialiser ce qui l'est déjà.

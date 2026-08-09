@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 
 import {
-  backlog,
   density,
   fetchProjects,
   fetchSnapshot,
@@ -10,13 +9,15 @@ import {
   isUnequipped,
   lastScan,
   projectAction,
+  restant,
   type Project,
   type Snapshot,
+  type Tableau as TableauData,
 } from './data'
 import { s } from './style'
 import { Produit } from './tabs/Produit'
 import { Historique } from './tabs/Historique'
-import { Backlog } from './tabs/Backlog'
+import { Tableau } from './tabs/Tableau'
 import { Donnees } from './tabs/Donnees'
 import { Stack } from './tabs/Stack'
 import { Terminal, type Layout } from './Terminal'
@@ -34,7 +35,7 @@ import { Divider, useResizable } from './useResizable'
 const TABS = [
   ['produit', 'Produit', '/'],
   ['historique', 'Historique', '/historique'],
-  ['backlog', 'Backlog', '/backlog'],
+  ['tableau', 'Tableau', '/tableau'],
   ['donnees', 'Données', '/donnees'],
   ['stack', 'Stack', '/stack'],
 ] as const
@@ -110,6 +111,18 @@ export function App() {
     // qu'on vient de viser.
     projectAction('touch', current).catch(() => {})
   }, [current])
+
+  /**
+   * Le tableau vit dans le snapshot, pas dans l'onglet.
+   *
+   * Chaque onglet est démonté quand on le quitte. Tant que les tickets vivaient
+   * dans l'état de l'onglet Tableau, un déplacement était écrit sur le disque
+   * mais perdu de l'affichage au premier changement d'onglet : au retour, la
+   * carte était revenue dans sa colonne d'origine, celle du snapshot chargé à
+   * l'ouverture du projet.
+   */
+  const setTableau = (tableau: TableauData) =>
+    setSnapshot(avant => (avant ? { ...avant, ...tableau } : avant))
 
   const reload = () => {
     if (!current) return
@@ -235,7 +248,14 @@ export function App() {
                       {tab === 'historique' && (
                         <Historique plans={plans} timeline={snapshot.timeline ?? []} />
                       )}
-                      {tab === 'backlog' && <Backlog plans={backlog(plans)} />}
+                      {tab === 'tableau' && (
+                        <Tableau
+                          root={snapshot.root}
+                          board={snapshot.board ?? []}
+                          tickets={snapshot.tickets ?? []}
+                          onChange={setTableau}
+                        />
+                      )}
                       {tab === 'donnees' && <Donnees graph={snapshot.graph} />}
                       {tab === 'stack' && <Stack snapshot={snapshot} />}
                     </>
@@ -521,12 +541,12 @@ function ProjectRow({
   const [hover, setHover] = useState(false)
   const [confirming, setConfirming] = useState(false)
 
-  // Chaque projet lit son propre compte de plans ouverts : c'est ce que la
+  // Chaque projet lit son propre compte de tickets restants : c'est ce que la
   // barre latérale annonce, et l'annoncer faux serait pire que de ne rien dire.
   useEffect(() => {
     fetchSnapshot(project.path)
       .then(snap => {
-        setOpen(backlog(snap.plans).length)
+        setOpen(restant(snap.tickets ?? [], snap.board ?? []))
         setEquipped(!isUnequipped(snap))
         const dates = snap.plans.flatMap(p => p.commits.map(c => c.date)).sort()
         setLast(dates.at(-1) ?? null)
@@ -539,7 +559,7 @@ function ProjectRow({
     : open === null
       ? '—'
       : open > 0
-        ? `${open} ouvert${open > 1 ? 's' : ''}`
+        ? `${open} à faire`
         : 'à jour'
 
   return (

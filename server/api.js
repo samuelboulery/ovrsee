@@ -13,11 +13,21 @@
  */
 
 import { createReadStream, existsSync, lstatSync, readFileSync } from 'node:fs'
-import { isAbsolute } from 'node:path'
+import { isAbsolute, join } from 'node:path'
 
 import { install } from '../hooks/install.js'
 import { registerProject, touchProject, unregisterProject } from '../hooks/plans.js'
-import { projects, snapshot, shotPath } from '../hooks/snapshot.js'
+import { projects, snapshot, shotPath, tableau } from '../hooks/snapshot.js'
+import {
+  addColumn,
+  createTicket,
+  deleteTicket,
+  reorderColumn,
+  moveTicket,
+  removeColumn,
+  renameColumn,
+  updateTicket,
+} from '../hooks/tickets.js'
 
 /**
  * Un dossier réel, désigné par un chemin absolu, qui n'est pas un lien.
@@ -85,6 +95,69 @@ function projectAction(body, cwd) {
 }
 
 /**
+ * Création, déplacement, modification, suppression d'un ticket.
+ *
+ * Les tickets sont la seule donnée du cockpit que l'interface écrit. Le geste
+ * courant est le glisser-déposer, d'où une réponse réduite au tableau : relire
+ * tout le projet après chaque déplacement serait payer le graphe et le journal
+ * git pour un champ qui change.
+ *
+ * Les refus de `hooks/tickets.js` — colonne inconnue, titre vide, nom de
+ * fichier douteux — remontent en 400 avec leur message. C'est une erreur
+ * d'appel, pas une panne du serveur.
+ *
+ * @param {unknown} body
+ * @param {string} root projet déjà vérifié comme présent au registre
+ */
+function ticketAction(body, root) {
+  const { action, file } = body ?? {}
+  const cockpitDir = join(root, 'cockpit')
+  const list = () => ({ json: tableau(root) })
+  const absent = () => ({ status: 404, json: { error: 'ticket introuvable' } })
+
+  try {
+    switch (action) {
+      case 'create':
+        createTicket(cockpitDir, body)
+        return list()
+
+      case 'move':
+        return moveTicket(cockpitDir, file, body?.colonne) ? list() : absent()
+
+      case 'update':
+        return updateTicket(cockpitDir, file, body) ? list() : absent()
+
+      case 'delete':
+        return deleteTicket(cockpitDir, file) ? list() : absent()
+
+      // Colonnes. L'identifiant n'est jamais modifiable : il est dérivé du
+      // titre à la création et cité par les tickets. Renommer ne touche donc
+      // que le titre, et retirer reloge les tickets avant d'écrire le board.
+      case 'column-add':
+        addColumn(cockpitDir, body)
+        return list()
+
+      case 'column-rename':
+        renameColumn(cockpitDir, body?.id, body)
+        return list()
+
+      case 'column-remove':
+        removeColumn(cockpitDir, body?.id, body?.vers)
+        return list()
+
+      case 'column-reorder':
+        reorderColumn(cockpitDir, body?.id, body?.index)
+        return list()
+
+      default:
+        return { status: 400, json: { error: 'action inconnue' } }
+    }
+  } catch (err) {
+    return { status: 400, json: { error: String(err.message ?? err) } }
+  }
+}
+
+/**
  * @param {URL} url
  * @param {string} cwd dépôt courant, pour la liste des projets
  * @param {{method?: string, headers?: Record<string, string>, body?: unknown}} [request]
@@ -107,6 +180,22 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
         return { status: 403, json: { error: 'en-tête X-Cockpit manquant' } }
       }
       return projectAction(body, cwd)
+
+    case '/api/tickets': {
+      // L'en-tête d'abord : rien de ce qui suit ne doit tourner pour une
+      // requête qu'on refuse de toute façon, pas même une lecture du registre.
+      if (method === 'POST' && headers['x-cockpit'] !== '1') {
+        return { status: 403, json: { error: 'en-tête X-Cockpit manquant' } }
+      }
+
+      // Même liste blanche que partout ailleurs : le registre. Un chemin
+      // arbitraire ne doit pas devenir une écriture disque arbitraire.
+      const asked = url.searchParams.get('path') ?? body?.path
+      const root = projects(cwd).find(p => p.path === asked)?.path ?? null
+      if (!root) return { status: 404, json: { error: 'projet inconnu' } }
+
+      return method === 'POST' ? ticketAction(body, root) : { json: tableau(root) }
+    }
 
     case '/api/project': {
       const root = asked()

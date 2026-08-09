@@ -9,7 +9,10 @@ Le dossier `cockpit/` d'un dépôt contient l'état du projet sous forme lisible
 les plans approuvés, la carte des pages, les captures datées. Il est écrit par
 des hooks, jamais à la main.
 
-**Le cockpit se lit. Il ne s'exécute jamais, et il ne s'édite jamais à la main.**
+**Le cockpit se lit. Il ne s'exécute jamais.** Une seule exception à l'édition :
+`cockpit/tickets/` et `cockpit/board.json`, qui sont le tableau du projet et se
+saisissent — par l'interface, par toi, ou par le CLI. Les plans, les pages et
+les scans restent capturés par des hooks et ne s'éditent pas à la main.
 
 ## Quand l'utiliser
 
@@ -30,15 +33,73 @@ des hooks, jamais à la main.
    signifie que le crawl a échoué ce jour-là : les captures de cette page sont
    plus vieilles que le commit.** Ne jamais présenter une capture périmée comme
    fraîche.
-4. `graphify-out/graph.json` — schéma de données et stack. Les relations y sont
+4. `cockpit/board.json` puis `cockpit/tickets/*.md` — le tableau : ce qui reste
+   à faire. Voir la section « Tickets » ci-dessous.
+5. `graphify-out/graph.json` — schéma de données et stack. Les relations y sont
    étiquetées `EXTRACTED` (lue dans le code), `INFERRED` (déduite) ou
    `AMBIGUOUS` (incertaine). Reprendre l'étiquette quand on cite la relation.
+
+## Tickets
+
+Le tableau du projet. Un fichier par ticket dans `cockpit/tickets/`, nommé
+`T-0012-un-slug.md`. Frontmatter JSON entre deux `---`, corps en markdown :
+
+```markdown
+---
+{
+  "id": "T-0012",
+  "titre": "Glisser-déposer entre colonnes",
+  "colonne": "pret",
+  "priorite": "haute",
+  "tags": ["ui"],
+  "cree": "2026-08-09",
+  "maj": "2026-08-09",
+  "plan": null
+}
+---
+
+## Contexte
+Pourquoi ce ticket existe.
+
+## Critères d'acceptation
+- [ ] …
+```
+
+- `colonne` référence un `id` de `cockpit/board.json`. Colonnes par défaut :
+  `backlog`, `a-specifier`, `pret`, `en-cours`, `revue`, `fait`. **Lire le
+  board avant d'écrire une colonne : elles sont configurables par projet**,
+  depuis le mode édition de l'onglet Tableau ou en éditant le fichier.
+- Un `id` de colonne ne se modifie jamais : il est dérivé du titre à la
+  création, et c'est lui que les tickets citent. Renommer une colonne ne touche
+  que son `titre`. Retirer une colonne suppose de reloger ses tickets d'abord —
+  réécrire leur `colonne`, pas seulement supprimer l'entrée du board.
+- `priorite` vaut `haute`, `moyenne` ou `basse`. Le tri est priorité puis date ;
+  il n'y a pas de rang manuel.
+- `id` : le maximum existant plus un, jamais un numéro repris à un ticket
+  supprimé.
+- `plan` lie un ticket à un plan de `cockpit/plans/`, ou vaut `null`. Les deux
+  stocks sont indépendants : un ticket n'est pas un plan, un plan n'est pas une
+  tâche.
+
+Écrire un ticket : soit directement le fichier, soit le CLI depuis la racine du
+dépôt **cockpit** (le CLI n'est pas installé dans les projets équipés) :
+
+```bash
+node hooks/cockpit-cli.js tickets                        # le tableau, colonne par colonne
+node hooks/cockpit-cli.js ticket new "<titre>" --colonne pret --priorite haute
+node hooks/cockpit-cli.js ticket move <T-0012-slug.md> en-cours
+node hooks/cockpit-cli.js ticket import-plans            # reprend les plans ouverts
+```
+
+Proposer des tickets est utile ; en créer trente d'un coup ne l'est pas. Un
+ticket vaut par son critère d'acceptation, pas par son existence.
 
 ## Ce qui se calcule, et qu'il ne faut donc pas chercher dans un fichier
 
 | Question | Réponse |
 |---|---|
-| Que reste-t-il à faire ? | Les plans `status: open` |
+| Que reste-t-il à faire ? | Les tickets hors dernière colonne du board |
+| Qu'a-t-on approuvé sans le solder ? | Les plans `status: open` |
 | Qu'a-t-on fait récemment ? | Les plans `status: closed`, triés par `closed` |
 | Combien de travail sur cette page ? | Les plans clos dont `commits[].files` recoupent les fichiers de la page |
 | Où le travail s'est-il concentré ? | Les `commits[].date` groupés par semaine |

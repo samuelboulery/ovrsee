@@ -122,8 +122,15 @@ export function updatePlanMeta(cockpitDir, file, update) {
   return true
 }
 
-/** Le backlog n'est pas saisi : c'est l'ensemble des plans jamais clos. */
-export function backlog(plans) {
+/**
+ * Les plans jamais clos.
+ *
+ * S'appelait `backlog` du temps où le backlog se déduisait des plans. Le
+ * backlog se saisit maintenant, ticket par ticket, dans `cockpit/tickets/` —
+ * ceci reste l'intention approuvée et non soldée, ce qui n'est pas la même
+ * chose.
+ */
+export function plansOuverts(plans) {
   return plans
     .filter(p => p.meta.status === 'open')
     .sort((a, b) => String(b.meta.opened ?? '').localeCompare(String(a.meta.opened ?? '')))
@@ -310,7 +317,7 @@ export function touchProject(root, now = new Date()) {
  *
  * Un plan se ferme à l'ouverture du suivant, pas au premier commit : un plan
  * est une intention, et une intention prend souvent plusieurs commits. Un plan
- * ouvert SANS commit n'est pas clos — c'est du backlog, approuvé puis
+ * ouvert SANS commit n'est pas clos — c'est du travail approuvé puis
  * abandonné.
  *
  * Vit ici, et non dans le hook, parce que le chemin manuel (`/cockpit

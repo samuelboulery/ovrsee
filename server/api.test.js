@@ -149,3 +149,94 @@ test('POST init refuse un dossier qui n’est pas un dépôt git', () => {
   // le dit au lieu d'installer un hook qui ne servira jamais.
   assert.equal(post({ action: 'init', path: dir }).status, 400)
 })
+
+// --- /api/tickets ----------------------------------------------------------
+
+const postTicket = (body, headers = { 'x-cockpit': '1' }) =>
+  resolve(url('/api/tickets'), null, { method: 'POST', headers, body })
+
+/** Un projet enregistré, prêt à recevoir des tickets. */
+const projetEnregistre = () => {
+  withRegistry()
+  const dir = projectWithShot()
+  post({ action: 'add', path: dir })
+  return dir
+}
+
+test('POST /api/tickets sans l’en-tête X-Cockpit est refusé', () => {
+  const dir = projetEnregistre()
+  assert.equal(postTicket({ action: 'create', path: dir, titre: 'X' }, {}).status, 403)
+})
+
+test('/api/tickets refuse un projet hors registre', () => {
+  projetEnregistre()
+  assert.equal(postTicket({ action: 'create', path: '/etc', titre: 'X' }).status, 404)
+  assert.equal(resolve(url('/api/tickets?path=%2Fetc'), null).status, 404)
+})
+
+test('/api/tickets crée puis déplace un ticket', () => {
+  const dir = projetEnregistre()
+
+  const cree = postTicket({ action: 'create', path: dir, titre: 'Premier' })
+  assert.equal(cree.json.tickets.length, 1)
+  assert.equal(cree.json.tickets[0].colonne, 'backlog')
+  assert.equal(cree.json.board[0].id, 'backlog')
+
+  const file = cree.json.tickets[0].file
+  const bouge = postTicket({ action: 'move', path: dir, file, colonne: 'pret' })
+  assert.equal(bouge.json.tickets[0].colonne, 'pret')
+})
+
+test('/api/tickets remonte les refus du modèle en 400', () => {
+  const dir = projetEnregistre()
+
+  assert.equal(postTicket({ action: 'create', path: dir, titre: '  ' }).status, 400)
+  assert.equal(postTicket({ action: 'create', path: dir, titre: 'X', colonne: 'nulle-part' }).status, 400)
+  assert.equal(postTicket({ action: 'move', path: dir, file: '../plans/x.md', colonne: 'pret' }).status, 400)
+  assert.equal(postTicket({ action: 'bidon', path: dir }).status, 400)
+})
+
+test('/api/tickets rend 404 sur un fichier de ticket qui n’existe pas', () => {
+  const dir = projetEnregistre()
+  assert.equal(postTicket({ action: 'move', path: dir, file: 'T-9999-absent.md', colonne: 'pret' }).status, 404)
+  assert.equal(postTicket({ action: 'delete', path: dir, file: 'T-9999-absent.md' }).status, 404)
+})
+
+test('/api/tickets supprime un ticket', () => {
+  const dir = projetEnregistre()
+  const file = postTicket({ action: 'create', path: dir, titre: 'Jetable' }).json.tickets[0].file
+
+  assert.deepEqual(postTicket({ action: 'delete', path: dir, file }).json.tickets, [])
+})
+
+test('/api/tickets édite les colonnes du tableau', () => {
+  const dir = projetEnregistre()
+
+  const ajoutee = postTicket({ action: 'column-add', path: dir, titre: 'Bloqué', apres: 'pret' })
+  assert.deepEqual(
+    ajoutee.json.board.map(c => c.id),
+    ['backlog', 'a-specifier', 'pret', 'bloque', 'en-cours', 'revue', 'fait'],
+  )
+
+  const renommee = postTicket({ action: 'column-rename', path: dir, id: 'bloque', titre: 'En attente' })
+  assert.equal(renommee.json.board.find(c => c.id === 'bloque').titre, 'En attente')
+
+  const decalee = postTicket({ action: 'column-reorder', path: dir, id: 'bloque', index: 0 })
+  assert.equal(decalee.json.board[0].id, 'bloque')
+
+  const retiree = postTicket({ action: 'column-remove', path: dir, id: 'bloque' })
+  assert.equal(retiree.json.board.some(c => c.id === 'bloque'), false)
+})
+
+test('/api/tickets reloge les tickets d’une colonne retirée', () => {
+  const dir = projetEnregistre()
+  const file = postTicket({ action: 'create', path: dir, titre: 'Déménage', colonne: 'revue' }).json
+    .tickets[0].file
+
+  // Sans destination, on refuse plutôt que de laisser un ticket citer une
+  // colonne disparue.
+  assert.equal(postTicket({ action: 'column-remove', path: dir, id: 'revue' }).status, 400)
+
+  const apres = postTicket({ action: 'column-remove', path: dir, id: 'revue', vers: 'fait' })
+  assert.equal(apres.json.tickets.find(t => t.file === file).colonne, 'fait')
+})

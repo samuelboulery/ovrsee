@@ -8,7 +8,7 @@ import {
   parsePlan,
   serializePlan,
   readPlans,
-  backlog,
+  plansOuverts,
   history,
   density,
   slugify,
@@ -184,9 +184,9 @@ const SAMPLE = [
   ]),
 ]
 
-test('backlog = les plans ouverts, du plus récent au plus ancien', () => {
+test('plansOuverts = les plans jamais clos, du plus récent au plus ancien', () => {
   assert.deepEqual(
-    backlog(SAMPLE).map(p => p.meta.title),
+    plansOuverts(SAMPLE).map(p => p.meta.title),
     ['Export CSV', 'Mode hors ligne'],
   )
 })
@@ -333,7 +333,7 @@ test('closeOpenPlans clôt un plan ouvert portant un commit, à la date du derni
   assert.equal(plan.meta.closed, '2026-07-09', 'la clôture porte la date du DERNIER commit')
 })
 
-test('closeOpenPlans laisse ouvert un plan sans commit — c’est du backlog, pas du travail fait', () => {
+test('closeOpenPlans laisse ouvert un plan sans commit — c’est une intention, pas du travail fait', () => {
   const dir = cockpitWithPlans([['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [] }]])
 
   assert.deepEqual(closeOpenPlans(dir), [])

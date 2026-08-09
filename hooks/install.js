@@ -36,6 +36,9 @@ import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { writeFileNoFollow } from './plans.js'
+import { DEFAULT_COLUMNS } from './tickets.js'
+
 const HERE = dirname(fileURLToPath(import.meta.url))
 const START = '# cockpit-hook-start'
 const END = '# cockpit-hook-end'
@@ -189,6 +192,17 @@ export function install(target) {
 
   mkdirSync(join(root, 'cockpit', 'plans'), { recursive: true })
   done.push(`cockpit/plans/ prêt dans ${root}`)
+
+  mkdirSync(join(root, 'cockpit', 'tickets'), { recursive: true })
+  done.push('cockpit/tickets/ prêt')
+
+  // Jamais écrasé : un projet qui a réorganisé ses colonnes ne doit pas les
+  // perdre en réinstallant les hooks.
+  const board = join(root, 'cockpit', 'board.json')
+  if (!existsSync(board)) {
+    writeFileNoFollow(board, JSON.stringify({ colonnes: DEFAULT_COLUMNS }, null, 2) + '\n')
+    done.push('cockpit/board.json écrit avec les colonnes par défaut')
+  }
 
   installPostCommit(root, done)
   installClaudeHooks(done)

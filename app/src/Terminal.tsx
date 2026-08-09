@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { backlog, frDate, lastScan, type Snapshot } from './data'
+import { plansOuverts, frDate, lastScan, sortTickets, type Snapshot } from './data'
 import { s } from './style'
 import { useTerminal } from './useTerminal'
 import { Divider, useResizable } from './useResizable'
@@ -294,7 +294,7 @@ function briefLines(snapshot: Snapshot | null): Array<{ text: string; style: str
   const dim = 'color: var(--color-neutral-400);'
   if (!snapshot) return [{ text: 'lecture de cockpit/…', style: 'color: var(--color-neutral-600);' }]
 
-  const open = backlog(snapshot.plans)
+  const open = plansOuverts(snapshot.plans)
   const closed = snapshot.plans.length - open.length
   const pages = snapshot.pages?.pages.length ?? 0
   const scan = lastScan(snapshot.scans)
@@ -330,7 +330,7 @@ function briefLines(snapshot: Snapshot | null): Array<{ text: string; style: str
 function buildInjections(snapshot: Snapshot | null): Array<{ label: string; text: string }> {
   if (!snapshot) return []
 
-  const open = backlog(snapshot.plans)
+  const open = plansOuverts(snapshot.plans)
   const pages = snapshot.pages?.pages ?? []
 
   return [
@@ -341,6 +341,20 @@ function buildInjections(snapshot: Snapshot | null): Array<{ label: string; text
     {
       label: `${open.length} plan(s) ouvert(s)`,
       text: open.map(p => `- ${p.title} (ouvert le ${frDate(p.opened)})`).join('\n'),
+    },
+    {
+      label: `Tableau (${snapshot.tickets?.length ?? 0} ticket(s))`,
+      // Colonne par colonne, dans l'ordre du tableau : c'est ce qui permet à
+      // Claude de proposer un déplacement plutôt qu'un ticket de plus.
+      text: (snapshot.board ?? [])
+        .map(colonne => {
+          const dedans = sortTickets(
+            (snapshot.tickets ?? []).filter(t => t.colonne === colonne.id),
+          )
+          const lignes = dedans.map(t => `  ${t.id} [${t.priorite}] ${t.titre} — ${t.file}`)
+          return [`${colonne.titre} (${dedans.length})`, ...lignes].join('\n')
+        })
+        .join('\n'),
     },
     {
       label: 'Chemin du cockpit',

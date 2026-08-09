@@ -4,7 +4,33 @@
   "title": "Skills installables + coffre Obsidian",
   "opened": "2026-08-09",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "11470b6",
+      "date": "2026-08-09",
+      "files": [
+        ".gitignore",
+        "README.md",
+        "app/src/App.tsx",
+        "app/src/SkillsPanel.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/data.ts",
+        "app/src/tabs/Apercu.tsx",
+        "electron-builder.yml",
+        "hooks/cockpit-cli.js",
+        "hooks/install.js",
+        "hooks/obsidian.js",
+        "hooks/obsidian.test.js",
+        "hooks/skills.js",
+        "hooks/skills.test.js",
+        "package.json",
+        "server/api.js",
+        "server/api.test.js",
+        "skills/cockpit-tickets/SKILL.md",
+        "skills/cockpit/SKILL.md"
+      ]
+    }
+  ]
 }
 ---
 

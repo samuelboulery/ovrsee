@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Plan directeur — Cockpit v1.0 : personnalisation, onboarding, ouverture",
   "opened": "2026-08-09",
-  "closed": null,
+  "closed": "2026-08-09",
   "commits": [
     {
       "sha": "0efa562",
@@ -173,6 +173,11 @@
     },
     {
       "sha": "1685d97",
+      "date": "2026-08-09",
+      "files": []
+    },
+    {
+      "sha": "d95b53b",
       "date": "2026-08-09",
       "files": []
     }

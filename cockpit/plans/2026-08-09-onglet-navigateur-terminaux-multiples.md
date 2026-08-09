@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Onglet Navigateur + terminaux multiples",
   "opened": "2026-08-09",
-  "closed": null,
+  "closed": "2026-08-09",
   "commits": [
     {
       "sha": "fb4e8ef",
@@ -22,6 +22,11 @@
     },
     {
       "sha": "c75e4c1",
+      "date": "2026-08-09",
+      "files": []
+    },
+    {
+      "sha": "bb2fc14",
       "date": "2026-08-09",
       "files": []
     }

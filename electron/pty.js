@@ -5,6 +5,11 @@
  * puis le cockpit y tape `claude` une fois. Quitter Claude rend la main au
  * shell au lieu de tuer le panneau.
  *
+ * Une session `shell` ouvre le même shell sans rien y taper : c'est là qu'on
+ * lance un serveur de dev ou qu'on suit des logs, sans occuper la session
+ * Claude. Le rendu ne choisit pas un programme pour autant — il envoie un mot
+ * d'un ensemble fermé, et c'est ici qu'on décide ce qu'il déclenche.
+ *
  * Le shell de connexion n'est pas un confort, c'est la condition pour que ça
  * marche : une application graphique lancée depuis le Finder hérite d'un PATH
  * minimal, où ni `claude` ni `node` n'existent — les hooks de Claude Code
@@ -21,8 +26,14 @@ import { spawn } from 'node-pty'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
-/** Tapé une fois par session, dans le shell qui vient de s'ouvrir. */
-const STARTUP_COMMAND = 'claude\n'
+/**
+ * Ce qui est tapé une fois dans le shell qui vient de s'ouvrir, par genre de
+ * session. `shell` n'a rien à taper : c'est un shell nu.
+ */
+const STARTUP_COMMAND = {
+  claude: 'claude\n',
+  shell: null,
+}
 
 const FALLBACK_SHELL = '/bin/zsh'
 
@@ -62,7 +73,7 @@ function sessionEnv() {
   }
 }
 
-/** @type {Map<string, {pty: import('node-pty').IPty, project: string}>} */
+/** @type {Map<string, {pty: import('node-pty').IPty, project: string, kind: string}>} */
 const sessions = new Map()
 
 let counter = 0
@@ -72,14 +83,20 @@ let counter = 0
  *
  * @param {Electron.WebContents} sender destinataire des octets du terminal
  * @param {string} projectPath dossier du projet
+ * @param {'claude'|'shell'} [kind] genre de session ; tout autre valeur vaut `claude`
  * @returns {{id: string} | {error: string}}
  */
-export function openSession(sender, projectPath) {
+export function openSession(sender, projectPath, kind = 'claude') {
   // Le chemin vient du rendu : il doit désigner un projet réel, pas un
   // dossier arbitraire, et surtout pas un fichier.
   if (typeof projectPath !== 'string' || !existsSync(join(projectPath, 'cockpit'))) {
     return { error: "ce dossier n'est pas un projet suivi par le cockpit" }
   }
+
+  // Le genre vient du rendu : `hasOwn` et pas une simple indexation, sinon
+  // `constructor` ou `toString` désigneraient une valeur héritée du prototype.
+  const known = typeof kind === 'string' && Object.hasOwn(STARTUP_COMMAND, kind)
+  const startup = known ? STARTUP_COMMAND[kind] : STARTUP_COMMAND.claude
 
   const shell = loginShell()
   const id = `pty-${++counter}`
@@ -102,12 +119,12 @@ export function openSession(sender, projectPath) {
 
   // `claude` est tapé au premier signe de vie du shell, pas avant : écrit trop
   // tôt, un prompt élaboré (instant prompt, autosuggestions) avale la ligne.
-  let primed = false
+  let primed = !startup
 
   pty.onData(data => {
     if (!primed) {
       primed = true
-      pty.write(STARTUP_COMMAND)
+      pty.write(startup)
     }
     if (!sender.isDestroyed()) sender.send('pty:data', id, data)
   })
@@ -116,7 +133,7 @@ export function openSession(sender, projectPath) {
     if (!sender.isDestroyed()) sender.send('pty:exit', id, exitCode)
   })
 
-  sessions.set(id, { pty, project: projectPath })
+  sessions.set(id, { pty, project: projectPath, kind: known ? kind : 'claude' })
   return { id }
 }
 

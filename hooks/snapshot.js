@@ -184,6 +184,10 @@ export function snapshot(root) {
     equipped: existsSync(join(root, 'cockpit')),
     plans,
     packageJson: readJson(join(root, 'package.json')),
+    // Le crawler y lit déjà `dev` et `baseUrl`. L'onglet Navigateur s'en sert
+    // comme URL par défaut : le projet a déjà déclaré où il s'affiche, le
+    // redemander à l'utilisateur serait une deuxième vérité à tenir à jour.
+    config: readJson(join(root, 'cockpit.config.json')),
     // Le seul texte du cockpit qui ne vient pas de `cockpit/`. Il y a une bonne
     // raison : c'est le seul endroit du dépôt où quelqu'un a déjà écrit ce que
     // le projet fait. Le recopier dans `cockpit/` en ferait une deuxième

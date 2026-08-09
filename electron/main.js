@@ -11,7 +11,17 @@
  * puisque ce même processus peut charger la page servie et l'y lire.
  */
 
-import { app, BrowserWindow, dialog, ipcMain, protocol, shell } from 'electron'
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  nativeTheme,
+  protocol,
+  shell,
+  webContents,
+  WebContentsView,
+} from 'electron'
 import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, extname, join, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -86,6 +96,31 @@ async function serveUi(pathname) {
   }
 }
 
+/**
+ * Invités attachés, par fenêtre hôte.
+ *
+ * @type {Map<number, Set<Electron.WebContents>>}
+ */
+const guestsByHost = new Map()
+
+/**
+ * Panneau de DevTools ouvert, par fenêtre hôte.
+ *
+ * @type {Map<number, {view: Electron.WebContentsView, target: Electron.WebContents, window: Electron.BrowserWindow}>}
+ */
+const devtoolsByHost = new Map()
+
+/** Ferme le panneau de DevTools d'une fenêtre, s'il y en a un. */
+function closeDevtools(hostId) {
+  const open = devtoolsByHost.get(hostId)
+  if (!open) return
+  devtoolsByHost.delete(hostId)
+
+  if (!open.target.isDestroyed()) open.target.closeDevTools()
+  if (!open.window.isDestroyed()) open.window.contentView.removeChildView(open.view)
+  if (!open.view.webContents.isDestroyed()) open.view.webContents.close()
+}
+
 function createWindow() {
   const window = new BrowserWindow({
     width: 1400,
@@ -103,7 +138,46 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
+      // L'onglet Navigateur affiche l'application en cours de développement.
+      // Une `<iframe>` ne conviendrait pas : le dev server est une autre
+      // origine, le rendu ne pourrait pas toucher son DOM et la sélection
+      // d'élément serait impossible.
+      webviewTag: true,
     },
+  })
+
+  // L'invité est attaché par le rendu : c'est ici qu'on décide de ses
+  // privilèges, pas dans les attributs de la balise. Sans cela, un rendu
+  // compromis attacherait une page distante avec `nodeIntegration`.
+  window.webContents.on('will-attach-webview', (_event, webPreferences) => {
+    delete webPreferences.preload
+    webPreferences.nodeIntegration = false
+    webPreferences.contextIsolation = true
+  })
+
+  // Les invités de cette fenêtre. Sert de liste blanche à `preview:devtools` :
+  // le rendu y désigne deux contenus par identifiant, et un identifiant est
+  // un entier — donc devinable. Rien d'autre que ce que cette fenêtre a
+  // elle-même attaché ne doit pouvoir être visé.
+  const guests = new Set()
+  guestsByHost.set(window.webContents.id, guests)
+
+  // Le garde `will-navigate` ci-dessous ne couvre que la fenêtre. Un
+  // `target="_blank"` de l'application inspectée ouvrirait sinon une fenêtre
+  // Electron nue, sans barre d'adresse ni indication d'origine.
+  window.webContents.on('did-attach-webview', (_event, guest) => {
+    guests.add(guest)
+    guest.once('destroyed', () => guests.delete(guest))
+    guest.setWindowOpenHandler(({ url }) => {
+      shell.openExternal(url)
+      return { action: 'deny' }
+    })
+  })
+
+  const hostId = window.webContents.id
+  window.webContents.once('destroyed', () => {
+    closeDevtools(hostId)
+    guestsByHost.delete(hostId)
   })
 
   // Les erreurs du rendu remontent sur la sortie du processus principal.
@@ -128,7 +202,10 @@ function createWindow() {
     if (!url.startsWith(ORIGIN)) event.preventDefault()
   })
 
-  window.loadURL(ORIGIN + '/')
+  // `COCKPIT_ROUTE=/navigateur` ouvre la fenêtre sur un autre onglet : sans
+  // cela, la capture automatique ci-dessous ne peut vérifier que la page
+  // d'arrivée, et les cinq autres onglets ne sont jamais regardés.
+  window.loadURL(ORIGIN + (process.env.COCKPIT_ROUTE ?? '/'))
 
   // `COCKPIT_CAPTURE=/chemin.png` : la fenêtre se photographie puis quitte.
   // Une interface graphique doit pouvoir se vérifier sans qu'un humain la
@@ -166,10 +243,85 @@ app.whenReady().then(() => {
 
   // Surface du terminal. Elle n'accepte jamais de nom de programme : le
   // processus lancé est décidé dans pty.js, pas par le rendu.
-  ipcMain.handle('pty:open', (event, projectPath) => openSession(event.sender, projectPath))
+  ipcMain.handle('pty:open', (event, projectPath, kind) =>
+    openSession(event.sender, projectPath, kind),
+  )
   ipcMain.handle('pty:write', (_event, id, data) => writeTo(id, data))
   ipcMain.handle('pty:resize', (_event, id, cols, rows) => resize(id, cols, rows))
   ipcMain.handle('pty:close', (_event, id) => closeSession(id))
+
+  /**
+   * Ouvrir — et positionner — le panneau de DevTools de l'aperçu.
+   *
+   * `webview.openDevTools()` ouvre une fenêtre séparée, et une fenêtre qui
+   * flotte à côté du cockpit annule ce que l'onglet Navigateur apporte.
+   * `setDevToolsWebContents` est la seule façon de les rendre ailleurs.
+   *
+   * L'hôte est une `WebContentsView`, pas une seconde `<webview>` : mesuré,
+   * une `<webview>` hôte charge bien le frontend mais reste sans cible — les
+   * panneaux s'affichent vides. Une `WebContentsView` les rend complets.
+   *
+   * Elle se pose *au-dessus* du DOM, sans y appartenir : c'est le rendu qui
+   * mesure l'emplacement réservé et renvoie ses coordonnées à chaque
+   * redimensionnement. Une taille nulle escamote le panneau — c'est ce qui
+   * arrive quand on quitte l'onglet.
+   *
+   * L'identifiant de la cible vient du rendu : il doit désigner un invité que
+   * *cette* fenêtre a attaché, sinon n'importe quel entier ouvrirait les
+   * DevTools d'un contenu quelconque.
+   */
+  ipcMain.handle('preview:devtools', (event, targetId, bounds, theme) => {
+    const guests = guestsByHost.get(event.sender.id)
+    const target = webContents.fromId(targetId)
+    if (!guests || !target || !guests.has(target)) return false
+
+    const window = BrowserWindow.fromWebContents(event.sender)
+    if (!window) return false
+
+    // Les DevTools suivent le thème du système, et s'ouvrent donc en clair sur
+    // un Mac en clair — éblouissant à côté d'une interface sombre. Leur thème
+    // n'est pas une option de l'API : `themeSource` est ce qui le décide.
+    //
+    // Le réglage vaut pour toute l'application, pas seulement pour les
+    // DevTools. C'est cohérent : le cockpit est sombre, et ses menus natifs,
+    // ses ascenseurs et ses dialogues doivent l'être aussi. Le thème vient du
+    // rendu parce qu'il est le seul à savoir ce qu'il affiche.
+    //
+    // Écarté : poser `uiTheme` dans le `localStorage` de la page DevTools.
+    // C'est la recette qui circule, elle ne fait plus rien — vérifié sur deux
+    // profils neufs, la page ne lit plus ce réglage là.
+    nativeTheme.themeSource = theme === 'light' ? 'light' : 'dark'
+
+    let open = devtoolsByHost.get(event.sender.id)
+    if (!open) {
+      const view = new WebContentsView({
+        webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
+      })
+      window.contentView.addChildView(view)
+      open = { view, target, window }
+      devtoolsByHost.set(event.sender.id, open)
+
+      target.setDevToolsWebContents(view.webContents)
+      target.openDevTools()
+    }
+
+    const visible = bounds?.width >= 1 && bounds?.height >= 1
+    open.view.setVisible(visible)
+    if (visible) {
+      open.view.setBounds({
+        x: Math.round(bounds.x),
+        y: Math.round(bounds.y),
+        width: Math.round(bounds.width),
+        height: Math.round(bounds.height),
+      })
+    }
+    return true
+  })
+
+  ipcMain.handle('preview:devtools-close', event => {
+    closeDevtools(event.sender.id)
+    return true
+  })
 
   // Choisir un dossier. Le seul geste qui ne peut pas passer par `/api` : une
   // page web n'a pas le droit de connaître un chemin du disque tant que

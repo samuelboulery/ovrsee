@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { plansOuverts, frDate, lastScan, sortTickets, type Snapshot } from './data'
 import { s } from './style'
-import { useTerminal } from './useTerminal'
+import { useTerminals } from './useTerminal'
 import { Divider, useResizable } from './useResizable'
 
 export type Layout = 'bottom' | 'side' | 'full'
@@ -57,7 +57,10 @@ export function Terminal({
   snapshot: Snapshot | null
 }) {
   const [notice, setNotice] = useState<string | null>(null)
-  const { host, error, inject, available } = useTerminal(snapshot?.root ?? null)
+  const { sessions, active, setActive, attach, openShell, closeShell, errors, inject, available } =
+    useTerminals(snapshot?.root ?? null)
+
+  const error = active ? (errors[active] ?? null) : null
 
   // Tirer vers le haut agrandit le panneau du bas ; tirer vers la gauche
   // agrandit celui du côté. D'où `invert` dans les deux cas.
@@ -137,20 +140,67 @@ export function Terminal({
         )}
       >
         <span
-          style={s(
-            'font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--color-neutral-500);',
-          )}
-        >
-          Terminal · claude
-        </span>
-        <span
           title={available ? 'Session en cours' : 'Terminal disponible dans l’application'}
           style={s(
             available && !error
-              ? 'width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent); display: block;'
-              : 'width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--color-neutral-600); display: block;',
+              ? 'width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent); display: block; flex: none;'
+              : 'width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--color-neutral-600); display: block; flex: none;',
           )}
         />
+
+        {/* Une pastille par session. Le shell nu sert à lancer un serveur de
+            dev ou à suivre des logs sans occuper la session Claude. */}
+        <div style={s('display: flex; align-items: center; gap: 2px; min-width: 0; overflow: hidden;')}>
+          {sessions.map(session => (
+            <div
+              key={session.key}
+              style={s(
+                'display: flex; align-items: center; border-radius: 5px; border: 1px solid ' +
+                  (active === session.key
+                    ? 'var(--color-accent-600); background: var(--color-accent-900);'
+                    : 'transparent; background: transparent;'),
+              )}
+            >
+              <button
+                type="button"
+                onClick={() => setActive(session.key)}
+                style={s(
+                  'cursor: pointer; font-family: var(--font-body); font-size: 11px; letter-spacing: .04em; padding: 3px 8px; border: 0; background: transparent; color: ' +
+                    (active === session.key
+                      ? 'var(--color-accent-200);'
+                      : 'var(--color-neutral-500);'),
+                )}
+              >
+                {session.label}
+              </button>
+              {session.kind !== 'claude' && (
+                <button
+                  type="button"
+                  title="Fermer cette session"
+                  aria-label={`Fermer ${session.label}`}
+                  onClick={() => closeShell(session.key)}
+                  style={s(
+                    'cursor: pointer; border: 0; background: transparent; color: var(--color-neutral-600); font-size: 12px; line-height: 1; padding: 3px 6px 3px 0;',
+                  )}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={openShell}
+            title="Ouvrir un shell dans le projet"
+            disabled={!available}
+            style={s(
+              'cursor: pointer; font-family: var(--font-body); font-size: 13px; line-height: 1; padding: 3px 8px; border-radius: 5px; border: 1px solid transparent; background: transparent; color: var(--color-neutral-600);',
+            )}
+          >
+            +
+          </button>
+        </div>
+
         <div style={s('flex: 1;')} />
         <span
           style={s(
@@ -195,8 +245,24 @@ export function Terminal({
       >
         {available && (
           // Session réelle : xterm occupe la zone, `claude` tourne derrière.
-          <div style={s('flex: 1; min-width: 0; min-height: 0; padding: 8px 4px 8px 10px;')}>
-            <div ref={host} style={s('width: 100%; height: 100%;')} />
+          //
+          // Les sessions sont empilées et toutes montées, l'inactive rendue
+          // transparente. Pas `display: none` : un conteneur de largeur nulle
+          // fait calculer à FitAddon une grille fausse, et `claude` se
+          // réafficherait de travers au retour sur l'onglet.
+          <div style={s('flex: 1; min-width: 0; min-height: 0; position: relative;')}>
+            {sessions.map(session => (
+              <div
+                key={session.key}
+                ref={attach(session)}
+                style={s(
+                  'position: absolute; inset: 8px 4px 8px 10px; ' +
+                    (active === session.key
+                      ? 'opacity: 1; z-index: 1;'
+                      : 'opacity: 0; pointer-events: none; z-index: 0;'),
+                )}
+              />
+            ))}
           </div>
         )}
 

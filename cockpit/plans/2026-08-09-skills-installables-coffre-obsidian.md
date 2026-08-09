@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Skills installables + coffre Obsidian",
   "opened": "2026-08-09",
-  "closed": null,
+  "closed": "2026-08-09",
   "commits": [
     {
       "sha": "11470b6",
@@ -29,6 +29,11 @@
         "skills/cockpit-tickets/SKILL.md",
         "skills/cockpit/SKILL.md"
       ]
+    },
+    {
+      "sha": "6e2a2c0",
+      "date": "2026-08-09",
+      "files": []
     }
   ]
 }

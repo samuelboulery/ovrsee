@@ -200,6 +200,19 @@ export interface Ticket {
   corps: string
 }
 
+/**
+ * `cockpit.config.json` — le contrat du crawl, à la racine du dépôt.
+ *
+ * Seuls les champs que l'interface lit sont déclarés : le crawler en connaît
+ * d'autres, et les recopier ici en ferait une deuxième définition à tenir.
+ */
+export interface CockpitConfig {
+  /** Commande qui démarre l'application. Affichée, jamais exécutée. */
+  dev?: string
+  /** Où l'application s'affiche une fois démarrée. */
+  baseUrl?: string
+}
+
 export interface Snapshot {
   root: string
   board: Colonne[]
@@ -208,6 +221,8 @@ export interface Snapshot {
   equipped: boolean
   plans: Plan[]
   packageJson: PackageJson | null
+  /** `cockpit.config.json` du dépôt — celui que lit déjà le crawler. */
+  config: CockpitConfig | null
   /** `README.md` du dépôt, tel quel. Absent = le dépôt n'en a pas. */
   readme: string | null
   pages: {

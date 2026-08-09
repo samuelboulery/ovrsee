@@ -8,6 +8,10 @@
  * `pty.js`, et c'est un shell de connexion ; le sélecteur, lui, ne prend aucun
  * argument et rend le seul chemin que l'utilisateur a cliqué.
  *
+ * `open` prend un *genre* de session (`claude`, `shell`), pas une commande :
+ * ce que ce mot déclenche est décidé dans `pty.js`, et un mot inconnu retombe
+ * sur `claude`.
+ *
  * Tout le reste — enregistrer, retirer, initialiser un projet — passe par
  * `/api`, partagé avec le dev server : deux chemins d'écriture divergeraient.
  *
@@ -32,8 +36,32 @@ contextBridge.exposeInMainWorld('cockpit', {
     pick: () => ipcRenderer.invoke('projects:pick'),
   },
 
+  preview: {
+    /**
+     * Ouvre les DevTools de l'aperçu dans la fenêtre, et les place.
+     *
+     * Appelée à chaque changement de taille de l'emplacement réservé : le
+     * panneau est une vue native posée sur le DOM, elle ne suit pas la mise en
+     * page toute seule. Une taille nulle l'escamote.
+     *
+     * @param {number} targetId contenu inspecté ; doit être un invité de cette fenêtre
+     * @param {{x: number, y: number, width: number, height: number}} bounds place réservée
+     * @param {'dark'|'light'} theme thème de l'interface ; tout le reste vaut `dark`
+     * @returns {Promise<boolean>}
+     */
+    devtools: (targetId, bounds, theme) =>
+      ipcRenderer.invoke('preview:devtools', targetId, bounds, theme),
+
+    /** Referme le panneau et rend la place. */
+    devtoolsClose: () => ipcRenderer.invoke('preview:devtools-close'),
+  },
+
   terminal: {
-    open: projectPath => ipcRenderer.invoke('pty:open', projectPath),
+    /**
+     * @param {string} projectPath dossier du projet
+     * @param {'claude'|'shell'} [kind] `claude` lance Claude, `shell` un shell nu
+     */
+    open: (projectPath, kind) => ipcRenderer.invoke('pty:open', projectPath, kind),
     write: (id, data) => ipcRenderer.invoke('pty:write', id, data),
     resize: (id, cols, rows) => ipcRenderer.invoke('pty:resize', id, cols, rows),
     close: id => ipcRenderer.invoke('pty:close', id),

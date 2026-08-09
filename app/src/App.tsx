@@ -17,6 +17,7 @@ import {
 import { SkillsList, SkillsModal, useSkills } from './SkillsPanel'
 import { s } from './style'
 import { Apercu } from './tabs/Apercu'
+import { Navigateur } from './tabs/Navigateur'
 import { Produit } from './tabs/Produit'
 import { Historique } from './tabs/Historique'
 import { Tableau } from './tabs/Tableau'
@@ -42,6 +43,7 @@ import { Divider, useResizable } from './useResizable'
  */
 const TABS = [
   ['apercu', 'Aperçu', '/'],
+  ['navigateur', 'Navigateur', '/navigateur'],
   ['produit', 'Produit', '/produit'],
   ['historique', 'Historique', '/historique'],
   ['tableau', 'Tableau', '/tableau'],
@@ -254,6 +256,20 @@ export function App() {
                   {!error && snapshot && !unequipped && (
                     <>
                       {tab === 'apercu' && <Apercu snapshot={snapshot} />}
+
+                      {/* Le seul onglet qui reste monté quand on le quitte :
+                          le démonter rechargerait l'application inspectée, et
+                          on perdrait son état à chaque va-et-vient. */}
+                      <div
+                        style={s(
+                          tab === 'navigateur'
+                            ? 'flex: 1; display: flex; min-width: 0; min-height: 0;'
+                            : 'display: none;',
+                        )}
+                      >
+                        <Navigateur snapshot={snapshot} visible={tab === 'navigateur'} />
+                      </div>
+
                       {tab === 'produit' && <Produit snapshot={snapshot} layout={layout} />}
                       {tab === 'historique' && (
                         <Historique plans={plans} timeline={snapshot.timeline ?? []} />

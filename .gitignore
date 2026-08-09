@@ -21,6 +21,9 @@ cockpit/obsidian/
 # Build de l app, reconstruit a la demande.
 app/dist/
 
+# Traduction de app/src en JavaScript, refaite à chaque `pnpm test`.
+app/.test-build/
+
 # Applications empaquetées, reconstruites à la demande.
 release/
 

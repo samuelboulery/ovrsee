@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import {
   density,
+  estAbandon,
   fetchProjects,
   fetchSnapshot,
   frDate,
@@ -14,6 +15,7 @@ import {
   type Snapshot,
   type Tableau as TableauData,
 } from './data'
+import { Garde } from './Garde'
 import { SkillsList, SkillsModal, useSkills } from './SkillsPanel'
 import { s } from './style'
 import { Apercu } from './tabs/Apercu'
@@ -56,6 +58,33 @@ type TabId = (typeof TABS)[number][0]
 const tabForPath = (pathname: string): TabId =>
   TABS.find(([, , path]) => path === pathname)?.[0] ?? 'apercu'
 
+/** Le nom de l'onglet tel que l'utilisateur le lit — pour les messages. */
+const labelOf = (id: TabId): string => TABS.find(([tab]) => tab === id)?.[1] ?? id
+
+/**
+ * Un élément défilant déborde-t-il ?
+ *
+ * Rendre la barre d'onglets défilante ne suffisait pas : sur macOS, la barre de
+ * défilement ne s'affiche que pendant le geste, donc rien ne signalait qu'un
+ * onglet était hors champ — c'est exactement le défaut qu'on corrige. Il faut
+ * mesurer pour pouvoir le dire.
+ */
+function useDeborde() {
+  const [deborde, setDeborde] = useState(false)
+  const [element, setElement] = useState<HTMLElement | null>(null)
+
+  useEffect(() => {
+    if (!element) return
+    const mesurer = () => setDeborde(element.scrollWidth > element.clientWidth + 1)
+    mesurer()
+    const observer = new ResizeObserver(mesurer)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [element])
+
+  return { deborde, ref: setElement }
+}
+
 /**
  * Le projet courant vit dans la requête, pas dans le chemin.
  *
@@ -79,6 +108,8 @@ export function App() {
   const [tab, setTab] = useState<TabId>(() => tabForPath(window.location.pathname))
   const [layout, setLayout] = useState<Layout>('bottom')
   const [terminal, setTerminal] = useState(true)
+
+  const onglets = useDeborde()
 
   const sidebar = useResizable({
     key: 'sidebar',
@@ -110,17 +141,27 @@ export function App() {
       .catch(err => setError(String(err.message ?? err)))
   }, [])
 
+  // Deux clics rapprochés lancent deux lectures. Sans abandon, la plus lente
+  // écrase la plus récente et l'écran affiche les plans du projet précédent
+  // sous le nom du suivant.
   useEffect(() => {
     if (!current) return
+    const abandon = new AbortController()
     setSnapshot(null)
-    fetchSnapshot(current)
+    setError(null)
+    fetchSnapshot(current, abandon.signal)
       .then(setSnapshot)
-      .catch(err => setError(String(err.message ?? err)))
+      .catch(err => {
+        if (estAbandon(err)) return
+        setError(String(err.message ?? err))
+      })
 
     // Le projet remonte en tête de la liste — mais au prochain chargement.
     // Réordonner sous le curseur au moment du clic ferait sauter la ligne
     // qu'on vient de viser.
     projectAction('touch', current).catch(() => {})
+
+    return () => abandon.abort()
   }, [current])
 
   /**
@@ -172,17 +213,23 @@ export function App() {
       {/* Bande de titre : elle remplace le chrome dessiné de la maquette
           (l. 29-41) et sert de zone de déplacement de la vraie fenêtre. Le
           retrait à gauche laisse la place aux pastilles du système. */}
-      <div
+      <header
         style={s(
           'height: 44px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 82px; background: #1b1d2b; border-bottom: 1px solid var(--color-divider); -webkit-app-region: drag;',
         )}
       >
-        <div style={s('font-size: 12.5px; color: var(--color-neutral-400); letter-spacing: .02em;')}>
+        {/* Le seul `h1` de l'écran : la fenêtre porte le nom du projet, et les
+            titres des onglets sont des `h2` sous celui-là. */}
+        <h1
+          style={s(
+            'margin: 0; font-size: 12.5px; font-weight: 400; color: var(--color-neutral-400); letter-spacing: .02em;',
+          )}
+        >
           Cockpit — {projects.find(p => p.path === current)?.name ?? '…'}
-        </div>
+        </h1>
         <div style={s('flex: 1;')} />
         <ScanBadge scan={scan} />
-      </div>
+      </header>
 
       <div style={s('flex: 1; display: flex; flex-direction: column; min-height: 0;')}>
 
@@ -190,6 +237,7 @@ export function App() {
           <Sidebar
             projects={projects}
             current={current}
+            snapshot={snapshot}
             width={sidebar.size}
             onPick={path => {
               setCurrent(path)
@@ -202,10 +250,21 @@ export function App() {
           <Divider axis="x" resizable={sidebar} />
 
           <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0;')}>
-            {/* Onglets — maquette l. 75-79 */}
-            <div
+            {/* Onglets — maquette l. 75-79.
+                `overflow-x: auto` et `flex: none` sur chaque lien : sous 800 px
+                de large, la barre débordait sans barre de défilement et
+                l'onglet Stack sortait de la fenêtre sans que rien ne le dise. */}
+            <nav
+              ref={onglets.ref}
+              aria-label="Onglets du projet"
               style={s(
-                'height: 44px; flex: none; display: flex; align-items: stretch; gap: 2px; padding: 0 12px; border-bottom: 1px solid var(--color-divider); background: #171927;',
+                'height: 44px; flex: none; display: flex; align-items: stretch; gap: 2px; padding: 0 12px; border-bottom: 1px solid var(--color-divider); background: #171927; overflow-x: auto; overflow-y: hidden; scrollbar-width: none;' +
+                  // Le dégradé n'apparaît que quand il y a réellement quelque
+                  // chose de coupé : posé en permanence, il estomperait le
+                  // dernier onglet d'une barre qui tient tout entière.
+                  (onglets.deborde
+                    ? ' mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);'
+                    : ''),
               )}
             >
               {TABS.map(([id, label, path]) => (
@@ -228,7 +287,7 @@ export function App() {
                     // `display: flex; align-items: center; text-decoration: none`
                     // rattrape la mise en forme par défaut d'un lien ; le reste
                     // est copié de la maquette l. 75-79.
-                    'display: flex; align-items: center; text-decoration: none; background: transparent; border: 0; cursor: pointer; font-family: var(--font-body); font-size: 13px; padding: 0 14px; letter-spacing: .01em; ' +
+                    'display: flex; align-items: center; flex: none; white-space: nowrap; text-decoration: none; background: transparent; border: 0; cursor: pointer; font-family: var(--font-body); font-size: 13px; padding: 0 14px; letter-spacing: .01em; ' +
                       (tab === id
                         ? 'color: var(--color-text); box-shadow: inset 0 -2px 0 var(--color-accent);'
                         : 'color: var(--color-neutral-500);'),
@@ -237,7 +296,7 @@ export function App() {
                   {label}
                 </a>
               ))}
-            </div>
+            </nav>
 
             <div
               style={s(
@@ -247,14 +306,20 @@ export function App() {
               )}
             >
               {contentVisible && (
-                <div style={s('flex: 1; overflow: hidden; display: flex; min-height: 0; min-width: 0;')}>
+                <main
+                  aria-live="polite"
+                  style={s('flex: 1; overflow: hidden; display: flex; min-height: 0; min-width: 0;')}
+                >
                   {error && <Message text={`Lecture impossible : ${error}`} />}
                   {!error && !snapshot && <Message text="Lecture de cockpit/…" />}
                   {!error && snapshot && unequipped && (
                     <Unequipped root={snapshot.root} onDone={reload} onError={setError} />
                   )}
                   {!error && snapshot && !unequipped && (
-                    <>
+                    // Le garde-fou est remonté à chaque changement d'onglet et
+                    // de projet : une panne sur l'un ne doit pas condamner les
+                    // autres, et revenir dessus doit réessayer.
+                    <Garde key={`${tab}:${snapshot.root}`} quoi={`l'onglet ${labelOf(tab)}`}>
                       {tab === 'apercu' && <Apercu snapshot={snapshot} />}
 
                       {/* Le seul onglet qui reste monté quand on le quitte :
@@ -272,21 +337,26 @@ export function App() {
 
                       {tab === 'produit' && <Produit snapshot={snapshot} layout={layout} />}
                       {tab === 'historique' && (
-                        <Historique plans={plans} timeline={snapshot.timeline ?? []} />
+                        <Historique
+                          plans={plans}
+                          timeline={snapshot.timeline ?? []}
+                          illisibles={snapshot.illisibles ?? []}
+                        />
                       )}
                       {tab === 'tableau' && (
                         <Tableau
                           root={snapshot.root}
                           board={snapshot.board ?? []}
                           tickets={snapshot.tickets ?? []}
+                          illisibles={snapshot.illisibles ?? []}
                           onChange={setTableau}
                         />
                       )}
                       {tab === 'donnees' && <Donnees graph={snapshot.graph} />}
                       {tab === 'stack' && <Stack snapshot={snapshot} />}
-                    </>
+                    </Garde>
                   )}
-                </div>
+                </main>
               )}
 
               {terminal && (
@@ -451,6 +521,7 @@ function Unequipped({
 function Sidebar({
   projects,
   current,
+  snapshot,
   width,
   onPick,
   onProjects,
@@ -459,6 +530,8 @@ function Sidebar({
 }: {
   projects: Project[]
   current: string | null
+  /** L'instantané du projet affiché, pour que sa pastille suive le tableau. */
+  snapshot: Snapshot | null
   width: number
   onPick: (path: string) => void
   onProjects: (list: Project[], select?: string | null) => void
@@ -474,7 +547,8 @@ function Sidebar({
   const picker = window.cockpit?.projects
 
   return (
-    <div
+    <aside
+      aria-label="Projets"
       style={s(
         `width: ${width}px; flex: none; display: flex; flex-direction: column; background: #13141f; border-right: 1px solid var(--color-divider); padding: 14px 0;`,
       )}
@@ -513,6 +587,7 @@ function Sidebar({
             key={project.path}
             project={project}
             active={project.path === current}
+            snapshot={project.path === current ? snapshot : null}
             onPick={onPick}
             onRemove={() => {
               projectAction('remove', project.path)
@@ -580,18 +655,21 @@ function Sidebar({
           <span>aujourd'hui</span>
         </div>
       </div>
-    </div>
+    </aside>
   )
 }
 
 function ProjectRow({
   project,
   active,
+  snapshot,
   onPick,
   onRemove,
 }: {
   project: Project
   active: boolean
+  /** Instantané déjà chargé par l'application, pour le projet affiché. */
+  snapshot: Snapshot | null
   onPick: (path: string) => void
   onRemove: () => void
 }) {
@@ -603,23 +681,43 @@ function ProjectRow({
 
   // Chaque projet lit son propre compte de tickets restants : c'est ce que la
   // barre latérale annonce, et l'annoncer faux serait pire que de ne rien dire.
+  //
+  // Sauf le projet affiché : celui-là a déjà son instantané dans
+  // l'application, et c'est lui qui bouge quand on déplace une carte. Le lire
+  // ici une seconde fois figeait la pastille sur l'état du chargement — créer
+  // un ticket puis le supprimer laissait « 1 à faire » du début à la fin.
   useEffect(() => {
-    fetchSnapshot(project.path)
+    if (snapshot) return
+    const abandon = new AbortController()
+    fetchSnapshot(project.path, abandon.signal)
       .then(snap => {
         setOpen(restant(snap.tickets ?? [], snap.board ?? []))
         setEquipped(!isUnequipped(snap))
-        const dates = snap.plans.flatMap(p => p.commits.map(c => c.date)).sort()
+        const dates = (snap.plans ?? []).flatMap(p => (p.commits ?? []).map(c => c.date)).sort()
         setLast(dates.at(-1) ?? null)
       })
       .catch(() => setOpen(null))
-  }, [project.path])
+    return () => abandon.abort()
+  }, [project.path, snapshot])
 
-  const badge = !equipped
+  const vivant = snapshot
+    ? {
+        open: restant(snapshot.tickets ?? [], snapshot.board ?? []),
+        equipped: !isUnequipped(snapshot),
+        last:
+          (snapshot.plans ?? [])
+            .flatMap(p => (p.commits ?? []).map(c => c.date))
+            .sort()
+            .at(-1) ?? null,
+      }
+    : { open, equipped, last }
+
+  const badge = !vivant.equipped
     ? 'à initialiser'
-    : open === null
+    : vivant.open === null
       ? '—'
-      : open > 0
-        ? `${open} à faire`
+      : vivant.open > 0
+        ? `${vivant.open} à faire`
         : 'à jour'
 
   return (
@@ -646,13 +744,13 @@ function ProjectRow({
         {!confirming && (
           <div
             title={
-              equipped
-                ? 'Plans approuvés qui ne sont pas encore clos'
+              vivant.equipped
+                ? 'Tickets qui ne sont pas dans la colonne finale du tableau'
                 : "Ce dossier n'a pas encore de cockpit/"
             }
             style={s(
               'font-size: 10px; padding: 1px 6px; border-radius: 999px; ' +
-                (open && equipped
+                (vivant.open && vivant.equipped
                   ? 'color: var(--color-accent-200); border: 1px solid var(--color-accent-700);'
                   : 'color: var(--color-neutral-600); border: 1px solid var(--color-neutral-800);'),
             )}
@@ -686,7 +784,7 @@ function ProjectRow({
         title="Dernier commit rattaché à un plan"
         style={s('font-size: 11px; color: var(--color-neutral-600); margin-top: 3px;')}
       >
-        {humanAge(last)}
+        {humanAge(vivant.last)}
       </div>
     </div>
   )

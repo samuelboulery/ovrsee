@@ -474,6 +474,16 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
 
   const errors = logs.filter(l => l.level === 'error').length
 
+  // `<webview>` est une balise d'Electron. Dans un navigateur elle ne rend
+  // rien : l'onglet affichait un grand rectangle blanc surmonté d'une barre
+  // d'URL et de boutons qui n'agissaient sur rien. Le panneau terminal dit déjà
+  // la vérité dans la même situation ; celui-ci la disait pas.
+  //
+  // Conséquence en cascade : le crawl tourne dans un navigateur, donc il
+  // photographiait ce blanc. La vignette de `/navigateur` dans l'onglet Produit
+  // affirmait à chaque commit que la page était vide.
+  if (!window.cockpit?.preview) return <HorsApplication />
+
   return (
     <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
       <div
@@ -690,5 +700,37 @@ function NavButton({ label, title, onClick }: { label: string; title: string; on
     >
       {label}
     </button>
+  )
+}
+
+/**
+ * Ce que l'onglet montre hors de l'application empaquetée.
+ *
+ * Même franchise que le panneau terminal : pas de barre d'URL inerte, pas de
+ * bouton qui ne fait rien. On dit pourquoi, et où le trouver.
+ */
+function HorsApplication() {
+  return (
+    <div
+      style={s(
+        'flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center;',
+      )}
+    >
+      <div style={s('font-size: 13px; color: var(--color-text);')}>
+        Le navigateur intégré n'existe que dans l'application.
+      </div>
+      <div
+        style={s(
+          'font-size: 11.5px; color: var(--color-neutral-600); max-width: 56ch; line-height: 1.6;',
+        )}
+      >
+        Inspecter une page demande une vue native et des DevTools, que la coquille
+        Electron fournit et qu'un onglet de navigateur n'a pas. Lancez{' '}
+        <span style={s('font-family: ui-monospace, monospace; color: var(--color-accent-300);')}>
+          pnpm electron
+        </span>{' '}
+        pour y accéder — les six autres onglets se lisent aussi bien ici.
+      </div>
+    </div>
   )
 }

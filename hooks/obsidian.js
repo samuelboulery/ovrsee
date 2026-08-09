@@ -25,7 +25,7 @@
 import { copyFileSync, existsSync, lstatSync, mkdirSync, rmSync } from 'node:fs'
 import { basename, join } from 'node:path'
 
-import { writeFileNoFollow } from './plans.js'
+import { writeFileNoFollow, isSafeSlug } from './plans.js'
 import { shotPath, snapshot } from './snapshot.js'
 import { colonneFinale } from './tickets.js'
 
@@ -209,6 +209,11 @@ function ecrirePages(dir, snap, root) {
   let captures = 0
 
   for (const page of pages) {
+    // Valide le slug avant d'en faire un chemin
+    if (!isSafeSlug(page.slug)) {
+      throw new Error(`slug non sûr dans pages.json : ${JSON.stringify(page.slug)}`)
+    }
+
     const source = page.shot ? shotPath(root, page.shot) : null
     if (source) {
       mkdirSync(join(dir, 'shots'), { recursive: true })

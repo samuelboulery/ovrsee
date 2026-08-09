@@ -67,9 +67,9 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
   if (pages.length === 0) {
     return (
       <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
-        <h1 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
+        <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
           Graphe de navigation
-        </h1>
+        </h2>
         <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
           Aucune page cartographiée. Le crawl tourne au commit — lancez-le une fois avec{' '}
           <span style={s('font-family: ui-monospace, monospace;')}>node crawl/index.js</span>.
@@ -83,9 +83,9 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
       <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
         <div style={s('flex: none; padding: 20px 22px 0;')}>
           <div style={s('display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;')}>
-            <h1 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
+            <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
               Graphe de navigation
-            </h1>
+            </h2>
             <span style={s('font-size: 12px; color: var(--color-neutral-500);')}>
               {pages.length} page{pages.length > 1 ? 's' : ''} · {linkCount} lien
               {linkCount > 1 ? 's' : ''} · reconstruit au commit

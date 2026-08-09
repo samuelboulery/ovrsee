@@ -22,6 +22,7 @@ import {
   slugify,
   planFileName,
   writeFileNoFollow,
+  isSafeSlug,
   isSafePlanFileName,
   updatePlanMeta,
   attachCommitToPlan,
@@ -309,6 +310,37 @@ test('writeFileNoFollow ne laisse pas de fichier temporaire derrière lui', () =
   assert.deepEqual(readdirSync(dir), ['a.md'])
 })
 
+test('writeFileNoFollow nettoie le fichier temporaire quand renameSync échoue', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const path = join(dir, 'a.md')
+
+  // Crée un répertoire à la place du fichier pour forcer l'échec de renameSync
+  mkdirSync(path)
+
+  assert.throws(
+    () => writeFileNoFollow(path, 'contenu'),
+    /EISDIR|is a directory/,
+  )
+
+  // Vérifie qu'aucun fichier .tmp-* n'est laissé derrière
+  const tmpFiles = readdirSync(dir).filter(f => f.startsWith('a.md.tmp-'))
+  assert.equal(tmpFiles.length, 0, 'aucun fichier temporaire ne doit rester après une erreur')
+})
+
+test("deux écritures successives vers le même chemin sans accumuler de fichiers temporaires", () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const path = join(dir, 'a.md')
+
+  // Effectue deux écritures consécutives
+  writeFileNoFollow(path, 'contenu1')
+  writeFileNoFollow(path, 'contenu2')
+
+  // Vérifie qu'il n'y a que le fichier final, pas de fichiers temporaires orphelins
+  const files = readdirSync(dir)
+  assert.deepEqual(files, ['a.md'], 'aucun fichier temporaire ne persiste')
+  assert.equal(readFileSync(path, 'utf8'), 'contenu2', 'le dernier contenu est en place')
+})
+
 // --- clôture, règle partagée par le hook et le CLI -------------------------
 
 const cockpitWithPlans = entries => {
@@ -452,6 +484,31 @@ test('attachCommitToPlan ne compte pas deux fois le même sha', () => {
 })
 
 // --- validation du pointeur .active-plan -----------------------------------
+
+test('isSafeSlug accepte un slug valide de pages.json', () => {
+  assert.ok(isSafeSlug('accueil'))
+  assert.ok(isSafeSlug('produit'))
+  assert.ok(isSafeSlug('mon-slug-valide'))
+  assert.ok(isSafeSlug('slug_avec_tiret'))
+})
+
+test('isSafeSlug rejette tout ce qui peut sortir du dossier pages', () => {
+  for (const mauvais of [
+    '../../evil',
+    '../secret',
+    'sous/dossier',
+    'sous\\dossier',
+    'a\0b',
+    '.',
+    '..',
+    '',
+    null,
+    undefined,
+    42,
+  ]) {
+    assert.equal(isSafeSlug(mauvais), false, `devrait rejeter ${JSON.stringify(mauvais)}`)
+  }
+})
 
 test('isSafePlanFileName accepte un nom produit par planFileName', () => {
   assert.ok(isSafePlanFileName(planFileName('Notes libres')))

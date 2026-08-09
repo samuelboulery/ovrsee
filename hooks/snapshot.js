@@ -13,6 +13,7 @@ import { basename, join, normalize } from 'node:path'
 
 import { readPlans, readRegistry } from './plans.js'
 import { readBoard, readTickets } from './tickets.js'
+import { readWhys } from './whys.js'
 import { timeline } from './timeline.js'
 
 const readJson = path => {
@@ -103,22 +104,36 @@ export function shotsByPage(root) {
   return out
 }
 
-/** Traces de scan, une par ligne. Les échecs comptent autant que les succès. */
-function scans(root) {
+/**
+ * Traces de scan, une par ligne. Les échecs comptent autant que les succès.
+ *
+ * Une ligne illisible est sautée — un journal en append-only peut être coupé
+ * net par un arrêt brutal, et une ligne tronquée ne doit pas emporter les
+ * autres. Elle est comptée, en revanche : sauter en silence ferait passer un
+ * journal abîmé pour un journal court.
+ */
+function scans(root, illisibles = []) {
+  let cassees = 0
+  let lignes = []
   try {
-    return readFileSync(join(root, 'cockpit', 'pages', 'scans.jsonl'), 'utf8')
+    lignes = readFileSync(join(root, 'cockpit', 'pages', 'scans.jsonl'), 'utf8')
       .split('\n')
       .filter(Boolean)
       .flatMap(line => {
         try {
           return [JSON.parse(line)]
         } catch {
+          cassees += 1
           return []
         }
       })
   } catch {
     return []
   }
+  if (cassees > 0) {
+    illisibles.push({ file: 'pages/scans.jsonl', quoi: 'scan', lignes: cassees })
+  }
+  return lignes
 }
 
 /**
@@ -158,7 +173,7 @@ function commits(root, limit = 300) {
  * moitié-là seule : après un glisser-déposer, relire le graphe, les captures et
  * le journal git serait du travail pour rien.
  */
-export function tableau(root) {
+export function tableau(root, illisibles = []) {
   const cockpitDir = join(root, 'cockpit')
   const colonnes = readBoard(cockpitDir)
 
@@ -167,17 +182,31 @@ export function tableau(root) {
     // Aplati comme les plans : l'interface lit `ticket.titre`, pas
     // `ticket.meta.titre`. Le corps prend son nom français au passage, pour ne
     // pas se confondre avec le `body` d'un plan dans les mêmes composants.
-    tickets: readTickets(cockpitDir, colonnes).map(t => ({ file: t.file, ...t.meta, corps: t.body })),
+    tickets: readTickets(cockpitDir, colonnes, illisibles).map(t => ({
+      file: t.file,
+      ...t.meta,
+      corps: t.body,
+    })),
+    illisibles,
   }
 }
 
 /** Tout ce que l'interface doit lire pour un projet, en une réponse. */
 export function snapshot(root) {
-  const plans = readPlans(join(root, 'cockpit')).map(p => ({ file: p.file, ...p.meta, body: p.body }))
+  // Ce que la lecture n'a pas su ouvrir, rassemblé au même endroit. C'est la
+  // seule chose que le cockpit ne peut pas se contenter de taire : un fichier
+  // absent et un fichier illisible produisent le même écran vide, et seul le
+  // second demande une intervention.
+  const illisibles = []
+  const plans = readPlans(join(root, 'cockpit'), illisibles).map(p => ({
+    file: p.file,
+    ...p.meta,
+    body: p.body,
+  }))
 
   return {
     root,
-    ...tableau(root),
+    ...tableau(root, illisibles),
     // Un fait, pas une déduction : un `cockpit/` vide et un `cockpit/` absent
     // se ressemblent une fois les plans lus, et l'interface ne doit pas
     // proposer d'initialiser ce qui l'est déjà.
@@ -194,7 +223,11 @@ export function snapshot(root) {
     // version à maintenir, donc une version fausse en trois semaines.
     readme: readText(join(root, 'README.md')),
     pages: readJson(join(root, 'cockpit', 'pages', 'pages.json')),
-    scans: scans(root),
+    scans: scans(root, illisibles),
+    // Les raisons d'être des dépendances, lues dans le code : un commentaire
+    // `WHY:` posé au-dessus d'un import. L'onglet Stack les affichait comme
+    // s'il les lisait déjà ; il devinait à partir des plans.
+    whys: readWhys(root),
     graph: readJson(join(root, 'graphify-out', 'graph.json')),
     shots: shotsByPage(root),
     // Les commits bruts ne sont pas renvoyés en plus : la frise porte déjà

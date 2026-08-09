@@ -18,10 +18,12 @@ import {
   readFileSync,
   renameSync,
   rmSync,
+  unlinkSync,
   writeFileSync,
 } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
+import { randomUUID } from 'node:crypto'
 
 const FENCE = '---'
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
@@ -65,10 +67,14 @@ export function serializePlan(meta, body) {
 /**
  * Lit tous les plans d'un dossier cockpit.
  * @param {string} cockpitDir chemin de `<repo>/cockpit`
+ * @param {Array<{file: string, quoi: string}>} [illisibles] collecteur des
+ *   fichiers que la lecture n'a pas su ouvrir. Sans lui, un plan cassé
+ *   disparaît de l'interface aussi sûrement que s'il n'existait pas, et rien
+ *   ne distingue « aucun plan » de « un plan qu'on ne sait plus lire ».
  * @returns {Array<{file: string, meta: object, body: string}>} du plus récent
- *   au plus ancien. Les fichiers illisibles sont ignorés en silence.
+ *   au plus ancien.
  */
-export function readPlans(cockpitDir) {
+export function readPlans(cockpitDir, illisibles = []) {
   const dir = join(cockpitDir, 'plans')
 
   let names
@@ -85,6 +91,7 @@ export function readPlans(cockpitDir) {
     try {
       raw = readFileSync(join(dir, name), 'utf8')
     } catch {
+      illisibles.push({ file: `plans/${name}`, quoi: 'plan' })
       continue
     }
     const plan = parsePlan(raw)
@@ -94,6 +101,7 @@ export function readPlans(cockpitDir) {
       // Un plan illisible ne doit pas emporter la lecture des autres, mais il
       // ne doit pas disparaître en silence non plus : c'est précisément le
       // contenu qu'on ne peut pas reconstituer.
+      illisibles.push({ file: `plans/${name}`, quoi: 'plan' })
       process.stderr.write(`[cockpit] plan illisible, ignoré : ${name}\n`)
     }
   }
@@ -231,9 +239,21 @@ export function writeFileNoFollow(path, content) {
     throw new Error(`refus d'écrire : ${path} est un lien symbolique`)
   }
 
-  const tmp = `${path}.tmp-${process.pid}`
-  writeFileSync(tmp, content, 'utf8')
-  renameSync(tmp, path)
+  // Nom temporaire unique : pid + uuid pour éviter les collisions entre
+  // écritures concurrentes du même processus vers le même chemin.
+  const tmp = `${path}.tmp-${process.pid}-${randomUUID()}`
+  try {
+    writeFileSync(tmp, content, 'utf8')
+    renameSync(tmp, path)
+  } catch (error) {
+    // Nettoie le fichier temporaire avant de relancer l'erreur
+    try {
+      unlinkSync(tmp)
+    } catch {
+      // Impossible de nettoyer, continuer sans panic
+    }
+    throw error
+  }
 }
 
 /**
@@ -422,6 +442,22 @@ function clearActivePlan(cockpitDir, closed) {
   } catch {
     // Pas de pointeur, ou illisible : rien à retirer.
   }
+}
+
+/**
+ * Un slug de page est-il sûr à recoller à un chemin ?
+ * Les slugs viennent de pages.json, jamais édités à la main, mais pages.json
+ * arrive dans le dépôt sans validation.
+ */
+export function isSafeSlug(slug) {
+  return (
+    typeof slug === 'string' &&
+    slug.length > 0 &&
+    !slug.includes('/') &&
+    !slug.includes('\\') &&
+    !slug.includes('\0') &&
+    !slug.startsWith('.')
+  )
 }
 
 /**

@@ -6,9 +6,11 @@ import {
   planRejected,
   planWhy,
   type GitCommit,
+  type Illisible,
   type Plan,
   type TimelineEntry,
 } from '../data'
+import { Illisibles } from '../Illisibles'
 import { s } from '../style'
 
 /** `2026-08-08T12:00:00+02:00` → `2026-08-08`. Les plans, eux, datent déjà du jour. */
@@ -26,7 +28,15 @@ const hour = (date: string): string => (date.length > 10 ? date.slice(11, 16) : 
  * regroupent leurs commits, et gardent, une fois dépliés, ce que l'historique
  * disait déjà : le pourquoi, l'alternative écartée, les fichiers touchés.
  */
-export function Historique({ plans, timeline }: { plans: Plan[]; timeline: TimelineEntry[] }) {
+export function Historique({
+  plans,
+  timeline,
+  illisibles = [],
+}: {
+  plans: Plan[]
+  timeline: TimelineEntry[]
+  illisibles?: Illisible[]
+}) {
   const byFile = new Map(plans.map(plan => [plan.file, plan]))
 
   if (timeline.length === 0) {
@@ -44,13 +54,15 @@ export function Historique({ plans, timeline }: { plans: Plan[]; timeline: Timel
 
   return (
     <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
-      <h1 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
+      <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
         Chronologie du projet
-      </h1>
+      </h2>
       <div style={s('font-size: 12px; color: var(--color-neutral-600); margin-bottom: 20px;')}>
         Chaque commit, dans l'ordre, et les plans qui les expliquent. Un plan est clos par le
         commit qui l'exécute.
       </div>
+
+      <Illisibles entries={illisibles} quoi="plan" />
 
       <div style={s('display: flex; flex-direction: column;')}>
         {timeline.map((entry, index) => {

@@ -20,6 +20,10 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSyn
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+// WHY: photographier une application exige de la faire tourner. Playwright
+// est le seul pilote qui gère l'attente du réseau, l'état d'authentification
+// et la capture pleine page sans embarquer son propre navigateur —
+// `playwright-core` utilise celui du système.
 import { chromium } from 'playwright-core'
 
 import { normalizeRoutes, pageSlug, sameOrigin } from './routes.js'

@@ -1,3 +1,6 @@
+// WHY: l'interface n'est qu'une vue sur des fichiers, et React la rend
+// remplaçable — le cadrage pose que si l'application disparaît, rien n'est
+// perdu. Un framework qui possède les données irait contre ça.
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 

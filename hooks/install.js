@@ -74,7 +74,7 @@ function commandFor(scriptName) {
 }
 
 /** Le bloc cockpit du `post-commit`, installé ou remplacé sans toucher au reste. */
-function installPostCommit(root, done) {
+export function installPostCommit(root, done) {
   const hookPath = join(root, '.git', 'hooks', 'post-commit')
   const block = [
     START,
@@ -89,14 +89,20 @@ function installPostCommit(root, done) {
   if (start !== -1) {
     // Remplace le bloc précédent, sans toucher au reste du fichier.
     const end = existing.indexOf(END, start)
-    const cut = end === -1 ? existing.length : end + END.length
+    // Si le marqueur de début existe mais pas le marqueur de fin, le fichier
+    // est endommagé : refuser de modifier plutôt que d'effacer la suite.
+    if (end === -1) {
+      throw new Error(`${hookPath} contient un marqueur cockpit non refermé (${START} sans ${END})`)
+    }
+    const cut = end + END.length
     existing = existing.slice(0, start) + block + existing.slice(cut)
   } else {
     if (!existing.endsWith('\n')) existing += '\n'
     existing += '\n' + block + '\n'
   }
 
-  writeFileSync(hookPath, existing, 'utf8')
+  // Écriture atomique : temp puis rename, puis chmod
+  writeFileNoFollow(hookPath, existing)
   chmodSync(hookPath, 0o755)
 
   done.push(`post-commit : bloc cockpit installé dans ${hookPath}`)

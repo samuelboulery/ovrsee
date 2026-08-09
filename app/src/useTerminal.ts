@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+// WHY: xterm est le terminal de VS Code, pas une imitation. Un rendu maison
+// devrait réimplémenter les séquences ANSI, le défilement et la sélection —
+// et `claude` s'afficherait de travers au premier cas non couvert.
 import { Terminal as XTerm } from '@xterm/xterm'
+// WHY: la grille d'un terminal se compte en cellules, pas en pixels. L'addon
+// convertit la taille du panneau en lignes/colonnes, ce qui est la seule
+// mesure que le pty comprend.
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
 

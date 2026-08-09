@@ -7,6 +7,20 @@
  * sont stockés nulle part.
  */
 
+/**
+ * La frontière entre ce que le serveur a envoyé et ce que l'interface suppose.
+ *
+ * Les types disent qu'un instantané a des tableaux ; le disque, lui, ne promet
+ * rien — un `pages.json` écrit par un crawl interrompu, un champ ajouté après
+ * coup, un fichier édité à la main. Le 9 août 2026, un champ qui n'était pas
+ * un tableau a vidé toute l'application.
+ *
+ * Chaque dérivation passe donc par ici plutôt que de se fier à sa signature.
+ * Un tableau vide dit « rien à montrer », ce que chaque onglet sait déjà
+ * afficher ; une exception dit « écran noir ».
+ */
+const liste = <T,>(valeur: T[] | null | undefined): T[] => (Array.isArray(valeur) ? valeur : [])
+
 export interface Commit {
   sha: string
   date: string
@@ -240,6 +254,31 @@ export interface Snapshot {
   shots: Record<string, string[]>
   /** Commits et plans mêlés, du plus récent au plus ancien. */
   timeline: TimelineEntry[]
+  /**
+   * Nom de paquet → commentaire `WHY:` posé au-dessus de son import.
+   *
+   * La seule source de la colonne « pourquoi » de l'onglet Stack. Absent =
+   * personne n'a écrit de raison, ce qui est une information.
+   */
+  whys?: Record<string, string>
+  /**
+   * Les fichiers de `cockpit/` que la lecture n'a pas su ouvrir.
+   *
+   * Un fichier absent et un fichier illisible produisent le même écran vide, et
+   * seul le second demande une intervention. Les taire faisait passer un
+   * tableau abîmé pour un tableau vide.
+   */
+  illisibles?: Illisible[]
+}
+
+/** Un fichier de `cockpit/` présent sur le disque mais que le cockpit ne sait pas lire. */
+export interface Illisible {
+  /** Chemin relatif à `cockpit/`, par exemple `tickets/T-0004-x.md`. */
+  file: string
+  /** `plan`, `ticket` ou `scan`. */
+  quoi: string
+  /** Pour un journal en append-only : combien de lignes sont perdues. */
+  lignes?: number
 }
 
 /** `2026-07-18-d2f1a3.png` → `2026-07-18`. */
@@ -301,7 +340,10 @@ export interface Placed {
  * volontairement : c'est le zoom du canevas qui la ramène à l'écran, et
  * dézoomer ne prétend rien sur la structure.
  */
-export function layoutGraph(pages: Page[]): { placed: Placed[]; width: number; height: number } {
+export function layoutGraph(
+  pages: Page[],
+): { placed: Placed[]; width: number; height: number } {
+  pages = liste(pages)
   if (pages.length === 0) return { placed: [], width: 0, height: 0 }
 
   const byRoute = new Map(pages.map(p => [p.route, p]))
@@ -383,11 +425,15 @@ export interface GraphifyGraph {
   links?: GraphLink[]
 }
 
-const json = async <T,>(url: string): Promise<T> => {
-  const response = await fetch(url)
+const json = async <T,>(url: string, signal?: AbortSignal): Promise<T> => {
+  const response = await fetch(url, { signal })
   if (!response.ok) throw new Error(`${url} → HTTP ${response.status}`)
   return response.json() as Promise<T>
 }
+
+/** Une requête abandonnée n'est pas une panne : elle n'a plus de destinataire. */
+export const estAbandon = (err: unknown): boolean =>
+  err instanceof DOMException && err.name === 'AbortError'
 
 export const fetchProjects = () => json<Project[]>('/api/projects')
 
@@ -496,8 +542,16 @@ export async function ticketAction(
 /** Un projet sans dossier `cockpit/` : rien à lire, donc rien à montrer. */
 export const isUnequipped = (snapshot: Snapshot): boolean => !snapshot.equipped
 
-export const fetchSnapshot = (path: string) =>
-  json<Snapshot>(`/api/project?path=${encodeURIComponent(path)}`)
+/**
+ * L'instantané d'un projet.
+ *
+ * Le `signal` n'est pas un détail : deux clics rapprochés dans la barre
+ * latérale lançaient deux lectures, et la plus lente écrasait la plus récente.
+ * L'écran affichait alors les plans du projet A sous le nom du projet B — le
+ * genre de faux qui ne se remarque pas.
+ */
+export const fetchSnapshot = (path: string, signal?: AbortSignal) =>
+  json<Snapshot>(`/api/project?path=${encodeURIComponent(path)}`, signal)
 
 export const shotUrl = (root: string, file: string) =>
   `/api/shot?path=${encodeURIComponent(root)}&file=${encodeURIComponent(file)}`
@@ -512,7 +566,7 @@ export const shotUrl = (root: string, file: string) =>
  * commit. Les deux listes se répondent sans se confondre.
  */
 export const plansOuverts = (plans: Plan[]): Plan[] =>
-  plans.filter(p => p.status === 'open').sort((a, b) => (b.opened ?? '').localeCompare(a.opened ?? ''))
+  liste(plans).filter(p => p.status === 'open').sort((a, b) => (b.opened ?? '').localeCompare(a.opened ?? ''))
 
 /**
  * Priorité d'abord, puis du plus récent au plus ancien.
@@ -521,7 +575,7 @@ export const plansOuverts = (plans: Plan[]): Plan[] =>
  * carte déplacée sans attendre le serveur, jamais pour en décider autrement.
  */
 export const sortTickets = (tickets: Ticket[]): Ticket[] =>
-  [...tickets].sort(
+  [...liste(tickets)].sort(
     (a, b) =>
       PRIORITES.indexOf(a.priorite) - PRIORITES.indexOf(b.priorite) ||
       (b.cree ?? '').localeCompare(a.cree ?? ''),
@@ -535,17 +589,17 @@ export const sortTickets = (tickets: Ticket[]): Ticket[] =>
  * comme terminale ferait disparaître tous les tickets du compte.
  */
 export const colonneFinale = (board: Colonne[]): string | null =>
-  board.length > 1 ? (board.at(-1)?.id ?? null) : null
+  liste(board).length > 1 ? (liste(board).at(-1)?.id ?? null) : null
 
 /** Ce qui reste à faire : tout ce qui n'est pas dans la colonne terminale. */
 export const restant = (tickets: Ticket[], board: Colonne[]): number => {
   const fini = colonneFinale(board)
-  return tickets.filter(t => t.colonne !== fini).length
+  return liste(tickets).filter(t => t.colonne !== fini).length
 }
 
 /** L'historique n'est pas saisi : ce sont les plans clos, par date de clôture. */
 export const history = (plans: Plan[]): Plan[] =>
-  plans
+  liste(plans)
     .filter(p => p.status === 'closed')
     .sort((a, b) => (b.closed ?? '').localeCompare(a.closed ?? ''))
 
@@ -554,7 +608,7 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 /** Densité d'activité : commits par semaine, du plus ancien au plus récent. */
 export function density(plans: Plan[], weeks = 16, now: Date = new Date()): number[] {
   const buckets = new Array(weeks).fill(0)
-  for (const plan of plans) {
+  for (const plan of liste(plans)) {
     for (const commit of plan.commits ?? []) {
       const at = Date.parse(commit.date)
       if (Number.isNaN(at)) continue
@@ -593,7 +647,7 @@ export function plansForPage(plans: Plan[], page: Page): Plan[] {
 }
 
 /** Dernier scan connu, réussi ou non. */
-export const lastScan = (scans: Scan[]): Scan | null => scans.at(-1) ?? null
+export const lastScan = (scans: Scan[]): Scan | null => liste(scans).at(-1) ?? null
 
 /**
  * Une page a-t-elle échoué au dernier scan ?
@@ -699,40 +753,114 @@ export function tablesFrom(graph: GraphifyGraph | null): TableRow[] {
 export interface StackRow {
   name: string
   version: string
-  why: string
+  /** Le commentaire `WHY:` trouvé au-dessus de l'import, ou rien. */
+  why: string | null
 }
 
 /**
  * Stack : les dépendances déclarées, et pourquoi elles sont là.
  *
  * Graphify cartographie le code, pas les dépendances — la liste vient donc du
- * package.json. La raison, elle, vient des plans : le plan clos le plus récent
- * qui mentionne la dépendance est celui qui l'a introduite ou justifiée.
+ * package.json. La raison vient d'un commentaire `WHY:` posé au-dessus de
+ * l'import du paquet, et de rien d'autre : voir `hooks/whys.js`.
  *
- * Une dépendance sans raison tracée le dit franchement. Inventer une
- * justification plausible serait précisément la documentation fausse que ce
- * projet existe pour éviter.
+ * Elle venait des plans, par recherche de sous-chaîne dans leur corps. Un plan
+ * qui citait `node-pty` en passant en devenait la justification affichée —
+ * constaté le 9 août 2026, où le plan d'audit s'est retrouvé présenté comme la
+ * raison d'être de `node-pty`. Une mention n'est pas une justification, et une
+ * fausse raison est pire que pas de raison : c'est ce qui fait cesser de croire
+ * au reste de l'écran.
  */
-export function stackFrom(packageJson: PackageJson | null, plans: Plan[]): StackRow[] {
+export function stackFrom(
+  packageJson: PackageJson | null,
+  whys: Record<string, string> = {},
+): StackRow[] {
   const all = { ...(packageJson?.dependencies ?? {}), ...(packageJson?.devDependencies ?? {}) }
 
-  // Tous les plans, pas seulement les clos : un plan encore ouvert qui
-  // mentionne une dépendance en est tout autant la raison. Du plus récent au
-  // plus ancien, pour que la dernière décision l'emporte.
-  const byRecency = [...plans].sort((a, b) =>
-    (b.closed ?? b.opened ?? '').localeCompare(a.closed ?? a.opened ?? ''),
-  )
+  return Object.entries(all).map(([name, version]) => ({
+    name,
+    version,
+    why: whys[name] ?? null,
+  }))
+}
 
-  return Object.entries(all).map(([name, version]) => {
-    const source = byRecency.find(plan =>
-      (plan.body ?? '').toLowerCase().includes(name.toLowerCase()),
-    )
-    if (!source) {
-      return { name, version, why: 'Aucune raison tracée : ni plan, ni commentaire # WHY:.' }
-    }
-    const when = source.closed
-      ? `plan du ${frDate(source.closed)}`
-      : `plan ouvert le ${frDate(source.opened)}`
-    return { name, version, why: `${source.title} — ${when}.` }
-  })
+/**
+ * Ce que le cockpit sait dire du projet, sans lire une ligne de code.
+ *
+ * Vit ici et pas dans le panneau terminal : c'est une lecture d'instantané, pas
+ * du rendu. Le panneau, lui, importe xterm et sa feuille de style — l'y laisser
+ * rendait ces lignes intestables autrement qu'en démarrant un navigateur.
+ */
+export function briefLines(snapshot: Snapshot | null): Array<{ text: string; style: string }> {
+  const dim = 'color: var(--color-neutral-400);'
+  if (!snapshot) return [{ text: 'lecture de cockpit/…', style: 'color: var(--color-neutral-600);' }]
+
+  const open = plansOuverts(snapshot.plans ?? [])
+  const closed = (snapshot.plans ?? []).length - open.length
+  const pages = snapshot.pages?.pages?.length ?? 0
+  const scan = lastScan(snapshot.scans ?? [])
+
+  const lines = [
+    { text: '$ claude', style: 'color: var(--color-neutral-500);' },
+    {
+      text: `◆ Contexte lisible dans ${snapshot.root}/cockpit — ${pages} page(s), ${closed} plan(s) clos, ${open.length} ouvert(s)`,
+      style: 'color: var(--color-accent-300);',
+    },
+    { text: '', style: '' },
+  ]
+
+  if (scan) {
+    lines.push({
+      text: scan.ok
+        ? `Dernier scan réussi le ${frDate(scan.date)} (commit ${scan.commit}).`
+        : `Dernier scan ÉCHOUÉ le ${frDate(scan.date)} : ${scan.error ?? 'raison non enregistrée'}.`,
+      style: scan.ok ? dim : 'color: var(--color-accent-200);',
+    })
+  } else {
+    lines.push({ text: 'Aucun scan enregistré : la carte des pages est vide.', style: dim })
+  }
+
+  const oldest = open.at(-1)
+  if (oldest) {
+    lines.push({ text: `Le plus ancien plan ouvert porte sur « ${oldest.title} ».`, style: dim })
+  }
+  lines.push({ text: '', style: '' })
+  return lines
+}
+
+/** Les blocs de contexte que les boutons du panneau écrivent dans la session. */
+export function buildInjections(snapshot: Snapshot | null): Array<{ label: string; text: string }> {
+  if (!snapshot) return []
+
+  const open = plansOuverts(snapshot.plans ?? [])
+  const pages = snapshot.pages?.pages ?? []
+
+  return [
+    {
+      label: `Carte des pages (${pages.length})`,
+      text: pages
+        .map(p => `${p.route} — ${p.title} → ${(p.links ?? []).join(', ') || 'aucun lien'}`)
+        .join('\n'),
+    },
+    {
+      label: `${open.length} plan(s) ouvert(s)`,
+      text: open.map(p => `- ${p.title} (ouvert le ${frDate(p.opened)})`).join('\n'),
+    },
+    {
+      label: `Tableau (${snapshot.tickets?.length ?? 0} ticket(s))`,
+      // Colonne par colonne, dans l'ordre du tableau : c'est ce qui permet à
+      // Claude de proposer un déplacement plutôt qu'un ticket de plus.
+      text: (snapshot.board ?? [])
+        .map(colonne => {
+          const dedans = sortTickets((snapshot.tickets ?? []).filter(t => t.colonne === colonne.id))
+          const lignes = dedans.map(t => `  ${t.id} [${t.priorite}] ${t.titre} — ${t.file}`)
+          return [`${colonne.titre} (${dedans.length})`, ...lignes].join('\n')
+        })
+        .join('\n'),
+    },
+    {
+      label: 'Chemin du cockpit',
+      text: `Lis ${snapshot.root}/cockpit/ pour l'état du projet. N'ouvre pas le code.`,
+    },
+  ]
 }

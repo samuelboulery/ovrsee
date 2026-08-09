@@ -22,6 +22,10 @@
  * dans Terminal.app.
  */
 
+// WHY: un vrai pseudo-terminal, pas un `child_process`. Sans pty, `claude`
+// se croit dans un tuyau : pas de couleurs, pas de saisie interactive, pas de
+// signal de redimensionnement. C'est un binaire natif, d'où le déballage de
+// l'asar dans electron-builder.yml.
 import { spawn } from 'node-pty'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'

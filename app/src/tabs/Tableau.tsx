@@ -6,11 +6,13 @@ import {
   sortTickets,
   ticketAction,
   type Colonne,
+  type Illisible,
   type Priorite,
   type Tableau as TableauData,
   type TicketAction,
   type Ticket,
 } from '../data'
+import { Illisibles } from '../Illisibles'
 import { s } from '../style'
 
 /**
@@ -49,11 +51,13 @@ export function Tableau({
   root,
   board,
   tickets,
+  illisibles = [],
   onChange,
 }: {
   root: string
   board: Colonne[]
   tickets: Ticket[]
+  illisibles?: Illisible[]
   onChange: (tableau: TableauData) => void
 }) {
   const [erreur, setErreur] = useState<string | null>(null)
@@ -177,9 +181,9 @@ export function Tableau({
     <div style={s('flex: 1; display: flex; flex-direction: column; overflow: hidden;')}>
       <div style={s('padding: 20px 22px 12px;')}>
         <div style={s('display: flex; align-items: baseline; gap: 10px;')}>
-          <h1 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
+          <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
             Tableau
-          </h1>
+          </h2>
           <div style={s('flex: 1;')} />
           <button
             type="button"
@@ -193,6 +197,8 @@ export function Tableau({
             {edition ? 'Terminer' : 'Éditer les colonnes'}
           </button>
         </div>
+
+        <Illisibles entries={illisibles} quoi="ticket" />
         <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
           {edition
             ? 'Renomme sur place, fais glisser une colonne par sa poignée, ajoute-en une en bout de rangée. Un identifiant de colonne ne change jamais : les tickets le citent.'
@@ -453,6 +459,7 @@ function ColonneVue({
             className="btn btn-ghost"
             style={s('font-size: 14px; padding: 0 6px; line-height: 1;')}
             title="Nouveau ticket"
+            aria-label={`Nouveau ticket dans ${colonne.titre}`}
             onClick={() => setSaisie(saisie === null ? '' : null)}
           >
             +

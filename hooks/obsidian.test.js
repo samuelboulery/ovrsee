@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -305,4 +305,34 @@ test('deux pages au même titre de document se distinguent par leur route', () =
   const liens = lire(root, 'index.md')
   assert.match(liens, /\[\[pages\/accueil\|Accueil\]\]/)
   assert.match(liens, /\[\[pages\/produit\|Produit\]\]/)
+})
+
+// --- validation des slugs ---
+
+test("un slug avec traversal de répertoire dans pages.json provoque une erreur", () => {
+  const root = fixture()
+  const pages = join(root, 'cockpit', 'pages', 'pages.json')
+  const lu = JSON.parse(readFileSync(pages, 'utf8'))
+  // Remplace le slug de la première page par un chemin d'échappement
+  lu.pages[0].slug = '../../evil'
+  writeFileSync(pages, JSON.stringify(lu), 'utf8')
+
+  assert.throws(() => exportVault(root), /slug non sûr/)
+
+  // Vérifie qu'aucun fichier n'a été écrit en dehors du coffre
+  const vaultDir = vault(root)
+  assert.ok(existsSync(vaultDir), 'le dossier du coffre existe')
+  // Pas de fichier "evil" écrit en dehors du coffre
+  const rootFiles = readdirSync(root)
+  assert.ok(!rootFiles.includes('evil'), 'aucun fichier hostile écrit à la racine')
+})
+
+test('un slug vide provoque une erreur', () => {
+  const root = fixture()
+  const pages = join(root, 'cockpit', 'pages', 'pages.json')
+  const lu = JSON.parse(readFileSync(pages, 'utf8'))
+  lu.pages[0].slug = ''
+  writeFileSync(pages, JSON.stringify(lu), 'utf8')
+
+  assert.throws(() => exportVault(root), /slug non sûr/)
 })

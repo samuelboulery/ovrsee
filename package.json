@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.json && vite build",
-    "test": "node --test hooks/*.test.js crawl/*.test.js server/*.test.js",
+    "test": "node --test hooks/*.test.js crawl/*.test.js server/*.test.js && node scripts/test-ui.js",
+    "test:ui": "node scripts/test-ui.js",
     "typecheck": "tsc -p tsconfig.json",
     "cockpit:install": "node hooks/install.js",
     "cockpit:status": "node hooks/cockpit-cli.js status",

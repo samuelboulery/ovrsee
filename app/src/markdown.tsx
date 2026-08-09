@@ -181,7 +181,11 @@ export function Markdown({ text }: { text: string }): ReactNode {
     const heading = HEADING.exec(line)
     if (heading) {
       const level = heading[1].length
-      const Tag = (['h1', 'h2', 'h3', 'h4'] as const)[level - 1]
+      // Décalé d'un cran : un README rendu dans un onglet est un document
+      // imbriqué, pas la page. Son `#` de titre est un `h2` sous le `h1` de la
+      // fenêtre — sans quoi la page compte deux titres de premier niveau et le
+      // plan du document devient faux pour un lecteur d'écran.
+      const Tag = (['h2', 'h3', 'h4', 'h5'] as const)[level - 1]
       blocks.push(
         <Tag key={key()} style={s(HEADING_STYLES[level - 1])}>
           {inline(heading[2], key())}

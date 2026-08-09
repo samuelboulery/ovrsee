@@ -232,7 +232,7 @@ export function reorderColumn(cockpitDir, id, index) {
  * @param {Array<{id: string}>} [colonnes]
  * @returns {Array<{file: string, meta: object, body: string}>}
  */
-export function readTickets(cockpitDir, colonnes = readBoard(cockpitDir)) {
+export function readTickets(cockpitDir, colonnes = readBoard(cockpitDir), illisibles = []) {
   let names
   try {
     names = readdirSync(join(cockpitDir, 'tickets'))
@@ -250,10 +250,12 @@ export function readTickets(cockpitDir, colonnes = readBoard(cockpitDir)) {
     try {
       raw = readFileSync(join(cockpitDir, 'tickets', name), 'utf8')
     } catch {
+      illisibles.push({ file: `tickets/${name}`, quoi: 'ticket' })
       continue
     }
     const ticket = parsePlan(raw)
     if (!ticket) {
+      illisibles.push({ file: `tickets/${name}`, quoi: 'ticket' })
       process.stderr.write(`[cockpit] ticket illisible, ignoré : ${name}\n`)
       continue
     }

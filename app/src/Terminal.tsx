@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { plansOuverts, frDate, lastScan, sortTickets, type Snapshot } from './data'
+import { briefLines, buildInjections, type Snapshot } from './data'
 import { s } from './style'
 import { useTerminals } from './useTerminal'
 import { Divider, useResizable } from './useResizable'
@@ -192,6 +192,7 @@ export function Terminal({
             type="button"
             onClick={openShell}
             title="Ouvrir un shell dans le projet"
+          aria-label="Ouvrir un shell dans le projet"
             disabled={!available}
             style={s(
               'cursor: pointer; font-family: var(--font-body); font-size: 13px; line-height: 1; padding: 3px 8px; border-radius: 5px; border: 1px solid transparent; background: transparent; color: var(--color-neutral-600);',
@@ -255,6 +256,13 @@ export function Terminal({
               <div
                 key={session.key}
                 ref={attach(session)}
+                // `inert` va avec la transparence : sans lui, la zone de saisie
+                // d'une session cachée reste dans l'ordre de tabulation, et le
+                // clavier traverse des terminaux qu'on ne voit pas. `inert` ne
+                // touche pas à la mise en page, donc FitAddon continue de
+                // mesurer juste — c'est pourquoi on ne peut pas juste passer en
+                // `display: none`.
+                inert={active !== session.key}
                 style={s(
                   'position: absolute; inset: 8px 4px 8px 10px; ' +
                     (active === session.key
@@ -360,78 +368,4 @@ export function Terminal({
       </div>
     </>
   )
-}
-
-/** Ce que le cockpit sait dire du projet, sans lire une ligne de code. */
-function briefLines(snapshot: Snapshot | null): Array<{ text: string; style: string }> {
-  const dim = 'color: var(--color-neutral-400);'
-  if (!snapshot) return [{ text: 'lecture de cockpit/…', style: 'color: var(--color-neutral-600);' }]
-
-  const open = plansOuverts(snapshot.plans)
-  const closed = snapshot.plans.length - open.length
-  const pages = snapshot.pages?.pages.length ?? 0
-  const scan = lastScan(snapshot.scans)
-
-  const lines = [
-    { text: '$ claude', style: 'color: var(--color-neutral-500);' },
-    {
-      text: `◆ Contexte lisible dans ${snapshot.root}/cockpit — ${pages} page(s), ${closed} plan(s) clos, ${open.length} ouvert(s)`,
-      style: 'color: var(--color-accent-300);',
-    },
-    { text: '', style: '' },
-  ]
-
-  if (scan) {
-    lines.push({
-      text: scan.ok
-        ? `Dernier scan réussi le ${frDate(scan.date)} (commit ${scan.commit}).`
-        : `Dernier scan ÉCHOUÉ le ${frDate(scan.date)} : ${scan.error ?? 'raison non enregistrée'}.`,
-      style: scan.ok ? dim : 'color: var(--color-accent-200);',
-    })
-  } else {
-    lines.push({ text: 'Aucun scan enregistré : la carte des pages est vide.', style: dim })
-  }
-
-  const oldest = open.at(-1)
-  if (oldest) {
-    lines.push({ text: `Le plus ancien plan ouvert porte sur « ${oldest.title} ».`, style: dim })
-  }
-  lines.push({ text: '', style: '' })
-  return lines
-}
-
-function buildInjections(snapshot: Snapshot | null): Array<{ label: string; text: string }> {
-  if (!snapshot) return []
-
-  const open = plansOuverts(snapshot.plans)
-  const pages = snapshot.pages?.pages ?? []
-
-  return [
-    {
-      label: `Carte des pages (${pages.length})`,
-      text: pages.map(p => `${p.route} — ${p.title} → ${p.links.join(', ') || 'aucun lien'}`).join('\n'),
-    },
-    {
-      label: `${open.length} plan(s) ouvert(s)`,
-      text: open.map(p => `- ${p.title} (ouvert le ${frDate(p.opened)})`).join('\n'),
-    },
-    {
-      label: `Tableau (${snapshot.tickets?.length ?? 0} ticket(s))`,
-      // Colonne par colonne, dans l'ordre du tableau : c'est ce qui permet à
-      // Claude de proposer un déplacement plutôt qu'un ticket de plus.
-      text: (snapshot.board ?? [])
-        .map(colonne => {
-          const dedans = sortTickets(
-            (snapshot.tickets ?? []).filter(t => t.colonne === colonne.id),
-          )
-          const lignes = dedans.map(t => `  ${t.id} [${t.priorite}] ${t.titre} — ${t.file}`)
-          return [`${colonne.titre} (${dedans.length})`, ...lignes].join('\n')
-        })
-        .join('\n'),
-    },
-    {
-      label: 'Chemin du cockpit',
-      text: `Lis ${snapshot.root}/cockpit/ pour l'état du projet. N'ouvre pas le code.`,
-    },
-  ]
 }

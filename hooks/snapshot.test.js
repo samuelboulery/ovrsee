@@ -40,3 +40,60 @@ test('les scripts du package.json arrivent tels quels', () => {
 
   assert.deepEqual(snapshot(dir).packageJson.scripts, { dev: 'vite' })
 })
+
+// --- fichiers illisibles ---------------------------------------------------
+//
+// Un plan ou un ticket au frontmatter cassé rendait `[]` : le fichier existait
+// sur le disque, l'interface affirmait qu'il n'y avait rien. Le crawl, lui,
+// inscrit ses échecs — la lecture doit le faire aussi.
+
+test('un plan au frontmatter cassé est signalé au lieu de disparaître', () => {
+  const dir = project()
+  writeFileSync(join(dir, 'cockpit', 'plans', '2026-08-09-casse.md'), '---\npas du json\n---\ncorps\n')
+
+  const { plans, illisibles } = snapshot(dir)
+  assert.deepEqual(plans, [])
+  assert.deepEqual(illisibles, [{ file: 'plans/2026-08-09-casse.md', quoi: 'plan' }])
+})
+
+test('un ticket au frontmatter cassé est signalé au lieu de disparaître', () => {
+  const dir = project()
+  mkdirSync(join(dir, 'cockpit', 'tickets'), { recursive: true })
+  writeFileSync(join(dir, 'cockpit', 'tickets', 'T-0001-casse.md'), '---\n{ cassé\n---\n\ncorps\n')
+
+  const { tickets, illisibles } = snapshot(dir)
+  assert.deepEqual(tickets, [])
+  assert.deepEqual(illisibles, [{ file: 'tickets/T-0001-casse.md', quoi: 'ticket' }])
+})
+
+test('un fichier cassé ne cache pas ceux qui se lisent', () => {
+  const dir = project()
+  mkdirSync(join(dir, 'cockpit', 'tickets'), { recursive: true })
+  writeFileSync(join(dir, 'cockpit', 'tickets', 'T-0001-casse.md'), '---\n{ cassé\n---\n')
+  writeFileSync(
+    join(dir, 'cockpit', 'tickets', 'T-0002-bon.md'),
+    '---\n{ "id": "T-0002", "titre": "Bon", "colonne": "backlog" }\n---\n\ncorps\n',
+  )
+
+  const { tickets, illisibles } = snapshot(dir)
+  assert.equal(tickets.length, 1)
+  assert.equal(tickets[0].id, 'T-0002')
+  assert.equal(illisibles.length, 1)
+})
+
+test('une ligne illisible de scans.jsonl est comptée, pas seulement sautée', () => {
+  const dir = project()
+  mkdirSync(join(dir, 'cockpit', 'pages'), { recursive: true })
+  writeFileSync(
+    join(dir, 'cockpit', 'pages', 'scans.jsonl'),
+    'pas du json\n{"date":"2026-08-09","ok":true,"commit":"abc"}\n',
+  )
+
+  const { scans, illisibles } = snapshot(dir)
+  assert.equal(scans.length, 1)
+  assert.deepEqual(illisibles, [{ file: 'pages/scans.jsonl', quoi: 'scan', lignes: 1 }])
+})
+
+test('un projet sain ne signale rien', () => {
+  assert.deepEqual(snapshot(project()).illisibles, [])
+})

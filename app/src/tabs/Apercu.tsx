@@ -10,6 +10,7 @@ import {
   stackFrom,
   type Snapshot,
 } from '../data'
+import { Illisibles } from '../Illisibles'
 import { Markdown } from '../markdown'
 import { s } from '../style'
 
@@ -43,12 +44,13 @@ const LIFECYCLE = new Set([
  * une page d'accueil qui contredit le reste est pire que pas de page d'accueil.
  */
 export function Apercu({ snapshot }: { snapshot: Snapshot }) {
-  const { packageJson, plans, readme, root } = snapshot
+  const { packageJson, readme, root } = snapshot
+  const plans = snapshot.plans ?? []
 
   const nom = packageJson?.name ?? root.split('/').filter(Boolean).at(-1) ?? root
   const pages = snapshot.pages?.pages ?? []
   const ouverts = plansOuverts(plans).length
-  const deps = stackFrom(packageJson, plans).length
+  const deps = stackFrom(packageJson, snapshot.whys).length
   const scan = lastScan(snapshot.scans)
   const tickets = restant(snapshot.tickets, snapshot.board)
 
@@ -74,13 +76,14 @@ export function Apercu({ snapshot }: { snapshot: Snapshot }) {
   return (
     <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
       <div style={s('max-width: 820px;')}>
-        <h1
+        <Illisibles entries={snapshot.illisibles ?? []} />
+        <h2
           style={s(
             'font-family: var(--font-heading); font-weight: 500; font-size: 22px; margin: 0 0 4px;',
           )}
         >
           {nom}
-        </h1>
+        </h2>
         <div
           style={s(
             'font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-neutral-600);',

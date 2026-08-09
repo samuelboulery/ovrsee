@@ -99,6 +99,32 @@ function pushUrl(path: string, project: string | null) {
   window.history.pushState(null, '', path + query)
 }
 
+/**
+ * Ouvrir un projet : sélecteur du système, puis enregistrement.
+ *
+ * Hors du composant parce que deux gestes y mènent — le bouton « + » de la
+ * barre latérale et le ⌘O du menu natif. Deux copies divergeraient.
+ *
+ * Sans passerelle (dans un navigateur), il n'y a pas de sélecteur : la fonction
+ * ne fait rien plutôt que d'échouer, et le bouton n'est de toute façon pas
+ * affiché.
+ */
+async function openProject(
+  onProjects: (list: Project[], select?: string | null) => void,
+  onError: (message: string) => void,
+) {
+  const picker = window.cockpit?.projects
+  if (!picker) return
+  try {
+    const path = await picker.pick()
+    if (!path) return // sélecteur annulé : rien à dire
+    const { projects: list } = await projectAction('add', path)
+    onProjects(list, path)
+  } catch (err) {
+    onError(String((err as Error).message ?? err))
+  }
+}
+
 export function App() {
   const [projects, setProjects] = useState<Project[]>([])
   const [current, setCurrent] = useState<string | null>(null)
@@ -192,6 +218,44 @@ export function App() {
       pushUrl(window.location.pathname, next)
     }
   }
+
+  /**
+   * Le menu natif — voir `electron/menu.js`.
+   *
+   * Il n'envoie que des mots, et c'est ici qu'ils deviennent des gestes : les
+   * mêmes que ceux des clics juste au-dessus. Absent dans un navigateur, où
+   * `window.cockpit` n'existe pas.
+   */
+  useEffect(() => {
+    const menu = window.cockpit?.menu
+    if (!menu) return
+
+    return menu.on(command => {
+      if (command === 'project:open') return void openProject(applyProjects, setError)
+      if (command === 'project:reload') return reload()
+      if (command === 'project:reveal') {
+        if (current) window.cockpit?.projects.reveal(current)
+        return
+      }
+      if (command === 'terminal:toggle') return setTerminal(ouvert => !ouvert)
+
+      const disposition = command.startsWith('terminal:layout:') && command.slice(16)
+      if (disposition) {
+        // Changer la disposition d'un terminal masqué ne montrerait rien.
+        setTerminal(true)
+        return setLayout(disposition as Layout)
+      }
+
+      const onglet = TABS.find(([id]) => command === `tab:${id}`)
+      if (onglet) {
+        setTab(onglet[0])
+        // Même correction qu'au clic : plein écran est une vue du terminal, on
+        // n'y reste pas en changeant d'onglet.
+        setLayout(l => (l === 'full' ? 'bottom' : l))
+        pushUrl(onglet[2], current)
+      }
+    })
+  }, [current])
 
   const plans = snapshot?.plans ?? []
   const scan = lastScan(snapshot?.scans ?? [])
@@ -563,18 +627,9 @@ function Sidebar({
         {picker && (
           <button
             type="button"
-            title="Ouvrir un projet"
+            title="Ouvrir un projet (⌘O)"
             className="btn btn-ghost"
-            onClick={async () => {
-              try {
-                const path = await picker.pick()
-                if (!path) return // sélecteur annulé : rien à dire
-                const { projects: list } = await projectAction('add', path)
-                onProjects(list, path)
-              } catch (err) {
-                onError(String((err as Error).message ?? err))
-              }
-            }}
+            onClick={() => openProject(onProjects, onError)}
             style={s('font-size: 14px; line-height: 1; padding: 2px 7px;')}
           >
             +

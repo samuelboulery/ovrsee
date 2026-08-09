@@ -1,7 +1,8 @@
 {
   "name": "cockpit",
-  "version": "1.1.0",
+  "version": "0.9.0-beta",
   "private": true,
+  "author": "Samuel Boulery",
   "type": "module",
   "packageManager": "pnpm@10.12.1",
   "description": "Vue en lecture seule sur un projet vibecodé : plans capturés, pages crawlées, historique daté.",

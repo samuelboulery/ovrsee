@@ -34,6 +34,34 @@ contextBridge.exposeInMainWorld('cockpit', {
      * @returns {Promise<string|null>} le chemin choisi, ou null si annulé
      */
     pick: () => ipcRenderer.invoke('projects:pick'),
+
+    /**
+     * Révèle le `cockpit/` d'un projet dans le Finder.
+     *
+     * Le chemin est vérifié contre le registre côté principal : ce qui n'y est
+     * pas n'est pas révélé.
+     *
+     * @param {string} projectPath dossier du projet
+     * @returns {Promise<boolean>}
+     */
+    reveal: projectPath => ipcRenderer.invoke('projects:reveal', projectPath),
+  },
+
+  menu: {
+    /**
+     * Écoute les commandes du menu natif.
+     *
+     * Un mot, jamais une fonction : le menu dit ce qu'on a choisi, le rendu
+     * décide de ce que ça fait — c'est lui qui tient déjà ces gestes.
+     *
+     * @param {(command: string) => void} handler
+     * @returns {() => void} désabonnement
+     */
+    on(handler) {
+      const listener = (_event, command) => handler(command)
+      ipcRenderer.on('menu:command', listener)
+      return () => ipcRenderer.off('menu:command', listener)
+    },
   },
 
   preview: {

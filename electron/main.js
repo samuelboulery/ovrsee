@@ -16,6 +16,7 @@ import {
   BrowserWindow,
   dialog,
   ipcMain,
+  Menu,
   nativeTheme,
   protocol,
   shell,
@@ -27,6 +28,8 @@ import { dirname, extname, join, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { fetchHandler } from '../server/api.js'
+import { projects } from '../hooks/snapshot.js'
+import { buildMenu } from './menu.js'
 import { openSession, writeTo, resize, closeSession, closeAll } from './pty.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -44,6 +47,11 @@ const MIME = {
   '.png': 'image/png',
   '.woff2': 'font/woff2',
 }
+
+// En développement, `app.name` vaut « Electron » : le premier menu et les
+// dialogues du système porteraient ce nom-là. Le paquet, lui, tient son nom de
+// `productName` — les poser tous les deux rend les deux modes identiques.
+app.setName('Cockpit')
 
 // Doit être déclaré avant `app.ready` : `standard` donne au schéma une origine
 // véritable, ce qui fait fonctionner les URL relatives et `fetch`.
@@ -230,6 +238,18 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Le panneau natif n'affiche par défaut que le nom et la version. Le
+  // copyright vient de `NSHumanReadableCopyright` dans l'application empaquetée,
+  // et de nulle part en développement — le poser ici rend les deux identiques.
+  app.setAboutPanelOptions({
+    applicationName: 'Cockpit',
+    applicationVersion: app.getVersion(),
+    copyright: '© 2026 Samuel Boulery',
+    credits: 'Vue en lecture seule sur un projet vibecodé.',
+  })
+
+  Menu.setApplicationMenu(buildMenu())
+
   protocol.handle(SCHEME, async request => {
     const url = new URL(request.url)
     // `server/api.js` décide ; ici on ne fait que router. Pas de dépôt
@@ -333,6 +353,20 @@ app.whenReady().then(() => {
       properties: ['openDirectory'],
     })
     return canceled ? null : (filePaths[0] ?? null)
+  })
+
+  // Révéler le `cockpit/` d'un projet dans le Finder — la seule commande du menu
+  // qui touche au disque.
+  //
+  // `showItemInFolder` et jamais `openPath` : révéler sélectionne un dossier,
+  // ouvrir *lancerait* ce que le chemin désigne. Le chemin vient du rendu, il
+  // est donc vérifié contre le registre avant usage — même garde que `known()`
+  // dans `server/api.js`. Sans elle, un rendu compromis ferait ouvrir le Finder
+  // n'importe où.
+  ipcMain.handle('projects:reveal', (_event, path) => {
+    if (typeof path !== 'string' || !projects(null).some(p => p.path === path)) return false
+    shell.showItemInFolder(join(path, 'cockpit'))
+    return true
   })
 
   createWindow()

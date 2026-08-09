@@ -33,8 +33,14 @@ declare global {
   interface Window {
     cockpit?: {
       terminal: TerminalBridge
-      /** Sélecteur de dossier du système. Rend null si l'utilisateur annule. */
-      projects: { pick: () => Promise<string | null> }
+      projects: {
+        /** Sélecteur de dossier du système. Rend null si l'utilisateur annule. */
+        pick: () => Promise<string | null>
+        /** Révèle le `cockpit/` du projet dans le Finder. */
+        reveal: (projectPath: string) => Promise<boolean>
+      }
+      /** Commandes du menu natif — voir `electron/menu.js`. */
+      menu: { on: (handler: (command: string) => void) => () => void }
       /** Onglet Navigateur — voir `electron/preload.cjs`. */
       preview: {
         devtools: (

@@ -1,10 +1,10 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { snapshot } from './snapshot.js'
+import { snapshot, vaultPath } from './snapshot.js'
 
 const project = () => {
   const dir = mkdtempSync(join(tmpdir(), 'cockpit-snap-'))
@@ -96,4 +96,83 @@ test('une ligne illisible de scans.jsonl est comptée, pas seulement sautée', (
 
 test('un projet sain ne signale rien', () => {
   assert.deepEqual(snapshot(project()).illisibles, [])
+})
+
+// --- source du graphe ------------------------------------------------------
+
+/** Un `graphify-out/graph.json` minimal mais valide. */
+const poserGraphify = dir => {
+  mkdirSync(join(dir, 'graphify-out'), { recursive: true })
+  writeFileSync(
+    join(dir, 'graphify-out', 'graph.json'),
+    JSON.stringify({ nodes: [{ id: 'g', label: 'venu de graphify' }], links: [] }),
+  )
+}
+
+/** Un coffre à une note de table, et le champ de config qui le désigne. */
+const poserCoffre = (dir, chemin = 'coffre') => {
+  mkdirSync(join(dir, chemin), { recursive: true })
+  writeFileSync(
+    join(dir, chemin, 'commandes.md'),
+    '---\ntype: table\ntitre: Commandes\n---\n\nLes commandes.\n',
+  )
+  writeFileSync(join(dir, 'cockpit.config.json'), JSON.stringify({ obsidianVault: chemin }))
+}
+
+test('sans coffre déclaré, le graphe vient de Graphify', () => {
+  const dir = project()
+  poserGraphify(dir)
+
+  const snap = snapshot(dir)
+  assert.equal(snap.graphSource, 'graphify')
+  assert.equal(snap.graph.nodes[0].label, 'venu de graphify')
+})
+
+test('Graphify l’emporte sur un coffre déclaré', () => {
+  const dir = project()
+  poserGraphify(dir)
+  poserCoffre(dir)
+
+  // Le point du test, et il vient du cadrage (§3) : la vue base de données
+  // n'est pas reconstruite parce que Graphify la fait mieux et à jour à chaque
+  // commit. Une note écrite à la main ne peut pas la recouvrir.
+  const snap = snapshot(dir)
+  assert.equal(snap.graphSource, 'graphify')
+  assert.equal(snap.graph.nodes[0].label, 'venu de graphify')
+})
+
+test('le coffre sert quand Graphify n’a rien produit', () => {
+  const dir = project()
+  poserCoffre(dir)
+
+  const snap = snapshot(dir)
+  assert.equal(snap.graphSource, 'obsidian')
+  assert.equal(snap.graph.nodes[0].label, 'Commandes')
+})
+
+test('un coffre déclaré mais illisible rend null, sans Graphify pour le sauver', () => {
+  const dir = project()
+  writeFileSync(
+    join(dir, 'cockpit.config.json'),
+    JSON.stringify({ obsidianVault: 'coffre-absent' }),
+  )
+
+  const snap = snapshot(dir)
+  assert.equal(snap.graph, null)
+  assert.equal(snap.graphSource, null)
+})
+
+test('sans source du tout, le graphe est null et le dit', () => {
+  const snap = snapshot(project())
+  assert.equal(snap.graph, null)
+  assert.equal(snap.graphSource, null)
+})
+
+test('un chemin de coffre en ~ est développé, pas collé au dépôt', () => {
+  // Sans cela, `join()` ferait `<repo>/~/Coffres`, et l'onglet dirait « coffre
+  // illisible » en désignant un chemin que personne n'a écrit.
+  assert.equal(vaultPath('/repo', '~/Coffres/x'), join(homedir(), 'Coffres', 'x'))
+  assert.equal(vaultPath('/repo', '~'), homedir())
+  assert.equal(vaultPath('/repo', '/ailleurs/coffre'), '/ailleurs/coffre')
+  assert.equal(vaultPath('/repo', 'coffre'), join('/repo', 'coffre'))
 })

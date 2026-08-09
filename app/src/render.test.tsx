@@ -72,7 +72,7 @@ const RENDUS: Array<[string, (snap: Snapshot) => ReactElement]> = [
       />
     ),
   ],
-  ['Données', snap => <Donnees graph={snap.graph} />],
+  ['Données', snap => <Donnees graph={snap.graph} source={snap.graphSource} vaultDeclared={false} />],
   ['Stack', snap => <Stack snapshot={snap} />],
 ]
 

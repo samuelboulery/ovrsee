@@ -47,7 +47,7 @@ en-têtes. Vérifier les deux.
 ```bash
 pnpm dev          # dev server Vite, port 5180 strict, sans terminal
 pnpm electron     # build:ui puis l'app complète, terminal compris
-pnpm test         # node --test sur hooks/ crawl/ server/ — pas de framework
+pnpm test         # node --test sur hooks/ crawl/ server/, puis app/src compilé
 pnpm typecheck    # tsc, ne couvre QUE app/src
 pnpm build:ui     # vite build vers app/dist/
 pnpm package      # DMG dans release/ (arm64, non signé)
@@ -55,11 +55,15 @@ pnpm package      # DMG dans release/ (arm64, non signé)
 
 `pnpm test` n'utilise **aucun framework** : `node:test` et `node:assert` seuls.
 Ne pas introduire vitest / jest pour ajouter un test — écrire dans le style existant.
+`app/src` n'y échappe pas : `scripts/test-ui.js` le compile dans un dossier jetable
+(`app/.test-build`, marqué CommonJS) et lance le même `node --test` dessus.
 
 Ce que la CI n'attrape pas, parce qu'il n'y en a pas et parce que `tsconfig.json`
 n'inclut que `app/src` : `hooks/`, `crawl/`, `server/` et `electron/` ne sont pas
-typés, et `app/src/` n'a aucun test. Un changement dans un onglet React ne casse
-aucun test — il faut lancer l'app.
+typés. Et les tests d'`app/src` ne sont que de deux sortes — les fonctions pures de
+`data.ts`, et un rendu des onglets sur des instantanés dégradés qui vérifie
+seulement qu'aucun ne lève. Rien ne couvre une interaction, un état ou une mise en
+page : pour ça, il faut lancer l'app.
 
 ## Zones à ne pas toucher
 
@@ -71,8 +75,9 @@ aucun test — il faut lancer l'app.
   embarqué pour la maquette. Hors périmètre : ne pas relire, ne pas corriger, ne pas
   compter dans les métriques du projet.
 - **`_ds/`** est une bibliothèque de design systems. Seul `nocturne-*` est chargé.
-- **`graphify-out/graph.json`** est versionné volontairement (les onglets Données et
-  Stack le lisent) ; `graphify-out/cache/` et `graph.html` sont ignorés.
+- **`graphify-out/graph.json`** est versionné volontairement (l'onglet Données le lit,
+  et lui seul — Stack lit `package.json` et les `WHY:`) ; `graphify-out/cache/` et
+  `graph.html` sont ignorés.
 
 ## Pièges connus
 

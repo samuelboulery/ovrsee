@@ -9,10 +9,12 @@
 
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
-import { basename, join, normalize } from 'node:path'
+import { homedir } from 'node:os'
+import { basename, isAbsolute, join, normalize } from 'node:path'
 
 import { readPlans, readRegistry } from './plans.js'
 import { readBoard, readTickets } from './tickets.js'
+import { readVault } from './vault.js'
 import { readWhys } from './whys.js'
 import { timeline } from './timeline.js'
 
@@ -191,6 +193,59 @@ export function tableau(root, illisibles = []) {
   }
 }
 
+/**
+ * Le chemin d'un coffre déclaré : absolu, `~`, ou relatif à la racine.
+ *
+ * `~` est développé parce que c'est ce que quelqu'un écrit pour un coffre qui
+ * vit dans son dossier personnel. Sans cela, `join()` en ferait `<repo>/~/…`,
+ * et l'onglet dirait « coffre illisible » en désignant un chemin que personne
+ * n'a demandé.
+ */
+export const vaultPath = (root, declare) => {
+  if (declare === '~') return homedir()
+  if (declare.startsWith('~/')) return join(homedir(), declare.slice(2))
+  return isAbsolute(declare) ? declare : join(root, declare)
+}
+
+/**
+ * Le graphe du projet, et d'où il vient.
+ *
+ * Deux sources possibles, jamais fusionnées : `graphify-out/graph.json`, écrit
+ * par Graphify, ou un coffre Obsidian désigné par `obsidianVault` dans
+ * `cockpit.config.json`. Fusionner deux vocabulaires d'identifiants coûterait
+ * plus que la fonctionnalité ne rapporte, et l'interface ne saurait plus dire
+ * d'où vient une ligne.
+ *
+ * **Graphify l'emporte, le coffre est un repli.** Le cadrage écarte de construire
+ * la vue base de données précisément parce que Graphify « le fait mieux, et à
+ * jour à chaque commit » (§3) : son graphe vient d'une analyse du code, celui du
+ * coffre de ce que quelqu'un a tapé. Recouvrir le premier par le second, c'est
+ * la dérive que le cadrage interdit — et un Graphify qui ne trouve aucune table
+ * énonce un fait vrai, pas une lacune à combler.
+ *
+ * Un coffre déclaré et ignoré pour cette raison ne doit pas devenir un no-op
+ * muet : l'onglet Données le dit, en dérivant l'information de `config`.
+ *
+ * Le chemin du coffre est absolu, ou relatif à la racine du dépôt observé. Il
+ * peut donc sortir du dépôt — c'est tout l'intérêt, un coffre vit rarement
+ * dedans. Ce que `readVault` en lit reste borné : les `.md` seuls, leur
+ * frontmatter et leurs wikilinks, jamais leur corps.
+ *
+ * @returns {{graph: object|null, graphSource: 'graphify'|'obsidian'|null}}
+ */
+function readGraph(root, config) {
+  const graphify = readJson(join(root, 'graphify-out', 'graph.json'))
+  if (graphify) return { graph: graphify, graphSource: 'graphify' }
+
+  const declare = config?.obsidianVault
+  if (typeof declare === 'string' && declare.trim().length > 0) {
+    const graph = readVault(vaultPath(root, declare.trim()))
+    if (graph) return { graph, graphSource: 'obsidian' }
+  }
+
+  return { graph: null, graphSource: null }
+}
+
 /** Tout ce que l'interface doit lire pour un projet, en une réponse. */
 export function snapshot(root) {
   // Ce que la lecture n'a pas su ouvrir, rassemblé au même endroit. C'est la
@@ -204,6 +259,8 @@ export function snapshot(root) {
     body: p.body,
   }))
 
+  const config = readJson(join(root, 'cockpit.config.json'))
+
   return {
     root,
     ...tableau(root, illisibles),
@@ -216,7 +273,7 @@ export function snapshot(root) {
     // Le crawler y lit déjà `dev` et `baseUrl`. L'onglet Navigateur s'en sert
     // comme URL par défaut : le projet a déjà déclaré où il s'affiche, le
     // redemander à l'utilisateur serait une deuxième vérité à tenir à jour.
-    config: readJson(join(root, 'cockpit.config.json')),
+    config,
     // Le seul texte du cockpit qui ne vient pas de `cockpit/`. Il y a une bonne
     // raison : c'est le seul endroit du dépôt où quelqu'un a déjà écrit ce que
     // le projet fait. Le recopier dans `cockpit/` en ferait une deuxième
@@ -228,7 +285,10 @@ export function snapshot(root) {
     // `WHY:` posé au-dessus d'un import. L'onglet Stack les affichait comme
     // s'il les lisait déjà ; il devinait à partir des plans.
     whys: readWhys(root),
-    graph: readJson(join(root, 'graphify-out', 'graph.json')),
+    // Graphify, ou le coffre Obsidian déclaré dans la config. `graphSource` dit
+    // lequel : l'onglet Données affiche la provenance, et un badge qui ment sur
+    // l'origine d'une donnée est exactement ce que ce projet cherche à éviter.
+    ...readGraph(root, config),
     shots: shotsByPage(root),
     // Les commits bruts ne sont pas renvoyés en plus : la frise porte déjà
     // sha, date et sujet, et deux copies de la même liste divergeraient.

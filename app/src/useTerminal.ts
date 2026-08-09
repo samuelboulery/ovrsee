@@ -67,7 +67,9 @@ export function useTerminal(projectPath: string | null) {
       // se sert pour ses encadrés.
       fontFamily: 'Menlo, ui-monospace, SFMono-Regular, monospace',
       fontSize: 12,
-      lineHeight: 1.35,
+      // 1 exactement : au-dessus, les glyphes pleins (█ ▀ ▄) du logo Claude
+      // se séparent en bandes.
+      lineHeight: 1,
       cursorBlink: true,
       theme: THEME,
       allowProposedApi: true,

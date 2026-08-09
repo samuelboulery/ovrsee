@@ -1,7 +1,7 @@
 # Graph Report - /Users/sam/code/cockpit  (2026-08-09)
 
 ## Corpus Check
-- 63 files · ~771,382 words
+- 63 files · ~778,050 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary

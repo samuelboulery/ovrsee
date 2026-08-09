@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Audit complet de Cockpit — plan d'exécution",
   "opened": "2026-08-09",
-  "closed": null,
+  "closed": "2026-08-09",
   "commits": [
     {
       "sha": "44f0961",
@@ -17,6 +17,53 @@
         ".claude/settings.json",
         "CLAUDE.md"
       ]
+    },
+    {
+      "sha": "569dc41",
+      "date": "2026-08-09",
+      "files": [
+        ".gitignore",
+        "AUDIT-2026-08-09.md",
+        "app/src/App.tsx",
+        "app/src/Garde.tsx",
+        "app/src/Illisibles.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/data.test.ts",
+        "app/src/data.ts",
+        "app/src/main.tsx",
+        "app/src/markdown.tsx",
+        "app/src/node-test.d.ts",
+        "app/src/render.test.tsx",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Donnees.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/Produit.tsx",
+        "app/src/tabs/Stack.tsx",
+        "app/src/tabs/Tableau.tsx",
+        "app/src/useTerminal.ts",
+        "crawl/index.js",
+        "electron/pty.js",
+        "hooks/install.js",
+        "hooks/install.test.js",
+        "hooks/obsidian.js",
+        "hooks/obsidian.test.js",
+        "hooks/plans.js",
+        "hooks/plans.test.js",
+        "hooks/snapshot.js",
+        "hooks/snapshot.test.js",
+        "hooks/tickets.js",
+        "hooks/whys.js",
+        "hooks/whys.test.js",
+        "package.json",
+        "scripts/test-ui.js",
+        "tsconfig.test.json"
+      ]
+    },
+    {
+      "sha": "36e698a",
+      "date": "2026-08-09",
+      "files": []
     }
   ]
 }

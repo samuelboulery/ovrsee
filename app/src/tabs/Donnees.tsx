@@ -47,6 +47,69 @@ function vide(source: Source): { titre: string; detail: string } {
   }
 }
 
+/**
+ * Alerte quand la source demandee manque.
+ */
+function SourceAlert({
+  sourceRequested,
+  config,
+}: {
+  sourceRequested?: string
+  config: { obsidianVault?: string } | null
+}) {
+  if (!sourceRequested || sourceRequested === 'auto') return null
+
+  if (sourceRequested === 'graphify') {
+    return (
+      <div
+        style={s(
+          'background: #3a3a1a; border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
+        )}
+      >
+        <div style={s('font-weight: 500; margin-bottom: 6px;')}>Graphify absent</div>
+        <div style={s('color: var(--color-warning-300);')}>
+          Le graphe n'a pas encore ete genere. Utilise le bouton du terminal integre pour
+          creer le graphe a partir du code source.
+        </div>
+      </div>
+    )
+  }
+
+  if (sourceRequested === 'obsidian') {
+    if (!config?.obsidianVault) {
+      return (
+        <div
+          style={s(
+            'background: #3a3a1a; border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
+          )}
+        >
+          <div style={s('font-weight: 500; margin-bottom: 6px;')}>Coffre Obsidian non configure</div>
+          <div style={s('color: var(--color-warning-300);')}>
+            Ajoute le champ <code>obsidianVault</code> a <code>cockpit.config.json</code> pour designer le chemin du
+            coffre.
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div
+        style={s(
+          'background: #3a3a1a; border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
+        )}
+      >
+        <div style={s('font-weight: 500; margin-bottom: 6px;')}>Coffre Obsidian illisible</div>
+        <div style={s('color: var(--color-warning-300);')}>
+          Le chemin <code>{config.obsidianVault}</code> n'existe pas ou n'est pas accessible. Verifie l'existence du
+          dossier et les permissions.
+        </div>
+      </div>
+    )
+  }
+
+  return null
+}
+
 /** Une table sans date le dit. C'est une information, pas un trou d'affichage. */
 const NON_DATE =
   'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-400); border: 1px dashed var(--color-neutral-600);'
@@ -84,12 +147,19 @@ function confStyle(conf: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS'): string {
 export function Donnees({
   graph,
   source,
+  sourceRequested,
+  sourceMissing,
+  sourceDate,
   vaultDeclared = false,
+  config = null,
 }: {
   graph: GraphifyGraph | null
   source: Source
-  /** Un `obsidianVault` est posé en config. Sert à ne pas l'ignorer en silence. */
+  sourceRequested?: string
+  sourceMissing?: boolean
+  sourceDate?: string | null
   vaultDeclared?: boolean
+  config?: { obsidianVault?: string } | null
 }) {
   const tables = tablesFrom(graph)
   const provenance = source ? PROVENANCE[source] : null
@@ -107,9 +177,12 @@ export function Donnees({
         {provenance && (
           <span className="tag tag-accent" style={s('font-size: 10.5px;')}>
             {provenance.badge}
+            {sourceDate && ` — ${sourceDate}`}
           </span>
         )}
       </div>
+
+      {sourceMissing && <SourceAlert sourceRequested={sourceRequested} config={config} />}
 
       {tables.length === 0 ? (
         <div>

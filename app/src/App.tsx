@@ -421,7 +421,11 @@ export function App() {
                         <Donnees
                           graph={snapshot.graph}
                           source={snapshot.graphSource}
+                          sourceRequested={snapshot.sourceRequested}
+                          sourceMissing={snapshot.sourceMissing}
+                          sourceDate={snapshot.sourceDate}
                           vaultDeclared={Boolean(snapshot.config?.obsidianVault)}
+                          config={snapshot.config}
                         />
                       )}
                       {tab === 'stack' && <Stack snapshot={snapshot} />}

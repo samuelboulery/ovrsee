@@ -9,7 +9,7 @@
       "source_file": "/Users/sam/code/cockpit/vite.config.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_vite_config_js",
-      "community": 30,
+      "community": 31,
       "norm_label": "vite.config.js"
     },
     {
@@ -18,7 +18,7 @@
       "source_file": "/Users/sam/code/cockpit/vite.config.js",
       "source_location": "L13",
       "id": "vite_config_cockpitdata",
-      "community": 30,
+      "community": 31,
       "norm_label": "cockpitdata()"
     },
     {
@@ -691,7 +691,7 @@
       "label": "shotDate()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L298",
+      "source_location": "L334",
       "id": "data_shotdate",
       "community": 1,
       "norm_label": "shotdate()"
@@ -700,16 +700,16 @@
       "label": "pageName()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L308",
+      "source_location": "L344",
       "id": "data_pagename",
-      "community": 5,
+      "community": 6,
       "norm_label": "pagename()"
     },
     {
       "label": "layoutGraph()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L356",
+      "source_location": "L392",
       "id": "data_layoutgraph",
       "community": 1,
       "norm_label": "layoutgraph()"
@@ -718,7 +718,7 @@
       "label": "json()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L441",
+      "source_location": "L477",
       "id": "data_json",
       "community": 1,
       "norm_label": "json()"
@@ -727,7 +727,7 @@
       "label": "estAbandon()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L448",
+      "source_location": "L484",
       "id": "data_estabandon",
       "community": 1,
       "norm_label": "estabandon()"
@@ -736,7 +736,7 @@
       "label": "fetchProjects()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L451",
+      "source_location": "L487",
       "id": "data_fetchprojects",
       "community": 1,
       "norm_label": "fetchprojects()"
@@ -745,7 +745,7 @@
       "label": "projectAction()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L467",
+      "source_location": "L503",
       "id": "data_projectaction",
       "community": 1,
       "norm_label": "projectaction()"
@@ -754,7 +754,7 @@
       "label": "fetchSkills()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L501",
+      "source_location": "L537",
       "id": "data_fetchskills",
       "community": 1,
       "norm_label": "fetchskills()"
@@ -763,7 +763,7 @@
       "label": "installSkills()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L503",
+      "source_location": "L539",
       "id": "data_installskills",
       "community": 1,
       "norm_label": "installskills()"
@@ -772,7 +772,7 @@
       "label": "ticketAction()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L539",
+      "source_location": "L575",
       "id": "data_ticketaction",
       "community": 1,
       "norm_label": "ticketaction()"
@@ -781,7 +781,7 @@
       "label": "isUnequipped()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L556",
+      "source_location": "L592",
       "id": "data_isunequipped",
       "community": 1,
       "norm_label": "isunequipped()"
@@ -790,7 +790,7 @@
       "label": "fetchSnapshot()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L566",
+      "source_location": "L602",
       "id": "data_fetchsnapshot",
       "community": 1,
       "norm_label": "fetchsnapshot()"
@@ -799,16 +799,34 @@
       "label": "shotUrl()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L569",
+      "source_location": "L605",
       "id": "data_shoturl",
       "community": 1,
       "norm_label": "shoturl()"
     },
     {
+      "label": "fetchSettings()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L614",
+      "id": "data_fetchsettings",
+      "community": 1,
+      "norm_label": "fetchsettings()"
+    },
+    {
+      "label": "updateSettings()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L626",
+      "id": "data_updatesettings",
+      "community": 1,
+      "norm_label": "updatesettings()"
+    },
+    {
       "label": "plansOuverts()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L581",
+      "source_location": "L647",
       "id": "data_plansouverts",
       "community": 1,
       "norm_label": "plansouverts()"
@@ -817,16 +835,34 @@
       "label": "sortTickets()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L590",
+      "source_location": "L656",
       "id": "data_sorttickets",
       "community": 1,
       "norm_label": "sorttickets()"
     },
     {
+      "label": "childrenOf()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L666",
+      "id": "data_childrenof",
+      "community": 1,
+      "norm_label": "childrenof()"
+    },
+    {
+      "label": "epicProgress()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L678",
+      "id": "data_epicprogress",
+      "community": 1,
+      "norm_label": "epicprogress()"
+    },
+    {
       "label": "colonneFinale()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L604",
+      "source_location": "L695",
       "id": "data_colonnefinale",
       "community": 1,
       "norm_label": "colonnefinale()"
@@ -835,7 +871,7 @@
       "label": "restant()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L608",
+      "source_location": "L708",
       "id": "data_restant",
       "community": 1,
       "norm_label": "restant()"
@@ -844,7 +880,7 @@
       "label": "history()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L614",
+      "source_location": "L730",
       "id": "data_history",
       "community": 1,
       "norm_label": "history()"
@@ -853,7 +889,7 @@
       "label": "density()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L622",
+      "source_location": "L738",
       "id": "data_density",
       "community": 1,
       "norm_label": "density()"
@@ -862,7 +898,7 @@
       "label": "plansForPage()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L647",
+      "source_location": "L763",
       "id": "data_plansforpage",
       "community": 1,
       "norm_label": "plansforpage()"
@@ -871,7 +907,7 @@
       "label": "lastScan()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L663",
+      "source_location": "L779",
       "id": "data_lastscan",
       "community": 1,
       "norm_label": "lastscan()"
@@ -880,7 +916,7 @@
       "label": "scanFailed()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L670",
+      "source_location": "L786",
       "id": "data_scanfailed",
       "community": 1,
       "norm_label": "scanfailed()"
@@ -889,7 +925,7 @@
       "label": "humanAge()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L673",
+      "source_location": "L789",
       "id": "data_humanage",
       "community": 1,
       "norm_label": "humanage()"
@@ -898,7 +934,7 @@
       "label": "frDate()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L696",
+      "source_location": "L812",
       "id": "data_frdate",
       "community": 1,
       "norm_label": "frdate()"
@@ -907,7 +943,7 @@
       "label": "frDateShort()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L704",
+      "source_location": "L820",
       "id": "data_frdateshort",
       "community": 1,
       "norm_label": "frdateshort()"
@@ -916,7 +952,7 @@
       "label": "confidenceOf()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L729",
+      "source_location": "L845",
       "id": "data_confidenceof",
       "community": 1,
       "norm_label": "confidenceof()"
@@ -925,7 +961,7 @@
       "label": "isSchemaNode()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L736",
+      "source_location": "L852",
       "id": "data_isschemanode",
       "community": 1,
       "norm_label": "isschemanode()"
@@ -934,7 +970,7 @@
       "label": "tablesFrom()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L747",
+      "source_location": "L863",
       "id": "data_tablesfrom",
       "community": 1,
       "norm_label": "tablesfrom()"
@@ -943,7 +979,7 @@
       "label": "stackFrom()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L796",
+      "source_location": "L912",
       "id": "data_stackfrom",
       "community": 1,
       "norm_label": "stackfrom()"
@@ -952,7 +988,7 @@
       "label": "briefLines()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L816",
+      "source_location": "L932",
       "id": "data_brieflines",
       "community": 1,
       "norm_label": "brieflines()"
@@ -961,7 +997,7 @@
       "label": "buildInjections()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L854",
+      "source_location": "L970",
       "id": "data_buildinjections",
       "community": 1,
       "norm_label": "buildinjections()"
@@ -979,7 +1015,7 @@
       "label": "tabForPath()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L58",
+      "source_location": "L59",
       "id": "app_tabforpath",
       "community": 10,
       "norm_label": "tabforpath()"
@@ -988,7 +1024,7 @@
       "label": "labelOf()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L62",
+      "source_location": "L63",
       "id": "app_labelof",
       "community": 10,
       "norm_label": "labelof()"
@@ -997,7 +1033,7 @@
       "label": "useDeborde()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L72",
+      "source_location": "L73",
       "id": "app_usedeborde",
       "community": 10,
       "norm_label": "usedeborde()"
@@ -1006,7 +1042,7 @@
       "label": "projectFromUrl()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L95",
+      "source_location": "L96",
       "id": "app_projectfromurl",
       "community": 10,
       "norm_label": "projectfromurl()"
@@ -1015,7 +1051,7 @@
       "label": "pushUrl()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L97",
+      "source_location": "L98",
       "id": "app_pushurl",
       "community": 10,
       "norm_label": "pushurl()"
@@ -1024,7 +1060,7 @@
       "label": "openProject()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L112",
+      "source_location": "L113",
       "id": "app_openproject",
       "community": 10,
       "norm_label": "openproject()"
@@ -1033,7 +1069,7 @@
       "label": "onPop()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L150",
+      "source_location": "L151",
       "id": "app_onpop",
       "community": 10,
       "norm_label": "onpop()"
@@ -1042,7 +1078,7 @@
       "label": "setTableau()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L202",
+      "source_location": "L203",
       "id": "app_settableau",
       "community": 10,
       "norm_label": "settableau()"
@@ -1051,7 +1087,7 @@
       "label": "reload()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L205",
+      "source_location": "L206",
       "id": "app_reload",
       "community": 1,
       "norm_label": "reload()"
@@ -1060,7 +1096,7 @@
       "label": "applyProjects()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L213",
+      "source_location": "L214",
       "id": "app_applyprojects",
       "community": 10,
       "norm_label": "applyprojects()"
@@ -1069,10 +1105,73 @@
       "label": "s()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L288",
+      "source_location": "L289",
       "id": "app_s",
       "community": 10,
       "norm_label": "s()"
+    },
+    {
+      "label": "PreferencesPanel.tsx",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L1",
+      "id": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "community": 15,
+      "norm_label": "preferencespanel.tsx"
+    },
+    {
+      "label": "PreferencesDensity()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L11",
+      "id": "preferencespanel_preferencesdensity",
+      "community": 15,
+      "norm_label": "preferencesdensity()"
+    },
+    {
+      "label": "PreferencesDisplay()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L27",
+      "id": "preferencespanel_preferencesdisplay",
+      "community": 15,
+      "norm_label": "preferencesdisplay()"
+    },
+    {
+      "label": "PreferencesActions()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L43",
+      "id": "preferencespanel_preferencesactions",
+      "community": 15,
+      "norm_label": "preferencesactions()"
+    },
+    {
+      "label": "PreferencesBootstrap()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L61",
+      "id": "preferencespanel_preferencesbootstrap",
+      "community": 15,
+      "norm_label": "preferencesbootstrap()"
+    },
+    {
+      "label": "onKey()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L144",
+      "id": "preferencespanel_onkey",
+      "community": 15,
+      "norm_label": "onkey()"
+    },
+    {
+      "label": "handleSave()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L153",
+      "id": "preferencespanel_handlesave",
+      "community": 1,
+      "norm_label": "handlesave()"
     },
     {
       "label": "Illisibles.tsx",
@@ -1080,7 +1179,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Illisibles.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_illisibles_tsx",
-      "community": 31,
+      "community": 32,
       "norm_label": "illisibles.tsx"
     },
     {
@@ -1089,7 +1188,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Illisibles.tsx",
       "source_location": "L15",
       "id": "illisibles_illisibles",
-      "community": 31,
+      "community": 32,
       "norm_label": "illisibles()"
     },
     {
@@ -1098,7 +1197,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/main.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_main_tsx",
-      "community": 40,
+      "community": 43,
       "norm_label": "main.tsx"
     },
     {
@@ -1107,7 +1206,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/usePanZoom.ts",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_usepanzoom_ts",
-      "community": 25,
+      "community": 26,
       "norm_label": "usepanzoom.ts"
     },
     {
@@ -1116,7 +1215,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/usePanZoom.ts",
       "source_location": "L36",
       "id": "usepanzoom_clamp",
-      "community": 25,
+      "community": 26,
       "norm_label": "clamp()"
     },
     {
@@ -1125,7 +1224,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/usePanZoom.ts",
       "source_location": "L58",
       "id": "usepanzoom_usepanzoom",
-      "community": 25,
+      "community": 26,
       "norm_label": "usepanzoom()"
     },
     {
@@ -1134,7 +1233,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/markdown.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_markdown_tsx",
-      "community": 17,
+      "community": 18,
       "norm_label": "markdown.tsx"
     },
     {
@@ -1143,7 +1242,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/markdown.tsx",
       "source_location": "L41",
       "id": "markdown_isexternal",
-      "community": 17,
+      "community": 18,
       "norm_label": "isexternal()"
     },
     {
@@ -1152,7 +1251,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/markdown.tsx",
       "source_location": "L49",
       "id": "markdown_inlinepattern",
-      "community": 17,
+      "community": 18,
       "norm_label": "inlinepattern()"
     },
     {
@@ -1161,7 +1260,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/markdown.tsx",
       "source_location": "L55",
       "id": "markdown_inline",
-      "community": 17,
+      "community": 18,
       "norm_label": "inline()"
     },
     {
@@ -1170,7 +1269,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/markdown.tsx",
       "source_location": "L144",
       "id": "markdown_key",
-      "community": 17,
+      "community": 18,
       "norm_label": "key()"
     },
     {
@@ -1179,34 +1278,34 @@
       "source_file": "/Users/sam/code/cockpit/app/src/data.test.ts",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_data_test_ts",
-      "community": 19,
+      "community": 20,
       "norm_label": "data.test.ts"
     },
     {
       "label": "snapshot()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.test.ts",
-      "source_location": "L32",
+      "source_location": "L35",
       "id": "data_test_snapshot",
-      "community": 19,
+      "community": 20,
       "norm_label": "snapshot()"
     },
     {
       "label": "plan()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.test.ts",
-      "source_location": "L50",
+      "source_location": "L53",
       "id": "data_test_plan",
-      "community": 19,
+      "community": 20,
       "norm_label": "plan()"
     },
     {
       "label": "t()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/data.test.ts",
-      "source_location": "L157",
+      "source_location": "L160",
       "id": "data_test_t",
-      "community": 19,
+      "community": 20,
       "norm_label": "t()"
     },
     {
@@ -1215,7 +1314,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/render.test.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_render_test_tsx",
-      "community": 32,
+      "community": 33,
       "norm_label": "render.test.tsx"
     },
     {
@@ -1224,7 +1323,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/render.test.tsx",
       "source_location": "L44",
       "id": "render_test_snapshot",
-      "community": 32,
+      "community": 33,
       "norm_label": "snapshot()"
     },
     {
@@ -1233,7 +1332,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/useTerminal.ts",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_useterminal_ts",
-      "community": 15,
+      "community": 16,
       "norm_label": "useterminal.ts"
     },
     {
@@ -1242,7 +1341,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/useTerminal.ts",
       "source_location": "L57",
       "id": "useterminal_terminalbridge",
-      "community": 15,
+      "community": 16,
       "norm_label": "terminalbridge()"
     },
     {
@@ -1251,7 +1350,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/useTerminal.ts",
       "source_location": "L105",
       "id": "useterminal_injecttoclaude",
-      "community": 15,
+      "community": 16,
       "norm_label": "injecttoclaude()"
     },
     {
@@ -1260,7 +1359,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/useTerminal.ts",
       "source_location": "L120",
       "id": "useterminal_pastetoclaude",
-      "community": 15,
+      "community": 16,
       "norm_label": "pastetoclaude()"
     },
     {
@@ -1269,7 +1368,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/useTerminal.ts",
       "source_location": "L124",
       "id": "useterminal_claudeslot",
-      "community": 15,
+      "community": 16,
       "norm_label": "claudeslot()"
     },
     {
@@ -1278,7 +1377,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/useTerminal.ts",
       "source_location": "L137",
       "id": "useterminal_useterminals",
-      "community": 15,
+      "community": 16,
       "norm_label": "useterminals()"
     },
     {
@@ -1287,7 +1386,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Garde.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_garde_tsx",
-      "community": 16,
+      "community": 17,
       "norm_label": "garde.tsx"
     },
     {
@@ -1296,7 +1395,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Garde.tsx",
       "source_location": "L23",
       "id": "garde_messagede",
-      "community": 16,
+      "community": 17,
       "norm_label": "messagede()"
     },
     {
@@ -1305,7 +1404,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Garde.tsx",
       "source_location": "L38",
       "id": "garde_garde",
-      "community": 16,
+      "community": 17,
       "norm_label": "garde"
     },
     {
@@ -1314,7 +1413,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Garde.tsx",
       "source_location": "L41",
       "id": "garde_garde_getderivedstatefromerror",
-      "community": 16,
+      "community": 17,
       "norm_label": ".getderivedstatefromerror()"
     },
     {
@@ -1323,7 +1422,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Garde.tsx",
       "source_location": "L45",
       "id": "garde_garde_componentdidcatch",
-      "community": 16,
+      "community": 17,
       "norm_label": ".componentdidcatch()"
     },
     {
@@ -1332,7 +1431,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Garde.tsx",
       "source_location": "L51",
       "id": "garde_garde_render",
-      "community": 16,
+      "community": 17,
       "norm_label": ".render()"
     },
     {
@@ -1341,7 +1440,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/env.d.ts",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_env_d_ts",
-      "community": 41,
+      "community": 44,
       "norm_label": "env.d.ts"
     },
     {
@@ -1350,7 +1449,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Terminal.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_terminal_tsx",
-      "community": 20,
+      "community": 21,
       "norm_label": "terminal.tsx"
     },
     {
@@ -1359,7 +1458,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Terminal.tsx",
       "source_location": "L23",
       "id": "terminal_panelstyle",
-      "community": 20,
+      "community": 21,
       "norm_label": "panelstyle()"
     },
     {
@@ -1368,7 +1467,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Terminal.tsx",
       "source_location": "L93",
       "id": "terminal_activate",
-      "community": 20,
+      "community": 21,
       "norm_label": "activate()"
     },
     {
@@ -1377,7 +1476,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Terminal.tsx",
       "source_location": "L219",
       "id": "terminal_s",
-      "community": 20,
+      "community": 21,
       "norm_label": "s()"
     },
     {
@@ -1386,7 +1485,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/node-test.d.ts",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_node_test_d_ts",
-      "community": 42,
+      "community": 45,
       "norm_label": "node-test.d.ts"
     },
     {
@@ -1395,7 +1494,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/useResizable.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_useresizable_tsx",
-      "community": 7,
+      "community": 9,
       "norm_label": "useresizable.tsx"
     },
     {
@@ -1404,7 +1503,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/useResizable.tsx",
       "source_location": "L43",
       "id": "useresizable_restore",
-      "community": 7,
+      "community": 9,
       "norm_label": "restore()"
     },
     {
@@ -1413,7 +1512,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/useResizable.tsx",
       "source_location": "L52",
       "id": "useresizable_useresizable",
-      "community": 7,
+      "community": 9,
       "norm_label": "useresizable()"
     },
     {
@@ -1422,7 +1521,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/useResizable.tsx",
       "source_location": "L144",
       "id": "useresizable_s",
-      "community": 7,
+      "community": 9,
       "norm_label": "s()"
     },
     {
@@ -1431,7 +1530,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/style.ts",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_style_ts",
-      "community": 26,
+      "community": 27,
       "norm_label": "style.ts"
     },
     {
@@ -1440,7 +1539,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/style.ts",
       "source_location": "L14",
       "id": "style_s",
-      "community": 26,
+      "community": 27,
       "norm_label": "s()"
     },
     {
@@ -1449,7 +1548,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/style.ts",
       "source_location": "L47",
       "id": "style_usehover",
-      "community": 26,
+      "community": 27,
       "norm_label": "usehover()"
     },
     {
@@ -1458,7 +1557,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/SkillsPanel.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_skillspanel_tsx",
-      "community": 18,
+      "community": 19,
       "norm_label": "skillspanel.tsx"
     },
     {
@@ -1467,7 +1566,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/SkillsPanel.tsx",
       "source_location": "L15",
       "id": "skillspanel_aproposer",
-      "community": 18,
+      "community": 19,
       "norm_label": "aproposer()"
     },
     {
@@ -1476,7 +1575,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/SkillsPanel.tsx",
       "source_location": "L34",
       "id": "skillspanel_bascule",
-      "community": 18,
+      "community": 19,
       "norm_label": "bascule()"
     },
     {
@@ -1485,7 +1584,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/SkillsPanel.tsx",
       "source_location": "L136",
       "id": "skillspanel_remplace",
-      "community": 18,
+      "community": 19,
       "norm_label": "remplace()"
     },
     {
@@ -1494,7 +1593,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/SkillsPanel.tsx",
       "source_location": "L158",
       "id": "skillspanel_onkey",
-      "community": 18,
+      "community": 19,
       "norm_label": "onkey()"
     },
     {
@@ -1503,7 +1602,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Lightbox.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_lightbox_tsx",
-      "community": 21,
+      "community": 22,
       "norm_label": "lightbox.tsx"
     },
     {
@@ -1512,7 +1611,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Lightbox.tsx",
       "source_location": "L7",
       "id": "lightbox_shotsha",
-      "community": 21,
+      "community": 22,
       "norm_label": "shotsha()"
     },
     {
@@ -1521,7 +1620,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Lightbox.tsx",
       "source_location": "L45",
       "id": "lightbox_step",
-      "community": 21,
+      "community": 22,
       "norm_label": "step()"
     },
     {
@@ -1530,7 +1629,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Lightbox.tsx",
       "source_location": "L48",
       "id": "lightbox_onkey",
-      "community": 21,
+      "community": 22,
       "norm_label": "onkey()"
     },
     {
@@ -1539,124 +1638,124 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
-      "community": 9,
+      "community": 8,
       "norm_label": "tableau.tsx"
     },
     {
       "label": "estColonne()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L29",
+      "source_location": "L32",
       "id": "tableau_estcolonne",
-      "community": 9,
+      "community": 8,
       "norm_label": "estcolonne()"
     },
     {
       "label": "ecrire()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L80",
+      "source_location": "L84",
       "id": "tableau_ecrire",
-      "community": 9,
+      "community": 8,
       "norm_label": "ecrire()"
     },
     {
       "label": "deplacer()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L93",
+      "source_location": "L97",
       "id": "tableau_deplacer",
-      "community": 9,
+      "community": 8,
       "norm_label": "deplacer()"
     },
     {
       "label": "creer()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L104",
+      "source_location": "L108",
       "id": "tableau_creer",
-      "community": 9,
+      "community": 8,
       "norm_label": "creer()"
     },
     {
       "label": "modifier()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L111",
+      "source_location": "L115",
       "id": "tableau_modifier",
-      "community": 9,
+      "community": 8,
       "norm_label": "modifier()"
     },
     {
       "label": "supprimer()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L118",
+      "source_location": "L122",
       "id": "tableau_supprimer",
-      "community": 9,
+      "community": 8,
       "norm_label": "supprimer()"
     },
     {
       "label": "renommer()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L123",
+      "source_location": "L127",
       "id": "tableau_renommer",
-      "community": 9,
+      "community": 8,
       "norm_label": "renommer()"
     },
     {
       "label": "retirer()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L141",
+      "source_location": "L145",
       "id": "tableau_retirer",
-      "community": 9,
+      "community": 8,
       "norm_label": "retirer()"
     },
     {
       "label": "ajouter()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L151",
+      "source_location": "L155",
       "id": "tableau_ajouter",
-      "community": 9,
+      "community": 8,
       "norm_label": "ajouter()"
     },
     {
       "label": "reordonner()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L165",
+      "source_location": "L169",
       "id": "tableau_reordonner",
-      "community": 9,
+      "community": 8,
       "norm_label": "reordonner()"
     },
     {
       "label": "cote()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L327",
+      "source_location": "L366",
       "id": "tableau_cote",
-      "community": 9,
+      "community": 8,
       "norm_label": "cote()"
     },
     {
       "label": "s()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L359",
+      "source_location": "L398",
       "id": "tableau_s",
-      "community": 9,
+      "community": 8,
       "norm_label": "s()"
     },
     {
       "label": "humanAge()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L755",
+      "source_location": "L883",
       "id": "tableau_humanage",
-      "community": 9,
+      "community": 8,
       "norm_label": "humanage()"
     },
     {
@@ -1665,7 +1764,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_tabs_navigateur_tsx",
-      "community": 7,
+      "community": 9,
       "norm_label": "navigateur.tsx"
     },
     {
@@ -1674,7 +1773,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx",
       "source_location": "L66",
       "id": "navigateur_url_key",
-      "community": 7,
+      "community": 9,
       "norm_label": "url_key()"
     },
     {
@@ -1683,7 +1782,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx",
       "source_location": "L84",
       "id": "navigateur_apptheme",
-      "community": 7,
+      "community": 9,
       "norm_label": "apptheme()"
     },
     {
@@ -1692,7 +1791,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx",
       "source_location": "L93",
       "id": "navigateur_starturl",
-      "community": 7,
+      "community": 9,
       "norm_label": "starturl()"
     },
     {
@@ -1701,7 +1800,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx",
       "source_location": "L99",
       "id": "navigateur_normalize",
-      "community": 7,
+      "community": 3,
       "norm_label": "normalize()"
     },
     {
@@ -1710,7 +1809,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx",
       "source_location": "L114",
       "id": "navigateur_pickelement",
-      "community": 7,
+      "community": 9,
       "norm_label": "pickelement()"
     },
     {
@@ -1719,7 +1818,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx",
       "source_location": "L195",
       "id": "navigateur_devtoolsstyle",
-      "community": 7,
+      "community": 9,
       "norm_label": "devtoolsstyle()"
     },
     {
@@ -1728,7 +1827,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx",
       "source_location": "L204",
       "id": "navigateur_describe",
-      "community": 7,
+      "community": 9,
       "norm_label": "describe()"
     },
     {
@@ -1737,7 +1836,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx",
       "source_location": "L220",
       "id": "navigateur_navigateur",
-      "community": 7,
+      "community": 9,
       "norm_label": "navigateur()"
     },
     {
@@ -1746,7 +1845,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx",
       "source_location": "L550",
       "id": "navigateur_s",
-      "community": 7,
+      "community": 9,
       "norm_label": "s()"
     },
     {
@@ -1755,7 +1854,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Historique.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_tabs_historique_tsx",
-      "community": 27,
+      "community": 28,
       "norm_label": "historique.tsx"
     },
     {
@@ -1764,7 +1863,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Historique.tsx",
       "source_location": "L17",
       "id": "historique_day",
-      "community": 27,
+      "community": 28,
       "norm_label": "day()"
     },
     {
@@ -1773,7 +1872,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Historique.tsx",
       "source_location": "L20",
       "id": "historique_hour",
-      "community": 27,
+      "community": 28,
       "norm_label": "hour()"
     },
     {
@@ -1782,7 +1881,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Donnees.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_tabs_donnees_tsx",
-      "community": 22,
+      "community": 34,
       "norm_label": "donnees.tsx"
     },
     {
@@ -1791,26 +1890,8 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Donnees.tsx",
       "source_location": "L29",
       "id": "donnees_vide",
-      "community": 22,
+      "community": 34,
       "norm_label": "vide()"
-    },
-    {
-      "label": "CoffreIgnore()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/app/src/tabs/Donnees.tsx",
-      "source_location": "L61",
-      "id": "donnees_coffreignore",
-      "community": 22,
-      "norm_label": "coffreignore()"
-    },
-    {
-      "label": "confStyle()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/app/src/tabs/Donnees.tsx",
-      "source_location": "L75",
-      "id": "donnees_confstyle",
-      "community": 22,
-      "norm_label": "confstyle()"
     },
     {
       "label": "Produit.tsx",
@@ -1818,7 +1899,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Produit.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_tabs_produit_tsx",
-      "community": 5,
+      "community": 6,
       "norm_label": "produit.tsx"
     },
     {
@@ -1827,7 +1908,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Produit.tsx",
       "source_location": "L120",
       "id": "produit_s",
-      "community": 5,
+      "community": 6,
       "norm_label": "s()"
     },
     {
@@ -1836,7 +1917,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Stack.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_tabs_stack_tsx",
-      "community": 43,
+      "community": 46,
       "norm_label": "stack.tsx"
     },
     {
@@ -1845,7 +1926,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Apercu.tsx",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_tabs_apercu_tsx",
-      "community": 33,
+      "community": 35,
       "norm_label": "apercu.tsx"
     },
     {
@@ -1854,7 +1935,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Apercu.tsx",
       "source_location": "L18",
       "id": "apercu_pluriel",
-      "community": 33,
+      "community": 35,
       "norm_label": "pluriel()"
     },
     {
@@ -1863,7 +1944,7 @@
       "source_file": "/Users/sam/code/cockpit/server/api.test.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_server_api_test_js",
-      "community": 6,
+      "community": 3,
       "norm_label": "api.test.js"
     },
     {
@@ -1872,7 +1953,7 @@
       "source_file": "/Users/sam/code/cockpit/server/api.test.js",
       "source_location": "L10",
       "id": "api_test_url",
-      "community": 6,
+      "community": 3,
       "norm_label": "url()"
     },
     {
@@ -1881,7 +1962,7 @@
       "source_file": "/Users/sam/code/cockpit/server/api.test.js",
       "source_location": "L12",
       "id": "api_test_projectwithshot",
-      "community": 6,
+      "community": 3,
       "norm_label": "projectwithshot()"
     },
     {
@@ -1890,7 +1971,7 @@
       "source_file": "/Users/sam/code/cockpit/server/api.test.js",
       "source_location": "L83",
       "id": "api_test_withregistry",
-      "community": 6,
+      "community": 3,
       "norm_label": "withregistry()"
     },
     {
@@ -1899,7 +1980,7 @@
       "source_file": "/Users/sam/code/cockpit/server/api.test.js",
       "source_location": "L87",
       "id": "api_test_post",
-      "community": 6,
+      "community": 3,
       "norm_label": "post()"
     },
     {
@@ -1908,7 +1989,7 @@
       "source_file": "/Users/sam/code/cockpit/server/api.test.js",
       "source_location": "L155",
       "id": "api_test_postticket",
-      "community": 6,
+      "community": 3,
       "norm_label": "postticket()"
     },
     {
@@ -1917,7 +1998,7 @@
       "source_file": "/Users/sam/code/cockpit/server/api.test.js",
       "source_location": "L159",
       "id": "api_test_projetenregistre",
-      "community": 6,
+      "community": 3,
       "norm_label": "projetenregistre()"
     },
     {
@@ -1926,7 +2007,7 @@
       "source_file": "/Users/sam/code/cockpit/server/api.test.js",
       "source_location": "L246",
       "id": "api_test_postskills",
-      "community": 6,
+      "community": 3,
       "norm_label": "postskills()"
     },
     {
@@ -1935,80 +2016,161 @@
       "source_file": "/Users/sam/code/cockpit/server/api.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_server_api_js",
-      "community": 6,
+      "community": 4,
       "norm_label": "api.js"
     },
     {
       "label": "usableDirectory()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L41",
+      "source_location": "L42",
       "id": "api_usabledirectory",
-      "community": 2,
+      "community": 4,
       "norm_label": "usabledirectory()"
     },
     {
       "label": "projectAction()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L60",
+      "source_location": "L61",
       "id": "api_projectaction",
-      "community": 2,
+      "community": 4,
       "norm_label": "projectaction()"
     },
     {
       "label": "ticketAction()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L123",
+      "source_location": "L124",
       "id": "api_ticketaction",
-      "community": 3,
+      "community": 2,
       "norm_label": "ticketaction()"
     },
     {
       "label": "resolve()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L178",
+      "source_location": "L179",
       "id": "api_resolve",
-      "community": 6,
+      "community": 3,
       "norm_label": "resolve()"
     },
     {
       "label": "parseBody()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L245",
+      "source_location": "L275",
       "id": "api_parsebody",
-      "community": 6,
+      "community": 4,
       "norm_label": "parsebody()"
     },
     {
       "label": "readBody()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L254",
+      "source_location": "L284",
       "id": "api_readbody",
-      "community": 6,
+      "community": 4,
       "norm_label": "readbody()"
     },
     {
       "label": "nodeMiddleware()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L262",
+      "source_location": "L292",
       "id": "api_nodemiddleware",
-      "community": 6,
+      "community": 4,
       "norm_label": "nodemiddleware()"
     },
     {
       "label": "fetchHandler()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L283",
+      "source_location": "L313",
       "id": "api_fetchhandler",
-      "community": 6,
+      "community": 4,
       "norm_label": "fetchhandler()"
+    },
+    {
+      "label": "dispatch.js",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L1",
+      "id": "users_sam_code_cockpit_mcp_dispatch_js",
+      "community": 2,
+      "norm_label": "dispatch.js"
+    },
+    {
+      "label": "validatePath()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L23",
+      "id": "dispatch_validatepath",
+      "community": 2,
+      "norm_label": "validatepath()"
+    },
+    {
+      "label": "dispatch()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L63",
+      "id": "dispatch_dispatch",
+      "community": 2,
+      "norm_label": "dispatch()"
+    },
+    {
+      "label": "server.js",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/mcp/server.js",
+      "source_location": "L1",
+      "id": "users_sam_code_cockpit_mcp_server_js",
+      "community": 5,
+      "norm_label": "server.js"
+    },
+    {
+      "label": "sendResponse()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/mcp/server.js",
+      "source_location": "L25",
+      "id": "server_sendresponse",
+      "community": 5,
+      "norm_label": "sendresponse()"
+    },
+    {
+      "label": "mcp.test.js",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/mcp/mcp.test.js",
+      "source_location": "L1",
+      "id": "users_sam_code_cockpit_mcp_mcp_test_js",
+      "community": 23,
+      "norm_label": "mcp.test.js"
+    },
+    {
+      "label": "withRegistry()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/mcp/mcp.test.js",
+      "source_location": "L16",
+      "id": "mcp_test_withregistry",
+      "community": 23,
+      "norm_label": "withregistry()"
+    },
+    {
+      "label": "registerProject()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/mcp/mcp.test.js",
+      "source_location": "L21",
+      "id": "mcp_test_registerproject",
+      "community": 23,
+      "norm_label": "registerproject()"
+    },
+    {
+      "label": "projectDir()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/mcp/mcp.test.js",
+      "source_location": "L28",
+      "id": "mcp_test_projectdir",
+      "community": 23,
+      "norm_label": "projectdir()"
     },
     {
       "label": "auth.js",
@@ -2016,7 +2178,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/auth.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_crawl_auth_js",
-      "community": 4,
+      "community": 5,
       "norm_label": "auth.js"
     },
     {
@@ -2025,7 +2187,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/auth.js",
       "source_location": "L37",
       "id": "auth_assertignored",
-      "community": 4,
+      "community": 5,
       "norm_label": "assertignored()"
     },
     {
@@ -2034,7 +2196,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/auth.js",
       "source_location": "L50",
       "id": "auth_main",
-      "community": 4,
+      "community": 5,
       "norm_label": "main()"
     },
     {
@@ -2043,7 +2205,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_crawl_index_js",
-      "community": 4,
+      "community": 5,
       "norm_label": "index.js"
     },
     {
@@ -2052,7 +2214,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L48",
       "id": "index_log",
-      "community": 4,
+      "community": 5,
       "norm_label": "log()"
     },
     {
@@ -2061,7 +2223,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L50",
       "id": "index_loadconfig",
-      "community": 4,
+      "community": 5,
       "norm_label": "loadconfig()"
     },
     {
@@ -2070,7 +2232,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L72",
       "id": "index_usestoragestate",
-      "community": 4,
+      "community": 5,
       "norm_label": "usestoragestate()"
     },
     {
@@ -2079,7 +2241,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L85",
       "id": "index_shortsha",
-      "community": 4,
+      "community": 5,
       "norm_label": "shortsha()"
     },
     {
@@ -2088,7 +2250,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L98",
       "id": "index_recordscan",
-      "community": 4,
+      "community": 5,
       "norm_label": "recordscan()"
     },
     {
@@ -2097,7 +2259,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L105",
       "id": "index_sleep",
-      "community": 4,
+      "community": 5,
       "norm_label": "sleep()"
     },
     {
@@ -2106,7 +2268,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L107",
       "id": "index_waitforserver",
-      "community": 4,
+      "community": 5,
       "norm_label": "waitforserver()"
     },
     {
@@ -2115,7 +2277,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L129",
       "id": "index_assertportfree",
-      "community": 4,
+      "community": 5,
       "norm_label": "assertportfree()"
     },
     {
@@ -2124,7 +2286,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L141",
       "id": "index_startapp",
-      "community": 4,
+      "community": 5,
       "norm_label": "startapp()"
     },
     {
@@ -2133,7 +2295,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L158",
       "id": "index_stopapp",
-      "community": 4,
+      "community": 5,
       "norm_label": "stopapp()"
     },
     {
@@ -2142,7 +2304,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L174",
       "id": "index_pathof",
-      "community": 4,
+      "community": 5,
       "norm_label": "pathof()"
     },
     {
@@ -2151,7 +2313,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L179",
       "id": "index_isignored",
-      "community": 4,
+      "community": 5,
       "norm_label": "isignored()"
     },
     {
@@ -2160,7 +2322,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L186",
       "id": "index_visitall",
-      "community": 4,
+      "community": 5,
       "norm_label": "visitall()"
     },
     {
@@ -2169,7 +2331,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L258",
       "id": "index_retainable",
-      "community": 4,
+      "community": 5,
       "norm_label": "retainable()"
     },
     {
@@ -2178,7 +2340,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L293",
       "id": "index_orphanshots",
-      "community": 4,
+      "community": 5,
       "norm_label": "orphanshots()"
     },
     {
@@ -2187,7 +2349,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L301",
       "id": "index_pruneshots",
-      "community": 4,
+      "community": 5,
       "norm_label": "pruneshots()"
     },
     {
@@ -2196,7 +2358,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/index.js",
       "source_location": "L311",
       "id": "index_run",
-      "community": 4,
+      "community": 5,
       "norm_label": "run()"
     },
     {
@@ -2205,7 +2367,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/retention.test.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_crawl_retention_test_js",
-      "community": 34,
+      "community": 36,
       "norm_label": "retention.test.js"
     },
     {
@@ -2214,7 +2376,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/retention.test.js",
       "source_location": "L7",
       "id": "retention_test_shot",
-      "community": 34,
+      "community": 36,
       "norm_label": "shot()"
     },
     {
@@ -2223,7 +2385,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_crawl_routes_js",
-      "community": 4,
+      "community": 5,
       "norm_label": "routes.js"
     },
     {
@@ -2232,7 +2394,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.js",
       "source_location": "L19",
       "id": "routes_isdynamicsegment",
-      "community": 4,
+      "community": 5,
       "norm_label": "isdynamicsegment()"
     },
     {
@@ -2241,7 +2403,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.js",
       "source_location": "L23",
       "id": "routes_segmentsof",
-      "community": 4,
+      "community": 5,
       "norm_label": "segmentsof()"
     },
     {
@@ -2250,7 +2412,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.js",
       "source_location": "L49",
       "id": "routes_normalizeroutes",
-      "community": 4,
+      "community": 5,
       "norm_label": "normalizeroutes()"
     },
     {
@@ -2259,7 +2421,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.js",
       "source_location": "L95",
       "id": "routes_pageslug",
-      "community": 4,
+      "community": 5,
       "norm_label": "pageslug()"
     },
     {
@@ -2268,7 +2430,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.js",
       "source_location": "L104",
       "id": "routes_sameorigin",
-      "community": 4,
+      "community": 5,
       "norm_label": "sameorigin()"
     },
     {
@@ -2277,7 +2439,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.test.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_crawl_routes_test_js",
-      "community": 44,
+      "community": 47,
       "norm_label": "routes.test.js"
     },
     {
@@ -2286,7 +2448,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-session-start.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_cockpit_session_start_js",
-      "community": 45,
+      "community": 48,
       "norm_label": "cockpit-session-start.js"
     },
     {
@@ -2340,34 +2502,34 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.test.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_tickets_test_js",
-      "community": 23,
+      "community": 24,
       "norm_label": "tickets.test.js"
     },
     {
       "label": "fixture()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.test.js",
-      "source_location": "L29",
+      "source_location": "L31",
       "id": "tickets_test_fixture",
-      "community": 23,
+      "community": 24,
       "norm_label": "fixture()"
     },
     {
       "label": "ecrireBoardBrut()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.test.js",
-      "source_location": "L37",
+      "source_location": "L39",
       "id": "tickets_test_ecrireboardbrut",
-      "community": 23,
+      "community": 24,
       "norm_label": "ecrireboardbrut()"
     },
     {
       "label": "writePlan()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.test.js",
-      "source_location": "L247",
+      "source_location": "L249",
       "id": "tickets_test_writeplan",
-      "community": 23,
+      "community": 24,
       "norm_label": "writeplan()"
     },
     {
@@ -2403,7 +2565,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_cockpit_post_commit_js",
-      "community": 2,
+      "community": 4,
       "norm_label": "cockpit-post-commit.js"
     },
     {
@@ -2412,7 +2574,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
       "source_location": "L22",
       "id": "cockpit_post_commit_git",
-      "community": 2,
+      "community": 4,
       "norm_label": "git()"
     },
     {
@@ -2421,7 +2583,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
       "source_location": "L33",
       "id": "cockpit_post_commit_changedfiles",
-      "community": 2,
+      "community": 4,
       "norm_label": "changedfiles()"
     },
     {
@@ -2430,7 +2592,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
       "source_location": "L59",
       "id": "cockpit_post_commit_crawlutile",
-      "community": 2,
+      "community": 4,
       "norm_label": "crawlutile()"
     },
     {
@@ -2439,7 +2601,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
       "source_location": "L61",
       "id": "cockpit_post_commit_attachcommit",
-      "community": 2,
+      "community": 4,
       "norm_label": "attachcommit()"
     },
     {
@@ -2448,7 +2610,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.js",
       "source_location": "L87",
       "id": "cockpit_post_commit_spawncrawl",
-      "community": 2,
+      "community": 4,
       "norm_label": "spawncrawl()"
     },
     {
@@ -2457,34 +2619,34 @@
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.test.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_snapshot_test_js",
-      "community": 24,
+      "community": 25,
       "norm_label": "snapshot.test.js"
     },
     {
       "label": "project()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.test.js",
-      "source_location": "L9",
+      "source_location": "L10",
       "id": "snapshot_test_project",
-      "community": 24,
+      "community": 25,
       "norm_label": "project()"
     },
     {
       "label": "poserGraphify()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.test.js",
-      "source_location": "L104",
+      "source_location": "L105",
       "id": "snapshot_test_posergraphify",
-      "community": 24,
+      "community": 25,
       "norm_label": "posergraphify()"
     },
     {
       "label": "poserCoffre()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.test.js",
-      "source_location": "L113",
+      "source_location": "L114",
       "id": "snapshot_test_posercoffre",
-      "community": 24,
+      "community": 25,
       "norm_label": "posercoffre()"
     },
     {
@@ -2493,7 +2655,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/vault.test.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_vault_test_js",
-      "community": 35,
+      "community": 37,
       "norm_label": "vault.test.js"
     },
     {
@@ -2502,7 +2664,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/vault.test.js",
       "source_location": "L10",
       "id": "vault_test_coffre",
-      "community": 35,
+      "community": 37,
       "norm_label": "coffre()"
     },
     {
@@ -2547,7 +2709,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/brief.js",
       "source_location": "L51",
       "id": "brief_readcockpit",
-      "community": 3,
+      "community": 2,
       "norm_label": "readcockpit()"
     },
     {
@@ -2592,7 +2754,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-cli.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_cockpit_cli_js",
-      "community": 46,
+      "community": 49,
       "norm_label": "cockpit-cli.js"
     },
     {
@@ -2601,7 +2763,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_tickets_js",
-      "community": 3,
+      "community": 2,
       "norm_label": "tickets.js"
     },
     {
@@ -2610,7 +2772,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L43",
       "id": "tickets_today",
-      "community": 3,
+      "community": 2,
       "norm_label": "today()"
     },
     {
@@ -2619,7 +2781,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L55",
       "id": "tickets_readboard",
-      "community": 3,
+      "community": 2,
       "norm_label": "readboard()"
     },
     {
@@ -2628,7 +2790,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L86",
       "id": "tickets_writeboard",
-      "community": 3,
+      "community": 2,
       "norm_label": "writeboard()"
     },
     {
@@ -2637,7 +2799,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L120",
       "id": "tickets_nouvelid",
-      "community": 3,
+      "community": 2,
       "norm_label": "nouvelid()"
     },
     {
@@ -2646,7 +2808,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L135",
       "id": "tickets_addcolumn",
-      "community": 3,
+      "community": 2,
       "norm_label": "addcolumn()"
     },
     {
@@ -2655,7 +2817,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L155",
       "id": "tickets_renamecolumn",
-      "community": 3,
+      "community": 2,
       "norm_label": "renamecolumn()"
     },
     {
@@ -2664,7 +2826,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L185",
       "id": "tickets_removecolumn",
-      "community": 3,
+      "community": 2,
       "norm_label": "removecolumn()"
     },
     {
@@ -2673,7 +2835,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L210",
       "id": "tickets_reordercolumn",
-      "community": 3,
+      "community": 2,
       "norm_label": "reordercolumn()"
     },
     {
@@ -2682,7 +2844,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L235",
       "id": "tickets_readtickets",
-      "community": 3,
+      "community": 2,
       "norm_label": "readtickets()"
     },
     {
@@ -2691,7 +2853,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L276",
       "id": "tickets_nextticketid",
-      "community": 3,
+      "community": 2,
       "norm_label": "nextticketid()"
     },
     {
@@ -2700,7 +2862,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L286",
       "id": "tickets_ticketfilename",
-      "community": 3,
+      "community": 2,
       "norm_label": "ticketfilename()"
     },
     {
@@ -2709,7 +2871,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L296",
       "id": "tickets_issafeticketfilename",
-      "community": 3,
+      "community": 2,
       "norm_label": "issafeticketfilename()"
     },
     {
@@ -2718,7 +2880,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L308",
       "id": "tickets_requirecolonne",
-      "community": 3,
+      "community": 2,
       "norm_label": "requirecolonne()"
     },
     {
@@ -2727,7 +2889,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L315",
       "id": "tickets_requirepriorite",
-      "community": 3,
+      "community": 2,
       "norm_label": "requirepriorite()"
     },
     {
@@ -2736,7 +2898,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L322",
       "id": "tickets_requirefile",
-      "community": 3,
+      "community": 2,
       "norm_label": "requirefile()"
     },
     {
@@ -2745,7 +2907,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L327",
       "id": "tickets_ticketpath",
-      "community": 3,
+      "community": 2,
       "norm_label": "ticketpath()"
     },
     {
@@ -2754,50 +2916,50 @@
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
       "source_location": "L337",
       "id": "tickets_createticket",
-      "community": 3,
+      "community": 2,
       "norm_label": "createticket()"
     },
     {
       "label": "rewrite()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L373",
+      "source_location": "L388",
       "id": "tickets_rewrite",
-      "community": 3,
+      "community": 2,
       "norm_label": "rewrite()"
     },
     {
       "label": "moveTicket()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L392",
+      "source_location": "L407",
       "id": "tickets_moveticket",
-      "community": 3,
+      "community": 2,
       "norm_label": "moveticket()"
     },
     {
       "label": "updateTicket()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L407",
+      "source_location": "L422",
       "id": "tickets_updateticket",
-      "community": 3,
+      "community": 2,
       "norm_label": "updateticket()"
     },
     {
       "label": "deleteTicket()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L433",
+      "source_location": "L466",
       "id": "tickets_deleteticket",
-      "community": 3,
+      "community": 2,
       "norm_label": "deleteticket()"
     },
     {
       "label": "colonneFinale()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L451",
+      "source_location": "L484",
       "id": "tickets_colonnefinale",
       "community": 13,
       "norm_label": "colonnefinale()"
@@ -2806,18 +2968,36 @@
       "label": "sortTickets()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L462",
+      "source_location": "L499",
       "id": "tickets_sorttickets",
-      "community": 3,
+      "community": 2,
       "norm_label": "sorttickets()"
+    },
+    {
+      "label": "childrenOf()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
+      "source_location": "L517",
+      "id": "tickets_childrenof",
+      "community": 2,
+      "norm_label": "childrenof()"
+    },
+    {
+      "label": "orphanChildren()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
+      "source_location": "L531",
+      "id": "tickets_orphanchildren",
+      "community": 2,
+      "norm_label": "orphanchildren()"
     },
     {
       "label": "importOpenPlans()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L482",
+      "source_location": "L551",
       "id": "tickets_importopenplans",
-      "community": 3,
+      "community": 2,
       "norm_label": "importopenplans()"
     },
     {
@@ -2826,7 +3006,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/brief.test.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_brief_test_js",
-      "community": 3,
+      "community": 2,
       "norm_label": "brief.test.js"
     },
     {
@@ -2835,7 +3015,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/brief.test.js",
       "source_location": "L13",
       "id": "brief_test_cockpitwith",
-      "community": 3,
+      "community": 2,
       "norm_label": "cockpitwith()"
     },
     {
@@ -2844,7 +3024,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/skills.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_skills_js",
-      "community": 6,
+      "community": 7,
       "norm_label": "skills.js"
     },
     {
@@ -2853,7 +3033,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/skills.js",
       "source_location": "L39",
       "id": "skills_skillsdir",
-      "community": 6,
+      "community": 7,
       "norm_label": "skillsdir()"
     },
     {
@@ -2862,7 +3042,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/skills.js",
       "source_location": "L65",
       "id": "skills_entree",
-      "community": 6,
+      "community": 7,
       "norm_label": "entree()"
     },
     {
@@ -2871,7 +3051,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/skills.js",
       "source_location": "L76",
       "id": "skills_bundledpath",
-      "community": 6,
+      "community": 7,
       "norm_label": "bundledpath()"
     },
     {
@@ -2880,7 +3060,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/skills.js",
       "source_location": "L83",
       "id": "skills_installedpath",
-      "community": 6,
+      "community": 7,
       "norm_label": "installedpath()"
     },
     {
@@ -2889,7 +3069,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/skills.js",
       "source_location": "L85",
       "id": "skills_lire",
-      "community": 6,
+      "community": 7,
       "norm_label": "lire()"
     },
     {
@@ -2898,7 +3078,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/skills.js",
       "source_location": "L104",
       "id": "skills_readskills",
-      "community": 6,
+      "community": 7,
       "norm_label": "readskills()"
     },
     {
@@ -2907,7 +3087,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/skills.js",
       "source_location": "L132",
       "id": "skills_installskills",
-      "community": 6,
+      "community": 7,
       "norm_label": "installskills()"
     },
     {
@@ -2916,7 +3096,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/whys.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_whys_js",
-      "community": 8,
+      "community": 3,
       "norm_label": "whys.js"
     },
     {
@@ -2925,7 +3105,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/whys.js",
       "source_location": "L76",
       "id": "whys_packageof",
-      "community": 8,
+      "community": 3,
       "norm_label": "packageof()"
     },
     {
@@ -2934,7 +3114,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/whys.js",
       "source_location": "L95",
       "id": "whys_whysinsource",
-      "community": 8,
+      "community": 3,
       "norm_label": "whysinsource()"
     },
     {
@@ -2943,7 +3123,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/whys.js",
       "source_location": "L135",
       "id": "whys_readwhys",
-      "community": 8,
+      "community": 3,
       "norm_label": "readwhys()"
     },
     {
@@ -2952,7 +3132,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-capture-plan.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_cockpit_capture_plan_js",
-      "community": 2,
+      "community": 4,
       "norm_label": "cockpit-capture-plan.js"
     },
     {
@@ -2961,7 +3141,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-capture-plan.js",
       "source_location": "L33",
       "id": "cockpit_capture_plan_readstdin",
-      "community": 2,
+      "community": 4,
       "norm_label": "readstdin()"
     },
     {
@@ -2970,7 +3150,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-capture-plan.js",
       "source_location": "L46",
       "id": "cockpit_capture_plan_reporoot",
-      "community": 2,
+      "community": 4,
       "norm_label": "reporoot()"
     },
     {
@@ -2979,7 +3159,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-capture-plan.js",
       "source_location": "L64",
       "id": "cockpit_capture_plan_readornull",
-      "community": 2,
+      "community": 4,
       "norm_label": "readornull()"
     },
     {
@@ -2988,7 +3168,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-capture-plan.js",
       "source_location": "L88",
       "id": "cockpit_capture_plan_planfrom",
-      "community": 2,
+      "community": 4,
       "norm_label": "planfrom()"
     },
     {
@@ -2997,7 +3177,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-capture-plan.js",
       "source_location": "L116",
       "id": "cockpit_capture_plan_titleof",
-      "community": 2,
+      "community": 4,
       "norm_label": "titleof()"
     },
     {
@@ -3006,7 +3186,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-capture-plan.js",
       "source_location": "L125",
       "id": "cockpit_capture_plan_main",
-      "community": 2,
+      "community": 4,
       "norm_label": "main()"
     },
     {
@@ -3015,7 +3195,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/timeline.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_timeline_js",
-      "community": 8,
+      "community": 3,
       "norm_label": "timeline.js"
     },
     {
@@ -3024,7 +3204,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/timeline.js",
       "source_location": "L43",
       "id": "timeline_timeline",
-      "community": 8,
+      "community": 3,
       "norm_label": "timeline()"
     },
     {
@@ -3033,7 +3213,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/obsidian.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_obsidian_js",
-      "community": 5,
+      "community": 6,
       "norm_label": "obsidian.js"
     },
     {
@@ -3042,7 +3222,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/obsidian.js",
       "source_location": "L46",
       "id": "obsidian_scalar",
-      "community": 5,
+      "community": 6,
       "norm_label": "scalar()"
     },
     {
@@ -3051,7 +3231,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/obsidian.js",
       "source_location": "L53",
       "id": "obsidian_frontmatter",
-      "community": 5,
+      "community": 6,
       "norm_label": "frontmatter()"
     },
     {
@@ -3060,7 +3240,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/obsidian.js",
       "source_location": "L73",
       "id": "obsidian_notename",
-      "community": 5,
+      "community": 6,
       "norm_label": "notename()"
     },
     {
@@ -3069,7 +3249,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/obsidian.js",
       "source_location": "L75",
       "id": "obsidian_link",
-      "community": 5,
+      "community": 6,
       "norm_label": "link()"
     },
     {
@@ -3078,7 +3258,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/obsidian.js",
       "source_location": "L77",
       "id": "obsidian_puces",
-      "community": 5,
+      "community": 6,
       "norm_label": "puces()"
     },
     {
@@ -3087,7 +3267,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/obsidian.js",
       "source_location": "L87",
       "id": "obsidian_pagename",
-      "community": 5,
+      "community": 6,
       "norm_label": "pagename()"
     },
     {
@@ -3096,7 +3276,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/obsidian.js",
       "source_location": "L111",
       "id": "obsidian_exportvault",
-      "community": 5,
+      "community": 6,
       "norm_label": "exportvault()"
     },
     {
@@ -3105,7 +3285,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/obsidian.js",
       "source_location": "L133",
       "id": "obsidian_ecrireplans",
-      "community": 5,
+      "community": 6,
       "norm_label": "ecrireplans()"
     },
     {
@@ -3114,7 +3294,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/obsidian.js",
       "source_location": "L165",
       "id": "obsidian_ecriretickets",
-      "community": 5,
+      "community": 6,
       "norm_label": "ecriretickets()"
     },
     {
@@ -3123,7 +3303,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/obsidian.js",
       "source_location": "L203",
       "id": "obsidian_ecrirepages",
-      "community": 5,
+      "community": 6,
       "norm_label": "ecrirepages()"
     },
     {
@@ -3132,7 +3312,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/obsidian.js",
       "source_location": "L266",
       "id": "obsidian_ecrireindex",
-      "community": 5,
+      "community": 6,
       "norm_label": "ecrireindex()"
     },
     {
@@ -3141,7 +3321,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/skills.test.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_skills_test_js",
-      "community": 36,
+      "community": 38,
       "norm_label": "skills.test.js"
     },
     {
@@ -3150,7 +3330,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/skills.test.js",
       "source_location": "L15",
       "id": "skills_test_fixture",
-      "community": 36,
+      "community": 38,
       "norm_label": "fixture()"
     },
     {
@@ -3159,7 +3339,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/install.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_install_js",
-      "community": 5,
+      "community": 7,
       "norm_label": "install.js"
     },
     {
@@ -3168,7 +3348,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/install.js",
       "source_location": "L56",
       "id": "install_shq",
-      "community": 5,
+      "community": 7,
       "norm_label": "shq()"
     },
     {
@@ -3177,7 +3357,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/install.js",
       "source_location": "L67",
       "id": "install_commandfor",
-      "community": 5,
+      "community": 7,
       "norm_label": "commandfor()"
     },
     {
@@ -3186,7 +3366,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/install.js",
       "source_location": "L77",
       "id": "install_installpostcommit",
-      "community": 5,
+      "community": 7,
       "norm_label": "installpostcommit()"
     },
     {
@@ -3195,7 +3375,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/install.js",
       "source_location": "L112",
       "id": "install_iscockpit",
-      "community": 5,
+      "community": 7,
       "norm_label": "iscockpit()"
     },
     {
@@ -3204,7 +3384,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/install.js",
       "source_location": "L114",
       "id": "install_installclaudehooks",
-      "community": 5,
+      "community": 7,
       "norm_label": "installclaudehooks()"
     },
     {
@@ -3213,7 +3393,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/install.js",
       "source_location": "L197",
       "id": "install_install",
-      "community": 5,
+      "community": 7,
       "norm_label": "install()"
     },
     {
@@ -3222,7 +3402,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/whys.test.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_whys_test_js",
-      "community": 37,
+      "community": 39,
       "norm_label": "whys.test.js"
     },
     {
@@ -3231,7 +3411,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/whys.test.js",
       "source_location": "L9",
       "id": "whys_test_projet",
-      "community": 37,
+      "community": 39,
       "norm_label": "projet()"
     },
     {
@@ -3240,106 +3420,124 @@
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_snapshot_js",
-      "community": 8,
+      "community": 3,
       "norm_label": "snapshot.js"
     },
     {
       "label": "readJson()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L21",
+      "source_location": "L22",
       "id": "snapshot_readjson",
-      "community": 8,
+      "community": 3,
       "norm_label": "readjson()"
     },
     {
       "label": "readText()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L40",
+      "source_location": "L41",
       "id": "snapshot_readtext",
-      "community": 8,
+      "community": 3,
       "norm_label": "readtext()"
     },
     {
       "label": "projects()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L67",
+      "source_location": "L68",
       "id": "snapshot_projects",
-      "community": 2,
+      "community": 4,
       "norm_label": "projects()"
     },
     {
       "label": "shotsByPage()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L90",
+      "source_location": "L91",
       "id": "snapshot_shotsbypage",
-      "community": 8,
+      "community": 3,
       "norm_label": "shotsbypage()"
     },
     {
       "label": "scans()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L117",
+      "source_location": "L118",
       "id": "snapshot_scans",
-      "community": 8,
+      "community": 3,
       "norm_label": "scans()"
     },
     {
       "label": "commits()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L153",
+      "source_location": "L154",
       "id": "snapshot_commits",
-      "community": 8,
+      "community": 3,
       "norm_label": "commits()"
     },
     {
       "label": "tableau()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L178",
+      "source_location": "L179",
       "id": "snapshot_tableau",
-      "community": 8,
+      "community": 3,
       "norm_label": "tableau()"
     },
     {
       "label": "vaultPath()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L204",
+      "source_location": "L205",
       "id": "snapshot_vaultpath",
-      "community": 8,
+      "community": 3,
       "norm_label": "vaultpath()"
+    },
+    {
+      "label": "fileDate()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
+      "source_location": "L217",
+      "id": "snapshot_filedate",
+      "community": 3,
+      "norm_label": "filedate()"
     },
     {
       "label": "readGraph()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L236",
+      "source_location": "L252",
       "id": "snapshot_readgraph",
-      "community": 8,
+      "community": 3,
       "norm_label": "readgraph()"
+    },
+    {
+      "label": "getVaultDate()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
+      "source_location": "L325",
+      "id": "snapshot_getvaultdate",
+      "community": 3,
+      "norm_label": "getvaultdate()"
     },
     {
       "label": "snapshot()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L250",
+      "source_location": "L356",
       "id": "snapshot_snapshot",
-      "community": 8,
+      "community": 3,
       "norm_label": "snapshot()"
     },
     {
       "label": "shotPath()",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L306",
+      "source_location": "L412",
       "id": "snapshot_shotpath",
-      "community": 7,
+      "community": 3,
       "norm_label": "shotpath()"
     },
     {
@@ -3348,7 +3546,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/cockpit-post-commit.test.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_cockpit_post_commit_test_js",
-      "community": 47,
+      "community": 50,
       "norm_label": "cockpit-post-commit.test.js"
     },
     {
@@ -3451,12 +3649,30 @@
       "norm_label": "readvault()"
     },
     {
+      "label": "settings.test.js",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.test.js",
+      "source_location": "L1",
+      "id": "users_sam_code_cockpit_hooks_settings_test_js",
+      "community": 40,
+      "norm_label": "settings.test.js"
+    },
+    {
+      "label": "tempDir()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.test.js",
+      "source_location": "L16",
+      "id": "settings_test_tempdir",
+      "community": 40,
+      "norm_label": "tempdir()"
+    },
+    {
       "label": "install.test.js",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/hooks/install.test.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_install_test_js",
-      "community": 38,
+      "community": 41,
       "norm_label": "install.test.js"
     },
     {
@@ -3465,7 +3681,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/install.test.js",
       "source_location": "L17",
       "id": "install_test_temprepo",
-      "community": 38,
+      "community": 41,
       "norm_label": "temprepo()"
     },
     {
@@ -3474,7 +3690,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_plans_js",
-      "community": 2,
+      "community": 4,
       "norm_label": "plans.js"
     },
     {
@@ -3483,7 +3699,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L37",
       "id": "plans_parseplan",
-      "community": 3,
+      "community": 2,
       "norm_label": "parseplan()"
     },
     {
@@ -3492,7 +3708,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L63",
       "id": "plans_serializeplan",
-      "community": 3,
+      "community": 2,
       "norm_label": "serializeplan()"
     },
     {
@@ -3501,7 +3717,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L77",
       "id": "plans_readplans",
-      "community": 3,
+      "community": 2,
       "norm_label": "readplans()"
     },
     {
@@ -3510,7 +3726,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L123",
       "id": "plans_updateplanmeta",
-      "community": 2,
+      "community": 4,
       "norm_label": "updateplanmeta()"
     },
     {
@@ -3519,7 +3735,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L149",
       "id": "plans_plansouverts",
-      "community": 2,
+      "community": 4,
       "norm_label": "plansouverts()"
     },
     {
@@ -3528,7 +3744,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L156",
       "id": "plans_history",
-      "community": 2,
+      "community": 4,
       "norm_label": "history()"
     },
     {
@@ -3537,7 +3753,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L170",
       "id": "plans_density",
-      "community": 2,
+      "community": 4,
       "norm_label": "density()"
     },
     {
@@ -3555,7 +3771,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L209",
       "id": "plans_planfilename",
-      "community": 2,
+      "community": 4,
       "norm_label": "planfilename()"
     },
     {
@@ -3564,7 +3780,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L225",
       "id": "plans_writefilenofollow",
-      "community": 5,
+      "community": 6,
       "norm_label": "writefilenofollow()"
     },
     {
@@ -3573,7 +3789,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L270",
       "id": "plans_registrypath",
-      "community": 2,
+      "community": 4,
       "norm_label": "registrypath()"
     },
     {
@@ -3582,7 +3798,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L274",
       "id": "plans_readregistry",
-      "community": 2,
+      "community": 4,
       "norm_label": "readregistry()"
     },
     {
@@ -3591,7 +3807,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L285",
       "id": "plans_writeregistry",
-      "community": 2,
+      "community": 4,
       "norm_label": "writeregistry()"
     },
     {
@@ -3600,7 +3816,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L299",
       "id": "plans_registerproject",
-      "community": 2,
+      "community": 4,
       "norm_label": "registerproject()"
     },
     {
@@ -3609,7 +3825,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L314",
       "id": "plans_unregisterproject",
-      "community": 2,
+      "community": 4,
       "norm_label": "unregisterproject()"
     },
     {
@@ -3618,7 +3834,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L333",
       "id": "plans_touchproject",
-      "community": 2,
+      "community": 4,
       "norm_label": "touchproject()"
     },
     {
@@ -3627,7 +3843,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L368",
       "id": "plans_closeopenplans",
-      "community": 2,
+      "community": 4,
       "norm_label": "closeopenplans()"
     },
     {
@@ -3636,7 +3852,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L417",
       "id": "plans_attachcommittoplan",
-      "community": 2,
+      "community": 4,
       "norm_label": "attachcommittoplan()"
     },
     {
@@ -3645,7 +3861,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L435",
       "id": "plans_clearactiveplan",
-      "community": 2,
+      "community": 4,
       "norm_label": "clearactiveplan()"
     },
     {
@@ -3654,7 +3870,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L452",
       "id": "plans_issafeslug",
-      "community": 2,
+      "community": 4,
       "norm_label": "issafeslug()"
     },
     {
@@ -3663,7 +3879,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L468",
       "id": "plans_issafeplanfilename",
-      "community": 2,
+      "community": 4,
       "norm_label": "issafeplanfilename()"
     },
     {
@@ -3721,12 +3937,66 @@
       "norm_label": "wikilinks()"
     },
     {
+      "label": "settings.js",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L1",
+      "id": "users_sam_code_cockpit_hooks_settings_js",
+      "community": 3,
+      "norm_label": "settings.js"
+    },
+    {
+      "label": "settingsPath()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L57",
+      "id": "settings_settingspath",
+      "community": 3,
+      "norm_label": "settingspath()"
+    },
+    {
+      "label": "readSettings()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L67",
+      "id": "settings_readsettings",
+      "community": 3,
+      "norm_label": "readsettings()"
+    },
+    {
+      "label": "validateSettings()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L87",
+      "id": "settings_validatesettings",
+      "community": 3,
+      "norm_label": "validatesettings()"
+    },
+    {
+      "label": "writeSettings()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L170",
+      "id": "settings_writesettings",
+      "community": 3,
+      "norm_label": "writesettings()"
+    },
+    {
+      "label": "mergeSettings()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L186",
+      "id": "settings_mergesettings",
+      "community": 3,
+      "norm_label": "mergesettings()"
+    },
+    {
       "label": "make-icon.js",
       "file_type": "code",
       "source_file": "/Users/sam/code/cockpit/scripts/make-icon.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_scripts_make_icon_js",
-      "community": 4,
+      "community": 5,
       "norm_label": "make-icon.js"
     },
     {
@@ -3735,7 +4005,7 @@
       "source_file": "/Users/sam/code/cockpit/scripts/make-icon.js",
       "source_location": "L86",
       "id": "make_icon_render",
-      "community": 4,
+      "community": 5,
       "norm_label": "render()"
     },
     {
@@ -3744,7 +4014,7 @@
       "source_file": "/Users/sam/code/cockpit/scripts/fix-pty-permissions.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_scripts_fix_pty_permissions_js",
-      "community": 39,
+      "community": 42,
       "norm_label": "fix-pty-permissions.js"
     },
     {
@@ -3753,7 +4023,7 @@
       "source_file": "/Users/sam/code/cockpit/scripts/fix-pty-permissions.js",
       "source_location": "L22",
       "id": "fix_pty_permissions_findhelpers",
-      "community": 39,
+      "community": 42,
       "norm_label": "findhelpers()"
     },
     {
@@ -3762,7 +4032,7 @@
       "source_file": "/Users/sam/code/cockpit/scripts/test-ui.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_scripts_test_ui_js",
-      "community": 28,
+      "community": 29,
       "norm_label": "test-ui.js"
     },
     {
@@ -3771,7 +4041,7 @@
       "source_file": "/Users/sam/code/cockpit/scripts/test-ui.js",
       "source_location": "L24",
       "id": "test_ui_run",
-      "community": 28,
+      "community": 29,
       "norm_label": "run()"
     },
     {
@@ -3780,7 +4050,7 @@
       "source_file": "/Users/sam/code/cockpit/scripts/test-ui.js",
       "source_location": "L36",
       "id": "test_ui_tests",
-      "community": 28,
+      "community": 29,
       "norm_label": "tests()"
     },
     {
@@ -3789,7 +4059,7 @@
       "source_file": "/Users/sam/code/cockpit/electron/main.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_electron_main_js",
-      "community": 7,
+      "community": 3,
       "norm_label": "main.js"
     },
     {
@@ -3798,7 +4068,7 @@
       "source_file": "/Users/sam/code/cockpit/electron/main.js",
       "source_location": "L68",
       "id": "main_serveui",
-      "community": 7,
+      "community": 3,
       "norm_label": "serveui()"
     },
     {
@@ -3807,7 +4077,7 @@
       "source_file": "/Users/sam/code/cockpit/electron/main.js",
       "source_location": "L122",
       "id": "main_closedevtools",
-      "community": 7,
+      "community": 3,
       "norm_label": "closedevtools()"
     },
     {
@@ -3816,7 +4086,7 @@
       "source_file": "/Users/sam/code/cockpit/electron/main.js",
       "source_location": "L132",
       "id": "main_createwindow",
-      "community": 7,
+      "community": 3,
       "norm_label": "createwindow()"
     },
     {
@@ -3825,7 +4095,7 @@
       "source_file": "/Users/sam/code/cockpit/electron/menu.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_electron_menu_js",
-      "community": 29,
+      "community": 30,
       "norm_label": "menu.js"
     },
     {
@@ -3834,7 +4104,7 @@
       "source_file": "/Users/sam/code/cockpit/electron/menu.js",
       "source_location": "L28",
       "id": "menu_send",
-      "community": 29,
+      "community": 30,
       "norm_label": "send()"
     },
     {
@@ -3843,7 +4113,7 @@
       "source_file": "/Users/sam/code/cockpit/electron/menu.js",
       "source_location": "L48",
       "id": "menu_buildmenu",
-      "community": 29,
+      "community": 30,
       "norm_label": "buildmenu()"
     },
     {
@@ -3924,7 +4194,7 @@
       "source_file": "/Users/sam/code/cockpit/_ds/industry-cf80b711-4721-49c0-a0d7-0ac6ade6e741/_ds_bundle.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_ds_industry_cf80b711_4721_49c0_a0d7_0ac6ade6e741_ds_bundle_js",
-      "community": 48,
+      "community": 51,
       "norm_label": "_ds_bundle.js"
     },
     {
@@ -3933,7 +4203,7 @@
       "source_file": "/Users/sam/code/cockpit/_ds/modernist-478d93d8-0281-4ad3-8ef7-47b321465972/_ds_bundle.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_ds_modernist_478d93d8_0281_4ad3_8ef7_47b321465972_ds_bundle_js",
-      "community": 49,
+      "community": 52,
       "norm_label": "_ds_bundle.js"
     },
     {
@@ -3942,7 +4212,7 @@
       "source_file": "/Users/sam/code/cockpit/_ds/nocturne-16d90168-f621-47c2-b3bb-29511cfd6dd0/_ds_bundle.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_ds_nocturne_16d90168_f621_47c2_b3bb_29511cfd6dd0_ds_bundle_js",
-      "community": 50,
+      "community": 53,
       "norm_label": "_ds_bundle.js"
     }
   ],
@@ -5523,7 +5793,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L298",
+      "source_location": "L334",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_shotdate",
@@ -5535,7 +5805,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L308",
+      "source_location": "L344",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_pagename",
@@ -5547,7 +5817,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L356",
+      "source_location": "L392",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_layoutgraph",
@@ -5559,7 +5829,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L441",
+      "source_location": "L477",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_json",
@@ -5571,7 +5841,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L448",
+      "source_location": "L484",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_estabandon",
@@ -5583,7 +5853,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L451",
+      "source_location": "L487",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_fetchprojects",
@@ -5595,7 +5865,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L467",
+      "source_location": "L503",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_projectaction",
@@ -5607,7 +5877,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L501",
+      "source_location": "L537",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_fetchskills",
@@ -5619,7 +5889,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L503",
+      "source_location": "L539",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_installskills",
@@ -5631,7 +5901,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L539",
+      "source_location": "L575",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_ticketaction",
@@ -5643,7 +5913,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L556",
+      "source_location": "L592",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_isunequipped",
@@ -5655,7 +5925,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L566",
+      "source_location": "L602",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_fetchsnapshot",
@@ -5667,7 +5937,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L569",
+      "source_location": "L605",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_shoturl",
@@ -5679,7 +5949,31 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L581",
+      "source_location": "L614",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_app_src_data_ts",
+      "_tgt": "data_fetchsettings",
+      "source": "users_sam_code_cockpit_app_src_data_ts",
+      "target": "data_fetchsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L626",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_app_src_data_ts",
+      "_tgt": "data_updatesettings",
+      "source": "users_sam_code_cockpit_app_src_data_ts",
+      "target": "data_updatesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L647",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_plansouverts",
@@ -5691,7 +5985,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L590",
+      "source_location": "L656",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_sorttickets",
@@ -5703,7 +5997,31 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L604",
+      "source_location": "L666",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_app_src_data_ts",
+      "_tgt": "data_childrenof",
+      "source": "users_sam_code_cockpit_app_src_data_ts",
+      "target": "data_childrenof",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L678",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_app_src_data_ts",
+      "_tgt": "data_epicprogress",
+      "source": "users_sam_code_cockpit_app_src_data_ts",
+      "target": "data_epicprogress",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L695",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_colonnefinale",
@@ -5715,7 +6033,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L608",
+      "source_location": "L708",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_restant",
@@ -5727,7 +6045,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L614",
+      "source_location": "L730",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_history",
@@ -5739,7 +6057,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L622",
+      "source_location": "L738",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_density",
@@ -5751,7 +6069,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L647",
+      "source_location": "L763",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_plansforpage",
@@ -5763,7 +6081,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L663",
+      "source_location": "L779",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_lastscan",
@@ -5775,7 +6093,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L670",
+      "source_location": "L786",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_scanfailed",
@@ -5787,7 +6105,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L673",
+      "source_location": "L789",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_humanage",
@@ -5799,7 +6117,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L696",
+      "source_location": "L812",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_frdate",
@@ -5811,7 +6129,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L704",
+      "source_location": "L820",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_frdateshort",
@@ -5823,7 +6141,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L729",
+      "source_location": "L845",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_confidenceof",
@@ -5835,7 +6153,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L736",
+      "source_location": "L852",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_isschemanode",
@@ -5847,7 +6165,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L747",
+      "source_location": "L863",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_tablesfrom",
@@ -5859,7 +6177,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L796",
+      "source_location": "L912",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_stackfrom",
@@ -5871,7 +6189,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L816",
+      "source_location": "L932",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_brieflines",
@@ -5883,7 +6201,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L854",
+      "source_location": "L970",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_ts",
       "_tgt": "data_buildinjections",
@@ -5895,7 +6213,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L359",
+      "source_location": "L395",
       "weight": 1.0,
       "_src": "data_layoutgraph",
       "_tgt": "data_liste",
@@ -5907,7 +6225,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L582",
+      "source_location": "L648",
       "weight": 1.0,
       "_src": "data_plansouverts",
       "_tgt": "data_liste",
@@ -5919,7 +6237,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L591",
+      "source_location": "L657",
       "weight": 1.0,
       "_src": "data_sorttickets",
       "_tgt": "data_liste",
@@ -5931,7 +6249,31 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L605",
+      "source_location": "L667",
+      "weight": 1.0,
+      "_src": "data_childrenof",
+      "_tgt": "data_liste",
+      "source": "data_liste",
+      "target": "data_childrenof",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L680",
+      "weight": 1.0,
+      "_src": "data_epicprogress",
+      "_tgt": "data_liste",
+      "source": "data_liste",
+      "target": "data_epicprogress",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L696",
       "weight": 1.0,
       "_src": "data_colonnefinale",
       "_tgt": "data_liste",
@@ -5943,7 +6285,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L610",
+      "source_location": "L710",
       "weight": 1.0,
       "_src": "data_restant",
       "_tgt": "data_liste",
@@ -5955,7 +6297,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L615",
+      "source_location": "L731",
       "weight": 1.0,
       "_src": "data_history",
       "_tgt": "data_liste",
@@ -5967,7 +6309,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L624",
+      "source_location": "L740",
       "weight": 1.0,
       "_src": "data_density",
       "_tgt": "data_liste",
@@ -5979,7 +6321,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L663",
+      "source_location": "L779",
       "weight": 1.0,
       "_src": "data_lastscan",
       "_tgt": "data_liste",
@@ -6075,7 +6417,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L451",
+      "source_location": "L487",
       "weight": 1.0,
       "_src": "data_fetchprojects",
       "_tgt": "data_json",
@@ -6087,7 +6429,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L478",
+      "source_location": "L514",
       "weight": 1.0,
       "_src": "data_projectaction",
       "_tgt": "data_json",
@@ -6099,7 +6441,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L501",
+      "source_location": "L537",
       "weight": 1.0,
       "_src": "data_fetchskills",
       "_tgt": "data_json",
@@ -6111,7 +6453,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L512",
+      "source_location": "L548",
       "weight": 1.0,
       "_src": "data_installskills",
       "_tgt": "data_json",
@@ -6123,7 +6465,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L550",
+      "source_location": "L586",
       "weight": 1.0,
       "_src": "data_ticketaction",
       "_tgt": "data_json",
@@ -6135,12 +6477,36 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L567",
+      "source_location": "L603",
       "weight": 1.0,
       "_src": "data_fetchsnapshot",
       "_tgt": "data_json",
       "source": "data_json",
       "target": "data_fetchsnapshot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L615",
+      "weight": 1.0,
+      "_src": "data_fetchsettings",
+      "_tgt": "data_json",
+      "source": "data_json",
+      "target": "data_fetchsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L633",
+      "weight": 1.0,
+      "_src": "data_updatesettings",
+      "_tgt": "data_json",
+      "source": "data_json",
+      "target": "data_updatesettings",
       "confidence_score": 1.0
     },
     {
@@ -6157,9 +6523,21 @@
     },
     {
       "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L157",
+      "weight": 1.0,
+      "_src": "data_updatesettings",
+      "_tgt": "preferencespanel_handlesave",
+      "source": "data_updatesettings",
+      "target": "preferencespanel_handlesave"
+    },
+    {
+      "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L820",
+      "source_location": "L936",
       "weight": 1.0,
       "_src": "data_brieflines",
       "_tgt": "data_plansouverts",
@@ -6171,7 +6549,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L857",
+      "source_location": "L973",
       "weight": 1.0,
       "_src": "data_buildinjections",
       "_tgt": "data_plansouverts",
@@ -6183,7 +6561,19 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L609",
+      "source_location": "L667",
+      "weight": 1.0,
+      "_src": "data_childrenof",
+      "_tgt": "data_sorttickets",
+      "source": "data_sorttickets",
+      "target": "data_childrenof",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
+      "source_location": "L709",
       "weight": 1.0,
       "_src": "data_restant",
       "_tgt": "data_colonnefinale",
@@ -6195,7 +6585,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L655",
+      "source_location": "L771",
       "weight": 1.0,
       "_src": "data_plansforpage",
       "_tgt": "data_history",
@@ -6207,7 +6597,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L670",
+      "source_location": "L786",
       "weight": 1.0,
       "_src": "data_scanfailed",
       "_tgt": "data_lastscan",
@@ -6219,7 +6609,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L823",
+      "source_location": "L939",
       "weight": 1.0,
       "_src": "data_brieflines",
       "_tgt": "data_lastscan",
@@ -6231,7 +6621,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.ts",
-      "source_location": "L837",
+      "source_location": "L953",
       "weight": 1.0,
       "_src": "data_brieflines",
       "_tgt": "data_frdate",
@@ -6243,7 +6633,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L58",
+      "source_location": "L59",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_app_tsx",
       "_tgt": "app_tabforpath",
@@ -6255,7 +6645,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L62",
+      "source_location": "L63",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_app_tsx",
       "_tgt": "app_labelof",
@@ -6267,7 +6657,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L72",
+      "source_location": "L73",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_app_tsx",
       "_tgt": "app_usedeborde",
@@ -6279,7 +6669,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L95",
+      "source_location": "L96",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_app_tsx",
       "_tgt": "app_projectfromurl",
@@ -6291,7 +6681,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L97",
+      "source_location": "L98",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_app_tsx",
       "_tgt": "app_pushurl",
@@ -6303,7 +6693,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L112",
+      "source_location": "L113",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_app_tsx",
       "_tgt": "app_openproject",
@@ -6315,7 +6705,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L150",
+      "source_location": "L151",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_app_tsx",
       "_tgt": "app_onpop",
@@ -6327,7 +6717,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L202",
+      "source_location": "L203",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_app_tsx",
       "_tgt": "app_settableau",
@@ -6339,7 +6729,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L205",
+      "source_location": "L206",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_app_tsx",
       "_tgt": "app_reload",
@@ -6351,7 +6741,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L213",
+      "source_location": "L214",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_app_tsx",
       "_tgt": "app_applyprojects",
@@ -6363,7 +6753,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L792",
+      "source_location": "L807",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_app_tsx",
       "_tgt": "app_s",
@@ -6375,7 +6765,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L151",
+      "source_location": "L152",
       "weight": 1.0,
       "_src": "app_onpop",
       "_tgt": "app_tabforpath",
@@ -6387,7 +6777,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L152",
+      "source_location": "L153",
       "weight": 1.0,
       "_src": "app_onpop",
       "_tgt": "app_projectfromurl",
@@ -6399,7 +6789,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/App.tsx",
-      "source_location": "L218",
+      "source_location": "L219",
       "weight": 1.0,
       "_src": "app_applyprojects",
       "_tgt": "app_pushurl",
@@ -6430,6 +6820,78 @@
       "_tgt": "navigateur_navigateur",
       "source": "app_reload",
       "target": "navigateur_navigateur"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "_tgt": "preferencespanel_preferencesdensity",
+      "source": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "target": "preferencespanel_preferencesdensity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "_tgt": "preferencespanel_preferencesdisplay",
+      "source": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "target": "preferencespanel_preferencesdisplay",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L43",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "_tgt": "preferencespanel_preferencesactions",
+      "source": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "target": "preferencespanel_preferencesactions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "_tgt": "preferencespanel_preferencesbootstrap",
+      "source": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "target": "preferencespanel_preferencesbootstrap",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L144",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "_tgt": "preferencespanel_onkey",
+      "source": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "target": "preferencespanel_onkey",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/app/src/PreferencesPanel.tsx",
+      "source_location": "L153",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "_tgt": "preferencespanel_handlesave",
+      "source": "users_sam_code_cockpit_app_src_preferencespanel_tsx",
+      "target": "preferencespanel_handlesave",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -6531,7 +6993,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.test.ts",
-      "source_location": "L32",
+      "source_location": "L35",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_test_ts",
       "_tgt": "data_test_snapshot",
@@ -6543,7 +7005,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.test.ts",
-      "source_location": "L50",
+      "source_location": "L53",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_test_ts",
       "_tgt": "data_test_plan",
@@ -6555,7 +7017,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/data.test.ts",
-      "source_location": "L157",
+      "source_location": "L160",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_data_test_ts",
       "_tgt": "data_test_t",
@@ -6939,7 +7401,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L29",
+      "source_location": "L32",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_estcolonne",
@@ -6951,7 +7413,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L80",
+      "source_location": "L84",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_ecrire",
@@ -6963,7 +7425,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L93",
+      "source_location": "L97",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_deplacer",
@@ -6975,7 +7437,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L104",
+      "source_location": "L108",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_creer",
@@ -6987,7 +7449,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L111",
+      "source_location": "L115",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_modifier",
@@ -6999,7 +7461,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L118",
+      "source_location": "L122",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_supprimer",
@@ -7011,7 +7473,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L123",
+      "source_location": "L127",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_renommer",
@@ -7023,7 +7485,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L141",
+      "source_location": "L145",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_retirer",
@@ -7035,7 +7497,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L151",
+      "source_location": "L155",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_ajouter",
@@ -7047,7 +7509,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L165",
+      "source_location": "L169",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_reordonner",
@@ -7059,7 +7521,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L327",
+      "source_location": "L366",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_cote",
@@ -7071,7 +7533,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L359",
+      "source_location": "L398",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_s",
@@ -7083,7 +7545,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L755",
+      "source_location": "L883",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_app_src_tabs_tableau_tsx",
       "_tgt": "tableau_humanage",
@@ -7095,7 +7557,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L97",
+      "source_location": "L101",
       "weight": 1.0,
       "_src": "tableau_deplacer",
       "_tgt": "tableau_ecrire",
@@ -7107,7 +7569,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L108",
+      "source_location": "L112",
       "weight": 1.0,
       "_src": "tableau_creer",
       "_tgt": "tableau_ecrire",
@@ -7119,7 +7581,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L112",
+      "source_location": "L116",
       "weight": 1.0,
       "_src": "tableau_modifier",
       "_tgt": "tableau_ecrire",
@@ -7131,7 +7593,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L120",
+      "source_location": "L124",
       "weight": 1.0,
       "_src": "tableau_supprimer",
       "_tgt": "tableau_ecrire",
@@ -7143,7 +7605,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L135",
+      "source_location": "L139",
       "weight": 1.0,
       "_src": "tableau_renommer",
       "_tgt": "tableau_ecrire",
@@ -7155,7 +7617,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L142",
+      "source_location": "L146",
       "weight": 1.0,
       "_src": "tableau_retirer",
       "_tgt": "tableau_ecrire",
@@ -7167,7 +7629,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L154",
+      "source_location": "L158",
       "weight": 1.0,
       "_src": "tableau_ajouter",
       "_tgt": "tableau_ecrire",
@@ -7179,7 +7641,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Tableau.tsx",
-      "source_location": "L175",
+      "source_location": "L179",
       "weight": 1.0,
       "_src": "tableau_reordonner",
       "_tgt": "tableau_ecrire",
@@ -7389,30 +7851,6 @@
       "_tgt": "donnees_vide",
       "source": "users_sam_code_cockpit_app_src_tabs_donnees_tsx",
       "target": "donnees_vide",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/app/src/tabs/Donnees.tsx",
-      "source_location": "L61",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_app_src_tabs_donnees_tsx",
-      "_tgt": "donnees_coffreignore",
-      "source": "users_sam_code_cockpit_app_src_tabs_donnees_tsx",
-      "target": "donnees_coffreignore",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/app/src/tabs/Donnees.tsx",
-      "source_location": "L75",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_app_src_tabs_donnees_tsx",
-      "_tgt": "donnees_confstyle",
-      "source": "users_sam_code_cockpit_app_src_tabs_donnees_tsx",
-      "target": "donnees_confstyle",
       "confidence_score": 1.0
     },
     {
@@ -7659,7 +8097,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L41",
+      "source_location": "L42",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_server_api_js",
       "_tgt": "api_usabledirectory",
@@ -7671,7 +8109,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L60",
+      "source_location": "L61",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_server_api_js",
       "_tgt": "api_projectaction",
@@ -7683,7 +8121,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L123",
+      "source_location": "L124",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_server_api_js",
       "_tgt": "api_ticketaction",
@@ -7695,7 +8133,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L178",
+      "source_location": "L179",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_server_api_js",
       "_tgt": "api_resolve",
@@ -7707,7 +8145,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L245",
+      "source_location": "L275",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_server_api_js",
       "_tgt": "api_parsebody",
@@ -7719,7 +8157,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L254",
+      "source_location": "L284",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_server_api_js",
       "_tgt": "api_readbody",
@@ -7731,7 +8169,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L262",
+      "source_location": "L292",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_server_api_js",
       "_tgt": "api_nodemiddleware",
@@ -7743,7 +8181,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L283",
+      "source_location": "L313",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_server_api_js",
       "_tgt": "api_fetchhandler",
@@ -7755,7 +8193,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L67",
+      "source_location": "L68",
       "weight": 1.0,
       "_src": "api_projectaction",
       "_tgt": "api_usabledirectory",
@@ -7767,7 +8205,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L193",
+      "source_location": "L194",
       "weight": 1.0,
       "_src": "api_resolve",
       "_tgt": "api_projectaction",
@@ -7851,7 +8289,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L223",
+      "source_location": "L253",
       "weight": 1.0,
       "_src": "api_resolve",
       "_tgt": "api_ticketaction",
@@ -7959,7 +8397,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L287",
+      "source_location": "L317",
       "weight": 1.0,
       "_src": "api_fetchhandler",
       "_tgt": "api_resolve",
@@ -7996,12 +8434,72 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "/Users/sam/code/cockpit/server/api.js",
+      "source_location": "L221",
+      "weight": 1.0,
+      "_src": "api_resolve",
+      "_tgt": "settings_readsettings",
+      "source": "api_resolve",
+      "target": "settings_readsettings"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/server/api.js",
       "source_location": "L194",
       "weight": 1.0,
       "_src": "api_resolve",
       "_tgt": "snapshot_projects",
       "source": "api_resolve",
       "target": "snapshot_projects"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/server/api.js",
+      "source_location": "L228",
+      "weight": 1.0,
+      "_src": "api_resolve",
+      "_tgt": "snapshot_readjson",
+      "source": "api_resolve",
+      "target": "snapshot_readjson"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/server/api.js",
+      "source_location": "L229",
+      "weight": 1.0,
+      "_src": "api_resolve",
+      "_tgt": "settings_mergesettings",
+      "source": "api_resolve",
+      "target": "settings_mergesettings"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/server/api.js",
+      "source_location": "L233",
+      "weight": 1.0,
+      "_src": "api_resolve",
+      "_tgt": "settings_writesettings",
+      "source": "api_resolve",
+      "target": "settings_writesettings"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/server/api.js",
+      "source_location": "L233",
+      "weight": 1.0,
+      "_src": "api_resolve",
+      "_tgt": "settings_validatesettings",
+      "source": "api_resolve",
+      "target": "settings_validatesettings"
     },
     {
       "relation": "calls",
@@ -8055,12 +8553,240 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/server/api.js",
-      "source_location": "L285",
+      "source_location": "L315",
       "weight": 1.0,
       "_src": "api_fetchhandler",
       "_tgt": "api_parsebody",
       "source": "api_parsebody",
       "target": "api_fetchhandler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_mcp_dispatch_js",
+      "_tgt": "dispatch_validatepath",
+      "source": "users_sam_code_cockpit_mcp_dispatch_js",
+      "target": "dispatch_validatepath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L63",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_mcp_dispatch_js",
+      "_tgt": "dispatch_dispatch",
+      "source": "users_sam_code_cockpit_mcp_dispatch_js",
+      "target": "dispatch_dispatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L78",
+      "weight": 1.0,
+      "_src": "dispatch_dispatch",
+      "_tgt": "dispatch_validatepath",
+      "source": "dispatch_validatepath",
+      "target": "dispatch_dispatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L48",
+      "weight": 1.0,
+      "_src": "dispatch_validatepath",
+      "_tgt": "plans_readregistry",
+      "source": "dispatch_validatepath",
+      "target": "plans_readregistry"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L67",
+      "weight": 1.0,
+      "_src": "dispatch_dispatch",
+      "_tgt": "plans_readregistry",
+      "source": "dispatch_dispatch",
+      "target": "plans_readregistry"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L82",
+      "weight": 1.0,
+      "_src": "dispatch_dispatch",
+      "_tgt": "snapshot_snapshot",
+      "source": "dispatch_dispatch",
+      "target": "snapshot_snapshot"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L105",
+      "weight": 1.0,
+      "_src": "dispatch_dispatch",
+      "_tgt": "brief_readcockpit",
+      "source": "dispatch_dispatch",
+      "target": "brief_readcockpit"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L109",
+      "weight": 1.0,
+      "_src": "dispatch_dispatch",
+      "_tgt": "brief_buildbrief",
+      "source": "dispatch_dispatch",
+      "target": "brief_buildbrief"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L122",
+      "weight": 1.0,
+      "_src": "dispatch_dispatch",
+      "_tgt": "tickets_readboard",
+      "source": "dispatch_dispatch",
+      "target": "tickets_readboard"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L136",
+      "weight": 1.0,
+      "_src": "dispatch_dispatch",
+      "_tgt": "tickets_readtickets",
+      "source": "dispatch_dispatch",
+      "target": "tickets_readtickets"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L160",
+      "weight": 1.0,
+      "_src": "dispatch_dispatch",
+      "_tgt": "plans_readplans",
+      "source": "dispatch_dispatch",
+      "target": "plans_readplans"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L221",
+      "weight": 1.0,
+      "_src": "dispatch_dispatch",
+      "_tgt": "tickets_createticket",
+      "source": "dispatch_dispatch",
+      "target": "tickets_createticket"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L249",
+      "weight": 1.0,
+      "_src": "dispatch_dispatch",
+      "_tgt": "tickets_updateticket",
+      "source": "dispatch_dispatch",
+      "target": "tickets_updateticket"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/mcp/dispatch.js",
+      "source_location": "L269",
+      "weight": 1.0,
+      "_src": "dispatch_dispatch",
+      "_tgt": "tickets_moveticket",
+      "source": "dispatch_dispatch",
+      "target": "tickets_moveticket"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/mcp/server.js",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_mcp_server_js",
+      "_tgt": "server_sendresponse",
+      "source": "users_sam_code_cockpit_mcp_server_js",
+      "target": "server_sendresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/mcp/server.js",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_src": "server_sendresponse",
+      "_tgt": "index_log",
+      "source": "server_sendresponse",
+      "target": "index_log"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/mcp/mcp.test.js",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_mcp_mcp_test_js",
+      "_tgt": "mcp_test_withregistry",
+      "source": "users_sam_code_cockpit_mcp_mcp_test_js",
+      "target": "mcp_test_withregistry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/mcp/mcp.test.js",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_mcp_mcp_test_js",
+      "_tgt": "mcp_test_registerproject",
+      "source": "users_sam_code_cockpit_mcp_mcp_test_js",
+      "target": "mcp_test_registerproject",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/mcp/mcp.test.js",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_mcp_mcp_test_js",
+      "_tgt": "mcp_test_projectdir",
+      "source": "users_sam_code_cockpit_mcp_mcp_test_js",
+      "target": "mcp_test_projectdir",
       "confidence_score": 1.0
     },
     {
@@ -8775,7 +9501,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.test.js",
-      "source_location": "L29",
+      "source_location": "L31",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_tickets_test_js",
       "_tgt": "tickets_test_fixture",
@@ -8787,7 +9513,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.test.js",
-      "source_location": "L37",
+      "source_location": "L39",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_tickets_test_js",
       "_tgt": "tickets_test_ecrireboardbrut",
@@ -8799,7 +9525,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.test.js",
-      "source_location": "L247",
+      "source_location": "L249",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_tickets_test_js",
       "_tgt": "tickets_test_writeplan",
@@ -8967,7 +9693,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.test.js",
-      "source_location": "L9",
+      "source_location": "L10",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_test_js",
       "_tgt": "snapshot_test_project",
@@ -8979,7 +9705,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.test.js",
-      "source_location": "L104",
+      "source_location": "L105",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_test_js",
       "_tgt": "snapshot_test_posergraphify",
@@ -8991,7 +9717,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.test.js",
-      "source_location": "L113",
+      "source_location": "L114",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_test_js",
       "_tgt": "snapshot_test_posercoffre",
@@ -9447,7 +10173,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L373",
+      "source_location": "L388",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_tickets_js",
       "_tgt": "tickets_rewrite",
@@ -9459,7 +10185,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L392",
+      "source_location": "L407",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_tickets_js",
       "_tgt": "tickets_moveticket",
@@ -9471,7 +10197,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L407",
+      "source_location": "L422",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_tickets_js",
       "_tgt": "tickets_updateticket",
@@ -9483,7 +10209,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L433",
+      "source_location": "L466",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_tickets_js",
       "_tgt": "tickets_deleteticket",
@@ -9495,7 +10221,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L451",
+      "source_location": "L484",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_tickets_js",
       "_tgt": "tickets_colonnefinale",
@@ -9507,7 +10233,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L462",
+      "source_location": "L499",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_tickets_js",
       "_tgt": "tickets_sorttickets",
@@ -9519,7 +10245,31 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L482",
+      "source_location": "L517",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_hooks_tickets_js",
+      "_tgt": "tickets_childrenof",
+      "source": "users_sam_code_cockpit_hooks_tickets_js",
+      "target": "tickets_childrenof",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
+      "source_location": "L531",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_hooks_tickets_js",
+      "_tgt": "tickets_orphanchildren",
+      "source": "users_sam_code_cockpit_hooks_tickets_js",
+      "target": "tickets_orphanchildren",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
+      "source_location": "L551",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_tickets_js",
       "_tgt": "tickets_importopenplans",
@@ -9543,7 +10293,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L387",
+      "source_location": "L402",
       "weight": 1.0,
       "_src": "tickets_rewrite",
       "_tgt": "tickets_today",
@@ -9615,7 +10365,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L394",
+      "source_location": "L409",
       "weight": 1.0,
       "_src": "tickets_moveticket",
       "_tgt": "tickets_readboard",
@@ -9627,7 +10377,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L483",
+      "source_location": "L552",
       "weight": 1.0,
       "_src": "tickets_importopenplans",
       "_tgt": "tickets_readboard",
@@ -9771,7 +10521,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L484",
+      "source_location": "L553",
       "weight": 1.0,
       "_src": "tickets_importopenplans",
       "_tgt": "tickets_readtickets",
@@ -9819,7 +10569,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L357",
+      "source_location": "L372",
       "weight": 1.0,
       "_src": "tickets_createticket",
       "_tgt": "tickets_ticketfilename",
@@ -9867,7 +10617,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L394",
+      "source_location": "L409",
       "weight": 1.0,
       "_src": "tickets_moveticket",
       "_tgt": "tickets_requirecolonne",
@@ -9891,7 +10641,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L409",
+      "source_location": "L424",
       "weight": 1.0,
       "_src": "tickets_updateticket",
       "_tgt": "tickets_requirepriorite",
@@ -9915,7 +10665,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L393",
+      "source_location": "L408",
       "weight": 1.0,
       "_src": "tickets_moveticket",
       "_tgt": "tickets_requirefile",
@@ -9927,7 +10677,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L408",
+      "source_location": "L423",
       "weight": 1.0,
       "_src": "tickets_updateticket",
       "_tgt": "tickets_requirefile",
@@ -9939,7 +10689,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L360",
+      "source_location": "L375",
       "weight": 1.0,
       "_src": "tickets_createticket",
       "_tgt": "tickets_ticketpath",
@@ -9951,7 +10701,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L374",
+      "source_location": "L389",
       "weight": 1.0,
       "_src": "tickets_rewrite",
       "_tgt": "tickets_ticketpath",
@@ -9963,7 +10713,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L435",
+      "source_location": "L468",
       "weight": 1.0,
       "_src": "tickets_deleteticket",
       "_tgt": "tickets_ticketpath",
@@ -9975,7 +10725,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L497",
+      "source_location": "L566",
       "weight": 1.0,
       "_src": "tickets_importopenplans",
       "_tgt": "tickets_createticket",
@@ -10011,7 +10761,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L396",
+      "source_location": "L411",
       "weight": 1.0,
       "_src": "tickets_moveticket",
       "_tgt": "tickets_rewrite",
@@ -10023,7 +10773,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
-      "source_location": "L411",
+      "source_location": "L426",
       "weight": 1.0,
       "_src": "tickets_updateticket",
       "_tgt": "tickets_rewrite",
@@ -10078,6 +10828,18 @@
       "_tgt": "obsidian_ecrireindex",
       "source": "tickets_colonnefinale",
       "target": "obsidian_ecrireindex"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/tickets.js",
+      "source_location": "L518",
+      "weight": 1.0,
+      "_src": "tickets_childrenof",
+      "_tgt": "tickets_sorttickets",
+      "source": "tickets_sorttickets",
+      "target": "tickets_childrenof",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -11175,7 +11937,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L21",
+      "source_location": "L22",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_js",
       "_tgt": "snapshot_readjson",
@@ -11187,7 +11949,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L40",
+      "source_location": "L41",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_js",
       "_tgt": "snapshot_readtext",
@@ -11199,7 +11961,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L67",
+      "source_location": "L68",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_js",
       "_tgt": "snapshot_projects",
@@ -11211,7 +11973,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L90",
+      "source_location": "L91",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_js",
       "_tgt": "snapshot_shotsbypage",
@@ -11223,7 +11985,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L117",
+      "source_location": "L118",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_js",
       "_tgt": "snapshot_scans",
@@ -11235,7 +11997,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L153",
+      "source_location": "L154",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_js",
       "_tgt": "snapshot_commits",
@@ -11247,7 +12009,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L178",
+      "source_location": "L179",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_js",
       "_tgt": "snapshot_tableau",
@@ -11259,7 +12021,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L204",
+      "source_location": "L205",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_js",
       "_tgt": "snapshot_vaultpath",
@@ -11271,7 +12033,19 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L236",
+      "source_location": "L217",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_hooks_snapshot_js",
+      "_tgt": "snapshot_filedate",
+      "source": "users_sam_code_cockpit_hooks_snapshot_js",
+      "target": "snapshot_filedate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
+      "source_location": "L252",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_js",
       "_tgt": "snapshot_readgraph",
@@ -11283,7 +12057,19 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L250",
+      "source_location": "L325",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_hooks_snapshot_js",
+      "_tgt": "snapshot_getvaultdate",
+      "source": "users_sam_code_cockpit_hooks_snapshot_js",
+      "target": "snapshot_getvaultdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
+      "source_location": "L356",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_js",
       "_tgt": "snapshot_snapshot",
@@ -11295,7 +12081,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L306",
+      "source_location": "L412",
       "weight": 1.0,
       "_src": "users_sam_code_cockpit_hooks_snapshot_js",
       "_tgt": "snapshot_shotpath",
@@ -11307,7 +12093,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L237",
+      "source_location": "L259",
       "weight": 1.0,
       "_src": "snapshot_readgraph",
       "_tgt": "snapshot_readjson",
@@ -11319,7 +12105,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L262",
+      "source_location": "L368",
       "weight": 1.0,
       "_src": "snapshot_snapshot",
       "_tgt": "snapshot_readjson",
@@ -11331,7 +12117,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L281",
+      "source_location": "L387",
       "weight": 1.0,
       "_src": "snapshot_snapshot",
       "_tgt": "snapshot_readtext",
@@ -11355,7 +12141,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L292",
+      "source_location": "L398",
       "weight": 1.0,
       "_src": "snapshot_snapshot",
       "_tgt": "snapshot_shotsbypage",
@@ -11367,7 +12153,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L283",
+      "source_location": "L389",
       "weight": 1.0,
       "_src": "snapshot_snapshot",
       "_tgt": "snapshot_scans",
@@ -11379,7 +12165,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L295",
+      "source_location": "L401",
       "weight": 1.0,
       "_src": "snapshot_snapshot",
       "_tgt": "snapshot_commits",
@@ -11391,7 +12177,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L266",
+      "source_location": "L372",
       "weight": 1.0,
       "_src": "snapshot_snapshot",
       "_tgt": "snapshot_tableau",
@@ -11403,7 +12189,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L242",
+      "source_location": "L263",
       "weight": 1.0,
       "_src": "snapshot_readgraph",
       "_tgt": "snapshot_vaultpath",
@@ -11415,13 +12201,61 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
-      "source_location": "L291",
+      "source_location": "L260",
+      "weight": 1.0,
+      "_src": "snapshot_readgraph",
+      "_tgt": "snapshot_filedate",
+      "source": "snapshot_filedate",
+      "target": "snapshot_readgraph",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
+      "source_location": "L265",
+      "weight": 1.0,
+      "_src": "snapshot_readgraph",
+      "_tgt": "snapshot_getvaultdate",
+      "source": "snapshot_readgraph",
+      "target": "snapshot_getvaultdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
+      "source_location": "L397",
       "weight": 1.0,
       "_src": "snapshot_snapshot",
       "_tgt": "snapshot_readgraph",
       "source": "snapshot_readgraph",
       "target": "snapshot_snapshot",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
+      "source_location": "L254",
+      "weight": 1.0,
+      "_src": "snapshot_readgraph",
+      "_tgt": "settings_readsettings",
+      "source": "snapshot_readgraph",
+      "target": "settings_readsettings"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
+      "source_location": "L255",
+      "weight": 1.0,
+      "_src": "snapshot_readgraph",
+      "_tgt": "settings_mergesettings",
+      "source": "snapshot_readgraph",
+      "target": "settings_mergesettings"
     },
     {
       "relation": "calls",
@@ -11637,6 +12471,18 @@
       "_tgt": "vault_resoudre",
       "source": "vault_resoudre",
       "target": "vault_readvault",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.test.js",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_hooks_settings_test_js",
+      "_tgt": "settings_test_tempdir",
+      "source": "users_sam_code_cockpit_hooks_settings_test_js",
+      "target": "settings_test_tempdir",
       "confidence_score": 1.0
     },
     {
@@ -12189,6 +13035,102 @@
       "_tgt": "obsidian_test_vault",
       "source": "obsidian_test_vault",
       "target": "obsidian_test_lire",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L57",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_hooks_settings_js",
+      "_tgt": "settings_settingspath",
+      "source": "users_sam_code_cockpit_hooks_settings_js",
+      "target": "settings_settingspath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L67",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_hooks_settings_js",
+      "_tgt": "settings_readsettings",
+      "source": "users_sam_code_cockpit_hooks_settings_js",
+      "target": "settings_readsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L87",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_hooks_settings_js",
+      "_tgt": "settings_validatesettings",
+      "source": "users_sam_code_cockpit_hooks_settings_js",
+      "target": "settings_validatesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L170",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_hooks_settings_js",
+      "_tgt": "settings_writesettings",
+      "source": "users_sam_code_cockpit_hooks_settings_js",
+      "target": "settings_writesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L186",
+      "weight": 1.0,
+      "_src": "users_sam_code_cockpit_hooks_settings_js",
+      "_tgt": "settings_mergesettings",
+      "source": "users_sam_code_cockpit_hooks_settings_js",
+      "target": "settings_mergesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L69",
+      "weight": 1.0,
+      "_src": "settings_readsettings",
+      "_tgt": "settings_settingspath",
+      "source": "settings_settingspath",
+      "target": "settings_readsettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L171",
+      "weight": 1.0,
+      "_src": "settings_writesettings",
+      "_tgt": "settings_settingspath",
+      "source": "settings_settingspath",
+      "target": "settings_writesettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/cockpit/hooks/settings.js",
+      "source_location": "L71",
+      "weight": 1.0,
+      "_src": "settings_readsettings",
+      "_tgt": "settings_validatesettings",
+      "source": "settings_readsettings",
+      "target": "settings_validatesettings",
       "confidence_score": 1.0
     },
     {

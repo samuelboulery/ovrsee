@@ -54,6 +54,63 @@
         "hooks/tickets.test.js",
         "skills/cockpit-tickets/SKILL.md"
       ]
+    },
+    {
+      "sha": "fae0ead",
+      "date": "2026-08-09",
+      "files": [
+        "app/src/data.ts",
+        "hooks/density.d.ts",
+        "hooks/density.js",
+        "hooks/density.test.js",
+        "hooks/plans.js",
+        "hooks/plans.test.js",
+        "mcp/dispatch.js"
+      ]
+    },
+    {
+      "sha": "66547a2",
+      "date": "2026-08-09",
+      "files": [
+        "app/src/ConfigClaudeModal.tsx",
+        "app/src/data.ts",
+        "hooks/config-claude.js",
+        "hooks/config-claude.test.js",
+        "server/api.js",
+        "server/api.test.js"
+      ]
+    },
+    {
+      "sha": "4ab00fd",
+      "date": "2026-08-09",
+      "files": [
+        "app/src/data.ts",
+        "app/src/useResizable.tsx",
+        "hooks/detect-package-manager.js",
+        "hooks/detect-package-manager.test.js",
+        "hooks/settings.js",
+        "hooks/settings.test.js"
+      ]
+    },
+    {
+      "sha": "24c3123",
+      "date": "2026-08-09",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Lightbox.tsx",
+        "app/src/PreferencesPanel.tsx",
+        "app/src/SkillsPanel.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/data.test.ts",
+        "app/src/data.ts",
+        "app/src/main.tsx",
+        "app/src/tabs/Donnees.tsx",
+        "app/src/tabs/Produit.tsx",
+        "app/src/theme.test.ts",
+        "app/src/theme.ts",
+        "app/src/useTerminal.ts",
+        "hooks/couleurs.test.js"
+      ]
     }
   ]
 }

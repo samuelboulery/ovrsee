@@ -17,6 +17,7 @@ import {
 } from './data'
 import { Garde } from './Garde'
 import { SkillsList, SkillsModal, useSkills } from './SkillsPanel'
+import { PreferencesModal } from './PreferencesPanel'
 import { s } from './style'
 import { Apercu } from './tabs/Apercu'
 import { Navigateur } from './tabs/Navigateur'
@@ -610,6 +611,7 @@ function Sidebar({
 }) {
   const max = Math.max(1, ...bars)
   const [skillsOuverts, setSkillsOuverts] = useState(false)
+  const [preferencesOuverts, setPreferencesOuverts] = useState(false)
 
   // Le sélecteur de dossier n'existe que dans l'application empaquetée. Dans un
   // navigateur, le bouton est absent plutôt que présent et inerte — même
@@ -665,7 +667,7 @@ function Sidebar({
           Le rappel est ici parce qu'une mise à jour du cockpit peut les rendre
           périmés longtemps après l'initialisation, quand l'écran qui les
           proposait n'apparaît plus. */}
-      <div style={s('padding: 0 14px 12px;')}>
+      <div style={s('padding: 0 14px 12px; display: flex; flex-direction: column; gap: 6px;')}>
         <button
           type="button"
           className="btn btn-ghost btn-block"
@@ -674,8 +676,17 @@ function Sidebar({
         >
           Skills Claude Code
         </button>
+        <button
+          type="button"
+          className="btn btn-ghost btn-block"
+          onClick={() => setPreferencesOuverts(true)}
+          style={s('font-size: 11px;')}
+        >
+          ⚙ Préférences
+        </button>
       </div>
       {skillsOuverts && <SkillsModal onClose={() => setSkillsOuverts(false)} />}
+      {preferencesOuverts && <PreferencesModal onClose={() => setPreferencesOuverts(false)} />}
 
       <div
         style={s(

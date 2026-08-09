@@ -232,6 +232,23 @@ export interface CockpitConfig {
   obsidianVault?: string
 }
 
+/**
+ * Préférences globales du cockpit.
+ *
+ * Les défauts sont définis dans `hooks/settings.js`, jamais ici — une valeur
+ * par défaut en deux endroits divergerait. Ce type décrit uniquement la forme.
+ */
+export interface SettingsType {
+  langue: string
+  theme: string
+  densiteActivite: { granularite: string; fenetre: string }
+  onglets: { actifs: string[]; ordre: string[] }
+  terminal: { visible: boolean; disposition: string; hauteur: number; largeur: number }
+  bootstrap: string[]
+  packageManager: string
+  sourceGraphe: string
+}
+
 export interface Snapshot {
   root: string
   board: Colonne[]
@@ -568,6 +585,36 @@ export const fetchSnapshot = (path: string, signal?: AbortSignal) =>
 
 export const shotUrl = (root: string, file: string) =>
   `/api/shot?path=${encodeURIComponent(root)}&file=${encodeURIComponent(file)}`
+
+/**
+ * Préférences du cockpit : globales si pas de projet, fusionnées si projet.
+ *
+ * Les champs `langue`, `theme`, `densiteActivite` ne se surchargent jamais
+ * par le projet — c'est une préférence personnelle.
+ */
+export const fetchSettings = (projectPath?: string): Promise<SettingsType> =>
+  json<SettingsType>(
+    projectPath
+      ? `/api/settings?path=${encodeURIComponent(projectPath)}`
+      : '/api/settings',
+  )
+
+/**
+ * Met à jour les préférences globales.
+ *
+ * Rend les préférences écrites pour la confirmation.
+ */
+export async function updateSettings(settings: Partial<SettingsType>): Promise<SettingsType> {
+  const response = await fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    body: JSON.stringify(settings),
+  })
+
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result
+}
 
 // --- dérivations -----------------------------------------------------------
 

@@ -289,3 +289,128 @@ test('POST /api/projects export-obsidian écrit le coffre', () => {
 test('POST /api/projects export-obsidian refuse un projet inconnu', () => {
   assert.equal(post({ action: 'export-obsidian', path: '/etc' }).status, 404)
 })
+
+// --- préférences --------------------------------------------------------
+
+test('GET /api/settings sans projet rend le profil global', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  process.env.COCKPIT_SETTINGS = join(dir, 'settings.json')
+
+  const result = resolve(url('/api/settings'), dir)
+
+  assert.ok(result && 'json' in result)
+  assert.equal(result.status, undefined)
+  assert.equal(result.json.langue, 'fr')
+  assert.equal(result.json.theme, 'auto')
+
+  delete process.env.COCKPIT_SETTINGS
+})
+
+test('GET /api/settings refuse un projet inconnu', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  process.env.COCKPIT_SETTINGS = join(dir, 'settings.json')
+
+  const result = resolve(url('/api/settings?path=%2Fetc'), dir)
+
+  assert.equal(result.status, 404)
+  assert.equal(result.json.error, 'inconnu')
+
+  delete process.env.COCKPIT_SETTINGS
+})
+
+test('GET /api/settings fusionne global + projet', () => {
+  const dir = projectWithShot()
+  const settingsDir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  process.env.COCKPIT_SETTINGS = join(settingsDir, 'settings.json')
+
+  // Créer un cockpit.config.json du projet
+  writeFileSync(join(dir, 'cockpit.config.json'), JSON.stringify({ onglets: { actifs: ['apercu'] } }))
+
+  const result = resolve(
+    url(`/api/settings?path=${encodeURIComponent(dir)}`),
+    dir,
+  )
+
+  assert.ok(result && 'json' in result)
+  assert.deepEqual(result.json.onglets.actifs, ['apercu'])
+  assert.equal(result.json.langue, 'fr')
+
+  delete process.env.COCKPIT_SETTINGS
+})
+
+test('POST /api/settings vérifie X-Cockpit', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  process.env.COCKPIT_SETTINGS = join(dir, 'settings.json')
+
+  const result = resolve(
+    url('/api/settings'),
+    dir,
+    { method: 'POST', headers: {}, body: { langue: 'en' } },
+  )
+
+  assert.equal(result.status, 403)
+  assert.equal(result.json.error, 'en-tête X-Cockpit manquant')
+
+  delete process.env.COCKPIT_SETTINGS
+})
+
+test('POST /api/settings valide et écrit', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  process.env.COCKPIT_SETTINGS = join(dir, 'settings.json')
+
+  const result = resolve(
+    url('/api/settings'),
+    dir,
+    { method: 'POST', headers: { 'x-cockpit': '1' }, body: { langue: 'en', theme: 'dark' } },
+  )
+
+  assert.ok(result && 'json' in result)
+  assert.equal(result.json.langue, 'en')
+  assert.equal(result.json.theme, 'dark')
+
+  delete process.env.COCKPIT_SETTINGS
+})
+
+test('POST /api/settings rejette les valeurs invalides', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  process.env.COCKPIT_SETTINGS = join(dir, 'settings.json')
+
+  const result = resolve(
+    url('/api/settings'),
+    dir,
+    { method: 'POST', headers: { 'x-cockpit': '1' }, body: { langue: 'de', theme: 42 } },
+  )
+
+  assert.ok(result && 'json' in result)
+  assert.equal(result.json.langue, 'fr')
+  assert.equal(result.json.theme, 'auto')
+
+  delete process.env.COCKPIT_SETTINGS
+})
+
+test('POST /api/settings partiel préserve les champs non transmis', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  process.env.COCKPIT_SETTINGS = join(dir, 'settings.json')
+
+  // Écrire d'abord un état avec langue en anglais
+  let result = resolve(
+    url('/api/settings'),
+    dir,
+    { method: 'POST', headers: { 'x-cockpit': '1' }, body: { langue: 'en' } },
+  )
+  assert.equal(result.json.langue, 'en')
+
+  // POST partiel : juste theme
+  result = resolve(
+    url('/api/settings'),
+    dir,
+    { method: 'POST', headers: { 'x-cockpit': '1' }, body: { theme: 'dark' } },
+  )
+
+  // Vérifier que langue n'a pas changé, que theme a changé, onglets intacts
+  assert.equal(result.json.langue, 'en')
+  assert.equal(result.json.theme, 'dark')
+  assert.deepEqual(result.json.onglets.actifs, ['apercu', 'navigateur', 'produit', 'historique', 'tableau', 'donnees', 'stack'])
+
+  delete process.env.COCKPIT_SETTINGS
+})

@@ -18,8 +18,9 @@ import { isAbsolute, join } from 'node:path'
 import { install } from '../hooks/install.js'
 import { exportVault } from '../hooks/obsidian.js'
 import { registerProject, touchProject, unregisterProject } from '../hooks/plans.js'
+import { readSettings, writeSettings, validateSettings, mergeSettings } from '../hooks/settings.js'
 import { installSkills, readSkills } from '../hooks/skills.js'
-import { projects, snapshot, shotPath, tableau } from '../hooks/snapshot.js'
+import { projects, snapshot, shotPath, tableau, readJson } from '../hooks/snapshot.js'
 import {
   addColumn,
   createTicket,
@@ -205,6 +206,35 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
       } catch (err) {
         return { status: 400, json: { error: String(err.message ?? err) } }
       }
+    }
+
+    case '/api/settings': {
+      // L'en-tête vérification d'abord pour les écritures
+      if (method === 'POST' && headers['x-cockpit'] !== '1') {
+        return { status: 403, json: { error: 'en-tête X-Cockpit manquant' } }
+      }
+
+      const askedPath = url.searchParams.get('path')
+
+      if (method === 'GET') {
+        // Sans projet : rendre le profil global seul (onboarding C1)
+        if (!askedPath) return { json: readSettings() }
+
+        // Avec projet : refuser si absent du registre
+        const root = projects(cwd).find(p => p.path === askedPath)?.path ?? null
+        if (!root) return { status: 404, json: { error: 'inconnu' } }
+
+        // Fusionner global + projet — réutilise readJson de snapshot.js
+        const projectConfig = readJson(join(root, 'cockpit.config.json')) ?? {}
+        return { json: mergeSettings(readSettings(), projectConfig) }
+      }
+
+      if (method === 'POST') {
+        writeSettings(validateSettings(body, readSettings()))
+        return { json: readSettings() }
+      }
+
+      return { status: 405, json: { error: 'méthode non permise' } }
     }
 
     case '/api/tickets': {

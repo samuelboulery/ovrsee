@@ -17,8 +17,9 @@ import { readBoard, readTickets } from './tickets.js'
 import { readVault } from './vault.js'
 import { readWhys } from './whys.js'
 import { timeline } from './timeline.js'
+import { readSettings, mergeSettings } from './settings.js'
 
-const readJson = path => {
+export const readJson = path => {
   try {
     return JSON.parse(readFileSync(path, 'utf8'))
   } catch {

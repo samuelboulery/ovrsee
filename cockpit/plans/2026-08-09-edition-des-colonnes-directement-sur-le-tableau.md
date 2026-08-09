@@ -1,10 +1,34 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Édition des colonnes directement sur le tableau",
   "opened": "2026-08-09",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-09",
+  "commits": [
+    {
+      "sha": "74318af",
+      "date": "2026-08-09",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/data.ts",
+        "app/src/tabs/Backlog.tsx",
+        "app/src/tabs/Tableau.tsx",
+        "hooks/brief.js",
+        "hooks/brief.test.js",
+        "hooks/cockpit-cli.js",
+        "hooks/install.js",
+        "hooks/plans.js",
+        "hooks/plans.test.js",
+        "hooks/snapshot.js",
+        "hooks/tickets.js",
+        "hooks/tickets.test.js",
+        "server/api.js",
+        "server/api.test.js",
+        "skills/cockpit/SKILL.md"
+      ]
+    }
+  ]
 }
 ---
 

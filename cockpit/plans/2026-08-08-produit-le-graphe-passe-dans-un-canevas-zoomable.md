@@ -14,6 +14,11 @@
         "app/src/useMeasure.ts",
         "app/src/usePanZoom.ts"
       ]
+    },
+    {
+      "sha": "27065d0",
+      "date": "2026-08-08",
+      "files": []
     }
   ]
 }

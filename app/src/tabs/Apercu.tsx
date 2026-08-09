@@ -12,10 +12,8 @@ import {
 } from '../data'
 import { Illisibles } from '../Illisibles'
 import { Markdown } from '../markdown'
+import { t } from '../i18n'
 import { s } from '../style'
-
-/** « 0 ticket », « 1 ticket », « 2 tickets » — l'accord du français. */
-const pluriel = (n: number, mot: string) => (n > 1 ? `${mot}s` : mot)
 
 /** Crochets appelés par le gestionnaire de paquets, jamais tapés à la main. */
 const LIFECYCLE = new Set([
@@ -108,37 +106,37 @@ export function Apercu({ snapshot }: { snapshot: Snapshot }) {
         >
           <Chiffre
             valeur={pages.length}
-            unite={pluriel(pages.length, 'page')}
-            legende={pluriel(pages.length, 'cartographiée')}
+            unite={pages.length > 1 ? t('apercu.pages') : t('apercu.page')}
+            legende={pages.length > 1 ? t('apercu.mapped_plural') : t('apercu.mapped')}
           />
           <Chiffre
             valeur={plans.length}
-            unite={pluriel(plans.length, 'plan')}
-            legende={ouverts > 0 ? `dont ${ouverts} ouvert${ouverts > 1 ? 's' : ''}` : 'tous clos'}
+            unite={plans.length > 1 ? t('apercu.plans') : t('apercu.plan')}
+            legende={ouverts > 0 ? `${t('apercu.open_info')} ${ouverts} ${ouverts > 1 ? t('apercu.opens') : t('apercu.open')}` : t('apercu.closed')}
             accent={ouverts > 0}
           />
-          <Chiffre valeur={tickets} unite={pluriel(tickets, 'ticket')} legende="à faire" />
+          <Chiffre valeur={tickets} unite={tickets > 1 ? t('apercu.tickets') : t('apercu.ticket')} legende={t('apercu.to_do')} />
           <Chiffre
             valeur={deps}
-            unite={pluriel(deps, 'dépendance')}
-            legende={pluriel(deps, 'déclarée')}
+            unite={deps > 1 ? t('apercu.dependencies') : t('apercu.dependency')}
+            legende={deps > 1 ? t('apercu.declared_plural') : t('apercu.declared')}
           />
           <Chiffre
             valeur={humanAge(derniere)}
             unite=""
-            legende="dernière activité"
+            legende={t('apercu.last_activity')}
           />
           <Chiffre
             valeur={scan ? frDate(scan.date) : '—'}
             unite=""
-            legende={scan ? (scan.ok ? 'dernier scan' : 'scan échoué') : 'aucun scan'}
+            legende={scan ? (scan.ok ? t('apercu.last_scan') : t('apercu.scan_failed')) : t('apercu.no_scan')}
             accent={scan?.ok === false}
           />
         </div>
 
         {scripts.length > 0 && (
           <div style={s('margin-top: 18px;')}>
-            <Titre>Comment on le lance</Titre>
+            <Titre>{t('apercu.how_to_launch')}</Titre>
             <div style={s('display: flex; flex-wrap: wrap; gap: 6px;')}>
               {scripts.map(script => (
                 // Du texte, pas un bouton. Le cockpit lit ; il n'exécute que le
@@ -159,7 +157,7 @@ export function Apercu({ snapshot }: { snapshot: Snapshot }) {
         )}
 
         <div style={s('margin-top: 18px;')}>
-          <Titre>Emporter ailleurs</Titre>
+          <Titre>{t('apercu.take_away')}</Titre>
           <Obsidian root={root} />
         </div>
 
@@ -169,8 +167,7 @@ export function Apercu({ snapshot }: { snapshot: Snapshot }) {
             <Markdown text={readme} />
           ) : (
             <div style={s('font-size: 12.5px; color: var(--color-neutral-600);')}>
-              Ce dépôt n'a pas de <code style={s('font-family: ui-monospace, monospace;')}>README.md</code> à sa
-              racine. Le cockpit n'en fabrique pas : ce qu'il afficherait serait inventé.
+              {t('apercu.no_readme')}
             </div>
           )}
         </div>
@@ -197,9 +194,7 @@ function Obsidian({ root }: { root: string }) {
   return (
     <div>
       <div style={s('font-size: 12px; color: var(--color-neutral-600); margin-bottom: 8px;')}>
-        Plans, tickets et pages en notes markdown liées, dans{' '}
-        <code style={s('font-family: ui-monospace, monospace;')}>cockpit/obsidian/</code> — à ouvrir
-        comme coffre. C'est une vue : la source reste le dépôt.
+        {t('apercu.obsidian_export_desc')}
       </div>
 
       <button
@@ -215,7 +210,7 @@ function Obsidian({ root }: { root: string }) {
             .finally(() => setBusy(false))
         }}
       >
-        {busy ? 'Export…' : 'Exporter en coffre Obsidian'}
+        {busy ? t('apercu.obsidian_exporting') : t('apercu.obsidian_export_btn')}
       </button>
 
       {erreur && (

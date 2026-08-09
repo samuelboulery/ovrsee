@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react'
 
+import { applyTheme } from './theme'
+import { t, setCurrentLanguage, type TranslationKey } from './i18n'
 import {
+  commitsDeLaFrise,
   density,
   estAbandon,
   fetchProjects,
+  fetchSettings,
   fetchSnapshot,
   frDate,
   humanAge,
@@ -11,12 +15,18 @@ import {
   lastScan,
   projectAction,
   restant,
+  updateSettings,
   type Project,
+  type SettingsType,
   type Snapshot,
   type Tableau as TableauData,
 } from './data'
 import { Garde } from './Garde'
-import { SkillsList, SkillsModal, useSkills } from './SkillsPanel'
+import { SkillsModal } from './SkillsPanel'
+import { ConfigClaudeModal } from './ConfigClaudeModal'
+import { PreferencesModal } from './PreferencesPanel'
+import { Welcome } from './Welcome'
+import { EquipmentPanel } from './EquipmentPanel'
 import { s } from './style'
 import { Apercu } from './tabs/Apercu'
 import { Navigateur } from './tabs/Navigateur'
@@ -43,23 +53,50 @@ import { Divider, useResizable } from './useResizable'
  * déjà prises de l'ancien `/` ont suivi dans `shots/produit/`, sans quoi vingt
  * images du graphe passeraient pour l'historique visuel d'Aperçu.
  */
-const TABS = [
-  ['apercu', 'Aperçu', '/'],
-  ['navigateur', 'Navigateur', '/navigateur'],
-  ['produit', 'Produit', '/produit'],
-  ['historique', 'Historique', '/historique'],
-  ['tableau', 'Tableau', '/tableau'],
-  ['donnees', 'Données', '/donnees'],
-  ['stack', 'Stack', '/stack'],
+export const TABS = [
+  ['apercu', 'tabs.apercu', '/'],
+  ['navigateur', 'tabs.navigateur', '/navigateur'],
+  ['produit', 'tabs.produit', '/produit'],
+  ['historique', 'tabs.historique', '/historique'],
+  ['tableau', 'tabs.tableau', '/tableau'],
+  ['donnees', 'tabs.donnees', '/donnees'],
+  ['stack', 'tabs.stack', '/stack'],
 ] as const
 
-type TabId = (typeof TABS)[number][0]
+export type TabId = (typeof TABS)[number][0]
+
+const tabToKey: Record<TabId, TranslationKey> = {
+  apercu: 'tabs.apercu',
+  navigateur: 'tabs.navigateur',
+  produit: 'tabs.produit',
+  historique: 'tabs.historique',
+  tableau: 'tabs.tableau',
+  donnees: 'tabs.donnees',
+  stack: 'tabs.stack',
+}
 
 const tabForPath = (pathname: string): TabId =>
   TABS.find(([, , path]) => path === pathname)?.[0] ?? 'apercu'
 
 /** Le nom de l'onglet tel que l'utilisateur le lit — pour les messages. */
-const labelOf = (id: TabId): string => TABS.find(([tab]) => tab === id)?.[1] ?? id
+export const labelOf = (id: TabId): string => t(tabToKey[id])
+
+/**
+ * Onglets actifs selon les préférences, dans l'ordre de l'ordre configuré.
+ *
+ * Si les préférences ne sont pas chargées, retourne tous les onglets pour
+ * éviter un écran vide au démarrage.
+ *
+ * @param settings préférences chargées (ou null au démarrage)
+ * @returns liste des onglets actifs dans l'ordre configuré
+ */
+const activeTabsInOrder = (settings: SettingsType | null) => {
+  if (!settings) return TABS
+  const active = new Set(settings.onglets.actifs)
+  return TABS.filter(([id]) => active.has(id)).sort(
+    (a, b) => settings.onglets.ordre.indexOf(a[0]) - settings.onglets.ordre.indexOf(b[0]),
+  )
+}
 
 /**
  * Un élément défilant déborde-t-il ?
@@ -129,11 +166,14 @@ export function App() {
   const [projects, setProjects] = useState<Project[]>([])
   const [current, setCurrent] = useState<string | null>(null)
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null)
+  const [settings, setSettings] = useState<SettingsType | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const [tab, setTab] = useState<TabId>(() => tabForPath(window.location.pathname))
   const [layout, setLayout] = useState<Layout>('bottom')
   const [terminal, setTerminal] = useState(true)
+  const [terminalHeight, setTerminalHeight] = useState(244)
+  const [terminalWidth, setTerminalWidth] = useState(468)
 
   const onglets = useDeborde()
 
@@ -155,6 +195,17 @@ export function App() {
     return () => window.removeEventListener('popstate', onPop)
   }, [])
 
+  // Redirection si l'onglet courant devient inactif.
+  // L'onglet Aperçu est toujours actif, donc on y redirige en dernier recours.
+  useEffect(() => {
+    const activeTabs = activeTabsInOrder(settings)
+    if (activeTabs.length > 0 && !activeTabs.some(([id]) => id === tab)) {
+      const target = activeTabs[0]
+      setTab(target[0] as TabId)
+      pushUrl(target[2], current)
+    }
+  }, [settings, tab, current])
+
   useEffect(() => {
     fetchProjects()
       .then(list => {
@@ -166,6 +217,55 @@ export function App() {
       })
       .catch(err => setError(String(err.message ?? err)))
   }, [])
+
+  useEffect(() => {
+    fetchSettings()
+      .then(s => {
+        setCurrentLanguage(s.langue)
+        setSettings(s)
+        setTerminalHeight(s.terminal.hauteur)
+        setTerminalWidth(s.terminal.largeur)
+        setLayout(s.terminal.disposition as Layout)
+        setTerminal(s.terminal.visible)
+        applyTheme(s.theme)
+      })
+      .catch(err => setError(String(err.message ?? err)))
+  }, [])
+
+  // Applique le thème quand il change dans les paramètres
+  useEffect(() => {
+    if (settings) {
+      applyTheme(settings.theme)
+    }
+  }, [settings?.theme])
+
+  /**
+   * Persistance des tailles du terminal, après le geste et pas pendant.
+   *
+   * `useResizable` signale chaque image du glissement : écrire directement
+   * ferait une requête par pixel parcouru. Le report de 300 ms les fond en une.
+   *
+   * La comparaison avec l'état enregistré n'est pas une optimisation : sans
+   * elle, l'arrivée des préférences déclenche l'effet et réécrit au démarrage
+   * ce qu'on vient tout juste de lire.
+   */
+  useEffect(() => {
+    if (!settings) return
+    const inchange =
+      settings.terminal.hauteur === terminalHeight && settings.terminal.largeur === terminalWidth
+    if (inchange) return
+
+    const timer = setTimeout(() => {
+      updateSettings({
+        terminal: {
+          ...settings.terminal,
+          hauteur: terminalHeight,
+          largeur: terminalWidth,
+        },
+      }).catch((err: unknown) => setError(String((err as Error).message ?? err)))
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [terminalHeight, terminalWidth, settings])
 
   // Deux clics rapprochés lancent deux lectures. Sans abandon, la plus lente
   // écrase la plus récente et l'écran affiche les plans du projet précédent
@@ -246,16 +346,17 @@ export function App() {
         return setLayout(disposition as Layout)
       }
 
-      const onglet = TABS.find(([id]) => command === `tab:${id}`)
+      const activeTabs = activeTabsInOrder(settings)
+      const onglet = activeTabs.find(([id]) => command === `tab:${id}`)
       if (onglet) {
-        setTab(onglet[0])
+        setTab(onglet[0] as TabId)
         // Même correction qu'au clic : plein écran est une vue du terminal, on
         // n'y reste pas en changeant d'onglet.
         setLayout(l => (l === 'full' ? 'bottom' : l))
         pushUrl(onglet[2], current)
       }
     })
-  }, [current])
+  }, [current, settings])
 
   const plans = snapshot?.plans ?? []
   const scan = lastScan(snapshot?.scans ?? [])
@@ -279,7 +380,7 @@ export function App() {
           retrait à gauche laisse la place aux pastilles du système. */}
       <header
         style={s(
-          'height: 44px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 82px; background: #1b1d2b; border-bottom: 1px solid var(--color-divider); -webkit-app-region: drag;',
+          'height: 44px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 82px; background: var(--theme-bg-tertiary); border-bottom: 1px solid var(--color-divider); -webkit-app-region: drag;',
         )}
       >
         {/* Le seul `h1` de l'écran : la fenêtre porte le nom du projet, et les
@@ -302,6 +403,7 @@ export function App() {
             projects={projects}
             current={current}
             snapshot={snapshot}
+            settings={settings}
             width={sidebar.size}
             onPick={path => {
               setCurrent(path)
@@ -309,7 +411,9 @@ export function App() {
             }}
             onProjects={applyProjects}
             onError={setError}
-            density={density(plans)}
+            density={density(commitsDeLaFrise(snapshot?.timeline ?? []), {
+              fenetre: settings?.densiteActivite.fenetre,
+            })}
           />
           <Divider axis="x" resizable={sidebar} />
 
@@ -322,7 +426,7 @@ export function App() {
               ref={onglets.ref}
               aria-label="Onglets du projet"
               style={s(
-                'height: 44px; flex: none; display: flex; align-items: stretch; gap: 2px; padding: 0 12px; border-bottom: 1px solid var(--color-divider); background: #171927; overflow-x: auto; overflow-y: hidden; scrollbar-width: none;' +
+                'height: 44px; flex: none; display: flex; align-items: stretch; gap: 2px; padding: 0 12px; border-bottom: 1px solid var(--color-divider); background: var(--theme-bg-quaternary); overflow-x: auto; overflow-y: hidden; scrollbar-width: none;' +
                   // Le dégradé n'apparaît que quand il y a réellement quelque
                   // chose de coupé : posé en permanence, il estomperait le
                   // dernier onglet d'une barre qui tient tout entière.
@@ -331,7 +435,7 @@ export function App() {
                     : ''),
               )}
             >
-              {TABS.map(([id, label, path]) => (
+              {activeTabsInOrder(settings).map(([id, cle, path]) => (
                 // Un vrai lien, pas un bouton : c'est ce que lit
                 // `page.$$eval('a[href]')` dans crawl/index.js. Le href doit
                 // exister pour que l'onglet soit découvrable.
@@ -357,7 +461,7 @@ export function App() {
                         : 'color: var(--color-neutral-500);'),
                   )}
                 >
-                  {label}
+                  {t(cle)}
                 </a>
               ))}
             </nav>
@@ -374,16 +478,17 @@ export function App() {
                   aria-live="polite"
                   style={s('flex: 1; overflow: hidden; display: flex; min-height: 0; min-width: 0;')}
                 >
-                  {error && <Message text={`Lecture impossible : ${error}`} />}
-                  {!error && !snapshot && <Message text="Lecture de cockpit/…" />}
+                  {error && <Message text={`${t('msg.read_error')}: ${error}`} />}
+                  {!error && projects.length === 0 && <Welcome />}
+                  {!error && projects.length > 0 && !snapshot && <Message text={t('msg.loading')} />}
                   {!error && snapshot && unequipped && (
-                    <Unequipped root={snapshot.root} onDone={reload} onError={setError} />
+                    <EquipmentPanel root={snapshot.root} onDone={reload} onError={setError} />
                   )}
                   {!error && snapshot && !unequipped && (
                     // Le garde-fou est remonté à chaque changement d'onglet et
                     // de projet : une panne sur l'un ne doit pas condamner les
                     // autres, et revenir dessus doit réessayer.
-                    <Garde key={`${tab}:${snapshot.root}`} quoi={`l'onglet ${labelOf(tab)}`}>
+                    <Garde key={`${tab}:${snapshot.root}`} quoi={t('garde.tab', { name: labelOf(tab) })}>
                       {tab === 'apercu' && <Apercu snapshot={snapshot} />}
 
                       {/* Le seul onglet qui reste monté quand on le quitte :
@@ -420,7 +525,11 @@ export function App() {
                         <Donnees
                           graph={snapshot.graph}
                           source={snapshot.graphSource}
+                          sourceRequested={snapshot.sourceRequested}
+                          sourceMissing={snapshot.sourceMissing}
+                          sourceDate={snapshot.sourceDate}
                           vaultDeclared={Boolean(snapshot.config?.obsidianVault)}
+                          config={snapshot.config}
                         />
                       )}
                       {tab === 'stack' && <Stack snapshot={snapshot} />}
@@ -436,6 +545,10 @@ export function App() {
                   onToggle={() => setTerminal(false)}
                   onReload={reload}
                   snapshot={snapshot}
+                  terminalHeight={terminalHeight}
+                  terminalWidth={terminalWidth}
+                  onTerminalHeightChange={setTerminalHeight}
+                  onTerminalWidthChange={setTerminalWidth}
                 />
               )}
             </div>
@@ -443,7 +556,7 @@ export function App() {
             {!terminal && (
               <div
                 style={s(
-                  'height: 32px; flex: none; border-top: 1px solid var(--color-divider); background: #101120; display: flex; align-items: center; gap: 10px; padding: 0 14px;',
+                  'height: 32px; flex: none; border-top: 1px solid var(--color-divider); background: var(--theme-bg-primary); display: flex; align-items: center; gap: 10px; padding: 0 14px;',
                 )}
               >
                 <button
@@ -474,7 +587,7 @@ function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
   if (!scan) {
     return (
       <div style={s('font-size: 11.5px; color: var(--color-neutral-600);')}>
-        aucun scan enregistré
+        {t('scan.none')}
       </div>
     )
   }
@@ -491,7 +604,7 @@ function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
             : 'width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--color-neutral-600); display: block;',
         )}
       />
-      {scan.ok ? 'dernier scan' : 'scan échoué'} · {frDate(scan.date)} · commit {scan.commit}
+      {scan.ok ? t('scan.last') : t('scan.failed')} · {frDate(scan.date)} · commit {scan.commit}
     </div>
   )
 }
@@ -508,81 +621,118 @@ function Message({ text }: { text: string }) {
   )
 }
 
-/**
- * Un projet qui n'a pas encore de `cockpit/`.
- *
- * Il apparaît quand même dans la liste : refuser un dossier parce qu'il n'est
- * pas encore équipé obligerait à équiper avant d'ouvrir, c'est-à-dire à savoir
- * d'avance ce que cette page est là pour montrer.
- */
-function Unequipped({
-  root,
-  onDone,
-  onError,
-}: {
-  root: string
-  onDone: () => void
-  onError: (message: string) => void
-}) {
-  const [busy, setBusy] = useState(false)
-  const [done, setDone] = useState<string[] | null>(null)
-  const { skills, choisis, setChoisis } = useSkills()
+/** Affiche l'histogramme de densité d'activité (barres verticaless). */
+function DensityHistogram({ bars, fenetre }: { bars: number[]; fenetre: string }) {
+  const max = Math.max(1, ...bars)
+
+  const cles: Record<string, string> = {
+    jour: 'density.window_day',
+    semaine: 'density.window_week',
+    mois: 'density.window_month',
+    '3mois': 'density.window_3months',
+    an: 'density.window_year',
+  }
+  const label = t((cles[fenetre] ?? 'density.window_3months') as Parameters<typeof t>[0])
+
+  return (
+    <>
+      <div style={s('display: flex; gap: 3px; align-items: flex-end; height: 34px;')}>
+        {bars.map((value, i) => {
+          const height = value === 0 ? 3 : Math.max(4, Math.round((value / max) * 34))
+          const color =
+            value === 0
+              ? 'var(--color-neutral-800)'
+              : value / max > 0.6
+                ? 'var(--color-accent-500)'
+                : 'var(--color-accent-700)'
+          return (
+            <div
+              key={i}
+              title={`${value} commit(s)`}
+              style={s(`flex: 1; height: ${height}px; border-radius: 1px; background: ${color};`)}
+              role="img"
+              aria-label={`seau ${i}: ${value} commits`}
+            />
+          )
+        })}
+      </div>
+      <div
+        style={s(
+          'display: flex; justify-content: space-between; font-size: 10px; color: var(--color-neutral-600); margin-top: 6px;',
+        )}
+      >
+        <span>{label}</span>
+        <span>{t('sidebar.today')}</span>
+      </div>
+    </>
+  )
+}
+
+/** Affiche une heatmap de 30 jours (grille 5×6). */
+function DensityHeatmap({ bars }: { bars: number[] }) {
+  const max = Math.max(1, ...bars)
+
+  // Les 30 jours : on suppose que bars[0] = le plus ancien, bars[29] = hier
+  // Construit la grille 5 rangées × 6 colonnes
+  const days = bars.slice(0, 30)
+
+  // Couleurs : 5 paliers sur la rampe accent
+  const colors = [
+    'var(--color-accent-900)', // 0 commits
+    'var(--color-accent-700)', // très peu
+    'var(--color-accent-500)', // moyen
+    'var(--color-accent-300)', // beaucoup
+    'var(--color-accent-100)', // beaucoup beaucoup
+  ]
+
+  const getColor = (value: number): string => {
+    if (value === 0) return colors[0]
+    if (value <= max * 0.2) return colors[1]
+    if (value <= max * 0.4) return colors[2]
+    if (value <= max * 0.6) return colors[3]
+    return colors[4]
+  }
+
+  const now = new Date()
+  const getDateLabel = (daysAgo: number): string => {
+    const d = new Date(now)
+    d.setDate(d.getDate() - (29 - daysAgo)) // 29 - daysAgo car days[0] est le plus ancien
+    const day = d.getDate()
+    const month = d.getMonth() + 1
+    return `${day}/${month}`
+  }
 
   return (
     <div
       style={s(
-        'flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center;',
+        'overflow-x: auto; border: 1px solid var(--color-divider); border-radius: 4px; margin-top: 8px;',
       )}
     >
-      <div style={s('font-size: 13px; color: var(--color-neutral-400);')}>
-        Ce dossier n'a pas de <code>cockpit/</code> — aucun plan, aucun scan à lire.
-      </div>
-      <div style={s('font-size: 11.5px; color: var(--color-neutral-600); max-width: 52ch;')}>
-        L'initialiser crée <code>cockpit/plans/</code> et pose le hook <code>post-commit</code> qui
-        rattache les commits au plan actif.
-      </div>
-
-      {/* Les skills se choisissent avant d'initialiser, pas après : c'est le
-          seul moment où l'on sait qu'un projet vient d'arriver, et un cockpit
-          que Claude Code ne sait pas remplir reste un dossier vide. */}
-      {!done && skills.length > 0 && (
-        <div style={s('width: min(520px, 100%); margin-top: 4px;')}>
-          <div
-            style={s(
-              'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 8px; text-align: left;',
-            )}
-          >
-            Skills Claude Code
-          </div>
-          <SkillsList skills={skills} choisis={choisis} onChoisis={setChoisis} />
-        </div>
-      )}
-
-      {done ? (
-        <div style={s('font-size: 11px; color: var(--color-neutral-500); text-align: left;')}>
-          {done.map(line => (
-            <div key={line}>{line}</div>
+      <table style={s('width: 100%; border-collapse: collapse; font-size: 10px;')}>
+        <tbody>
+          {Array.from({ length: 5 }).map((_, rowIdx) => (
+            <tr key={rowIdx}>
+              {Array.from({ length: 6 }).map((_, colIdx) => {
+                const idx = rowIdx * 6 + colIdx
+                if (idx >= days.length) return <td key={colIdx} />
+                const value = days[idx]
+                const date = getDateLabel(idx)
+                return (
+                  <td
+                    key={colIdx}
+                    style={s(
+                      `width: 16px; height: 16px; border: 1px solid var(--color-divider); background: ${getColor(value)}; cursor: pointer;`,
+                    )}
+                    title={`${date}: ${value} commits`}
+                    role="img"
+                    aria-label={`${date}: ${value} commits`}
+                  />
+                )
+              })}
+            </tr>
           ))}
-        </div>
-      ) : (
-        <button
-          type="button"
-          className="btn"
-          disabled={busy}
-          onClick={() => {
-            setBusy(true)
-            projectAction('init', root, { skills: choisis })
-              .then(result => {
-                setDone(result.done ?? [])
-                onDone()
-              })
-              .catch(err => onError(String(err.message ?? err)))
-              .finally(() => setBusy(false))
-          }}
-        >
-          {busy ? 'Initialisation…' : 'Initialiser cockpit ici'}
-        </button>
-      )}
+        </tbody>
+      </table>
     </div>
   )
 }
@@ -592,6 +742,7 @@ function Sidebar({
   projects,
   current,
   snapshot,
+  settings,
   width,
   onPick,
   onProjects,
@@ -602,14 +753,16 @@ function Sidebar({
   current: string | null
   /** L'instantané du projet affiché, pour que sa pastille suive le tableau. */
   snapshot: Snapshot | null
+  settings: SettingsType | null
   width: number
   onPick: (path: string) => void
   onProjects: (list: Project[], select?: string | null) => void
   onError: (message: string) => void
   density: number[]
 }) {
-  const max = Math.max(1, ...bars)
   const [skillsOuverts, setSkillsOuverts] = useState(false)
+  const [preferencesOuverts, setPreferencesOuverts] = useState(false)
+  const [configOuverte, setConfigOuverte] = useState(false)
 
   // Le sélecteur de dossier n'existe que dans l'application empaquetée. Dans un
   // navigateur, le bouton est absent plutôt que présent et inerte — même
@@ -618,9 +771,9 @@ function Sidebar({
 
   return (
     <aside
-      aria-label="Projets"
+      aria-label={t('sidebar.projects')}
       style={s(
-        `width: ${width}px; flex: none; display: flex; flex-direction: column; background: #13141f; border-right: 1px solid var(--color-divider); padding: 14px 0;`,
+        `width: ${width}px; flex: none; display: flex; flex-direction: column; background: var(--theme-bg-secondary); border-right: 1px solid var(--color-divider); padding: 14px 0;`,
       )}
     >
       <div
@@ -628,7 +781,7 @@ function Sidebar({
           'padding: 0 14px 10px; display: flex; align-items: center; gap: 8px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);',
         )}
       >
-        Projets
+        {t('sidebar.projects')}
         <div style={s('flex: 1;')} />
         {picker && (
           <button
@@ -665,17 +818,39 @@ function Sidebar({
           Le rappel est ici parce qu'une mise à jour du cockpit peut les rendre
           périmés longtemps après l'initialisation, quand l'écran qui les
           proposait n'apparaît plus. */}
-      <div style={s('padding: 0 14px 12px;')}>
+      <div style={s('padding: 0 14px 12px; display: flex; flex-direction: column; gap: 6px;')}>
         <button
           type="button"
           className="btn btn-ghost btn-block"
           onClick={() => setSkillsOuverts(true)}
           style={s('font-size: 11px;')}
         >
-          Skills Claude Code
+          {t('sidebar.skills')}
+        </button>
+        <button
+          type="button"
+          className="btn btn-ghost btn-block"
+          onClick={() => setPreferencesOuverts(true)}
+          style={s('font-size: 11px;')}
+        >
+          ⚙ {t('sidebar.preferences')}
+        </button>
+        {/* La configuration de Claude Code n'est pas celle du cockpit : elle
+            vit dans `~/.claude/` et le cockpit ne fait que la lire. Le bouton
+            est ici parce qu'on s'y demande ce qui est installé au même moment
+            qu'on se demande quels skills le sont. */}
+        <button
+          type="button"
+          className="btn btn-ghost btn-block"
+          onClick={() => setConfigOuverte(true)}
+          style={s('font-size: 11px;')}
+        >
+          ⌘ {t('sidebar.claude_config')}
         </button>
       </div>
       {skillsOuverts && <SkillsModal onClose={() => setSkillsOuverts(false)} />}
+      {preferencesOuverts && <PreferencesModal onClose={() => setPreferencesOuverts(false)} />}
+      {configOuverte && <ConfigClaudeModal onClose={() => setConfigOuverte(false)} />}
 
       <div
         style={s(
@@ -687,34 +862,14 @@ function Sidebar({
             'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 8px;',
           )}
         >
-          Densité d'activité
+          {t('sidebar.activity')}
         </div>
-        <div style={s('display: flex; gap: 3px; align-items: flex-end; height: 34px;')}>
-          {bars.map((value, i) => {
-            const height = value === 0 ? 3 : Math.max(4, Math.round((value / max) * 34))
-            const color =
-              value === 0
-                ? 'var(--color-neutral-800)'
-                : value / max > 0.6
-                  ? 'var(--color-accent-500)'
-                  : 'var(--color-accent-700)'
-            return (
-              <div
-                key={i}
-                title={`${value} commit(s)`}
-                style={s(`flex: 1; height: ${height}px; border-radius: 1px; background: ${color};`)}
-              />
-            )
-          })}
-        </div>
-        <div
-          style={s(
-            'display: flex; justify-content: space-between; font-size: 10px; color: var(--color-neutral-600); margin-top: 6px;',
-          )}
-        >
-          <span>16 semaines</span>
-          <span>aujourd'hui</span>
-        </div>
+
+        {settings?.densiteActivite.fenetre === 'mois' ? (
+          <DensityHeatmap bars={bars} />
+        ) : (
+          <DensityHistogram bars={bars} fenetre={settings?.densiteActivite.fenetre ?? '3mois'} />
+        )}
       </div>
     </aside>
   )
@@ -774,12 +929,12 @@ function ProjectRow({
     : { open, equipped, last }
 
   const badge = !vivant.equipped
-    ? 'à initialiser'
+    ? t('project.to_initialize')
     : vivant.open === null
       ? '—'
       : vivant.open > 0
-        ? `${vivant.open} à faire`
-        : 'à jour'
+        ? t('project.to_do', { n: vivant.open })
+        : t('project.up_to_date')
 
   return (
     <div

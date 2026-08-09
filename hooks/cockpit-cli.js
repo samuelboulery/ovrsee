@@ -8,8 +8,10 @@
  *   node hooks/cockpit-cli.js close
  *   node hooks/cockpit-cli.js capture <fichier-de-plan.md>
  *   node hooks/cockpit-cli.js tickets
- *   node hooks/cockpit-cli.js ticket new "<titre>" [--colonne pret]
+ *   node hooks/cockpit-cli.js ticket new "<titre>" [--colonne pret] [--epic]
  *   node hooks/cockpit-cli.js ticket move <fichier.md> <colonne>
+ *   node hooks/cockpit-cli.js ticket link <fichier.md> --epic <T-XXXX>
+ *   node hooks/cockpit-cli.js ticket unlink <fichier.md>
  *   node hooks/cockpit-cli.js ticket import-plans
  *
  * Contrairement aux hooks, cet outil est invoqué explicitement : il a le droit
@@ -40,6 +42,8 @@ import {
   readBoard,
   readTickets,
   sortTickets,
+  updateTicket,
+  childrenOf,
 } from './tickets.js'
 
 const root = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
@@ -64,6 +68,22 @@ const commands = {
     console.log(
       existsSync(pointer) ? `actif : ${readFileSync(pointer, 'utf8').trim()}` : 'aucun plan actif',
     )
+
+    // Afficher les épics avec leurs enfants
+    const colonnes = readBoard(cockpitDir)
+    const tickets = sortTickets(readTickets(cockpitDir, colonnes))
+    const epics = tickets.filter(t => t.meta?.type === 'epic')
+
+    if (epics.length > 0) {
+      console.log(`\n${epics.length} epic(s)`)
+      for (const epic of epics) {
+        console.log(`  ${epic.meta.id}  [${epic.meta.priorite}]  ${epic.meta.titre}`)
+        const enfants = childrenOf(tickets, epic.meta.id)
+        for (const enfant of enfants) {
+          console.log(`    └─ ${enfant.meta.id}  [${enfant.meta.priorite}]  ${enfant.meta.titre}`)
+        }
+      }
+    }
   },
 
   close() {
@@ -119,8 +139,10 @@ const commands = {
   /**
    * Écriture des tickets depuis la ligne de commande.
    *
-   *   ticket new "<titre>" [--colonne pret] [--priorite haute] [--corps "..."]
+   *   ticket new "<titre>" [--colonne pret] [--priorite haute] [--corps "..."] [--epic]
    *   ticket move <fichier.md> <colonne>
+   *   ticket link <fichier.md> --epic <T-XXXX>
+   *   ticket unlink <fichier.md>
    *   ticket import-plans
    */
   ticket(sub, ...rest) {
@@ -137,14 +159,16 @@ const commands = {
 
     switch (sub) {
       case 'new': {
-        if (!args[0]) throw new Error('usage : ticket new "<titre>" [--colonne x] [--priorite haute]')
+        if (!args[0]) throw new Error('usage : ticket new "<titre>" [--colonne x] [--priorite haute] [--epic]')
         const { file, meta } = createTicket(cockpitDir, {
           titre: args[0],
           colonne: flags.colonne,
           priorite: flags.priorite,
           corps: flags.corps,
+          type: flags.epic ? 'epic' : undefined,
         })
-        console.log(`créé : ${meta.id} en ${meta.colonne} — cockpit/tickets/${file}`)
+        const typeLabel = flags.epic ? ' (epic)' : ''
+        console.log(`créé : ${meta.id} en ${meta.colonne}${typeLabel} — cockpit/tickets/${file}`)
         return
       }
 
@@ -152,6 +176,24 @@ const commands = {
         if (!args[0] || !args[1]) throw new Error('usage : ticket move <fichier.md> <colonne>')
         if (!moveTicket(cockpitDir, args[0], args[1])) throw new Error(`ticket introuvable : ${args[0]}`)
         console.log(`déplacé : ${args[0]} → ${args[1]}`)
+        return
+      }
+
+      case 'link': {
+        if (!args[0] || !flags.epic) throw new Error('usage : ticket link <fichier.md> --epic <T-XXXX>')
+        if (!updateTicket(cockpitDir, args[0], { epic: flags.epic })) {
+          throw new Error(`ticket introuvable : ${args[0]}`)
+        }
+        console.log(`rattaché : ${args[0]} → epic ${flags.epic}`)
+        return
+      }
+
+      case 'unlink': {
+        if (!args[0]) throw new Error('usage : ticket unlink <fichier.md>')
+        if (!updateTicket(cockpitDir, args[0], { epic: null })) {
+          throw new Error(`ticket introuvable : ${args[0]}`)
+        }
+        console.log(`détaché : ${args[0]}`)
         return
       }
 
@@ -166,7 +208,7 @@ const commands = {
       }
 
       default:
-        throw new Error('sous-commandes : new, move, import-plans')
+        throw new Error('sous-commandes : new, move, link, unlink, import-plans')
     }
   },
 

@@ -7,6 +7,8 @@
  * sont stockés nulle part.
  */
 
+import { t } from './i18n'
+
 /**
  * La frontière entre ce que le serveur a envoyé et ce que l'interface suppose.
  *
@@ -84,7 +86,7 @@ const firstParagraph = (text: string): string =>
 export function planWhy(plan: Plan): string {
   const found = section(plan.body, /contexte|probl[eè]me|intention|pourquoi/i)
   const raw = firstParagraph(found ?? plan.body ?? '')
-  return raw ? stripMarkdown(raw) : 'Aucune intention écrite dans ce plan.'
+  return raw ? stripMarkdown(raw) : t('msg.no_intention')
 }
 
 /**
@@ -211,6 +213,10 @@ export interface Ticket {
   maj: string
   /** Plan lié, s'il existe. Les deux stocks restent indépendants. */
   plan: string | null
+  /** Type du ticket : "epic" pour les epics, absent pour les tickets ordinaires. */
+  type?: 'epic'
+  /** ID du ticket parent si ce ticket est enfant d'un epic. */
+  epic?: string
   corps: string
 }
 
@@ -230,6 +236,29 @@ export interface CockpitConfig {
    * produit. Absolu, `~`, ou relatif à la racine du dépôt.
    */
   obsidianVault?: string
+}
+
+/**
+ * Préférences globales du cockpit.
+ *
+ * Les défauts sont définis dans `hooks/settings.js`, jamais ici — une valeur
+ * par défaut en deux endroits divergerait. Ce type décrit uniquement la forme.
+ */
+export interface Action {
+  label: string
+  text: string
+}
+
+export interface SettingsType {
+  langue: string
+  theme: string
+  densiteActivite: { granularite: string; fenetre: string }
+  onglets: { actifs: string[]; ordre: string[] }
+  terminal: { visible: boolean; disposition: string; hauteur: number; largeur: number }
+  bootstrap: string[]
+  packageManager: string
+  sourceGraphe: string
+  customActions?: Action[]
 }
 
 export interface Snapshot {
@@ -263,6 +292,21 @@ export interface Snapshot {
    * ligne dont on ignore l'origine ne se vérifie pas.
    */
   graphSource: 'graphify' | 'obsidian' | null
+  /**
+   * La source de graphe demandée : 'auto', 'graphify', ou 'obsidian'.
+   * Permet de distinguer un choix explicite du défaut.
+   */
+  sourceRequested: string
+  /**
+   * true si la source demandée n'a pas pu être trouvée.
+   * Affiche une alerte distincte selon le type de source.
+   */
+  sourceMissing: boolean
+  /**
+   * Date du graphe, au format YYYY-MM-DD, ou null si non daté.
+   * Affichée dans le badge de provenance.
+   */
+  sourceDate: string | null
   /** slug de page → captures successives, de la plus récente à la plus ancienne */
   shots: Record<string, string[]>
   /** Commits et plans mêlés, du plus récent au plus ancien. */
@@ -480,6 +524,26 @@ export async function projectAction(
   return result
 }
 
+export interface FolderState {
+  isGit: boolean
+  hasLockfile: boolean
+  hasConfig: boolean
+  equipped: boolean
+  hasPackageJson: boolean
+}
+
+export async function getFolderState(path: string): Promise<FolderState> {
+  const response = await fetch('/api/projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    body: JSON.stringify({ action: 'state', path }),
+  })
+
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result
+}
+
 /**
  * Un skill Claude Code du catalogue, tel que le serveur le rend.
  *
@@ -569,6 +633,52 @@ export const fetchSnapshot = (path: string, signal?: AbortSignal) =>
 export const shotUrl = (root: string, file: string) =>
   `/api/shot?path=${encodeURIComponent(root)}&file=${encodeURIComponent(file)}`
 
+/**
+ * Préférences du cockpit : globales si pas de projet, fusionnées si projet.
+ *
+ * Les champs `langue`, `theme`, `densiteActivite` ne se surchargent jamais
+ * par le projet — c'est une préférence personnelle.
+ */
+export const fetchSettings = (projectPath?: string): Promise<SettingsType> =>
+  json<SettingsType>(
+    projectPath
+      ? `/api/settings?path=${encodeURIComponent(projectPath)}`
+      : '/api/settings',
+  )
+
+/**
+ * Met à jour les préférences globales.
+ *
+ * Rend les préférences écrites pour la confirmation.
+ */
+export async function updateSettings(settings: Partial<SettingsType>): Promise<SettingsType> {
+  const response = await fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    body: JSON.stringify(settings),
+  })
+
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result
+}
+
+/**
+ * Compose une commande d'exécution adaptée au gestionnaire de paquets configuré.
+ *
+ * Utilisé par B3 pour construire les lignes d'injection dans le terminal.
+ * Le gestionnaire doit être fourni explicitement pour éviter les défauts trompeurs.
+ *
+ * @param {string} script nom du script npm (ex. 'cockpit:crawl')
+ * @param {string} packageManager gestionnaire de paquets ('pnpm', 'npm', 'yarn', 'bun')
+ * @returns {string} commande complète (ex. 'pnpm cockpit:crawl' ou 'npm run cockpit:crawl')
+ */
+export function composerCommande(script: string, packageManager: string): string {
+  const isNpm = packageManager === 'npm'
+  const prefix = isNpm ? 'npm run ' : `${packageManager} `
+  return prefix + script
+}
+
 // --- dérivations -----------------------------------------------------------
 
 /**
@@ -595,6 +705,31 @@ export const sortTickets = (tickets: Ticket[]): Ticket[] =>
   )
 
 /**
+ * Les enfants d'un epic, triés par priorité puis date.
+ */
+export const childrenOf = (tickets: Ticket[], epicId: string): Ticket[] =>
+  sortTickets(liste(tickets).filter(t => t.epic === epicId))
+
+/**
+ * Progression d'un epic : nombre d'enfants en colonne finale vs. total.
+ */
+export interface EpicProgress {
+  done: number
+  total: number
+  percent: number
+}
+
+export const epicProgress = (children: Ticket[], finalColumn: string | null): EpicProgress => {
+  if (children.length === 0) return { done: 0, total: 0, percent: 0 }
+  const done = finalColumn ? liste(children).filter(t => t.colonne === finalColumn).length : 0
+  return {
+    done,
+    total: children.length,
+    percent: done === 0 ? 0 : Math.round((done / children.length) * 100),
+  }
+}
+
+/**
  * La colonne qui vaut « terminé », s'il y en a une.
  *
  * Miroir de `colonneFinale` dans `hooks/tickets.js` : la dernière colonne, mais
@@ -604,10 +739,35 @@ export const sortTickets = (tickets: Ticket[]): Ticket[] =>
 export const colonneFinale = (board: Colonne[]): string | null =>
   liste(board).length > 1 ? (liste(board).at(-1)?.id ?? null) : null
 
-/** Ce qui reste à faire : tout ce qui n'est pas dans la colonne terminale. */
+/**
+ * Ce qui reste à faire.
+ *
+ * Compte les tickets à faire, avec une logique spéciale pour les epics :
+ * - Epic AVEC enfants : ne compte pas (ses enfants comptent à sa place)
+ * - Epic SANS enfant : compte pour 1
+ * - Enfant d'un epic existant : compte (les enfants prennent la place de l'epic)
+ * - Enfant orphelin (epic inexistant) : compte comme ticket ordinaire
+ * - Ticket ordinaire : compte toujours
+ */
 export const restant = (tickets: Ticket[], board: Colonne[]): number => {
   const fini = colonneFinale(board)
-  return liste(tickets).filter(t => t.colonne !== fini).length
+  const ticketsList = liste(tickets)
+
+  // Déterminer quels epics ont des enfants
+  const epicsAvecEnfants = new Set(
+    ticketsList
+      .filter(t => t.type === 'epic' && ticketsList.some(ch => ch.epic === t.id))
+      .map(t => t.id)
+  )
+
+  return ticketsList
+    .filter(t => {
+      if (t.colonne === fini) return false // Rien en colonne finale ne compte
+      if (t.type === 'epic' && epicsAvecEnfants.has(t.id)) return false // Epic AVEC enfants ne compte pas
+      // Epic vide, enfant, ou ticket ordinaire → compte (les enfants prennent la place de l'epic)
+      return true
+    })
+    .length
 }
 
 /** L'historique n'est pas saisi : ce sont les plans clos, par date de clôture. */
@@ -616,21 +776,33 @@ export const history = (plans: Plan[]): Plan[] =>
     .filter(p => p.status === 'closed')
     .sort((a, b) => (b.closed ?? '').localeCompare(a.closed ?? ''))
 
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000
+/**
+ * `density()` vit dans `hooks/density.js`, et nulle part ailleurs.
+ *
+ * Elle a longtemps existé en double, ici et là-bas, et les deux copies avaient
+ * fini par diverger sur la façon de reconnaître leur entrée. Le CLI et le
+ * serveur MCP en ont besoin autant que l'interface, et eux ne peuvent pas
+ * importer `app/src` — c'est ce qui fixe le sens de la dépendance.
+ *
+ * Le module est séparé de `plans.js`, qui importe `node:fs` : un module Node
+ * dans le bundle du navigateur se fait externaliser par Vite, et l'application
+ * tombe à la première lecture au lieu de refuser de compiler.
+ */
+import { density } from '../../hooks/density'
+export { density }
 
-/** Densité d'activité : commits par semaine, du plus ancien au plus récent. */
-export function density(plans: Plan[], weeks = 16, now: Date = new Date()): number[] {
-  const buckets = new Array(weeks).fill(0)
-  for (const plan of liste(plans)) {
-    for (const commit of plan.commits ?? []) {
-      const at = Date.parse(commit.date)
-      if (Number.isNaN(at)) continue
-      const index = weeks - 1 - Math.floor((now.getTime() - at) / WEEK_MS)
-      if (index >= 0 && index < weeks) buckets[index] += 1
-    }
-  }
-  return buckets
-}
+/**
+ * Tous les commits de la frise, ceux des plans comme les autres.
+ *
+ * La densité comptait naguère les seuls commits rattachés à un plan, et un
+ * projet avancé par correctifs paraissait dormant. La frise, elle, connaît les
+ * deux sortes : `hooks/timeline.js` explique pourquoi les taire donnait « une
+ * chronologie à trous ». La densité lit donc la même source qu'elle.
+ */
+export const commitsDeLaFrise = (timeline: TimelineEntry[]): GitCommit[] =>
+  liste(timeline).flatMap(entry =>
+    entry.kind === 'plan' ? (entry.commits ?? []) : entry.commit ? [entry.commit] : [],
+  )
 
 /**
  * Plans clos ayant touché les fichiers d'une page.
@@ -669,35 +841,42 @@ export const lastScan = (scans: Scan[]): Scan | null => liste(scans).at(-1) ?? n
  */
 export const scanFailed = (scans: Scan[]): boolean => lastScan(scans)?.ok === false
 
+/**
+ * Retourne l'abréviation du mois traduit.
+ */
+function getMonth(monthNumber: number): string {
+  const monthKeys = [
+    'months.jan', 'months.feb', 'months.mar', 'months.apr',
+    'months.may', 'months.jun', 'months.jul', 'months.aug',
+    'months.sep', 'months.oct', 'months.nov', 'months.dec',
+  ] as const
+  return t(monthKeys[monthNumber - 1])
+}
+
 /** « il y a 3 semaines » — une date brute ne dit pas si l'information a dérivé. */
 export function humanAge(date: string | null | undefined, now: Date = new Date()): string {
-  if (!date) return 'jamais'
+  if (!date) return t('msg.never')
   const at = Date.parse(date)
   if (Number.isNaN(at)) return String(date)
 
   const days = Math.floor((now.getTime() - at) / (24 * 60 * 60 * 1000))
-  if (days <= 0) return "aujourd'hui"
-  if (days === 1) return 'hier'
-  if (days < 7) return `il y a ${days} jours`
+  if (days <= 0) return t('msg.today')
+  if (days === 1) return t('msg.yesterday')
+  if (days < 7) return t('msg.days_ago', { n: days })
   if (days < 31) {
     const weeks = Math.floor(days / 7)
-    return weeks === 1 ? 'il y a 1 semaine' : `il y a ${weeks} semaines`
+    return weeks === 1 ? t('msg.week_ago') : t('msg.weeks_ago', { n: weeks })
   }
   const months = Math.floor(days / 30)
-  return months === 1 ? 'il y a 1 mois' : `il y a ${months} mois`
+  return months === 1 ? t('msg.month_ago') : t('msg.months_ago', { n: months })
 }
-
-const MONTHS = [
-  'janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin',
-  'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.',
-]
 
 /** `2026-07-18` → `18 juil. 2026`, comme dans la maquette. */
 export function frDate(date: string | null | undefined): string {
   if (!date) return '—'
   const [y, m, d] = String(date).split('-').map(Number)
   if (!y || !m || !d) return String(date)
-  return `${d} ${MONTHS[m - 1]} ${y}`
+  return `${d} ${getMonth(m)} ${y}`
 }
 
 /** `2026-07-18` → `18 juil.` — le pied des cartes du graphe est étroit. */
@@ -705,7 +884,7 @@ export function frDateShort(date: string | null | undefined): string {
   if (!date) return '—'
   const [, m, d] = String(date).split('-').map(Number)
   if (!m || !d) return String(date)
-  return `${d} ${MONTHS[m - 1]}`
+  return `${d} ${getMonth(m)}`
 }
 
 // --- lecture du graphe Graphify -------------------------------------------
@@ -806,6 +985,52 @@ export function stackFrom(
   }))
 }
 
+// --- Configuration Claude Code -----------------------------------------------
+
+/**
+ * Un agent Claude Code, tel que le serveur le rend.
+ *
+ * Le frontmatter du `.md` est parsé côté serveur, les secrets masqués.
+ */
+export interface Agent {
+  name: string
+  description?: string | string[]
+  tools?: string | string[]
+  model?: string
+  timeout?: string | number
+  [key: string]: unknown
+}
+
+/**
+ * Une commande Claude Code, telle que le serveur la rend.
+ */
+export interface Command {
+  name: string
+  description?: string | string[]
+  [key: string]: unknown
+}
+
+/**
+ * Un plugin Claude Code, depuis `installed_plugins.json`.
+ */
+export interface Plugin {
+  name: string
+  status: string
+}
+
+/**
+ * Configuration complète de Claude Code.
+ */
+export interface ConfigClaude {
+  agents: Agent[]
+  commands: Command[]
+  plugins: Plugin[]
+  hooks: Record<string, { hooks: Array<{ type: string }> }>
+  env: Record<string, string>
+}
+
+export const fetchConfigClaude = () => json<ConfigClaude>('/api/config-claude')
+
 /**
  * Ce que le cockpit sait dire du projet, sans lire une ligne de code.
  *
@@ -815,7 +1040,8 @@ export function stackFrom(
  */
 export function briefLines(snapshot: Snapshot | null): Array<{ text: string; style: string }> {
   const dim = 'color: var(--color-neutral-400);'
-  if (!snapshot) return [{ text: 'lecture de cockpit/…', style: 'color: var(--color-neutral-600);' }]
+  if (!snapshot)
+    return [{ text: t('brief.reading'), style: 'color: var(--color-neutral-600);' }]
 
   const open = plansOuverts(snapshot.plans ?? [])
   const closed = (snapshot.plans ?? []).length - open.length
@@ -825,7 +1051,7 @@ export function briefLines(snapshot: Snapshot | null): Array<{ text: string; sty
   const lines = [
     { text: '$ claude', style: 'color: var(--color-neutral-500);' },
     {
-      text: `◆ Contexte lisible dans ${snapshot.root}/cockpit — ${pages} page(s), ${closed} plan(s) clos, ${open.length} ouvert(s)`,
+      text: `◆ ${t('brief.readable_in', { root: snapshot.root })} — ${t(pages > 1 ? 'brief.pages_plural' : 'brief.pages', { n: pages })}, ${t(closed > 1 ? 'brief.closed_plural' : 'brief.closed', { n: closed })}, ${t(open.length > 1 ? 'brief.open_plural' : 'brief.open', { n: open.length })}`,
       style: 'color: var(--color-accent-300);',
     },
     { text: '', style: '' },
@@ -834,17 +1060,20 @@ export function briefLines(snapshot: Snapshot | null): Array<{ text: string; sty
   if (scan) {
     lines.push({
       text: scan.ok
-        ? `Dernier scan réussi le ${frDate(scan.date)} (commit ${scan.commit}).`
-        : `Dernier scan ÉCHOUÉ le ${frDate(scan.date)} : ${scan.error ?? 'raison non enregistrée'}.`,
+        ? t('brief.scan_ok', { date: frDate(scan.date), commit: scan.commit })
+        : t('brief.scan_failed', {
+            date: frDate(scan.date),
+            error: scan.error ?? t('brief.no_reason'),
+          }),
       style: scan.ok ? dim : 'color: var(--color-accent-200);',
     })
   } else {
-    lines.push({ text: 'Aucun scan enregistré : la carte des pages est vide.', style: dim })
+    lines.push({ text: t('brief.no_scan'), style: dim })
   }
 
   const oldest = open.at(-1)
   if (oldest) {
-    lines.push({ text: `Le plus ancien plan ouvert porte sur « ${oldest.title} ».`, style: dim })
+    lines.push({ text: t('brief.oldest_plan', { title: oldest.title }), style: dim })
   }
   lines.push({ text: '', style: '' })
   return lines
@@ -856,6 +1085,9 @@ export function buildInjections(snapshot: Snapshot | null): Array<{ label: strin
 
   const open = plansOuverts(snapshot.plans ?? [])
   const pages = snapshot.pages?.pages ?? []
+  const tickets = snapshot.tickets ?? []
+  const epicIds = new Set(tickets.filter(t => t.type === 'epic').map(t => t.id))
+  const epicCount = epicIds.size
 
   return [
     {
@@ -869,13 +1101,27 @@ export function buildInjections(snapshot: Snapshot | null): Array<{ label: strin
       text: open.map(p => `- ${p.title} (ouvert le ${frDate(p.opened)})`).join('\n'),
     },
     {
-      label: `Tableau (${snapshot.tickets?.length ?? 0} ticket(s))`,
+      label: `Tableau (${tickets.length} ticket(s)${epicCount > 0 ? `, dont ${epicCount} epic(s)` : ''})`,
       // Colonne par colonne, dans l'ordre du tableau : c'est ce qui permet à
       // Claude de proposer un déplacement plutôt qu'un ticket de plus.
+      // Les epics affichent leur progression ; les enfants affichent leur parent.
       text: (snapshot.board ?? [])
         .map(colonne => {
-          const dedans = sortTickets((snapshot.tickets ?? []).filter(t => t.colonne === colonne.id))
-          const lignes = dedans.map(t => `  ${t.id} [${t.priorite}] ${t.titre} — ${t.file}`)
+          const dedans = sortTickets(tickets.filter(t => t.colonne === colonne.id))
+          const lignes = dedans.map(t => {
+            let ligne = `  ${t.id} [${t.priorite}] ${t.titre}`
+            // Si c'est un epic, afficher la progression
+            if (t.type === 'epic') {
+              const children = childrenOf(tickets, t.id)
+              const prog = epicProgress(children, colonneFinale(snapshot.board ?? []))
+              ligne += ` [${prog.done}/${prog.total} fait]`
+            }
+            // Si c'est un enfant, afficher le parent
+            if (t.epic && epicIds.has(t.epic)) {
+              ligne += ` (enfant de ${t.epic})`
+            }
+            return ligne
+          })
           return [`${colonne.titre} (${dedans.length})`, ...lignes].join('\n')
         })
         .join('\n'),
@@ -885,4 +1131,74 @@ export function buildInjections(snapshot: Snapshot | null): Array<{ label: strin
       text: `Lis ${snapshot.root}/cockpit/ pour l'état du projet. N'ouvre pas le code.`,
     },
   ]
+}
+
+/**
+ * Décide si un texte est une commande (! ou /) ou du contexte.
+ *
+ * Les commandes s'injectent directement avec `\n` final : elles partent illico
+ * dans le shell. Les contextes passent par le collage encadré (bracket paste) :
+ * littéral, multiligne accepté, sans `\n` final — l'utilisateur relit et valide.
+ *
+ * @param text texte à injecter
+ * @returns objet avec mode ('command' ou 'context') et texte adapté
+ */
+export function decideInjection(text: string): { mode: 'command' | 'context'; text: string } {
+  // Les commandes commencent par ! ou /
+  if (text.startsWith('!') || text.startsWith('/')) {
+    // Commande : ajouter \n pour exécuter immédiatement
+    return { mode: 'command', text: text + '\n' }
+  }
+
+  // Contexte : l'encadrement (bracket paste) sera fait par pasteToClaude()
+  // On ne met pas de \n final — l'utilisateur valide lui-même
+  return { mode: 'context', text }
+}
+
+/**
+ * Actions livrées + actions personnalisées, avec validation des sauts de ligne.
+ *
+ * Les actions livrées demandent le gestionnaire : `!pnpm cockpit:crawl` sur un
+ * projet pnpm, `!npm run cockpit:crawl` sur npm. Les actions perso sont tapées
+ * telles quelles et refusent les sauts de ligne : une action multiligne serait
+ * une commande shell qui s'exécute ligne par ligne, ce qui n'est pas explicite
+ * au clic.
+ *
+ * Une action perso qui contient `\n` retourne une erreur dans le tableau.
+ */
+export function buildActions(
+  snapshot: Snapshot | null,
+  settings: SettingsType,
+): Array<Action | { label: string; error: string }> {
+  const packageManager = settings.packageManager
+
+  // Actions livrées, composées avec le gestionnaire
+  const delivered = [
+    {
+      label: `⟳ ${t('action.crawl')}`,
+      text: `!${composerCommande('cockpit:crawl', packageManager)}`,
+    },
+    {
+      label: `◆ ${t('action.graph')}`,
+      text: '/graphify',
+    },
+    {
+      label: `◈ ${t('action.graph_obsidian')}`,
+      text: '/graphify . --obsidian --obsidian-dir cockpit/obsidian/graphe',
+    },
+  ]
+
+  // Actions personnalisées, validées
+  const custom = (settings.customActions ?? []).map(action => {
+    // Rejette les sauts de ligne
+    if (action.text.includes('\n')) {
+      return {
+        label: action.label,
+        error: t('actions.newline_refused'),
+      }
+    }
+    return action
+  })
+
+  return [...delivered, ...custom]
 }

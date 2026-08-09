@@ -1,23 +1,8 @@
 import { frDate, tablesFrom, type GraphifyGraph, type Snapshot } from '../data'
+import { t } from '../i18n'
 import { s } from '../style'
 
 type Source = Snapshot['graphSource']
-
-/**
- * D'où viennent les lignes. Le badge ne doit jamais nommer la mauvaise source,
- * ni laisser croire qu'une déclaration manuscrite a été lue dans le code.
- */
-const PROVENANCE: Record<'graphify' | 'obsidian', { badge: string; intro: string }> = {
-  graphify: {
-    badge: 'lu depuis Graphify',
-    intro: 'Introspection reconstruite à chaque commit. Le cockpit ne recalcule rien.',
-  },
-  obsidian: {
-    badge: 'déclaré dans le coffre Obsidian',
-    intro:
-      'Ces lignes sont déclarées à la main dans les notes « type: table » du coffre : elles disent ce que leur auteur a écrit, pas ce que le code contient. La date de chacune est la seule chose qui permette d’en juger.',
-  },
-}
 
 /**
  * Ce qu'on dit quand il n'y a aucune ligne.
@@ -29,22 +14,80 @@ const PROVENANCE: Record<'graphify' | 'obsidian', { badge: string; intro: string
 function vide(source: Source): { titre: string; detail: string } {
   if (source === 'obsidian') {
     return {
-      titre: 'Aucune note « type: table » dans le coffre.',
-      detail:
-        'Une note devient une table quand son frontmatter porte `type: table`. Ses colonnes se déclarent dans `columns`, sa date de mise à jour dans `maj`, et les notes qui la citent en wikilink en deviennent les usages.',
+      titre: t('donnees.no_obsidian_note'),
+      detail: t('donnees.obsidian_note_detail'),
     }
   }
   if (source === 'graphify') {
     return {
-      titre: 'Aucun schéma de base détecté par Graphify dans ce projet.',
-      detail: 'Ce n’est pas une panne : ce projet n’a pas de base à cartographier.',
+      titre: t('donnees.no_graphify_schema'),
+      detail: t('donnees.no_graphify_detail'),
     }
   }
   return {
-    titre: 'Aucune source de graphe pour ce projet.',
-    detail:
-      'Lancer Graphify, ou désigner un coffre Obsidian avec le champ `obsidianVault` de `cockpit.config.json`.',
+    titre: t('donnees.no_graph_source'),
+    detail: t('donnees.no_graph_source_detail'),
   }
+}
+
+/**
+ * Alerte quand la source demandee manque.
+ */
+function SourceAlert({
+  sourceRequested,
+  config,
+}: {
+  sourceRequested?: string
+  config: { obsidianVault?: string } | null
+}) {
+  if (!sourceRequested || sourceRequested === 'auto') return null
+
+  if (sourceRequested === 'graphify') {
+    return (
+      <div
+        style={s(
+          'background: var(--theme-bg-alerte); border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
+        )}
+      >
+        <div style={s('font-weight: 500; margin-bottom: 6px;')}>{t('donnees.graphify_missing_title')}</div>
+        <div style={s('color: var(--color-warning-300);')}>
+          {t('donnees.graphify_missing')}
+        </div>
+      </div>
+    )
+  }
+
+  if (sourceRequested === 'obsidian') {
+    if (!config?.obsidianVault) {
+      return (
+        <div
+          style={s(
+            'background: var(--theme-bg-alerte); border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
+          )}
+        >
+          <div style={s('font-weight: 500; margin-bottom: 6px;')}>{t('donnees.obsidian_unconfigured_title')}</div>
+          <div style={s('color: var(--color-warning-300);')}>
+            {t('donnees.obsidian_unconfigured')}
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div
+        style={s(
+          'background: var(--theme-bg-alerte); border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
+        )}
+      >
+        <div style={s('font-weight: 500; margin-bottom: 6px;')}>{t('donnees.obsidian_unreadable_title')}</div>
+        <div style={s('color: var(--color-warning-300);')}>
+          {t('donnees.obsidian_unreadable')} <code>{config.obsidianVault}</code>
+        </div>
+      </div>
+    )
+  }
+
+  return null
 }
 
 /** Une table sans date le dit. C'est une information, pas un trou d'affichage. */
@@ -65,9 +108,7 @@ function CoffreIgnore() {
         'font-size: 11px; color: var(--color-neutral-500); margin-bottom: 18px; padding-left: 10px; border-left: 1px solid var(--color-neutral-700);',
       )}
     >
-      Un coffre Obsidian est déclaré dans <code>cockpit.config.json</code>, mais il n’est pas
-      lu : Graphify a produit un graphe, et il vient du code plutôt que d’une saisie. Retirer
-      <code> graphify-out/</code> pour lire le coffre à la place.
+      {t('donnees.vault_ignored')}
     </div>
   )
 }
@@ -84,13 +125,31 @@ function confStyle(conf: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS'): string {
 export function Donnees({
   graph,
   source,
+  sourceRequested,
+  sourceMissing,
+  sourceDate,
   vaultDeclared = false,
+  config = null,
 }: {
   graph: GraphifyGraph | null
   source: Source
-  /** Un `obsidianVault` est posé en config. Sert à ne pas l'ignorer en silence. */
+  sourceRequested?: string
+  sourceMissing?: boolean
+  sourceDate?: string | null
   vaultDeclared?: boolean
+  config?: { obsidianVault?: string } | null
 }) {
+  const PROVENANCE: Record<'graphify' | 'obsidian', { badge: string; intro: string }> = {
+    graphify: {
+      badge: t('donnees.from_graphify'),
+      intro: t('donnees.graphify_intro'),
+    },
+    obsidian: {
+      badge: t('donnees.from_obsidian'),
+      intro: t('donnees.obsidian_intro'),
+    },
+  }
+
   const tables = tablesFrom(graph)
   const provenance = source ? PROVENANCE[source] : null
   const rien = vide(source)
@@ -102,14 +161,17 @@ export function Donnees({
     <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
       <div style={s('display: flex; align-items: baseline; gap: 10px;')}>
         <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
-          Tables
+          {t('donnees.title')}
         </h2>
         {provenance && (
           <span className="tag tag-accent" style={s('font-size: 10.5px;')}>
             {provenance.badge}
+            {sourceDate && ` — ${sourceDate}`}
           </span>
         )}
       </div>
+
+      {sourceMissing && <SourceAlert sourceRequested={sourceRequested} config={config} />}
 
       {tables.length === 0 ? (
         <div>
@@ -129,27 +191,27 @@ export function Donnees({
             <thead>
               <tr>
                 <th>Table</th>
-                <th>Colonnes</th>
-                <th>Utilisée par</th>
-                <th>{source === 'obsidian' ? 'Déclaré' : 'Confiance'}</th>
+                <th>{t('donnees.col_header')}</th>
+                <th>{t('donnees.used_header')}</th>
+                <th>{source === 'obsidian' ? t('donnees.declared_header') : t('donnees.confidence_header')}</th>
               </tr>
             </thead>
             <tbody>
-              {tables.map((t) => (
-                <tr key={t.name}>
-                  <td style={s('font-family: ui-monospace, monospace;')}>{t.name}</td>
-                  <td style={s('color: var(--color-neutral-500);')}>{t.cols}</td>
-                  <td style={s('color: var(--color-neutral-400);')}>{t.used}</td>
+              {tables.map((table) => (
+                <tr key={table.name}>
+                  <td style={s('font-family: ui-monospace, monospace;')}>{table.name}</td>
+                  <td style={s('color: var(--color-neutral-500);')}>{table.cols}</td>
+                  <td style={s('color: var(--color-neutral-400);')}>{table.used}</td>
                   <td>
                     {/* `declared` posé — même à null — signe une ligne du coffre.
                         Elle n'a pas de confiance à afficher : elle a une date, ou
                         l'aveu qu'elle n'en a pas. */}
-                    {t.declared === undefined ? (
-                      <span style={s(confStyle(t.conf))}>{t.conf}</span>
-                    ) : t.declared ? (
-                      <span style={s('color: var(--color-neutral-400);')}>{frDate(t.declared)}</span>
+                    {table.declared === undefined ? (
+                      <span style={s(confStyle(table.conf))}>{table.conf}</span>
+                    ) : table.declared ? (
+                      <span style={s('color: var(--color-neutral-400);')}>{frDate(table.declared)}</span>
                     ) : (
-                      <span style={s(NON_DATE)}>non daté</span>
+                      <span style={s(NON_DATE)}>{t('donnees.no_date')}</span>
                     )}
                   </td>
                 </tr>

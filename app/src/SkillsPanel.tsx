@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 
 import { fetchSkills, installSkills, type SkillEntry } from './data'
 import { s } from './style'
+import { t } from './i18n'
 
 /**
  * Un skill installé ne sert à rien s'il ne l'est pas au bon endroit : Claude
@@ -53,7 +54,7 @@ export function SkillsList({
             />
           ) : (
             <span
-              title={skill.installe ? 'déjà en place' : 'à installer vous-même'}
+              title={skill.installe ? t('a11y.skill_installed') : t('a11y.skill_to_install')}
               style={s('margin-top: 1px; font-size: 12px; color: var(--color-neutral-600);')}
             >
               {skill.installe ? '✓' : '·'}
@@ -74,13 +75,13 @@ export function SkillsList({
               >
                 {skill.source === 'externe'
                   ? skill.installe
-                    ? 'détecté'
-                    : 'externe'
+                    ? t('skills.detected')
+                    : t('skills.external')
                   : skill.installe
                     ? skill.aJour
-                      ? 'à jour'
-                      : 'mise à jour'
-                    : 'à installer'}
+                      ? t('skills.up_to_date')
+                      : t('skills.update_available')
+                    : t('skills.install_needed')}
               </span>
             </label>
 
@@ -92,7 +93,7 @@ export function SkillsList({
                 commande est là pour être copiée, pas pour être lancée d'ici. */}
             {skill.source === 'externe' && !skill.installe && skill.commande && (
               <div style={s('font-size: 11px; color: var(--color-neutral-600); margin-top: 5px;')}>
-                À installer vous-même : <code>{skill.commande}</code>
+                {t('skills.install_yourself')} <code>{skill.commande}</code>
               </div>
             )}
           </div>
@@ -174,7 +175,7 @@ export function SkillsModal({ onClose }: { onClose: () => void }) {
       <div
         onClick={event => event.stopPropagation()}
         style={s(
-          'width: min(560px, 100%); max-height: 100%; overflow: auto; background: #13141f; border: 1px solid var(--color-divider); border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px;',
+          'width: min(560px, 100%); max-height: 100%; overflow: auto; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px;',
         )}
       >
         <div style={s('display: flex; align-items: baseline; gap: 10px;')}>
@@ -183,17 +184,16 @@ export function SkillsModal({ onClose }: { onClose: () => void }) {
               'font-family: var(--font-heading); font-weight: 500; font-size: 16px; margin: 0;',
             )}
           >
-            Skills Claude Code
+            {t('skills.title')}
           </h2>
           <div style={s('flex: 1;')} />
           <button type="button" className="btn btn-ghost" onClick={onClose}>
-            Fermer
+            {t('skills.close')}
           </button>
         </div>
 
         <div style={s('font-size: 11.5px; color: var(--color-neutral-600);')}>
-          Installés dans <code>~/.claude/skills/</code>, hors de tout projet. Ce sont eux qui
-          apprennent à Claude Code à lire le cockpit et à y déposer des tickets.
+          {t('skills.installed_in')} <code>~/.claude/skills/</code>, {t('skills.learn_cockpit')}
         </div>
 
         <SkillsList skills={skills} choisis={choisis} onChoisis={setChoisis} />
@@ -233,10 +233,10 @@ export function SkillsModal({ onClose }: { onClose: () => void }) {
           }}
         >
           {busy
-            ? 'Installation…'
+            ? t('skills.installing')
             : choisis.length === 0
-              ? 'Rien à installer'
-              : `Installer ${choisis.length} skill(s)`}
+              ? t('skills.nothing_to_install')
+              : t('skills.install_count', { count: choisis.length })}
         </button>
       </div>
     </div>

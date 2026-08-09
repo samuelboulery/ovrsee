@@ -330,7 +330,7 @@ const ticketPath = (cockpitDir, file) => join(cockpitDir, 'tickets', requireFile
  * Crée un ticket et l'écrit.
  *
  * @param {string} cockpitDir
- * @param {{titre: string, colonne?: string, priorite?: string, tags?: string[], corps?: string, plan?: string|null}} champs
+ * @param {{titre: string, colonne?: string, priorite?: string, tags?: string[], corps?: string, plan?: string|null, type?: string, epic?: string}} champs
  * @param {Date} [now]
  * @returns {{file: string, meta: object, body: string}}
  */
@@ -353,6 +353,21 @@ export function createTicket(cockpitDir, champs, now = new Date()) {
     maj: date,
     plan: champs?.plan ?? null,
   }
+
+  // Valider et ajouter type si présent
+  if (champs?.type !== undefined && champs.type !== null) {
+    if (champs.type !== 'epic') throw new Error('type doit valoir "epic" ou être absent')
+    meta.type = champs.type
+  }
+
+  // Valider et ajouter epic si présent
+  if (champs?.epic !== undefined && champs.epic !== null) {
+    if (typeof champs.epic !== 'string' || !/^T-\d+$/.test(champs.epic)) {
+      throw new Error('epic doit être un ID T-XXXX ou être absent')
+    }
+    meta.epic = champs.epic
+  }
+
   const body = String(champs?.corps ?? '').trim() + '\n'
   const file = ticketFileName(meta.id, titre)
 
@@ -397,12 +412,12 @@ export function moveTicket(cockpitDir, file, colonne, now = new Date()) {
 }
 
 /**
- * Modifie le contenu d'un ticket : titre, priorité, tags, plan lié, corps.
+ * Modifie le contenu d'un ticket : titre, priorité, tags, plan lié, corps, type, epic.
  *
  * Le fichier n'est jamais renommé quand le titre change : l'identifiant est la
  * clé, et renommer casserait toute référence déjà écrite ailleurs.
  *
- * @param {{titre?: string, priorite?: string, tags?: string[], plan?: string|null, corps?: string}} patch
+ * @param {{titre?: string, priorite?: string, tags?: string[], plan?: string|null, corps?: string, type?: string|null, epic?: string|null}} patch
  */
 export function updateTicket(cockpitDir, file, patch, now = new Date()) {
   requireFile(file)
@@ -421,6 +436,24 @@ export function updateTicket(cockpitDir, file, patch, now = new Date()) {
       if (patch?.priorite !== undefined) meta.priorite = patch.priorite
       if (patch?.tags !== undefined) meta.tags = Array.isArray(patch.tags) ? patch.tags.map(String) : []
       if (patch?.plan !== undefined) meta.plan = patch.plan ?? null
+
+      // Gérer type
+      if (patch?.type !== undefined && patch.type !== null) {
+        if (patch.type !== 'epic') throw new Error('type doit valoir "epic" ou être absent')
+        meta.type = patch.type
+      } else if (patch?.type === null) {
+        delete meta.type
+      }
+
+      // Gérer epic
+      if (patch?.epic !== undefined && patch.epic !== null) {
+        if (typeof patch.epic !== 'string' || !/^T-\d+$/.test(patch.epic)) {
+          throw new Error('epic doit être un ID T-XXXX ou être absent')
+        }
+        meta.epic = patch.epic
+      } else if (patch?.epic === null) {
+        delete meta.epic
+      }
 
       const body = patch?.corps === undefined ? ticket.body : String(patch.corps).trim() + '\n'
       return { meta, body }
@@ -458,6 +491,10 @@ export function colonneFinale(colonnes) {
  * Pas de champ de rang : le réordonnancement manuel obligerait à réécrire
  * plusieurs fichiers à chaque glissement, pour une information que la priorité
  * porte déjà. Si le rang manque un jour, il s'ajoutera.
+ *
+ * Les epics et les tickets ordinaires se trient ensemble — les epics ne sont
+ * pas exclus du tri, c'est voulu, et ils apparaissent au même rang que les
+ * tickets ordinaires de même priorité.
  */
 export function sortTickets(tickets) {
   const rang = t => {
@@ -467,6 +504,38 @@ export function sortTickets(tickets) {
 
   return [...tickets].sort(
     (a, b) => rang(a) - rang(b) || String(b.meta?.cree ?? '').localeCompare(String(a.meta?.cree ?? '')),
+  )
+}
+
+/**
+ * Les enfants d'un epic, triés par priorité puis date.
+ *
+ * @param {Array<{meta: object}>} tickets
+ * @param {string} epicId l'ID du ticket parent (ex. "T-0021")
+ * @returns {Array<{meta: object}>}
+ */
+export function childrenOf(tickets, epicId) {
+  return sortTickets(tickets.filter(t => t.meta?.epic === epicId))
+}
+
+/**
+ * Les enfants pointant un epic inexistant.
+ *
+ * Un enfant dont l'epic a été supprimé reste un ticket ordinaire orphelin,
+ * sans erreur bloquante. Aucune validation complexe — juste une tolérance.
+ *
+ * @param {Array<{meta: object}>} tickets
+ * @param {Array<{id: string}>} colonnes (inutilisé pour l'instant, pour compatibilité)
+ * @returns {Array<{meta: object}>}
+ */
+export function orphanChildren(tickets) {
+  const epicIds = new Set(
+    tickets
+      .filter(t => t.meta?.type === 'epic')
+      .map(t => t.meta?.id)
+  )
+  return tickets.filter(
+    t => t.meta?.epic && !epicIds.has(t.meta.epic)
   )
 }
 

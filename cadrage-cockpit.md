@@ -47,10 +47,20 @@ Objectif : réduire le coût de reprise en main, et garder la maîtrise d'un cod
 |---|---|
 | Construire la cartographie technique et la vue base de données | Graphify le fait mieux, gratuitement, et à jour à chaque commit |
 | Un objet `feature` | Non définissable de façon stable. Se calcule à partir des plans |
-| Serveur MCP | Inutile en mono-projet : Claude Code lit `/cockpit/` directement dans le repo |
 | Captures des états d'écran (modale, erreur, liste vide) | Reporté en v2 — coût élevé, bénéfice non démontré |
 | Gestion des accès et credentials | Un gestionnaire de mots de passe et un fichier `ACCESS.md` suffisent |
 | Application native Swift | Le terminal embarqué est aussi bon en web. Voir §6 |
+
+**Révision du cadrage — Serveur MCP**
+
+L'écart supposait un mono-projet consulté depuis Claude Code dans le dépôt courant.
+L'usage depuis Claude Desktop change cette prémisse : il n'y a pas de dépôt courant
+dans une fenêtre Claude, et le registre de projets (introduit pour le multi-projet
+lui-même) expose exactement ce qui manque. Le serveur MCP devient une traduction
+transparente des routes `/api/*` du serveur HTTP vers stdio JSON-RPC 2.0 : même
+interface, même validations (registre + symlinks refusés), ni lecture ni écriture
+en dehors de `cockpit/tickets/` et `cockpit/board.json`. Zéro dépendance, même
+standard de tests que `server/api.test.js`.
 
 ---
 

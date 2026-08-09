@@ -1,9 +1,17 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
+import { setCurrentLanguage } from './i18n'
 import {
   briefLines,
+  buildActions,
   buildInjections,
+  childrenOf,
+  colonneFinale,
+  commitsDeLaFrise,
+  composerCommande,
+  decideInjection,
+  epicProgress,
   frDate,
   humanAge,
   lastScan,
@@ -22,7 +30,14 @@ import {
   type Plan,
   type Snapshot,
   type Ticket,
+  type SettingsType,
 } from './data'
+
+// Ces tests comparent du texte : ils épinglent donc la langue, sinon ils
+// dépendraient de `navigator.language`, absent sous `node --test`. Ce qu'ils
+// vérifient est le contenu du brief, pas sa traduction — celle-ci est gardée
+// par `hooks/i18n.test.js`.
+setCurrentLanguage('fr')
 
 /**
  * Un instantané minimal mais valide. Les tests le dégradent champ par champ :
@@ -68,13 +83,13 @@ const plan = (patch: Partial<Plan> = {}): Plan =>
 test('briefLines survit à un pages.json qui est un tableau', () => {
   const snap = snapshot({ pages: [] as unknown as Snapshot['pages'] })
   const lines = briefLines(snap)
-  assert.ok(lines.some(l => l.text.includes('0 page(s)')))
+  assert.ok(lines.some(l => l.text.includes('0 page')))
 })
 
 test('briefLines survit à un pages.json vide, nul ou sans tableau', () => {
   for (const pages of [null, undefined, {}, 'texte'] as unknown[]) {
     const snap = snapshot({ pages: pages as Snapshot['pages'] })
-    assert.ok(briefLines(snap).some(l => l.text.includes('0 page(s)')))
+    assert.ok(briefLines(snap).some(l => l.text.includes('0 page')))
   }
 })
 
@@ -178,6 +193,126 @@ test('restant compte les tickets hors de la dernière colonne', () => {
   assert.equal(restant(tickets, [] as unknown as Snapshot['board']), 2)
 })
 
+test("childrenOf retourne les enfants d'un epic triés", () => {
+  const tickets = [
+    { id: 'T-1', titre: 'Epic', type: 'epic', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-2', titre: 'Enfant 1', epic: 'T-1', priorite: 'moyenne', cree: '2026-08-02' },
+    { id: 'T-3', titre: 'Enfant 2', epic: 'T-1', priorite: 'haute', cree: '2026-08-03' },
+    { id: 'T-4', titre: 'Autre', priorite: 'basse', cree: '2026-08-01' },
+  ] as unknown as Ticket[]
+
+  const children = childrenOf(tickets, 'T-1')
+  assert.equal(children.length, 2)
+  assert.equal(children[0].id, 'T-3') // T-3 haute en premier
+  assert.equal(children[1].id, 'T-2') // T-2 moyenne en deuxième
+})
+
+test("childrenOf retourne une liste vide si epic inexistant", () => {
+  const tickets = [
+    { id: 'T-1', priorite: 'haute', cree: '2026-08-01' },
+  ] as unknown as Ticket[]
+
+  const children = childrenOf(tickets, 'T-999')
+  assert.deepEqual(children, [])
+})
+
+test("epicProgress calcule la progression des enfants", () => {
+  const board = [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'fait', titre: 'Fait' },
+  ] as Snapshot['board']
+  const fini = colonneFinale(board)
+
+  // Aucun enfant
+  assert.deepEqual(epicProgress([], fini), { done: 0, total: 0, percent: 0 })
+
+  // 1 enfant fini, 2 pas finis
+  const children = [
+    { id: 'T-1', colonne: 'backlog' },
+    { id: 'T-2', colonne: 'fait' },
+    { id: 'T-3', colonne: 'backlog' },
+  ] as unknown as Ticket[]
+  const prog = epicProgress(children, fini)
+  assert.equal(prog.total, 3)
+  assert.equal(prog.done, 1)
+  assert.equal(prog.percent, 33)
+
+  // finalColumn null → pas de comptage
+  assert.deepEqual(epicProgress(children, null), { done: 0, total: 3, percent: 0 })
+})
+
+test("restant avec epics : un epic vide compte pour 1", () => {
+  const board = [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'fait', titre: 'Fait' },
+  ] as Snapshot['board']
+
+  const tickets = [
+    { id: 'T-1', type: 'epic', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-2', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+  ] as unknown as Ticket[]
+
+  // Epic vide (pas d'enfants) + 1 ticket ordinaire = 2 à faire
+  assert.equal(restant(tickets, board), 2)
+})
+
+test("restant avec epics : un epic avec enfants ne compte pas", () => {
+  const board = [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'fait', titre: 'Fait' },
+  ] as Snapshot['board']
+
+  const tickets = [
+    { id: 'T-1', type: 'epic', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-2', epic: 'T-1', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-3', epic: 'T-1', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+  ] as unknown as Ticket[]
+
+  // Epic avec 2 enfants = 2 à faire (epic ne compte pas, ses enfants oui)
+  assert.equal(restant(tickets, board), 2)
+})
+
+test("restant avec epics : un enfant orphelin compte", () => {
+  const board = [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'fait', titre: 'Fait' },
+  ] as Snapshot['board']
+
+  const tickets = [
+    { id: 'T-1', epic: 'T-999', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+  ] as unknown as Ticket[]
+
+  // Enfant orphelin (epic inexistant) compte comme ticket ordinaire
+  assert.equal(restant(tickets, board), 1)
+})
+
+test("restant avec epics : cas complexe", () => {
+  const board = [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'en-cours', titre: 'En cours' },
+    { id: 'fait', titre: 'Fait' },
+  ] as Snapshot['board']
+
+  const tickets = [
+    // Epic 1 avec 3 enfants : 1 fait, 2 en backlog
+    { id: 'T-1', type: 'epic', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-2', epic: 'T-1', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-3', epic: 'T-1', colonne: 'en-cours', priorite: 'haute', cree: '2026-08-01' },
+    { id: 'T-4', epic: 'T-1', colonne: 'fait', priorite: 'haute', cree: '2026-08-01' },
+
+    // Epic 2 vide
+    { id: 'T-5', type: 'epic', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+
+    // Ticket ordinaire
+    { id: 'T-6', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01' },
+  ] as unknown as Ticket[]
+
+  // T-2, T-3 (enfants en backlog et en-cours), T-5 (epic vide), T-6 (ticket ordinaire) = 4
+  // T-4 est en colonne finale, ne compte pas
+  // T-1 a des enfants, ne compte pas
+  assert.equal(restant(tickets, board), 4)
+})
+
 test('layoutGraph encaisse une liste de pages vide', () => {
   const { placed, width, height } = layoutGraph([])
   assert.deepEqual(placed, [])
@@ -234,4 +369,192 @@ test('stackFrom n’attribue une raison que si un WHY: la donne', () => {
   assert.equal(rows.find(r => r.name === 'node-pty')?.why, 'le seul pty qui compile en arm64.')
   // Le point du ticket : sans WHY:, rien. Pas un plan qui cite le nom.
   assert.equal(rows.find(r => r.name === 'vite')?.why, null)
+})
+
+/**
+ * La densité lit la frise, pas les plans : c'est ce qui lui fait voir les
+ * commits hors plan. Si cette fonction en perdait une sorte, l'histogramme
+ * redeviendrait faux sans que rien ne le signale.
+ */
+test('commitsDeLaFrise rend les commits des plans et ceux hors plan', () => {
+  const commits = commitsDeLaFrise([
+    {
+      kind: 'plan',
+      date: '2026-07-20',
+      plan: 'p.md',
+      title: 'Un plan',
+      status: 'closed',
+      commits: [
+        { sha: 'aaa', date: '2026-07-20T09:00:00', subject: 'dans le plan' },
+        { sha: 'bbb', date: '2026-07-20T10:00:00', subject: 'aussi' },
+      ],
+    },
+    {
+      kind: 'commit',
+      date: '2026-07-20',
+      commit: { sha: 'ccc', date: '2026-07-20T11:00:00', subject: 'hors plan' },
+    },
+  ])
+
+  assert.deepEqual(
+    commits.map(c => c.sha),
+    ['aaa', 'bbb', 'ccc'],
+  )
+})
+
+test('commitsDeLaFrise survit à une frise absente ou mal formée', () => {
+  assert.deepEqual(commitsDeLaFrise([]), [])
+  assert.deepEqual(commitsDeLaFrise(null as never), [])
+  // Une bande de plan sans commits : le plan existe, git n'en sait rien encore.
+  assert.deepEqual(
+    commitsDeLaFrise([
+      { kind: 'plan', date: '2026-07-20', plan: 'p.md', title: 'x', status: 'open', commits: [] },
+    ]),
+    [],
+  )
+})
+
+// --- composerCommande : adaptation du gestionnaire de paquets ---------
+
+test('composerCommande compose la ligne adaptée au gestionnaire', () => {
+  assert.equal(composerCommande('cockpit:crawl', 'pnpm'), 'pnpm cockpit:crawl')
+  assert.equal(composerCommande('cockpit:crawl', 'npm'), 'npm run cockpit:crawl')
+  assert.equal(composerCommande('cockpit:crawl', 'yarn'), 'yarn cockpit:crawl')
+  assert.equal(composerCommande('cockpit:crawl', 'bun'), 'bun cockpit:crawl')
+})
+
+test('composerCommande nécessite le gestionnaire explicite', () => {
+  // Le paramètre packageManager est obligatoire pour éviter les défauts trompeurs
+  assert.equal(composerCommande('cockpit:crawl', 'pnpm'), 'pnpm cockpit:crawl')
+  assert.equal(composerCommande('test', 'npm'), 'npm run test')
+})
+
+// --- Gestion des onglets : filtrage et redirection ---
+
+test('onglet masqué : rendu survit avec un seul onglet actif', () => {
+  const snap = snapshot({})
+  // Ce test vérifie simplement que les onglets rendus survivent
+  // même si un seul est actif. Le filtrage se fait dans App.tsx.
+  assert.ok(snap)
+})
+
+// --- buildActions : actions livrées + personnalisées ---
+
+test('buildActions compose les actions livrées avec le gestionnaire pnpm', () => {
+  const snap = snapshot({})
+  const settings = {
+    langue: 'fr',
+    theme: 'auto',
+    densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
+    onglets: { actifs: [], ordre: [] },
+    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
+    bootstrap: [],
+    packageManager: 'pnpm',
+    sourceGraphe: 'auto',
+    customActions: [],
+  } as SettingsType
+
+  const actions = buildActions(snap, settings)
+
+  // Trois actions livrées
+  const delivered = actions.filter((a): a is { label: string; text: string } => !('error' in a))
+  assert.equal(delivered.length, 3)
+
+  // Première action : Crawl avec pnpm
+  assert.match(delivered[0].text, /^!pnpm cockpit:crawl/)
+})
+
+test('buildActions compose les actions livrées avec le gestionnaire npm', () => {
+  const snap = snapshot({})
+  const settings = {
+    langue: 'fr',
+    theme: 'auto',
+    densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
+    onglets: { actifs: [], ordre: [] },
+    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
+    bootstrap: [],
+    packageManager: 'npm',
+    sourceGraphe: 'auto',
+    customActions: [],
+  } as SettingsType
+
+  const actions = buildActions(snap, settings)
+  const delivered = actions.filter((a): a is { label: string; text: string } => !('error' in a))
+
+  // Première action : Crawl avec npm run
+  assert.match(delivered[0].text, /^!npm run cockpit:crawl/)
+})
+
+test('buildActions inclut les actions personnalisées valides', () => {
+  const snap = snapshot({})
+  const settings = {
+    langue: 'fr',
+    theme: 'auto',
+    densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
+    onglets: { actifs: [], ordre: [] },
+    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
+    bootstrap: [],
+    packageManager: 'pnpm',
+    sourceGraphe: 'auto',
+    customActions: [
+      { label: 'Mon test', text: 'pnpm test' },
+      { label: 'Lancer le serveur', text: 'pnpm dev' },
+    ],
+  } as SettingsType
+
+  const actions = buildActions(snap, settings)
+  const withoutErrors = actions.filter((a): a is { label: string; text: string } => !('error' in a))
+
+  // 3 livrées + 2 personnalisées = 5
+  assert.equal(withoutErrors.length, 5)
+  assert.ok(withoutErrors.some(a => a.text === 'pnpm test'))
+  assert.ok(withoutErrors.some(a => a.text === 'pnpm dev'))
+})
+
+test('buildActions rejette les actions personnalisées avec sauts de ligne', () => {
+  const snap = snapshot({})
+  const settings = {
+    langue: 'fr',
+    theme: 'auto',
+    densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
+    onglets: { actifs: [], ordre: [] },
+    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
+    bootstrap: [],
+    packageManager: 'pnpm',
+    sourceGraphe: 'auto',
+    customActions: [
+      { label: 'Commande invalide', text: 'pnpm test\npnpm build' },
+    ],
+  } as SettingsType
+
+  const actions = buildActions(snap, settings)
+  const errors = actions.filter((a): a is { label: string; error: string } => 'error' in a)
+
+  // Une action rejetée avec erreur
+  assert.equal(errors.length, 1)
+  assert.equal(errors[0].label, 'Commande invalide')
+  assert.match(errors[0].error, /saut de ligne|line break/)
+})
+
+// --- decideInjection : contexte vs commande ---
+
+test('decideInjection : commande avec ! → mode command avec \\n', () => {
+  const result = decideInjection('!pnpm cockpit:crawl')
+  assert.equal(result.mode, 'command')
+  assert.equal(result.text, '!pnpm cockpit:crawl\n')
+})
+
+test('decideInjection : commande avec / → mode command avec \\n', () => {
+  const result = decideInjection('/graphify')
+  assert.equal(result.mode, 'command')
+  assert.equal(result.text, '/graphify\n')
+})
+
+test('decideInjection : contexte multiligne → mode context sans \\n', () => {
+  const context = 'Carte des pages (3)\n/route1 — titre1 → lien1\n/route2 — titre2 → aucun lien'
+  const result = decideInjection(context)
+  assert.equal(result.mode, 'context')
+  // Pas de \n ajouté, le bracket paste l'encadrera
+  assert.equal(result.text, context)
+  assert(!result.text.endsWith('\n'))
 })

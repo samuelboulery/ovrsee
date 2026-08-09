@@ -17,8 +17,9 @@ import { readBoard, readTickets } from './tickets.js'
 import { readVault } from './vault.js'
 import { readWhys } from './whys.js'
 import { timeline } from './timeline.js'
+import { readSettings, mergeSettings } from './settings.js'
 
-const readJson = path => {
+export const readJson = path => {
   try {
     return JSON.parse(readFileSync(path, 'utf8'))
   } catch {
@@ -208,20 +209,35 @@ export const vaultPath = (root, declare) => {
 }
 
 /**
+ * Date de modification d'un fichier, au format ISO, ou null.
+ *
+ * Utilisé pour dater le graphe Graphify et obtenir la mtime la plus récente
+ * du coffre Obsidian.
+ */
+function fileDate(path) {
+  try {
+    const stat = statSync(path)
+    return new Date(stat.mtime).toISOString().split('T')[0]
+  } catch {
+    return null
+  }
+}
+
+/**
  * Le graphe du projet, et d'où il vient.
+ *
+ * Trois niveaux de résolution pour `sourceGraphe` :
+ * 1. Défaut : `'auto'` (Graphify si présent, sinon Obsidian)
+ * 2. Profil global : `~/.claude/cockpit/settings.json`
+ * 3. Dépôt : `cockpit.config.json` (plus spécifique prime)
+ *
+ * Retour enrichi : `{ graph, graphSource, sourceRequested, sourceMissing, sourceDate }`
  *
  * Deux sources possibles, jamais fusionnées : `graphify-out/graph.json`, écrit
  * par Graphify, ou un coffre Obsidian désigné par `obsidianVault` dans
  * `cockpit.config.json`. Fusionner deux vocabulaires d'identifiants coûterait
  * plus que la fonctionnalité ne rapporte, et l'interface ne saurait plus dire
  * d'où vient une ligne.
- *
- * **Graphify l'emporte, le coffre est un repli.** Le cadrage écarte de construire
- * la vue base de données précisément parce que Graphify « le fait mieux, et à
- * jour à chaque commit » (§3) : son graphe vient d'une analyse du code, celui du
- * coffre de ce que quelqu'un a tapé. Recouvrir le premier par le second, c'est
- * la dérive que le cadrage interdit — et un Graphify qui ne trouve aucune table
- * énonce un fait vrai, pas une lacune à combler.
  *
  * Un coffre déclaré et ignoré pour cette raison ne doit pas devenir un no-op
  * muet : l'onglet Données le dit, en dérivant l'information de `config`.
@@ -231,19 +247,109 @@ export const vaultPath = (root, declare) => {
  * dedans. Ce que `readVault` en lit reste borné : les `.md` seuls, leur
  * frontmatter et leurs wikilinks, jamais leur corps.
  *
- * @returns {{graph: object|null, graphSource: 'graphify'|'obsidian'|null}}
+ * @returns {{graph: object|null, graphSource: 'graphify'|'obsidian'|null, sourceRequested: string, sourceMissing: boolean, sourceDate: string|null}}
  */
 function readGraph(root, config) {
-  const graphify = readJson(join(root, 'graphify-out', 'graph.json'))
-  if (graphify) return { graph: graphify, graphSource: 'graphify' }
+  // Résolution à trois niveaux : défaut → profil global → config projet
+  const globalSettings = readSettings()
+  const merged = mergeSettings(globalSettings, config)
+  const sourceChoice = merged?.sourceGraphe ?? 'auto'
+
+  const graphifyPath = join(root, 'graphify-out', 'graph.json')
+  const graphifyGraph = readJson(graphifyPath)
+  const graphifyDate = graphifyGraph ? fileDate(graphifyPath) : null
 
   const declare = config?.obsidianVault
-  if (typeof declare === 'string' && declare.trim().length > 0) {
-    const graph = readVault(vaultPath(root, declare.trim()))
-    if (graph) return { graph, graphSource: 'obsidian' }
+  const obsidianPath = typeof declare === 'string' && declare.trim().length > 0 ? vaultPath(root, declare.trim()) : null
+  const obsidianGraph = obsidianPath ? readVault(obsidianPath) : null
+  const obsidianDate = obsidianGraph ? getVaultDate(obsidianPath) : null
+
+  // Cas 1 : source explicite demandée
+  if (sourceChoice === 'graphify') {
+    return {
+      graph: graphifyGraph,
+      graphSource: graphifyGraph ? 'graphify' : null,
+      sourceRequested: 'graphify',
+      sourceMissing: !graphifyGraph,
+      sourceDate: graphifyDate,
+    }
   }
 
-  return { graph: null, graphSource: null }
+  if (sourceChoice === 'obsidian') {
+    return {
+      graph: obsidianGraph,
+      graphSource: obsidianGraph ? 'obsidian' : null,
+      sourceRequested: 'obsidian',
+      sourceMissing: !obsidianGraph,
+      sourceDate: obsidianDate,
+    }
+  }
+
+  // Cas 2 : 'auto' — Graphify l'emporte, Obsidian en repli
+  if (graphifyGraph) {
+    return {
+      graph: graphifyGraph,
+      graphSource: 'graphify',
+      sourceRequested: 'auto',
+      sourceMissing: false,
+      sourceDate: graphifyDate,
+    }
+  }
+
+  if (obsidianGraph) {
+    return {
+      graph: obsidianGraph,
+      graphSource: 'obsidian',
+      sourceRequested: 'auto',
+      sourceMissing: false,
+      sourceDate: obsidianDate,
+    }
+  }
+
+  // Cas 3 : rien n'est disponible
+  return {
+    graph: null,
+    graphSource: null,
+    sourceRequested: 'auto',
+    sourceMissing: false,
+    sourceDate: null,
+  }
+}
+
+/**
+ * La date de modification la plus récente d'un coffre Obsidian.
+ *
+ * Itère sur les fichiers du coffre et retourne le mtime le plus récent,
+ * au format ISO.
+ */
+function getVaultDate(vaultRoot) {
+  try {
+    if (!existsSync(vaultRoot) || !statSync(vaultRoot).isDirectory()) return null
+
+    let maxMtime = 0
+    const parcourir = dir => {
+      try {
+        const entries = readdirSync(dir, { withFileTypes: true })
+        for (const entry of entries) {
+          if (entry.name.startsWith('.')) continue
+          const full = join(dir, entry.name)
+          if (entry.isDirectory()) {
+            parcourir(full)
+          } else if (entry.isFile() && entry.name.endsWith('.md')) {
+            const stat = statSync(full)
+            maxMtime = Math.max(maxMtime, stat.mtimeMs)
+          }
+        }
+      } catch {
+        // Aucun fichier trouvé
+      }
+    }
+
+    parcourir(vaultRoot)
+    return maxMtime > 0 ? new Date(maxMtime).toISOString().split('T')[0] : null
+  } catch {
+    return null
+  }
 }
 
 /** Tout ce que l'interface doit lire pour un projet, en une réponse. */

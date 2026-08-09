@@ -14,12 +14,15 @@
 
 import { createReadStream, existsSync, lstatSync, readFileSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'
+import { execFileSync } from 'node:child_process'
 
+import { readConfigClaude } from '../hooks/config-claude.js'
 import { install } from '../hooks/install.js'
 import { exportVault } from '../hooks/obsidian.js'
 import { registerProject, touchProject, unregisterProject } from '../hooks/plans.js'
+import { readSettings, writeSettings, validateSettings, mergeSettings } from '../hooks/settings.js'
 import { installSkills, readSkills } from '../hooks/skills.js'
-import { projects, snapshot, shotPath, tableau } from '../hooks/snapshot.js'
+import { projects, snapshot, shotPath, tableau, readJson } from '../hooks/snapshot.js'
 import {
   addColumn,
   createTicket,
@@ -45,6 +48,45 @@ const usableDirectory = path =>
   existsSync(path) &&
   !lstatSync(path).isSymbolicLink() &&
   lstatSync(path).isDirectory()
+
+/**
+ * État détecté d'un dossier : est-ce un dépôt git ? a-t-il un lockfile ?
+ * cockpit.config.json ? Est-ce équipé ?
+ */
+function getFolderState(root) {
+  const hasGit = (() => {
+    try {
+      execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: root, stdio: 'ignore' })
+      return true
+    } catch {
+      return false
+    }
+  })()
+
+  const hasLockfile = ['pnpm-lock.yaml', 'package-lock.json', 'yarn.lock', 'bun.lockb']
+    .some(name => existsSync(join(root, name)))
+
+  const hasConfig = existsSync(join(root, 'cockpit.config.json'))
+
+  try {
+    const snap = snapshot(root)
+    return {
+      isGit: hasGit,
+      hasLockfile,
+      hasConfig,
+      equipped: snap.equipped,
+      hasPackageJson: snap.packageJson !== null,
+    }
+  } catch {
+    return {
+      isGit: hasGit,
+      hasLockfile,
+      hasConfig,
+      equipped: false,
+      hasPackageJson: existsSync(join(root, 'package.json')),
+    }
+  }
+}
 
 /**
  * Ajout, retrait, remontée en tête, initialisation.
@@ -86,6 +128,11 @@ function projectAction(body, cwd) {
       } catch (err) {
         return { status: 400, json: { error: String(err.message ?? err) } }
       }
+    }
+
+    case 'state': {
+      if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
+      return { json: getFolderState(path) }
     }
 
     case 'init': {
@@ -205,6 +252,46 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
       } catch (err) {
         return { status: 400, json: { error: String(err.message ?? err) } }
       }
+    }
+
+    case '/api/config-claude': {
+      // Configuration Claude Code : agents, commands, plugins, hooks, env.
+      // Lecture seule, GET uniquement. Masquage des secrets effectué côté serveur.
+      if (method !== 'GET') return { status: 405, json: { error: 'méthode non permise' } }
+      try {
+        return { json: readConfigClaude() }
+      } catch (err) {
+        return { status: 400, json: { error: String(err.message ?? err) } }
+      }
+    }
+
+    case '/api/settings': {
+      // L'en-tête vérification d'abord pour les écritures
+      if (method === 'POST' && headers['x-cockpit'] !== '1') {
+        return { status: 403, json: { error: 'en-tête X-Cockpit manquant' } }
+      }
+
+      const askedPath = url.searchParams.get('path')
+
+      if (method === 'GET') {
+        // Sans projet : rendre le profil global seul (onboarding C1)
+        if (!askedPath) return { json: readSettings() }
+
+        // Avec projet : refuser si absent du registre
+        const root = projects(cwd).find(p => p.path === askedPath)?.path ?? null
+        if (!root) return { status: 404, json: { error: 'inconnu' } }
+
+        // Fusionner global + projet — réutilise readJson de snapshot.js
+        const projectConfig = readJson(join(root, 'cockpit.config.json')) ?? {}
+        return { json: mergeSettings(readSettings(), projectConfig) }
+      }
+
+      if (method === 'POST') {
+        writeSettings(validateSettings(body, readSettings()))
+        return { json: readSettings() }
+      }
+
+      return { status: 405, json: { error: 'méthode non permise' } }
     }
 
     case '/api/tickets': {

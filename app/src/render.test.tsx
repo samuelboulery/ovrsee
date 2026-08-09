@@ -55,6 +55,36 @@ const DEGRADES: Array<[string, Snapshot]> = [
   ['tickets et board absents', snapshot({ board: undefined, tickets: undefined })],
   ['captures absentes', snapshot({ shots: undefined })],
   ['readme absent', snapshot({ readme: undefined })],
+  [
+    'epic avec enfants',
+    snapshot({
+      board: [{ id: 'backlog', titre: 'Backlog' }, { id: 'fait', titre: 'Fait' }],
+      tickets: [
+        { id: 'T-1', file: 'T-0001-epic.md', titre: 'Epic', type: 'epic', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01', maj: '2026-08-01', plan: null, tags: [], corps: '' },
+        { id: 'T-2', file: 'T-0002-enfant.md', titre: 'Enfant', epic: 'T-1', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01', maj: '2026-08-01', plan: null, tags: [], corps: '' },
+        { id: 'T-3', file: 'T-0003-enfant2.md', titre: 'Enfant 2', epic: 'T-1', colonne: 'fait', priorite: 'moyenne', cree: '2026-08-01', maj: '2026-08-01', plan: null, tags: [], corps: '' },
+      ],
+    }),
+  ],
+  [
+    'enfant orphelin',
+    snapshot({
+      board: [{ id: 'backlog', titre: 'Backlog' }, { id: 'fait', titre: 'Fait' }],
+      tickets: [
+        { id: 'T-1', file: 'T-0001-orphelin.md', titre: 'Orphelin', epic: 'T-999', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01', maj: '2026-08-01', plan: null, tags: [], corps: '' },
+      ],
+    }),
+  ],
+  [
+    "boucle d'epics",
+    snapshot({
+      board: [{ id: 'backlog', titre: 'Backlog' }, { id: 'fait', titre: 'Fait' }],
+      tickets: [
+        { id: 'T-1', file: 'T-0001-epic1.md', titre: 'Epic 1', type: 'epic', epic: 'T-2', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01', maj: '2026-08-01', plan: null, tags: [], corps: '' },
+        { id: 'T-2', file: 'T-0002-epic2.md', titre: 'Epic 2', type: 'epic', epic: 'T-1', colonne: 'backlog', priorite: 'haute', cree: '2026-08-01', maj: '2026-08-01', plan: null, tags: [], corps: '' },
+      ],
+    }),
+  ],
 ]
 
 const RENDUS: Array<[string, (snap: Snapshot) => ReactElement]> = [

@@ -1,17 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { briefLines, buildInjections, type Snapshot } from './data'
+import { briefLines, buildActions, decideInjection, fetchSettings, type Snapshot, type SettingsType } from './data'
 import { s } from './style'
-import { useTerminals } from './useTerminal'
+import { t, type TranslationKey } from './i18n'
+import { useTerminals, pasteToClaude } from './useTerminal'
 import { Divider, useResizable } from './useResizable'
 
 export type Layout = 'bottom' | 'side' | 'full'
 
-const LAYOUTS: Array<[Layout, string]> = [
-  ['bottom', 'Bas'],
-  ['side', 'Côté'],
-  ['full', 'Plein'],
-]
+const LAYOUT_IDS: Layout[] = ['bottom', 'side', 'full']
+
+const layoutLabel = (layout: Layout): string => {
+  const map: Record<Layout, TranslationKey> = {
+    'bottom': 'terminal.layout_bottom',
+    'side': 'terminal.layout_side',
+    'full': 'terminal.layout_full',
+  }
+  return t(map[layout])
+}
 
 /**
  * Le panneau se dimensionne selon sa disposition.
@@ -22,12 +28,12 @@ const LAYOUTS: Array<[Layout, string]> = [
  */
 const panelStyle = (layout: Layout, size: number): string => {
   if (layout === 'full') {
-    return 'flex: 1; background: #101120; display: flex; flex-direction: column; min-height: 0; min-width: 0;'
+    return 'flex: 1; background: var(--theme-bg-primary); display: flex; flex-direction: column; min-height: 0; min-width: 0;'
   }
   if (layout === 'side') {
-    return `width: ${size}px; flex: none; border-left: 1px solid var(--color-divider); background: #101120; display: flex; flex-direction: column; min-height: 0;`
+    return `width: ${size}px; flex: none; border-left: 1px solid var(--color-divider); background: var(--theme-bg-primary); display: flex; flex-direction: column; min-height: 0;`
   }
-  return `height: ${size}px; flex: none; border-top: 1px solid var(--color-divider); background: #101120; display: flex; flex-direction: column; min-height: 0;`
+  return `height: ${size}px; flex: none; border-top: 1px solid var(--color-divider); background: var(--theme-bg-primary); display: flex; flex-direction: column; min-height: 0;`
 }
 
 /**
@@ -48,6 +54,10 @@ export function Terminal({
   onToggle,
   onReload,
   snapshot,
+  terminalHeight,
+  terminalWidth,
+  onTerminalHeightChange,
+  onTerminalWidthChange,
 }: {
   layout: Layout
   onLayout: (layout: Layout) => void
@@ -55,30 +65,49 @@ export function Terminal({
   /** Relit `cockpit/` — après un scan, l'interface ne se met pas à jour seule. */
   onReload: () => void
   snapshot: Snapshot | null
+  terminalHeight: number
+  terminalWidth: number
+  onTerminalHeightChange: (height: number) => void
+  onTerminalWidthChange: (width: number) => void
 }) {
   const [notice, setNotice] = useState<string | null>(null)
+  const [settings, setSettings] = useState<SettingsType | null>(null)
   const { sessions, active, setActive, attach, openShell, closeShell, errors, inject, available } =
     useTerminals(snapshot?.root ?? null)
+
+  // Charge les paramètres pour construire les actions avec le gestionnaire actuel
+  useEffect(() => {
+    fetchSettings()
+      .then(s => setSettings(s))
+      .catch(() => {
+        // En cas d'erreur, utilise les défauts (fetchSettings les retourne)
+      })
+  }, [])
 
   const error = active ? (errors[active] ?? null) : null
 
   // Tirer vers le haut agrandit le panneau du bas ; tirer vers la gauche
   // agrandit celui du côté. D'où `invert` dans les deux cas.
+  //
+  // Les tailles initiales viennent des préférences, et la callback met à jour
+  // le state parent au lieu du localStorage.
   const height = useResizable({
     key: 'terminal.bottom',
-    initial: 244,
+    initial: terminalHeight,
     min: 120,
     max: () => window.innerHeight * 0.7,
     axis: 'y',
     invert: true,
+    onResize: onTerminalHeightChange,
   })
   const widthSide = useResizable({
     key: 'terminal.side',
-    initial: 468,
+    initial: terminalWidth,
     min: 320,
     max: () => window.innerWidth * 0.7,
     axis: 'x',
     invert: true,
+    onResize: onTerminalWidthChange,
   })
 
   const sizing = layout === 'side' ? widthSide : height
@@ -86,49 +115,55 @@ export function Terminal({
   /**
    * Un clic injecte dans la session quand elle existe, et copie sinon.
    *
+   * Les commandes (! ou /) s'injectent directement. Les contextes passent par
+   * le collage encadré : littéral, sans `\n` final, l'utilisateur valide.
    * Le repli n'est pas un pis-aller déguisé : le libellé du panneau change
    * aussi, pour que le bouton ne prétende jamais écrire dans une session
    * inexistante.
    */
   const activate = async (label: string, text: string) => {
-    if (inject(text + '\n')) {
-      setNotice(`« ${label} » injecté`)
+    const { mode, text: toInject } = decideInjection(text)
+
+    // Session : injecter via le canal adapté
+    if (mode === 'command') {
+      if (inject(toInject)) {
+        setNotice(`« ${label} » injecté`)
+        setTimeout(() => setNotice(null), 2000)
+        return
+      }
     } else {
-      try {
-        await navigator.clipboard.writeText(text)
-        setNotice(`« ${label} » copié`)
-      } catch {
-        setNotice('copie refusée par le navigateur')
+      // Contexte : collage encadré
+      if (pasteToClaude(toInject)) {
+        setNotice(`« ${label} » collé dans la session Claude`)
+        setTimeout(() => setNotice(null), 2000)
+        return
       }
     }
-    setTimeout(() => setNotice(null), 2000)
+
+    // Repli : pas de session (navigateur)
+    try {
+      await navigator.clipboard.writeText(text)
+      setNotice(`« ${label} » copié`)
+      setTimeout(() => setNotice(null), 2000)
+    } catch {
+      setNotice(t('navigateur.copy_failed'))
+      setTimeout(() => setNotice(null), 2000)
+    }
   }
 
-  const injections = buildInjections(snapshot)
+  // Construit les actions livrées et personnalisées quand les paramètres sont disponibles
+  const allActions = settings ? buildActions(snapshot, settings) : []
 
-  /**
-   * Les actions rapides écrivent une commande dans la session — elles ne
-   * l'exécutent pas depuis le cockpit.
-   *
-   * ponytail: le pty ouvre un shell puis y tape `claude` (electron/pty.js:25),
-   * donc la session est *dans* Claude : `!` est son préfixe bash, `/graphify`
-   * sa commande. Quitter Claude rend un shell nu, où ces deux formes ne veulent
-   * plus rien dire — d'où le libellé « Envoyer à la session Claude », qui ne
-   * promet rien d'autre. Plafond connu ; l'alternative serait un canal IPC qui
-   * lance le crawl lui-même, écartée parce qu'elle rompt « le cockpit
-   * n'exécute jamais ».
-   */
-  const actions = [
-    { label: '⟳ Relancer un scan', text: '!pnpm cockpit:crawl' },
-    { label: '◆ Regénérer le graphe', text: '/graphify' },
-    // Graphify écrit `index.md` et `graph.canvas` à la racine du dossier qu'on
-    // lui donne. Lui donner le coffre entier écraserait celui qu'écrit
-    // l'export du cockpit — d'où le sous-dossier réservé.
-    {
-      label: '◈ Graphe → coffre Obsidian',
-      text: '/graphify . --obsidian --obsidian-dir cockpit/obsidian/graphe',
-    },
-  ]
+  // Sépare les actions en deux catégories : commandes (! ou /) et contexte (texte brut)
+  const commands = allActions.filter((a): a is { label: string; text: string } => {
+    if ('error' in a) return false // Ignore les erreurs pour le classement
+    return a.text.startsWith('!') || a.text.startsWith('/')
+  })
+  const context = allActions.filter((a): a is { label: string; text: string } => {
+    if ('error' in a) return false
+    return !a.text.startsWith('!') && !a.text.startsWith('/')
+  })
+  const actionErrors = allActions.filter((a): a is { label: string; error: string } => 'error' in a)
 
   return (
     <>
@@ -140,7 +175,7 @@ export function Terminal({
         )}
       >
         <span
-          title={available ? 'Session en cours' : 'Terminal disponible dans l’application'}
+          title={available ? t('a11y.session_active') : t('a11y.terminal_available')}
           style={s(
             available && !error
               ? 'width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent); display: block; flex: none;'
@@ -176,8 +211,8 @@ export function Terminal({
               {session.kind !== 'claude' && (
                 <button
                   type="button"
-                  title="Fermer cette session"
-                  aria-label={`Fermer ${session.label}`}
+                  title={t('terminal.close_session')}
+                  aria-label={t('terminal.close_session_aria', { label: session.label })}
                   onClick={() => closeShell(session.key)}
                   style={s(
                     'cursor: pointer; border: 0; background: transparent; color: var(--color-neutral-600); font-size: 12px; line-height: 1; padding: 3px 6px 3px 0;',
@@ -191,8 +226,8 @@ export function Terminal({
           <button
             type="button"
             onClick={openShell}
-            title="Ouvrir un shell dans le projet"
-          aria-label="Ouvrir un shell dans le projet"
+            title={t('terminal.open_shell')}
+            aria-label={t('terminal.open_shell')}
             disabled={!available}
             style={s(
               'cursor: pointer; font-family: var(--font-body); font-size: 13px; line-height: 1; padding: 3px 8px; border-radius: 5px; border: 1px solid transparent; background: transparent; color: var(--color-neutral-600);',
@@ -208,10 +243,10 @@ export function Terminal({
             'font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--color-neutral-600);',
           )}
         >
-          Disposition
+          {t('terminal.layouts')}
         </span>
         <div style={s('display: flex; gap: 2px;')}>
-          {LAYOUTS.map(([id, label]) => (
+          {LAYOUT_IDS.map((id) => (
             <button
               key={id}
               type="button"
@@ -223,7 +258,7 @@ export function Terminal({
                     : 'var(--color-neutral-800); background: transparent; color: var(--color-neutral-500);'),
               )}
             >
-              {label}
+              {layoutLabel(id)}
             </button>
           ))}
         </div>
@@ -233,7 +268,7 @@ export function Terminal({
           className="btn btn-ghost"
           style={s('font-size: 11px; padding: 4px 9px;')}
         >
-          Réduire
+          {t('terminal.reduce')}
         </button>
       </div>
 
@@ -290,7 +325,7 @@ export function Terminal({
           ))}
           <div style={s('display: flex; align-items: center; gap: 7px; color: var(--color-neutral-600);')}>
             <span style={s('color: var(--color-neutral-700);')}>›</span>
-            <span>terminal disponible dans l'application, pas dans le navigateur</span>
+            <span>{t('terminal.no_terminal_browser')}</span>
           </div>
         </div>
 
@@ -301,56 +336,115 @@ export function Terminal({
               : 'width: 268px; flex: none; border-left: 1px solid var(--color-divider); padding: 12px 14px;',
           )}
         >
+          {/* Section : Commandes pour Claude */}
           <div
             style={s(
               'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);',
             )}
           >
-            Envoyer à la session Claude
+            {t('terminal.commands_section')}
           </div>
           <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
-            {actions.map(({ label, text }) => (
-              <button
-                key={label}
-                type="button"
-                onClick={() => activate(label, text)}
-                className="btn btn-primary btn-block"
-                style={s('font-size: 11.5px; padding: 5px 10px;')}
+            {commands.map(action => (
+              <details
+                key={action.label}
+                style={s('display: flex; flex-direction: column;')}
               >
-                {label}
-              </button>
+                <summary style={s('cursor: pointer; list-style: none; display: flex; align-items: center; gap: 6px;')}>
+                  <button
+                    type="button"
+                    onClick={e => {
+                      e.preventDefault()
+                      activate(action.label, action.text)
+                    }}
+                    className="btn btn-primary btn-block"
+                    style={s('font-size: 11.5px; padding: 5px 10px; flex: 1; text-align: left;')}
+                  >
+                    {action.label}
+                  </button>
+                  <span style={s('font-size: 11px; color: var(--color-neutral-600); flex: none;')}>▼</span>
+                </summary>
+                <pre
+                  style={s(
+                    'margin: 6px 0 0 0; padding: 8px; background: var(--theme-bg-error); border: 1px solid var(--color-divider); border-radius: 3px; font-size: 10px; color: var(--color-neutral-600); white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto;',
+                  )}
+                >
+                  {action.text}
+                </pre>
+              </details>
             ))}
-            <button
-              type="button"
-              onClick={onReload}
-              className="btn btn-secondary btn-block"
-              style={s('font-size: 11.5px; padding: 5px 10px;')}
-              title="Relit cockpit/ — à faire après un scan"
-            >
-              ↻ Rafraîchir le cockpit
-            </button>
-          </div>
-
-          <div
-            style={s(
-              'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-top: 18px;',
-            )}
-          >
-            {available ? 'Injecter dans la session' : 'Copier pour la session'}
-          </div>
-          <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
-            {injections.map(({ label, text }) => (
+            {commands.length > 0 && (
               <button
-                key={label}
                 type="button"
-                onClick={() => activate(label, text)}
+                onClick={onReload}
                 className="btn btn-secondary btn-block"
                 style={s('font-size: 11.5px; padding: 5px 10px;')}
+                title="Relit cockpit/ — à faire après un scan"
               >
-                {label}
+                {t('terminal.refresh_cockpit')}
               </button>
-            ))}
+            )}
           </div>
+
+          {/* Affiche les erreurs si présentes */}
+          {actionErrors.length > 0 && (
+            <div style={s('display: flex; flex-direction: column; gap: 6px; margin-top: 12px;')}>
+              {actionErrors.map(err => (
+                <div
+                  key={err.label}
+                  style={s(
+                    'font-size: 11px; color: var(--color-accent-300); border: 1px solid var(--color-accent-700); border-radius: 4px; padding: 6px 8px;',
+                  )}
+                >
+                  <div style={s('font-weight: 500;')}>{err.label}</div>
+                  <div>{err.error}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Section : Contexte pour Claude */}
+          {context.length > 0 && (
+            <>
+              <div
+                style={s(
+                  'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-top: 18px;',
+                )}
+              >
+                {t('terminal.context_section')}
+              </div>
+              <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
+                {context.map(action => (
+                  <details
+                    key={action.label}
+                    style={s('display: flex; flex-direction: column;')}
+                  >
+                    <summary style={s('cursor: pointer; list-style: none; display: flex; align-items: center; gap: 6px;')}>
+                      <button
+                        type="button"
+                        onClick={e => {
+                          e.preventDefault()
+                          activate(action.label, action.text)
+                        }}
+                        className="btn btn-secondary btn-block"
+                        style={s('font-size: 11.5px; padding: 5px 10px; flex: 1; text-align: left;')}
+                      >
+                        {action.label}
+                      </button>
+                      <span style={s('font-size: 11px; color: var(--color-neutral-600); flex: none;')}>▼</span>
+                    </summary>
+                    <pre
+                      style={s(
+                        'margin: 6px 0 0 0; padding: 8px; background: var(--theme-bg-error); border: 1px solid var(--color-divider); border-radius: 3px; font-size: 10px; color: var(--color-neutral-600); white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto;',
+                      )}
+                    >
+                      {action.text}
+                    </pre>
+                  </details>
+                ))}
+              </div>
+            </>
+          )}
           <div
             style={s(
               'font-size: 11px; color: var(--color-neutral-600); margin-top: 13px; line-height: 1.5;',
@@ -360,8 +454,8 @@ export function Terminal({
               (error
                 ? error
                 : available
-                  ? 'Un clic écrit dans la session Claude.'
-                  : "Un clic copie le contexte. Le cockpit n'exécute jamais.")}
+                  ? t('terminal.click_injects')
+                  : t('terminal.click_copies'))}
           </div>
         </div>
       </div>

@@ -10,6 +10,10 @@ import { createRoot } from 'react-dom/client'
 import '../../_ds/nocturne-16d90168-f621-47c2-b3bb-29511cfd6dd0/styles.css'
 
 import { App } from './App'
+import { initializeTheme } from './theme'
+
+// Initialiser le système de thème avant le rendu
+initializeTheme()
 
 const container = document.getElementById('root')
 if (!container) throw new Error('#root introuvable')

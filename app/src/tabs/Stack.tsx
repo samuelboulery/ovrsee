@@ -1,4 +1,5 @@
 import { stackFrom, type Snapshot } from '../data'
+import { t } from '../i18n'
 import { s } from '../style'
 
 /**
@@ -24,14 +25,12 @@ export function Stack({ snapshot }: { snapshot: Snapshot }) {
         Stack
       </h2>
       <div style={s('font-size: 12px; color: var(--color-neutral-600); margin-bottom: 20px;')}>
-        Ce qui est utilisé, et pourquoi. Une raison est un commentaire{' '}
-        <span style={s('font-family: ui-monospace, monospace;')}>WHY:</span> posé juste au-dessus de
-        l'import du paquet — rien d'autre n'est lu, pour qu'aucune ligne ne dise du faux.
-        {rows.length > 0 && ` ${tracees} sur ${rows.length} en ont une.`}
+        {t('stack.why_subtitle')}
+        {rows.length > 0 && ` ${tracees} sur ${rows.length} ${t('stack.of_stack')}`}
       </div>
       {rows.length === 0 ? (
         <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
-          Aucune dépendance déclarée dans package.json.
+          {t('stack.no_dependencies')}
         </div>
       ) : (
         <div style={s('display: flex; flex-direction: column; gap: 10px; max-width: 780px;')}>
@@ -59,11 +58,7 @@ export function Stack({ snapshot }: { snapshot: Snapshot }) {
               >
                 {row.why ?? (
                   <>
-                    Aucune raison écrite. Un commentaire{' '}
-                    <span style={s('font-family: ui-monospace, monospace;')}>
-                      WHY: …
-                    </span>{' '}
-                    au-dessus de son import apparaîtra ici.
+                    {t('stack.no_why')}
                   </>
                 )}
               </div>

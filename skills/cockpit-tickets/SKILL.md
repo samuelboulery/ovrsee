@@ -134,3 +134,31 @@ jamais.
   d'abord.
 - Le reste du dossier `cockpit/` se lit et ne s'écrit pas — voir le skill
   `cockpit`.
+
+## Epics
+
+Un epic est un ticket qui regroupe plusieurs autres tickets autour d'un même sujet.
+Il signale à Claude qu'il faut penser en grappes, pas en tickets à plat.
+
+**Créer un epic.** Lorsque plusieurs tickets relèvent d'un même domaine — ou quand
+tu proposes 3+ tâches liées et qu'on demande de les regrouper — écris un ticket
+avec `"type": "epic"` dans le frontmatter. Exemple concret : l'epic « Robustesse
+du rendu » regroupe « malformé vide tout », « aucun garde-fou », « ticket
+corrompu ». Un epic a un titre et des critères d'acceptation comme les autres.
+
+**Rattacher un enfant.** Dans un ticket enfant, ajoute `"epic": "T-0015"` (l'`id`
+de l'epic). Le ticket s'affiche alors au tableau sous son epic, sans indentation,
+juste marqué du numéro parent. Les enfants héritent du tri global (priorité, date).
+
+**Détacher.** Supprime le champ `epic` du ticket enfant. Il revient indépendant,
+ne disparaît pas.
+
+**Supprimer un epic.** Supprime son fichier. Ses enfants restent intacts, orphelins.
+Chaque enfant redevient un ticket autonome dans le flux normal.
+
+| Champ | Règle |
+|---|---|
+| `type` | `"epic"` pour un regroupement, absent sinon. |
+| `epic` | L'`id` d'un epic auquel ce ticket appartient, ou absent. |
+
+L'interface affiche les épics en premier, puis leurs enfants, puis les orphelins.

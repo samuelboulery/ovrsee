@@ -6,7 +6,9 @@ import { join } from 'node:path'
 
 import {
   DEFAULT_COLUMNS,
+  childrenOf,
   colonneFinale,
+  orphanChildren,
   readBoard,
   readTickets,
   nextTicketId,
@@ -438,4 +440,112 @@ test('reorderColumn au même index ne réécrit rien', () => {
 
 test('reorderColumn refuse une colonne inconnue', () => {
   assert.throws(() => reorderColumn(fixture(), 'nowhere', 0), /colonne/)
+})
+
+// --- epics (type et epic) --------------------------------------------------
+
+test("createTicket accepte un type 'epic'", () => {
+  const cockpitDir = fixture()
+  const written = createTicket(cockpitDir, { titre: 'Mon epic', type: 'epic' })
+
+  assert.equal(written.meta.type, 'epic')
+
+  const [ticket] = readTickets(cockpitDir)
+  assert.equal(ticket.meta.type, 'epic')
+})
+
+test('createTicket refuse un type invalide', () => {
+  const cockpitDir = fixture()
+  assert.throws(() => createTicket(cockpitDir, { titre: 'X', type: 'roadmap' }), /type/)
+})
+
+test('createTicket accepte un epic parent', () => {
+  const cockpitDir = fixture()
+  const epic = createTicket(cockpitDir, { titre: 'Epic', type: 'epic' })
+  const enfant = createTicket(cockpitDir, { titre: 'Enfant', epic: epic.meta.id })
+
+  assert.equal(enfant.meta.epic, epic.meta.id)
+
+  const tickets = readTickets(cockpitDir)
+  assert.equal(tickets.find(t => t.meta.id === enfant.meta.id).meta.epic, epic.meta.id)
+})
+
+test('createTicket refuse un epic invalide', () => {
+  const cockpitDir = fixture()
+  assert.throws(() => createTicket(cockpitDir, { titre: 'X', epic: 'pas-un-id' }), /epic/)
+  assert.throws(() => createTicket(cockpitDir, { titre: 'X', epic: 'T-999-trop-long' }), /epic/)
+})
+
+test('updateTicket peut changer type et epic', () => {
+  const cockpitDir = fixture()
+  const { file } = createTicket(cockpitDir, { titre: 'Avant' })
+
+  updateTicket(cockpitDir, file, { type: 'epic' })
+
+  let [ticket] = readTickets(cockpitDir)
+  assert.equal(ticket.meta.type, 'epic')
+
+  const epic = createTicket(cockpitDir, { titre: 'Parent', type: 'epic' })
+  updateTicket(cockpitDir, file, { epic: epic.meta.id })
+
+  ticket = readTickets(cockpitDir).find(t => t.meta.id === ticket.meta.id)
+  assert.equal(ticket.meta.epic, epic.meta.id)
+})
+
+test('updateTicket peut détacher un enfant en mettant epic à null', () => {
+  const cockpitDir = fixture()
+  const epic = createTicket(cockpitDir, { titre: 'Parent', type: 'epic' })
+  const { file, meta } = createTicket(cockpitDir, { titre: 'Enfant', epic: epic.meta.id })
+
+  updateTicket(cockpitDir, file, { epic: null })
+
+  const ticket = readTickets(cockpitDir).find(t => t.meta.id === meta.id)
+  assert.equal(ticket.meta.epic, undefined)
+})
+
+test('updateTicket peut retirer le type epic', () => {
+  const cockpitDir = fixture()
+  const { file } = createTicket(cockpitDir, { titre: 'Était epic', type: 'epic' })
+
+  updateTicket(cockpitDir, file, { type: null })
+
+  const [ticket] = readTickets(cockpitDir)
+  assert.equal(ticket.meta.type, undefined)
+})
+
+test("childrenOf retourne les enfants d'un epic triés", () => {
+  const cockpitDir = fixture()
+  const epic = createTicket(cockpitDir, { titre: 'Epic', type: 'epic' })
+  const enfant1 = createTicket(cockpitDir, { titre: 'Enfant 1', epic: epic.meta.id, priorite: 'moyenne' })
+  const enfant2 = createTicket(cockpitDir, { titre: 'Enfant 2', epic: epic.meta.id, priorite: 'haute' })
+  createTicket(cockpitDir, { titre: 'Autre' })
+
+  const tickets = readTickets(cockpitDir)
+  const children = childrenOf(tickets, epic.meta.id)
+
+  assert.equal(children.length, 2)
+  // T-enfant2 (haute) avant T-enfant1 (moyenne)
+  assert.equal(children[0].meta.titre, 'Enfant 2')
+  assert.equal(children[1].meta.titre, 'Enfant 1')
+})
+
+test('childrenOf retourne une liste vide si epic inexistant', () => {
+  const cockpitDir = fixture()
+  const tickets = readTickets(cockpitDir)
+  const children = childrenOf(tickets, 'T-999')
+  assert.deepEqual(children, [])
+})
+
+test("orphanChildren détecte les enfants pointant un epic inexistant", () => {
+  const cockpitDir = fixture()
+  const epic = createTicket(cockpitDir, { titre: 'Epic', type: 'epic' })
+  const enfantVrai = createTicket(cockpitDir, { titre: 'Enfant vrai', epic: epic.meta.id })
+  const enfantOrphelin = createTicket(cockpitDir, { titre: 'Orphelin', epic: 'T-999' })
+  createTicket(cockpitDir, { titre: 'Ordinaire' })
+
+  const tickets = readTickets(cockpitDir)
+  const orphans = orphanChildren(tickets)
+
+  assert.equal(orphans.length, 1)
+  assert.equal(orphans[0].meta.titre, 'Orphelin')
 })

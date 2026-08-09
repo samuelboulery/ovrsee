@@ -17,6 +17,7 @@ pnpm install
 
 # 1. Installer la capture dans un dépôt (à faire une fois par projet)
 pnpm cockpit:install /chemin/du/projet
+pnpm cockpit:install /chemin/du/projet --skills cockpit,cockpit-tickets
 # puis ajouter le hook PostToolUse affiché à la fin, dans ~/.claude/settings.json
 
 # 2. Cartographier l'application (nécessite un cockpit.config.json à sa racine)
@@ -32,6 +33,9 @@ pnpm package                            # DMG dans release/
 # 4. Clore le plan quand son travail est fini
 pnpm cockpit:status                     # quel plan est actif
 pnpm cockpit:close                      # le clore, et lâcher le pointeur
+
+# 5. Emporter le tout dans Obsidian (facultatif)
+pnpm cockpit:obsidian                   # ou le bouton de l'onglet Aperçu
 ```
 
 Clore n'est pas une formalité. Tant qu'un plan est actif, le hook post-commit
@@ -54,6 +58,39 @@ Les deux hooks Claude Code (affichés par `cockpit:install`) ferment la boucle :
 l'un capture chaque plan approuvé, l'autre réinjecte l'état du projet au
 démarrage d'une session — Claude Code sait où en est le projet sans qu'on le
 lui explique.
+
+## Skills Claude Code
+
+Un dossier `cockpit/` ne sert à rien si Claude Code ne sait pas le lire ni le
+remplir. Deux skills livrés répondent à ça, et s'installent dans
+`~/.claude/skills/` — depuis l'écran d'initialisation d'un projet, depuis le
+bouton « Skills Claude Code » de la barre latérale, ou avec `--skills`.
+
+| Skill | Ce qu'il apprend |
+|---|---|
+| `cockpit` | Lire `cockpit/` : plans, pages, scans, et les pièges de lecture |
+| `cockpit-tickets` | Écrire les tickets du Tableau, format et gestes compris |
+
+Le catalogue signale aussi **Graphify**, qui alimente l'onglet Données. Celui-là
+est seulement détecté : le cockpit n'installe pas le paquet de quelqu'un
+d'autre à votre place, il affiche la commande.
+
+## Coffre Obsidian
+
+`pnpm cockpit:obsidian`, ou le bouton de l'onglet Aperçu, traduit `cockpit/` en
+notes Obsidian dans `cockpit/obsidian/` : frontmatter YAML — donc requêtable en
+Dataview —, wikilinks entre plans, tickets et pages, et la dernière capture de
+chaque page copiée dans le coffre. C'est une vue, comme l'application : la
+source reste le dépôt, et réexporter écrase.
+
+Graphify écrit son propre `index.md` à la racine du dossier qu'on lui donne. On
+lui réserve donc `graphe/`, que l'export ne touche jamais :
+
+```
+/graphify . --obsidian --obsidian-dir cockpit/obsidian/graphe
+```
+
+C'est ce que fait le bouton « ◈ Graphe → coffre Obsidian » du terminal intégré.
 
 Exemple de `cockpit.config.json`, à la racine du projet observé :
 

@@ -31,6 +31,8 @@ import {
   registerProject,
 } from './plans.js'
 
+import { exportVault } from './obsidian.js'
+
 import {
   createTicket,
   importOpenPlans,
@@ -166,6 +168,22 @@ const commands = {
       default:
         throw new Error('sous-commandes : new, move, import-plans')
     }
+  },
+
+  /**
+   * Écrit le coffre Obsidian du projet.
+   *
+   *   cockpit-cli.js obsidian [--dir <chemin>]
+   *
+   * Même implémentation que le bouton de l'interface : une seconde finirait par
+   * diverger de celle-ci.
+   */
+  obsidian(...rest) {
+    const flag = rest.indexOf('--dir')
+    const dir = flag === -1 ? undefined : rest[flag + 1]
+    if (flag !== -1 && !dir) throw new Error('usage : obsidian [--dir <chemin>]')
+
+    for (const line of exportVault(root, dir)) console.log(line)
   },
 }
 

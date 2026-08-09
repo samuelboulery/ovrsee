@@ -1,8 +1,11 @@
+import { useState } from 'react'
+
 import {
   frDate,
   humanAge,
   lastScan,
   plansOuverts,
+  projectAction,
   restant,
   stackFrom,
   type Snapshot,
@@ -152,6 +155,11 @@ export function Apercu({ snapshot }: { snapshot: Snapshot }) {
           </div>
         )}
 
+        <div style={s('margin-top: 18px;')}>
+          <Titre>Emporter ailleurs</Titre>
+          <Obsidian root={root} />
+        </div>
+
         <div style={s('margin-top: 24px;')}>
           <Titre>README.md</Titre>
           {readme ? (
@@ -164,6 +172,66 @@ export function Apercu({ snapshot }: { snapshot: Snapshot }) {
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+/**
+ * Export du coffre Obsidian.
+ *
+ * C'est un bouton, contrairement aux scripts du dessus qui restent du texte —
+ * et la distinction tient : celui-ci lit `cockpit/` et écrit dans `cockpit/`,
+ * exactement comme « Initialiser ». Il n'exécute rien du projet observé.
+ *
+ * Le graphe du code n'est pas de la partie : Graphify l'écrit lui-même dans le
+ * sous-dossier `graphe/`, depuis le terminal, parce qu'il a besoin de Claude.
+ */
+function Obsidian({ root }: { root: string }) {
+  const [busy, setBusy] = useState(false)
+  const [done, setDone] = useState<string[] | null>(null)
+  const [erreur, setErreur] = useState<string | null>(null)
+
+  return (
+    <div>
+      <div style={s('font-size: 12px; color: var(--color-neutral-600); margin-bottom: 8px;')}>
+        Plans, tickets et pages en notes markdown liées, dans{' '}
+        <code style={s('font-family: ui-monospace, monospace;')}>cockpit/obsidian/</code> — à ouvrir
+        comme coffre. C'est une vue : la source reste le dépôt.
+      </div>
+
+      <button
+        type="button"
+        className="btn btn-secondary"
+        disabled={busy}
+        onClick={() => {
+          setBusy(true)
+          setErreur(null)
+          projectAction('export-obsidian', root)
+            .then(result => setDone(result.done ?? []))
+            .catch(err => setErreur(String(err.message ?? err)))
+            .finally(() => setBusy(false))
+        }}
+      >
+        {busy ? 'Export…' : 'Exporter en coffre Obsidian'}
+      </button>
+
+      {erreur && (
+        <div
+          style={s(
+            'margin-top: 8px; font-size: 12px; color: var(--color-accent-300); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
+          )}
+        >
+          {erreur}
+        </div>
+      )}
+
+      {done && (
+        <div style={s('margin-top: 8px; font-size: 11px; color: var(--color-neutral-500);')}>
+          {done.map(line => (
+            <div key={line}>{line}</div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

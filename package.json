@@ -14,6 +14,7 @@
     "cockpit:status": "node hooks/cockpit-cli.js status",
     "cockpit:close": "node hooks/cockpit-cli.js close",
     "cockpit:brief": "node hooks/cockpit-session-start.js",
+    "cockpit:obsidian": "node hooks/cockpit-cli.js obsidian",
     "cockpit:crawl": "node crawl/index.js",
     "cockpit:auth": "node crawl/auth.js",
     "electron": "pnpm build:ui && electron .",

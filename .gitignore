@@ -13,6 +13,11 @@ dist/
 graphify-out/cache/
 graphify-out/graph.html
 
+# Coffre Obsidian : une traduction de cockpit/ et de graphify-out/, réécrite à
+# chaque export. Le versionner mettrait chaque plan et chaque ticket deux fois
+# dans le dépôt, et chaque export ferait un diff qui n'apprend rien.
+cockpit/obsidian/
+
 # Build de l app, reconstruit a la demande.
 app/dist/
 

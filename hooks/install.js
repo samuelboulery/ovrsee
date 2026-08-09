@@ -37,6 +37,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { writeFileNoFollow } from './plans.js'
+import { installSkills } from './skills.js'
 import { DEFAULT_COLUMNS } from './tickets.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -177,12 +178,17 @@ function installClaudeHooks(done) {
  * Équipe un dépôt. Rend la liste de ce qui a été fait, ligne par ligne — c'est
  * ce que le CLI affiche et ce que l'interface montre après un « Initialiser ».
  *
+ * Les skills demandés s'installent en dernier : ils vont dans `~/.claude/`, pas
+ * dans le dépôt, et rater cette étape ne doit pas laisser le projet à moitié
+ * équipé.
+ *
  * @param {string} target dossier quelconque à l'intérieur du dépôt
+ * @param {{skills?: string[]}} options noms de skills du catalogue à installer
  * @returns {string[]}
  * @throws si `target` n'est pas dans un dépôt git : le rattachement des commits
  *   aux plans n'a alors aucun sens, et le dire vaut mieux qu'installer à moitié.
  */
-export function install(target) {
+export function install(target, { skills = [] } = {}) {
   const root = execFileSync('git', ['rev-parse', '--show-toplevel'], {
     cwd: resolve(target),
     encoding: 'utf8',
@@ -206,11 +212,17 @@ export function install(target) {
 
   installPostCommit(root, done)
   installClaudeHooks(done)
+  done.push(...installSkills(skills))
 
   return done
 }
 
 // Exécution directe seulement : importé, ce fichier n'écrit rien.
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  for (const line of install(process.argv[2] ?? process.cwd())) console.log(line)
+  const args = process.argv.slice(2)
+  const flag = args.indexOf('--skills')
+  const skills = flag === -1 ? [] : (args[flag + 1] ?? '').split(',').filter(Boolean)
+  const target = args.find((a, i) => !a.startsWith('--') && i !== flag + 1) ?? process.cwd()
+
+  for (const line of install(target, { skills })) console.log(line)
 }

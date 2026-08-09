@@ -10,6 +10,9 @@ files:
   - electron/**
   - server/**
   - hooks/**
+  # Les SKILL.md que l'application propose d'installer dans ~/.claude/skills/.
+  # Sans eux, le panneau des skills n'aurait rien à copier.
+  - skills/**
   - app/dist/**
   - package.json
   # Les modules réellement chargés par le processus principal. Le reste

@@ -16,7 +16,9 @@ import { createReadStream, existsSync, lstatSync, readFileSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'
 
 import { install } from '../hooks/install.js'
+import { exportVault } from '../hooks/obsidian.js'
 import { registerProject, touchProject, unregisterProject } from '../hooks/plans.js'
+import { installSkills, readSkills } from '../hooks/skills.js'
 import { projects, snapshot, shotPath, tableau } from '../hooks/snapshot.js'
 import {
   addColumn,
@@ -77,10 +79,19 @@ function projectAction(body, cwd) {
       touchProject(path)
       return list()
 
+    case 'export-obsidian': {
+      if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
+      try {
+        return { json: { projects: projects(cwd), done: exportVault(path) } }
+      } catch (err) {
+        return { status: 400, json: { error: String(err.message ?? err) } }
+      }
+    }
+
     case 'init': {
       if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
       try {
-        return { json: { projects: projects(cwd), done: install(path) } }
+        return { json: { projects: projects(cwd), done: install(path, { skills: body?.skills }) } }
       } catch (err) {
         // Le cas courant : le dossier n'est pas un dépôt git. Le dire, plutôt
         // que d'installer à moitié un rattachement des commits qui ne peut pas
@@ -180,6 +191,21 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
         return { status: 403, json: { error: 'en-tête X-Cockpit manquant' } }
       }
       return projectAction(body, cwd)
+
+    // Les skills vivent dans `~/.claude/`, pas dans un projet : c'est la seule
+    // route qui ne prend pas de chemin. La liste blanche n'est donc pas le
+    // registre des projets mais le catalogue, appliqué dans `installSkills`.
+    case '/api/skills': {
+      if (method !== 'POST') return { json: readSkills() }
+      if (headers['x-cockpit'] !== '1') {
+        return { status: 403, json: { error: 'en-tête X-Cockpit manquant' } }
+      }
+      try {
+        return { json: { done: installSkills(body?.noms), skills: readSkills() } }
+      } catch (err) {
+        return { status: 400, json: { error: String(err.message ?? err) } }
+      }
+    }
 
     case '/api/tickets': {
       // L'en-tête d'abord : rien de ce qui suit ne doit tourner pour une

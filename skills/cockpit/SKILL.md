@@ -81,8 +81,12 @@ Pourquoi ce ticket existe.
   stocks sont indépendants : un ticket n'est pas un plan, un plan n'est pas une
   tâche.
 
-Écrire un ticket : soit directement le fichier, soit le CLI depuis la racine du
-dépôt **cockpit** (le CLI n'est pas installé dans les projets équipés) :
+**Pour écrire un ticket, utiliser le skill `cockpit-tickets`** : il porte le
+format complet, le calcul de l'`id` et les gestes courants. Ici, on ne fait que
+lire.
+
+Le CLI existe aussi, mais **seulement depuis la racine du dépôt cockpit** — il
+n'est pas installé dans les projets équipés :
 
 ```bash
 node hooks/cockpit-cli.js tickets                        # le tableau, colonne par colonne

@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -239,4 +239,53 @@ test('/api/tickets reloge les tickets d’une colonne retirée', () => {
 
   const apres = postTicket({ action: 'column-remove', path: dir, id: 'revue', vers: 'fait' })
   assert.equal(apres.json.tickets.find(t => t.file === file).colonne, 'fait')
+})
+
+// --- /api/skills -----------------------------------------------------------
+
+const postSkills = (body, headers = { 'x-cockpit': '1' }) =>
+  resolve(url('/api/skills'), null, { method: 'POST', headers, body })
+
+test('GET /api/skills rend le catalogue', () => {
+  process.env.COCKPIT_SKILLS_DIR = mkdtempSync(join(tmpdir(), 'cockpit-skills-api-'))
+  const result = resolve(url('/api/skills'))
+
+  assert.ok(result && 'json' in result)
+  assert.ok(result.json.some(s => s.nom === 'cockpit-tickets'))
+  assert.equal(result.json.every(s => typeof s.installe === 'boolean'), true)
+})
+
+test('POST /api/skills sans l’en-tête X-Cockpit est refusé', () => {
+  assert.equal(postSkills({ noms: ['cockpit'] }, {}).status, 403)
+})
+
+test('POST /api/skills installe et rend le catalogue à jour', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-skills-api-'))
+  process.env.COCKPIT_SKILLS_DIR = dir
+
+  const result = postSkills({ noms: ['cockpit-tickets'] })
+
+  assert.match(result.json.done.join('\n'), /installé/)
+  assert.equal(result.json.skills.find(s => s.nom === 'cockpit-tickets').aJour, true)
+})
+
+test('POST /api/skills ignore un nom hors catalogue sans rien écrire', () => {
+  process.env.COCKPIT_SKILLS_DIR = mkdtempSync(join(tmpdir(), 'cockpit-skills-api-'))
+  const result = postSkills({ noms: ['../evasion'] })
+
+  assert.match(result.json.done.join('\n'), /inconnu du catalogue/)
+})
+
+// --- /api/projects : export Obsidian ---------------------------------------
+
+test('POST /api/projects export-obsidian écrit le coffre', () => {
+  const dir = projetEnregistre()
+  const result = post({ action: 'export-obsidian', path: dir })
+
+  assert.ok(result.json.done.some(l => /index\.md écrit/.test(l)))
+  assert.ok(existsSync(join(dir, 'cockpit', 'obsidian', 'index.md')))
+})
+
+test('POST /api/projects export-obsidian refuse un projet inconnu', () => {
+  assert.equal(post({ action: 'export-obsidian', path: '/etc' }).status, 404)
 })

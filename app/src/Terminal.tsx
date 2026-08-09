@@ -118,6 +118,13 @@ export function Terminal({
   const actions = [
     { label: '⟳ Relancer un scan', text: '!pnpm cockpit:crawl' },
     { label: '◆ Regénérer le graphe', text: '/graphify' },
+    // Graphify écrit `index.md` et `graph.canvas` à la racine du dossier qu'on
+    // lui donne. Lui donner le coffre entier écraserait celui qu'écrit
+    // l'export du cockpit — d'où le sous-dossier réservé.
+    {
+      label: '◈ Graphe → coffre Obsidian',
+      text: '/graphify . --obsidian --obsidian-dir cockpit/obsidian/graphe',
+    },
   ]
 
   return (

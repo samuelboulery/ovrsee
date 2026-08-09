@@ -14,6 +14,7 @@ import {
   type Snapshot,
   type Tableau as TableauData,
 } from './data'
+import { SkillsList, SkillsModal, useSkills } from './SkillsPanel'
 import { s } from './style'
 import { Apercu } from './tabs/Apercu'
 import { Produit } from './tabs/Produit'
@@ -369,6 +370,7 @@ function Unequipped({
 }) {
   const [busy, setBusy] = useState(false)
   const [done, setDone] = useState<string[] | null>(null)
+  const { skills, choisis, setChoisis } = useSkills()
 
   return (
     <div
@@ -384,6 +386,22 @@ function Unequipped({
         rattache les commits au plan actif.
       </div>
 
+      {/* Les skills se choisissent avant d'initialiser, pas après : c'est le
+          seul moment où l'on sait qu'un projet vient d'arriver, et un cockpit
+          que Claude Code ne sait pas remplir reste un dossier vide. */}
+      {!done && skills.length > 0 && (
+        <div style={s('width: min(520px, 100%); margin-top: 4px;')}>
+          <div
+            style={s(
+              'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 8px; text-align: left;',
+            )}
+          >
+            Skills Claude Code
+          </div>
+          <SkillsList skills={skills} choisis={choisis} onChoisis={setChoisis} />
+        </div>
+      )}
+
       {done ? (
         <div style={s('font-size: 11px; color: var(--color-neutral-500); text-align: left;')}>
           {done.map(line => (
@@ -397,7 +415,7 @@ function Unequipped({
           disabled={busy}
           onClick={() => {
             setBusy(true)
-            projectAction('init', root)
+            projectAction('init', root, { skills: choisis })
               .then(result => {
                 setDone(result.done ?? [])
                 onDone()
@@ -432,6 +450,7 @@ function Sidebar({
   density: number[]
 }) {
   const max = Math.max(1, ...bars)
+  const [skillsOuverts, setSkillsOuverts] = useState(false)
 
   // Le sélecteur de dossier n'existe que dans l'application empaquetée. Dans un
   // navigateur, le bouton est absent plutôt que présent et inerte — même
@@ -489,6 +508,22 @@ function Sidebar({
       </div>
 
       <div style={s('flex: 1;')} />
+
+      {/* Les skills ne dépendent d'aucun projet — ils vivent dans `~/.claude/`.
+          Le rappel est ici parce qu'une mise à jour du cockpit peut les rendre
+          périmés longtemps après l'initialisation, quand l'écran qui les
+          proposait n'apparaît plus. */}
+      <div style={s('padding: 0 14px 12px;')}>
+        <button
+          type="button"
+          className="btn btn-ghost btn-block"
+          onClick={() => setSkillsOuverts(true)}
+          style={s('font-size: 11px;')}
+        >
+          Skills Claude Code
+        </button>
+      </div>
+      {skillsOuverts && <SkillsModal onClose={() => setSkillsOuverts(false)} />}
 
       <div
         style={s(

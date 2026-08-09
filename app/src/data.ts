@@ -376,11 +376,16 @@ const json = async <T,>(url: string): Promise<T> => {
 
 export const fetchProjects = () => json<Project[]>('/api/projects')
 
-export type ProjectAction = 'add' | 'remove' | 'touch' | 'init'
+export type ProjectAction = 'add' | 'remove' | 'touch' | 'init' | 'export-obsidian'
 
 /**
- * Ajoute, retire, remonte en tête ou équipe un projet. Rend la liste à jour,
- * déjà triée — l'interface n'a pas à refaire le tri du serveur.
+ * Ajoute, retire, remonte en tête, équipe un projet ou en exporte le coffre.
+ * Rend la liste à jour, déjà triée — l'interface n'a pas à refaire le tri du
+ * serveur.
+ *
+ * `payload` porte ce qui est propre à un geste — les skills à installer pour
+ * `init`. Les autres n'en ont pas besoin, d'où le paramètre optionnel plutôt
+ * qu'une seconde fonction par action.
  *
  * `X-Cockpit` n'est pas une authentification : c'est ce qui empêche une page
  * quelconque ouverte dans le navigateur de poster vers le dev server local.
@@ -388,16 +393,51 @@ export type ProjectAction = 'add' | 'remove' | 'touch' | 'init'
 export async function projectAction(
   action: ProjectAction,
   path: string,
+  payload: Record<string, unknown> = {},
 ): Promise<{ projects: Project[]; done?: string[] }> {
   const response = await fetch('/api/projects', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
-    body: JSON.stringify({ action, path }),
+    body: JSON.stringify({ ...payload, action, path }),
   })
 
-  const payload = await response.json()
-  if (!response.ok) throw new Error(payload?.error ?? `HTTP ${response.status}`)
-  return payload
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result
+}
+
+/**
+ * Un skill Claude Code du catalogue, tel que le serveur le rend.
+ *
+ * `bundled` : livré avec le cockpit, donc installable d'un clic. `externe` :
+ * détecté seulement — le cockpit n'exécute pas l'installateur de quelqu'un
+ * d'autre à la place de l'utilisateur.
+ */
+export interface SkillEntry {
+  nom: string
+  source: 'bundled' | 'externe'
+  titre: string
+  resume: string
+  commande?: string
+  url?: string
+  installe: boolean
+  aJour: boolean
+}
+
+export const fetchSkills = () => json<SkillEntry[]>('/api/skills')
+
+export async function installSkills(
+  noms: string[],
+): Promise<{ done: string[]; skills: SkillEntry[] }> {
+  const response = await fetch('/api/skills', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    body: JSON.stringify({ noms }),
+  })
+
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result
 }
 
 export type TicketAction =

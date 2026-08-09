@@ -31,3 +31,5 @@
 {"date":"2026-08-09","commit":"089a9ef","ok":true,"pages":7}
 {"date":"2026-08-09","commit":"36e698a","ok":false,"error":"http://localhost:5180 répond déjà — un autre serveur occupe le port. Arrêtez-le, ou donnez un baseUrl libre dans cockpit.config.json."}
 {"date":"2026-08-09","commit":"569dc41","ok":true,"pages":7}
+{"date":"2026-08-09","commit":"bccf743","ok":true,"pages":7}
+{"date":"2026-08-09","commit":"4afe6e6","ok":true,"pages":7}

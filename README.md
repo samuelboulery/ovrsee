@@ -92,6 +92,47 @@ lui réserve donc `graphe/`, que l'export ne touche jamais :
 
 C'est ce que fait le bouton « ◈ Graphe → coffre Obsidian » du terminal intégré.
 
+### Un coffre comme source de l'onglet Données
+
+L'export ci-dessus va du dépôt vers le coffre. Le chemin inverse existe aussi,
+pour qui documente son projet dans Obsidian plutôt qu'avec Graphify : le champ
+`obsidianVault` désigne un coffre, et l'onglet Données le lit **quand Graphify
+n'a rien produit**.
+
+La convention est étroite, et volontairement. **Une note est une table quand son
+frontmatter porte `type: table`** — rien d'autre n'en fait une. `columns` en
+donne les colonnes, `maj` la date de dernière mise à jour, et les notes qui la
+citent en wikilink en deviennent les usages.
+
+```markdown
+---
+type: table
+titre: Commandes
+columns: [id, client_id, total]
+maj: 2026-03-12
+---
+
+Les commandes passées.
+```
+
+**Graphify passe devant, toujours.** Le cadrage écarte de reconstruire la vue
+base de données parce que Graphify la fait mieux et à jour à chaque commit : son
+graphe vient du code, celui du coffre de ce que quelqu'un a tapé. Un coffre
+déclaré alors que `graphify-out/graph.json` existe n'est pas lu — et l'onglet le
+dit, plutôt que de laisser un champ de config sans effet visible.
+
+Ces lignes ne portent donc pas la confiance `EXTRACTED` / `INFERRED` /
+`AMBIGUOUS` de Graphify, qui dit ce qu'un parseur a tiré du code. Elles portent
+leur date, ou la mention **non daté**. C'est la seule condition à laquelle une
+donnée écrite à la main a sa place ici : datée, on peut en juger ; sans date,
+elle ment sans prévenir.
+
+Le chemin est absolu, ou relatif à la racine du dépôt — donc il peut en sortir,
+et c'est l'intérêt. Le cockpit lira alors des fichiers hors du dépôt : seulement
+des `.md`, seulement leur frontmatter et leurs wikilinks, jamais leur corps,
+sans suivre les liens symboliques et dans la limite de 4000 notes. Il n'écrit
+jamais dans le coffre.
+
 Exemple de `cockpit.config.json`, à la racine du projet observé :
 
 ```json
@@ -100,7 +141,8 @@ Exemple de `cockpit.config.json`, à la racine du projet observé :
   "baseUrl": "http://localhost:8099",
   "entryRoutes": ["/", "/login"],
   "auth": { "storageState": ".cockpit-auth.json" },
-  "ignore": ["/auth/callback"]
+  "ignore": ["/auth/callback"],
+  "obsidianVault": "~/Coffres/mon-projet"
 }
 ```
 

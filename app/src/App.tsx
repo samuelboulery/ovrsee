@@ -416,7 +416,13 @@ export function App() {
                           onChange={setTableau}
                         />
                       )}
-                      {tab === 'donnees' && <Donnees graph={snapshot.graph} />}
+                      {tab === 'donnees' && (
+                        <Donnees
+                          graph={snapshot.graph}
+                          source={snapshot.graphSource}
+                          vaultDeclared={Boolean(snapshot.config?.obsidianVault)}
+                        />
+                      )}
                       {tab === 'stack' && <Stack snapshot={snapshot} />}
                     </Garde>
                   )}

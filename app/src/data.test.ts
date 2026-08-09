@@ -205,6 +205,24 @@ test('tablesFrom encaisse un graphe absent', () => {
   assert.deepEqual(tablesFrom(null), [])
 })
 
+test('tablesFrom transporte la date déclarée, et ne l’invente pas', () => {
+  const rows = tablesFrom({
+    nodes: [
+      { id: 'coffre', label: 'Commandes', file_type: 'table', declared: '2026-03-12' },
+      { id: 'muette', label: 'Clients', file_type: 'table', declared: null },
+      { id: 'code', label: 'orders', file_type: 'sql' },
+    ],
+    links: [],
+  })
+  const par = Object.fromEntries(rows.map(r => [r.name, r]))
+
+  assert.equal(par.Commandes.declared, '2026-03-12')
+  // Déclarée mais non datée : `null`, pas `undefined`.
+  assert.equal(par.Clients.declared, null)
+  // Venue de Graphify : rien du tout, c'est ce qui la fait afficher une confiance.
+  assert.equal('declared' in par.orders, false)
+})
+
 test('stackFrom encaisse un package.json absent', () => {
   assert.deepEqual(stackFrom(null), [])
 })

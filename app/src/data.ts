@@ -225,6 +225,11 @@ export interface CockpitConfig {
   dev?: string
   /** Où l'application s'affiche une fois démarrée. */
   baseUrl?: string
+  /**
+   * Coffre Obsidian tenant lieu de source de graphe, quand Graphify n'a rien
+   * produit. Absolu, `~`, ou relatif à la racine du dépôt.
+   */
+  obsidianVault?: string
 }
 
 export interface Snapshot {
@@ -250,6 +255,14 @@ export interface Snapshot {
   } | null
   scans: Scan[]
   graph: GraphifyGraph | null
+  /**
+   * D'où vient `graph` : Graphify, ou un coffre Obsidian déclaré en config.
+   *
+   * L'onglet Données l'affiche. Les deux sources n'ont ni la même fraîcheur ni
+   * la même fiabilité — l'une est analysée, l'autre écrite à la main — et une
+   * ligne dont on ignore l'origine ne se vérifie pas.
+   */
+  graphSource: 'graphify' | 'obsidian' | null
   /** slug de page → captures successives, de la plus récente à la plus ancienne */
   shots: Record<string, string[]>
   /** Commits et plans mêlés, du plus récent au plus ancien. */
@@ -702,6 +715,13 @@ export interface TableRow {
   cols: string
   used: string
   conf: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS'
+  /**
+   * Date que l'auteur d'une note du coffre y a écrite, `null` s'il n'en a pas
+   * mis. **`undefined` signifie que la ligne ne vient pas d'un coffre** — c'est
+   * ce qui distingue une table déclarée d'une table dérivée du code, et donc ce
+   * qui décide si l'onglet affiche une confiance ou une date.
+   */
+  declared?: string | null
 }
 
 const CONFIDENCES = ['EXTRACTED', 'INFERRED', 'AMBIGUOUS'] as const
@@ -746,6 +766,8 @@ export function tablesFrom(graph: GraphifyGraph | null): TableRow[] {
       cols: String(node.columns ?? '—'),
       used: users.length > 0 ? [...new Set(users)].slice(0, 3).join(' · ') : 'aucune page identifiée',
       conf: worst ?? 'INFERRED',
+      // Transporté tel quel : seul un nœud venu d'un coffre le porte.
+      ...('declared' in node ? { declared: (node.declared as string | null) ?? null } : {}),
     }
   })
 }

@@ -5934,8 +5934,8 @@
       "source_file": "/Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx",
       "source_location": "L375",
       "weight": 1.0,
-      "_src": "navigateur_send",
-      "_tgt": "useterminal_pastetoclaude",
+      "_src": "useterminal_pastetoclaude",
+      "_tgt": "navigateur_send",
       "source": "useterminal_pastetoclaude",
       "target": "navigateur_send"
     },
@@ -6642,8 +6642,8 @@
       "source_file": "/Users/sam/code/cockpit/hooks/snapshot.js",
       "source_location": "L215",
       "weight": 1.0,
-      "_src": "snapshot_shotpath",
-      "_tgt": "navigateur_normalize",
+      "_src": "navigateur_normalize",
+      "_tgt": "snapshot_shotpath",
       "source": "navigateur_normalize",
       "target": "snapshot_shotpath"
     },
@@ -6654,8 +6654,8 @@
       "source_file": "/Users/sam/code/cockpit/hooks/plans.js",
       "source_location": "L188",
       "weight": 1.0,
-      "_src": "plans_slugify",
-      "_tgt": "navigateur_normalize",
+      "_src": "navigateur_normalize",
+      "_tgt": "plans_slugify",
       "source": "navigateur_normalize",
       "target": "plans_slugify"
     },
@@ -6666,8 +6666,8 @@
       "source_file": "/Users/sam/code/cockpit/electron/main.js",
       "source_location": "L61",
       "weight": 1.0,
-      "_src": "main_serveui",
-      "_tgt": "navigateur_normalize",
+      "_src": "navigateur_normalize",
+      "_tgt": "main_serveui",
       "source": "navigateur_normalize",
       "target": "main_serveui"
     },

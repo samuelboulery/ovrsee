@@ -1,7 +1,7 @@
 # Graph Report - /Users/sam/code/cockpit  (2026-08-09)
 
 ## Corpus Check
-- 54 files · ~689,367 words
+- 54 files · ~690,801 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -71,8 +71,8 @@
   /Users/sam/code/cockpit/support.js → /Users/sam/code/cockpit/scripts/make-icon.js
 - `ecrire()` --calls--> `ticketAction()`  [INFERRED]
   /Users/sam/code/cockpit/app/src/tabs/Tableau.tsx → /Users/sam/code/cockpit/server/api.js
-- `slugify()` --calls--> `normalize()`  [INFERRED]
-  /Users/sam/code/cockpit/hooks/plans.js → /Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx
+- `normalize()` --calls--> `slugify()`  [INFERRED]
+  /Users/sam/code/cockpit/app/src/tabs/Navigateur.tsx → /Users/sam/code/cockpit/hooks/plans.js
 
 ## Communities
 

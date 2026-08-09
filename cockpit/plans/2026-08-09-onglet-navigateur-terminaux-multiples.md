@@ -19,6 +19,11 @@
         "electron/pty.js",
         "hooks/snapshot.js"
       ]
+    },
+    {
+      "sha": "c75e4c1",
+      "date": "2026-08-09",
+      "files": []
     }
   ]
 }

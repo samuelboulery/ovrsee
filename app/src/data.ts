@@ -732,21 +732,33 @@ export const history = (plans: Plan[]): Plan[] =>
     .filter(p => p.status === 'closed')
     .sort((a, b) => (b.closed ?? '').localeCompare(a.closed ?? ''))
 
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000
+/**
+ * `density()` vit dans `hooks/density.js`, et nulle part ailleurs.
+ *
+ * Elle a longtemps existé en double, ici et là-bas, et les deux copies avaient
+ * fini par diverger sur la façon de reconnaître leur entrée. Le CLI et le
+ * serveur MCP en ont besoin autant que l'interface, et eux ne peuvent pas
+ * importer `app/src` — c'est ce qui fixe le sens de la dépendance.
+ *
+ * Le module est séparé de `plans.js`, qui importe `node:fs` : un module Node
+ * dans le bundle du navigateur se fait externaliser par Vite, et l'application
+ * tombe à la première lecture au lieu de refuser de compiler.
+ */
+import { density } from '../../hooks/density'
+export { density }
 
-/** Densité d'activité : commits par semaine, du plus ancien au plus récent. */
-export function density(plans: Plan[], weeks = 16, now: Date = new Date()): number[] {
-  const buckets = new Array(weeks).fill(0)
-  for (const plan of liste(plans)) {
-    for (const commit of plan.commits ?? []) {
-      const at = Date.parse(commit.date)
-      if (Number.isNaN(at)) continue
-      const index = weeks - 1 - Math.floor((now.getTime() - at) / WEEK_MS)
-      if (index >= 0 && index < weeks) buckets[index] += 1
-    }
-  }
-  return buckets
-}
+/**
+ * Tous les commits de la frise, ceux des plans comme les autres.
+ *
+ * La densité comptait naguère les seuls commits rattachés à un plan, et un
+ * projet avancé par correctifs paraissait dormant. La frise, elle, connaît les
+ * deux sortes : `hooks/timeline.js` explique pourquoi les taire donnait « une
+ * chronologie à trous ». La densité lit donc la même source qu'elle.
+ */
+export const commitsDeLaFrise = (timeline: TimelineEntry[]): GitCommit[] =>
+  liste(timeline).flatMap(entry =>
+    entry.kind === 'plan' ? (entry.commits ?? []) : entry.commit ? [entry.commit] : [],
+  )
 
 /**
  * Plans clos ayant touché les fichiers d'une page.

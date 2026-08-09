@@ -18,7 +18,6 @@ import {
   readPlans,
   plansOuverts,
   history,
-  density,
   slugify,
   planFileName,
   writeFileNoFollow,
@@ -217,29 +216,6 @@ test('history trie sur la clôture, pas sur l’ouverture', () => {
     history(plans).map(p => p.meta.title),
     ['Ouvert tôt, clos tard', 'Ouvert tard, clos tôt'],
   )
-})
-
-test('density compte les commits par semaine, du plus ancien au plus récent', () => {
-  const d = density(SAMPLE, { weeks: 6, now: new Date('2026-07-20T00:00:00Z') })
-  assert.equal(d.length, 6)
-  assert.equal(
-    d.reduce((a, b) => a + b, 0),
-    2,
-    'les deux commits de l’échantillon tombent dans la fenêtre',
-  )
-  assert.equal(d.at(-1), 1, 'le commit du 18 juil. tombe dans la semaine courante')
-})
-
-test('density ignore les commits hors fenêtre au lieu de les empiler sur le premier seau', () => {
-  const vieux = [P('closed', 'Antique', '2020-01-01', '2020-01-02', [
-    { sha: 'aaa', date: '2020-01-02', files: [] },
-  ])]
-  const d = density(vieux, { weeks: 4, now: new Date('2026-07-20T00:00:00Z') })
-  assert.deepEqual(d, [0, 0, 0, 0])
-})
-
-test('density rend une fenêtre de zéros quand il n’y a aucun plan', () => {
-  assert.deepEqual(density([], { weeks: 3, now: new Date('2026-07-20T00:00:00Z') }), [0, 0, 0])
 })
 
 // --- nommage ---------------------------------------------------------------

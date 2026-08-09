@@ -26,7 +26,6 @@ import { basename, dirname, join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 
 const FENCE = '---'
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
 /**
  * @param {string} src contenu brut d'un fichier de plan
@@ -157,30 +156,6 @@ export function history(plans) {
   return plans
     .filter(p => p.meta.status === 'closed')
     .sort((a, b) => String(b.meta.closed ?? '').localeCompare(String(a.meta.closed ?? '')))
-}
-
-/**
- * Densité d'activité : nombre de commits par semaine, du plus ancien seau au
- * plus récent. Alimente la sparkline de la barre latérale.
- *
- * @param {Array} plans
- * @param {{weeks?: number, now?: Date}} [opts]
- * @returns {number[]} tableau de longueur `weeks`
- */
-export function density(plans, { weeks = 16, now = new Date() } = {}) {
-  const buckets = new Array(weeks).fill(0)
-  const end = now.getTime()
-
-  for (const plan of plans) {
-    for (const commit of plan.meta.commits ?? []) {
-      const at = Date.parse(commit.date)
-      if (Number.isNaN(at)) continue
-      // Seau 0 = la semaine la plus ancienne, dernier seau = la semaine courante.
-      const index = weeks - 1 - Math.floor((end - at) / WEEK_MS)
-      if (index >= 0 && index < weeks) buckets[index] += 1
-    }
-  }
-  return buckets
 }
 
 const ACCENTS = /[̀-ͯ]/g

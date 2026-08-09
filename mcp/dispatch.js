@@ -10,7 +10,8 @@ import { isAbsolute, join } from 'node:path'
 
 // Imports des hooks
 import { readRegistry } from '../hooks/plans.js'
-import { readPlans, density } from '../hooks/plans.js'
+import { readPlans } from '../hooks/plans.js'
+import { density } from '../hooks/density.js'
 import { readTickets, readBoard, createTicket, updateTicket, moveTicket } from '../hooks/tickets.js'
 import { snapshot, projects, tableau } from '../hooks/snapshot.js'
 import { buildBrief, readCockpit } from '../hooks/brief.js'

@@ -1,15 +1,22 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Mouvement automatique des tickets (en cours → revue → fini) + colonnes adaptatives",
   "opened": "2026-08-10",
-  "closed": null,
+  "closed": "2026-08-10",
   "commits": [
     {
       "sha": "aec2324",
       "date": "2026-08-10",
       "files": [
         ".gitignore"
+      ]
+    },
+    {
+      "sha": "4c94bb7",
+      "date": "2026-08-10",
+      "files": [
+        "\"ovrsee/tickets/T-0024-panneau-preferences-int\\303\\251grations.md\""
       ]
     }
   ]

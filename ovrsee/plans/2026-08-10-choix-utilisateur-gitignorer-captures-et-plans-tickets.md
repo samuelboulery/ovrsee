@@ -4,7 +4,24 @@
   "title": "Choix utilisateur : gitignorer captures et plans/tickets",
   "opened": "2026-08-10",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "f837d74",
+      "date": "2026-08-10",
+      "files": [
+        "app/src/Onboarding.tsx",
+        "app/src/PreferencesProjet.tsx",
+        "app/src/data.ts",
+        "hooks/gitignore-sync.js",
+        "hooks/gitignore-sync.test.js",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/ovrsee-post-commit.js",
+        "hooks/settings.js",
+        "hooks/settings.test.js"
+      ]
+    }
+  ]
 }
 ---
 

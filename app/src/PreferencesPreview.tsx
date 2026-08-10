@@ -15,8 +15,14 @@ import type { SettingsType } from './data'
 import { t, type TranslationKey } from './i18n'
 import { s } from './style'
 
-/** Les mêmes sept onglets que `TABS` dans `App.tsx`, et leurs clés. */
-const TAB_KEYS: Record<string, TranslationKey> = {
+/**
+ * Les mêmes sept onglets que `TABS` dans `App.tsx`, et leurs clés.
+ *
+ * La table est ici — et pas dans `PreferencesPanel.tsx`, qui en gardait une
+ * copie — parce que ce fichier n'importe aucune section : les sections peuvent
+ * donc toutes s'y référer sans cycle d'import.
+ */
+export const TAB_KEYS: Record<string, TranslationKey> = {
   apercu: 'tabs.apercu',
   navigateur: 'tabs.navigateur',
   produit: 'tabs.produit',
@@ -25,6 +31,15 @@ const TAB_KEYS: Record<string, TranslationKey> = {
   donnees: 'tabs.donnees',
   stack: 'tabs.stack',
 }
+
+/**
+ * L'ordre d'usine des onglets.
+ *
+ * C'est le dernier recours quand un fichier de préférences abîmé rend un
+ * `onglets.ordre` incomplet : `validateSettings` (`hooks/settings.js`) exige
+ * les sept identifiants, faute de quoi il rejette le tableau en silence.
+ */
+export const ORDRE_USINE = Object.keys(TAB_KEYS)
 
 /**
  * Les onglets visibles, dans l'ordre — même règle qu'`activeTabsInOrder()`
@@ -48,21 +63,13 @@ function Ligne({ width, dim = false }: { width: number; dim?: boolean }) {
   )
 }
 
-/** Le liseré qui désigne la zone que la section courante manipule. */
-const surlignage = (actif: boolean) =>
-  actif ? ' outline: 1px solid var(--color-accent); outline-offset: -1px;' : ''
-
 /**
+ * La maquette n'a plus de zone à souligner : onglets et terminal se règlent
+ * maintenant dans la même section, et les templates la montrent entière.
+ *
  * @param settings les préférences en cours d'édition
- * @param highlight la zone à souligner, selon la section ouverte
  */
-export function PreferencesPreview({
-  settings,
-  highlight,
-}: {
-  settings: SettingsType
-  highlight?: 'tabs' | 'terminal'
-}) {
+export function PreferencesPreview({ settings }: { settings: SettingsType }) {
   const onglets = ongletsVisibles(settings)
   const terminal = settings.terminal ?? { visible: false, disposition: 'bottom' }
   const visible = terminal.visible === true
@@ -82,8 +89,7 @@ export function PreferencesPreview({
     <div
       style={s(
         'display: flex; gap: 5px; padding: 6px 7px; background: var(--theme-bg-primary); font-size: 8px; color: var(--color-neutral-500);' +
-          formeTerminal +
-          surlignage(highlight === 'terminal'),
+          formeTerminal,
       )}
     >
       <span style={s('color: var(--color-accent); line-height: 1;')}>❯</span>
@@ -131,8 +137,7 @@ export function PreferencesPreview({
               visible porte le liseré d'accent, comme la vraie nav. */}
           <div
             style={s(
-              'flex: none; height: 18px; display: flex; align-items: stretch; gap: 1px; padding: 0 5px; background: var(--theme-bg-quaternary); border-bottom: 1px solid var(--color-divider); overflow: hidden;' +
-                surlignage(highlight === 'tabs'),
+              'flex: none; height: 18px; display: flex; align-items: stretch; gap: 1px; padding: 0 5px; background: var(--theme-bg-quaternary); border-bottom: 1px solid var(--color-divider); overflow: hidden;',
             )}
           >
             {onglets.map((id, index) => (

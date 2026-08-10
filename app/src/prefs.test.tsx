@@ -6,15 +6,12 @@ import type { SettingsType } from './data'
 import {
   basculerOnglet,
   deplacerOnglet,
-  SectionActions,
-  SectionActivite,
-  SectionAvance,
-  SectionDemarrage,
   SectionGeneral,
-  SectionOnglets,
-  SectionTerminal,
+  SectionInterface,
 } from './PreferencesPanel'
 import { PreferencesPreview, ongletsVisibles } from './PreferencesPreview'
+import { appliquerProfil, PROFILS, profilCourant, SectionProfils } from './PreferencesProfils'
+import { SectionProjet } from './PreferencesProjet'
 
 /**
  * L'écran des préférences.
@@ -109,13 +106,10 @@ test('ongletsVisibles : filtre par actifs et suit l’ordre', () => {
 /* — rendu — */
 
 const SECTIONS = [
+  ['Profils', SectionProfils],
   ['Général', SectionGeneral],
-  ['Onglets', SectionOnglets],
-  ['Terminal', SectionTerminal],
-  ['Activité', SectionActivite],
-  ['Actions', SectionActions],
-  ['Démarrage', SectionDemarrage],
-  ['Avancé', SectionAvance],
+  ['Interface', SectionInterface],
+  ['Projet', SectionProjet],
 ] as const
 
 /** Les préférences telles qu'un fichier abîmé peut les rendre. */
@@ -145,7 +139,6 @@ test('aperçu : les trois dispositions et le terminal masqué', () => {
     const html = renderToStaticMarkup(
       <PreferencesPreview
         settings={settings({ terminal: { visible: true, disposition, hauteur: 1, largeur: 1 } })}
-        highlight="terminal"
       />,
     )
     assert(html.includes('❯'), `terminal absent de l’aperçu en ${disposition}`)
@@ -163,9 +156,72 @@ test('aperçu : la barre d’onglets ne montre que les onglets visibles', () => 
   const html = renderToStaticMarkup(
     <PreferencesPreview
       settings={settings({ onglets: { ordre: ORDRE, actifs: ['apercu', 'stack'] } })}
-      highlight="tabs"
     />,
   )
   assert(html.includes('Stack'), 'onglet visible absent')
   assert.equal(html.includes('Produit'), false, 'onglet masqué dessiné quand même')
+})
+
+/* — les templates — */
+
+const profil = (id: string) => {
+  const trouve = PROFILS.find(p => p.id === id)
+  assert(trouve, `profil inconnu : ${id}`)
+  return trouve
+}
+
+test('appliquerProfil : `ordre` garde toujours les sept identifiants', () => {
+  // C'est l'invariant que `validateSettings` exige : un `ordre` incomplet est
+  // rejeté en silence, et le rangement de l'utilisateur retombe à l'usine.
+  const cas: SettingsType[] = [
+    settings(),
+    settings({ onglets: { ordre: ['apercu'], actifs: ['apercu'] } }),
+    settings({ onglets: undefined }),
+  ]
+  for (const depart of cas) {
+    for (const p of PROFILS) {
+      const ordre = appliquerProfil(depart, p).onglets.ordre
+      assert.deepEqual([...ordre].sort(), [...ORDRE].sort())
+    }
+  }
+})
+
+test('appliquerProfil : les onglets du template passent en tête, dans son ordre', () => {
+  const suivant = appliquerProfil(settings(), profil('dev'))
+  assert.deepEqual(suivant.onglets.actifs, ['apercu', 'tableau', 'stack', 'historique'])
+  assert.deepEqual(suivant.onglets.ordre.slice(0, 4), suivant.onglets.actifs)
+})
+
+test('appliquerProfil : ne touche que les onglets et le terminal', () => {
+  const avant = settings({
+    theme: 'dark',
+    langue: 'en',
+    customActions: [{ label: 'Test', text: 'pnpm test' }],
+    terminal: { visible: true, disposition: 'bottom', hauteur: 300, largeur: 500 },
+  })
+  const apres = appliquerProfil(avant, profil('sobre'))
+
+  assert.equal(apres.theme, 'dark')
+  assert.equal(apres.langue, 'en')
+  assert.deepEqual(apres.densiteActivite, avant.densiteActivite)
+  assert.deepEqual(apres.customActions, avant.customActions)
+  assert.equal(apres.packageManager, avant.packageManager)
+  // Un template choisit une disposition, il ne redimensionne pas la fenêtre.
+  assert.equal(apres.terminal.hauteur, 300)
+  assert.equal(apres.terminal.largeur, 500)
+  assert.equal(apres.terminal.visible, false)
+})
+
+test('profilCourant : reconnaît le réglage d’usine, et rien d’autre', () => {
+  assert.equal(profilCourant(settings()), 'complet')
+  assert.equal(profilCourant(appliquerProfil(settings(), profil('revue'))), 'revue')
+  assert.equal(profilCourant(basculerOnglet(settings(), 'stack')), null)
+})
+
+test('profilCourant : terminal masqué, la disposition ne départage pas', () => {
+  // Elle ne se voit nulle part : deux réglages qui n'en diffèrent que par là
+  // sont le même écran.
+  const sobre = appliquerProfil(settings(), profil('sobre'))
+  const autre = { ...sobre, terminal: { ...sobre.terminal, disposition: 'full' } }
+  assert.equal(profilCourant(autre), 'sobre')
 })

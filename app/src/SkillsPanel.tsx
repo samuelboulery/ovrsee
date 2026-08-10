@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { fetchSkills, installSkills, type SkillEntry } from './data'
+import { fetchSkills, type SkillEntry } from './data'
 import { s } from './style'
 import { t } from './i18n'
 
@@ -19,9 +19,10 @@ const aProposer = (skill: SkillEntry): boolean => skill.source === 'bundled' && 
  * La liste des skills, sans son cadre.
  *
  * Deux usages, deux cadres : l'écran d'initialisation, où la sélection part
- * avec le bouton « Initialiser », et la modale de la barre latérale, qui
- * installe pour elle-même. D'où la sélection remontée plutôt que gardée ici —
- * un composant qui déciderait quand installer ne saurait pas servir les deux.
+ * avec le bouton « Initialiser », et la section « Claude Code » des
+ * préférences, qui installe pour elle-même. D'où la sélection remontée plutôt
+ * que gardée ici — un composant qui déciderait quand installer ne saurait pas
+ * servir les deux.
  */
 export function SkillsList({
   skills,
@@ -140,105 +141,4 @@ export function useSkills(): {
   }
 
   return { skills, choisis, setChoisis, setSkills: remplace }
-}
-
-/**
- * La même liste, en modale, pour un projet déjà équipé.
- *
- * Elle ne dépend d'aucun projet : les skills vivent dans `~/.claude/`, et une
- * mise à jour du cockpit peut les rendre périmés longtemps après
- * l'initialisation.
- */
-export function SkillsModal({ onClose }: { onClose: () => void }) {
-  const { skills, choisis, setChoisis, setSkills } = useSkills()
-  const [busy, setBusy] = useState(false)
-  const [done, setDone] = useState<string[] | null>(null)
-  const [erreur, setErreur] = useState<string | null>(null)
-
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      onClose()
-      event.preventDefault()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
-
-  return (
-    <div
-      onClick={onClose}
-      style={s(
-        'position: fixed; inset: 0; z-index: 50; background: rgba(6,7,14,.88); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 24px;',
-      )}
-    >
-      <div
-        onClick={event => event.stopPropagation()}
-        style={s(
-          'width: min(560px, 100%); max-height: 100%; overflow: auto; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 8px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px;',
-        )}
-      >
-        <div style={s('display: flex; align-items: baseline; gap: 10px;')}>
-          <h2
-            style={s(
-              'font-family: var(--font-heading); font-weight: 500; font-size: 16px; margin: 0;',
-            )}
-          >
-            {t('skills.title')}
-          </h2>
-          <div style={s('flex: 1;')} />
-          <button type="button" className="btn btn-ghost" onClick={onClose}>
-            {t('skills.close')}
-          </button>
-        </div>
-
-        <div style={s('font-size: 11.5px; color: var(--color-neutral-600);')}>
-          {t('skills.installed_in')} <code>~/.claude/skills/</code>, {t('skills.learn_cockpit')}
-        </div>
-
-        <SkillsList skills={skills} choisis={choisis} onChoisis={setChoisis} />
-
-        {erreur && (
-          <div
-            style={s(
-              'font-size: 12px; color: var(--color-accent-300); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
-            )}
-          >
-            {erreur}
-          </div>
-        )}
-
-        {done && (
-          <div style={s('font-size: 11px; color: var(--color-neutral-500);')}>
-            {done.map(line => (
-              <div key={line}>{line}</div>
-            ))}
-          </div>
-        )}
-
-        <button
-          type="button"
-          className="btn btn-primary"
-          disabled={busy || choisis.length === 0}
-          onClick={() => {
-            setBusy(true)
-            setErreur(null)
-            installSkills(choisis)
-              .then(result => {
-                setDone(result.done)
-                setSkills(result.skills)
-              })
-              .catch(err => setErreur(String(err.message ?? err)))
-              .finally(() => setBusy(false))
-          }}
-        >
-          {busy
-            ? t('skills.installing')
-            : choisis.length === 0
-              ? t('skills.nothing_to_install')
-              : t('skills.install_count', { count: choisis.length })}
-        </button>
-      </div>
-    </div>
-  )
 }

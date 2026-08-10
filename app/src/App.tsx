@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { applyTheme } from './theme'
-import { t, setCurrentLanguage, type TranslationKey } from './i18n'
+import { t, setCurrentLanguage } from './i18n'
 import {
   commitsDeLaFrise,
   density,
@@ -22,8 +22,6 @@ import {
   type Tableau as TableauData,
 } from './data'
 import { Garde } from './Garde'
-import { SkillsModal } from './SkillsPanel'
-import { ConfigClaudeModal } from './ConfigClaudeModal'
 import { PreferencesModal } from './PreferencesPanel'
 import { Welcome } from './Welcome'
 import { EquipmentPanel } from './EquipmentPanel'
@@ -65,21 +63,17 @@ export const TABS = [
 
 export type TabId = (typeof TABS)[number][0]
 
-const tabToKey: Record<TabId, TranslationKey> = {
-  apercu: 'tabs.apercu',
-  navigateur: 'tabs.navigateur',
-  produit: 'tabs.produit',
-  historique: 'tabs.historique',
-  tableau: 'tabs.tableau',
-  donnees: 'tabs.donnees',
-  stack: 'tabs.stack',
-}
-
 const tabForPath = (pathname: string): TabId =>
   TABS.find(([, , path]) => path === pathname)?.[0] ?? 'apercu'
 
-/** Le nom de l'onglet tel que l'utilisateur le lit — pour les messages. */
-export const labelOf = (id: TabId): string => t(tabToKey[id])
+/**
+ * Le nom de l'onglet tel que l'utilisateur le lit — pour les messages.
+ *
+ * Lu dans `TABS`, qui porte déjà la clé : une seconde table identifiant → clé
+ * finissait par diverger de celle-ci.
+ */
+export const labelOf = (id: TabId): string =>
+  t(TABS.find(([tab]) => tab === id)?.[1] ?? 'tabs.apercu')
 
 /**
  * Onglets actifs selon les préférences, dans l'ordre de l'ordre configuré.
@@ -603,6 +597,13 @@ export function App() {
           onSaved={next => {
             setSettings(next)
             setCurrentLanguage(next.langue)
+            // Le terminal a un état local, que le menu et le bouton basculent
+            // sans rien écrire. Après une écriture, c'est le fichier qui fait
+            // foi — sinon appliquer un profil sans terminal masque les onglets
+            // et laisse le terminal ouvert. Les tailles, elles, ne se relisent
+            // pas : elles ont leur propre écriture différée au redimensionnement.
+            setTerminal(next.terminal.visible)
+            setLayout(next.terminal.disposition as Layout)
           }}
         />
       )}
@@ -794,9 +795,6 @@ function Sidebar({
   onOpenPreferences: () => void
   density: number[]
 }) {
-  const [skillsOuverts, setSkillsOuverts] = useState(false)
-  const [configOuverte, setConfigOuverte] = useState(false)
-
   // Le sélecteur de dossier n'existe que dans l'application empaquetée. Dans un
   // navigateur, le bouton est absent plutôt que présent et inerte — même
   // franchise que pour le terminal.
@@ -847,19 +845,11 @@ function Sidebar({
 
       <div style={s('flex: 1;')} />
 
-      {/* Les skills ne dépendent d'aucun projet — ils vivent dans `~/.claude/`.
-          Le rappel est ici parce qu'une mise à jour du cockpit peut les rendre
-          périmés longtemps après l'initialisation, quand l'écran qui les
-          proposait n'apparaît plus. */}
+      {/* Une seule porte vers la configuration. Les skills et la lecture de
+          `~/.claude/` avaient chacun leur bouton et leur modale ; ils sont
+          maintenant deux sections des préférences, parce que c'est la même
+          question — comment le cockpit est réglé. */}
       <div style={s('padding: 0 14px 12px; display: flex; flex-direction: column; gap: 6px;')}>
-        <button
-          type="button"
-          className="btn btn-ghost btn-block"
-          onClick={() => setSkillsOuverts(true)}
-          style={s('font-size: 11px;')}
-        >
-          {t('sidebar.skills')}
-        </button>
         <button
           type="button"
           className="btn btn-ghost btn-block"
@@ -869,21 +859,7 @@ function Sidebar({
         >
           ⚙ {t('sidebar.preferences')}
         </button>
-        {/* La configuration de Claude Code n'est pas celle du cockpit : elle
-            vit dans `~/.claude/` et le cockpit ne fait que la lire. Le bouton
-            est ici parce qu'on s'y demande ce qui est installé au même moment
-            qu'on se demande quels skills le sont. */}
-        <button
-          type="button"
-          className="btn btn-ghost btn-block"
-          onClick={() => setConfigOuverte(true)}
-          style={s('font-size: 11px;')}
-        >
-          ⌘ {t('sidebar.claude_config')}
-        </button>
       </div>
-      {skillsOuverts && <SkillsModal onClose={() => setSkillsOuverts(false)} />}
-      {configOuverte && <ConfigClaudeModal onClose={() => setConfigOuverte(false)} />}
 
       <div
         style={s(

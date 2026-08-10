@@ -336,6 +336,21 @@ export function Terminal({
               : 'width: 268px; flex: none; border-left: 1px solid var(--color-divider); padding: 12px 14px;',
           )}
         >
+          {/* La session s'ouvre pour tout projet du registre — c'est ce qui
+              permet de l'équiper depuis le terminal. Mais sans `cockpit/`, rien
+              de ce qui s'y passe n'est capté : le dire ici plutôt que de laisser
+              croire que les plans sont enregistrés. */}
+          {snapshot && !snapshot.equipped && (
+            <div
+              style={s(
+                'font-size: 11px; color: var(--color-accent-300); border: 1px solid var(--color-accent-700); border-radius: 4px; padding: 6px 8px; margin-bottom: 12px;',
+              )}
+            >
+              <div style={s('font-weight: 500;')}>{t('terminal.not_equipped')}</div>
+              <div>{t('terminal.not_equipped_desc')}</div>
+            </div>
+          )}
+
           {/* Section : Commandes pour Claude */}
           <div
             style={s(

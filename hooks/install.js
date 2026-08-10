@@ -181,6 +181,29 @@ function installClaudeHooks(done) {
 }
 
 /**
+ * Écrit `cockpit.config.json` — ce qui débloque le crawl, qui refuse de démarrer
+ * sans lui (`crawl/index.js`).
+ *
+ * **Jamais écrasé.** Le fichier ne sert pas qu'au crawl : `mergeSettings` y lit
+ * aussi les surcharges de préférences du projet. L'écraser pour deux champs en
+ * emporterait d'autres, sans rapport. Et `install` doit rester réexécutable.
+ *
+ * Les trois champs sont écrits en clair même quand ils valent les défauts du
+ * crawler : un fichier vide, « parce que ça vaut les défauts », n'apprendrait
+ * rien à qui l'ouvre. Le reste — `maxPages`, `viewport`, `auth` — reste implicite.
+ */
+function writeCockpitConfig(root, { dev, baseUrl }, done) {
+  const path = join(root, 'cockpit.config.json')
+  if (existsSync(path)) {
+    done.push('cockpit.config.json existait déjà — conservé tel quel')
+    return
+  }
+
+  writeFileNoFollow(path, JSON.stringify({ dev, baseUrl, entryRoutes: ['/'] }, null, 2) + '\n')
+  done.push(`cockpit.config.json écrit (${dev} → ${baseUrl})`)
+}
+
+/**
  * Équipe un dépôt. Rend la liste de ce qui a été fait, ligne par ligne — c'est
  * ce que le CLI affiche et ce que l'interface montre après un « Initialiser ».
  *
@@ -188,19 +211,53 @@ function installClaudeHooks(done) {
  * dans le dépôt, et rater cette étape ne doit pas laisser le projet à moitié
  * équipé.
  *
+ * **L'ordre du premier commit n'est pas cosmétique.** Il passe avant la pose du
+ * hook post-commit et l'écriture de la configuration, parce que ce hook lance un
+ * crawl détaché — le serveur de développement du projet observé — dès qu'un
+ * commit touche des sources et qu'un `cockpit.config.json` existe. Committer en
+ * dernier ferait démarrer ce serveur dans la seconde qui suit le clic, sur un
+ * projet dont les dépendances ne sont peut-être même pas installées.
+ *
  * @param {string} target dossier quelconque à l'intérieur du dépôt
- * @param {{skills?: string[]}} options noms de skills du catalogue à installer
+ * @param {{
+ *   skills?: string[],
+ *   gitInit?: boolean,
+ *   commit?: boolean,
+ *   config?: {dev: string, baseUrl: string} | null,
+ * }} options
  * @returns {string[]}
- * @throws si `target` n'est pas dans un dépôt git : le rattachement des commits
- *   aux plans n'a alors aucun sens, et le dire vaut mieux qu'installer à moitié.
+ * @throws si `target` n'est pas dans un dépôt git et qu'on n'a pas demandé de
+ *   l'y transformer : le rattachement des commits aux plans n'a alors aucun
+ *   sens, et le dire vaut mieux qu'installer à moitié.
  */
-export function install(target, { skills = [] } = {}) {
+export function install(target, { skills = [], gitInit = false, commit = false, config = null } = {}) {
+  const done = []
+  const cwd = resolve(target)
+
+  if (gitInit) {
+    execFileSync('git', ['init'], { cwd, stdio: 'ignore' })
+    done.push('dépôt git créé')
+  }
+
   const root = execFileSync('git', ['rev-parse', '--show-toplevel'], {
-    cwd: resolve(target),
+    cwd,
     encoding: 'utf8',
   }).trim()
 
-  const done = []
+  // Un échec ici — identité git absente, rien à committer — n'a pas à faire
+  // échouer l'équipement : le commit est un confort, `cockpit/` est le sujet.
+  if (commit) {
+    try {
+      execFileSync('git', ['add', '-A'], { cwd: root, stdio: 'ignore' })
+      execFileSync('git', ['commit', '-m', 'chore: point de départ du cockpit'], {
+        cwd: root,
+        stdio: 'ignore',
+      })
+      done.push('premier commit créé')
+    } catch (err) {
+      done.push(`premier commit impossible : ${err?.message ?? err}`)
+    }
+  }
 
   mkdirSync(join(root, 'cockpit', 'plans'), { recursive: true })
   done.push(`cockpit/plans/ prêt dans ${root}`)
@@ -215,6 +272,8 @@ export function install(target, { skills = [] } = {}) {
     writeFileNoFollow(board, JSON.stringify({ colonnes: DEFAULT_COLUMNS }, null, 2) + '\n')
     done.push('cockpit/board.json écrit avec les colonnes par défaut')
   }
+
+  if (config) writeCockpitConfig(root, config, done)
 
   installPostCommit(root, done)
   installClaudeHooks(done)

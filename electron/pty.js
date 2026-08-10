@@ -28,7 +28,6 @@
 // l'asar dans electron-builder.yml.
 import { spawn } from 'node-pty'
 import { existsSync } from 'node:fs'
-import { join } from 'node:path'
 
 /**
  * Ce qui est tapé une fois dans le shell qui vient de s'ouvrir, par genre de
@@ -85,16 +84,21 @@ let counter = 0
 /**
  * Ouvre une session dans le dossier d'un projet.
  *
+ * Un projet sans `cockpit/` ouvre une session comme les autres : c'est là qu'on
+ * l'équipe. L'appartenance au registre est vérifiée en amont, dans le
+ * gestionnaire `pty:open` de `main.js` — la liste blanche vit avec les autres,
+ * pas dupliquée ici.
+ *
  * @param {Electron.WebContents} sender destinataire des octets du terminal
- * @param {string} projectPath dossier du projet
+ * @param {string} projectPath dossier du projet, déjà reconnu par `main.js`
  * @param {'claude'|'shell'} [kind] genre de session ; tout autre valeur vaut `claude`
  * @returns {{id: string} | {error: string}}
  */
 export function openSession(sender, projectPath, kind = 'claude') {
-  // Le chemin vient du rendu : il doit désigner un projet réel, pas un
-  // dossier arbitraire, et surtout pas un fichier.
-  if (typeof projectPath !== 'string' || !existsSync(join(projectPath, 'cockpit'))) {
-    return { error: "ce dossier n'est pas un projet suivi par le cockpit" }
+  // Reste après la garde du registre : un projet enregistré puis déplacé sur le
+  // disque échouerait sinon dans `spawn`, avec un message autrement moins clair.
+  if (typeof projectPath !== 'string' || !existsSync(projectPath)) {
+    return { error: 'le dossier de ce projet est introuvable' }
   }
 
   // Le genre vient du rendu : `hasOwn` et pas une simple indexation, sinon

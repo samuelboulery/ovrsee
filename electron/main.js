@@ -267,9 +267,20 @@ app.whenReady().then(() => {
 
   // Surface du terminal. Elle n'accepte jamais de nom de programme : le
   // processus lancé est décidé dans pty.js, pas par le rendu.
-  ipcMain.handle('pty:open', (event, projectPath, kind) =>
-    openSession(event.sender, projectPath, kind),
-  )
+  //
+  // La liste blanche est le registre, et non la présence d'un `cockpit/` :
+  // ouvrir un terminal sur un projet qu'on vient d'ajouter est la seule façon
+  // d'y installer quoi que ce soit, et l'exiger équipé enfermait l'utilisateur
+  // — l'écran d'équipement renvoyait au terminal, que le terminal refusait.
+  // Ce qui doit rester impossible, c'est qu'un rendu compromis lance un shell
+  // dans un dossier que l'utilisateur n'a jamais désigné : même garde que
+  // `projects:reveal`.
+  ipcMain.handle('pty:open', (event, projectPath, kind) => {
+    if (typeof projectPath !== 'string' || !projects(null).some(p => p.path === projectPath)) {
+      return { error: "ce dossier n'est pas dans la liste des projets du cockpit" }
+    }
+    return openSession(event.sender, projectPath, kind)
+  })
   ipcMain.handle('pty:write', (_event, id, data) => writeTo(id, data))
   ipcMain.handle('pty:resize', (_event, id, cols, rows) => resize(id, cols, rows))
   ipcMain.handle('pty:close', (_event, id) => closeSession(id))

@@ -50,6 +50,13 @@ test('i18n: tous les dictionnaires ont les mêmes clés', () => {
     'equipment.bootstrap_desc', 'equipment.send_to_terminal', 'equipment.prerequisites_title',
     'equipment.missing_git', 'equipment.missing_lockfile', 'equipment.missing_config',
     'equipment.initialize_btn', 'equipment.initializing',
+    'equipment.options_title', 'equipment.opt_git_init', 'equipment.opt_git_init_desc',
+    'equipment.opt_commit', 'equipment.opt_commit_desc', 'equipment.opt_obsidian',
+    'equipment.opt_obsidian_desc', 'equipment.opt_config', 'equipment.field_dev',
+    'equipment.field_base_url', 'equipment.config_crawl_note', 'equipment.config_exists',
+    'equipment.graphify_note', 'equipment.graphify_send', 'equipment.warnings_title',
+    'equipment.writes_title', 'equipment.done_continue',
+    'terminal.not_equipped', 'terminal.not_equipped_desc',
     // Mois
     'months.jan', 'months.feb', 'months.mar', 'months.apr', 'months.may', 'months.jun',
     'months.jul', 'months.aug', 'months.sep', 'months.oct', 'months.nov', 'months.dec',

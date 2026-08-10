@@ -50,8 +50,35 @@ const usableDirectory = path =>
   lstatSync(path).isDirectory()
 
 /**
+ * Ce qu'on propose de mettre dans `cockpit.config.json`, pour que le formulaire
+ * d'équipement arrive pré-rempli plutôt que vide.
+ *
+ * ponytail: heuristique volontairement courte — le script `dev` ou `start` du
+ * `package.json`, le port que ce script déclare, sinon 3000 pour Next et 5173
+ * sinon. Un projet non-JS retombe sur les valeurs par défaut du crawler. Ce sont
+ * deux champs de formulaire éditables, pas une détection qui doit avoir raison :
+ * la corriger coûte une frappe, la deviner mieux coûterait un analyseur.
+ *
+ * Le gestionnaire de paquets vient des préférences plutôt que d'une constante —
+ * il y est déjà réglé, et proposer `pnpm dev` à quelqu'un qui a choisi `npm`
+ * serait une faute qu'on lui ferait corriger à chaque projet.
+ */
+function detectDefaults(root) {
+  const scripts = readJson(join(root, 'package.json'))?.scripts ?? {}
+  const nom = ['dev', 'start'].find(cle => typeof scripts[cle] === 'string') ?? 'dev'
+  const script = scripts[nom] ?? ''
+  const port =
+    /(?:--port|-p)[= ](\d{4,5})/.exec(script)?.[1] ?? (/\bnext\b/.test(script) ? '3000' : '5173')
+
+  return {
+    dev: `${readSettings().packageManager} ${nom}`,
+    baseUrl: `http://localhost:${port}`,
+  }
+}
+
+/**
  * État détecté d'un dossier : est-ce un dépôt git ? a-t-il un lockfile ?
- * cockpit.config.json ? Est-ce équipé ?
+ * cockpit.config.json ? Est-ce équipé ? Et que proposer au formulaire ?
  */
 function getFolderState(root) {
   const hasGit = (() => {
@@ -68,6 +95,8 @@ function getFolderState(root) {
 
   const hasConfig = existsSync(join(root, 'cockpit.config.json'))
 
+  const defaults = detectDefaults(root)
+
   try {
     const snap = snapshot(root)
     return {
@@ -76,6 +105,7 @@ function getFolderState(root) {
       hasConfig,
       equipped: snap.equipped,
       hasPackageJson: snap.packageJson !== null,
+      defaults,
     }
   } catch {
     return {
@@ -84,8 +114,42 @@ function getFolderState(root) {
       hasConfig,
       equipped: false,
       hasPackageJson: existsSync(join(root, 'package.json')),
+      defaults,
     }
   }
+}
+
+/** Distingue « pas de config demandée » de « config demandée, mais fausse ». */
+const INVALID = Symbol('config invalide')
+
+/**
+ * La configuration de crawl proposée par le formulaire d'équipement.
+ *
+ * Ce que cette validation vise, et ce qu'elle ne vise pas. `dev` finira dans un
+ * `spawn(…, { shell: true })` du crawler : c'est une commande shell, et ça le
+ * restera — c'est le sens du champ, exactement comme éditer `cockpit.config.json`
+ * à la main. Prétendre l'assainir ici donnerait une fausse assurance. Ce qui
+ * tient une page tierce à distance, c'est l'en-tête `X-Cockpit` et le registre
+ * comme liste blanche, pas une expression rationnelle sur une ligne de commande.
+ *
+ * Restent deux refus qui valent la peine : un `baseUrl` qui n'est pas une URL
+ * http — le crawler le refuserait de toute façon, mais bien plus tard et bien
+ * moins clairement — et une valeur qui n'est pas une chaîne, qui écrirait un
+ * JSON absurde qu'on relirait sans comprendre.
+ *
+ * @returns {{dev: string, baseUrl: string} | null | typeof INVALID}
+ */
+function validateCrawlConfig(config) {
+  if (config === undefined || config === null) return null
+  if (typeof config !== 'object' || Array.isArray(config)) return INVALID
+
+  const dev = typeof config.dev === 'string' ? config.dev.trim() : ''
+  const baseUrl = typeof config.baseUrl === 'string' ? config.baseUrl.trim() : ''
+
+  if (!dev || dev.length > 300 || /[\r\n]/.test(dev)) return INVALID
+  if (baseUrl.length > 300 || !/^https?:\/\/\S+$/.test(baseUrl)) return INVALID
+
+  return { dev, baseUrl }
 }
 
 /**
@@ -137,8 +201,27 @@ function projectAction(body, cwd) {
 
     case 'init': {
       if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
+
+      const config = validateCrawlConfig(body?.config)
+      if (config === INVALID) {
+        return { status: 400, json: { error: 'config de crawl invalide : dev et baseUrl requis' } }
+      }
+
       try {
-        return { json: { projects: projects(cwd), done: install(path, { skills: body?.skills }) } }
+        const done = install(path, {
+          skills: body?.skills,
+          gitInit: body?.gitInit === true,
+          commit: body?.commit === true,
+          config,
+        })
+
+        // L'export s'orchestre ici plutôt que dans `install` : c'est déjà une
+        // action de cette route, et l'équipement n'a pas à connaître Obsidian.
+        // Après, jamais avant — exporter un coffre d'un `cockpit/` inexistant
+        // ne produirait qu'un index vide.
+        if (body?.obsidian === true) done.push(...exportVault(path))
+
+        return { json: { projects: projects(cwd), done } }
       } catch (err) {
         // Le cas courant : le dossier n'est pas un dépôt git. Le dire, plutôt
         // que d'installer à moitié un rattachement des commits qui ne peut pas

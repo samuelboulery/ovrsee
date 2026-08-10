@@ -519,3 +519,62 @@ test("POST /api/projects action='state' refuse un projet hors registre", () => {
   assert.equal(result.status, 404, 'projet inconnu rend 404')
   assert.ok(result.json?.error, 'erreur présente')
 })
+
+test("POST /api/projects action='state' propose une config de crawl pré-remplie", () => {
+  withRegistry()
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-defaults-'))
+  writeFileSync(
+    join(dir, 'package.json'),
+    JSON.stringify({ scripts: { dev: 'vite --port 4321' } }),
+  )
+  post({ action: 'add', path: dir })
+
+  const { defaults } = post({ action: 'state', path: dir }).json
+
+  assert.match(defaults.dev, / dev$/, 'le script dev est repris')
+  assert.equal(defaults.baseUrl, 'http://localhost:4321', 'le port vient du script')
+})
+
+test("POST /api/projects action='state' retombe sur 5173 sans package.json", () => {
+  withRegistry()
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-defaults-'))
+  post({ action: 'add', path: dir })
+
+  assert.equal(post({ action: 'state', path: dir }).json.defaults.baseUrl, 'http://localhost:5173')
+})
+
+// --- validation de la config de crawl envoyée à `init` ----------------------
+//
+// Le refus arrive avant `install` : une config fausse ne doit pas équiper à
+// moitié le projet puis échouer à l'écriture du fichier.
+
+const initAvecConfig = config => {
+  withRegistry()
+  const dir = mkdtempSync(join(tmpdir(), 'cockpit-init-'))
+  post({ action: 'add', path: dir })
+  return post({ action: 'init', path: dir, config })
+}
+
+test("POST init refuse une config de crawl sans baseUrl", () => {
+  const result = initAvecConfig({ dev: 'pnpm dev' })
+  assert.equal(result.status, 400)
+  assert.match(result.json.error, /config de crawl invalide/)
+})
+
+test("POST init refuse un baseUrl qui n'est pas une URL http", () => {
+  const result = initAvecConfig({ dev: 'pnpm dev', baseUrl: 'localhost:5173' })
+  assert.equal(result.status, 400)
+})
+
+test('POST init refuse une commande de démarrage multiligne', () => {
+  const result = initAvecConfig({ dev: 'pnpm dev\nrm -rf /', baseUrl: 'http://localhost:5173' })
+  assert.equal(result.status, 400)
+})
+
+test('POST init sans config ne déclenche pas la validation', () => {
+  // Le dossier n'est pas un dépôt git : l'erreur doit venir de git, pas de la
+  // validation — c'est ce qui prouve qu'une absence de config est licite.
+  const result = initAvecConfig(undefined)
+  assert.equal(result.status, 400)
+  assert.doesNotMatch(result.json.error, /config de crawl invalide/)
+})

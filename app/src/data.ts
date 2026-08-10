@@ -530,6 +530,8 @@ export interface FolderState {
   hasConfig: boolean
   equipped: boolean
   hasPackageJson: boolean
+  /** Ce que le serveur propose de mettre dans `cockpit.config.json`. */
+  defaults: { dev: string; baseUrl: string }
 }
 
 export async function getFolderState(path: string): Promise<FolderState> {

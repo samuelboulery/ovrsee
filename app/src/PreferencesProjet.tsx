@@ -17,7 +17,7 @@ import { useState } from 'react'
 import type { Integration, SettingsType } from './data'
 import { t, type TranslationKey } from './i18n'
 import { BlocIntegrations } from './PreferencesIntegrations'
-import { ErrorBox, Field, GroupLabel, Row, SectionTitle } from './PreferencesControls'
+import { ErrorBox, Field, GroupLabel, Row, SectionTitle, Switch } from './PreferencesControls'
 import { s } from './style'
 
 type SectionProps = {
@@ -274,7 +274,29 @@ export function BlocAvance({ settings, onSettings }: SectionProps) {
   )
 }
 
-/** Les quatre blocs, sous un seul titre. */
+/** Ce qui doit rester hors du suivi git du projet. */
+export function BlocGitignore({ settings, onSettings }: SectionProps) {
+  return (
+    <>
+      <Row label={t('pref.gitignore_shots')} hint={t('pref.gitignore_shots_hint')}>
+        <Switch
+          checked={settings.gitignoreShots ?? true}
+          onChange={gitignoreShots => onSettings({ ...settings, gitignoreShots })}
+          label={t('pref.gitignore_shots')}
+        />
+      </Row>
+      <Row label={t('pref.gitignore_plans')} hint={t('pref.gitignore_plans_hint')} last>
+        <Switch
+          checked={settings.gitignorePlans ?? false}
+          onChange={gitignorePlans => onSettings({ ...settings, gitignorePlans })}
+          label={t('pref.gitignore_plans')}
+        />
+      </Row>
+    </>
+  )
+}
+
+/** Les cinq blocs, sous un seul titre. */
 export function SectionProjet({
   settings,
   onSettings,
@@ -290,6 +312,8 @@ export function SectionProjet({
       <BlocDemarrage settings={settings} onSettings={onSettings} />
       <GroupLabel>{t('pref.advanced')}</GroupLabel>
       <BlocAvance settings={settings} onSettings={onSettings} />
+      <GroupLabel>{t('pref.gitignore_title')}</GroupLabel>
+      <BlocGitignore settings={settings} onSettings={onSettings} />
       <GroupLabel>{t('pref.integrations_title')}</GroupLabel>
       <BlocIntegrations root={root} integrations={integrations} />
     </>

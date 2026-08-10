@@ -71,6 +71,13 @@ const translations = {
     'pref.profile_dev_desc':
       'Le travail en cours et les dépendances, terminal en colonne à droite.',
     'pref.advanced': 'Avancé',
+    'pref.gitignore_title': 'Gitignore',
+    'pref.gitignore_shots': 'Ignorer les captures d’écran',
+    'pref.gitignore_shots_hint':
+      'Désactiver ne restaure pas les captures déjà retirées du suivi ; activer ne retire pas du suivi git celles déjà commitées.',
+    'pref.gitignore_plans': 'Ignorer les plans et tickets',
+    'pref.gitignore_plans_hint':
+      'Même nuance : le suivi git déjà en place n’est jamais modifié rétroactivement par ce réglage.',
     'pref.language': 'Langue',
     'pref.language_fr': 'Français',
     'pref.language_en': 'English',
@@ -722,6 +729,13 @@ const translations = {
     'pref.profile_dev': 'Dev',
     'pref.profile_dev_desc': 'Work in progress and dependencies, terminal in a right-hand column.',
     'pref.advanced': 'Advanced',
+    'pref.gitignore_title': 'Gitignore',
+    'pref.gitignore_shots': 'Ignore screenshots',
+    'pref.gitignore_shots_hint':
+      'Turning this off does not restore already-untracked screenshots; turning it on does not untrack ones already committed.',
+    'pref.gitignore_plans': 'Ignore plans and tickets',
+    'pref.gitignore_plans_hint':
+      'Same nuance: existing git tracking is never changed retroactively by this setting.',
     'pref.language': 'Language',
     'pref.language_fr': 'Français',
     'pref.language_en': 'English',

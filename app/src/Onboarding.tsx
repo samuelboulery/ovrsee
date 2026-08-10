@@ -43,6 +43,7 @@ import {
 } from './PreferencesControls'
 import { PreferencesPreview, ongletsVisibles } from './PreferencesPreview'
 import { SectionProfils, profilCourant } from './PreferencesProfils'
+import { BlocGitignore } from './PreferencesProjet'
 import { s } from './style'
 import { applyTheme } from './theme'
 
@@ -376,13 +377,15 @@ function EcranReglages({
         />
       </Row>
 
-      <Row label={t('onboard.bootstrap_label')} hint={t('onboard.bootstrap_hint')} last>
+      <Row label={t('onboard.bootstrap_label')} hint={t('onboard.bootstrap_hint')}>
         <Switch
           checked={reponses.bootstrap}
           onChange={bootstrap => onReponses({ ...reponses, bootstrap })}
           label={t('onboard.bootstrap_label')}
         />
       </Row>
+
+      <BlocGitignore settings={settings} onSettings={onSettings} />
 
       <div style={s('margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--color-divider);')}>
         <div style={s('font-size: 13px; color: var(--color-text);')}>{t('onboard.first_project')}</div>

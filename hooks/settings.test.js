@@ -212,6 +212,30 @@ test('mergeSettings : projet surcharge sourceGraphe', () => {
   assert.equal(result.sourceGraphe, 'obsidian')
 })
 
+test('mergeSettings : projet surcharge gitignoreShots', () => {
+  const global = { ...DEFAULT_SETTINGS }
+  const project = { gitignoreShots: false }
+  const result = mergeSettings(global, project)
+  assert.equal(result.gitignoreShots, false)
+})
+
+test('mergeSettings : projet surcharge gitignorePlans', () => {
+  const global = { ...DEFAULT_SETTINGS }
+  const project = { gitignorePlans: true }
+  const result = mergeSettings(global, project)
+  assert.equal(result.gitignorePlans, true)
+})
+
+test('validateSettings : gitignoreShots invalide retombe au défaut', () => {
+  const result = validateSettings({ gitignoreShots: 'oui' })
+  assert.equal(result.gitignoreShots, DEFAULT_SETTINGS.gitignoreShots)
+})
+
+test('validateSettings : gitignorePlans valide accepté', () => {
+  const result = validateSettings({ gitignorePlans: true })
+  assert.equal(result.gitignorePlans, true)
+})
+
 test('mergeSettings : fusion partielle conserve globale pour non-surchargés', () => {
   const global = { ...DEFAULT_SETTINGS, theme: 'dark' }
   const project = { onglets: { actifs: ['apercu'] } }

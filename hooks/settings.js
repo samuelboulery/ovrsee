@@ -30,6 +30,8 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
  *   customActions: Array<{label: string, text: string}>,
  *   onboardingVu: boolean,
  *   claude: {niveau: string, usage: string},
+ *   gitignoreShots: boolean,
+ *   gitignorePlans: boolean,
  * }}
  */
 export const DEFAULT_SETTINGS = {
@@ -59,6 +61,10 @@ export const DEFAULT_SETTINGS = {
   // niveau décide des skills pré-cochés à l'équipement d'un projet. Le profil
   // d'interface, lui, ne se garde pas — voir `app/src/PreferencesProfils.tsx`.
   claude: { niveau: 'intermediaire', usage: 'terminal' },
+  // Alignés sur l'état constaté du dépôt ovrsee lui-même au moment d'écrire
+  // ce réglage : captures ignorées, plans/tickets versionnés.
+  gitignoreShots: true,
+  gitignorePlans: false,
 }
 
 /** Les valeurs admises pour `claude.niveau`, du plus neuf au plus aguerri. */
@@ -196,6 +202,13 @@ export function validateSettings(partial, defaults = DEFAULT_SETTINGS) {
     out.onboardingVu = partial.onboardingVu
   }
 
+  if (typeof partial.gitignoreShots === 'boolean') {
+    out.gitignoreShots = partial.gitignoreShots
+  }
+  if (typeof partial.gitignorePlans === 'boolean') {
+    out.gitignorePlans = partial.gitignorePlans
+  }
+
   // Objet imbriqué : claude
   if (partial.claude && typeof partial.claude === 'object') {
     const { niveau, usage } = partial.claude
@@ -284,6 +297,13 @@ export function mergeSettings(global, project = {}) {
 
   if (typeof project.sourceGraphe === 'string' && ['auto', 'graphify', 'obsidian'].includes(project.sourceGraphe)) {
     out.sourceGraphe = project.sourceGraphe
+  }
+
+  if (typeof project.gitignoreShots === 'boolean') {
+    out.gitignoreShots = project.gitignoreShots
+  }
+  if (typeof project.gitignorePlans === 'boolean') {
+    out.gitignorePlans = project.gitignorePlans
   }
 
   return out

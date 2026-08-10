@@ -17,6 +17,9 @@ import { fileURLToPath } from 'node:url'
 
 import { attachCommitToPlan, isSafePlanFileName } from './plans.js'
 import { readBoard, readTickets, moveTicket } from './tickets.js'
+import { readSettings, mergeSettings } from './settings.js'
+import { syncGitignore } from './gitignore-sync.js'
+import { readJson } from './snapshot.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 
@@ -142,6 +145,9 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     const ovrseeDir = join(root, 'ovrsee')
 
     if (existsSync(ovrseeDir)) {
+      const projectConfig = readJson(join(root, 'ovrsee.config.json')) ?? {}
+      syncGitignore(root, mergeSettings(readSettings(), projectConfig))
+
       const sources = changedFiles(root)
       const file = attachCommit(ovrseeDir, root, sources)
       if (file) {

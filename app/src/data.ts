@@ -317,6 +317,10 @@ export interface SettingsType {
   onboardingVu?: boolean
   /** Ce que la présentation a appris de l'usage de Claude Code. */
   claude?: { niveau: string; usage: string }
+  /** `ovrsee/pages/shots/` doit-il être gitignoré dans le projet ? */
+  gitignoreShots?: boolean
+  /** `ovrsee/plans/` et `ovrsee/tickets/` doivent-ils être gitignorés ? */
+  gitignorePlans?: boolean
 }
 
 export interface Snapshot {

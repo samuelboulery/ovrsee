@@ -2,7 +2,7 @@
 {
   "id": "T-0018",
   "titre": "Backend : git-status, journal d'audits, environnements, route git-fetch",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "l",
   "tags": ["backend", "apercu"],

@@ -2,7 +2,7 @@
 {
   "id": "T-0019",
   "titre": "Frontend : dashboard Aperçu (Santé, Branches, Environnements, README repliable)",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "l",
   "tags": ["frontend", "apercu"],

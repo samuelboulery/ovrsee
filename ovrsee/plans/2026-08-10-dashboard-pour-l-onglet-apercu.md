@@ -1,10 +1,31 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Dashboard pour l'onglet Aperçu",
   "opened": "2026-08-10",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-10",
+  "commits": [
+    {
+      "sha": "7ae9fcc",
+      "date": "2026-08-10",
+      "files": [
+        "app/src/data.ts",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Branches.tsx",
+        "app/src/tabs/Environnements.tsx",
+        "app/src/tabs/Sante.tsx",
+        "hooks/git-status.js",
+        "hooks/git-status.test.js",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/ovrsee-capture-audit.js",
+        "hooks/snapshot.js",
+        "hooks/snapshot.test.js",
+        "server/api.js",
+        "server/api.test.js"
+      ]
+    }
+  ]
 }
 ---
 

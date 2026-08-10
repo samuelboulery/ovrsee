@@ -2,7 +2,7 @@
 {
   "id": "T-0017",
   "titre": "Dashboard de santé sur l'onglet Aperçu",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": ["ui", "apercu"],
   "cree": "2026-08-10",

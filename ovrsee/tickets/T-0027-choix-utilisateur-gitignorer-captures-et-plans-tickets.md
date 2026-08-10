@@ -2,7 +2,7 @@
 {
   "id": "T-0027",
   "titre": "Choix utilisateur : gitignorer captures et plans/tickets",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "M",
   "tags": [

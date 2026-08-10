@@ -25,6 +25,20 @@
       "sha": "fc49c92",
       "date": "2026-08-10",
       "files": []
+    },
+    {
+      "sha": "a4e411f",
+      "date": "2026-08-10",
+      "files": [
+        "hooks/ovrsee-capture-audit.js",
+        "hooks/ovrsee-capture-plan.js",
+        "hooks/ovrsee-post-commit.js",
+        "hooks/ovrsee-post-commit.test.js",
+        "hooks/ovrsee-tool-edit.js",
+        "hooks/ovrsee-tool-edit.test.js",
+        "hooks/ovrsee-tool-stop.js",
+        "hooks/ovrsee-tool-stop.test.js"
+      ]
     }
   ]
 }

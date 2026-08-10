@@ -2,9 +2,13 @@
 {
   "id": "T-0025",
   "titre": "Badge LIVE et schéma Supabase dans l'onglet Données",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
-  "tags": ["integrations", "frontend", "charge-m"],
+  "tags": [
+    "integrations",
+    "frontend",
+    "charge-m"
+  ],
   "cree": "2026-08-10",
   "maj": "2026-08-10",
   "plan": "2026-08-10-integrations-deploiements-base-de-donnees-apercu-donnees.md",

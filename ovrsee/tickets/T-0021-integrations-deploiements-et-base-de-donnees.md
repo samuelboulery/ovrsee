@@ -2,7 +2,7 @@
 {
   "id": "T-0021",
   "titre": "Intégrations déploiements et base de données",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "integrations",

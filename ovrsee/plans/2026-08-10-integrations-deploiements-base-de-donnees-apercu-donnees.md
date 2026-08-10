@@ -1,15 +1,44 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Intégrations Déploiements & Base de données (Aperçu + Données)",
   "opened": "2026-08-10",
-  "closed": null,
+  "closed": "2026-08-10",
   "commits": [
     {
       "sha": "7b704e2",
       "date": "2026-08-10",
       "files": [
         "hooks/ovrsee-capture-audit.js"
+      ]
+    },
+    {
+      "sha": "32ed79a",
+      "date": "2026-08-10",
+      "files": [
+        "CLAUDE.md",
+        "app/src/App.tsx",
+        "app/src/PreferencesIntegrations.tsx",
+        "app/src/PreferencesPanel.tsx",
+        "app/src/PreferencesProjet.tsx",
+        "app/src/data.ts",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Deploiements.tsx",
+        "app/src/tabs/Donnees.tsx",
+        "app/src/useTerminal.ts",
+        "cadrage-ovrsee.md",
+        "electron/main.js",
+        "electron/preload.cjs",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/integrationProviders.js",
+        "hooks/integrationProviders.test.js",
+        "hooks/integrations.js",
+        "hooks/integrations.test.js",
+        "hooks/snapshot.js",
+        "hooks/snapshot.test.js",
+        "\"ovrsee/tickets/T-0024-panneau-preferences-int\\303\\251grations.md\"",
+        "server/api.test.js"
       ]
     }
   ]

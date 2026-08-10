@@ -2,7 +2,7 @@
 {
   "id": "T-0022",
   "titre": "Stockage, chiffrement et IPC des secrets d'intégration",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "integrations",

@@ -1,10 +1,29 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Ticketing automatique après plan ou audit validé",
   "opened": "2026-08-10",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-10",
+  "commits": [
+    {
+      "sha": "76327a2",
+      "date": "2026-08-10",
+      "files": [
+        "app/src/data.ts",
+        "app/src/tabs/Tableau.tsx",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/ovrsee-capture-audit.js",
+        "hooks/ovrsee-capture-plan.js",
+        "hooks/ovrsee-capture-plan.test.js",
+        "hooks/ovrsee-post-commit.js",
+        "hooks/ovrsee-post-commit.test.js",
+        "hooks/tickets.js",
+        "hooks/tickets.test.js",
+        "mcp/server.js"
+      ]
+    }
+  ]
 }
 ---
 

@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Tableau : auto-refresh, dissociation visuelle des epics, panneau en lecture",
   "opened": "2026-08-10",
-  "closed": null,
+  "closed": "2026-08-10",
   "commits": [
     {
       "sha": "7ae9fcc",
@@ -29,6 +29,17 @@
       "sha": "cb13656",
       "date": "2026-08-10",
       "files": []
+    },
+    {
+      "sha": "b03387b",
+      "date": "2026-08-10",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/data.ts",
+        "app/src/tabs/Tableau.tsx",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js"
+      ]
     }
   ]
 }

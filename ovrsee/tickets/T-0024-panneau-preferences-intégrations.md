@@ -2,7 +2,7 @@
 {
   "id": "T-0024",
   "titre": "Panneau Préférences pour ajouter/éditer une intégration",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "integrations",

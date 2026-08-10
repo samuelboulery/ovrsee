@@ -1,10 +1,24 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Markdown, badge \"non commité\" et auto-refresh dans ovrsee",
   "opened": "2026-08-10",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-10",
+  "commits": [
+    {
+      "sha": "a2c1c52",
+      "date": "2026-08-10",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/data.ts",
+        "app/src/tabs/Tableau.tsx",
+        "hooks/git-status.js",
+        "hooks/git-status.test.js",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js"
+      ]
+    }
+  ]
 }
 ---
 

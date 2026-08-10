@@ -2,7 +2,7 @@
 {
   "id": "T-0023",
   "titre": "Widget Déploiements sur l'onglet Aperçu",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "integrations",

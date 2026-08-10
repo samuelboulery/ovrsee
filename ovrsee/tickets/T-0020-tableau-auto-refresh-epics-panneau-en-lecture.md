@@ -2,7 +2,7 @@
 {
   "id": "T-0020",
   "titre": "Tableau : auto-refresh, dissociation visuelle des epics, panneau en lecture",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "M",
   "tags": [
@@ -28,14 +28,14 @@ Détail de l'approche dans le plan lié.
 
 ## Critères d'acceptation
 
-- [ ] Un ticket créé sur disque (skill ou édition directe) apparaît dans
+- [x] Un ticket créé sur disque (skill ou édition directe) apparaît dans
       l'onglet Tableau sans clic sur reload, en quelques secondes.
-- [ ] Une carte epic se distingue visuellement d'une carte normale (bordure
+- [x] Une carte epic se distingue visuellement d'une carte normale (bordure
       et fond teintés, en plus du tag « epic » existant).
-- [ ] Une carte enfant d'un epic porte un liseré coloré, et se retrouve
+- [x] Une carte enfant d'un epic porte un liseré coloré, et se retrouve
       regroupée juste après son epic quand les deux sont dans la même
       colonne.
-- [ ] Cliquer une carte ouvre le panneau de détail en lecture (pas de champ
+- [x] Cliquer une carte ouvre le panneau de détail en lecture (pas de champ
       éditable visible) ; un bouton « Modifier » bascule vers le formulaire
       d'édition actuel.
-- [ ] `pnpm test` passe toujours.
+- [x] `pnpm test` passe toujours.

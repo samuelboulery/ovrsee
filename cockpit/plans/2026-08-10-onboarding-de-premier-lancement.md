@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Onboarding de premier lancement",
   "opened": "2026-08-10",
-  "closed": null,
+  "closed": "2026-08-10",
   "commits": [
     {
       "sha": "1af9cb3",
@@ -32,6 +32,11 @@
         "server/api.js",
         "server/api.test.js"
       ]
+    },
+    {
+      "sha": "9361778",
+      "date": "2026-08-10",
+      "files": []
     }
   ]
 }

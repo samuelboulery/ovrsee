@@ -8370,8 +8370,8 @@
       "source_file": "/Users/sam/code/cockpit/app/src/profilage.ts",
       "source_location": "L89",
       "weight": 1.0,
-      "_src": "profilage_appliquerreponses",
-      "_tgt": "preferencesprofils_appliquerprofil",
+      "_src": "preferencesprofils_appliquerprofil",
+      "_tgt": "profilage_appliquerreponses",
       "source": "preferencesprofils_appliquerprofil",
       "target": "profilage_appliquerreponses"
     },
@@ -9018,8 +9018,8 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Onboarding.tsx",
       "source_location": "L139",
       "weight": 1.0,
-      "_src": "onboarding_s",
-      "_tgt": "i18n_t",
+      "_src": "i18n_t",
+      "_tgt": "onboarding_s",
       "source": "i18n_t",
       "target": "onboarding_s"
     },
@@ -9582,8 +9582,8 @@
       "source_file": "/Users/sam/code/cockpit/app/src/Onboarding.tsx",
       "source_location": "L431",
       "weight": 1.0,
-      "_src": "onboarding_finaliser",
-      "_tgt": "profilage_appliquerreponses",
+      "_src": "profilage_appliquerreponses",
+      "_tgt": "onboarding_finaliser",
       "source": "profilage_appliquerreponses",
       "target": "onboarding_finaliser"
     },

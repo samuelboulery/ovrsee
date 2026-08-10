@@ -18,6 +18,7 @@
     "cockpit:brief": "node hooks/cockpit-session-start.js",
     "cockpit:obsidian": "node hooks/cockpit-cli.js obsidian",
     "cockpit:crawl": "node crawl/index.js",
+    "cockpit:mcp": "node mcp/server.js",
     "cockpit:auth": "node crawl/auth.js",
     "electron": "pnpm build:ui && electron .",
     "build:ui": "vite build",

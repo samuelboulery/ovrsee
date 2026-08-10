@@ -163,7 +163,19 @@ Capacités :
 - Écriture sur `cockpit/tickets/` et `cockpit/board.json` uniquement
 - Aucune exécution de code
 
-Pour l'utiliser, déclarez-le dans `claude_desktop_config.json` :
+Il ne lit que les projets du registre — celui qu'alimente `pnpm cockpit:install`.
+Un chemin qui n'y figure pas est refusé, même s'il existe sur le disque.
+
+Pour l'enregistrer dans Claude Code :
+
+```bash
+claude mcp add -s user cockpit -- node /chemin/absolu/cockpit/mcp/server.js
+```
+
+La portée `user` est la bonne : le serveur est multi-projet par construction,
+il n'a rien à voir avec le dépôt courant.
+
+Dans Claude Desktop, c'est `claude_desktop_config.json` :
 
 ```json
 {
@@ -176,14 +188,21 @@ Pour l'utiliser, déclarez-le dans `claude_desktop_config.json` :
 }
 ```
 
-Puis :
+Les skills, elles, n'y sont pas visibles : `~/.claude/skills/` est lu par Claude
+Code — en ligne de commande comme dans l'application de bureau — mais pas par le
+chat de Claude Desktop, qui tient son propre catalogue.
+
+Pour le voir répondre à la main :
 
 ```bash
-# En développement
-node mcp/server.js < /dev/null
+printf '%s\n' \
+ '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05"}}' \
+ '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+ | pnpm cockpit:mcp
 ```
 
-(Le serveur lit JSON-RPC depuis stdin et écrit sur stdout.)
+(Le serveur lit JSON-RPC depuis stdin et écrit sur stdout. Rien d'autre ne doit
+sortir sur stdout : ce n'est pas un journal, c'est le transport.)
 
 ## Données produites
 

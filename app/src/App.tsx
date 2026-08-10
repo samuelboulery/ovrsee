@@ -169,6 +169,10 @@ export function App() {
   const [settings, setSettings] = useState<SettingsType | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  // L'écran des préférences s'ouvre d'ici et pas de la barre latérale : le
+  // menu natif l'ouvre aussi, et son gestionnaire vit dans ce composant.
+  const [preferencesOuvertes, setPreferencesOuvertes] = useState(false)
+
   const [tab, setTab] = useState<TabId>(() => tabForPath(window.location.pathname))
   const [layout, setLayout] = useState<Layout>('bottom')
   const [terminal, setTerminal] = useState(true)
@@ -331,6 +335,7 @@ export function App() {
     if (!menu) return
 
     return menu.on(command => {
+      if (command === 'preferences:open') return setPreferencesOuvertes(true)
       if (command === 'project:open') return void openProject(applyProjects, setError)
       if (command === 'project:reload') return reload()
       if (command === 'project:reveal') {
@@ -357,6 +362,18 @@ export function App() {
       }
     })
   }, [current, settings])
+
+  // ⌘, hors Electron : dans un navigateur il n'y a pas de menu natif pour
+  // porter le raccourci, et c'est le geste qu'on essaie en premier.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== ',' || !(event.metaKey || event.ctrlKey)) return
+      setPreferencesOuvertes(true)
+      event.preventDefault()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const plans = snapshot?.plans ?? []
   const scan = lastScan(snapshot?.scans ?? [])
@@ -411,6 +428,7 @@ export function App() {
             }}
             onProjects={applyProjects}
             onError={setError}
+            onOpenPreferences={() => setPreferencesOuvertes(true)}
             density={density(commitsDeLaFrise(snapshot?.timeline ?? []), {
               fenetre: settings?.densiteActivite.fenetre,
             })}
@@ -545,6 +563,7 @@ export function App() {
                   onToggle={() => setTerminal(false)}
                   onReload={reload}
                   snapshot={snapshot}
+                  settings={settings}
                   terminalHeight={terminalHeight}
                   terminalWidth={terminalWidth}
                   onTerminalHeightChange={setTerminalHeight}
@@ -575,6 +594,18 @@ export function App() {
           </div>
         </div>
       </div>
+
+      {/* Au niveau de la fenêtre, pas dans la barre latérale : une modale
+          `position: fixed` posée dans un `<aside>` marchait par accident. */}
+      {preferencesOuvertes && (
+        <PreferencesModal
+          onClose={() => setPreferencesOuvertes(false)}
+          onSaved={next => {
+            setSettings(next)
+            setCurrentLanguage(next.langue)
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -747,6 +778,7 @@ function Sidebar({
   onPick,
   onProjects,
   onError,
+  onOpenPreferences,
   density: bars,
 }: {
   projects: Project[]
@@ -758,10 +790,11 @@ function Sidebar({
   onPick: (path: string) => void
   onProjects: (list: Project[], select?: string | null) => void
   onError: (message: string) => void
+  /** La modale vit dans `App` : le menu natif l'ouvre par le même chemin. */
+  onOpenPreferences: () => void
   density: number[]
 }) {
   const [skillsOuverts, setSkillsOuverts] = useState(false)
-  const [preferencesOuverts, setPreferencesOuverts] = useState(false)
   const [configOuverte, setConfigOuverte] = useState(false)
 
   // Le sélecteur de dossier n'existe que dans l'application empaquetée. Dans un
@@ -830,7 +863,8 @@ function Sidebar({
         <button
           type="button"
           className="btn btn-ghost btn-block"
-          onClick={() => setPreferencesOuverts(true)}
+          onClick={onOpenPreferences}
+          title="⌘,"
           style={s('font-size: 11px;')}
         >
           ⚙ {t('sidebar.preferences')}
@@ -849,7 +883,6 @@ function Sidebar({
         </button>
       </div>
       {skillsOuverts && <SkillsModal onClose={() => setSkillsOuverts(false)} />}
-      {preferencesOuverts && <PreferencesModal onClose={() => setPreferencesOuverts(false)} />}
       {configOuverte && <ConfigClaudeModal onClose={() => setConfigOuverte(false)} />}
 
       <div

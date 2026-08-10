@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import { briefLines, buildActions, decideInjection, fetchSettings, type Snapshot, type SettingsType } from './data'
+import { briefLines, buildActions, type Snapshot, type SettingsType } from './data'
 import { s } from './style'
 import { t, type TranslationKey } from './i18n'
 import { useTerminals, pasteToClaude } from './useTerminal'
@@ -54,6 +54,7 @@ export function Terminal({
   onToggle,
   onReload,
   snapshot,
+  settings,
   terminalHeight,
   terminalWidth,
   onTerminalHeightChange,
@@ -65,24 +66,27 @@ export function Terminal({
   /** Relit `cockpit/` — après un scan, l'interface ne se met pas à jour seule. */
   onReload: () => void
   snapshot: Snapshot | null
+  /** Vient d'`App` et pas d'un `fetchSettings()` local : une copie chargée au
+      montage ne verrait jamais l'enregistrement des préférences. */
+  settings: SettingsType | null
   terminalHeight: number
   terminalWidth: number
   onTerminalHeightChange: (height: number) => void
   onTerminalWidthChange: (width: number) => void
 }) {
   const [notice, setNotice] = useState<string | null>(null)
-  const [settings, setSettings] = useState<SettingsType | null>(null)
-  const { sessions, active, setActive, attach, openShell, closeShell, errors, inject, available } =
-    useTerminals(snapshot?.root ?? null)
-
-  // Charge les paramètres pour construire les actions avec le gestionnaire actuel
-  useEffect(() => {
-    fetchSettings()
-      .then(s => setSettings(s))
-      .catch(() => {
-        // En cas d'erreur, utilise les défauts (fetchSettings les retourne)
-      })
-  }, [])
+  const {
+    sessions,
+    active,
+    setActive,
+    attach,
+    openShell,
+    closeShell,
+    errors,
+    focusClaude,
+    claudeKey,
+    available,
+  } = useTerminals(snapshot?.root ?? null)
 
   const error = active ? (errors[active] ?? null) : null
 
@@ -113,31 +117,27 @@ export function Terminal({
   const sizing = layout === 'side' ? widthSide : height
 
   /**
-   * Un clic injecte dans la session quand elle existe, et copie sinon.
+   * Un clic écrit dans la session quand elle existe, et copie sinon.
    *
-   * Les commandes (! ou /) s'injectent directement. Les contextes passent par
-   * le collage encadré : littéral, sans `\n` final, l'utilisateur valide.
+   * Tout passe par le collage encadré, commandes comprises : le texte se dépose
+   * dans la saisie de `claude` sans être validé. C'est délibéré — une commande
+   * qui partait au clic ne laissait aucune place au contexte qu'on voulait lui
+   * ajouter. Le curseur suit, sinon il faudrait cliquer dans la grille pour
+   * compléter.
+   *
    * Le repli n'est pas un pis-aller déguisé : le libellé du panneau change
    * aussi, pour que le bouton ne prétende jamais écrire dans une session
    * inexistante.
    */
   const activate = async (label: string, text: string) => {
-    const { mode, text: toInject } = decideInjection(text)
-
-    // Session : injecter via le canal adapté
-    if (mode === 'command') {
-      if (inject(toInject)) {
-        setNotice(`« ${label} » injecté`)
-        setTimeout(() => setNotice(null), 2000)
-        return
-      }
-    } else {
-      // Contexte : collage encadré
-      if (pasteToClaude(toInject)) {
-        setNotice(`« ${label} » collé dans la session Claude`)
-        setTimeout(() => setNotice(null), 2000)
-        return
-      }
+    if (pasteToClaude(text)) {
+      if (claudeKey) setActive(claudeKey)
+      // Après le rendu : une session inactive est `inert`, et `focus()` n'y
+      // prend pas tant que React n'a pas commis le changement d'onglet.
+      setTimeout(focusClaude, 0)
+      setNotice(`« ${label} » écrit dans le terminal`)
+      setTimeout(() => setNotice(null), 2000)
+      return
     }
 
     // Repli : pas de session (navigateur)
@@ -346,44 +346,17 @@ export function Terminal({
           </div>
           <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
             {commands.map(action => (
-              <details
-                key={action.label}
-                style={s('display: flex; flex-direction: column;')}
-              >
-                <summary style={s('cursor: pointer; list-style: none; display: flex; align-items: center; gap: 6px;')}>
-                  <button
-                    type="button"
-                    onClick={e => {
-                      e.preventDefault()
-                      activate(action.label, action.text)
-                    }}
-                    className="btn btn-primary btn-block"
-                    style={s('font-size: 11.5px; padding: 5px 10px; flex: 1; text-align: left;')}
-                  >
-                    {action.label}
-                  </button>
-                  <span style={s('font-size: 11px; color: var(--color-neutral-600); flex: none;')}>▼</span>
-                </summary>
-                <pre
-                  style={s(
-                    'margin: 6px 0 0 0; padding: 8px; background: var(--theme-bg-error); border: 1px solid var(--color-divider); border-radius: 3px; font-size: 10px; color: var(--color-neutral-600); white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto;',
-                  )}
-                >
-                  {action.text}
-                </pre>
-              </details>
-            ))}
-            {commands.length > 0 && (
               <button
+                key={action.label}
                 type="button"
-                onClick={onReload}
-                className="btn btn-secondary btn-block"
+                onClick={() => activate(action.label, action.text)}
+                className="btn btn-primary btn-block"
                 style={s('font-size: 11.5px; padding: 5px 10px;')}
-                title="Relit cockpit/ — à faire après un scan"
+                title={action.text}
               >
-                {t('terminal.refresh_cockpit')}
+                {action.label}
               </button>
-            )}
+            ))}
           </div>
 
           {/* Affiche les erreurs si présentes */}
@@ -415,36 +388,46 @@ export function Terminal({
               </div>
               <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
                 {context.map(action => (
-                  <details
+                  <button
                     key={action.label}
-                    style={s('display: flex; flex-direction: column;')}
+                    type="button"
+                    onClick={() => activate(action.label, action.text)}
+                    className="btn btn-secondary btn-block"
+                    style={s('font-size: 11.5px; padding: 5px 10px;')}
+                    title={action.text}
                   >
-                    <summary style={s('cursor: pointer; list-style: none; display: flex; align-items: center; gap: 6px;')}>
-                      <button
-                        type="button"
-                        onClick={e => {
-                          e.preventDefault()
-                          activate(action.label, action.text)
-                        }}
-                        className="btn btn-secondary btn-block"
-                        style={s('font-size: 11.5px; padding: 5px 10px; flex: 1; text-align: left;')}
-                      >
-                        {action.label}
-                      </button>
-                      <span style={s('font-size: 11px; color: var(--color-neutral-600); flex: none;')}>▼</span>
-                    </summary>
-                    <pre
-                      style={s(
-                        'margin: 6px 0 0 0; padding: 8px; background: var(--theme-bg-error); border: 1px solid var(--color-divider); border-radius: 3px; font-size: 10px; color: var(--color-neutral-600); white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto;',
-                      )}
-                    >
-                      {action.text}
-                    </pre>
-                  </details>
+                    {action.label}
+                  </button>
                 ))}
               </div>
             </>
           )}
+
+          {/* Hors des deux sections : ce bouton n'écrit rien dans le terminal,
+              il fait relire `cockpit/` à l'interface. Le ranger avec les
+              commandes laissait croire qu'il lançait quelque chose. */}
+          <div
+            style={s(
+              'margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--color-divider);',
+            )}
+          >
+            <button
+              type="button"
+              onClick={onReload}
+              className="btn btn-secondary btn-block"
+              style={s('font-size: 11.5px; padding: 5px 10px;')}
+            >
+              {t('terminal.refresh_cockpit')}
+            </button>
+            <div
+              style={s(
+                'font-size: 11px; color: var(--color-neutral-600); margin-top: 6px; line-height: 1.5;',
+              )}
+            >
+              {t('terminal.reload_hint')}
+            </div>
+          </div>
+
           <div
             style={s(
               'font-size: 11px; color: var(--color-neutral-600); margin-top: 13px; line-height: 1.5;',

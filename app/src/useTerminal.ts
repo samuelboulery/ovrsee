@@ -292,8 +292,18 @@ export function useTerminals(projectPath: string | null) {
     [projectPath],
   )
 
-  /** Écrit dans la session Claude — c'est ce que font les boutons d'injection. */
-  const inject = injectToClaude
+  /**
+   * Place le curseur dans la session Claude.
+   *
+   * Un bouton qui écrit dans le terminal sans y donner le clavier obligerait à
+   * cliquer dans la grille pour compléter la commande — le collage servirait à
+   * moitié.
+   */
+  const focusClaude = useCallback(() => {
+    if (!projectPath) return
+    const pane = panes.current.get(claudeSlot(projectPath).key)
+    pane?.xterm.focus()
+  }, [projectPath])
 
   return {
     sessions,
@@ -303,7 +313,8 @@ export function useTerminals(projectPath: string | null) {
     openShell,
     closeShell,
     errors,
-    inject,
+    focusClaude,
+    claudeKey: projectPath ? claudeSlot(projectPath).key : null,
     available: Boolean(terminalBridge()),
   }
 }

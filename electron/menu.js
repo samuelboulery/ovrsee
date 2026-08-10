@@ -62,6 +62,14 @@ export function buildMenu(lang = 'fr') {
             submenu: [
               { role: 'about', label: m('menu.about') },
               { type: 'separator' },
+              // La place que macOS lui donne depuis toujours, avec ⌘, — un
+              // utilisateur l'y cherche avant de chercher un bouton.
+              {
+                label: m('menu.preferences'),
+                accelerator: 'CmdOrCtrl+,',
+                click: send('preferences:open'),
+              },
+              { type: 'separator' },
               { role: 'services', label: m('menu.services') },
               { type: 'separator' },
               { role: 'hide', label: m('menu.hide') },
@@ -92,6 +100,18 @@ export function buildMenu(lang = 'fr') {
           click: send('project:reveal'),
         },
         { type: 'separator' },
+        // Hors macOS, il n'y a pas de menu applicatif : les préférences se
+        // rangent sous Fichier, comme le veut l'usage Windows et Linux.
+        ...(mac
+          ? []
+          : [
+              {
+                label: m('menu.preferences'),
+                accelerator: 'CmdOrCtrl+,',
+                click: send('preferences:open'),
+              },
+              { type: 'separator' },
+            ]),
         { role: 'close', label: m('menu.close_window') },
       ],
     },

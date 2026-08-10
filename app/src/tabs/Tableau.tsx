@@ -11,6 +11,7 @@ import {
   ticketAction,
   type Charge,
   type Colonne,
+  type GitStatus,
   type Illisible,
   type Priorite,
   type Tableau as TableauData,
@@ -19,6 +20,7 @@ import {
 } from '../data'
 import { Illisibles } from '../Illisibles'
 import { t } from '../i18n'
+import { Markdown } from '../markdown'
 import { s } from '../style'
 
 /**
@@ -99,12 +101,14 @@ export function Tableau({
   board,
   tickets,
   illisibles = [],
+  gitStatus,
   onChange,
 }: {
   root: string
   board: Colonne[]
   tickets: Ticket[]
   illisibles?: Illisible[]
+  gitStatus?: GitStatus
   onChange: (tableau: TableauData) => void
 }) {
   const [erreur, setErreur] = useState<string | null>(null)
@@ -343,6 +347,8 @@ export function Tableau({
             ticket={selection}
             colonnes={board}
             allTickets={tickets}
+            root={root}
+            gitStatus={gitStatus}
             onFermer={() => setOuverte(null)}
             onModifier={patch => modifier(selection.file, patch)}
             onDeplacer={colonne => deplacer(selection.file, colonne)}
@@ -871,6 +877,8 @@ function Detail({
   ticket,
   colonnes,
   allTickets,
+  root,
+  gitStatus,
   onFermer,
   onModifier,
   onDeplacer,
@@ -879,6 +887,8 @@ function Detail({
   ticket: Ticket
   colonnes: Colonne[]
   allTickets: Ticket[]
+  root: string
+  gitStatus?: GitStatus
   onFermer: () => void
   onModifier: (patch: TicketPatch) => void
   onDeplacer: (colonne: string) => void
@@ -896,6 +906,7 @@ function Detail({
 
   const colonne = colonnes.find(c => c.id === ticket.colonne)
   const parentEpic = ticket.epic ? allTickets.find(t => t.id === ticket.epic) : null
+  const nonCommite = gitStatus?.dirty.files?.includes(`ovrsee/tickets/${ticket.file}`) ?? false
 
   return (
     <div style={s(PANNEAU)}>
@@ -1052,15 +1063,26 @@ function Detail({
             </div>
           )}
 
-          <div style={s('font-size: 12px; margin-top: 12px; min-height: 220px; line-height: 1.55; white-space: pre-wrap;')}>
-            {ticket.corps || <span style={s('color: var(--color-neutral-600);')}>{t('tableau.no_description')}</span>}
+          <div style={s('font-size: 12px; margin-top: 12px; min-height: 220px; line-height: 1.55;')}>
+            {ticket.corps ? (
+              <Markdown text={ticket.corps} root={root} />
+            ) : (
+              <span style={s('color: var(--color-neutral-600);')}>{t('tableau.no_description')}</span>
+            )}
           </div>
         </>
       )}
 
       <div style={s('font-size: 10.5px; color: var(--color-neutral-600); margin-top: 10px; line-height: 1.6;')}>
         <div>{t('tableau.created')} {humanAge(ticket.cree)} · {t('tableau.modified')} {humanAge(ticket.maj)}</div>
-        <div>ovrsee/tickets/{ticket.file}</div>
+        <div>
+          ovrsee/tickets/{ticket.file}
+          {nonCommite && (
+            <span className="tag tag-accent" style={s('font-size: 10px; margin-left: 6px;')}>
+              {t('tableau.uncommitted')}
+            </span>
+          )}
+        </div>
         {ticket.plan && <div>{t('tableau.linked_plan')} {ticket.plan}</div>}
       </div>
 

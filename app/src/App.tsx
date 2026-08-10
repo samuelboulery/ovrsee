@@ -341,6 +341,20 @@ export function App() {
     return () => clearInterval(timer)
   }, [current])
 
+  /**
+   * Les autres onglets (Aperçu, Historique, Données…) reçoivent le snapshot
+   * en prop et restent figés sur celui chargé à l'ouverture tant qu'on ne
+   * clique pas sur reload. Un intervalle plus long que le poll tickets — pas
+   * de raison de refaire tourner git log/graphify toutes les 4 secondes.
+   */
+  useEffect(() => {
+    if (!current) return
+    const timer = setInterval(() => {
+      fetchSnapshot(current).then(setSnapshot).catch(() => {})
+    }, 15000)
+    return () => clearInterval(timer)
+  }, [current])
+
   const reload = () => {
     if (!current) return
     fetchSnapshot(current)
@@ -638,6 +652,7 @@ export function App() {
                           board={snapshot.board ?? []}
                           tickets={snapshot.tickets ?? []}
                           illisibles={snapshot.illisibles ?? []}
+                          gitStatus={snapshot.gitStatus}
                           onChange={setTableau}
                         />
                       )}

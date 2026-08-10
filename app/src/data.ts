@@ -191,7 +191,7 @@ export interface GitBranch {
  */
 export interface GitStatus {
   branch: string | null
-  dirty: { staged: number; unstaged: number; untracked: number }
+  dirty: { staged: number; unstaged: number; untracked: number; files: string[] }
   branches: GitBranch[]
   lastFetch: string | null
 }
@@ -203,7 +203,7 @@ export interface GitStatus {
  */
 export const EMPTY_GIT_STATUS: GitStatus = {
   branch: null,
-  dirty: { staged: 0, unstaged: 0, untracked: 0 },
+  dirty: { staged: 0, unstaged: 0, untracked: 0, files: [] },
   branches: [],
   lastFetch: null,
 }

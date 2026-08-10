@@ -31,6 +31,7 @@ function dirty(root) {
   let staged = 0
   let unstaged = 0
   let untracked = 0
+  const files = []
   for (const line of lines) {
     const [index, tree] = line
     if (index === '?' && tree === '?') untracked += 1
@@ -38,8 +39,9 @@ function dirty(root) {
       if (index !== ' ') staged += 1
       if (tree !== ' ') unstaged += 1
     }
+    files.push(line.slice(3))
   }
-  return { staged, unstaged, untracked }
+  return { staged, unstaged, untracked, files }
 }
 
 /**
@@ -75,7 +77,7 @@ function lastFetch(root) {
   }
 }
 
-const EMPTY = { branch: null, dirty: { staged: 0, unstaged: 0, untracked: 0 }, branches: [], lastFetch: null }
+const EMPTY = { branch: null, dirty: { staged: 0, unstaged: 0, untracked: 0, files: [] }, branches: [], lastFetch: null }
 
 export function gitStatus(root) {
   let branch

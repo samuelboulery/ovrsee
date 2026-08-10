@@ -27,7 +27,7 @@ test('gitStatus hors dépôt git rend un état vide', () => {
   const dir = mkdtempSync(join(tmpdir(), 'not-a-repo-'))
   assert.deepEqual(gitStatus(dir), {
     branch: null,
-    dirty: { staged: 0, unstaged: 0, untracked: 0 },
+    dirty: { staged: 0, unstaged: 0, untracked: 0, files: [] },
     branches: [],
     lastFetch: null,
   })
@@ -39,7 +39,7 @@ test('gitStatus lit la branche courante et une branche sans remote', () => {
 
   const status = gitStatus(dir)
   assert.equal(status.branch, 'main')
-  assert.deepEqual(status.dirty, { staged: 0, unstaged: 0, untracked: 0 })
+  assert.deepEqual(status.dirty, { staged: 0, unstaged: 0, untracked: 0, files: [] })
   assert.deepEqual(status.branches, [{ name: 'main', upstream: null, ahead: 0, behind: 0 }])
   assert.equal(status.lastFetch, null)
 })
@@ -54,7 +54,12 @@ test('gitStatus compte les fichiers indexés, modifiés et non suivis séparéme
   sh(dir, ['add', 'b.txt'])
 
   const status = gitStatus(dir)
-  assert.deepEqual(status.dirty, { staged: 1, unstaged: 1, untracked: 1 })
+  assert.deepEqual(status.dirty, {
+    staged: 1,
+    unstaged: 1,
+    untracked: 1,
+    files: ['a.txt', 'b.txt', 'nouveau.txt'],
+  })
 })
 
 test('gitStatus rend ahead/behind pour une branche suivie', () => {

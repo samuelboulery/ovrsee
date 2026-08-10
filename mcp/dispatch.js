@@ -1,308 +1,209 @@
 /**
  * Dispatcher pur pour les outils MCP.
  *
- * Valide le chemin (registre + usableDirectory), appelle les fonctions de
- * hooks/, et formate les résultats pour MCP. Aucun side-effect sur stdout.
+ * Ne décide de rien lui-même : chaque outil est un appel à `resolve()` de
+ * `server/api.js`, la même fonction que le middleware Vite et le protocole
+ * `cockpit://` d'Electron. C'est l'invariant du projet — trois implémentations
+ * divergeraient, et les bugs ne se verraient que dans certains modes.
+ *
+ * Ce qui reste ici n'est donc que de la traduction : un nom d'outil vers une
+ * route, et un corps de réponse vers un résultat d'outil. Aucun side-effect sur
+ * stdout : c'est `mcp/server.js` qui écrit.
  */
 
-import { existsSync, lstatSync, readFileSync } from 'node:fs'
-import { isAbsolute, join } from 'node:path'
+import { basename } from 'node:path'
 
-// Imports des hooks
-import { readRegistry } from '../hooks/plans.js'
-import { readPlans } from '../hooks/plans.js'
-import { density } from '../hooks/density.js'
-import { readTickets, readBoard, createTicket, updateTicket, moveTicket } from '../hooks/tickets.js'
-import { snapshot, projects, tableau } from '../hooks/snapshot.js'
+import { resolve, usableDirectory } from '../server/api.js'
 import { buildBrief, readCockpit } from '../hooks/brief.js'
-import { timeline as buildTimeline } from '../hooks/timeline.js'
 
 /**
- * Valide qu'un chemin est un dossier réel et enregistré au registre.
- * Retourne le chemin s'il est valide, ou un objet d'erreur sinon.
+ * Origine factice. `resolve()` ne lit que `pathname` et `searchParams` ; en
+ * stdio il n'y a pas d'hôte, mais `URL` en exige un.
  */
-function validatePath(path) {
-  // Valider usableDirectory
-  if (typeof path !== 'string' || path.length === 0) {
-    return { isError: true, code: 400, message: 'Chemin vide' }
-  }
-  if (!isAbsolute(path)) {
-    return { isError: true, code: 400, message: 'Chemin non absolu' }
-  }
-  if (!existsSync(path)) {
-    return { isError: true, code: 400, message: 'Chemin inexistant' }
-  }
-  let stat
-  try {
-    stat = lstatSync(path)
-  } catch {
-    return { isError: true, code: 400, message: 'Impossible de lire le chemin' }
-  }
-  if (stat.isSymbolicLink()) {
-    return { isError: true, code: 400, message: 'Lien symbolique refusé' }
-  }
-  if (!stat.isDirectory()) {
-    return { isError: true, code: 400, message: 'Doit être un dossier' }
-  }
+const ORIGINE = 'http://cockpit'
 
-  // Valider au registre (sauf pour listProjects)
-  const registered = readRegistry().some(p => p.path === path)
-  if (!registered) {
-    return { isError: true, code: 404, message: 'Projet non enregistré' }
-  }
+/**
+ * Un appel à `resolve()`, traduit en résultat d'outil.
+ *
+ * `cwd` vide est délibéré : dans une session stdio il n'y a pas de dépôt
+ * courant, et seul le registre doit faire liste blanche. L'en-tête `X-Cockpit`
+ * est la parade CORS du dev server — sans objet ici, mais `resolve()` l'exige
+ * pour toute écriture, et la lui donner vaut mieux que la rendre optionnelle.
+ *
+ * @param {string} route
+ * @param {string | null} chemin projet, ajouté en `?path=` s'il est fourni
+ * @param {{method?: string, body?: unknown}} [requete]
+ */
+function appel(route, chemin = null, requete = {}) {
+  const url = new URL(route, ORIGINE)
+  if (chemin) url.searchParams.set('path', chemin)
 
-  return { valid: true, path }
+  const out = resolve(url, '', { headers: { 'x-cockpit': '1' }, ...requete })
+
+  // `null` veut dire « pas notre route » côté HTTP. Ici, c'est une faute de
+  // programmation dans la table ci-dessous, pas une requête d'un client.
+  if (!out) return { isError: true, code: 500, message: `Route absente : ${route}` }
+  if (typeof out.status === 'number' && out.status >= 400) {
+    return { isError: true, code: out.status, message: String(out.json?.error ?? 'erreur') }
+  }
+  return { content: out.json }
 }
 
 /**
- * Dispatcher principal. Appelle la fonction appropriée et retourne le résultat.
+ * Refuse un chemin avant d'aller plus loin, ou `null` s'il passe.
  *
- * @param {string} method nom de l'outil MCP
+ * `resolve()` applique déjà la liste blanche du registre sur ses routes, mais
+ * `getBrief` n'en a pas : la garde vit donc ici pour que tous les outils la
+ * subissent. Le lien symbolique et le chemin relatif s'ajoutent en défense en
+ * profondeur — un projet enregistré ne devrait jamais être un lien, et s'il
+ * l'est on ne le suit pas.
+ */
+function refus(chemin) {
+  if (typeof chemin !== 'string' || chemin.length === 0) {
+    return { isError: true, code: 400, message: 'Chemin vide' }
+  }
+  if (!usableDirectory(chemin)) {
+    return { isError: true, code: 400, message: 'Chemin inutilisable : absolu, dossier réel, sans lien' }
+  }
+
+  const liste = appel('/api/projects')
+  if (liste.isError) return liste
+  if (!liste.content.some(p => p.path === chemin)) {
+    return { isError: true, code: 404, message: 'Projet non enregistré' }
+  }
+  return null
+}
+
+/** Le snapshot d'un projet, ou l'erreur qui l'empêche. */
+const projet = chemin => appel('/api/project', chemin)
+
+/**
+ * Le tri décroissant sur une date de frontmatter, puis les N premiers.
+ *
+ * Les noms de champs ne sont pas interchangeables : un ticket porte `cree`, un
+ * plan porte `opened`. Trier sur un champ absent ne lève rien — ça rend
+ * simplement l'ordre du dossier en se faisant passer pour une chronologie.
+ */
+const derniers = (liste, champ, limite) =>
+  [...(liste ?? [])]
+    .sort((a, b) => String(b?.[champ] ?? '').localeCompare(String(a?.[champ] ?? '')))
+    .slice(0, limite)
+
+/**
+ * Un outil = une fonction du chemin et des arguments vers un résultat.
+ * Toutes reçoivent un chemin déjà validé, sauf `listProjects` qui n'en prend pas.
+ */
+const OUTILS = {
+  listProjects: () => appel('/api/projects'),
+
+  getProjectSummary: chemin => {
+    const snap = projet(chemin)
+    if (snap.isError) return snap
+
+    const liste = appel('/api/projects')
+    const entree = liste.isError ? null : liste.content.find(p => p.path === chemin)
+
+    return {
+      content: {
+        path: chemin,
+        name: entree?.name ?? basename(chemin),
+        equipped: snap.content.equipped,
+        planCount: snap.content.plans?.length ?? 0,
+        ticketCount: snap.content.tickets?.length ?? 0,
+        pageCount: snap.content.pages?.pages?.length ?? 0,
+        lastOpened: entree?.lastOpened ?? null,
+      },
+    }
+  },
+
+  // La seule lecture qui n'a pas de route : le brief est un texte composé pour
+  // le terminal, que l'interface ne demande jamais au serveur. Le composer ici
+  // ne duplique aucune logique de `resolve()`.
+  getBrief: chemin => {
+    const state = readCockpit(chemin)
+    return { content: state ? buildBrief(state) : '' }
+  },
+
+  getBoard: chemin => {
+    const snap = projet(chemin)
+    return snap.isError ? snap : { content: { colonnes: snap.content.board } }
+  },
+
+  listTickets: (chemin, args) => {
+    const snap = projet(chemin)
+    return snap.isError
+      ? snap
+      : { content: derniers(snap.content.tickets, 'cree', args.limit ?? 20) }
+  },
+
+  getPlans: (chemin, args) => {
+    const snap = projet(chemin)
+    return snap.isError
+      ? snap
+      : { content: derniers(snap.content.plans, 'opened', args.limit ?? 10) }
+  },
+
+  getTimeline: chemin => {
+    const snap = projet(chemin)
+    return snap.isError ? snap : { content: snap.content.timeline }
+  },
+
+  getGraph: chemin => {
+    const snap = projet(chemin)
+    return snap.isError
+      ? snap
+      : { content: { graph: snap.content.graph, graphSource: snap.content.graphSource } }
+  },
+
+  createTicket: (chemin, args) => {
+    if (typeof args.titre !== 'string' || args.titre.trim().length === 0) {
+      return { isError: true, code: 400, message: 'Titre vide ou invalide' }
+    }
+    return ecriture(chemin, { ...args, action: 'create' })
+  },
+
+  updateTicket: (chemin, args) => {
+    if (!args.file) return { isError: true, code: 400, message: 'Fichier manquant' }
+    return ecriture(chemin, { ...args, action: 'update' })
+  },
+
+  moveTicket: (chemin, args) => {
+    if (!args.file || !args.colonne) {
+      return { isError: true, code: 400, message: 'Fichier ou colonne manquante' }
+    }
+    return ecriture(chemin, { ...args, action: 'move' })
+  },
+}
+
+/**
+ * Écriture d'un ticket. `resolve()` rend le tableau complet après chaque geste ;
+ * on n'en garde que la confirmation et les colonnes, parce qu'un client MCP
+ * paierait le texte de tous les tickets pour un champ qui change.
+ */
+function ecriture(chemin, body) {
+  const out = appel('/api/tickets', chemin, { method: 'POST', body: { ...body, path: chemin } })
+  return out.isError ? out : { content: { success: true, board: { colonnes: out.content.board } } }
+}
+
+/**
+ * Dispatcher principal.
+ *
+ * @param {string} outil nom de l'outil MCP
  * @param {object} args arguments passés par le client
  * @returns {{content: *} | {isError: true, code: number, message: string}}
  */
-export function dispatch(method, args = {}) {
+export function dispatch(outil, args = {}) {
+  const fn = OUTILS[outil]
+  if (!fn) return { isError: true, code: 400, message: `Outil inconnu : ${outil}` }
+
   try {
-    switch (method) {
-      case 'listProjects': {
-        const list = readRegistry()
-        return {
-          content: list.map(p => ({
-            path: p.path,
-            name: p.name,
-            lastOpened: p.lastOpened,
-          })),
-        }
-      }
+    if (outil === 'listProjects') return fn()
 
-      case 'getProjectSummary': {
-        const val = validatePath(args.path)
-        if (val.isError) return val
+    const nonValide = refus(args.path)
+    if (nonValide) return nonValide
 
-        try {
-          const snap = snapshot(args.path)
-          // Compter les plans, tickets, pages (implicitement dans l'objet snapshot)
-          return {
-            content: {
-              path: args.path,
-              name: snap.name ?? '',
-              equipped: snap.equipped ?? false,
-              planCount: snap.plans?.length ?? 0,
-              ticketCount: snap.tickets?.length ?? 0,
-              pageCount: snap.pageCount ?? 0,
-              lastOpened: readRegistry().find(p => p.path === args.path)?.lastOpened,
-            },
-          }
-        } catch (err) {
-          return { isError: true, code: 400, message: String(err.message) }
-        }
-      }
-
-      case 'getBrief': {
-        const val = validatePath(args.path)
-        if (val.isError) return val
-
-        try {
-          const state = readCockpit(args.path)
-          if (!state) {
-            return { content: '' }
-          }
-          const brief = buildBrief(state)
-          return { content: brief }
-        } catch (err) {
-          return { isError: true, code: 400, message: String(err.message) }
-        }
-      }
-
-      case 'getBoard': {
-        const val = validatePath(args.path)
-        if (val.isError) return val
-
-        try {
-          const cockpitDir = join(args.path, 'cockpit')
-          const board = readBoard(cockpitDir)
-          return { content: { colonnes: board } }
-        } catch (err) {
-          return { isError: true, code: 400, message: String(err.message) }
-        }
-      }
-
-      case 'listTickets': {
-        const val = validatePath(args.path)
-        if (val.isError) return val
-
-        try {
-          const cockpitDir = join(args.path, 'cockpit')
-          const board = readBoard(cockpitDir)
-          const tickets = readTickets(cockpitDir, board)
-          const limit = args.limit ?? 20
-          const sorted = tickets.sort((a, b) => {
-            const aDate = new Date(a.meta?.creatDate || 0).getTime()
-            const bDate = new Date(b.meta?.creatDate || 0).getTime()
-            return bDate - aDate
-          })
-          return {
-            content: sorted.slice(0, limit).map(t => ({
-              file: t.file,
-              ...t.meta,
-            })),
-          }
-        } catch (err) {
-          return { isError: true, code: 400, message: String(err.message) }
-        }
-      }
-
-      case 'getPlans': {
-        const val = validatePath(args.path)
-        if (val.isError) return val
-
-        try {
-          const cockpitDir = join(args.path, 'cockpit')
-          const plans = readPlans(cockpitDir)
-          const limit = args.limit ?? 10
-          const sorted = plans.sort((a, b) => {
-            const aDate = new Date(a.meta?.dateCreation || 0).getTime()
-            const bDate = new Date(b.meta?.dateCreation || 0).getTime()
-            return bDate - aDate
-          })
-          return {
-            content: sorted.slice(0, limit).map(p => ({
-              file: p.file,
-              ...p.meta,
-            })),
-          }
-        } catch (err) {
-          return { isError: true, code: 400, message: String(err.message) }
-        }
-      }
-
-      case 'getTimeline': {
-        const val = validatePath(args.path)
-        if (val.isError) return val
-
-        try {
-          const cockpitDir = join(args.path, 'cockpit')
-          const plans = readPlans(cockpitDir)
-          const weeks = args.weeks ?? 16
-          // timeline() ne prend que les plans (pas les commits en MCP)
-          // On retourne simplement un résumé par semaine
-          const tl = buildTimeline([], plans)
-          return { content: tl }
-        } catch (err) {
-          return { isError: true, code: 400, message: String(err.message) }
-        }
-      }
-
-      case 'getGraph': {
-        const val = validatePath(args.path)
-        if (val.isError) return val
-
-        try {
-          const graphPath = join(args.path, 'cockpit', 'graphify-out', 'graph.json')
-          if (!existsSync(graphPath)) {
-            return { content: null }
-          }
-          const graph = JSON.parse(readFileSync(graphPath, 'utf8'))
-          return { content: graph }
-        } catch (err) {
-          return { isError: true, code: 400, message: String(err.message) }
-        }
-      }
-
-      case 'createTicket': {
-        const val = validatePath(args.path)
-        if (val.isError) return val
-
-        if (!args.titre || typeof args.titre !== 'string') {
-          return { isError: true, code: 400, message: 'Titre vide ou invalide' }
-        }
-
-        try {
-          const cockpitDir = join(args.path, 'cockpit')
-          createTicket(cockpitDir, {
-            titre: args.titre,
-            colonne: args.colonne,
-            priorite: args.priorite,
-            tags: args.tags,
-            plan: args.plan,
-            corps: args.corps,
-            type: args.type,
-            epic: args.epic,
-          })
-          // Relire le board pour confirmer
-          const board = readBoard(cockpitDir)
-          return { content: { success: true, board } }
-        } catch (err) {
-          return { isError: true, code: 400, message: String(err.message) }
-        }
-      }
-
-      case 'updateTicket': {
-        const val = validatePath(args.path)
-        if (val.isError) return val
-
-        if (!args.file) {
-          return { isError: true, code: 400, message: 'Fichier manquant' }
-        }
-
-        try {
-          const cockpitDir = join(args.path, 'cockpit')
-          const result = updateTicket(cockpitDir, args.file, args)
-          if (!result) {
-            return { isError: true, code: 404, message: 'Ticket non trouvé' }
-          }
-          return { content: { success: true } }
-        } catch (err) {
-          return { isError: true, code: 400, message: String(err.message) }
-        }
-      }
-
-      case 'moveTicket': {
-        const val = validatePath(args.path)
-        if (val.isError) return val
-
-        if (!args.file || !args.colonne) {
-          return { isError: true, code: 400, message: 'Fichier ou colonne manquante' }
-        }
-
-        try {
-          const cockpitDir = join(args.path, 'cockpit')
-          const result = moveTicket(cockpitDir, args.file, args.colonne)
-          if (!result) {
-            return { isError: true, code: 404, message: 'Ticket ou colonne non trouvé' }
-          }
-          const board = readBoard(cockpitDir)
-          return { content: { success: true, board: { colonnes: board } } }
-        } catch (err) {
-          return { isError: true, code: 400, message: String(err.message) }
-        }
-      }
-
-      case 'archiveTicket': {
-        const val = validatePath(args.path)
-        if (val.isError) return val
-
-        if (!args.file) {
-          return { isError: true, code: 400, message: 'Fichier manquant' }
-        }
-
-        try {
-          const cockpitDir = join(args.path, 'cockpit')
-          // Archiver = déplacer vers la colonne 'terminé'
-          const result = moveTicket(cockpitDir, args.file, 'terminé')
-          if (!result) {
-            return { isError: true, code: 404, message: 'Ticket non trouvé' }
-          }
-          return { content: { success: true } }
-        } catch (err) {
-          return { isError: true, code: 400, message: String(err.message) }
-        }
-      }
-
-      default:
-        return { isError: true, code: 400, message: `Outil inconnu : ${method}` }
-    }
+    return fn(args.path, args)
   } catch (err) {
-    return { isError: true, code: 500, message: String(err.message) }
+    return { isError: true, code: 500, message: String(err.message ?? err) }
   }
 }

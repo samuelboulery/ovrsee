@@ -53,7 +53,7 @@ pnpm test         # node --test sur hooks/ crawl/ server/ mcp/, puis app/src com
 pnpm typecheck    # tsc, ne couvre QUE app/src
 pnpm build:ui     # vite build vers app/dist/
 pnpm package      # DMG dans release/ (arm64, non signé)
-pnpm cockpit:mcp  # serveur MCP stdio (JSON-RPC 2.0) pour Claude Desktop
+pnpm cockpit:mcp  # serveur MCP stdio (JSON-RPC 2.0) pour Claude Code et Claude Desktop
 ```
 
 `pnpm test` n'utilise **aucun framework** : `node:test` et `node:assert` seuls.
@@ -93,6 +93,11 @@ page : pour ça, il faut lancer l'app.
   `electron-builder.yml`) et `spawn-helper` doit garder son bit d'exécution — d'où
   `scripts/fix-pty-permissions.js` en postinstall. C'est le point de rupture classique
   de l'empaquetage, et il ne se voit qu'à l'exécution du DMG, jamais en dev.
+- **Le stdout du serveur MCP est le transport, pas un journal.** Un `console.log`
+  ajouté dans n'importe quel module de `hooks/` ou `server/` se retrouve au milieu
+  d'un flux JSON-RPC et coupe la conversation. Les traces vont sur stderr. Et
+  tester `dispatch()` ne teste pas le fil : `mcp/mcp.test.js` fait les deux depuis
+  qu'un protocole non conforme est passé sous une suite verte.
 - **Un secret collé dans un plan approuvé part dans git en clair.** La parade est en
   amont : ne pas en coller.
 

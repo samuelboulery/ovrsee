@@ -7,6 +7,10 @@
  * Format JSON-RPC 2.0 :
  * - Demande : { jsonrpc: "2.0", id?: <number|string>, method: <string>, params?: <any> }
  * - Réponse : { jsonrpc: "2.0", id: <number|string>, result?: <any>, error?: {code, message} }
+ *
+ * stdout est le transport, pas un journal : rien d'autre que du JSON-RPC ne doit
+ * y être écrit, sous peine de couper la conversation au milieu. Les traces vont
+ * sur stderr.
  */
 
 import { dispatch } from './dispatch.js'
@@ -18,27 +22,163 @@ const rl = createInterface({
   terminal: false,
 })
 
-/**
- * @param {*} id
- * @param {*} result
- */
-function sendResponse(id, result) {
-  if (result?.isError) {
-    console.log(JSON.stringify({
-      jsonrpc: '2.0',
-      id,
-      error: {
-        code: result.code ?? -32603,
-        message: result.message ?? 'Erreur interne',
+/** Les outils annoncés, dans l'ordre où ils se lisent. */
+const TOOLS = [
+  {
+    name: 'listProjects',
+    description: 'Énumère les projets enregistrés',
+    inputSchema: { type: 'object', properties: {}, required: [] },
+  },
+  {
+    name: 'getProjectSummary',
+    description: 'Résumé d\'un projet : compteurs, dates, statut',
+    inputSchema: {
+      type: 'object',
+      properties: { path: { type: 'string' } },
+      required: ['path'],
+    },
+  },
+  {
+    name: 'getBrief',
+    description: 'Texte du brief d\'un projet',
+    inputSchema: {
+      type: 'object',
+      properties: { path: { type: 'string' } },
+      required: ['path'],
+    },
+  },
+  {
+    name: 'getBoard',
+    description: 'Structure des colonnes d\'un projet',
+    inputSchema: {
+      type: 'object',
+      properties: { path: { type: 'string' } },
+      required: ['path'],
+    },
+  },
+  {
+    name: 'listTickets',
+    description: 'N derniers tickets d\'un projet',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: { type: 'string' },
+        limit: { type: 'number', default: 20 },
       },
-    }))
-  } else {
-    console.log(JSON.stringify({
-      jsonrpc: '2.0',
-      id,
-      result: result?.content ?? result ?? null,
-    }))
+      required: ['path'],
+    },
+  },
+  {
+    name: 'getPlans',
+    description: 'N derniers plans d\'un projet',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: { type: 'string' },
+        limit: { type: 'number', default: 10 },
+      },
+      required: ['path'],
+    },
+  },
+  {
+    name: 'getTimeline',
+    description: 'Chronologie des commits d\'un projet, par semaine',
+    inputSchema: {
+      type: 'object',
+      properties: { path: { type: 'string' } },
+      required: ['path'],
+    },
+  },
+  {
+    name: 'getGraph',
+    description: 'Graphe de dépendances complet (volumineux : plusieurs centaines de ko)',
+    inputSchema: {
+      type: 'object',
+      properties: { path: { type: 'string' } },
+      required: ['path'],
+    },
+  },
+  {
+    name: 'createTicket',
+    description: 'Crée un ticket',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: { type: 'string' },
+        titre: { type: 'string' },
+        colonne: { type: 'string' },
+        priorite: { type: 'string' },
+        tags: { type: 'array', items: { type: 'string' } },
+        plan: { type: 'string' },
+        corps: { type: 'string' },
+        type: { type: 'string' },
+        epic: { type: 'string' },
+      },
+      required: ['path', 'titre'],
+    },
+  },
+  {
+    name: 'updateTicket',
+    description: 'Met à jour un ticket',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: { type: 'string' },
+        file: { type: 'string' },
+        titre: { type: 'string' },
+        colonne: { type: 'string' },
+        priorite: { type: 'string' },
+        tags: { type: 'array', items: { type: 'string' } },
+        corps: { type: 'string' },
+      },
+      required: ['path', 'file'],
+    },
+  },
+  {
+    name: 'moveTicket',
+    description: 'Déplace un ticket vers une colonne — sert aussi à archiver',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: { type: 'string' },
+        file: { type: 'string' },
+        colonne: { type: 'string' },
+      },
+      required: ['path', 'file', 'colonne'],
+    },
+  },
+]
+
+/** Une réponse JSON-RPC réussie. */
+function sendResult(id, result) {
+  console.log(JSON.stringify({ jsonrpc: '2.0', id, result }))
+}
+
+/**
+ * Une erreur JSON-RPC — réservée aux fautes de *protocole*.
+ *
+ * Un outil qui refuse un chemin n'est pas une faute de protocole : la spec veut
+ * qu'il réponde un résultat marqué `isError`, pour que le modèle lise le motif
+ * du refus au lieu de voir l'appel disparaître. Voir `toolResult`.
+ */
+function sendError(id, code, message) {
+  console.log(JSON.stringify({ jsonrpc: '2.0', id, error: { code, message } }))
+}
+
+/**
+ * Le résultat d'un outil, à la forme que la spec MCP impose : une liste de blocs
+ * de contenu, jamais la donnée nue. C'est ce que `dispatch()` ne peut pas
+ * produire seul — il ne connaît pas le transport.
+ *
+ * @param {{content: *} | {isError: true, code: number, message: string}} out
+ */
+function toolResult(out) {
+  if (out?.isError) {
+    return { content: [{ type: 'text', text: `Erreur ${out.code} : ${out.message}` }], isError: true }
   }
+  const data = out?.content
+  const text = typeof data === 'string' ? data : JSON.stringify(data ?? null)
+  return { content: [{ type: 'text', text }] }
 }
 
 rl.on('line', (line) => {
@@ -55,184 +195,34 @@ rl.on('line', (line) => {
 
   const { jsonrpc, id, method, params } = request
   if (jsonrpc !== '2.0' || !method) {
-    console.log(JSON.stringify({
-      jsonrpc: '2.0',
-      id,
-      error: { code: -32600, message: 'Requête invalide' },
-    }))
+    sendError(id, -32600, 'Requête invalide')
     return
   }
 
-  // Pas de notification pour l'instant.
+  // Une demande sans `id` est une notification : la spec interdit d'y répondre.
   if (id === undefined) return
 
   try {
     if (method === 'initialize') {
-      sendResponse(id, {
-        content: {
-          protocolVersion: '2024-11-05',
-          capabilities: {},
-          serverInfo: { name: 'cockpit-mcp', version: '1.0.0' },
-        },
+      sendResult(id, {
+        protocolVersion: '2024-11-05',
+        // `tools` doit être déclaré : un client conforme n'appelle `tools/list`
+        // que si le serveur annonce cette capacité. Un objet vide suffit —
+        // aucune option (comme `listChanged`) n'est proposée.
+        capabilities: { tools: {} },
+        serverInfo: { name: 'cockpit-mcp', version: '1.0.0' },
       })
     } else if (method === 'tools/list') {
-      sendResponse(id, {
-        content: {
-          tools: [
-            {
-              name: 'listProjects',
-              description: 'Énumère les projets enregistrés',
-              inputSchema: { type: 'object', properties: {}, required: [] },
-            },
-            {
-              name: 'getProjectSummary',
-              description: 'Résumé d\'un projet : compteurs, dates, statut',
-              inputSchema: {
-                type: 'object',
-                properties: { path: { type: 'string' } },
-                required: ['path'],
-              },
-            },
-            {
-              name: 'getBrief',
-              description: 'Texte du brief d\'un projet',
-              inputSchema: {
-                type: 'object',
-                properties: { path: { type: 'string' } },
-                required: ['path'],
-              },
-            },
-            {
-              name: 'getBoard',
-              description: 'Structure des colonnes d\'un projet',
-              inputSchema: {
-                type: 'object',
-                properties: { path: { type: 'string' } },
-                required: ['path'],
-              },
-            },
-            {
-              name: 'listTickets',
-              description: 'N derniers tickets d\'un projet',
-              inputSchema: {
-                type: 'object',
-                properties: {
-                  path: { type: 'string' },
-                  limit: { type: 'number', default: 20 },
-                },
-                required: ['path'],
-              },
-            },
-            {
-              name: 'getPlans',
-              description: 'N derniers plans d\'un projet',
-              inputSchema: {
-                type: 'object',
-                properties: {
-                  path: { type: 'string' },
-                  limit: { type: 'number', default: 10 },
-                },
-                required: ['path'],
-              },
-            },
-            {
-              name: 'getTimeline',
-              description: 'Chronologie des commits d\'un projet',
-              inputSchema: {
-                type: 'object',
-                properties: {
-                  path: { type: 'string' },
-                  weeks: { type: 'number', default: 16 },
-                },
-                required: ['path'],
-              },
-            },
-            {
-              name: 'getGraph',
-              description: 'Graphe de dépendances complet (~384 KB)',
-              inputSchema: {
-                type: 'object',
-                properties: { path: { type: 'string' } },
-                required: ['path'],
-              },
-            },
-            {
-              name: 'createTicket',
-              description: 'Crée un ticket',
-              inputSchema: {
-                type: 'object',
-                properties: {
-                  path: { type: 'string' },
-                  titre: { type: 'string' },
-                  colonne: { type: 'string' },
-                  priorite: { type: 'string' },
-                  tags: { type: 'array' },
-                  plan: { type: 'string' },
-                  corps: { type: 'string' },
-                  type: { type: 'string' },
-                  epic: { type: 'string' },
-                },
-                required: ['path', 'titre'],
-              },
-            },
-            {
-              name: 'updateTicket',
-              description: 'Met à jour un ticket',
-              inputSchema: {
-                type: 'object',
-                properties: {
-                  path: { type: 'string' },
-                  file: { type: 'string' },
-                },
-                required: ['path', 'file'],
-              },
-            },
-            {
-              name: 'moveTicket',
-              description: 'Déplace un ticket vers une colonne',
-              inputSchema: {
-                type: 'object',
-                properties: {
-                  path: { type: 'string' },
-                  file: { type: 'string' },
-                  colonne: { type: 'string' },
-                },
-                required: ['path', 'file', 'colonne'],
-              },
-            },
-            {
-              name: 'archiveTicket',
-              description: 'Archive un ticket (déplace vers colonne terminée)',
-              inputSchema: {
-                type: 'object',
-                properties: {
-                  path: { type: 'string' },
-                  file: { type: 'string' },
-                },
-                required: ['path', 'file'],
-              },
-            },
-          ],
-        },
-      })
+      sendResult(id, { tools: TOOLS })
     } else if (method === 'tools/call') {
       const { name, arguments: args } = params ?? {}
-      const result = dispatch(name, args || {})
-      sendResponse(id, result)
+      sendResult(id, toolResult(dispatch(name, args || {})))
     } else {
-      sendResponse(id, {
-        isError: true,
-        code: -32601,
-        message: 'Méthode non trouvée',
-      })
+      sendError(id, -32601, 'Méthode non trouvée')
     }
   } catch (err) {
     console.error('[ERR]', err.message || err)
-    sendResponse(id, {
-      isError: true,
-      code: -32603,
-      message: 'Erreur interne du serveur',
-    })
+    sendError(id, -32603, 'Erreur interne du serveur')
   }
 })
 

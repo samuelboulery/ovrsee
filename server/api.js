@@ -40,8 +40,11 @@ import {
  * Le chemin vient du rendu. Il n'ouvre qu'une lecture du `cockpit/` qui s'y
  * trouve — c'est le sens même d'« ouvrir un projet » — mais il n'a aucune raison
  * d'être relatif, de désigner un fichier, ni de passer par un lien symbolique.
+ *
+ * Exporté pour le serveur MCP : ses outils reçoivent un chemin par le même
+ * chemin de confiance qu'une barre d'adresse, et doivent le refuser pareil.
  */
-const usableDirectory = path =>
+export const usableDirectory = path =>
   typeof path === 'string' &&
   path.length > 0 &&
   isAbsolute(path) &&

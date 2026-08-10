@@ -6,7 +6,8 @@
 
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { existsSync, mkdtempSync, mkdirSync, writeFileSync, symlinkSync, readdirSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, symlinkSync, readdirSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -213,29 +214,6 @@ test('moveTicket refuse un ticket inexistant', () => {
   assert.equal(result.code, 404)
 })
 
-// --- Tests archiveTicket ----
-
-test('archiveTicket archive un ticket (déplace vers terminé)', () => {
-  withRegistry()
-  const dir = projectDir()
-  registerProject(dir)
-
-  // Créer un ticket
-  dispatch('createTicket', { path: dir, titre: 'Archive me', colonne: 'backlog' })
-
-  // Trouver le fichier
-  const ticketsDir = join(dir, 'cockpit', 'tickets')
-  const file = readdirSync(ticketsDir)[0]
-
-  const result = dispatch('archiveTicket', {
-    path: dir,
-    file,
-  })
-
-  assert.ok(!result.isError)
-  assert.ok(result.content.success)
-})
-
 // --- Tests chemin absolu/vide ----
 
 test('dispatch refuse un chemin vide', () => {
@@ -274,6 +252,26 @@ test('listTickets retourne les N derniers tickets', () => {
 
 // --- Tests getPlans ----
 
+test('listTickets rend les plus récents d\'abord, et pas plus que la limite', () => {
+  withRegistry()
+  const dir = projectDir()
+  registerProject(dir)
+
+  dispatch('createTicket', { path: dir, titre: 'Ancien', colonne: 'backlog' })
+  dispatch('createTicket', { path: dir, titre: 'Recent', colonne: 'backlog' })
+  // Vieillir le premier : sans cela les deux portent la même date du jour et
+  // l'ordre rendu ne prouve rien. Le frontmatter est du JSON entre `---`.
+  const fichiers = readdirSync(join(dir, 'cockpit', 'tickets')).sort()
+  const ancien = join(dir, 'cockpit', 'tickets', fichiers[0])
+  writeFileSync(ancien, readFileSync(ancien, 'utf8').replace(/"cree": "[^"]+"/, '"cree": "2020-01-01"'))
+
+  const result = dispatch('listTickets', { path: dir, limit: 1 })
+
+  assert.ok(!result.isError)
+  assert.equal(result.content.length, 1)
+  assert.equal(result.content[0].titre, 'Recent')
+})
+
 test('getPlans retourne les N derniers plans', () => {
   withRegistry()
   const dir = projectDir()
@@ -295,4 +293,101 @@ test('dispatch retourne une erreur pour un outil inconnu', () => {
   assert.ok(result.isError)
   assert.equal(result.code, 400)
   assert.match(result.message, /inconnu/)
+})
+
+// --- Tests du fil stdio ----
+//
+// Les tests ci-dessus n'appellent que `dispatch()`. Ils étaient verts pendant
+// que le serveur renvoyait la donnée nue au lieu de l'enveloppe `content` que
+// la spec MCP exige — c'est-à-dire pendant qu'aucun client réel ne pouvait s'en
+// servir. Ceux-ci parlent au serveur par où un client lui parle.
+
+/**
+ * Envoie des demandes JSON-RPC au serveur et rend ses réponses, dans l'ordre.
+ *
+ * @param {string[]} demandes lignes JSON
+ * @param {string} registre chemin d'un registre isolé
+ */
+function parLeFil(demandes, registre) {
+  const out = execFileSync(process.execPath, [join(import.meta.dirname, 'server.js')], {
+    input: demandes.join('\n') + '\n',
+    env: { ...process.env, COCKPIT_REGISTRY: registre },
+    encoding: 'utf8',
+  })
+  return out.trim().split('\n').filter(Boolean).map(l => JSON.parse(l))
+}
+
+const demande = (id, method, params) =>
+  JSON.stringify({ jsonrpc: '2.0', id, method, ...(params ? { params } : {}) })
+
+test('le serveur annonce la capacité tools à l\'initialisation', () => {
+  withRegistry()
+
+  const [rep] = parLeFil([demande(1, 'initialize', { protocolVersion: '2024-11-05' })], process.env.COCKPIT_REGISTRY)
+
+  assert.equal(rep.id, 1)
+  assert.equal(rep.result.protocolVersion, '2024-11-05')
+  // Sans ceci, un client conforme n'appelle jamais `tools/list`.
+  assert.deepEqual(rep.result.capabilities.tools, {})
+})
+
+test('le serveur ne répond pas à une notification', () => {
+  withRegistry()
+
+  const reps = parLeFil([
+    JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' }),
+    demande(2, 'tools/list'),
+  ], process.env.COCKPIT_REGISTRY)
+
+  assert.equal(reps.length, 1)
+  assert.equal(reps[0].id, 2)
+})
+
+test('tools/list annonce des outils avec un schéma d\'entrée', () => {
+  withRegistry()
+
+  const [rep] = parLeFil([demande(1, 'tools/list')], process.env.COCKPIT_REGISTRY)
+
+  assert.ok(Array.isArray(rep.result.tools))
+  assert.ok(rep.result.tools.every(t => t.name && t.description && t.inputSchema))
+  // Retiré : `moveTicket` fait le même geste, vers une colonne qui existe.
+  assert.ok(!rep.result.tools.some(t => t.name === 'archiveTicket'))
+})
+
+test('tools/call enveloppe le résultat dans content', () => {
+  withRegistry()
+  const dir = projectDir()
+  registerProject(dir)
+
+  const [rep] = parLeFil(
+    [demande(1, 'tools/call', { name: 'listProjects', arguments: {} })],
+    process.env.COCKPIT_REGISTRY,
+  )
+
+  assert.equal(rep.error, undefined)
+  assert.ok(Array.isArray(rep.result.content))
+  assert.equal(rep.result.content[0].type, 'text')
+  assert.equal(JSON.parse(rep.result.content[0].text)[0].path, dir)
+})
+
+test('un refus d\'outil est un résultat isError, pas une erreur JSON-RPC', () => {
+  withRegistry()
+
+  const [rep] = parLeFil(
+    [demande(1, 'tools/call', { name: 'getProjectSummary', arguments: { path: '/tmp/inexistant-12345' } })],
+    process.env.COCKPIT_REGISTRY,
+  )
+
+  // Une erreur JSON-RPC ferait disparaître le motif du refus côté modèle.
+  assert.equal(rep.error, undefined)
+  assert.equal(rep.result.isError, true)
+  assert.match(rep.result.content[0].text, /Erreur 400/)
+})
+
+test('une méthode inconnue reste une erreur JSON-RPC', () => {
+  withRegistry()
+
+  const [rep] = parLeFil([demande(1, 'resources/list')], process.env.COCKPIT_REGISTRY)
+
+  assert.equal(rep.error.code, -32601)
 })

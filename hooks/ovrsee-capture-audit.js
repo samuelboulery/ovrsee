@@ -17,7 +17,8 @@
  */
 
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { appendFileSync, existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 /**
  * Noms exacts tels qu'invoqués par l'outil Skill : `plugin:skill` pour les
@@ -52,6 +53,24 @@ function repoRoot(cwd) {
   }
 }
 
+/**
+ * Trace un audit dans `ovrsee/audits.jsonl`, seulement si le projet est déjà
+ * équipé. Un échec d'écriture ne doit jamais faire échouer le hook — c'est
+ * le nudge qui compte, pas la trace.
+ */
+function logAudit(root, skill) {
+  const ovrseeDir = join(root, 'ovrsee')
+  if (!existsSync(ovrseeDir)) return
+  try {
+    appendFileSync(
+      join(ovrseeDir, 'audits.jsonl'),
+      `${JSON.stringify({ date: new Date().toISOString(), skill })}\n`,
+    )
+  } catch {
+    // Tant pis pour la trace, le nudge part quand même.
+  }
+}
+
 function main() {
   const raw = readStdin()
   if (!raw.trim()) return
@@ -65,7 +84,10 @@ function main() {
 
   const skill = payload?.tool_input?.skill
   if (typeof skill !== 'string' || !AUDIT_SKILLS.has(skill)) return
-  if (!repoRoot(payload.cwd || process.cwd())) return // Hors dépôt git : rien à faire.
+  const root = repoRoot(payload.cwd || process.cwd())
+  if (!root) return // Hors dépôt git : rien à faire.
+
+  logAudit(root, skill)
 
   process.stdout.write(
     JSON.stringify({

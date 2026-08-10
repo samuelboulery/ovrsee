@@ -167,6 +167,47 @@ export interface Scan {
   error?: string
 }
 
+/** Une revue capturée par `ovrsee-capture-audit.js`, telle qu'écrite dans `ovrsee/audits.jsonl`. */
+export interface Audit {
+  /** ISO complet. */
+  date: string
+  /** Nom exact du skill invoqué, ex. `security-review`. */
+  skill: string
+}
+
+/** Une branche locale, et son avance/retard sur la remote qu'elle suit. */
+export interface GitBranch {
+  name: string
+  /** `origin/main`, ou `null` si la branche ne suit rien. */
+  upstream: string | null
+  ahead: number
+  behind: number
+}
+
+/**
+ * État git local, lu sans réseau — voir `hooks/git-status.js`. `lastFetch`
+ * date ce que le dépôt sait du distant : sans clic sur Rafraîchir, `ahead`
+ * et `behind` peuvent être aussi vieux que ce fetch.
+ */
+export interface GitStatus {
+  branch: string | null
+  dirty: { staged: number; unstaged: number; untracked: number }
+  branches: GitBranch[]
+  lastFetch: string | null
+}
+
+/**
+ * Repli d'un `gitStatus` absent — un snapshot plus vieux que ce champ, ou un
+ * instantané de test qui ne le porte pas. Même raison que `liste()` : un champ
+ * manquant doit rendre un écran vide, jamais une exception.
+ */
+export const EMPTY_GIT_STATUS: GitStatus = {
+  branch: null,
+  dirty: { staged: 0, unstaged: 0, untracked: 0 },
+  branches: [],
+  lastFetch: null,
+}
+
 export interface Project {
   path: string
   name: string
@@ -243,6 +284,12 @@ export interface OvrseeConfig {
    * produit. Absolu, `~`, ou relatif à la racine du dépôt.
    */
   obsidianVault?: string
+  /**
+   * Environnements déclarés à la main — rien ne les détecte. `branche`, si
+   * renseignée, sert à marquer celui qui correspond à `gitStatus.branch` :
+   * une correspondance de nom, pas une preuve de déploiement.
+   */
+  environments?: Array<{ nom: string; url?: string; branche?: string }>
 }
 
 /**
@@ -337,6 +384,10 @@ export interface Snapshot {
    * tableau abîmé pour un tableau vide.
    */
   illisibles?: Illisible[]
+  /** État git local — branche, arbre de travail, branches et leur tracking. */
+  gitStatus: GitStatus
+  /** Revues capturées, de la plus récente à la plus ancienne dans le fichier. */
+  audits: Audit[]
 }
 
 /** Un fichier de `ovrsee/` présent sur le disque mais que l'ovrsee ne sait pas lire. */
@@ -528,6 +579,25 @@ export async function projectAction(
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
     body: JSON.stringify({ ...payload, action, path }),
+  })
+
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result
+}
+
+/**
+ * Lance `git fetch` sur le dépôt, et rend l'état git à jour.
+ *
+ * Séparé de `projectAction` : cette action ne rend pas `projects`, et lui
+ * donner la même forme aurait obligé chaque appelant existant à composer
+ * avec un champ qui, pour eux, ne manque jamais.
+ */
+export async function gitFetch(path: string): Promise<{ gitStatus: GitStatus }> {
+  const response = await fetch('/api/projects', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
+    body: JSON.stringify({ action: 'git-fetch', path }),
   })
 
   const result = await response.json()
@@ -856,6 +926,10 @@ export function plansForPage(plans: Plan[], page: Page): Plan[] {
 
 /** Dernier scan connu, réussi ou non. */
 export const lastScan = (scans: Scan[]): Scan | null => liste(scans).at(-1) ?? null
+
+/** Dernier audit capturé, ou `null` si aucun n'a encore été tracé. */
+export const lastAudit = (audits: Audit[]): Audit | null =>
+  [...liste(audits)].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? '')).at(0) ?? null
 
 /**
  * Une page a-t-elle échoué au dernier scan ?

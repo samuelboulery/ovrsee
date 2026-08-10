@@ -23,6 +23,7 @@ import { registerProject, touchProject, unregisterProject } from '../hooks/plans
 import { readSettings, writeSettings, validateSettings, mergeSettings } from '../hooks/settings.js'
 import { installSkills, readSkills } from '../hooks/skills.js'
 import { projects, snapshot, shotPath, mediaPath, tableau, readJson } from '../hooks/snapshot.js'
+import { gitStatus } from '../hooks/git-status.js'
 import {
   addColumn,
   createTicket,
@@ -200,6 +201,19 @@ function projectAction(body) {
     case 'state': {
       if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
       return { json: getFolderState(path) }
+    }
+
+    // Le seul geste réseau du dashboard : jamais automatique, toujours un
+    // clic. `gitStatus` sans fetch préalable ne connaît que le dernier
+    // distant vu — c'est ce que ce bouton met à jour.
+    case 'git-fetch': {
+      if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
+      try {
+        execFileSync('git', ['fetch'], { cwd: path, stdio: 'ignore' })
+      } catch (err) {
+        return { status: 400, json: { error: String(err.message ?? err) } }
+      }
+      return { json: { gitStatus: gitStatus(path) } }
     }
 
     case 'init': {

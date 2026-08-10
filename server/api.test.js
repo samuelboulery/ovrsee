@@ -1,6 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -365,6 +366,26 @@ test('POST /api/projects export-obsidian écrit le coffre', () => {
 
 test('POST /api/projects export-obsidian refuse un projet inconnu', () => {
   assert.equal(post({ action: 'export-obsidian', path: '/etc' }).status, 404)
+})
+
+// --- /api/projects : git-fetch ----------------------------------------------
+
+test('POST /api/projects git-fetch rend un gitStatus à jour', () => {
+  const dir = projetEnregistre()
+  execFileSync('git', ['init', '-b', 'main', '-q'], { cwd: dir })
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir })
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir })
+  writeFileSync(join(dir, 'a.txt'), 'a')
+  execFileSync('git', ['add', 'a.txt'], { cwd: dir })
+  execFileSync('git', ['commit', '-q', '-m', 'premier commit'], { cwd: dir })
+
+  const result = post({ action: 'git-fetch', path: dir })
+
+  assert.equal(result.json.gitStatus.branch, 'main')
+})
+
+test('POST /api/projects git-fetch refuse un projet inconnu', () => {
+  assert.equal(post({ action: 'git-fetch', path: '/etc' }).status, 404)
 })
 
 // --- préférences --------------------------------------------------------

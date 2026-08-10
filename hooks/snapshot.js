@@ -18,6 +18,7 @@ import { readVault } from './vault.js'
 import { readWhys } from './whys.js'
 import { timeline } from './timeline.js'
 import { readSettings, mergeSettings } from './settings.js'
+import { gitStatus } from './git-status.js'
 
 export const readJson = path => {
   try {
@@ -129,6 +130,35 @@ function scans(root, illisibles = []) {
   }
   if (cassees > 0) {
     illisibles.push({ file: 'pages/scans.jsonl', quoi: 'scan', lignes: cassees })
+  }
+  return lignes
+}
+
+/**
+ * Journal des audits, une ligne par revue capturée par
+ * `ovrsee-capture-audit.js` — même tolérance qu'un journal de scans : une
+ * ligne illisible est sautée et comptée, jamais fatale aux autres.
+ */
+function audits(root, illisibles = []) {
+  let cassees = 0
+  let lignes = []
+  try {
+    lignes = readFileSync(join(root, 'ovrsee', 'audits.jsonl'), 'utf8')
+      .split('\n')
+      .filter(Boolean)
+      .flatMap(line => {
+        try {
+          return [JSON.parse(line)]
+        } catch {
+          cassees += 1
+          return []
+        }
+      })
+  } catch {
+    return []
+  }
+  if (cassees > 0) {
+    illisibles.push({ file: 'audits.jsonl', quoi: 'audit', lignes: cassees })
   }
   return lignes
 }
@@ -393,6 +423,10 @@ export function snapshot(root) {
     // Les commits bruts ne sont pas renvoyés en plus : la frise porte déjà
     // sha, date et sujet, et deux copies de la même liste divergeraient.
     timeline: timeline(commits(root), plans),
+    // État local, jamais rafraîchi par un fetch réseau ici — voir
+    // `gitStatus.lastFetch` pour dater ce que le dépôt sait du distant.
+    gitStatus: gitStatus(root),
+    audits: audits(root, illisibles),
   }
 }
 

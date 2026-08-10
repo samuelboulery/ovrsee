@@ -95,6 +95,24 @@ test('une ligne illisible de scans.jsonl est comptée, pas seulement sautée', (
   assert.deepEqual(illisibles, [{ file: 'pages/scans.jsonl', quoi: 'scan', lignes: 1 }])
 })
 
+test('une ligne illisible de audits.jsonl est comptée, pas seulement sautée', () => {
+  const dir = project()
+  writeFileSync(
+    join(dir, 'ovrsee', 'audits.jsonl'),
+    'pas du json\n{"date":"2026-08-10T10:00:00.000Z","skill":"security-review"}\n',
+  )
+
+  const { audits, illisibles } = snapshot(dir)
+  assert.equal(audits.length, 1)
+  assert.deepEqual(illisibles, [{ file: 'audits.jsonl', quoi: 'audit', lignes: 1 }])
+})
+
+test('un dépôt hors git rend un gitStatus vide plutôt que de lever', () => {
+  const { gitStatus } = snapshot(project())
+  assert.equal(gitStatus.branch, null)
+  assert.deepEqual(gitStatus.branches, [])
+})
+
 test('un projet sain ne signale rien', () => {
   assert.deepEqual(snapshot(project()).illisibles, [])
 })

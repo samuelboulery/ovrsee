@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import {
+  EMPTY_GIT_STATUS,
   frDate,
   humanAge,
   lastScan,
@@ -8,10 +9,14 @@ import {
   projectAction,
   restant,
   stackFrom,
+  type GitStatus,
   type Snapshot,
 } from '../data'
+import { Branches } from './Branches'
+import { Environnements } from './Environnements'
 import { Illisibles } from '../Illisibles'
 import { Markdown, headings } from '../markdown'
+import { Sante } from './Sante'
 import { t } from '../i18n'
 import { s } from '../style'
 import type { Editeur } from '../useTerminal'
@@ -103,6 +108,19 @@ export function Apercu({
     setHauteur(entete.current?.offsetHeight ?? 96)
   }, [root, packageJson?.description])
 
+  // L'état git est réévalué à chaque nouveau snapshot (changement de projet,
+  // rechargement) mais mis à jour localement après un fetch — relire tout le
+  // snapshot pour un champ qui change serait payer le reste du projet dessus.
+  const [gitStatus, setGitStatus] = useState<GitStatus>(snapshot.gitStatus ?? EMPTY_GIT_STATUS)
+  useEffect(() => {
+    setGitStatus(snapshot.gitStatus ?? EMPTY_GIT_STATUS)
+  }, [root, snapshot.gitStatus])
+
+  // Le README est replié par défaut : c'est la réponse à « c'est quoi, ce
+  // projet ? », pas quelque chose qu'on relit à chaque ouverture de l'onglet.
+  const [readmeOpen, setReadmeOpen] = useState(false)
+  const [ancreEnAttente, setAncreEnAttente] = useState<string | null>(null)
+
   /**
    * Amener un titre sous l'en-tête, en ne bougeant que ce cadre.
    *
@@ -111,13 +129,30 @@ export function Apercu({
    * cassée. Le `href` reste posé quand même — il rend le lien copiable et
    * ouvrable au clic du milieu, ce qu'un `onClick` seul ne donne pas.
    */
-  const aller = (id: string) => {
+  const scrollVers = (id: string) => {
     const cible = document.getElementById(id)
     const cadre = boite.current
     if (!cible || !cadre) return
     cadre.scrollTop +=
       cible.getBoundingClientRect().top - cadre.getBoundingClientRect().top - (hauteur + 14)
   }
+
+  // Un lien du sommaire peut viser un titre caché derrière le README replié :
+  // l'ouvrir d'abord, défiler une fois le markdown monté.
+  const aller = (id: string) => {
+    if (!readmeOpen) {
+      setReadmeOpen(true)
+      setAncreEnAttente(id)
+      return
+    }
+    scrollVers(id)
+  }
+
+  useEffect(() => {
+    if (!readmeOpen || !ancreEnAttente) return
+    scrollVers(ancreEnAttente)
+    setAncreEnAttente(null)
+  }, [readmeOpen, ancreEnAttente])
 
   return (
     <div ref={boite} style={s('flex: 1; display: flex; flex-direction: column; overflow: auto;')}>
@@ -198,7 +233,13 @@ export function Apercu({
         )}
       >
         <div style={s('flex: 1; min-width: 0; max-width: 820px;')}>
-          <Lancement packageJson={packageJson} />
+          <Sante snapshot={snapshot} gitStatus={gitStatus} />
+          <Branches root={root} gitStatus={gitStatus} onGitStatus={setGitStatus} />
+          <Environnements config={snapshot.config} gitStatus={gitStatus} />
+
+          <div style={s('margin-top: 18px;')}>
+            <Lancement packageJson={packageJson} />
+          </div>
 
           <div style={s('margin-top: 18px;')}>
             <Titre>{t('apercu.take_away')}</Titre>
@@ -206,14 +247,25 @@ export function Apercu({
           </div>
 
           <div style={s('margin-top: 24px;')}>
-            <Titre>README.md</Titre>
-            {readme ? (
-              <Markdown text={readme} root={root} />
-            ) : (
+            <div style={s('display: flex; align-items: center; justify-content: space-between; gap: 12px;')}>
+              <Titre>README.md</Titre>
+              {readme && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={s(BOUTON)}
+                  onClick={() => setReadmeOpen(open => !open)}
+                >
+                  {readmeOpen ? t('apercu.hide_readme') : t('apercu.show_readme')}
+                </button>
+              )}
+            </div>
+            {!readme && (
               <div style={s('font-size: 12.5px; color: var(--color-neutral-600);')}>
                 {t('apercu.no_readme')}
               </div>
             )}
+            {readme && readmeOpen && <Markdown text={readme} root={root} />}
           </div>
         </div>
 

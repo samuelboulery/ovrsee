@@ -545,6 +545,7 @@ export function App() {
                   onToggle={() => setTerminal(false)}
                   onReload={reload}
                   snapshot={snapshot}
+                  settings={settings}
                   terminalHeight={terminalHeight}
                   terminalWidth={terminalWidth}
                   onTerminalHeightChange={setTerminalHeight}

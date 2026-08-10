@@ -58,3 +58,4 @@
 {"date":"2026-08-10","commit":"c017018","ok":false,"error":"http://localhost:5180 répond déjà — un autre serveur occupe le port. Arrêtez-le, ou donnez un baseUrl libre dans cockpit.config.json."}
 {"date":"2026-08-10","commit":"8fdd55e","ok":false,"error":"http://localhost:5180 répond déjà — un autre serveur occupe le port. Arrêtez-le, ou donnez un baseUrl libre dans cockpit.config.json."}
 {"date":"2026-08-10","commit":"981e78a","ok":true,"pages":7}
+{"date":"2026-08-10","commit":"1af9cb3","ok":true,"pages":7}

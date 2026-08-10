@@ -4,7 +4,36 @@
   "title": "Onboarding de premier lancement",
   "opened": "2026-08-10",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "1af9cb3",
+      "date": "2026-08-10",
+      "files": [
+        "CLAUDE.md",
+        "README.en.md",
+        "README.md",
+        "app/src/App.tsx",
+        "app/src/Onboarding.tsx",
+        "app/src/OnboardingArt.tsx",
+        "app/src/PreferencesPanel.tsx",
+        "app/src/PreferencesProfils.tsx",
+        "app/src/Welcome.tsx",
+        "app/src/data.ts",
+        "app/src/onboarding.test.tsx",
+        "app/src/profilage.ts",
+        "electron/main.js",
+        "electron/menu.js",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/plans.test.js",
+        "hooks/settings.js",
+        "hooks/settings.test.js",
+        "hooks/snapshot.js",
+        "server/api.js",
+        "server/api.test.js"
+      ]
+    }
+  ]
 }
 ---
 

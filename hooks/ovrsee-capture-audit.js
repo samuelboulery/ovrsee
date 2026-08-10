@@ -1,23 +1,31 @@
 #!/usr/bin/env node
 /**
- * Hook PostToolUse, matcher `Skill` : après un skill d'audit (revue de code,
- * revue de sécurité, audit de sur-ingénierie), pousse Claude à décomposer les
- * constats en tickets dans le même tour.
+ * Trois hooks en un fichier, branchés sur `hook_event_name` :
  *
- * Symétrique à `ovrsee-capture-plan.js`, mais ne capture rien sur disque —
- * un rapport d'audit n'est pas une intention approuvée, il n'a pas de statut
- * ouvert/fermé à suivre. Seul le nudge compte ici.
+ * - UserPromptSubmit : un skill d'audit invoqué en commande slash (ex.
+ *   `/ponytail:ponytail-audit`) ne passe jamais par l'outil `Skill` — le
+ *   harness le charge avant même le tour du modèle, donc PostToolUse ne voit
+ *   rien. On détecte la commande dans le prompt brut et on pose un marqueur.
+ * - PostToolUse (matcher `Skill`) : cas où l'audit est réellement invoqué via
+ *   l'outil `Skill` (agent, appel programmatique). Trace direct.
+ * - Stop : si un marqueur attend (posé par UserPromptSubmit), l'audit vient
+ *   de tourner dans le tour qui se termine — c'est là, et seulement là, que
+ *   les constats existent. Trace + nudge, puis marqueur supprimé.
  *
  * Contrat (identique à ovrsee-capture-plan.js) : JSON sur stdin, exit 0
  * TOUJOURS. Un hook qui bloquerait l'outil casserait la revue elle-même.
  *
- *   stdin  {"tool_name":"Skill","tool_input":{"skill":"code-review:code-review",...},"cwd":"/chemin"}
- *   stdout {"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"..."}}
- *          Silencieux (aucune sortie) si le skill invoqué n'est pas un audit.
+ *   stdin  UserPromptSubmit {"hook_event_name":"UserPromptSubmit","prompt":"/ponytail:ponytail-audit","cwd":"/chemin"}
+ *          PostToolUse      {"hook_event_name":"PostToolUse","tool_name":"Skill","tool_input":{"skill":"code-review:code-review"},"cwd":"/chemin"}
+ *          Stop             {"hook_event_name":"Stop","cwd":"/chemin"}
+ *   effets <repo>/ovrsee/.pending-audit (créé par UserPromptSubmit, consommé par Stop)
+ *          <repo>/ovrsee/audits.jsonl   (trace, si le projet est équipé)
+ *   stdout {"hookSpecificOutput":{"hookEventName":"...","additionalContext":"..."}}
+ *          Silencieux (aucune sortie) si rien à faire pour cet event.
  */
 
 import { execFileSync } from 'node:child_process'
-import { appendFileSync, existsSync, readFileSync } from 'node:fs'
+import { appendFileSync, existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 /**
@@ -27,6 +35,18 @@ import { join } from 'node:path'
  * un nudge qui ne part jamais.
  */
 const AUDIT_SKILLS = new Set(['code-review:code-review', 'security-review', 'ponytail:ponytail-audit', 'ponytail:ponytail-review'])
+
+/**
+ * Un skill invoqué en commande slash s'écrit `/<nom-du-skill>` — vérifié sur
+ * cette session : `/ponytail:ponytail-audit` déclenche le skill
+ * `ponytail:ponytail-audit`, un-à-un. Args éventuels après un espace ignorés.
+ */
+function skillFromSlashCommand(prompt) {
+  const trimmed = prompt.trim()
+  if (!trimmed.startsWith('/')) return null
+  const name = trimmed.slice(1).split(/\s+/, 1)[0]
+  return AUDIT_SKILLS.has(name) ? name : null
+}
 
 function readStdin() {
   try {
@@ -60,15 +80,42 @@ function repoRoot(cwd) {
  */
 function logAudit(root, skill) {
   const ovrseeDir = join(root, 'ovrsee')
-  if (!existsSync(ovrseeDir)) return
+  if (!existsSync(ovrseeDir)) return false
   try {
     appendFileSync(
       join(ovrseeDir, 'audits.jsonl'),
       `${JSON.stringify({ date: new Date().toISOString(), skill })}\n`,
     )
+    return true
   } catch {
     // Tant pis pour la trace, le nudge part quand même.
+    return true
   }
+}
+
+const pendingAuditPath = (root) => join(root, 'ovrsee', '.pending-audit')
+
+const NUDGE_TEXT = (skill) =>
+  `[ovrsee] Revue « ${skill} » terminée. Décompose les constats en tickets via le skill cockpit-tickets — un ticket par constat réel, pas par ligne de rapport ; priorité dérivée de la gravité, charge estimée (xs–xl) quand c'est raisonnable.`
+
+/**
+ * PostToolUse peut injecter du contexte sans rouvrir le tour (hookSpecificOutput
+ * .additionalContext). Stop n'a pas cette option : pour pousser Claude à
+ * continuer après un Stop, seul `decision: "block"` + `reason` rouvre le tour.
+ */
+function nudge(hookEventName, skill) {
+  if (hookEventName === 'Stop') {
+    process.stdout.write(JSON.stringify({ decision: 'block', reason: NUDGE_TEXT(skill) }))
+    return
+  }
+  process.stdout.write(
+    JSON.stringify({
+      hookSpecificOutput: {
+        hookEventName,
+        additionalContext: NUDGE_TEXT(skill),
+      },
+    }),
+  )
 }
 
 function main() {
@@ -82,21 +129,55 @@ function main() {
     return
   }
 
+  const eventName = payload?.hook_event_name
+  const root = repoRoot(payload?.cwd || process.cwd())
+  if (!root) return // Hors dépôt git : rien à faire.
+  if (!existsSync(join(root, 'ovrsee'))) return // Projet non équipé.
+
+  // Skill invoqué en commande slash : le tour ne fait que commencer, aucun
+  // constat n'existe encore. On pose juste un marqueur pour le Stop hook.
+  if (eventName === 'UserPromptSubmit' || (typeof payload?.prompt === 'string' && !payload.tool_input)) {
+    const skill = skillFromSlashCommand(payload.prompt || '')
+    if (!skill) return
+    try {
+      writeFileSync(pendingAuditPath(root), JSON.stringify({ skill, date: new Date().toISOString() }))
+    } catch {
+      // Pas de marqueur, pas de nudge au Stop — tant pis, silencieux.
+    }
+    return
+  }
+
+  // Fin de tour : si un audit slash-command attendait, les constats existent
+  // maintenant dans la réponse qui vient de se terminer.
+  // ponytail: suppose l'audit fini au premier Stop qui suit la commande. Si
+  // Claude fan-out des agents async pour l'audit, ce Stop arrive avant les
+  // résultats — marqueur consommé trop tôt, pas de second nudge au vrai Stop
+  // final. Upgrade : ne consommer que si aucune tâche background n'est active.
+  if (eventName === 'Stop') {
+    const markerPath = pendingAuditPath(root)
+    if (!existsSync(markerPath)) return
+    let skill
+    try {
+      skill = JSON.parse(readFileSync(markerPath, 'utf8'))?.skill
+    } catch {
+      skill = null
+    }
+    try {
+      unlinkSync(markerPath)
+    } catch {
+      // Marqueur non supprimé : pire cas, un nudge en double au prochain Stop.
+    }
+    if (typeof skill !== 'string' || !AUDIT_SKILLS.has(skill)) return
+    logAudit(root, skill)
+    nudge('Stop', skill)
+    return
+  }
+
+  // Appel réel de l'outil Skill (agent, invocation programmatique).
   const skill = payload?.tool_input?.skill
   if (typeof skill !== 'string' || !AUDIT_SKILLS.has(skill)) return
-  const root = repoRoot(payload.cwd || process.cwd())
-  if (!root) return // Hors dépôt git : rien à faire.
-
   logAudit(root, skill)
-
-  process.stdout.write(
-    JSON.stringify({
-      hookSpecificOutput: {
-        hookEventName: 'PostToolUse',
-        additionalContext: `[ovrsee] Revue « ${skill} » terminée. Décompose les constats en tickets via le skill cockpit-tickets — un ticket par constat réel, pas par ligne de rapport ; priorité dérivée de la gravité, charge estimée (xs–xl) quand c'est raisonnable.`,
-      },
-    }),
-  )
+  nudge('PostToolUse', skill)
 }
 
 try {

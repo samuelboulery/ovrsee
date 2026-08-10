@@ -22,7 +22,7 @@ import { exportVault } from '../hooks/obsidian.js'
 import { registerProject, touchProject, unregisterProject } from '../hooks/plans.js'
 import { readSettings, writeSettings, validateSettings, mergeSettings } from '../hooks/settings.js'
 import { installSkills, readSkills } from '../hooks/skills.js'
-import { projects, snapshot, shotPath, tableau, readJson } from '../hooks/snapshot.js'
+import { projects, snapshot, shotPath, mediaPath, tableau, readJson } from '../hooks/snapshot.js'
 import {
   addColumn,
   createTicket,
@@ -302,7 +302,7 @@ function ticketAction(body, root) {
  * @param {URL} url
  * @param {string} cwd dépôt courant, pour la liste des projets
  * @param {{method?: string, headers?: Record<string, string>, body?: unknown}} [request]
- * @returns {{json: unknown} | {file: string} | {status: number, json: unknown} | null}
+ * @returns {{json: unknown} | {file: string, type?: string} | {status: number, json: unknown} | null}
  *   null quand la route n'est pas à nous : l'appelant passe la main.
  */
 export function resolve(url, cwd = process.cwd(), request = {}) {
@@ -403,7 +403,16 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
     case '/api/shot': {
       const root = asked()
       const file = root ? shotPath(root, url.searchParams.get('file') ?? '') : null
-      return file ? { file } : { status: 404, json: { error: 'capture introuvable' } }
+      return file ? { file, type: 'image/png' } : { status: 404, json: { error: 'capture introuvable' } }
+    }
+
+    // Les images et vidéos qu'un README cite. Même liste blanche de projets que
+    // partout, plus une liste blanche d'extensions dans `mediaPath` : cette
+    // route lit à la racine du dépôt, pas dans le seul `cockpit/`.
+    case '/api/media': {
+      const root = asked()
+      const media = root ? mediaPath(root, url.searchParams.get('file') ?? '') : null
+      return media ?? { status: 404, json: { error: 'média introuvable' } }
     }
 
     default:
@@ -439,7 +448,7 @@ export function nodeMiddleware(cwd = process.cwd()) {
     if (!result) return next()
 
     if ('file' in result) {
-      res.setHeader('Content-Type', 'image/png')
+      res.setHeader('Content-Type', result.type ?? 'image/png')
       return createReadStream(result.file).pipe(res)
     }
 
@@ -463,7 +472,7 @@ export async function fetchHandler(url, cwd = process.cwd(), request = null) {
 
   if ('file' in result) {
     return new Response(readFileSync(result.file), {
-      headers: { 'Content-Type': 'image/png' },
+      headers: { 'Content-Type': result.type ?? 'image/png' },
     })
   }
 

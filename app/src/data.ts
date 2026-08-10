@@ -636,6 +636,16 @@ export const shotUrl = (root: string, file: string) =>
   `/api/shot?path=${encodeURIComponent(root)}&file=${encodeURIComponent(file)}`
 
 /**
+ * Une image ou une vidéo du dépôt, citée par un README.
+ *
+ * Chemin relatif à la racine, pas à `cockpit/` — c'est toute la différence avec
+ * `shotUrl`, et la raison pour laquelle le serveur n'accepte ici qu'une liste
+ * blanche d'extensions.
+ */
+export const mediaUrl = (root: string, file: string) =>
+  `/api/media?path=${encodeURIComponent(root)}&file=${encodeURIComponent(file)}`
+
+/**
  * Préférences du cockpit : globales si pas de projet, fusionnées si projet.
  *
  * Les champs `langue`, `theme`, `densiteActivite` ne se surchargent jamais

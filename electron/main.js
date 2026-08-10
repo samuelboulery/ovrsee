@@ -54,6 +54,21 @@ const MIME = {
 // `productName` — les poser tous les deux rend les deux modes identiques.
 app.setName('Cockpit')
 
+/**
+ * Les éditeurs qu'on sait ouvrir, par leur schéma d'URL.
+ *
+ * Une liste blanche, parce que la valeur vient du rendu. Un éditeur absent de
+ * la machine ne répond simplement pas — `openExternal` échoue en silence, et
+ * c'est le comportement voulu : mieux vaut un bouton sans effet qu'une boîte
+ * de dialogue système sur un projet qu'on regarde.
+ */
+const EDITORS = {
+  vscode: 'vscode://file',
+  cursor: 'cursor://file',
+  zed: 'zed://file',
+  windsurf: 'windsurf://file',
+}
+
 // Doit être déclaré avant `app.ready` : `standard` donne au schéma une origine
 // véritable, ce qui fait fonctionner les URL relatives et `fetch`.
 protocol.registerSchemesAsPrivileged([
@@ -381,6 +396,26 @@ app.whenReady().then(() => {
   ipcMain.handle('projects:reveal', (_event, path) => {
     if (typeof path !== 'string' || !projects(null).some(p => p.path === path)) return false
     shell.showItemInFolder(join(path, 'cockpit'))
+    return true
+  })
+
+  /**
+   * Ouvrir un projet dans l'éditeur de l'utilisateur.
+   *
+   * Un schéma d'URL, jamais un `spawn` : `vscode://file/…` est de la même
+   * classe qu'ouvrir un lien web, et le cockpit ne gagne pas au passage le
+   * droit de lancer des binaires. L'invariant du cadrage tient — il lit, et
+   * n'exécute que le terminal qu'on lui demande.
+   *
+   * La liste des éditeurs est ici et pas dans le rendu : autrement, un rendu
+   * compromis ferait ouvrir n'importe quelle URL par le système. Même garde de
+   * registre que `projects:reveal` pour le chemin.
+   */
+  ipcMain.handle('projects:edit', (_event, path, editor) => {
+    const scheme = EDITORS[editor]
+    if (!scheme) return false
+    if (typeof path !== 'string' || !projects(null).some(p => p.path === path)) return false
+    shell.openExternal(`${scheme}${path}`)
     return true
   })
 

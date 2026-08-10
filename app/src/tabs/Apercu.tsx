@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
   frDate,
@@ -11,9 +11,10 @@ import {
   type Snapshot,
 } from '../data'
 import { Illisibles } from '../Illisibles'
-import { Markdown } from '../markdown'
+import { Markdown, headings } from '../markdown'
 import { t } from '../i18n'
 import { s } from '../style'
+import type { Editeur } from '../useTerminal'
 
 /** Crochets appelés par le gestionnaire de paquets, jamais tapés à la main. */
 const LIFECYCLE = new Set([
@@ -29,6 +30,35 @@ const LIFECYCLE = new Set([
 ])
 
 /**
+ * Le pont Electron, ou rien.
+ *
+ * `typeof window` et pas `window` directement : les onglets sont rendus côté
+ * serveur par les tests (`render.test.tsx`), où l'objet n'existe pas. Une
+ * lecture directe y lèverait, et le test qui vérifie qu'aucun onglet ne lève
+ * échouerait sur sa propre garde.
+ *
+ * La présence ne suffit pas, la forme est vérifiée : `window.cockpit` peut être
+ * un élément du document plutôt que le pont, car un `id` dans la page devient un
+ * global. Les ancres du markdown sont préfixées pour que ça n'arrive plus
+ * (`slug()`), mais s'y fier serait faire dépendre le mode Electron du contenu
+ * d'un README.
+ */
+const pont = () => {
+  if (typeof window === 'undefined') return undefined
+  const bridge = window.cockpit
+  return typeof bridge?.projects?.edit === 'function' ? bridge : undefined
+}
+
+const EDITEURS: Array<[Editeur, string]> = [
+  ['vscode', 'VS Code'],
+  ['cursor', 'Cursor'],
+  ['zed', 'Zed'],
+  ['windsurf', 'Windsurf'],
+]
+
+const BOUTON = 'font-size: 12px; padding: 4px 9px;'
+
+/**
  * Onglet Aperçu — la page d'arrivée.
  *
  * Les cinq autres onglets répondent à des questions qu'on ne se pose qu'en
@@ -40,8 +70,17 @@ const LIFECYCLE = new Set([
  * dérivés du snapshot par les mêmes fonctions que les onglets qui les
  * affichent en détail : deux calculs séparés finiraient par se contredire, et
  * une page d'accueil qui contredit le reste est pire que pas de page d'accueil.
+ *
+ * @param onTerminal ouvre le panneau du terminal. Il vit dans l'état de `App` —
+ *   ouvrir un pty depuis ici créerait une session que le panneau ignore.
  */
-export function Apercu({ snapshot }: { snapshot: Snapshot }) {
+export function Apercu({
+  snapshot,
+  onTerminal,
+}: {
+  snapshot: Snapshot
+  onTerminal?: () => void
+}) {
   const { packageJson, readme, root } = snapshot
   const plans = snapshot.plans ?? []
 
@@ -51,59 +90,81 @@ export function Apercu({ snapshot }: { snapshot: Snapshot }) {
   const deps = stackFrom(packageJson, snapshot.whys).length
   const scan = lastScan(snapshot.scans)
   const tickets = restant(snapshot.tickets, snapshot.board)
+  const plan = readme ? headings(readme) : []
 
-  // Les scripts de cycle de vie sont retirés : `postinstall` n'est pas une
-  // commande qu'on tape, le gestionnaire de paquets l'appelle. Le proposer ici
-  // inviterait à lancer à la main ce qui tourne déjà tout seul.
-  //
-  // Le filtre ne peut pas être un simple préfixe `pre`/`post` : `preview` et
-  // `postcss` sont des scripts qu'on lance vraiment. Un `preX` n'est un crochet
-  // que s'il existe un `X`, et le reste vient de la liste npm.
-  const tous = Object.keys(packageJson?.scripts ?? {})
-  const scripts = tous.filter(
-    name =>
-      !LIFECYCLE.has(name) &&
-      !(/^(pre|post)/.test(name) && tous.includes(name.replace(/^(pre|post)/, ''))),
-  )
+  // La hauteur de l'en-tête sert deux fois : à poser le sommaire juste en
+  // dessous, et à décaler les ancres pour qu'un titre visé ne se retrouve pas
+  // caché derrière. Elle est mesurée plutôt que constante parce qu'un projet
+  // sans description a un en-tête plus court.
+  const entete = useRef<HTMLDivElement>(null)
+  const boite = useRef<HTMLDivElement>(null)
+  const [hauteur, setHauteur] = useState(96)
+  useEffect(() => {
+    setHauteur(entete.current?.offsetHeight ?? 96)
+  }, [root, packageJson?.description])
 
-  // La dernière activité vient de la frise, pas des plans : un commit hors plan
-  // est du travail lui aussi, et le passer sous silence ferait paraître un
-  // projet actif à l'abandon.
-  const derniere = snapshot.timeline?.[0]?.date ?? null
+  /**
+   * Amener un titre sous l'en-tête, en ne bougeant que ce cadre.
+   *
+   * Laisser le navigateur suivre le `#` déplaçait la fenêtre entière : la barre
+   * d'onglets et la latérale sortaient de l'écran, et l'application paraissait
+   * cassée. Le `href` reste posé quand même — il rend le lien copiable et
+   * ouvrable au clic du milieu, ce qu'un `onClick` seul ne donne pas.
+   */
+  const aller = (id: string) => {
+    const cible = document.getElementById(id)
+    const cadre = boite.current
+    if (!cible || !cadre) return
+    cadre.scrollTop +=
+      cible.getBoundingClientRect().top - cadre.getBoundingClientRect().top - (hauteur + 14)
+  }
 
   return (
-    <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
-      <div style={s('max-width: 820px;')}>
+    <div ref={boite} style={s('flex: 1; display: flex; flex-direction: column; overflow: auto;')}>
+      <div
+        ref={entete}
+        style={s(
+          'position: sticky; top: 0; z-index: 2; padding: 18px 22px 12px; background: var(--color-bg); border-bottom: 1px solid var(--color-divider);',
+        )}
+      >
         <Illisibles entries={snapshot.illisibles ?? []} />
-        <h2
-          style={s(
-            'font-family: var(--font-heading); font-weight: 500; font-size: 22px; margin: 0 0 4px;',
-          )}
-        >
-          {nom}
-        </h2>
+
         <div
           style={s(
-            'font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-neutral-600);',
+            'display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; flex-wrap: wrap;',
           )}
         >
-          {root}
+          <div style={s('min-width: 0;')}>
+            <h2
+              style={s(
+                'font-family: var(--font-heading); font-weight: 500; font-size: 22px; margin: 0 0 4px;',
+              )}
+            >
+              {nom}
+            </h2>
+            <div
+              style={s(
+                'font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-neutral-600);',
+              )}
+            >
+              {root}
+            </div>
+          </div>
+
+          <Actions root={root} onTerminal={onTerminal} />
         </div>
+
         {packageJson?.description && (
           <div
             style={s(
-              'font-size: 13px; color: var(--color-neutral-400); line-height: 1.6; margin-top: 10px; text-wrap: pretty;',
+              'font-size: 13px; color: var(--color-neutral-400); line-height: 1.6; margin-top: 10px; max-width: 820px; text-wrap: pretty;',
             )}
           >
             {packageJson.description}
           </div>
         )}
 
-        <div
-          style={s(
-            'display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 0; padding: 14px 16px; border: 1px solid var(--color-neutral-800); border-radius: 8px; background: var(--color-surface);',
-          )}
-        >
+        <div style={s('display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 14px;')}>
           <Chiffre
             valeur={pages.length}
             unite={pages.length > 1 ? t('apercu.pages') : t('apercu.page')}
@@ -121,11 +182,7 @@ export function Apercu({ snapshot }: { snapshot: Snapshot }) {
             unite={deps > 1 ? t('apercu.dependencies') : t('apercu.dependency')}
             legende={deps > 1 ? t('apercu.declared_plural') : t('apercu.declared')}
           />
-          <Chiffre
-            valeur={humanAge(derniere)}
-            unite=""
-            legende={t('apercu.last_activity')}
-          />
+          <Chiffre valeur={humanAge(derniere(snapshot))} unite="" legende={t('apercu.last_activity')} />
           <Chiffre
             valeur={scan ? frDate(scan.date) : '—'}
             unite=""
@@ -133,44 +190,222 @@ export function Apercu({ snapshot }: { snapshot: Snapshot }) {
             accent={scan?.ok === false}
           />
         </div>
+      </div>
 
-        {scripts.length > 0 && (
-          <div style={s('margin-top: 18px;')}>
-            <Titre>{t('apercu.how_to_launch')}</Titre>
-            <div style={s('display: flex; flex-wrap: wrap; gap: 6px;')}>
-              {scripts.map(script => (
-                // Du texte, pas un bouton. Le cockpit lit ; il n'exécute que le
-                // terminal qu'on lui demande — un bouton qui lance `package`
-                // depuis une vue de lecture serait un piège.
-                <span
-                  key={script}
-                  title={packageJson?.scripts?.[script]}
-                  style={s(
-                    'font-family: ui-monospace, monospace; font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--color-neutral-800); color: var(--color-neutral-400); user-select: all;',
-                  )}
-                >
-                  pnpm {script}
-                </span>
-              ))}
-            </div>
-          </div>
+      <div
+        style={s(
+          `display: flex; align-items: flex-start; gap: 28px; padding: 18px 22px 32px; --md-anchor: ${hauteur + 14}px;`,
         )}
+      >
+        <div style={s('flex: 1; min-width: 0; max-width: 820px;')}>
+          <Lancement packageJson={packageJson} />
 
-        <div style={s('margin-top: 18px;')}>
-          <Titre>{t('apercu.take_away')}</Titre>
-          <Obsidian root={root} />
+          <div style={s('margin-top: 18px;')}>
+            <Titre>{t('apercu.take_away')}</Titre>
+            <Obsidian root={root} />
+          </div>
+
+          <div style={s('margin-top: 24px;')}>
+            <Titre>README.md</Titre>
+            {readme ? (
+              <Markdown text={readme} root={root} />
+            ) : (
+              <div style={s('font-size: 12.5px; color: var(--color-neutral-600);')}>
+                {t('apercu.no_readme')}
+              </div>
+            )}
+          </div>
         </div>
 
-        <div style={s('margin-top: 24px;')}>
-          <Titre>README.md</Titre>
-          {readme ? (
-            <Markdown text={readme} />
-          ) : (
-            <div style={s('font-size: 12.5px; color: var(--color-neutral-600);')}>
-              {t('apercu.no_readme')}
-            </div>
+        {plan.length >= 3 && <Sommaire plan={plan} top={hauteur + 14} aller={aller} />}
+      </div>
+    </div>
+  )
+}
+
+/**
+ * La dernière activité vient de la frise, pas des plans : un commit hors plan
+ * est du travail lui aussi, et le passer sous silence ferait paraître un projet
+ * actif à l'abandon.
+ */
+const derniere = (snapshot: Snapshot) => snapshot.timeline?.[0]?.date ?? null
+
+/**
+ * Ce qu'on peut faire d'un projet sans y toucher.
+ *
+ * Aucune de ces actions n'exécute quoi que ce soit du projet observé. Ouvrir
+ * l'éditeur passe par un schéma d'URL — `vscode://file/…` —, du même ordre
+ * qu'ouvrir un lien : c'est le système qui décide, pas le cockpit. La liste des
+ * schémas et la vérification du chemin vivent dans le processus principal
+ * (`electron/main.js`), jamais ici.
+ *
+ * En navigateur, `window.cockpit` n'existe pas et il ne reste que la copie du
+ * chemin — un bouton qui ne peut rien faire vaut mieux caché qu'inerte.
+ */
+function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }) {
+  const cockpit = pont()
+  const [copie, setCopie] = useState(false)
+  const [editeur, setEditeur] = useState<Editeur>(() => {
+    if (typeof localStorage === 'undefined') return 'vscode'
+    const garde = localStorage.getItem('cockpit.editor')
+    return EDITEURS.some(([nom]) => nom === garde) ? (garde as Editeur) : 'vscode'
+  })
+
+  return (
+    <div style={s('display: flex; flex-wrap: wrap; align-items: center; gap: 6px;')}>
+      {cockpit && (
+        <>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            style={s(BOUTON)}
+            onClick={() => cockpit.projects.edit(root, editeur)}
+          >
+            {t('apercu.open_editor')}
+          </button>
+
+          <select
+            className="input"
+            aria-label={t('apercu.editor')}
+            value={editeur}
+            onChange={event => {
+              const choisi = event.target.value as Editeur
+              setEditeur(choisi)
+              // Une préférence d'affichage, pas un réglage du projet : elle n'a
+              // rien à faire dans `cockpit.config.json`, que git suit.
+              localStorage.setItem('cockpit.editor', choisi)
+            }}
+            style={s('font-size: 12px; padding: 3px 6px; min-height: 0; width: auto;')}
+          >
+            {EDITEURS.map(([valeur, nom]) => (
+              <option key={valeur} value={valeur}>
+                {nom}
+              </option>
+            ))}
+          </select>
+
+          <button
+            type="button"
+            className="btn btn-secondary"
+            style={s(BOUTON)}
+            onClick={() => cockpit.projects.reveal(root)}
+          >
+            {t('apercu.reveal')}
+          </button>
+
+          {onTerminal && (
+            <button type="button" className="btn btn-secondary" style={s(BOUTON)} onClick={onTerminal}>
+              {t('apercu.terminal_shell')}
+            </button>
           )}
-        </div>
+        </>
+      )}
+
+      <button
+        type="button"
+        className="btn btn-secondary"
+        style={s(BOUTON)}
+        onClick={() => {
+          navigator.clipboard
+            ?.writeText(root)
+            .then(() => {
+              setCopie(true)
+              setTimeout(() => setCopie(false), 1500)
+            })
+            .catch(() => setCopie(false))
+        }}
+      >
+        {copie ? t('apercu.copied') : t('apercu.copy_path')}
+      </button>
+    </div>
+  )
+}
+
+/**
+ * Le plan du README, à droite.
+ *
+ * Il ne paraît qu'à partir de trois titres : en dessous, une colonne entière
+ * pour deux liens coûte plus de place qu'elle n'en fait gagner. Les titres de
+ * quatrième niveau en sont exclus — un sommaire qui descend aussi bas cesse
+ * d'être un sommaire.
+ */
+function Sommaire({
+  plan,
+  top,
+  aller,
+}: {
+  plan: Array<{ level: number; texte: string; id: string }>
+  top: number
+  aller: (id: string) => void
+}) {
+  return (
+    <nav
+      aria-label={t('apercu.summary')}
+      style={s(`position: sticky; top: ${top}px; width: 190px; flex: none;`)}
+    >
+      <Titre>{t('apercu.summary')}</Titre>
+      {plan
+        .filter(titre => titre.level <= 3)
+        .map(titre => (
+          <a
+            key={titre.id}
+            href={`#${titre.id}`}
+            onClick={event => {
+              event.preventDefault()
+              aller(titre.id)
+            }}
+            style={s(
+              'display: block; font-size: 11.5px; line-height: 1.5; margin: 4px 0; color: var(--color-neutral-500); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; ' +
+                (titre.level > 1 ? 'padding-left: 10px;' : ''),
+            )}
+            title={titre.texte}
+          >
+            {titre.texte}
+          </a>
+        ))}
+    </nav>
+  )
+}
+
+/**
+ * Les scripts du `package.json`, en texte.
+ *
+ * Du texte, pas des boutons. Le cockpit lit ; il n'exécute que le terminal
+ * qu'on lui demande — un bouton qui lance `package` depuis une vue de lecture
+ * serait un piège.
+ */
+function Lancement({ packageJson }: { packageJson: Snapshot['packageJson'] }) {
+  // Les scripts de cycle de vie sont retirés : `postinstall` n'est pas une
+  // commande qu'on tape, le gestionnaire de paquets l'appelle. Le proposer ici
+  // inviterait à lancer à la main ce qui tourne déjà tout seul.
+  //
+  // Le filtre ne peut pas être un simple préfixe `pre`/`post` : `preview` et
+  // `postcss` sont des scripts qu'on lance vraiment. Un `preX` n'est un crochet
+  // que s'il existe un `X`, et le reste vient de la liste npm.
+  const tous = Object.keys(packageJson?.scripts ?? {})
+  const scripts = tous.filter(
+    name =>
+      !LIFECYCLE.has(name) &&
+      !(/^(pre|post)/.test(name) && tous.includes(name.replace(/^(pre|post)/, ''))),
+  )
+
+  if (scripts.length === 0) return null
+
+  return (
+    <div>
+      <Titre>{t('apercu.how_to_launch')}</Titre>
+      <div style={s('display: flex; flex-wrap: wrap; gap: 6px;')}>
+        {scripts.map(script => (
+          <span
+            key={script}
+            title={packageJson?.scripts?.[script]}
+            style={s(
+              'font-family: ui-monospace, monospace; font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--color-neutral-800); color: var(--color-neutral-400); user-select: all;',
+            )}
+          >
+            pnpm {script}
+          </span>
+        ))}
       </div>
     </div>
   )
@@ -259,7 +494,7 @@ function Chiffre({
   accent?: boolean
 }) {
   return (
-    <div style={s('min-width: 118px;')}>
+    <div>
       <div
         style={s(
           'font-size: 17px; font-weight: 500; ' +

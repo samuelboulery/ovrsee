@@ -45,6 +45,19 @@ contextBridge.exposeInMainWorld('cockpit', {
      * @returns {Promise<boolean>}
      */
     reveal: projectPath => ipcRenderer.invoke('projects:reveal', projectPath),
+
+    /**
+     * Ouvre un projet dans un éditeur, par son schéma d'URL.
+     *
+     * Le nom de l'éditeur est vérifié contre une liste blanche côté principal,
+     * et le chemin contre le registre. Rend `false` si l'un des deux est refusé
+     * — pas si l'éditeur n'est pas installé, ce que le système ne dit pas.
+     *
+     * @param {string} projectPath dossier du projet
+     * @param {'vscode'|'cursor'|'zed'|'windsurf'} editor
+     * @returns {Promise<boolean>}
+     */
+    edit: (projectPath, editor) => ipcRenderer.invoke('projects:edit', projectPath, editor),
   },
 
   menu: {

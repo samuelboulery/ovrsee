@@ -31,6 +31,9 @@ export interface TerminalBridge {
   ) => () => void
 }
 
+/** Les éditeurs dont le processus principal connaît le schéma d'URL. */
+export type Editeur = 'vscode' | 'cursor' | 'zed' | 'windsurf'
+
 declare global {
   interface Window {
     cockpit?: {
@@ -40,6 +43,8 @@ declare global {
         pick: () => Promise<string | null>
         /** Révèle le `cockpit/` du projet dans le Finder. */
         reveal: (projectPath: string) => Promise<boolean>
+        /** Ouvre le projet dans un éditeur, par schéma d'URL. */
+        edit: (projectPath: string, editor: Editeur) => Promise<boolean>
       }
       /** Commandes du menu natif — voir `electron/menu.js`. */
       menu: { on: (handler: (command: string) => void) => () => void }

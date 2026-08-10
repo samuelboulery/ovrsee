@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { resolve } from './api.js'
-import { shotPath } from '../hooks/snapshot.js'
+import { mediaPath, shotPath } from '../hooks/snapshot.js'
 
 const url = path => new URL(path, 'http://localhost')
 
@@ -74,6 +74,71 @@ test('shotPath refuse la traversée et accepte un chemin légitime', () => {
   assert.equal(shotPath(dir, '../../secret.txt'), null)
   assert.equal(shotPath(dir, 'shots/inexistant.png'), null)
   assert.ok(shotPath(dir, 'shots/accueil/2026-08-08-abc.png'))
+})
+
+test('/api/media sert une image du dépôt, avec son type', () => {
+  const dir = projectWithShot()
+  mkdirSync(join(dir, 'docs'), { recursive: true })
+  writeFileSync(join(dir, 'docs', 'demo.png'), 'png')
+
+  const result = resolve(url(`/api/media?path=${encodeURIComponent(dir)}&file=docs/demo.png`), dir)
+
+  assert.ok('file' in result)
+  assert.equal(result.type, 'image/png')
+})
+
+test('/api/media ne sert que des images et des vidéos', () => {
+  const dir = projectWithShot()
+  writeFileSync(join(dir, '.env'), 'CLE=secret')
+
+  for (const fichier of ['secret.txt', '.env', 'package.json']) {
+    const result = resolve(
+      url(`/api/media?path=${encodeURIComponent(dir)}&file=${encodeURIComponent(fichier)}`),
+      dir,
+    )
+    assert.equal(result.status, 404, `devrait refuser ${fichier}`)
+  }
+})
+
+test('/api/media ne laisse pas sortir du dépôt', () => {
+  const dir = projectWithShot()
+  const voisin = `${dir}-voisin`
+  mkdirSync(voisin, { recursive: true })
+  writeFileSync(join(voisin, 'vol.png'), 'png')
+
+  // Le dossier voisin est le cas que le seul contrôle de préfixe laisse
+  // passer : son chemin commence par celui du projet, à un séparateur près.
+  for (const evasion of ['../../etc/passwd', `../${join(voisin.split('/').at(-1), 'vol.png')}`]) {
+    const result = resolve(
+      url(`/api/media?path=${encodeURIComponent(dir)}&file=${encodeURIComponent(evasion)}`),
+      dir,
+    )
+    assert.equal(result.status, 404, `devrait refuser ${evasion}`)
+  }
+})
+
+test('/api/media refuse un projet non enregistré', () => {
+  const dir = projectWithShot()
+  const result = resolve(url('/api/media?path=%2Fetc&file=passwd.png'), dir)
+
+  assert.equal(result.status, 404)
+})
+
+test('mediaPath rend le type attendu pour chaque extension servie', () => {
+  const dir = projectWithShot()
+  mkdirSync(join(dir, 'docs'), { recursive: true })
+
+  for (const [fichier, type] of [
+    ['a.png', 'image/png'],
+    ['b.JPG', 'image/jpeg'],
+    ['c.svg', 'image/svg+xml'],
+    ['d.mp4', 'video/mp4'],
+  ]) {
+    writeFileSync(join(dir, 'docs', fichier), 'x')
+    assert.equal(mediaPath(dir, `docs/${fichier}`)?.type, type)
+  }
+
+  assert.equal(mediaPath(dir, 'docs/absent.png'), null)
 })
 
 // --- écriture du registre ---------------------------------------------------

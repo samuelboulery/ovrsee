@@ -10,7 +10,7 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { basename, isAbsolute, join, normalize } from 'node:path'
+import { basename, extname, isAbsolute, join, normalize, sep } from 'node:path'
 
 import { readPlans, readRegistry } from './plans.js'
 import { readBoard, readTickets } from './tickets.js'
@@ -413,6 +413,51 @@ export function shotPath(root, relative) {
   const base = join(root, 'cockpit', 'pages')
   const file = normalize(join(base, relative ?? ''))
 
-  if (!file.startsWith(base) || !existsSync(file)) return null
+  if (!inside(base, file) || !existsSync(file)) return null
   return file
+}
+
+/**
+ * Un chemin est-il sous un dossier ?
+ *
+ * Le `sep` final n'est pas une coquetterie : `/a/b-secret` commence par `/a/b`,
+ * et `join('/a/b', '../b-secret/x.png')` produit exactement ce chemin-là. Sans
+ * le séparateur, la garde laisse passer le dossier voisin.
+ */
+const inside = (base, file) => file.startsWith(base.endsWith(sep) ? base : base + sep)
+
+/**
+ * Types servis par `/api/media`, et rien d'autre.
+ *
+ * L'allowlist d'extensions est la vraie garde de cette route. Sans elle,
+ * `mediaPath` servirait `.env`, `id_rsa` ou n'importe quel fichier du dépôt à
+ * qui saurait en écrire le chemin dans un README — le contrôle de préfixe
+ * n'empêche que d'en sortir.
+ */
+const MEDIA_TYPES = {
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.webp': 'image/webp',
+  '.avif': 'image/avif',
+  '.svg': 'image/svg+xml',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
+  '.mov': 'video/quicktime',
+}
+
+/**
+ * Un média du dépôt — image ou vidéo citée par un README —, ou null.
+ *
+ * `relative` vient du README, donc d'un fichier qu'on lit sans l'avoir écrit :
+ * il est traité comme une entrée hostile, au même titre que la barre d'adresse.
+ */
+export function mediaPath(root, relative) {
+  const base = normalize(root)
+  const file = normalize(join(base, relative ?? ''))
+  const type = MEDIA_TYPES[extname(file).toLowerCase()]
+
+  if (!type || !inside(base, file) || !existsSync(file)) return null
+  return { file, type }
 }

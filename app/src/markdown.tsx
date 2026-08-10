@@ -1,5 +1,8 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
+import { mediaUrl } from './data'
+import { KIND_STYLES, tokens } from './highlight'
+import { t } from './i18n'
 import { s } from './style'
 
 /**
@@ -27,6 +30,16 @@ const QUOTE = /^>\s?(.*)$/
 const RULE = /^(-{3,}|\*{3,}|_{3,})$/
 const ROW = /^\|.*\|\s*$/
 const SEPARATOR = /^\|[\s:|-]+\|\s*$/
+const TASK = /^\[([ xX])\]\s+(.*)$/
+const DETAILS = /^<details\b/i
+const DETAILS_END = /<\/details>/i
+const SUMMARY = /<summary[^>]*>([\s\S]*?)<\/summary>/i
+const HTML_IMG = /^<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>$/i
+const VIDEO = /\.(mp4|webm|mov)$/i
+// La même liste que `MEDIA_TYPES` côté serveur (hooks/snapshot.js). La tenir
+// des deux côtés évite l'icône d'image cassée : ce que le serveur refuserait
+// n'est pas demandé, il est affiché en texte.
+const IMAGE = /\.(png|jpe?g|gif|webp|avif|svg)$/i
 
 /**
  * Un lien externe s'ouvre dans le navigateur ; tout le reste reste du texte.
@@ -46,13 +59,73 @@ const isExternal = (href: string) => /^https?:\/\//i.test(href)
  * `lastIndex`, que l'appel imbriqué remettrait à zéro — la boucle extérieure
  * repartirait alors du début et ne s'arrêterait jamais.
  */
-const inlinePattern = () => /(`[^`]+`)|(\*\*[^*]+\*\*)|(\*[^*\n]+\*)|(\[[^\]]*\]\([^)\s]+\))/g
+const inlinePattern = () =>
+  /(`[^`]+`)|(!\[[^\]]*\]\([^)\s]+\))|(\*\*[^*]+\*\*)|(\*[^*\n]+\*)|(\[[^\]]*\]\([^)\s]+\))/g
 
 const CODE_STYLE =
   'font-family: ui-monospace, monospace; font-size: .92em; background: var(--color-neutral-900); border: 1px solid var(--color-neutral-800); border-radius: 4px; padding: 1px 5px;'
 
-/** `**gras**`, `*italique*`, `` `code` ``, `[texte](url)`. */
-function inline(text: string, keyPrefix: string): ReactNode[] {
+/**
+ * Une image ou une vidéo du dépôt, ou rien.
+ *
+ * Rien de distant ne se charge — ni badge, ni GIF hébergé. Le cockpit lit des
+ * README qu'il n'a pas écrits : une balise `<img>` vers un domaine tiers ferait
+ * partir une requête à chaque ouverture du projet, et dirait à qui l'a écrite
+ * quand on regarde. Une source distante reste donc affichée en clair, avec son
+ * URL, comme un lien relatif.
+ *
+ * `root` absent — un appelant qui ne travaille pas sur un projet — retombe sur
+ * le même rendu texte : mieux vaut un chemin lisible qu'une image cassée.
+ */
+function media(src: string, alt: string, key: string, root?: string): ReactNode {
+  const servable = IMAGE.test(src) || VIDEO.test(src)
+
+  // `//` et `data:` sont des sources distantes ou embarquées déguisées : elles
+  // ne passent pas par le serveur, donc pas par sa liste blanche.
+  const distant = isExternal(src) || src.startsWith('//') || src.startsWith('data:')
+
+  if (!root || !src || !servable || distant) {
+    return (
+      <span key={key} style={s('color: var(--color-neutral-500);')}>
+        {alt || t('markdown.image')}
+        <span style={s('font-family: ui-monospace, monospace; font-size: .88em;')}>
+          {` (${src})`}
+        </span>
+      </span>
+    )
+  }
+
+  const url = mediaUrl(root, src.replace(/^\.\//, ''))
+
+  // ponytail: pas de requêtes Range côté serveur. Une vidéo se lit du début ;
+  // se déplacer dans une longue timeline peut hoqueter. À traiter le jour où
+  // quelqu'un met un screencast de 200 Mo dans son README.
+  if (VIDEO.test(src)) {
+    return (
+      <video
+        key={key}
+        src={url}
+        controls
+        preload="metadata"
+        style={s('display: block; max-width: 100%; margin: 12px 0; border-radius: 8px;')}
+      />
+    )
+  }
+
+  return (
+    <img
+      key={key}
+      src={url}
+      alt={alt}
+      style={s(
+        'display: inline-block; max-width: 100%; height: auto; margin: 4px 0; border-radius: 8px;',
+      )}
+    />
+  )
+}
+
+/** `**gras**`, `*italique*`, `` `code` ``, `[texte](url)`, `![alt](src)`. */
+function inline(text: string, keyPrefix: string, root?: string): ReactNode[] {
   const out: ReactNode[] = []
   let last = 0
   let index = 0
@@ -69,6 +142,9 @@ function inline(text: string, keyPrefix: string): ReactNode[] {
           {token.slice(1, -1)}
         </code>,
       )
+    } else if (token.startsWith('![')) {
+      const cut = token.indexOf('](')
+      out.push(media(token.slice(cut + 2, -1), token.slice(2, cut), key, root))
     } else if (token.startsWith('**')) {
       out.push(
         <strong key={key} style={s('font-weight: 600; color: var(--color-text);')}>
@@ -88,7 +164,7 @@ function inline(text: string, keyPrefix: string): ReactNode[] {
       // Un intitulé de lien porte souvent lui-même du markdown — c'est le cas
       // dès qu'un README cite un fichier : `[`cadrage.md`](./cadrage.md)`. Le
       // rendre brut ferait apparaître les accents graves à l'écran.
-      const texte = label ? inline(label, `${key}-l`) : href
+      const texte = label ? inline(label, `${key}-l`, root) : href
       out.push(
         isExternal(href) ? (
           <a
@@ -119,15 +195,140 @@ function inline(text: string, keyPrefix: string): ReactNode[] {
   return out
 }
 
+// `--md-anchor` est posée par l'onglet qui rend le document — l'Aperçu y met la
+// hauteur de son en-tête collant. Sans ce décalage, cliquer un lien du sommaire
+// amène le titre visé pile *sous* l'en-tête, donc hors de vue. La valeur par
+// défaut est nulle : un appelant qui ne pose rien ne subit rien.
+const ANCHOR = 'scroll-margin-top: var(--md-anchor, 0px);'
+
 const HEADING_STYLES = [
-  'font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 26px 0 8px;',
-  'font-family: var(--font-heading); font-weight: 500; font-size: 15.5px; margin: 24px 0 7px;',
-  'font-family: var(--font-heading); font-weight: 500; font-size: 13.5px; margin: 20px 0 6px;',
-  'font-weight: 600; font-size: 12.5px; margin: 16px 0 5px; color: var(--color-neutral-300);',
+  `font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 26px 0 8px; ${ANCHOR}`,
+  `font-family: var(--font-heading); font-weight: 500; font-size: 15.5px; margin: 24px 0 7px; ${ANCHOR}`,
+  `font-family: var(--font-heading); font-weight: 500; font-size: 13.5px; margin: 20px 0 6px; ${ANCHOR}`,
+  `font-weight: 600; font-size: 12.5px; margin: 16px 0 5px; color: var(--color-neutral-300); ${ANCHOR}`,
 ]
 
 const CELL =
   'padding: 7px 11px; border-bottom: 1px solid var(--color-neutral-800); text-align: left; vertical-align: top;'
+
+/**
+ * Un bloc de code : sa barre, sa coloration, son bouton copier.
+ *
+ * L'étiquette de langage était jusqu'ici *dans* le `<pre>` — donc sélectionnée
+ * avec le code, et copiée avec lui. Elle sort dans une barre : ce qu'on copie
+ * est exactement ce qui se lance.
+ */
+function Bloc({ code, language }: { code: string; language: string }) {
+  const [copie, setCopie] = useState(false)
+
+  return (
+    <div
+      style={s(
+        'margin: 12px 0; border: 1px solid var(--color-neutral-800); border-radius: 8px; background: var(--color-neutral-900); overflow: hidden;',
+      )}
+    >
+      <div
+        style={s(
+          'display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 5px 10px; border-bottom: 1px solid var(--color-neutral-800);',
+        )}
+      >
+        <span style={s('font-size: 10px; color: var(--color-neutral-600);')}>{language}</span>
+        <button
+          type="button"
+          onClick={() => {
+            // Un presse-papier refusé n'est pas une panne : le code reste
+            // sélectionnable à la main, et le bouton ne prétend pas avoir
+            // réussi.
+            navigator.clipboard
+              ?.writeText(code)
+              .then(() => {
+                setCopie(true)
+                setTimeout(() => setCopie(false), 1500)
+              })
+              .catch(() => setCopie(false))
+          }}
+          style={s(
+            'background: none; border: 0; padding: 2px 4px; cursor: pointer; font-size: 10px; letter-spacing: .04em; color: ' +
+              (copie ? 'var(--color-accent-300);' : 'var(--color-neutral-600);'),
+          )}
+        >
+          {copie ? t('markdown.copied') : t('markdown.copy')}
+        </button>
+      </div>
+      <pre
+        style={s(
+          'margin: 0; padding: 12px 14px; overflow-x: auto; font-family: ui-monospace, monospace; font-size: 11.5px; line-height: 1.6; color: var(--color-neutral-300);',
+        )}
+      >
+        <code>
+          {tokens(code, language).map((token, index) =>
+            token.kind === 'plain' ? (
+              token.text
+            ) : (
+              <span key={index} style={s(KIND_STYLES[token.kind])}>
+                {token.text}
+              </span>
+            ),
+          )}
+        </code>
+      </pre>
+    </div>
+  )
+}
+
+/**
+ * L'ancre d'un titre.
+ *
+ * Le préfixe `md-` n'est pas décoratif. Un élément qui porte un `id` devient une
+ * propriété de `window` : un README qui commence par « # Cockpit » posait un
+ * `id="cockpit"`, et `window.cockpit` cessait alors de désigner le pont Electron
+ * pour désigner ce titre. La détection du mode Electron basculait avec, et le
+ * navigateur affichait des boutons qui ne pouvaient rien faire. Aucune ancre ne
+ * doit pouvoir se nommer comme un global — le préfixe le garantit pour tous les
+ * README à venir, pas seulement celui-ci.
+ *
+ * ponytail: deux titres identiques dans un même document partagent leur ancre,
+ * et le sommaire mène alors au premier. Dédoublonner demanderait au sommaire et
+ * au rendu de compter à l'identique — deux comptages qui finiraient par
+ * diverger, pour un cas qui ne se produit presque jamais.
+ */
+export const slug = (text: string): string =>
+  'md-' +
+  text
+    .toLowerCase()
+    .replace(/[`*_[\]()]/g, '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+/**
+ * Les titres d'un document, pour un sommaire.
+ *
+ * Le suivi des clôtures de blocs de code n'est pas du zèle : `# installation`
+ * dans un bloc `bash` est un commentaire, et le faire figurer au sommaire
+ * mènerait à une ancre qui n'existe pas.
+ */
+export function headings(text: string): Array<{ level: number; texte: string; id: string }> {
+  const out: Array<{ level: number; texte: string; id: string }> = []
+  let fenced = false
+
+  for (const line of text.replace(/\r\n?/g, '\n').split('\n')) {
+    if (FENCE.test(line)) {
+      fenced = !fenced
+      continue
+    }
+    if (fenced) continue
+
+    const found = HEADING.exec(line)
+    if (found) {
+      const texte = found[2].replace(/[`*]/g, '').trim()
+      out.push({ level: found[1].length, texte, id: slug(found[2]) })
+    }
+  }
+
+  return out
+}
 
 const cells = (line: string) =>
   line
@@ -136,7 +337,11 @@ const cells = (line: string) =>
     .split('|')
     .map(cell => cell.trim())
 
-export function Markdown({ text }: { text: string }): ReactNode {
+/**
+ * @param root racine du projet, pour servir les images et vidéos qu'il cite.
+ *   Sans elle, les médias s'affichent en texte — voir `media()`.
+ */
+export function Markdown({ text, root }: { text: string; root?: string }): ReactNode {
   const lines = text.replace(/\r\n?/g, '\n').split('\n')
   const blocks: ReactNode[] = []
   let i = 0
@@ -160,21 +365,41 @@ export function Markdown({ text }: { text: string }): ReactNode {
       while (i < lines.length && !FENCE.test(lines[i])) body.push(lines[i++])
       i += 1 // la ligne de clôture
 
+      blocks.push(<Bloc key={key()} code={body.join('\n')} language={language} />)
+      continue
+    }
+
+    // `<details>` et `<img>` : les deux seules balises HTML reconnues, parce
+    // que ce sont les deux qu'un README écrit vraiment — un pliage pour une
+    // section longue, une capture centrée. Tout autre HTML reste affiché en
+    // clair, comme avant : visible, donc corrigible.
+    if (DETAILS.test(line.trim())) {
+      const body: string[] = []
+      while (i < lines.length && !DETAILS_END.test(lines[i])) body.push(lines[i++])
+      i += 1 // la ligne de clôture
+
+      const brut = body.join('\n')
+      const resume = SUMMARY.exec(brut)
       blocks.push(
-        <pre
+        <details
           key={key()}
           style={s(
-            'margin: 12px 0; padding: 12px 14px; overflow-x: auto; background: var(--color-neutral-900); border: 1px solid var(--color-neutral-800); border-radius: 8px; font-family: ui-monospace, monospace; font-size: 11.5px; line-height: 1.6; color: var(--color-neutral-300);',
+            'margin: 12px 0; padding: 8px 12px; border: 1px solid var(--color-neutral-800); border-radius: 8px;',
           )}
         >
-          {language && (
-            <div style={s('font-size: 10px; color: var(--color-neutral-600); margin-bottom: 6px;')}>
-              {language}
-            </div>
-          )}
-          <code>{body.join('\n')}</code>
-        </pre>,
+          <summary style={s('cursor: pointer; font-size: 12.5px; color: var(--color-neutral-300);')}>
+            {resume ? inline(resume[1].trim(), key(), root) : t('markdown.details')}
+          </summary>
+          <Markdown text={brut.replace(SUMMARY, '').replace(/^<details[^>]*>/i, '')} root={root} />
+        </details>,
       )
+      continue
+    }
+
+    const balise = HTML_IMG.exec(line.trim())
+    if (balise) {
+      blocks.push(<div key={key()}>{media(balise[1], '', key(), root)}</div>)
+      i += 1
       continue
     }
 
@@ -187,8 +412,9 @@ export function Markdown({ text }: { text: string }): ReactNode {
       // plan du document devient faux pour un lecteur d'écran.
       const Tag = (['h2', 'h3', 'h4', 'h5'] as const)[level - 1]
       blocks.push(
-        <Tag key={key()} style={s(HEADING_STYLES[level - 1])}>
-          {inline(heading[2], key())}
+        // L'ancre est ce qui rend le sommaire cliquable — voir `headings()`.
+        <Tag key={key()} id={slug(heading[2])} style={s(HEADING_STYLES[level - 1])}>
+          {inline(heading[2], key(), root)}
         </Tag>,
       )
       i += 1
@@ -230,7 +456,7 @@ export function Markdown({ text }: { text: string }): ReactNode {
                       `${CELL} font-weight: 500; color: var(--color-neutral-400); background: var(--color-surface);`,
                     )}
                   >
-                    {inline(cell, `${key()}-h${c}`)}
+                    {inline(cell, `${key()}-h${c}`, root)}
                   </th>
                 ))}
               </tr>
@@ -240,7 +466,7 @@ export function Markdown({ text }: { text: string }): ReactNode {
                 <tr key={r}>
                   {row.map((cell, c) => (
                     <td key={c} style={s(`${CELL} color: var(--color-neutral-300);`)}>
-                      {inline(cell, `${key()}-${r}-${c}`)}
+                      {inline(cell, `${key()}-${r}-${c}`, root)}
                     </td>
                   ))}
                 </tr>
@@ -265,7 +491,7 @@ export function Markdown({ text }: { text: string }): ReactNode {
             'margin: 12px 0; padding: 2px 0 2px 14px; border-left: 2px solid var(--color-accent-700); color: var(--color-neutral-400); font-size: 12.5px; line-height: 1.6;',
           )}
         >
-          {inline(body.join(' '), key())}
+          {inline(body.join(' '), key(), root)}
         </blockquote>,
       )
       continue
@@ -280,18 +506,36 @@ export function Markdown({ text }: { text: string }): ReactNode {
         i += 1
       }
       const List = bulleted ? 'ul' : 'ol'
+      // Une liste de tâches perd ses puces : la case en fait déjà office, et
+      // les deux ensemble décalent le texte pour rien.
+      const taches = items.some(item => TASK.test(item))
       blocks.push(
         <List
           key={key()}
           style={s(
-            'margin: 10px 0; padding-left: 20px; font-size: 12.5px; line-height: 1.65; color: var(--color-neutral-300);',
+            'margin: 10px 0; font-size: 12.5px; line-height: 1.65; color: var(--color-neutral-300); ' +
+              (taches ? 'padding-left: 2px; list-style: none;' : 'padding-left: 20px;'),
           )}
         >
-          {items.map((item, index) => (
-            <li key={index} style={s('margin: 3px 0; text-wrap: pretty;')}>
-              {inline(item, `${key()}-${index}`)}
-            </li>
-          ))}
+          {items.map((item, index) => {
+            const tache = TASK.exec(item)
+            return (
+              <li key={index} style={s('margin: 3px 0; text-wrap: pretty;')}>
+                {tache && (
+                  // En lecture seule : le cockpit lit, il ne coche pas. Cocher
+                  // ici écrirait dans le README d'un dépôt qu'il observe.
+                  <input
+                    type="checkbox"
+                    checked={tache[1] !== ' '}
+                    readOnly
+                    disabled
+                    style={s('margin-right: 7px; vertical-align: middle; accent-color: var(--color-accent);')}
+                  />
+                )}
+                {inline(tache ? tache[2] : item, `${key()}-${index}`, root)}
+              </li>
+            )
+          })}
         </List>,
       )
       continue
@@ -314,7 +558,7 @@ export function Markdown({ text }: { text: string }): ReactNode {
           'margin: 10px 0; font-size: 12.5px; line-height: 1.7; color: var(--color-neutral-300); text-wrap: pretty;',
         )}
       >
-        {inline(paragraph.join(' '), key())}
+        {inline(paragraph.join(' '), key(), root)}
       </p>,
     )
   }
@@ -330,4 +574,6 @@ const isBlockStart = (line: string): boolean =>
   NUMBER.test(line) ||
   QUOTE.test(line) ||
   RULE.test(line.trim()) ||
-  ROW.test(line)
+  ROW.test(line) ||
+  DETAILS.test(line.trim()) ||
+  HTML_IMG.test(line.trim())

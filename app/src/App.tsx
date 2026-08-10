@@ -501,7 +501,12 @@ export function App() {
                     // de projet : une panne sur l'un ne doit pas condamner les
                     // autres, et revenir dessus doit réessayer.
                     <Garde key={`${tab}:${snapshot.root}`} quoi={t('garde.tab', { name: labelOf(tab) })}>
-                      {tab === 'apercu' && <Apercu snapshot={snapshot} />}
+                      {tab === 'apercu' && (
+                        // Le terminal a son état ici : l'Aperçu demande son
+                        // ouverture, il ne lance pas de session lui-même —
+                        // sinon le panneau en ignorerait l'existence.
+                        <Apercu snapshot={snapshot} onTerminal={() => setTerminal(true)} />
+                      )}
 
                       {/* Le seul onglet qui reste monté quand on le quitte :
                           le démonter rechargerait l'application inspectée, et

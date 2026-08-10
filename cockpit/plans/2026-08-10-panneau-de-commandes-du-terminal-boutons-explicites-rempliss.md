@@ -1,10 +1,20 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Panneau de commandes du terminal : boutons explicites, remplissage sans envoi",
   "opened": "2026-08-10",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-10",
+  "commits": [
+    {
+      "sha": "05839a8",
+      "date": "2026-08-10",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/useTerminal.ts"
+      ]
+    }
+  ]
 }
 ---
 

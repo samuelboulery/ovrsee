@@ -2,10 +2,14 @@
 {
   "id": "T-0027",
   "titre": "Choix utilisateur : gitignorer captures et plans/tickets",
-  "colonne": "en-cours",
+  "colonne": "revue",
   "priorite": "moyenne",
   "charge": "M",
-  "tags": ["préférences", "onboarding", "git"],
+  "tags": [
+    "préférences",
+    "onboarding",
+    "git"
+  ],
   "cree": "2026-08-10",
   "maj": "2026-08-10",
   "plan": "2026-08-10-choix-utilisateur-gitignorer-captures-et-plans-tickets.md"

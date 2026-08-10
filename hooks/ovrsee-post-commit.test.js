@@ -44,22 +44,31 @@ const fixture = () => {
   return ovrseeDir
 }
 
-test('avancerTicketsDuPlan fait passer en cours un ticket lié encore au backlog', () => {
-  const ovrseeDir = fixture()
-  const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'backlog', plan: '2026-08-10-x.md' })
-
-  avancerTicketsDuPlan(ovrseeDir, '2026-08-10-x.md')
-
-  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'en-cours')
-})
-
-test('avancerTicketsDuPlan ne recule jamais un ticket déjà plus loin', () => {
+test('avancerTicketsDuPlan fait passer en colonne finale un ticket lié en revue', () => {
   const ovrseeDir = fixture()
   const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'revue', plan: '2026-08-10-x.md' })
 
   avancerTicketsDuPlan(ovrseeDir, '2026-08-10-x.md')
 
-  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'revue')
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'fait')
+})
+
+test('avancerTicketsDuPlan pousse aussi un ticket resté en cours (pas de colonne revue)', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'en-cours', plan: '2026-08-10-x.md' })
+
+  avancerTicketsDuPlan(ovrseeDir, '2026-08-10-x.md')
+
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'fait')
+})
+
+test('avancerTicketsDuPlan ne retouche jamais un ticket déjà en finale', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'fait', plan: '2026-08-10-x.md' })
+
+  avancerTicketsDuPlan(ovrseeDir, '2026-08-10-x.md')
+
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'fait')
 })
 
 test('avancerTicketsDuPlan ignore les tickets d’un autre plan', () => {
@@ -71,11 +80,11 @@ test('avancerTicketsDuPlan ignore les tickets d’un autre plan', () => {
   assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'backlog')
 })
 
-test('avancerTicketsDuPlan ne fait rien si le board n’a pas de colonne en-cours', () => {
+test('avancerTicketsDuPlan ne fait rien sur un board à une seule colonne', () => {
   const ovrseeDir = fixture()
   writeFileSync(
     join(ovrseeDir, 'board.json'),
-    JSON.stringify({ colonnes: [{ id: 'todo', titre: 'À faire' }, { id: 'done', titre: 'Fait' }] }),
+    JSON.stringify({ colonnes: [{ id: 'todo', titre: 'À faire' }] }),
     'utf8',
   )
   const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'todo', plan: '2026-08-10-x.md' })

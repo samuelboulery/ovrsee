@@ -197,7 +197,7 @@ function main() {
     JSON.stringify({
       hookSpecificOutput: {
         hookEventName: 'PostToolUse',
-        additionalContext: `[ovrsee] Plan capturé : ovrsee/plans/${file}. Décompose-le maintenant en tickets via le skill cockpit-tickets — priorité et charge (xs–xl) pour chacun, champ plan renseigné sur ${file}. Un plan simple peut ne produire qu'un seul ticket : ne pas forcer le découpage.`,
+        additionalContext: `[ovrsee] Plan capturé : ovrsee/plans/${file}. Décompose-le maintenant en tickets via le skill ovrsee-tickets — priorité et charge (xs–xl) pour chacun, champ plan renseigné sur ${file}. Un plan simple peut ne produire qu'un seul ticket : ne pas forcer le découpage.`,
       },
     }),
   )

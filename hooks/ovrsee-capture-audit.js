@@ -96,7 +96,7 @@ function logAudit(root, skill) {
 const pendingAuditPath = (root) => join(root, 'ovrsee', '.pending-audit')
 
 const NUDGE_TEXT = (skill) =>
-  `[ovrsee] Revue « ${skill} » terminée. Décompose les constats en tickets via le skill cockpit-tickets — un ticket par constat réel, pas par ligne de rapport ; priorité dérivée de la gravité, charge estimée (xs–xl) quand c'est raisonnable.`
+  `[ovrsee] Revue « ${skill} » terminée. Décompose les constats en tickets via le skill ovrsee-tickets — un ticket par constat réel, pas par ligne de rapport ; priorité dérivée de la gravité, charge estimée (xs–xl) quand c'est raisonnable.`
 
 /**
  * PostToolUse peut injecter du contexte sans rouvrir le tour (hookSpecificOutput

@@ -16,7 +16,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { attachCommitToPlan, isSafePlanFileName } from './plans.js'
-import { readBoard, readTickets, moveTicket } from './tickets.js'
+import { colonneFinale, readBoard, readTickets, moveTicket } from './tickets.js'
 import { readSettings, mergeSettings } from './settings.js'
 import { syncGitignore } from './gitignore-sync.js'
 import { readJson } from './snapshot.js'
@@ -84,33 +84,35 @@ function attachCommit(ovrseeDir, root, sources) {
   return attachCommitToPlan(ovrseeDir, file, commit) ? file : null
 }
 
-const EN_COURS = 'en-cours'
-
 /**
- * Avance vers « en cours » les tickets liés à ce plan, s'ils n'y sont pas
- * déjà et n'y sont jamais allés au-delà — par ordre du board, pas par un
- * statut dédié.
+ * Avance vers la colonne finale les tickets liés à ce plan, s'ils n'y sont
+ * pas déjà — par ordre du board, pas par un statut dédié.
+ *
+ * Un commit est le signal qu'un travail est passé la relecture : que le
+ * ticket vienne de « revue » (cas nominal, `ovrsee-tool-stop.js` l'y a mis) ou
+ * soit resté en « en cours » (board sans colonne `revue`), le commit le
+ * pousse en une fois vers la finale. `en-cours` lui-même est atteint plus tôt,
+ * à la première édition sous le plan actif (`ovrsee-tool-edit.js`) — ce hook
+ * n'a donc plus à s'en charger.
  *
  * Idempotent à dessein : appelé à chaque commit du plan, pas seulement au
- * premier, plutôt que de suivre « est-ce le premier commit ? ». Un ticket
- * déjà en « en cours », en revue ou plus loin n'est jamais reculé — l'avancée
+ * dernier. Un ticket déjà en finale n'est jamais retouché — l'avancée
  * manuelle d'un ticket reste toujours plus vraie que cette règle automatique.
  *
- * Silencieuse si le board n'a pas de colonne `en-cours` : un board reconfiguré
- * sans cet id ne doit jamais faire échouer un commit.
+ * Silencieuse si le board n'a qu'une seule colonne (`colonneFinale` rend déjà
+ * `null`) : un board reconfiguré sans colonne terminale ne doit jamais faire
+ * échouer un commit.
  */
 export function avancerTicketsDuPlan(ovrseeDir, planFile) {
   const colonnes = readBoard(ovrseeDir)
-  const iCible = colonnes.findIndex(c => c.id === EN_COURS)
-  if (iCible === -1) return
+  const finale = colonneFinale(colonnes)
+  if (!finale) return
 
-  const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
   for (const ticket of readTickets(ovrseeDir, colonnes)) {
-    if (ticket.meta.plan !== planFile) continue
-    if ((rangDe.get(ticket.meta.colonne) ?? 0) >= iCible) continue
+    if (ticket.meta.plan !== planFile || ticket.meta.colonne === finale) continue
 
     try {
-      moveTicket(ovrseeDir, ticket.file, EN_COURS)
+      moveTicket(ovrseeDir, ticket.file, finale)
     } catch {
       // Un ticket qui ne peut pas être déplacé ne doit jamais faire échouer le commit.
     }

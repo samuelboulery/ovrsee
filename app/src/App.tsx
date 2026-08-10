@@ -9,6 +9,7 @@ import {
   fetchProjects,
   fetchSettings,
   fetchSnapshot,
+  fetchTableau,
   frDate,
   humanAge,
   isUnequipped,
@@ -325,6 +326,20 @@ export function App() {
    */
   const setTableau = (tableau: TableauData) =>
     setSnapshot(avant => (avant ? { ...avant, ...tableau } : avant))
+
+  /**
+   * Un ticket écrit hors de l'app (skill, terminal) n'émet aucun événement —
+   * seul un poll régulier le fait apparaître sans que l'utilisateur clique
+   * sur reload. `board`/`tickets` seuls : les captures, l'historique et le
+   * graphe n'ont aucune raison de bouger toutes les 4 secondes.
+   */
+  useEffect(() => {
+    if (!current) return
+    const timer = setInterval(() => {
+      fetchTableau(current).then(setTableau).catch(() => {})
+    }, 4000)
+    return () => clearInterval(timer)
+  }, [current])
 
   const reload = () => {
     if (!current) return

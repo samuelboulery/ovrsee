@@ -38,6 +38,31 @@ const estColonne = (transfert: DataTransfer) => transfert.types.includes(TYPE_CO
 type Insertion = { index: number; apres: boolean }
 
 /**
+ * Fait suivre chaque epic de ses enfants présents dans la même colonne.
+ *
+ * `sortTickets` n'a aucune notion d'epic — sans ce passage, les enfants d'un
+ * même epic se dispersent dans la colonne au gré de leur priorité et de leur
+ * date. Un enfant en priorité haute peut trier *avant* son epic en priorité
+ * basse : les enfants sont donc exclus du parcours principal et réinjectés
+ * juste après leur epic, jamais laissés à leur place d'origine. Purement un
+ * ordre d'affichage : l'ordre stocké (celui de `board.json`) n'existe pas, il
+ * est recalculé à chaque rendu, donc réordonner ici ne perd rien. Un enfant
+ * dont l'epic est dans une autre colonne garde sa place.
+ */
+const groupEpics = (tickets: Ticket[]): Ticket[] => {
+  const epicsIci = new Set(tickets.filter(t => t.type === 'epic').map(t => t.id))
+  const enfantIci = (t: Ticket) => t.epic !== undefined && epicsIci.has(t.epic)
+
+  const suite: Ticket[] = []
+  for (const ticket of tickets) {
+    if (enfantIci(ticket)) continue
+    suite.push(ticket)
+    if (ticket.type === 'epic') suite.push(...tickets.filter(t => t.epic === ticket.id))
+  }
+  return suite
+}
+
+/**
  * Le tableau du projet : des tickets qu'on saisit, priorise et déplace.
  *
  * C'est la seule vue de l'ovrsee qui écrit. Tout le reste est capturé par un
@@ -275,7 +300,7 @@ export function Tableau({
               colonne={colonne}
               index={index}
               colonnes={board}
-              tickets={sortTickets(ticketsAffichables.filter(t => t.colonne === colonne.id))}
+              tickets={groupEpics(sortTickets(ticketsAffichables.filter(t => t.colonne === colonne.id)))}
               edition={edition}
               finale={index === board.length - 1 && board.length > 1}
               survolee={survolee === colonne.id}
@@ -723,12 +748,24 @@ function Carte({
   const progress = isEpic ? epicProgress(children, finalColumn) : null
   const parentEpic = ticket.epic ? allTickets.find(t => t.id === ticket.epic) : null
 
+  // Le liseré signale l'appartenance à un epic même quand l'enfant n'est
+  // plus dans la même colonne — regrouper visuellement n'est possible que
+  // là, mais l'indicateur d'appartenance, lui, vaut partout.
+  const liseréEnfant = parentEpic ? 'box-shadow: inset 3px 0 0 var(--color-accent);' : ''
+
   return (
     <div
       draggable
       onDragStart={event => event.dataTransfer.setData(TYPE_CARTE, ticket.file)}
       onClick={() => onOuvrir(ticket.file)}
-      style={s('border: 1px solid var(--color-neutral-800); border-radius: 8px; padding: 10px 11px; background: var(--color-surface); cursor: pointer;')}
+      style={s(
+        'border: 1px solid ' +
+          (isEpic ? 'var(--color-accent-600)' : 'var(--color-neutral-800)') +
+          '; border-radius: 8px; padding: 10px 11px; background: ' +
+          (isEpic ? 'color-mix(in srgb, var(--color-accent) 10%, var(--color-surface))' : 'var(--color-surface)') +
+          '; cursor: pointer;' +
+          liseréEnfant,
+      )}
     >
       <div style={s('display: flex; align-items: center; gap: 7px;')}>
         <span
@@ -851,6 +888,14 @@ function Detail({
   const [tags, setTags] = useState(ticket.tags.join(', '))
   const [corps, setCorps] = useState(ticket.corps)
   const [confirme, setConfirme] = useState(false)
+  // Un ticket s'ouvre pour être lu, pas pour être aussitôt modifié — le
+  // formulaire d'édition n'apparaît que sur demande explicite. Le panneau est
+  // remonté à chaque changement de ticket (`key={selection.file}` chez
+  // l'appelant), donc ouvrir un autre ticket revient toujours en lecture.
+  const [edition, setEdition] = useState(false)
+
+  const colonne = colonnes.find(c => c.id === ticket.colonne)
+  const parentEpic = ticket.epic ? allTickets.find(t => t.id === ticket.epic) : null
 
   return (
     <div style={s(PANNEAU)}>
@@ -859,106 +904,159 @@ function Detail({
           {ticket.id}
         </div>
         <div style={s('flex: 1;')} />
+        <button
+          type="button"
+          className={edition ? 'btn btn-primary' : 'btn btn-ghost'}
+          style={s('font-size: 12px;')}
+          onClick={() => setEdition(!edition)}
+        >
+          {edition ? t('tableau.finish_editing') : t('tableau.edit_ticket')}
+        </button>
         <button type="button" className="btn btn-ghost" style={s('font-size: 12px;')} onClick={onFermer}>
           {t('tableau.close')}
         </button>
       </div>
 
-      <input
-        className="input"
-        value={titre}
-        onChange={event => setTitre(event.target.value)}
-        onBlur={() => titre.trim() && titre !== ticket.titre && onModifier({ titre })}
-        style={s('font-size: 13px; width: 100%;')}
-      />
-
-      <div style={s('display: flex; gap: 8px; margin-top: 10px;')}>
-        <select
-          className="input"
-          value={ticket.colonne}
-          onChange={event => onDeplacer(event.target.value)}
-          style={s('font-size: 12px; flex: 1;')}
-        >
-          {colonnes.map(colonne => (
-            <option key={colonne.id} value={colonne.id}>
-              {colonne.titre}
-            </option>
-          ))}
-        </select>
-        <select
-          className="input"
-          value={ticket.priorite}
-          onChange={event => onModifier({ priorite: event.target.value as Priorite })}
-          style={s('font-size: 12px; flex: 1;')}
-        >
-          {PRIORITES.map(priorite => (
-            <option key={priorite} value={priorite}>
-              {priorite}
-            </option>
-          ))}
-        </select>
-        <select
-          className="input"
-          value={ticket.charge ?? ''}
-          onChange={event => onModifier({ charge: (event.target.value || null) as Charge | null })}
-          style={s('font-size: 12px; flex: 1;')}
-        >
-          <option value="">{t('tableau.charge_none')}</option>
-          {CHARGES.map(charge => (
-            <option key={charge} value={charge}>
-              {charge}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div style={s('display: flex; align-items: center; gap: 8px; margin-top: 8px;')}>
-        <label style={s('display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--color-neutral-500); white-space: nowrap;')}>
+      {edition ? (
+        <>
           <input
-            type="checkbox"
-            checked={ticket.type === 'epic'}
-            disabled={Boolean(ticket.epic)}
-            title={ticket.epic ? t('tableau.epic_checkbox_disabled') : undefined}
-            onChange={event => onModifier({ type: event.target.checked ? 'epic' : null })}
-          />
-          {t('tableau.epic_checkbox')}
-        </label>
-        {ticket.type !== 'epic' && (
-          <select
             className="input"
-            value={ticket.epic ?? ''}
-            onChange={event => onModifier({ epic: event.target.value || null })}
-            style={s('font-size: 12px; flex: 1;')}
-          >
-            <option value="">{t('tableau.no_epic_parent')}</option>
-            {allTickets
-              .filter(t => t.type === 'epic' && t.id !== ticket.id)
-              .map(epic => (
-                <option key={epic.id} value={epic.id}>
-                  {epic.titre}
+            value={titre}
+            onChange={event => setTitre(event.target.value)}
+            onBlur={() => titre.trim() && titre !== ticket.titre && onModifier({ titre })}
+            style={s('font-size: 13px; width: 100%;')}
+          />
+
+          <div style={s('display: flex; gap: 8px; margin-top: 10px;')}>
+            <select
+              className="input"
+              value={ticket.colonne}
+              onChange={event => onDeplacer(event.target.value)}
+              style={s('font-size: 12px; flex: 1;')}
+            >
+              {colonnes.map(colonne => (
+                <option key={colonne.id} value={colonne.id}>
+                  {colonne.titre}
                 </option>
               ))}
-          </select>
-        )}
-      </div>
+            </select>
+            <select
+              className="input"
+              value={ticket.priorite}
+              onChange={event => onModifier({ priorite: event.target.value as Priorite })}
+              style={s('font-size: 12px; flex: 1;')}
+            >
+              {PRIORITES.map(priorite => (
+                <option key={priorite} value={priorite}>
+                  {priorite}
+                </option>
+              ))}
+            </select>
+            <select
+              className="input"
+              value={ticket.charge ?? ''}
+              onChange={event => onModifier({ charge: (event.target.value || null) as Charge | null })}
+              style={s('font-size: 12px; flex: 1;')}
+            >
+              <option value="">{t('tableau.charge_none')}</option>
+              {CHARGES.map(charge => (
+                <option key={charge} value={charge}>
+                  {charge}
+                </option>
+              ))}
+            </select>
+          </div>
 
-      <input
-        className="input"
-        value={tags}
-        placeholder={t('tableau.tags_placeholder')}
-        onChange={event => setTags(event.target.value)}
-        onBlur={() => onModifier({ tags: tags.split(',').map(t => t.trim()).filter(Boolean) })}
-        style={s('font-size: 12px; width: 100%; margin-top: 8px;')}
-      />
+          <div style={s('display: flex; align-items: center; gap: 8px; margin-top: 8px;')}>
+            <label style={s('display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--color-neutral-500); white-space: nowrap;')}>
+              <input
+                type="checkbox"
+                checked={ticket.type === 'epic'}
+                disabled={Boolean(ticket.epic)}
+                title={ticket.epic ? t('tableau.epic_checkbox_disabled') : undefined}
+                onChange={event => onModifier({ type: event.target.checked ? 'epic' : null })}
+              />
+              {t('tableau.epic_checkbox')}
+            </label>
+            {ticket.type !== 'epic' && (
+              <select
+                className="input"
+                value={ticket.epic ?? ''}
+                onChange={event => onModifier({ epic: event.target.value || null })}
+                style={s('font-size: 12px; flex: 1;')}
+              >
+                <option value="">{t('tableau.no_epic_parent')}</option>
+                {allTickets
+                  .filter(t => t.type === 'epic' && t.id !== ticket.id)
+                  .map(epic => (
+                    <option key={epic.id} value={epic.id}>
+                      {epic.titre}
+                    </option>
+                  ))}
+              </select>
+            )}
+          </div>
 
-      <textarea
-        className="input"
-        value={corps}
-        placeholder={t('tableau.acceptance_criteria_placeholder')}
-        onChange={(event) => setCorps(event.target.value)}
-        onBlur={() => { if (corps !== ticket.corps) onModifier({ corps }) }}
-        style={s('font-size: 12px; width: 100%; margin-top: 8px; min-height: 220px; line-height: 1.55; font-family: var(--font-mono, monospace);')}
-      />
+          <input
+            className="input"
+            value={tags}
+            placeholder={t('tableau.tags_placeholder')}
+            onChange={event => setTags(event.target.value)}
+            onBlur={() => onModifier({ tags: tags.split(',').map(t => t.trim()).filter(Boolean) })}
+            style={s('font-size: 12px; width: 100%; margin-top: 8px;')}
+          />
+
+          <textarea
+            className="input"
+            value={corps}
+            placeholder={t('tableau.acceptance_criteria_placeholder')}
+            onChange={(event) => setCorps(event.target.value)}
+            onBlur={() => { if (corps !== ticket.corps) onModifier({ corps }) }}
+            style={s('font-size: 12px; width: 100%; margin-top: 8px; min-height: 220px; line-height: 1.55; font-family: var(--font-mono, monospace);')}
+          />
+        </>
+      ) : (
+        <>
+          <div style={s('font-size: 15px; font-weight: 500; line-height: 1.4;')}>{ticket.titre}</div>
+
+          <div style={s('font-size: 12px; color: var(--color-neutral-500); margin-top: 8px;')}>
+            {colonne?.titre ?? ticket.colonne} · {t('tableau.priority_label')} {ticket.priorite}
+            {ticket.charge && <> · {t('tableau.charge_label')} {ticket.charge}</>}
+          </div>
+
+          {(ticket.type === 'epic' || parentEpic || ticket.epic) && (
+            <div style={s('margin-top: 8px;')}>
+              {ticket.type === 'epic' ? (
+                <span className="tag tag-outline" style={s('font-size: 10px;')}>
+                  {t('tableau.epic_checkbox')}
+                </span>
+              ) : (
+                <span
+                  className="tag tag-outline"
+                  style={s('font-size: 10px;')}
+                  title={parentEpic ? undefined : t('tableau.parent_epic_missing')}
+                >
+                  {parentEpic ? `${t('tableau.child_of')} ${parentEpic.titre}` : t('tableau.orphan_ticket')}
+                </span>
+              )}
+            </div>
+          )}
+
+          {ticket.tags.length > 0 && (
+            <div style={s('display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;')}>
+              {ticket.tags.map(tag => (
+                <span key={tag} className="tag tag-neutral" style={s('font-size: 10px;')}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div style={s('font-size: 12px; margin-top: 12px; min-height: 220px; line-height: 1.55; white-space: pre-wrap;')}>
+            {ticket.corps || <span style={s('color: var(--color-neutral-600);')}>{t('tableau.no_description')}</span>}
+          </div>
+        </>
+      )}
 
       <div style={s('font-size: 10.5px; color: var(--color-neutral-600); margin-top: 10px; line-height: 1.6;')}>
         <div>{t('tableau.created')} {humanAge(ticket.cree)} · {t('tableau.modified')} {humanAge(ticket.maj)}</div>
@@ -966,23 +1064,25 @@ function Detail({
         {ticket.plan && <div>{t('tableau.linked_plan')} {ticket.plan}</div>}
       </div>
 
-      <div style={s('display: flex; justify-content: flex-end; margin-top: 14px;')}>
-        {confirme ? (
-          <div style={s('display: flex; align-items: center; gap: 8px;')}>
-            <span style={s('font-size: 11px; color: var(--color-neutral-400);')}>{t('tableau.delete_ticket_confirm')}</span>
-            <button type="button" className="btn btn-secondary" style={s('font-size: 11.5px;')} onClick={() => setConfirme(false)}>
-              {t('tableau.cancel')}
-            </button>
-            <button type="button" className="btn btn-primary" style={s('font-size: 11.5px;')} onClick={onSupprimer}>
+      {edition && (
+        <div style={s('display: flex; justify-content: flex-end; margin-top: 14px;')}>
+          {confirme ? (
+            <div style={s('display: flex; align-items: center; gap: 8px;')}>
+              <span style={s('font-size: 11px; color: var(--color-neutral-400);')}>{t('tableau.delete_ticket_confirm')}</span>
+              <button type="button" className="btn btn-secondary" style={s('font-size: 11.5px;')} onClick={() => setConfirme(false)}>
+                {t('tableau.cancel')}
+              </button>
+              <button type="button" className="btn btn-primary" style={s('font-size: 11.5px;')} onClick={onSupprimer}>
+                {t('tableau.delete')}
+              </button>
+            </div>
+          ) : (
+            <button type="button" className="btn btn-ghost" style={s('font-size: 11.5px;')} onClick={() => setConfirme(true)}>
               {t('tableau.delete')}
             </button>
-          </div>
-        ) : (
-          <button type="button" className="btn btn-ghost" style={s('font-size: 11.5px;')} onClick={() => setConfirme(true)}>
-            {t('tableau.delete')}
-          </button>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

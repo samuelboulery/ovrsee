@@ -699,6 +699,13 @@ export async function ticketAction(
   return result
 }
 
+/**
+ * Relit colonnes et tickets seuls — pour le polling qui garde le tableau à
+ * jour quand un ticket est écrit hors de l'app (skill, terminal).
+ */
+export const fetchTableau = (path: string, signal?: AbortSignal) =>
+  json<Tableau>(`/api/tickets?path=${encodeURIComponent(path)}`, signal)
+
 /** Un projet sans dossier `ovrsee/` : rien à lire, donc rien à montrer. */
 export const isUnequipped = (snapshot: Snapshot): boolean => !snapshot.equipped
 

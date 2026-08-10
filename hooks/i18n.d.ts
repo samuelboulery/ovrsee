@@ -449,6 +449,8 @@ export type TranslationKey =
   | 'tableau.title'
   | 'tableau.finish_editing'
   | 'tableau.edit_columns'
+  | 'tableau.edit_ticket'
+  | 'tableau.no_description'
   | 'tableau.children_of'
   | 'tableau.back'
   | 'tableau.edit_mode_help'

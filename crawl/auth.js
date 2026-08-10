@@ -21,11 +21,11 @@ import { join, resolve } from 'node:path'
 import { chromium } from 'playwright-core'
 
 const root = resolve(process.argv[2] ?? process.cwd())
-const config = JSON.parse(readFileSync(join(root, 'cockpit.config.json'), 'utf8'))
+const config = JSON.parse(readFileSync(join(root, 'ovrsee.config.json'), 'utf8'))
 
 const statePath = config.auth?.storageState
 if (!statePath) {
-  console.error('cockpit.config.json ne déclare pas auth.storageState — rien à enregistrer.')
+  console.error('ovrsee.config.json ne déclare pas auth.storageState — rien à enregistrer.')
   process.exit(1)
 }
 

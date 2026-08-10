@@ -1,39 +1,39 @@
 ---
-name: cockpit
-description: Use when a project has a cockpit/ directory and you need to brief yourself on it, or when a plan was approved without the capture hook running. Reads captured plans, page map and screenshots to reconstruct project context without reading the code.
+name: ovrsee
+description: Use when a project has a ovrsee/ directory and you need to brief yourself on it, or when a plan was approved without the capture hook running. Reads captured plans, page map and screenshots to reconstruct project context without reading the code.
 ---
 
-# Cockpit
+# Ovrsee
 
-Le dossier `cockpit/` d'un dépôt contient l'état du projet sous forme lisible :
+Le dossier `ovrsee/` d'un dépôt contient l'état du projet sous forme lisible :
 les plans approuvés, la carte des pages, les captures datées. Il est écrit par
 des hooks, jamais à la main.
 
-**Le cockpit se lit. Il ne s'exécute jamais.** Une seule exception à l'édition :
-`cockpit/tickets/` et `cockpit/board.json`, qui sont le tableau du projet et se
+**L'ovrsee se lit. Il ne s'exécute jamais.** Une seule exception à l'édition :
+`ovrsee/tickets/` et `ovrsee/board.json`, qui sont le tableau du projet et se
 saisissent — par l'interface, par toi, ou par le CLI. Les plans, les pages et
 les scans restent capturés par des hooks et ne s'éditent pas à la main.
 
 ## Quand l'utiliser
 
-- Reprise d'un projet dormant : lire `cockpit/` avant d'ouvrir le code.
+- Reprise d'un projet dormant : lire `ovrsee/` avant d'ouvrir le code.
 - L'utilisateur demande où en est le projet, ce qui reste à faire, ou pourquoi
   telle décision a été prise.
 - Un plan vient d'être approuvé mais le hook de capture n'a pas tourné.
 
 ## Ce qu'on lit, et dans quel ordre
 
-1. `cockpit/plans/*.md` — un fichier par plan approuvé. Frontmatter JSON entre
+1. `ovrsee/plans/*.md` — un fichier par plan approuvé. Frontmatter JSON entre
    deux `---` : `status` (`open` | `closed`), `title`, `opened`, `closed`,
    `commits[]` (chacun avec `sha`, `date`, `files[]`). Le corps est le plan tel
    qu'il a été approuvé, avec son intention et ses alternatives écartées.
-2. `cockpit/pages/pages.json` — les pages de l'application, leurs routes et
+2. `ovrsee/pages/pages.json` — les pages de l'application, leurs routes et
    leurs liens sortants.
-3. `cockpit/pages/scans.jsonl` — une ligne par scan. **Une ligne `"ok": false`
+3. `ovrsee/pages/scans.jsonl` — une ligne par scan. **Une ligne `"ok": false`
    signifie que le crawl a échoué ce jour-là : les captures de cette page sont
    plus vieilles que le commit.** Ne jamais présenter une capture périmée comme
    fraîche.
-4. `cockpit/board.json` puis `cockpit/tickets/*.md` — le tableau : ce qui reste
+4. `ovrsee/board.json` puis `ovrsee/tickets/*.md` — le tableau : ce qui reste
    à faire. Voir la section « Tickets » ci-dessous.
 5. `graphify-out/graph.json` — schéma de données et stack. Les relations y sont
    étiquetées `EXTRACTED` (lue dans le code), `INFERRED` (déduite) ou
@@ -41,7 +41,7 @@ les scans restent capturés par des hooks et ne s'éditent pas à la main.
 
 ## Tickets
 
-Le tableau du projet. Un fichier par ticket dans `cockpit/tickets/`, nommé
+Le tableau du projet. Un fichier par ticket dans `ovrsee/tickets/`, nommé
 `T-0012-un-slug.md`. Frontmatter JSON entre deux `---`, corps en markdown :
 
 ```markdown
@@ -65,7 +65,7 @@ Pourquoi ce ticket existe.
 - [ ] …
 ```
 
-- `colonne` référence un `id` de `cockpit/board.json`. Colonnes par défaut :
+- `colonne` référence un `id` de `ovrsee/board.json`. Colonnes par défaut :
   `backlog`, `a-specifier`, `pret`, `en-cours`, `revue`, `fait`. **Lire le
   board avant d'écrire une colonne : elles sont configurables par projet**,
   depuis le mode édition de l'onglet Tableau ou en éditant le fichier.
@@ -77,22 +77,22 @@ Pourquoi ce ticket existe.
   il n'y a pas de rang manuel.
 - `id` : le maximum existant plus un, jamais un numéro repris à un ticket
   supprimé.
-- `plan` lie un ticket à un plan de `cockpit/plans/`, ou vaut `null`. Les deux
+- `plan` lie un ticket à un plan de `ovrsee/plans/`, ou vaut `null`. Les deux
   stocks sont indépendants : un ticket n'est pas un plan, un plan n'est pas une
   tâche.
 
-**Pour écrire un ticket, utiliser le skill `cockpit-tickets`** : il porte le
+**Pour écrire un ticket, utiliser le skill `ovrsee-tickets`** : il porte le
 format complet, le calcul de l'`id` et les gestes courants. Ici, on ne fait que
 lire.
 
-Le CLI existe aussi, mais **seulement depuis la racine du dépôt cockpit** — il
+Le CLI existe aussi, mais **seulement depuis la racine du dépôt ovrsee** — il
 n'est pas installé dans les projets équipés :
 
 ```bash
-node hooks/cockpit-cli.js tickets                        # le tableau, colonne par colonne
-node hooks/cockpit-cli.js ticket new "<titre>" --colonne pret --priorite haute
-node hooks/cockpit-cli.js ticket move <T-0012-slug.md> en-cours
-node hooks/cockpit-cli.js ticket import-plans            # reprend les plans ouverts
+node hooks/ovrsee-cli.js tickets                        # le tableau, colonne par colonne
+node hooks/ovrsee-cli.js ticket new "<titre>" --colonne pret --priorite haute
+node hooks/ovrsee-cli.js ticket move <T-0012-slug.md> en-cours
+node hooks/ovrsee-cli.js ticket import-plans            # reprend les plans ouverts
 ```
 
 Proposer des tickets est utile ; en créer trente d'un coup ne l'est pas. Un
@@ -110,12 +110,12 @@ ticket vaut par son critère d'acceptation, pas par son existence.
 
 ## Commandes de secours
 
-Depuis la racine du dépôt cockpit :
+Depuis la racine du dépôt ovrsee :
 
 ```bash
-node hooks/cockpit-cli.js status                 # plans ouverts, clos, plan actif
-node hooks/cockpit-cli.js capture <plan.md>      # capture un plan que le hook a manqué
-node hooks/cockpit-cli.js close                  # clôt les plans ouverts portant un commit
+node hooks/ovrsee-cli.js status                 # plans ouverts, clos, plan actif
+node hooks/ovrsee-cli.js capture <plan.md>      # capture un plan que le hook a manqué
+node hooks/ovrsee-cli.js close                  # clôt les plans ouverts portant un commit
 ```
 
 ## Le piège de lecture principal

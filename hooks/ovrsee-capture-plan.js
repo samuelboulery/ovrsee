@@ -12,9 +12,9 @@
  *
  *   stdin  {"tool_name":"ExitPlanMode","tool_input":{},"cwd":"/chemin"}
  *          `tool_input.plan` n'est plus garanti — voir `planFrom`.
- *   effets <repo>/cockpit/plans/<date>-<slug>.md   (status: open)
- *          <repo>/cockpit/.active-plan
- *          ~/.claude/cockpit/projects.json
+ *   effets <repo>/ovrsee/plans/<date>-<slug>.md   (status: open)
+ *          <repo>/ovrsee/.active-plan
+ *          ~/.claude/ovrsee/projects.json
  */
 
 import { execFileSync } from 'node:child_process'
@@ -139,8 +139,8 @@ function main() {
   const root = repoRoot(payload.cwd || process.cwd())
   if (!root) return // Hors dépôt git : rien à capturer, sortie silencieuse.
 
-  const cockpitDir = join(root, 'cockpit')
-  closeOpenPlans(cockpitDir, message => process.stderr.write(`[cockpit] ${message}\n`))
+  const ovrseeDir = join(root, 'ovrsee')
+  closeOpenPlans(ovrseeDir, message => process.stderr.write(`[ovrsee] ${message}\n`))
 
   const title = titleOf(planText)
   const now = new Date()
@@ -153,17 +153,17 @@ function main() {
     commits: [],
   }
 
-  writeFileNoFollow(join(cockpitDir, 'plans', file), serializePlan(meta, planText))
-  writeFileNoFollow(join(cockpitDir, '.active-plan'), file + '\n')
+  writeFileNoFollow(join(ovrseeDir, 'plans', file), serializePlan(meta, planText))
+  writeFileNoFollow(join(ovrseeDir, '.active-plan'), file + '\n')
   registerProject(root)
 
-  process.stdout.write(`[cockpit] plan capturé : cockpit/plans/${file}\n`)
+  process.stdout.write(`[ovrsee] plan capturé : ovrsee/plans/${file}\n`)
 }
 
 try {
   main()
 } catch (err) {
   // Dernier filet : on signale, on ne bloque jamais.
-  process.stderr.write(`[cockpit] capture ignorée : ${err?.message ?? err}\n`)
+  process.stderr.write(`[ovrsee] capture ignorée : ${err?.message ?? err}\n`)
 }
 process.exit(0)

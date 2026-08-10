@@ -1,7 +1,7 @@
 /**
  * La présentation de premier lancement — trois écrans, passables à tout moment.
  *
- * Elle ne s'ouvre que sur un cockpit réellement vide : `projects()` ne rend plus
+ * Elle ne s'ouvre que sur un ovrsee réellement vide : `projects()` ne rend plus
  * que le registre, donc un dépôt fraîchement cloné n'a rien à montrer tant que
  * personne n'a désigné un projet. C'est le seul moment où l'on peut expliquer ce
  * que fait cette application — et surtout ce qu'elle ne fait pas.
@@ -10,7 +10,7 @@
  * plein écran : ce qu'elle explique se voit derrière elle, et la fermer ne fait
  * pas basculer d'un monde à l'autre.
  *
- * Ce qu'elle écrit : `~/.claude/cockpit/settings.json`, par `onFini`. Rien
+ * Ce qu'elle écrit : `~/.claude/ovrsee/settings.json`, par `onFini`. Rien
  * d'autre. L'ajout d'un projet passe par le sélecteur natif que la coquille lui
  * prête ; elle n'équipe rien elle-même — `EquipmentPanel` prend le relais après.
  */
@@ -95,7 +95,7 @@ function Carte({
   )
 }
 
-/* — Écran 1 : ce qu'est le cockpit — */
+/* — Écran 1 : ce qu'est l'ovrsee — */
 
 /** Les trois affirmations, chacune en deux temps : ce qu'on retient, puis pourquoi. */
 const AFFIRMATIONS = [

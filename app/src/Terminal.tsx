@@ -63,7 +63,7 @@ export function Terminal({
   layout: Layout
   onLayout: (layout: Layout) => void
   onToggle: () => void
-  /** Relit `cockpit/` — après un scan, l'interface ne se met pas à jour seule. */
+  /** Relit `ovrsee/` — après un scan, l'interface ne se met pas à jour seule. */
   onReload: () => void
   snapshot: Snapshot | null
   /** Vient d'`App` et pas d'un `fetchSettings()` local : une copie chargée au
@@ -337,7 +337,7 @@ export function Terminal({
           )}
         >
           {/* La session s'ouvre pour tout projet du registre — c'est ce qui
-              permet de l'équiper depuis le terminal. Mais sans `cockpit/`, rien
+              permet de l'équiper depuis le terminal. Mais sans `ovrsee/`, rien
               de ce qui s'y passe n'est capté : le dire ici plutôt que de laisser
               croire que les plans sont enregistrés. */}
           {snapshot && !snapshot.equipped && (
@@ -419,7 +419,7 @@ export function Terminal({
           )}
 
           {/* Hors des deux sections : ce bouton n'écrit rien dans le terminal,
-              il fait relire `cockpit/` à l'interface. Le ranger avec les
+              il fait relire `ovrsee/` à l'interface. Le ranger avec les
               commandes laissait croire qu'il lançait quelque chose. */}
           <div
             style={s(
@@ -432,7 +432,7 @@ export function Terminal({
               className="btn btn-secondary btn-block"
               style={s('font-size: 11.5px; padding: 5px 10px;')}
             >
-              {t('terminal.refresh_cockpit')}
+              {t('terminal.refresh_ovrsee')}
             </button>
             <div
               style={s(

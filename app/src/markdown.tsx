@@ -8,7 +8,7 @@ import { s } from './style'
 /**
  * Rendu markdown, en éléments React.
  *
- * Pourquoi pas une bibliothèque : le seul markdown que le cockpit affiche est
+ * Pourquoi pas une bibliothèque : le seul markdown que l'ovrsee affiche est
  * celui de fichiers du dépôt qu'on lit — README, corps de plan, corps de
  * ticket. Ce sous-ensemble tient en un fichier, et une dépendance de plus
  * demanderait sa propre justification dans l'onglet Stack.
@@ -45,10 +45,10 @@ const IMAGE = /\.(png|jpe?g|gif|webp|avif|svg)$/i
  * Un lien externe s'ouvre dans le navigateur ; tout le reste reste du texte.
  *
  * Ce n'est pas une limitation, c'est la seule forme correcte ici. Un lien
- * relatif — `./cadrage-cockpit.md` — serait nuisible deux fois : Electron le
+ * relatif — `./cadrage-ovrsee.md` — serait nuisible deux fois : Electron le
  * refuse (`will-navigate`, electron/main.js), et surtout le crawl découvre les
  * écrans en lisant `a[href]`. Un README bavard inscrirait alors ses liens comme
- * des routes du cockpit, et la carte de navigation montrerait des pages qui
+ * des routes de l'ovrsee, et la carte de navigation montrerait des pages qui
  * n'existent pas.
  */
 const isExternal = (href: string) => /^https?:\/\//i.test(href)
@@ -68,7 +68,7 @@ const CODE_STYLE =
 /**
  * Une image ou une vidéo du dépôt, ou rien.
  *
- * Rien de distant ne se charge — ni badge, ni GIF hébergé. Le cockpit lit des
+ * Rien de distant ne se charge — ni badge, ni GIF hébergé. L'ovrsee lit des
  * README qu'il n'a pas écrits : une balise `<img>` vers un domaine tiers ferait
  * partir une requête à chaque ouverture du projet, et dirait à qui l'a écrite
  * quand on regarde. Une source distante reste donc affichée en clair, avec son
@@ -280,8 +280,8 @@ function Bloc({ code, language }: { code: string; language: string }) {
  * L'ancre d'un titre.
  *
  * Le préfixe `md-` n'est pas décoratif. Un élément qui porte un `id` devient une
- * propriété de `window` : un README qui commence par « # Cockpit » posait un
- * `id="cockpit"`, et `window.cockpit` cessait alors de désigner le pont Electron
+ * propriété de `window` : un README qui commence par « # Ovrsee » posait un
+ * `id="ovrsee"`, et `window.ovrsee` cessait alors de désigner le pont Electron
  * pour désigner ce titre. La détection du mode Electron basculait avec, et le
  * navigateur affichait des boutons qui ne pouvaient rien faire. Aucune ancre ne
  * doit pouvoir se nommer comme un global — le préfixe le garantit pour tous les
@@ -522,7 +522,7 @@ export function Markdown({ text, root }: { text: string; root?: string }): React
             return (
               <li key={index} style={s('margin: 3px 0; text-wrap: pretty;')}>
                 {tache && (
-                  // En lecture seule : le cockpit lit, il ne coche pas. Cocher
+                  // En lecture seule : l'ovrsee lit, il ne coche pas. Cocher
                   // ici écrirait dans le README d'un dépôt qu'il observe.
                   <input
                     type="checkbox"

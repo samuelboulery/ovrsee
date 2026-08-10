@@ -41,7 +41,7 @@ import { Divider, useResizable } from './useResizable'
  * Chaque onglet a sa route.
  *
  * Ce n'est pas du confort : un crawler découvre les écrans en suivant les
- * `<a href>`. Tant que les onglets vivaient dans un état React, Cockpit
+ * `<a href>`. Tant que les onglets vivaient dans un état React, Ovrsee
  * produisait une carte à une seule page de lui-même — exactement la limite
  * relevée sur `associa`.
  *
@@ -145,7 +145,7 @@ async function openProject(
   onProjects: (list: Project[], select?: string | null) => void,
   onError: (message: string) => void,
 ) {
-  const picker = window.cockpit?.projects
+  const picker = window.ovrsee?.projects
   if (!picker) return
   try {
     const path = await picker.pick()
@@ -195,7 +195,7 @@ export function App() {
   // « ouverte ».
   const [sidebarOuverte, setSidebarOuverte] = useState(() => {
     try {
-      return localStorage.getItem('cockpit.sidebar') !== 'ferme'
+      return localStorage.getItem('ovrsee.sidebar') !== 'ferme'
     } catch {
       return true
     }
@@ -203,7 +203,7 @@ export function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('cockpit.sidebar', sidebarOuverte ? 'ouvert' : 'ferme')
+      localStorage.setItem('ovrsee.sidebar', sidebarOuverte ? 'ouvert' : 'ferme')
     } catch {
       /* Rien à faire : la préférence ne survivra pas à la session. */
     }
@@ -368,10 +368,10 @@ export function App() {
    *
    * Il n'envoie que des mots, et c'est ici qu'ils deviennent des gestes : les
    * mêmes que ceux des clics juste au-dessus. Absent dans un navigateur, où
-   * `window.cockpit` n'existe pas.
+   * `window.ovrsee` n'existe pas.
    */
   useEffect(() => {
-    const menu = window.cockpit?.menu
+    const menu = window.ovrsee?.menu
     if (!menu) return
 
     return menu.on(command => {
@@ -379,7 +379,7 @@ export function App() {
       if (command === 'project:open') return void openProject(applyProjects, setError)
       if (command === 'project:reload') return reload()
       if (command === 'project:reveal') {
-        if (current) window.cockpit?.projects.reveal(current)
+        if (current) window.ovrsee?.projects.reveal(current)
         return
       }
       if (command === 'sidebar:toggle') return setSidebarOuverte(ouverte => !ouverte)
@@ -475,7 +475,7 @@ export function App() {
             'margin: 0; font-size: 12.5px; font-weight: 400; color: var(--color-neutral-400); letter-spacing: .02em;',
           )}
         >
-          Cockpit — {projects.find(p => p.path === current)?.name ?? '…'}
+          Ovrsee — {projects.find(p => p.path === current)?.name ?? '…'}
         </h1>
         <div style={s('flex: 1;')} />
         <ScanBadge scan={scan} />
@@ -574,7 +574,7 @@ export function App() {
                   {!error && projects.length === 0 && (
                     <Welcome
                       onAjouterProjet={
-                        window.cockpit?.projects
+                        window.ovrsee?.projects
                           ? () => void openProject(applyProjects, setError)
                           : undefined
                       }
@@ -693,7 +693,7 @@ export function App() {
             updateSettings(next).catch(err => setError(String(err.message ?? err)))
           }}
           onAjouterProjet={
-            window.cockpit?.projects ? () => void openProject(applyProjects, setError) : undefined
+            window.ovrsee?.projects ? () => void openProject(applyProjects, setError) : undefined
           }
         />
       )}
@@ -901,7 +901,7 @@ function Sidebar({
   // Le sélecteur de dossier n'existe que dans l'application empaquetée. Dans un
   // navigateur, le bouton est absent plutôt que présent et inerte — même
   // franchise que pour le terminal.
-  const picker = window.cockpit?.projects
+  const picker = window.ovrsee?.projects
 
   return (
     <aside
@@ -951,7 +951,7 @@ function Sidebar({
       {/* Une seule porte vers la configuration. Les skills et la lecture de
           `~/.claude/` avaient chacun leur bouton et leur modale ; ils sont
           maintenant deux sections des préférences, parce que c'est la même
-          question — comment le cockpit est réglé. */}
+          question — comment l'ovrsee est réglé. */}
       <div style={s('padding: 0 14px 12px; display: flex; flex-direction: column; gap: 6px;')}>
         <button
           type="button"
@@ -1074,7 +1074,7 @@ function ProjectRow({
             title={
               vivant.equipped
                 ? 'Tickets qui ne sont pas dans la colonne finale du tableau'
-                : "Ce dossier n'a pas encore de cockpit/"
+                : "Ce dossier n'a pas encore de ovrsee/"
             }
             style={s(
               'font-size: 10px; padding: 1px 6px; border-radius: 999px; ' +

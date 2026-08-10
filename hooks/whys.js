@@ -17,7 +17,7 @@
  * import { spawn } from 'node-pty'
  * ```
  *
- * Limité aux imports JavaScript et TypeScript : c'est ce que le cockpit sait
+ * Limité aux imports JavaScript et TypeScript : c'est ce que l'ovrsee sait
  * lire aujourd'hui. Un projet Python affichera « aucune raison tracée », ce qui
  * est vrai, plutôt qu'une raison inventée.
  */

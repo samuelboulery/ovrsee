@@ -22,7 +22,7 @@ import test from 'node:test'
 const EXCEPTIONS = new Set([
   '#9184d9', // marque
   '#796cbf', // marque, tracé du graphe
-  '#ffffff', // fond du webview Chromium, qui n'est pas le cockpit
+  '#ffffff', // fond du webview Chromium, qui n'est pas l'ovrsee
   '#fff',
   '#000', // mask-image
 ])

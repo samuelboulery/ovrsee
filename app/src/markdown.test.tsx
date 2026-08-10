@@ -78,7 +78,7 @@ test('markdown : les titres portent une ancre, et le sommaire les retrouve', () 
     ],
   )
   // Préfixé : une ancre ne doit jamais pouvoir se nommer comme un global du
-  // navigateur — un `# Cockpit` posait `window.cockpit` sur son propre titre.
+  // navigateur — un `# Ovrsee` posait `window.ovrsee` sur son propre titre.
   assert.equal(plan[0].id, 'md-preferences')
 })
 
@@ -99,11 +99,11 @@ test('markdown : un bloc de code est coloré et porte un bouton copier', () => {
 })
 
 test('markdown : une ancre ne peut pas se nommer comme un global', () => {
-  // `# Cockpit` posait `id="cockpit"`, et `window.cockpit` désignait alors ce
+  // `# Ovrsee` posait `id="ovrsee"`, et `window.ovrsee` désignait alors ce
   // titre au lieu du pont Electron : le navigateur affichait des boutons morts.
-  const html = rendu('# Cockpit\n')
-  assert.match(html, /id="md-cockpit"/)
-  assert.ok(!/id="cockpit"/.test(html))
+  const html = rendu('# Ovrsee\n')
+  assert.match(html, /id="md-ovrsee"/)
+  assert.ok(!/id="ovrsee"/.test(html))
 })
 
 test('markdown : le texte non reconnu n’est jamais avalé', () => {

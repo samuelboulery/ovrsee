@@ -4,14 +4,14 @@ import { defineConfig } from 'vite'
 import { nodeMiddleware } from './server/api.js'
 
 /**
- * Sert les données du cockpit au dev server.
+ * Sert les données de l'ovrsee au dev server.
  *
- * Pas de backend : le cockpit lit des fichiers, il n'a rien à exécuter ni à
+ * Pas de backend : l'ovrsee lit des fichiers, il n'a rien à exécuter ni à
  * stocker. Les routes elles-mêmes vivent dans `server/api.js`, partagées avec
  * l'application Electron — deux implémentations divergeraient.
  */
-const cockpitData = () => ({
-  name: 'cockpit-data',
+const ovrseeData = () => ({
+  name: 'ovrsee-data',
   configureServer(server) {
     server.middlewares.use(nodeMiddleware())
   },
@@ -19,6 +19,6 @@ const cockpitData = () => ({
 
 export default defineConfig({
   root: 'app',
-  plugins: [react(), cockpitData()],
+  plugins: [react(), ovrseeData()],
   server: { port: 5180, strictPort: true },
 })

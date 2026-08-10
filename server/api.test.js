@@ -15,14 +15,14 @@ const url = path => new URL(path, 'http://localhost')
  *
  * L'inscription n'est pas décorative : le registre est la seule liste blanche
  * des routes, et un dossier qui n'y figure pas rend 404 même s'il porte un
- * `cockpit/` en bonne et due forme.
+ * `ovrsee/` en bonne et due forme.
  */
 const projectWithShot = () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
-  mkdirSync(join(dir, 'cockpit', 'pages', 'shots', 'accueil'), { recursive: true })
-  writeFileSync(join(dir, 'cockpit', 'pages', 'shots', 'accueil', '2026-08-08-abc.png'), 'png')
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
+  mkdirSync(join(dir, 'ovrsee', 'pages', 'shots', 'accueil'), { recursive: true })
+  writeFileSync(join(dir, 'ovrsee', 'pages', 'shots', 'accueil', '2026-08-08-abc.png'), 'png')
   writeFileSync(join(dir, 'secret.txt'), 'ne doit jamais sortir')
-  process.env.COCKPIT_REGISTRY = join(mkdtempSync(join(tmpdir(), 'cockpit-reg-')), 'projects.json')
+  process.env.OVRSEE_REGISTRY = join(mkdtempSync(join(tmpdir(), 'ovrsee-reg-')), 'projects.json')
   registerProject(dir)
   return dir
 }
@@ -156,13 +156,13 @@ test('mediaPath rend le type attendu pour chaque extension servie', () => {
 // Même précaution que dans hooks/plans.test.js : le registre réel est celui de
 // la machine, ces tests ne doivent pas y toucher.
 const withRegistry = () => {
-  process.env.COCKPIT_REGISTRY = join(mkdtempSync(join(tmpdir(), 'cockpit-reg-')), 'projects.json')
+  process.env.OVRSEE_REGISTRY = join(mkdtempSync(join(tmpdir(), 'ovrsee-reg-')), 'projects.json')
 }
 
-const post = (body, cwd = null, headers = { 'x-cockpit': '1' }) =>
+const post = (body, cwd = null, headers = { 'x-ovrsee': '1' }) =>
   resolve(url('/api/projects'), cwd, { method: 'POST', headers, body })
 
-test('POST /api/projects sans l’en-tête X-Cockpit est refusé', () => {
+test('POST /api/projects sans l’en-tête X-Ovrsee est refusé', () => {
   withRegistry()
   const result = post({ action: 'add', path: '/tmp' }, null, {})
 
@@ -229,7 +229,7 @@ test('POST init refuse un dossier qui n’est pas un dépôt git', () => {
 
 // --- /api/tickets ----------------------------------------------------------
 
-const postTicket = (body, headers = { 'x-cockpit': '1' }) =>
+const postTicket = (body, headers = { 'x-ovrsee': '1' }) =>
   resolve(url('/api/tickets'), null, { method: 'POST', headers, body })
 
 /** Un projet enregistré, prêt à recevoir des tickets. */
@@ -240,7 +240,7 @@ const projetEnregistre = () => {
   return dir
 }
 
-test('POST /api/tickets sans l’en-tête X-Cockpit est refusé', () => {
+test('POST /api/tickets sans l’en-tête X-Ovrsee est refusé', () => {
   const dir = projetEnregistre()
   assert.equal(postTicket({ action: 'create', path: dir, titre: 'X' }, {}).status, 403)
 })
@@ -320,34 +320,34 @@ test('/api/tickets reloge les tickets d’une colonne retirée', () => {
 
 // --- /api/skills -----------------------------------------------------------
 
-const postSkills = (body, headers = { 'x-cockpit': '1' }) =>
+const postSkills = (body, headers = { 'x-ovrsee': '1' }) =>
   resolve(url('/api/skills'), null, { method: 'POST', headers, body })
 
 test('GET /api/skills rend le catalogue', () => {
-  process.env.COCKPIT_SKILLS_DIR = mkdtempSync(join(tmpdir(), 'cockpit-skills-api-'))
+  process.env.OVRSEE_SKILLS_DIR = mkdtempSync(join(tmpdir(), 'ovrsee-skills-api-'))
   const result = resolve(url('/api/skills'))
 
   assert.ok(result && 'json' in result)
-  assert.ok(result.json.some(s => s.nom === 'cockpit-tickets'))
+  assert.ok(result.json.some(s => s.nom === 'ovrsee-tickets'))
   assert.equal(result.json.every(s => typeof s.installe === 'boolean'), true)
 })
 
-test('POST /api/skills sans l’en-tête X-Cockpit est refusé', () => {
-  assert.equal(postSkills({ noms: ['cockpit'] }, {}).status, 403)
+test('POST /api/skills sans l’en-tête X-Ovrsee est refusé', () => {
+  assert.equal(postSkills({ noms: ['ovrsee'] }, {}).status, 403)
 })
 
 test('POST /api/skills installe et rend le catalogue à jour', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-skills-api-'))
-  process.env.COCKPIT_SKILLS_DIR = dir
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-skills-api-'))
+  process.env.OVRSEE_SKILLS_DIR = dir
 
-  const result = postSkills({ noms: ['cockpit-tickets'] })
+  const result = postSkills({ noms: ['ovrsee-tickets'] })
 
   assert.match(result.json.done.join('\n'), /installé/)
-  assert.equal(result.json.skills.find(s => s.nom === 'cockpit-tickets').aJour, true)
+  assert.equal(result.json.skills.find(s => s.nom === 'ovrsee-tickets').aJour, true)
 })
 
 test('POST /api/skills ignore un nom hors catalogue sans rien écrire', () => {
-  process.env.COCKPIT_SKILLS_DIR = mkdtempSync(join(tmpdir(), 'cockpit-skills-api-'))
+  process.env.OVRSEE_SKILLS_DIR = mkdtempSync(join(tmpdir(), 'ovrsee-skills-api-'))
   const result = postSkills({ noms: ['../evasion'] })
 
   assert.match(result.json.done.join('\n'), /inconnu du catalogue/)
@@ -360,7 +360,7 @@ test('POST /api/projects export-obsidian écrit le coffre', () => {
   const result = post({ action: 'export-obsidian', path: dir })
 
   assert.ok(result.json.done.some(l => /index\.md écrit/.test(l)))
-  assert.ok(existsSync(join(dir, 'cockpit', 'obsidian', 'index.md')))
+  assert.ok(existsSync(join(dir, 'ovrsee', 'obsidian', 'index.md')))
 })
 
 test('POST /api/projects export-obsidian refuse un projet inconnu', () => {
@@ -370,8 +370,8 @@ test('POST /api/projects export-obsidian refuse un projet inconnu', () => {
 // --- préférences --------------------------------------------------------
 
 test('GET /api/settings sans projet rend le profil global', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
-  process.env.COCKPIT_SETTINGS = join(dir, 'settings.json')
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
+  process.env.OVRSEE_SETTINGS = join(dir, 'settings.json')
 
   const result = resolve(url('/api/settings'), dir)
 
@@ -380,28 +380,28 @@ test('GET /api/settings sans projet rend le profil global', () => {
   assert.equal(result.json.langue, 'fr')
   assert.equal(result.json.theme, 'auto')
 
-  delete process.env.COCKPIT_SETTINGS
+  delete process.env.OVRSEE_SETTINGS
 })
 
 test('GET /api/settings refuse un projet inconnu', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
-  process.env.COCKPIT_SETTINGS = join(dir, 'settings.json')
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
+  process.env.OVRSEE_SETTINGS = join(dir, 'settings.json')
 
   const result = resolve(url('/api/settings?path=%2Fetc'), dir)
 
   assert.equal(result.status, 404)
   assert.equal(result.json.error, 'inconnu')
 
-  delete process.env.COCKPIT_SETTINGS
+  delete process.env.OVRSEE_SETTINGS
 })
 
 test('GET /api/settings fusionne global + projet', () => {
   const dir = projectWithShot()
-  const settingsDir = mkdtempSync(join(tmpdir(), 'cockpit-'))
-  process.env.COCKPIT_SETTINGS = join(settingsDir, 'settings.json')
+  const settingsDir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
+  process.env.OVRSEE_SETTINGS = join(settingsDir, 'settings.json')
 
-  // Créer un cockpit.config.json du projet
-  writeFileSync(join(dir, 'cockpit.config.json'), JSON.stringify({ onglets: { actifs: ['apercu'] } }))
+  // Créer un ovrsee.config.json du projet
+  writeFileSync(join(dir, 'ovrsee.config.json'), JSON.stringify({ onglets: { actifs: ['apercu'] } }))
 
   const result = resolve(
     url(`/api/settings?path=${encodeURIComponent(dir)}`),
@@ -412,12 +412,12 @@ test('GET /api/settings fusionne global + projet', () => {
   assert.deepEqual(result.json.onglets.actifs, ['apercu'])
   assert.equal(result.json.langue, 'fr')
 
-  delete process.env.COCKPIT_SETTINGS
+  delete process.env.OVRSEE_SETTINGS
 })
 
-test('POST /api/settings vérifie X-Cockpit', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
-  process.env.COCKPIT_SETTINGS = join(dir, 'settings.json')
+test('POST /api/settings vérifie X-Ovrsee', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
+  process.env.OVRSEE_SETTINGS = join(dir, 'settings.json')
 
   const result = resolve(
     url('/api/settings'),
@@ -426,54 +426,54 @@ test('POST /api/settings vérifie X-Cockpit', () => {
   )
 
   assert.equal(result.status, 403)
-  assert.equal(result.json.error, 'en-tête X-Cockpit manquant')
+  assert.equal(result.json.error, 'en-tête X-Ovrsee manquant')
 
-  delete process.env.COCKPIT_SETTINGS
+  delete process.env.OVRSEE_SETTINGS
 })
 
 test('POST /api/settings valide et écrit', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
-  process.env.COCKPIT_SETTINGS = join(dir, 'settings.json')
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
+  process.env.OVRSEE_SETTINGS = join(dir, 'settings.json')
 
   const result = resolve(
     url('/api/settings'),
     dir,
-    { method: 'POST', headers: { 'x-cockpit': '1' }, body: { langue: 'en', theme: 'dark' } },
+    { method: 'POST', headers: { 'x-ovrsee': '1' }, body: { langue: 'en', theme: 'dark' } },
   )
 
   assert.ok(result && 'json' in result)
   assert.equal(result.json.langue, 'en')
   assert.equal(result.json.theme, 'dark')
 
-  delete process.env.COCKPIT_SETTINGS
+  delete process.env.OVRSEE_SETTINGS
 })
 
 test('POST /api/settings rejette les valeurs invalides', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
-  process.env.COCKPIT_SETTINGS = join(dir, 'settings.json')
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
+  process.env.OVRSEE_SETTINGS = join(dir, 'settings.json')
 
   const result = resolve(
     url('/api/settings'),
     dir,
-    { method: 'POST', headers: { 'x-cockpit': '1' }, body: { langue: 'de', theme: 42 } },
+    { method: 'POST', headers: { 'x-ovrsee': '1' }, body: { langue: 'de', theme: 42 } },
   )
 
   assert.ok(result && 'json' in result)
   assert.equal(result.json.langue, 'fr')
   assert.equal(result.json.theme, 'auto')
 
-  delete process.env.COCKPIT_SETTINGS
+  delete process.env.OVRSEE_SETTINGS
 })
 
 test('POST /api/settings partiel préserve les champs non transmis', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
-  process.env.COCKPIT_SETTINGS = join(dir, 'settings.json')
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
+  process.env.OVRSEE_SETTINGS = join(dir, 'settings.json')
 
   // Écrire d'abord un état avec langue en anglais
   let result = resolve(
     url('/api/settings'),
     dir,
-    { method: 'POST', headers: { 'x-cockpit': '1' }, body: { langue: 'en' } },
+    { method: 'POST', headers: { 'x-ovrsee': '1' }, body: { langue: 'en' } },
   )
   assert.equal(result.json.langue, 'en')
 
@@ -481,7 +481,7 @@ test('POST /api/settings partiel préserve les champs non transmis', () => {
   result = resolve(
     url('/api/settings'),
     dir,
-    { method: 'POST', headers: { 'x-cockpit': '1' }, body: { theme: 'dark' } },
+    { method: 'POST', headers: { 'x-ovrsee': '1' }, body: { theme: 'dark' } },
   )
 
   // Vérifier que langue n'a pas changé, que theme a changé, onglets intacts
@@ -489,7 +489,7 @@ test('POST /api/settings partiel préserve les champs non transmis', () => {
   assert.equal(result.json.theme, 'dark')
   assert.deepEqual(result.json.onglets.actifs, ['apercu', 'navigateur', 'produit', 'historique', 'tableau', 'donnees', 'stack'])
 
-  delete process.env.COCKPIT_SETTINGS
+  delete process.env.OVRSEE_SETTINGS
 })
 
 // --- /api/config-claude ---------------------------------------------------
@@ -497,8 +497,8 @@ test('POST /api/settings partiel préserve les champs non transmis', () => {
 const configClaudeUrl = (path = '') => url(`/api/config-claude${path}`)
 
 test('GET /api/config-claude rend la configuration', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-config-'))
-  process.env.COCKPIT_CONFIG_CLAUDE_DIR = dir
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-config-'))
+  process.env.OVRSEE_CONFIG_CLAUDE_DIR = dir
 
   const result = resolve(configClaudeUrl())
 
@@ -509,7 +509,7 @@ test('GET /api/config-claude rend la configuration', () => {
   assert.ok('hooks' in result.json)
   assert.ok('env' in result.json)
 
-  delete process.env.COCKPIT_CONFIG_CLAUDE_DIR
+  delete process.env.OVRSEE_CONFIG_CLAUDE_DIR
 })
 
 test('POST /api/config-claude est refusé', () => {
@@ -519,8 +519,8 @@ test('POST /api/config-claude est refusé', () => {
 })
 
 test('GET /api/config-claude masque les valeurs secrètes', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-config-secret-'))
-  process.env.COCKPIT_CONFIG_CLAUDE_DIR = dir
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-config-secret-'))
+  process.env.OVRSEE_CONFIG_CLAUDE_DIR = dir
 
   // Créer un settings.json avec des secrets
   const settingsPath = join(dir, 'settings.json')
@@ -547,12 +547,12 @@ test('GET /api/config-claude masque les valeurs secrètes', () => {
   assert.ok('API_KEY' in result.json.env)
   assert.ok('DATABASE_URL' in result.json.env)
 
-  delete process.env.COCKPIT_CONFIG_CLAUDE_DIR
+  delete process.env.OVRSEE_CONFIG_CLAUDE_DIR
 })
 
 test('GET /api/config-claude retourne une réponse sans secrets', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-config-secret2-'))
-  process.env.COCKPIT_CONFIG_CLAUDE_DIR = dir
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-config-secret2-'))
+  process.env.OVRSEE_CONFIG_CLAUDE_DIR = dir
 
   // Créer agents avec des secrets dans le frontmatter
   mkdirSync(join(dir, 'agents'), { recursive: true })
@@ -577,17 +577,17 @@ Agent body
   assert.ok(responseStr.includes('secret_api_key'))
   assert.ok(responseStr.includes('****'))
 
-  delete process.env.COCKPIT_CONFIG_CLAUDE_DIR
+  delete process.env.OVRSEE_CONFIG_CLAUDE_DIR
 })
 
 test("POST /api/projects action='state' rend l'état d'un dossier non équipé", () => {
   withRegistry()
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-unequipped-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-unequipped-'))
   post({ action: 'add', path: dir })
   
   const result = post({ action: 'state', path: dir })
   assert.ok(result && result.json, 'state rend une réponse')
-  assert.equal(result.json.equipped, false, 'dossier sans cockpit/ n\'est pas équipé')
+  assert.equal(result.json.equipped, false, 'dossier sans ovrsee/ n\'est pas équipé')
 })
 
 test("POST /api/projects action='state' refuse un projet hors registre", () => {
@@ -599,7 +599,7 @@ test("POST /api/projects action='state' refuse un projet hors registre", () => {
 
 test("POST /api/projects action='state' propose une config de crawl pré-remplie", () => {
   withRegistry()
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-defaults-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-defaults-'))
   writeFileSync(
     join(dir, 'package.json'),
     JSON.stringify({ scripts: { dev: 'vite --port 4321' } }),
@@ -614,7 +614,7 @@ test("POST /api/projects action='state' propose une config de crawl pré-remplie
 
 test("POST /api/projects action='state' retombe sur 5173 sans package.json", () => {
   withRegistry()
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-defaults-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-defaults-'))
   post({ action: 'add', path: dir })
 
   assert.equal(post({ action: 'state', path: dir }).json.defaults.baseUrl, 'http://localhost:5173')
@@ -627,7 +627,7 @@ test("POST /api/projects action='state' retombe sur 5173 sans package.json", () 
 
 const initAvecConfig = config => {
   withRegistry()
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-init-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-init-'))
   post({ action: 'add', path: dir })
   return post({ action: 'init', path: dir, config })
 }

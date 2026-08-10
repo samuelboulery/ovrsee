@@ -1,7 +1,7 @@
 /**
  * Tests pour config-claude.js
  *
- * Utilise COCKPIT_CONFIG_CLAUDE_DIR pour isoler les tests du ~/.claude/ réel.
+ * Utilise OVRSEE_CONFIG_CLAUDE_DIR pour isoler les tests du ~/.claude/ réel.
  */
 
 import assert from 'node:assert/strict'
@@ -13,13 +13,13 @@ import { tmpdir } from 'node:os'
 import { readAgents, readCommands, readPlugins, readHooks, readEnv, readConfigClaude } from './config-claude.js'
 
 const setupTestDir = () => {
-  const testDir = mkdtempSync(join(tmpdir(), 'cockpit-config-test-'))
-  process.env.COCKPIT_CONFIG_CLAUDE_DIR = testDir
+  const testDir = mkdtempSync(join(tmpdir(), 'ovrsee-config-test-'))
+  process.env.OVRSEE_CONFIG_CLAUDE_DIR = testDir
   return testDir
 }
 
 const cleanup = (dir) => {
-  delete process.env.COCKPIT_CONFIG_CLAUDE_DIR
+  delete process.env.OVRSEE_CONFIG_CLAUDE_DIR
   try {
     rmSync(dir, { recursive: true, force: true })
   } catch {

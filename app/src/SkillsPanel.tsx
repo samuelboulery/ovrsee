@@ -6,11 +6,11 @@ import { t } from './i18n'
 
 /**
  * Un skill installé ne sert à rien s'il ne l'est pas au bon endroit : Claude
- * Code ne lit que `~/.claude/skills/`. Le cockpit connaît ce chemin, l'utilisateur
+ * Code ne lit que `~/.claude/skills/`. L'ovrsee connaît ce chemin, l'utilisateur
  * n'a pas à le connaître.
  *
  * Un skill est à proposer quand il est absent, ou quand la version livrée avec
- * cette copie du cockpit a changé depuis l'installation. Un skill à jour ne
+ * cette copie de l'ovrsee a changé depuis l'installation. Un skill à jour ne
  * porte pas de case : il n'y a rien à décider.
  */
 const aProposer = (skill: SkillEntry): boolean => skill.source === 'bundled' && !skill.aJour
@@ -90,7 +90,7 @@ export function SkillsList({
               {skill.resume}
             </div>
 
-            {/* Le cockpit n'exécute pas l'installateur de quelqu'un d'autre : la
+            {/* L'ovrsee n'exécute pas l'installateur de quelqu'un d'autre : la
                 commande est là pour être copiée, pas pour être lancée d'ici. */}
             {skill.source === 'externe' && !skill.installe && skill.commande && (
               <div style={s('font-size: 11px; color: var(--color-neutral-600); margin-top: 5px;')}>

@@ -4,15 +4,15 @@
  * tourné — session sans hook installé, plan approuvé hors dépôt, machine
  * d'appoint.
  *
- *   node hooks/cockpit-cli.js status
- *   node hooks/cockpit-cli.js close
- *   node hooks/cockpit-cli.js capture <fichier-de-plan.md>
- *   node hooks/cockpit-cli.js tickets
- *   node hooks/cockpit-cli.js ticket new "<titre>" [--colonne pret] [--epic]
- *   node hooks/cockpit-cli.js ticket move <fichier.md> <colonne>
- *   node hooks/cockpit-cli.js ticket link <fichier.md> --epic <T-XXXX>
- *   node hooks/cockpit-cli.js ticket unlink <fichier.md>
- *   node hooks/cockpit-cli.js ticket import-plans
+ *   node hooks/ovrsee-cli.js status
+ *   node hooks/ovrsee-cli.js close
+ *   node hooks/ovrsee-cli.js capture <fichier-de-plan.md>
+ *   node hooks/ovrsee-cli.js tickets
+ *   node hooks/ovrsee-cli.js ticket new "<titre>" [--colonne pret] [--epic]
+ *   node hooks/ovrsee-cli.js ticket move <fichier.md> <colonne>
+ *   node hooks/ovrsee-cli.js ticket link <fichier.md> --epic <T-XXXX>
+ *   node hooks/ovrsee-cli.js ticket unlink <fichier.md>
+ *   node hooks/ovrsee-cli.js ticket import-plans
  *
  * Contrairement aux hooks, cet outil est invoqué explicitement : il a le droit
  * d'échouer bruyamment.
@@ -47,11 +47,11 @@ import {
 } from './tickets.js'
 
 const root = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
-const cockpitDir = join(root, 'cockpit')
+const ovrseeDir = join(root, 'ovrsee')
 
 const commands = {
   status() {
-    const plans = readPlans(cockpitDir)
+    const plans = readPlans(ovrseeDir)
     const open = plansOuverts(plans)
     const closed = history(plans)
 
@@ -64,14 +64,14 @@ const commands = {
       console.log(`  clos    ${p.meta.closed}  ${p.meta.title}`)
     }
 
-    const pointer = join(cockpitDir, '.active-plan')
+    const pointer = join(ovrseeDir, '.active-plan')
     console.log(
       existsSync(pointer) ? `actif : ${readFileSync(pointer, 'utf8').trim()}` : 'aucun plan actif',
     )
 
     // Afficher les épics avec leurs enfants
-    const colonnes = readBoard(cockpitDir)
-    const tickets = sortTickets(readTickets(cockpitDir, colonnes))
+    const colonnes = readBoard(ovrseeDir)
+    const tickets = sortTickets(readTickets(ovrseeDir, colonnes))
     const epics = tickets.filter(t => t.meta?.type === 'epic')
 
     if (epics.length > 0) {
@@ -87,7 +87,7 @@ const commands = {
   },
 
   close() {
-    const closed = closeOpenPlans(cockpitDir, console.error)
+    const closed = closeOpenPlans(ovrseeDir, console.error)
     if (closed.length === 0) {
       console.log('aucun plan ouvert portant un commit — rien à clore')
       return
@@ -96,10 +96,10 @@ const commands = {
   },
 
   capture(path) {
-    if (!path) throw new Error('usage : cockpit-cli.js capture <fichier-de-plan.md>')
+    if (!path) throw new Error('usage : ovrsee-cli.js capture <fichier-de-plan.md>')
 
     // Même règle que le hook automatique : ouvrir un plan ferme le précédent.
-    for (const file of closeOpenPlans(cockpitDir, console.error)) {
+    for (const file of closeOpenPlans(ovrseeDir, console.error)) {
       console.log(`clos : ${file}`)
     }
 
@@ -115,16 +115,16 @@ const commands = {
       closed: null,
       commits: [],
     }
-    writeFileNoFollow(join(cockpitDir, 'plans', file), serializePlan(meta, text))
-    writeFileNoFollow(join(cockpitDir, '.active-plan'), file + '\n')
+    writeFileNoFollow(join(ovrseeDir, 'plans', file), serializePlan(meta, text))
+    writeFileNoFollow(join(ovrseeDir, '.active-plan'), file + '\n')
     if (registerProject(root)) console.log(`projet enregistré : ${root}`)
-    console.log(`capturé : cockpit/plans/${file}`)
+    console.log(`capturé : ovrsee/plans/${file}`)
   },
 
   /** Le tableau, colonne par colonne. */
   tickets() {
-    const colonnes = readBoard(cockpitDir)
-    const tickets = sortTickets(readTickets(cockpitDir, colonnes))
+    const colonnes = readBoard(ovrseeDir)
+    const tickets = sortTickets(readTickets(ovrseeDir, colonnes))
 
     for (const colonne of colonnes) {
       const dedans = tickets.filter(t => t.meta.colonne === colonne.id)
@@ -160,7 +160,7 @@ const commands = {
     switch (sub) {
       case 'new': {
         if (!args[0]) throw new Error('usage : ticket new "<titre>" [--colonne x] [--priorite haute] [--epic]')
-        const { file, meta } = createTicket(cockpitDir, {
+        const { file, meta } = createTicket(ovrseeDir, {
           titre: args[0],
           colonne: flags.colonne,
           priorite: flags.priorite,
@@ -168,20 +168,20 @@ const commands = {
           type: flags.epic ? 'epic' : undefined,
         })
         const typeLabel = flags.epic ? ' (epic)' : ''
-        console.log(`créé : ${meta.id} en ${meta.colonne}${typeLabel} — cockpit/tickets/${file}`)
+        console.log(`créé : ${meta.id} en ${meta.colonne}${typeLabel} — ovrsee/tickets/${file}`)
         return
       }
 
       case 'move': {
         if (!args[0] || !args[1]) throw new Error('usage : ticket move <fichier.md> <colonne>')
-        if (!moveTicket(cockpitDir, args[0], args[1])) throw new Error(`ticket introuvable : ${args[0]}`)
+        if (!moveTicket(ovrseeDir, args[0], args[1])) throw new Error(`ticket introuvable : ${args[0]}`)
         console.log(`déplacé : ${args[0]} → ${args[1]}`)
         return
       }
 
       case 'link': {
         if (!args[0] || !flags.epic) throw new Error('usage : ticket link <fichier.md> --epic <T-XXXX>')
-        if (!updateTicket(cockpitDir, args[0], { epic: flags.epic })) {
+        if (!updateTicket(ovrseeDir, args[0], { epic: flags.epic })) {
           throw new Error(`ticket introuvable : ${args[0]}`)
         }
         console.log(`rattaché : ${args[0]} → epic ${flags.epic}`)
@@ -190,7 +190,7 @@ const commands = {
 
       case 'unlink': {
         if (!args[0]) throw new Error('usage : ticket unlink <fichier.md>')
-        if (!updateTicket(cockpitDir, args[0], { epic: null })) {
+        if (!updateTicket(ovrseeDir, args[0], { epic: null })) {
           throw new Error(`ticket introuvable : ${args[0]}`)
         }
         console.log(`détaché : ${args[0]}`)
@@ -198,7 +198,7 @@ const commands = {
       }
 
       case 'import-plans': {
-        const cree = importOpenPlans(cockpitDir)
+        const cree = importOpenPlans(ovrseeDir)
         if (cree.length === 0) {
           console.log('aucun plan ouvert à reprendre — rien à faire')
           return
@@ -215,7 +215,7 @@ const commands = {
   /**
    * Écrit le coffre Obsidian du projet.
    *
-   *   cockpit-cli.js obsidian [--dir <chemin>]
+   *   ovrsee-cli.js obsidian [--dir <chemin>]
    *
    * Même implémentation que le bouton de l'interface : une seconde finirait par
    * diverger de celle-ci.

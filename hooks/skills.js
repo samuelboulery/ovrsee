@@ -1,14 +1,14 @@
 /**
- * Le catalogue des skills Claude Code que le cockpit sait proposer.
+ * Le catalogue des skills Claude Code que l'ovrsee sait proposer.
  *
  * Un skill est un fichier `SKILL.md` dans `~/.claude/skills/<nom>/`. Claude Code
  * le lit à la demande : tant qu'il n'est pas là, un projet équipé reste un
- * dossier `cockpit/` que personne ne sait remplir.
+ * dossier `ovrsee/` que personne ne sait remplir.
  *
  * Deux natures d'entrées, et la distinction n'est pas cosmétique :
  *
  * - `bundled` — le fichier est dans ce dépôt, sous `skills/<nom>/SKILL.md`. Le
- *   cockpit l'écrit lui-même : rien à télécharger, rien à exécuter.
+ *   ovrsee l'écrit lui-même : rien à télécharger, rien à exécuter.
  * - `externe` — le skill appartient à quelqu'un d'autre (Graphify). On **détecte
  *   sa présence, on ne l'installe jamais**. Installer un paquet tiers depuis une
  *   interface graphique, c'est lancer du code arbitraire à la place de
@@ -16,7 +16,7 @@
  *   la lance s'il le veut.
  *
  * Le catalogue est une constante et non un registre distant : il n'y a pas de
- * mise à jour hors d'une mise à jour du cockpit, donc pas de réseau à gérer, et
+ * mise à jour hors d'une mise à jour de l'ovrsee, donc pas de réseau à gérer, et
  * surtout la liste des noms écrivables est fixée à la compilation.
  */
 
@@ -32,24 +32,24 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 /**
  * Où les skills s'installent.
  *
- * `COCKPIT_SKILLS_DIR` existe pour les tests, comme `COCKPIT_REGISTRY` pour le
+ * `OVRSEE_SKILLS_DIR` existe pour les tests, comme `OVRSEE_REGISTRY` pour le
  * registre : un test qui écrit dans les skills de la machine casserait l'outil
  * qu'il vérifie.
  */
 export const skillsDir = () =>
-  process.env.COCKPIT_SKILLS_DIR ?? join(homedir(), '.claude', 'skills')
+  process.env.OVRSEE_SKILLS_DIR ?? join(homedir(), '.claude', 'skills')
 
 export const CATALOGUE = [
   {
-    nom: 'cockpit',
+    nom: 'ovrsee',
     source: 'bundled',
-    titre: 'Cockpit — lire le projet',
+    titre: 'Ovrsee — lire le projet',
     resume: "Plans, pages, scans : ce qu'il faut lire, et dans quel ordre, sans ouvrir le code.",
   },
   {
-    nom: 'cockpit-tickets',
+    nom: 'ovrsee-tickets',
     source: 'bundled',
-    titre: 'Cockpit — ticketing',
+    titre: 'Ovrsee — ticketing',
     resume: 'Créer et déplacer les tickets du Tableau depuis la conversation.',
   },
   {
@@ -95,7 +95,7 @@ const lire = path => {
  *
  * `aJour` ne vaut que pour les skills livrés : c'est la comparaison au fichier
  * du dépôt, et c'est elle qui permet de proposer une réinstallation après une
- * mise à jour du cockpit. Un skill externe n'a pas de version de référence — on
+ * mise à jour de l'ovrsee. Un skill externe n'a pas de version de référence — on
  * sait seulement s'il est là.
  *
  * @returns {Array<{nom: string, source: string, titre: string, resume: string,
@@ -146,7 +146,7 @@ export function installSkills(noms) {
 
     const contenu = lire(bundledPath(nom))
     if (contenu === null) {
-      done.push(`${nom} : introuvable dans cette version du cockpit — ignoré.`)
+      done.push(`${nom} : introuvable dans cette version de l'ovrsee — ignoré.`)
       continue
     }
 

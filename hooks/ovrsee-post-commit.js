@@ -27,7 +27,7 @@ const git = (args, cwd) =>
  * garder ferait apparaître tous les plans comme touchant toutes les pages, et
  * la relation plan → fichiers → page ne voudrait plus rien dire.
  */
-const DERIVED = ['cockpit/', 'graphify-out/']
+const DERIVED = ['ovrsee/', 'graphify-out/']
 
 /** Fichiers sources du dernier commit. */
 function changedFiles(root) {
@@ -43,7 +43,7 @@ function changedFiles(root) {
 /**
  * Ce commit vaut-il un crawl ?
  *
- * `changedFiles()` a déjà retiré `cockpit/` et `graphify-out/` : une liste vide
+ * `changedFiles()` a déjà retiré `ovrsee/` et `graphify-out/` : une liste vide
  * veut donc dire « ce commit n'a touché que des sorties ». Photographier une
  * application qui n'a pas bougé produit une fournée de captures, laquelle
  * demande un commit, lequel relance un crawl — l'arbre de travail ne redevient
@@ -58,8 +58,8 @@ function changedFiles(root) {
  */
 export const crawlUtile = sources => Array.isArray(sources) && sources.length > 0
 
-function attachCommit(cockpitDir, root, sources) {
-  const pointer = join(cockpitDir, '.active-plan')
+function attachCommit(ovrseeDir, root, sources) {
+  const pointer = join(ovrseeDir, '.active-plan')
   if (!existsSync(pointer)) return null
 
   // Le pointeur est écrit par nous et ne contient qu'un nom de fichier, mais
@@ -77,7 +77,7 @@ function attachCommit(cockpitDir, root, sources) {
   // La règle — plan clos, sha déjà là — vit dans plans.js : elle décide de ce
   // que l'historique raconte, et enfouie ici elle ne se vérifierait qu'en
   // committant pour de vrai.
-  return attachCommitToPlan(cockpitDir, file, commit) ? file : null
+  return attachCommitToPlan(ovrseeDir, file, commit) ? file : null
 }
 
 /**
@@ -86,7 +86,7 @@ function attachCommit(cockpitDir, root, sources) {
  */
 function spawnCrawl(root) {
   const crawler = join(HERE, '..', 'crawl', 'index.js')
-  if (!existsSync(crawler) || !existsSync(join(root, 'cockpit.config.json'))) return
+  if (!existsSync(crawler) || !existsSync(join(root, 'ovrsee.config.json'))) return
 
   const child = spawn(process.execPath, [crawler], {
     cwd: root,
@@ -105,16 +105,16 @@ function spawnCrawl(root) {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const root = git(['rev-parse', '--show-toplevel'], process.cwd())
-    const cockpitDir = join(root, 'cockpit')
+    const ovrseeDir = join(root, 'ovrsee')
 
-    if (existsSync(cockpitDir)) {
+    if (existsSync(ovrseeDir)) {
       const sources = changedFiles(root)
-      const file = attachCommit(cockpitDir, root, sources)
-      if (file) process.stdout.write(`[cockpit] commit rattaché à ${file}\n`)
+      const file = attachCommit(ovrseeDir, root, sources)
+      if (file) process.stdout.write(`[ovrsee] commit rattaché à ${file}\n`)
       if (crawlUtile(sources)) spawnCrawl(root)
     }
   } catch (err) {
-    process.stderr.write(`[cockpit] post-commit ignoré : ${err?.message ?? err}\n`)
+    process.stderr.write(`[ovrsee] post-commit ignoré : ${err?.message ?? err}\n`)
   }
   process.exit(0)
 }

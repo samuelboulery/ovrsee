@@ -28,7 +28,7 @@ import { s } from '../style'
  * avant le dépôt.
  */
 const TYPE_CARTE = 'text/plain'
-const TYPE_COLONNE = 'application/x-cockpit-colonne'
+const TYPE_COLONNE = 'application/x-ovrsee-colonne'
 
 const estColonne = (transfert: DataTransfer) => transfert.types.includes(TYPE_COLONNE)
 
@@ -38,10 +38,10 @@ type Insertion = { index: number; apres: boolean }
 /**
  * Le tableau du projet : des tickets qu'on saisit, priorise et déplace.
  *
- * C'est la seule vue du cockpit qui écrit. Tout le reste est capturé par un
+ * C'est la seule vue de l'ovrsee qui écrit. Tout le reste est capturé par un
  * hook et se lit ; un tableau, lui, n'a de sens que si on peut y poser une
  * intention avant qu'elle devienne un plan. Les fichiers écrits ici sont ceux
- * que Claude lit et écrit aussi — `cockpit/tickets/`.
+ * que Claude lit et écrit aussi — `ovrsee/tickets/`.
  *
  * Le glisser-déposer est celui du navigateur, sans bibliothèque : déplacer une
  * carte d'une colonne à l'autre est exactement ce que l'API HTML5 fait déjà.
@@ -880,7 +880,7 @@ function Detail({
 
       <div style={s('font-size: 10.5px; color: var(--color-neutral-600); margin-top: 10px; line-height: 1.6;')}>
         <div>{t('tableau.created')} {humanAge(ticket.cree)} · {t('tableau.modified')} {humanAge(ticket.maj)}</div>
-        <div>cockpit/tickets/{ticket.file}</div>
+        <div>ovrsee/tickets/{ticket.file}</div>
         {ticket.plan && <div>{t('tableau.linked_plan')} {ticket.plan}</div>}
       </div>
 

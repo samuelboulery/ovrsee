@@ -2,7 +2,7 @@
  * Chargement et dérivations pour l'interface.
  *
  * Remplace le `renderVals()` de la maquette : mêmes formes de données, mais
- * lues depuis `cockpit/` au lieu d'être écrites en dur. Ce qui se calculait
+ * lues depuis `ovrsee/` au lieu d'être écrites en dur. Ce qui se calculait
  * dans la maquette se calcule toujours ici — backlog, historique et densité ne
  * sont stockés nulle part.
  */
@@ -196,9 +196,9 @@ export interface Colonne {
 }
 
 /**
- * La seule donnée du cockpit qui se saisit.
+ * La seule donnée de l'ovrsee qui se saisit.
  *
- * Un fichier par ticket dans `cockpit/tickets/`, écrit aussi bien par cette
+ * Un fichier par ticket dans `ovrsee/tickets/`, écrit aussi bien par cette
  * interface que par Claude — d'où les noms de champs en français, qui sont
  * ceux du frontmatter sur le disque.
  */
@@ -221,12 +221,12 @@ export interface Ticket {
 }
 
 /**
- * `cockpit.config.json` — le contrat du crawl, à la racine du dépôt.
+ * `ovrsee.config.json` — le contrat du crawl, à la racine du dépôt.
  *
  * Seuls les champs que l'interface lit sont déclarés : le crawler en connaît
  * d'autres, et les recopier ici en ferait une deuxième définition à tenir.
  */
-export interface CockpitConfig {
+export interface OvrseeConfig {
   /** Commande qui démarre l'application. Affichée, jamais exécutée. */
   dev?: string
   /** Où l'application s'affiche une fois démarrée. */
@@ -239,7 +239,7 @@ export interface CockpitConfig {
 }
 
 /**
- * Préférences globales du cockpit.
+ * Préférences globales de l'ovrsee.
  *
  * Les défauts sont définis dans `hooks/settings.js`, jamais ici — une valeur
  * par défaut en deux endroits divergerait. Ce type décrit uniquement la forme.
@@ -269,12 +269,12 @@ export interface Snapshot {
   root: string
   board: Colonne[]
   tickets: Ticket[]
-  /** Le dossier `cockpit/` existe-t-il ? Lu sur le disque, pas déduit. */
+  /** Le dossier `ovrsee/` existe-t-il ? Lu sur le disque, pas déduit. */
   equipped: boolean
   plans: Plan[]
   packageJson: PackageJson | null
-  /** `cockpit.config.json` du dépôt — celui que lit déjà le crawler. */
-  config: CockpitConfig | null
+  /** `ovrsee.config.json` du dépôt — celui que lit déjà le crawler. */
+  config: OvrseeConfig | null
   /** `README.md` du dépôt, tel quel. Absent = le dépôt n'en a pas. */
   readme: string | null
   pages: {
@@ -323,7 +323,7 @@ export interface Snapshot {
    */
   whys?: Record<string, string>
   /**
-   * Les fichiers de `cockpit/` que la lecture n'a pas su ouvrir.
+   * Les fichiers de `ovrsee/` que la lecture n'a pas su ouvrir.
    *
    * Un fichier absent et un fichier illisible produisent le même écran vide, et
    * seul le second demande une intervention. Les taire faisait passer un
@@ -332,9 +332,9 @@ export interface Snapshot {
   illisibles?: Illisible[]
 }
 
-/** Un fichier de `cockpit/` présent sur le disque mais que le cockpit ne sait pas lire. */
+/** Un fichier de `ovrsee/` présent sur le disque mais que l'ovrsee ne sait pas lire. */
 export interface Illisible {
-  /** Chemin relatif à `cockpit/`, par exemple `tickets/T-0004-x.md`. */
+  /** Chemin relatif à `ovrsee/`, par exemple `tickets/T-0004-x.md`. */
   file: string
   /** `plan`, `ticket` ou `scan`. */
   quoi: string
@@ -509,7 +509,7 @@ export type ProjectAction = 'add' | 'remove' | 'touch' | 'init' | 'export-obsidi
  * `init`. Les autres n'en ont pas besoin, d'où le paramètre optionnel plutôt
  * qu'une seconde fonction par action.
  *
- * `X-Cockpit` n'est pas une authentification : c'est ce qui empêche une page
+ * `X-Ovrsee` n'est pas une authentification : c'est ce qui empêche une page
  * quelconque ouverte dans le navigateur de poster vers le dev server local.
  */
 export async function projectAction(
@@ -519,7 +519,7 @@ export async function projectAction(
 ): Promise<{ projects: Project[]; done?: string[] }> {
   const response = await fetch('/api/projects', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
     body: JSON.stringify({ ...payload, action, path }),
   })
 
@@ -534,14 +534,14 @@ export interface FolderState {
   hasConfig: boolean
   equipped: boolean
   hasPackageJson: boolean
-  /** Ce que le serveur propose de mettre dans `cockpit.config.json`. */
+  /** Ce que le serveur propose de mettre dans `ovrsee.config.json`. */
   defaults: { dev: string; baseUrl: string }
 }
 
 export async function getFolderState(path: string): Promise<FolderState> {
   const response = await fetch('/api/projects', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
     body: JSON.stringify({ action: 'state', path }),
   })
 
@@ -553,8 +553,8 @@ export async function getFolderState(path: string): Promise<FolderState> {
 /**
  * Un skill Claude Code du catalogue, tel que le serveur le rend.
  *
- * `bundled` : livré avec le cockpit, donc installable d'un clic. `externe` :
- * détecté seulement — le cockpit n'exécute pas l'installateur de quelqu'un
+ * `bundled` : livré avec l'ovrsee, donc installable d'un clic. `externe` :
+ * détecté seulement — l'ovrsee n'exécute pas l'installateur de quelqu'un
  * d'autre à la place de l'utilisateur.
  */
 export interface SkillEntry {
@@ -575,7 +575,7 @@ export async function installSkills(
 ): Promise<{ done: string[]; skills: SkillEntry[] }> {
   const response = await fetch('/api/skills', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
     body: JSON.stringify({ noms }),
   })
 
@@ -613,7 +613,7 @@ export async function ticketAction(
 ): Promise<Tableau> {
   const response = await fetch('/api/tickets', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
     body: JSON.stringify({ ...payload, action, path }),
   })
 
@@ -622,7 +622,7 @@ export async function ticketAction(
   return result
 }
 
-/** Un projet sans dossier `cockpit/` : rien à lire, donc rien à montrer. */
+/** Un projet sans dossier `ovrsee/` : rien à lire, donc rien à montrer. */
 export const isUnequipped = (snapshot: Snapshot): boolean => !snapshot.equipped
 
 /**
@@ -642,7 +642,7 @@ export const shotUrl = (root: string, file: string) =>
 /**
  * Une image ou une vidéo du dépôt, citée par un README.
  *
- * Chemin relatif à la racine, pas à `cockpit/` — c'est toute la différence avec
+ * Chemin relatif à la racine, pas à `ovrsee/` — c'est toute la différence avec
  * `shotUrl`, et la raison pour laquelle le serveur n'accepte ici qu'une liste
  * blanche d'extensions.
  */
@@ -650,7 +650,7 @@ export const mediaUrl = (root: string, file: string) =>
   `/api/media?path=${encodeURIComponent(root)}&file=${encodeURIComponent(file)}`
 
 /**
- * Préférences du cockpit : globales si pas de projet, fusionnées si projet.
+ * Préférences de l'ovrsee : globales si pas de projet, fusionnées si projet.
  *
  * Les champs `langue`, `theme`, `densiteActivite` ne se surchargent jamais
  * par le projet — c'est une préférence personnelle.
@@ -670,7 +670,7 @@ export const fetchSettings = (projectPath?: string): Promise<SettingsType> =>
 export async function updateSettings(settings: Partial<SettingsType>): Promise<SettingsType> {
   const response = await fetch('/api/settings', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Cockpit': '1' },
+    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
     body: JSON.stringify(settings),
   })
 
@@ -685,9 +685,9 @@ export async function updateSettings(settings: Partial<SettingsType>): Promise<S
  * Utilisé par B3 pour construire les lignes d'injection dans le terminal.
  * Le gestionnaire doit être fourni explicitement pour éviter les défauts trompeurs.
  *
- * @param {string} script nom du script npm (ex. 'cockpit:crawl')
+ * @param {string} script nom du script npm (ex. 'ovrsee:crawl')
  * @param {string} packageManager gestionnaire de paquets ('pnpm', 'npm', 'yarn', 'bun')
- * @returns {string} commande complète (ex. 'pnpm cockpit:crawl' ou 'npm run cockpit:crawl')
+ * @returns {string} commande complète (ex. 'pnpm ovrsee:crawl' ou 'npm run ovrsee:crawl')
  */
 export function composerCommande(script: string, packageManager: string): string {
   const isNpm = packageManager === 'npm'
@@ -933,7 +933,7 @@ const isSchemaNode = (node: GraphNode): boolean =>
   /sql|table|model/i.test(String(node.file_type ?? ''))
 
 /**
- * Tables lues depuis Graphify. Le cockpit ne recalcule rien : il reprend les
+ * Tables lues depuis Graphify. L'ovrsee ne recalcule rien : il reprend les
  * nœuds de schéma et l'étiquette de confiance des liens qui y mènent.
  *
  * Un projet sans SQL rend une liste vide — ce n'est pas une panne, c'est
@@ -1048,7 +1048,7 @@ export interface ConfigClaude {
 export const fetchConfigClaude = () => json<ConfigClaude>('/api/config-claude')
 
 /**
- * Ce que le cockpit sait dire du projet, sans lire une ligne de code.
+ * Ce que l'ovrsee sait dire du projet, sans lire une ligne de code.
  *
  * Vit ici et pas dans le panneau terminal : c'est une lecture d'instantané, pas
  * du rendu. Le panneau, lui, importe xterm et sa feuille de style — l'y laisser
@@ -1143,8 +1143,8 @@ export function buildInjections(snapshot: Snapshot | null): Array<{ label: strin
         .join('\n'),
     },
     {
-      label: 'Chemin du cockpit',
-      text: `Lis ${snapshot.root}/cockpit/ pour l'état du projet. N'ouvre pas le code.`,
+      label: "Chemin de l'ovrsee",
+      text: `Lis ${snapshot.root}/ovrsee/ pour l'état du projet. N'ouvre pas le code.`,
     },
   ]
 }
@@ -1174,8 +1174,8 @@ export function decideInjection(text: string): { mode: 'command' | 'context'; te
 /**
  * Actions livrées + actions personnalisées, avec validation des sauts de ligne.
  *
- * Les actions livrées demandent le gestionnaire : `!pnpm cockpit:crawl` sur un
- * projet pnpm, `!npm run cockpit:crawl` sur npm. Les actions perso sont tapées
+ * Les actions livrées demandent le gestionnaire : `!pnpm ovrsee:crawl` sur un
+ * projet pnpm, `!npm run ovrsee:crawl` sur npm. Les actions perso sont tapées
  * telles quelles et refusent les sauts de ligne : une action multiligne serait
  * une commande shell qui s'exécute ligne par ligne, ce qui n'est pas explicite
  * au clic.
@@ -1192,7 +1192,7 @@ export function buildActions(
   const delivered = [
     {
       label: `⟳ ${t('action.crawl')}`,
-      text: `!${composerCommande('cockpit:crawl', packageManager)}`,
+      text: `!${composerCommande('ovrsee:crawl', packageManager)}`,
     },
     {
       label: `◆ ${t('action.graph')}`,
@@ -1200,7 +1200,7 @@ export function buildActions(
     },
     {
       label: `◈ ${t('action.graph_obsidian')}`,
-      text: '/graphify . --obsidian --obsidian-dir cockpit/obsidian/graphe',
+      text: '/graphify . --obsidian --obsidian-dir ovrsee/obsidian/graphe',
     },
   ]
 

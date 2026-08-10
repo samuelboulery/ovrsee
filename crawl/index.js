@@ -41,14 +41,14 @@ const DEFAULTS = {
 }
 
 const root = resolve(process.argv[2] ?? process.cwd())
-const cockpitDir = join(root, 'cockpit')
-const pagesDir = join(cockpitDir, 'pages')
+const ovrseeDir = join(root, 'ovrsee')
+const pagesDir = join(ovrseeDir, 'pages')
 const shotsDir = join(pagesDir, 'shots')
 
 const log = message => process.stdout.write(`[crawl] ${message}\n`)
 
 function loadConfig() {
-  const path = join(root, 'cockpit.config.json')
+  const path = join(root, 'ovrsee.config.json')
   if (!existsSync(path)) throw new Error(`configuration absente : ${path}`)
 
   const config = { ...DEFAULTS, ...JSON.parse(readFileSync(path, 'utf8')) }
@@ -134,7 +134,7 @@ async function assertPortFree(baseUrl) {
   }
   throw new Error(
     `${baseUrl} répond déjà — un autre serveur occupe le port. ` +
-      `Arrêtez-le, ou donnez un baseUrl libre dans cockpit.config.json.`,
+      `Arrêtez-le, ou donnez un baseUrl libre dans ovrsee.config.json.`,
   )
 }
 
@@ -287,7 +287,7 @@ export function retainable(files, now = new Date()) {
  *
  * On les signale, on ne les supprime PAS : effacer serait irréversible, et une
  * capture d'une page réellement supprimée reste un morceau d'histoire. Le
- * cockpit dit ce qu'il sait — « ces images ne correspondent à rien d'actuel » —
+ * ovrsee dit ce qu'il sait — « ces images ne correspondent à rien d'actuel » —
  * et laisse l'arbitrage à celui qui peut le faire.
  */
 function orphanShots(knownSlugs) {
@@ -385,7 +385,7 @@ async function run() {
       ) + '\n',
     )
     recordScan({ date, commit, ok: true, pages: pages.size })
-    log(`${pages.size} page(s) écrite(s) dans cockpit/pages/pages.json`)
+    log(`${pages.size} page(s) écrite(s) dans ovrsee/pages/pages.json`)
   } finally {
     if (browser) await browser.close().catch(() => {})
     stopApp(app)
@@ -397,7 +397,7 @@ async function run() {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   run().catch(err => {
     const message = String(err?.message ?? err)
-    // L'échec est une information, pas un silence. Sans cette ligne, le cockpit
+    // L'échec est une information, pas un silence. Sans cette ligne, l'ovrsee
     // continuerait d'afficher la capture d'avant comme si elle datait d'aujourd'hui.
     recordScan({
       date: new Date().toISOString().slice(0, 10),

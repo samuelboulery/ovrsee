@@ -66,7 +66,7 @@ export const lightTheme = {
  * Constantes non thématisées (marque, webview, masques).
  */
 export const unthemedColors = {
-  brand: '#9184d9', // Marque Cockpit (curseur xterm, bordures)
+  brand: '#9184d9', // Marque Ovrsee (curseur xterm, bordures)
   brandAlt: '#796cbf', // Marque secondaire (SVG)
   webviewBg: '#ffffff', // Fond webview Chromium
   maskBlack: '#000', // mask-image
@@ -81,7 +81,7 @@ export const unthemedColors = {
  */
 export function initializeTheme(): void {
   const style = document.createElement('style')
-  style.id = 'cockpit-theme-vars'
+  style.id = 'ovrsee-theme-vars'
   // Inject CSS statique avec les sélecteurs et media queries
   style.textContent = getCSSVariables()
   document.head.appendChild(style)

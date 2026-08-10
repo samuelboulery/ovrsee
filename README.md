@@ -1,24 +1,24 @@
-# Cockpit
+# Ovrsee
 
 Une vue en lecture seule sur un projet développé en vibecoding : ce qui a été fait,
 pourquoi, ce qui reste ouvert, et à quoi l'application ressemblait à chaque commit.
 
-**Le cockpit lit ; il n'exécute que le terminal qu'on lui demande.** La vérité vit dans `<repo>/cockpit/`, en
+**L'ovrsee lit ; il n'exécute que le terminal qu'on lui demande.** La vérité vit dans `<repo>/ovrsee/`, en
 markdown et en images, versionnée par git. L'application n'est qu'une vue : si elle
 disparaît, rien n'est perdu.
 
-Contexte complet : [`cadrage-cockpit.md`](./cadrage-cockpit.md) — [`README.en.md`](./README.en.md)
+Contexte complet : [`cadrage-ovrsee.md`](./cadrage-ovrsee.md) — [`README.en.md`](./README.en.md)
 
 ## Ce qu'on y voit
 
 L'application capture les plans approuvés, photographie chaque écran à chaque commit,
-énumère les pages et leurs dépendances, et tient l'historique daté — tout dans `cockpit/`.
+énumère les pages et leurs dépendances, et tient l'historique daté — tout dans `ovrsee/`.
 
-![Aperçu du cockpit](./cockpit/pages/shots/accueil/2026-08-09-24c3123.png)
+![Aperçu de l'ovrsee](./ovrsee/pages/shots/accueil/2026-08-09-24c3123.png)
 
 ## Premier lancement
 
-Un cockpit fraîchement cloné, ou téléchargé, s'ouvre **vide** : aucun projet n'est
+Un ovrsee fraîchement cloné, ou téléchargé, s'ouvre **vide** : aucun projet n'est
 observé tant qu'on n'en a pas désigné un. Une modale de trois écrans explique alors ce
 que fait l'application, règle l'interface d'après votre usage de Claude Code, et mène
 au choix du premier dépôt. Elle se passe d'un clic — ou de la touche Échap — et se
@@ -32,22 +32,22 @@ reste modifiable ensuite dans les préférences.
 
 ```bash
 # 1. Installer une fois par projet
-pnpm cockpit:install /chemin/du/projet
+pnpm ovrsee:install /chemin/du/projet
 
-# 2. Cartographier l'application (nécessite un cockpit.config.json)
-pnpm cockpit:crawl /chemin/du/projet
+# 2. Cartographier l'application (nécessite un ovrsee.config.json)
+pnpm ovrsee:crawl /chemin/du/projet
 
 # 3. Lire
 pnpm electron          # application avec terminal intégré
 pnpm dev               # ou dans un navigateur, sans terminal
-pnpm cockpit:brief     # ou en texte, depuis le terminal
+pnpm ovrsee:brief     # ou en texte, depuis le terminal
 ```
 
-Quand un plan est approuvé dans Claude Code, il est capturé automatiquement dans `cockpit/plans/`.
+Quand un plan est approuvé dans Claude Code, il est capturé automatiquement dans `ovrsee/plans/`.
 Le hook post-commit rattache ensuite chaque commit au plan actif. Clore le plan quand son travail est fini :
 
 ```bash
-pnpm cockpit:close     # retire .active-plan
+pnpm ovrsee:close     # retire .active-plan
 ```
 
 Tant qu'un plan est actif, le hook post-commit lui rattache **tout** commit — même ceux
@@ -65,19 +65,19 @@ Deux skills disponibles — installer depuis l'écran d'initialisation, ou via `
 
 | Skill | Ce qu'il apprend |
 |---|---|
-| `cockpit` | Lire `cockpit/` : plans, pages, scans, captures, pièges de lecture |
-| `cockpit-tickets` | Écrire les tickets du tableau, format et gestes compris |
+| `ovrsee` | Lire `ovrsee/` : plans, pages, scans, captures, pièges de lecture |
+| `ovrsee-tickets` | Écrire les tickets du tableau, format et gestes compris |
 
-**Graphify** (alimente l'onglet Données) est détecté mais non installé — le cockpit
+**Graphify** (alimente l'onglet Données) est détecté mais non installé — l'ovrsee
 affiche sa commande.
 
 ## Coffre Obsidian
 
 ```bash
-pnpm cockpit:obsidian          # ou le bouton de l'onglet Accueil
+pnpm ovrsee:obsidian          # ou le bouton de l'onglet Accueil
 ```
 
-Traduit `cockpit/` en notes Obsidian dans `cockpit/obsidian/` : frontmatter YAML
+Traduit `ovrsee/` en notes Obsidian dans `ovrsee/obsidian/` : frontmatter YAML
 (requêtable en Dataview), wikilinks entre plans/tickets/pages, et les captures.
 C'est une vue — la source reste le dépôt, réexporter écrase.
 
@@ -85,7 +85,7 @@ Graphify écrit son propre `index.md` à la racine du dossier qu'on lui donne. R
 que l'export ne touche jamais. Exemple :
 
 ```bash
-/graphify . --obsidian --obsidian-dir cockpit/obsidian/graphe
+/graphify . --obsidian --obsidian-dir ovrsee/obsidian/graphe
 ```
 
 C'est ce que fait le bouton « ◈ Graphe → coffre Obsidian » du terminal intégré.
@@ -93,7 +93,7 @@ C'est ce que fait le bouton « ◈ Graphe → coffre Obsidian » du terminal int
 ### Coffre comme source de l'onglet Données
 
 Si vous documentez dans Obsidian plutôt qu'avec Graphify, le champ `obsidianVault`
-dans `cockpit.config.json` désigne un coffre, et l'onglet Données le lit **quand Graphify
+dans `ovrsee.config.json` désigne un coffre, et l'onglet Données le lit **quand Graphify
 n'a rien produit**.
 
 Une note est une table quand son frontmatter porte `type: table`. `columns` en donne
@@ -114,7 +114,7 @@ Les commandes passées.
 que quelqu'un a tapé. Un coffre déclaré alors que `graphify-out/graph.json` existe n'est
 pas lu.
 
-## Multi-projets et cockpit.config.json
+## Multi-projets et ovrsee.config.json
 
 Exemple complet :
 
@@ -123,7 +123,7 @@ Exemple complet :
   "dev": "pnpm dev --port 8099 --strictPort",
   "baseUrl": "http://localhost:8099",
   "entryRoutes": ["/", "/login"],
-  "auth": { "storageState": ".cockpit-auth.json" },
+  "auth": { "storageState": ".ovrsee-auth.json" },
   "ignore": ["/auth/callback"],
   "obsidianVault": "~/Coffres/mon-projet"
 }
@@ -148,8 +148,8 @@ celui d'un autre projet produirait des captures datées d'aujourd'hui montrant l
 ## Pièges connus
 
 **Un plan actif capte tous les commits.**
-Tant que `cockpit/.active-plan` existe, le hook post-commit rattache chaque commit au
-plan — y compris un correctif sans rapport. `pnpm cockpit:close` avant de changer de sujet.
+Tant que `ovrsee/.active-plan` existe, le hook post-commit rattache chaque commit au
+plan — y compris un correctif sans rapport. `pnpm ovrsee:close` avant de changer de sujet.
 
 **Le crawl refuse de démarrer si `baseUrl` répond déjà.**
 C'est voulu. Rien dans une réponse HTTP ne distingue son propre serveur de celui d'un
@@ -167,21 +167,21 @@ de mots de passe et dans un `ACCESS.md` non versionné.
 
 ## Serveur MCP
 
-Cockpit expose un serveur MCP (Model Context Protocol) en stdio. C'est le moyen pour
+Ovrsee expose un serveur MCP (Model Context Protocol) en stdio. C'est le moyen pour
 Claude Code de lire et modifier les tickets sans quitter son interface.
 
 Capacités :
-- Lecture complète de `cockpit/`
-- Écriture sur `cockpit/tickets/` et `cockpit/board.json` uniquement
+- Lecture complète de `ovrsee/`
+- Écriture sur `ovrsee/tickets/` et `ovrsee/board.json` uniquement
 - Aucune exécution de code
 
-Il ne lit que les projets du registre — celui qu'alimente `pnpm cockpit:install`.
+Il ne lit que les projets du registre — celui qu'alimente `pnpm ovrsee:install`.
 Un chemin qui n'y figure pas est refusé, même s'il existe sur le disque.
 
 Pour l'enregistrer dans Claude Code :
 
 ```bash
-claude mcp add -s user cockpit -- node /chemin/absolu/cockpit/mcp/server.js
+claude mcp add -s user ovrsee -- node /chemin/absolu/ovrsee/mcp/server.js
 ```
 
 La portée `user` est la bonne : le serveur est multi-projet par construction,
@@ -192,9 +192,9 @@ Dans Claude Desktop, c'est `claude_desktop_config.json` :
 ```json
 {
   "mcpServers": {
-    "cockpit": {
+    "ovrsee": {
       "command": "node",
-      "args": ["/chemin/absolu/cockpit/mcp/server.js"]
+      "args": ["/chemin/absolu/ovrsee/mcp/server.js"]
     }
   }
 }
@@ -210,7 +210,7 @@ Pour le voir répondre à la main :
 printf '%s\n' \
  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05"}}' \
  '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
- | pnpm cockpit:mcp
+ | pnpm ovrsee:mcp
 ```
 
 (Le serveur lit JSON-RPC depuis stdin et écrit sur stdout. Rien d'autre ne doit
@@ -218,7 +218,7 @@ sortir sur stdout : ce n'est pas un journal, c'est le transport.)
 
 ## Données produites
 
-Stockées dans le dépôt observé, sous `<repo>/cockpit/` :
+Stockées dans le dépôt observé, sous `<repo>/ovrsee/` :
 
 ```
 plans/<date>-<slug>.md    1 fichier = 1 plan approuvé

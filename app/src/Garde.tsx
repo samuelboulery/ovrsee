@@ -12,7 +12,7 @@ import { t } from './i18n'
  * s'est produit le 9 août 2026 sur un `pages.json` mal formé — écran noir, rien
  * dans l'interface, tout dans la console.
  *
- * Le cockpit lit des fichiers écrits par des hooks, sur des projets qu'il n'a
+ * L'ovrsee lit des fichiers écrits par des hooks, sur des projets qu'il n'a
  * pas construits. Il lira un jour un fichier que personne n'a prévu. Corriger
  * les champs un par un est sans fin ; le garde-fou tient pour les cas qu'on n'a
  * pas imaginés.
@@ -46,7 +46,7 @@ export class Garde extends Component<GardeProps, GardeState> {
   componentDidCatch(error: unknown, info: ErrorInfo) {
     // La console garde la trace complète : le panneau ne montre que le
     // message, mais l'enquête doit rester possible.
-    console.error(`[cockpit] rendu impossible — ${this.props.quoi}`, error, info.componentStack)
+    console.error(`[ovrsee] rendu impossible — ${this.props.quoi}`, error, info.componentStack)
   }
 
   render() {
@@ -80,7 +80,7 @@ export function Panne({ quoi, message }: { quoi: string; message: string }) {
         {message}
       </div>
       <div style={s('font-size: 11.5px; color: var(--color-neutral-600); max-width: 56ch;')}>
-        {t('garde.file_error')} <code>cockpit/</code> que le cockpit ne
+        {t('garde.file_error')} <code>ovrsee/</code> que l'ovrsee ne
         sait pas lire.
       </div>
     </div>

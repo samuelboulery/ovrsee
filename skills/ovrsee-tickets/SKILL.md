@@ -1,23 +1,23 @@
 ---
-name: cockpit-tickets
-description: Use when a project has a cockpit/ directory and work needs to be tracked - creating a ticket from a request, moving one as work starts or lands, or answering "what is left to do". Writes cockpit/tickets/*.md directly; no CLI is installed in equipped projects.
+name: ovrsee-tickets
+description: Use when a project has a ovrsee/ directory and work needs to be tracked - creating a ticket from a request, moving one as work starts or lands, or answering "what is left to do". Writes ovrsee/tickets/*.md directly; no CLI is installed in equipped projects.
 ---
 
-# Cockpit — tickets
+# Ovrsee — tickets
 
-Le tableau d'un projet équipé vit dans `cockpit/tickets/`, un fichier par
-ticket, et dans `cockpit/board.json`, qui décrit ses colonnes. C'est **la seule
-donnée du cockpit qui se saisit** : les plans, les pages et les scans sont
+Le tableau d'un projet équipé vit dans `ovrsee/tickets/`, un fichier par
+ticket, et dans `ovrsee/board.json`, qui décrit ses colonnes. C'est **la seule
+donnée de l'ovrsee qui se saisit** : les plans, les pages et les scans sont
 capturés par des hooks et ne s'éditent pas à la main.
 
-Ces fichiers s'écrivent directement. Le CLI `cockpit-cli.js` n'existe que dans
-le dépôt cockpit lui-même, pas dans les projets équipés : ici, écrire le fichier
-*est* le geste normal. L'interface du cockpit relit le dossier, elle ne détient
+Ces fichiers s'écrivent directement. Le CLI `ovrsee-cli.js` n'existe que dans
+le dépôt ovrsee lui-même, pas dans les projets équipés : ici, écrire le fichier
+*est* le geste normal. L'interface de l'ovrsee relit le dossier, elle ne détient
 rien.
 
 ## Avant d'écrire quoi que ce soit
 
-**Lire `cockpit/board.json`.** Les colonnes sont configurables par projet ; les
+**Lire `ovrsee/board.json`.** Les colonnes sont configurables par projet ; les
 supposer est l'erreur qui produit un ticket invisible, rangé dans une colonne
 qui n'existe pas.
 
@@ -44,7 +44,7 @@ vaut mieux que de le faire en silence.
 
 ## Le format d'un ticket
 
-Un fichier `cockpit/tickets/T-0012-un-slug.md`. Frontmatter **JSON** entre deux
+Un fichier `ovrsee/tickets/T-0012-un-slug.md`. Frontmatter **JSON** entre deux
 `---`, puis le corps en markdown :
 
 ```markdown
@@ -78,7 +78,7 @@ Pourquoi ce ticket existe. Ce qui ne va pas aujourd'hui.
 | `priorite` | `haute`, `moyenne` ou `basse`. Rien d'autre. |
 | `tags` | Liste de chaînes, éventuellement vide. |
 | `cree` / `maj` | `YYYY-MM-DD`. `maj` change à chaque modification, `cree` jamais. |
-| `plan` | Nom de fichier d'un plan de `cockpit/plans/`, ou `null`. |
+| `plan` | Nom de fichier d'un plan de `ovrsee/plans/`, ou `null`. |
 
 Le nom du fichier est `T-0012-<slug du titre>.md` : le titre en minuscules sans
 accents, tout ce qui n'est pas `[a-z0-9]` devenant un tiret, coupé à 60
@@ -132,8 +132,8 @@ jamais.
 - **Ne pas supprimer une colonne sans reloger ses tickets.** Retirer l'entrée du
   board laisse des tickets citant une colonne absente. Réécrire leur `colonne`
   d'abord.
-- Le reste du dossier `cockpit/` se lit et ne s'écrit pas — voir le skill
-  `cockpit`.
+- Le reste du dossier `ovrsee/` se lit et ne s'écrit pas — voir le skill
+  `ovrsee`.
 
 ## Epics
 

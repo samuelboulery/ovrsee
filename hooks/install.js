@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * Installe la capture cockpit dans un dépôt.
+ * Installe la capture ovrsee dans un dépôt.
  *
  *   node hooks/install.js [chemin-du-dépôt]
  *
  * Trois choses :
  *
- * 1. le dossier `cockpit/plans/`, seul endroit que lit `readPlans` ;
+ * 1. le dossier `ovrsee/plans/`, seul endroit que lit `readPlans` ;
  * 2. un bloc délimité dans `.git/hooks/post-commit`, en préservant ce qui s'y
  *    trouve déjà (Graphify installe son propre bloc au même endroit) ;
  * 3. les deux hooks Claude Code dans `~/.claude/settings.json`.
@@ -41,8 +41,8 @@ import { installSkills } from './skills.js'
 import { DEFAULT_COLUMNS } from './tickets.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
-const START = '# cockpit-hook-start'
-const END = '# cockpit-hook-end'
+const START = '# ovrsee-hook-start'
+const END = '# ovrsee-hook-end'
 const SETTINGS = join(homedir(), '.claude', 'settings.json')
 
 /**
@@ -56,10 +56,10 @@ const SETTINGS = join(homedir(), '.claude', 'settings.json')
 const shq = value => `'${String(value).replaceAll("'", `'\\''`)}'`
 
 /**
- * La ligne qui lance `cockpit-post-commit.js` à chaque commit.
+ * La ligne qui lance `ovrsee-post-commit.js` à chaque commit.
  *
  * Depuis l'application empaquetée, deux pièges se combinent : `process.execPath`
- * est le binaire Cockpit et non `node` — l'écrire tel quel ferait ouvrir la
+ * est le binaire Ovrsee et non `node` — l'écrire tel quel ferait ouvrir la
  * fenêtre à chaque commit — et le script est resté dans `app.asar`, que `node`
  * ne sait pas lire. `ELECTRON_RUN_AS_NODE=1` résout les deux d'un coup : le même
  * binaire se comporte alors en node, et lui seul sait ouvrir l'archive.
@@ -73,13 +73,13 @@ function commandFor(scriptName) {
     : `${runtime} ${script}`
 }
 
-/** Le bloc cockpit du `post-commit`, installé ou remplacé sans toucher au reste. */
+/** Le bloc ovrsee du `post-commit`, installé ou remplacé sans toucher au reste. */
 export function installPostCommit(root, done) {
   const hookPath = join(root, '.git', 'hooks', 'post-commit')
   const block = [
     START,
-    '# Rattache le commit au plan actif de cockpit/. Installé par: node hooks/install.js',
-    `${commandFor('cockpit-post-commit.js')} || true`,
+    '# Rattache le commit au plan actif de ovrsee/. Installé par: node hooks/install.js',
+    `${commandFor('ovrsee-post-commit.js')} || true`,
     END,
   ].join('\n')
 
@@ -92,7 +92,7 @@ export function installPostCommit(root, done) {
     // Si le marqueur de début existe mais pas le marqueur de fin, le fichier
     // est endommagé : refuser de modifier plutôt que d'effacer la suite.
     if (end === -1) {
-      throw new Error(`${hookPath} contient un marqueur cockpit non refermé (${START} sans ${END})`)
+      throw new Error(`${hookPath} contient un marqueur ovrsee non refermé (${START} sans ${END})`)
     }
     const cut = end + END.length
     existing = existing.slice(0, start) + block + existing.slice(cut)
@@ -105,11 +105,11 @@ export function installPostCommit(root, done) {
   writeFileNoFollow(hookPath, existing)
   chmodSync(hookPath, 0o755)
 
-  done.push(`post-commit : bloc cockpit installé dans ${hookPath}`)
+  done.push(`post-commit : bloc ovrsee installé dans ${hookPath}`)
 }
 
-/** Une entrée est-elle déjà celle du cockpit ? */
-const isCockpit = (entry, script) => JSON.stringify(entry).includes(script)
+/** Une entrée est-elle déjà celle de l'ovrsee ? */
+const isOvrsee = (entry, script) => JSON.stringify(entry).includes(script)
 
 function installClaudeHooks(done) {
   if (!existsSync(SETTINGS)) {
@@ -131,14 +131,14 @@ function installClaudeHooks(done) {
   const added = []
 
   const sessionStart = (hooks.SessionStart ??= [])
-  if (!sessionStart.some(e => isCockpit(e, 'cockpit-session-start'))) {
+  if (!sessionStart.some(e => isOvrsee(e, 'ovrsee-session-start'))) {
     sessionStart.push({
       hooks: [
         {
           type: 'command',
-          command: commandFor('cockpit-session-start.js'),
+          command: commandFor('ovrsee-session-start.js'),
           timeout: 5,
-          statusMessage: 'Lecture du cockpit...',
+          statusMessage: 'Lecture de l\'ovrsee...',
         },
       ],
     })
@@ -146,10 +146,10 @@ function installClaudeHooks(done) {
   }
 
   const postToolUse = (hooks.PostToolUse ??= [])
-  if (!postToolUse.some(e => isCockpit(e, 'cockpit-capture-plan'))) {
+  if (!postToolUse.some(e => isOvrsee(e, 'ovrsee-capture-plan'))) {
     postToolUse.push({
       matcher: 'ExitPlanMode',
-      hooks: [{ type: 'command', command: commandFor('cockpit-capture-plan.js') }],
+      hooks: [{ type: 'command', command: commandFor('ovrsee-capture-plan.js') }],
     })
     added.push('PostToolUse/ExitPlanMode — capture des plans approuvés')
   }
@@ -160,7 +160,7 @@ function installClaudeHooks(done) {
   }
 
   // Sauvegarde avant écriture : ce fichier n'est pas versionné.
-  const backup = `${SETTINGS}.avant-cockpit`
+  const backup = `${SETTINGS}.avant-ovrsee`
   copyFileSync(SETTINGS, backup)
 
   const updated = JSON.stringify(settings, null, 2) + '\n'
@@ -181,7 +181,7 @@ function installClaudeHooks(done) {
 }
 
 /**
- * Écrit `cockpit.config.json` — ce qui débloque le crawl, qui refuse de démarrer
+ * Écrit `ovrsee.config.json` — ce qui débloque le crawl, qui refuse de démarrer
  * sans lui (`crawl/index.js`).
  *
  * **Jamais écrasé.** Le fichier ne sert pas qu'au crawl : `mergeSettings` y lit
@@ -192,15 +192,15 @@ function installClaudeHooks(done) {
  * crawler : un fichier vide, « parce que ça vaut les défauts », n'apprendrait
  * rien à qui l'ouvre. Le reste — `maxPages`, `viewport`, `auth` — reste implicite.
  */
-function writeCockpitConfig(root, { dev, baseUrl }, done) {
-  const path = join(root, 'cockpit.config.json')
+function writeOvrseeConfig(root, { dev, baseUrl }, done) {
+  const path = join(root, 'ovrsee.config.json')
   if (existsSync(path)) {
-    done.push('cockpit.config.json existait déjà — conservé tel quel')
+    done.push('ovrsee.config.json existait déjà — conservé tel quel')
     return
   }
 
   writeFileNoFollow(path, JSON.stringify({ dev, baseUrl, entryRoutes: ['/'] }, null, 2) + '\n')
-  done.push(`cockpit.config.json écrit (${dev} → ${baseUrl})`)
+  done.push(`ovrsee.config.json écrit (${dev} → ${baseUrl})`)
 }
 
 /**
@@ -214,7 +214,7 @@ function writeCockpitConfig(root, { dev, baseUrl }, done) {
  * **L'ordre du premier commit n'est pas cosmétique.** Il passe avant la pose du
  * hook post-commit et l'écriture de la configuration, parce que ce hook lance un
  * crawl détaché — le serveur de développement du projet observé — dès qu'un
- * commit touche des sources et qu'un `cockpit.config.json` existe. Committer en
+ * commit touche des sources et qu'un `ovrsee.config.json` existe. Committer en
  * dernier ferait démarrer ce serveur dans la seconde qui suit le clic, sur un
  * projet dont les dépendances ne sont peut-être même pas installées.
  *
@@ -245,11 +245,11 @@ export function install(target, { skills = [], gitInit = false, commit = false, 
   }).trim()
 
   // Un échec ici — identité git absente, rien à committer — n'a pas à faire
-  // échouer l'équipement : le commit est un confort, `cockpit/` est le sujet.
+  // échouer l'équipement : le commit est un confort, `ovrsee/` est le sujet.
   if (commit) {
     try {
       execFileSync('git', ['add', '-A'], { cwd: root, stdio: 'ignore' })
-      execFileSync('git', ['commit', '-m', 'chore: point de départ du cockpit'], {
+      execFileSync('git', ['commit', '-m', 'chore: point de départ de l\'ovrsee'], {
         cwd: root,
         stdio: 'ignore',
       })
@@ -259,21 +259,21 @@ export function install(target, { skills = [], gitInit = false, commit = false, 
     }
   }
 
-  mkdirSync(join(root, 'cockpit', 'plans'), { recursive: true })
-  done.push(`cockpit/plans/ prêt dans ${root}`)
+  mkdirSync(join(root, 'ovrsee', 'plans'), { recursive: true })
+  done.push(`ovrsee/plans/ prêt dans ${root}`)
 
-  mkdirSync(join(root, 'cockpit', 'tickets'), { recursive: true })
-  done.push('cockpit/tickets/ prêt')
+  mkdirSync(join(root, 'ovrsee', 'tickets'), { recursive: true })
+  done.push('ovrsee/tickets/ prêt')
 
   // Jamais écrasé : un projet qui a réorganisé ses colonnes ne doit pas les
   // perdre en réinstallant les hooks.
-  const board = join(root, 'cockpit', 'board.json')
+  const board = join(root, 'ovrsee', 'board.json')
   if (!existsSync(board)) {
     writeFileNoFollow(board, JSON.stringify({ colonnes: DEFAULT_COLUMNS }, null, 2) + '\n')
-    done.push('cockpit/board.json écrit avec les colonnes par défaut')
+    done.push('ovrsee/board.json écrit avec les colonnes par défaut')
   }
 
-  if (config) writeCockpitConfig(root, config, done)
+  if (config) writeOvrseeConfig(root, config, done)
 
   installPostCommit(root, done)
   installClaudeHooks(done)

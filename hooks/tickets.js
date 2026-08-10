@@ -1,7 +1,7 @@
 /**
- * Lecture et écriture des tickets de `/cockpit/tickets/`.
+ * Lecture et écriture des tickets de `/ovrsee/tickets/`.
  *
- * Les tickets sont la seule donnée *saisie* du cockpit. Tout le reste — plans,
+ * Les tickets sont la seule donnée *saisie* de l'ovrsee. Tout le reste — plans,
  * pages, scans — est capturé par un hook et ne s'édite pas. Un tableau kanban,
  * lui, n'a de sens que si on peut y poser une intention avant qu'elle existe
  * sous forme de plan, et la déplacer à la main.
@@ -49,13 +49,13 @@ const today = (now = new Date()) => now.toISOString().slice(0, 10)
  * profit des défauts. Un tableau dont deux colonnes portent le même `id` est
  * pire qu'un tableau standard — les tickets s'y répartiraient au hasard.
  *
- * @param {string} cockpitDir chemin de `<repo>/cockpit`
+ * @param {string} ovrseeDir chemin de `<repo>/ovrsee`
  * @returns {Array<{id: string, titre: string, wip?: number}>}
  */
-export function readBoard(cockpitDir) {
+export function readBoard(ovrseeDir) {
   let parsed
   try {
-    parsed = JSON.parse(readFileSync(join(cockpitDir, 'board.json'), 'utf8'))
+    parsed = JSON.parse(readFileSync(join(ovrseeDir, 'board.json'), 'utf8'))
   } catch {
     return DEFAULT_COLUMNS
   }
@@ -83,7 +83,7 @@ export function readBoard(cockpitDir) {
  * @param {Array<{id: string, titre: string, wip?: number}>} colonnes
  * @returns {Array} les colonnes écrites
  */
-export function writeBoard(cockpitDir, colonnes) {
+export function writeBoard(ovrseeDir, colonnes) {
   if (!Array.isArray(colonnes) || colonnes.length === 0) {
     throw new Error('un tableau sans colonne serait vide : au moins une colonne est requise')
   }
@@ -106,7 +106,7 @@ export function writeBoard(cockpitDir, colonnes) {
     return { id, titre, wip }
   })
 
-  writeFileNoFollow(join(cockpitDir, 'board.json'), JSON.stringify({ colonnes: propres }, null, 2) + '\n')
+  writeFileNoFollow(join(ovrseeDir, 'board.json'), JSON.stringify({ colonnes: propres }, null, 2) + '\n')
   return propres
 }
 
@@ -132,8 +132,8 @@ const nouvelId = (titre, pris) => {
  * @param {{titre: string, wip?: number|null, apres?: string}} champs `apres` est
  *   l'identifiant de la colonne après laquelle insérer ; à la fin par défaut.
  */
-export function addColumn(cockpitDir, { titre, wip = null, apres } = {}) {
-  const colonnes = readBoard(cockpitDir)
+export function addColumn(ovrseeDir, { titre, wip = null, apres } = {}) {
+  const colonnes = readBoard(ovrseeDir)
   const propre = String(titre ?? '').trim()
   if (!propre) throw new Error('titre vide')
 
@@ -143,7 +143,7 @@ export function addColumn(cockpitDir, { titre, wip = null, apres } = {}) {
   const at = colonnes.findIndex(c => c.id === apres)
   const suite = at === -1 ? [...colonnes, ajoutee] : colonnes.toSpliced(at + 1, 0, ajoutee)
 
-  return writeBoard(cockpitDir, suite)
+  return writeBoard(ovrseeDir, suite)
 }
 
 /**
@@ -152,12 +152,12 @@ export function addColumn(cockpitDir, { titre, wip = null, apres } = {}) {
  *
  * @param {{titre?: string, wip?: number|null}} champs `wip: null` retire la limite.
  */
-export function renameColumn(cockpitDir, id, champs = {}) {
-  const colonnes = readBoard(cockpitDir)
+export function renameColumn(ovrseeDir, id, champs = {}) {
+  const colonnes = readBoard(ovrseeDir)
   if (!colonnes.some(c => c.id === id)) throw new Error(`colonne inconnue : ${id}`)
 
   return writeBoard(
-    cockpitDir,
+    ovrseeDir,
     colonnes.map(colonne => {
       if (colonne.id !== id) return colonne
 
@@ -182,20 +182,20 @@ export function renameColumn(cockpitDir, id, champs = {}) {
  *
  * @param {string} [vers] colonne d'accueil, obligatoire si la colonne n'est pas vide
  */
-export function removeColumn(cockpitDir, id, vers) {
-  const colonnes = readBoard(cockpitDir)
+export function removeColumn(ovrseeDir, id, vers) {
+  const colonnes = readBoard(ovrseeDir)
   if (!colonnes.some(c => c.id === id)) throw new Error(`colonne inconnue : ${id}`)
   if (colonnes.length === 1) throw new Error('impossible de retirer la dernière colonne')
 
-  const dedans = readTickets(cockpitDir, colonnes).filter(t => t.meta.colonne === id)
+  const dedans = readTickets(ovrseeDir, colonnes).filter(t => t.meta.colonne === id)
   if (dedans.length > 0) {
     if (!vers || vers === id || !colonnes.some(c => c.id === vers)) {
       throw new Error(`destination requise pour les ${dedans.length} ticket(s) de ${id}`)
     }
-    for (const ticket of dedans) moveTicket(cockpitDir, ticket.file, vers)
+    for (const ticket of dedans) moveTicket(ovrseeDir, ticket.file, vers)
   }
 
-  return writeBoard(cockpitDir, colonnes.filter(c => c.id !== id))
+  return writeBoard(ovrseeDir, colonnes.filter(c => c.id !== id))
 }
 
 /**
@@ -207,8 +207,8 @@ export function removeColumn(cockpitDir, id, vers) {
  *
  * @param {number} index position visée dans le tableau final
  */
-export function reorderColumn(cockpitDir, id, index) {
-  const colonnes = readBoard(cockpitDir)
+export function reorderColumn(ovrseeDir, id, index) {
+  const colonnes = readBoard(ovrseeDir)
   const at = colonnes.findIndex(c => c.id === id)
   if (at === -1) throw new Error(`colonne inconnue : ${id}`)
 
@@ -217,7 +217,7 @@ export function reorderColumn(cockpitDir, id, index) {
 
   const suite = [...colonnes]
   suite.splice(cible, 0, ...suite.splice(at, 1))
-  return writeBoard(cockpitDir, suite)
+  return writeBoard(ovrseeDir, suite)
 }
 
 /**
@@ -228,14 +228,14 @@ export function reorderColumn(cockpitDir, id, index) {
  * fichier n'est pas réécrit pour autant : c'est une lecture, et l'utilisateur
  * peut vouloir restaurer sa colonne.
  *
- * @param {string} cockpitDir
+ * @param {string} ovrseeDir
  * @param {Array<{id: string}>} [colonnes]
  * @returns {Array<{file: string, meta: object, body: string}>}
  */
-export function readTickets(cockpitDir, colonnes = readBoard(cockpitDir), illisibles = []) {
+export function readTickets(ovrseeDir, colonnes = readBoard(ovrseeDir), illisibles = []) {
   let names
   try {
-    names = readdirSync(join(cockpitDir, 'tickets'))
+    names = readdirSync(join(ovrseeDir, 'tickets'))
   } catch {
     return []
   }
@@ -248,7 +248,7 @@ export function readTickets(cockpitDir, colonnes = readBoard(cockpitDir), illisi
     if (!name.endsWith('.md')) continue
     let raw
     try {
-      raw = readFileSync(join(cockpitDir, 'tickets', name), 'utf8')
+      raw = readFileSync(join(ovrseeDir, 'tickets', name), 'utf8')
     } catch {
       illisibles.push({ file: `tickets/${name}`, quoi: 'ticket' })
       continue
@@ -256,7 +256,7 @@ export function readTickets(cockpitDir, colonnes = readBoard(cockpitDir), illisi
     const ticket = parsePlan(raw)
     if (!ticket) {
       illisibles.push({ file: `tickets/${name}`, quoi: 'ticket' })
-      process.stderr.write(`[cockpit] ticket illisible, ignoré : ${name}\n`)
+      process.stderr.write(`[ovrsee] ticket illisible, ignoré : ${name}\n`)
       continue
     }
     const colonne = connues.has(ticket.meta.colonne) ? ticket.meta.colonne : repli
@@ -324,18 +324,18 @@ const requireFile = file => {
   return file
 }
 
-const ticketPath = (cockpitDir, file) => join(cockpitDir, 'tickets', requireFile(file))
+const ticketPath = (ovrseeDir, file) => join(ovrseeDir, 'tickets', requireFile(file))
 
 /**
  * Crée un ticket et l'écrit.
  *
- * @param {string} cockpitDir
+ * @param {string} ovrseeDir
  * @param {{titre: string, colonne?: string, priorite?: string, tags?: string[], corps?: string, plan?: string|null, type?: string, epic?: string}} champs
  * @param {Date} [now]
  * @returns {{file: string, meta: object, body: string}}
  */
-export function createTicket(cockpitDir, champs, now = new Date()) {
-  const colonnes = readBoard(cockpitDir)
+export function createTicket(ovrseeDir, champs, now = new Date()) {
+  const colonnes = readBoard(ovrseeDir)
   const titre = String(champs?.titre ?? '').trim()
   if (!titre) throw new Error('titre vide')
 
@@ -344,7 +344,7 @@ export function createTicket(cockpitDir, champs, now = new Date()) {
   const date = today(now)
 
   const meta = {
-    id: nextTicketId(readTickets(cockpitDir, colonnes)),
+    id: nextTicketId(readTickets(ovrseeDir, colonnes)),
     titre,
     colonne,
     priorite,
@@ -371,8 +371,8 @@ export function createTicket(cockpitDir, champs, now = new Date()) {
   const body = String(champs?.corps ?? '').trim() + '\n'
   const file = ticketFileName(meta.id, titre)
 
-  mkdirSync(join(cockpitDir, 'tickets'), { recursive: true })
-  writeFileNoFollow(ticketPath(cockpitDir, file), serializePlan(meta, body))
+  mkdirSync(join(ovrseeDir, 'tickets'), { recursive: true })
+  writeFileNoFollow(ticketPath(ovrseeDir, file), serializePlan(meta, body))
 
   return { file, meta, body }
 }
@@ -385,8 +385,8 @@ export function createTicket(cockpitDir, champs, now = new Date()) {
  *
  * @returns {boolean} vrai si le fichier a été réécrit
  */
-function rewrite(cockpitDir, file, transform, now) {
-  const path = ticketPath(cockpitDir, file)
+function rewrite(ovrseeDir, file, transform, now) {
+  const path = ticketPath(ovrseeDir, file)
 
   let ticket
   try {
@@ -404,11 +404,11 @@ function rewrite(cockpitDir, file, transform, now) {
 }
 
 /** Déplace un ticket d'une colonne à l'autre. Ne touche à rien d'autre. */
-export function moveTicket(cockpitDir, file, colonne, now = new Date()) {
+export function moveTicket(ovrseeDir, file, colonne, now = new Date()) {
   requireFile(file)
-  requireColonne(readBoard(cockpitDir), colonne)
+  requireColonne(readBoard(ovrseeDir), colonne)
 
-  return rewrite(cockpitDir, file, ticket => ({ meta: { ...ticket.meta, colonne }, body: ticket.body }), now)
+  return rewrite(ovrseeDir, file, ticket => ({ meta: { ...ticket.meta, colonne }, body: ticket.body }), now)
 }
 
 /**
@@ -419,12 +419,12 @@ export function moveTicket(cockpitDir, file, colonne, now = new Date()) {
  *
  * @param {{titre?: string, priorite?: string, tags?: string[], plan?: string|null, corps?: string, type?: string|null, epic?: string|null}} patch
  */
-export function updateTicket(cockpitDir, file, patch, now = new Date()) {
+export function updateTicket(ovrseeDir, file, patch, now = new Date()) {
   requireFile(file)
   if (patch?.priorite !== undefined) requirePriorite(patch.priorite)
 
   return rewrite(
-    cockpitDir,
+    ovrseeDir,
     file,
     ticket => {
       const meta = { ...ticket.meta }
@@ -463,9 +463,9 @@ export function updateTicket(cockpitDir, file, patch, now = new Date()) {
 }
 
 /** @returns {boolean} vrai si un fichier a bien été retiré */
-export function deleteTicket(cockpitDir, file) {
+export function deleteTicket(ovrseeDir, file) {
   try {
-    unlinkSync(ticketPath(cockpitDir, file))
+    unlinkSync(ticketPath(ovrseeDir, file))
     return true
   } catch {
     return false
@@ -544,16 +544,16 @@ export function orphanChildren(tickets) {
  *
  * Migration exécutable plusieurs fois sans dommage : un plan déjà repris est
  * reconnu au champ `plan` d'un ticket existant. Le corps du plan n'est pas
- * recopié — il vit dans `cockpit/plans/`, et deux copies divergeraient.
+ * recopié — il vit dans `ovrsee/plans/`, et deux copies divergeraient.
  *
  * @returns {Array<{file: string, meta: object}>} les tickets créés
  */
-export function importOpenPlans(cockpitDir, now = new Date()) {
-  const colonnes = readBoard(cockpitDir)
-  const dejaRepris = new Set(readTickets(cockpitDir, colonnes).map(t => t.meta.plan).filter(Boolean))
+export function importOpenPlans(ovrseeDir, now = new Date()) {
+  const colonnes = readBoard(ovrseeDir)
+  const dejaRepris = new Set(readTickets(ovrseeDir, colonnes).map(t => t.meta.plan).filter(Boolean))
   const cree = []
 
-  for (const plan of readPlans(cockpitDir).slice().reverse()) {
+  for (const plan of readPlans(ovrseeDir).slice().reverse()) {
     if (plan.meta.status !== 'open' || dejaRepris.has(plan.file)) continue
 
     // Un plan ouvert sans commit n'a jamais été commencé : c'est du backlog.
@@ -564,7 +564,7 @@ export function importOpenPlans(cockpitDir, now = new Date()) {
 
     cree.push(
       createTicket(
-        cockpitDir,
+        ovrseeDir,
         {
           titre: plan.meta.title ?? plan.file,
           colonne,

@@ -1,18 +1,18 @@
-# Cockpit — English
+# Ovrsee — English
 
 A read-only view of a vibecoded project: what was built, why, what remains open,
 and what the app looked like at each commit. Full docs: [`README.md`](./README.md)
 
-**Cockpit reads; it only runs a terminal if you ask.** The truth lives in `<repo>/cockpit/`,
+**Ovrsee reads; it only runs a terminal if you ask.** The truth lives in `<repo>/ovrsee/`,
 in markdown and images, versioned by git. The app is just a view — if it disappears, nothing is lost.
 
-Complete context: [`cadrage-cockpit.md`](./cadrage-cockpit.md) (French)
+Complete context: [`cadrage-ovrsee.md`](./cadrage-ovrsee.md) (French)
 
-![Cockpit overview](./cockpit/pages/shots/accueil/2026-08-09-24c3123.png)
+![Ovrsee overview](./ovrsee/pages/shots/accueil/2026-08-09-24c3123.png)
 
 ## First launch
 
-A freshly cloned — or downloaded — cockpit opens **empty**: no project is watched
+A freshly cloned — or downloaded — ovrsee opens **empty**: no project is watched
 until you point at one. A three-screen modal then explains what the app does, tunes
 the interface to how you use Claude Code, and leads to picking a first repository.
 It is skippable in one click — or with Escape — and replayable from *Preferences →
@@ -26,22 +26,22 @@ in Preferences afterwards.
 
 ```bash
 # Install once per project
-pnpm cockpit:install /path/to/project
+pnpm ovrsee:install /path/to/project
 
-# Map the application (requires cockpit.config.json at project root)
-pnpm cockpit:crawl /path/to/project
+# Map the application (requires ovrsee.config.json at project root)
+pnpm ovrsee:crawl /path/to/project
 
 # Read
 pnpm electron          # app with integrated terminal
 pnpm dev               # or browser, no terminal
-pnpm cockpit:brief     # or text from CLI
+pnpm ovrsee:brief     # or text from CLI
 ```
 
-When a plan is approved in Claude Code, it is captured automatically in `cockpit/plans/`.
+When a plan is approved in Claude Code, it is captured automatically in `ovrsee/plans/`.
 The post-commit hook then attaches each commit to the active plan. Close the plan when work is done:
 
 ```bash
-pnpm cockpit:close     # removes .active-plan
+pnpm ovrsee:close     # removes .active-plan
 ```
 
 While a plan is active, every commit gets attached to it — even unrelated fixes.
@@ -53,8 +53,8 @@ Two skills, installed from the init screen or with `--skills`:
 
 | Skill | What it teaches |
 |---|---|
-| `cockpit` | Read `cockpit/`: plans, pages, screenshots, pitfalls |
-| `cockpit-tickets` | Write board tickets, format, gestures |
+| `ovrsee` | Read `ovrsee/`: plans, pages, screenshots, pitfalls |
+| `ovrsee-tickets` | Write board tickets, format, gestures |
 
 **Graphify** (feeds the Data tab) is detected but not installed — the app shows the command.
 
@@ -88,7 +88,7 @@ This is intentional: a socket would be open to any process on the same user.
 ## Known Traps
 
 **An active plan captures every commit.**
-While `cockpit/.active-plan` exists, the post-commit hook attaches all commits to it — including unrelated fixes. Run `pnpm cockpit:close` before switching tasks.
+While `ovrsee/.active-plan` exists, the post-commit hook attaches all commits to it — including unrelated fixes. Run `pnpm ovrsee:close` before switching tasks.
 
 **The crawler refuses to start if `baseUrl` already responds.**
 This is intentional. There is no way to distinguish your own server from another's in an HTTP response, and crawling the wrong app would produce backdated screenshots.
@@ -113,4 +113,4 @@ The project uses Node's built-in `test` module only — no test frameworks.
 ## See also
 
 - [`CLAUDE.md`](./CLAUDE.md) — technical reference (French)
-- [`cadrage-cockpit.md`](./cadrage-cockpit.md) — design rationale (French)
+- [`cadrage-ovrsee.md`](./cadrage-ovrsee.md) — design rationale (French)

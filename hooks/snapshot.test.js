@@ -8,8 +8,8 @@ import { snapshot, vaultPath } from './snapshot.js'
 import { DEFAULT_SETTINGS, writeSettings } from './settings.js'
 
 const project = () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-snap-'))
-  mkdirSync(join(dir, 'cockpit', 'plans'), { recursive: true })
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-snap-'))
+  mkdirSync(join(dir, 'ovrsee', 'plans'), { recursive: true })
   return dir
 }
 
@@ -50,7 +50,7 @@ test('les scripts du package.json arrivent tels quels', () => {
 
 test('un plan au frontmatter cassé est signalé au lieu de disparaître', () => {
   const dir = project()
-  writeFileSync(join(dir, 'cockpit', 'plans', '2026-08-09-casse.md'), '---\npas du json\n---\ncorps\n')
+  writeFileSync(join(dir, 'ovrsee', 'plans', '2026-08-09-casse.md'), '---\npas du json\n---\ncorps\n')
 
   const { plans, illisibles } = snapshot(dir)
   assert.deepEqual(plans, [])
@@ -59,8 +59,8 @@ test('un plan au frontmatter cassé est signalé au lieu de disparaître', () =>
 
 test('un ticket au frontmatter cassé est signalé au lieu de disparaître', () => {
   const dir = project()
-  mkdirSync(join(dir, 'cockpit', 'tickets'), { recursive: true })
-  writeFileSync(join(dir, 'cockpit', 'tickets', 'T-0001-casse.md'), '---\n{ cassé\n---\n\ncorps\n')
+  mkdirSync(join(dir, 'ovrsee', 'tickets'), { recursive: true })
+  writeFileSync(join(dir, 'ovrsee', 'tickets', 'T-0001-casse.md'), '---\n{ cassé\n---\n\ncorps\n')
 
   const { tickets, illisibles } = snapshot(dir)
   assert.deepEqual(tickets, [])
@@ -69,10 +69,10 @@ test('un ticket au frontmatter cassé est signalé au lieu de disparaître', () 
 
 test('un fichier cassé ne cache pas ceux qui se lisent', () => {
   const dir = project()
-  mkdirSync(join(dir, 'cockpit', 'tickets'), { recursive: true })
-  writeFileSync(join(dir, 'cockpit', 'tickets', 'T-0001-casse.md'), '---\n{ cassé\n---\n')
+  mkdirSync(join(dir, 'ovrsee', 'tickets'), { recursive: true })
+  writeFileSync(join(dir, 'ovrsee', 'tickets', 'T-0001-casse.md'), '---\n{ cassé\n---\n')
   writeFileSync(
-    join(dir, 'cockpit', 'tickets', 'T-0002-bon.md'),
+    join(dir, 'ovrsee', 'tickets', 'T-0002-bon.md'),
     '---\n{ "id": "T-0002", "titre": "Bon", "colonne": "backlog" }\n---\n\ncorps\n',
   )
 
@@ -84,9 +84,9 @@ test('un fichier cassé ne cache pas ceux qui se lisent', () => {
 
 test('une ligne illisible de scans.jsonl est comptée, pas seulement sautée', () => {
   const dir = project()
-  mkdirSync(join(dir, 'cockpit', 'pages'), { recursive: true })
+  mkdirSync(join(dir, 'ovrsee', 'pages'), { recursive: true })
   writeFileSync(
-    join(dir, 'cockpit', 'pages', 'scans.jsonl'),
+    join(dir, 'ovrsee', 'pages', 'scans.jsonl'),
     'pas du json\n{"date":"2026-08-09","ok":true,"commit":"abc"}\n',
   )
 
@@ -117,7 +117,7 @@ const poserCoffre = (dir, chemin = 'coffre') => {
     join(dir, chemin, 'commandes.md'),
     '---\ntype: table\ntitre: Commandes\n---\n\nLes commandes.\n',
   )
-  writeFileSync(join(dir, 'cockpit.config.json'), JSON.stringify({ obsidianVault: chemin }))
+  writeFileSync(join(dir, 'ovrsee.config.json'), JSON.stringify({ obsidianVault: chemin }))
 }
 
 test('sans coffre déclaré, le graphe vient de Graphify', () => {
@@ -154,7 +154,7 @@ test("le coffre sert quand Graphify n’a rien produit", () => {
 test('un coffre déclaré mais illisible rend null, sans Graphify pour le sauver', () => {
   const dir = project()
   writeFileSync(
-    join(dir, 'cockpit.config.json'),
+    join(dir, 'ovrsee.config.json'),
     JSON.stringify({ obsidianVault: 'coffre-absent' }),
   )
 
@@ -231,17 +231,17 @@ test("sourceDate est null quand il n'y a pas de source", () => {
 })
 
 test('choix explicite de Graphify avec sourceMissing quand absent', () => {
-  const tempDir = mkdtempSync(join(tmpdir(), 'cockpit-snap-src-'))
+  const tempDir = mkdtempSync(join(tmpdir(), 'ovrsee-snap-src-'))
   const dir = project()
   const settingsFile = join(tempDir, 'settings.json')
   try {
     // Config projet demande Graphify explicitement
     writeFileSync(
-      join(dir, 'cockpit.config.json'),
+      join(dir, 'ovrsee.config.json'),
       JSON.stringify({ sourceGraphe: 'graphify' }),
     )
     // Pas de Graphify, pas de coffre
-    process.env.COCKPIT_SETTINGS = settingsFile
+    process.env.OVRSEE_SETTINGS = settingsFile
     writeSettings(DEFAULT_SETTINGS)
 
     const snap = snapshot(dir)
@@ -249,23 +249,23 @@ test('choix explicite de Graphify avec sourceMissing quand absent', () => {
     assert.equal(snap.sourceMissing, true)
     assert.equal(snap.graph, null)
   } finally {
-    delete process.env.COCKPIT_SETTINGS
+    delete process.env.OVRSEE_SETTINGS
     rmSync(tempDir, { recursive: true })
   }
 })
 
 test("choix explicite d'Obsidian avec sourceMissing quand absent", () => {
-  const tempDir = mkdtempSync(join(tmpdir(), 'cockpit-snap-src-'))
+  const tempDir = mkdtempSync(join(tmpdir(), 'ovrsee-snap-src-'))
   const dir = project()
   const settingsFile = join(tempDir, 'settings.json')
   try {
     // Config projet demande Obsidian explicitement, mais pas configuré
     writeFileSync(
-      join(dir, 'cockpit.config.json'),
+      join(dir, 'ovrsee.config.json'),
       JSON.stringify({ sourceGraphe: 'obsidian' }),
     )
     // Pas de Graphify
-    process.env.COCKPIT_SETTINGS = settingsFile
+    process.env.OVRSEE_SETTINGS = settingsFile
     writeSettings(DEFAULT_SETTINGS)
 
     const snap = snapshot(dir)
@@ -273,7 +273,7 @@ test("choix explicite d'Obsidian avec sourceMissing quand absent", () => {
     assert.equal(snap.sourceMissing, true)
     assert.equal(snap.graph, null)
   } finally {
-    delete process.env.COCKPIT_SETTINGS
+    delete process.env.OVRSEE_SETTINGS
     rmSync(tempDir, { recursive: true })
   }
 })

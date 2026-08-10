@@ -2,7 +2,7 @@
  * Sessions de terminal.
  *
  * Le panneau est un vrai terminal : le pty ouvre un **shell de connexion**,
- * puis le cockpit y tape `claude` une fois. Quitter Claude rend la main au
+ * puis l'ovrsee y tape `claude` une fois. Quitter Claude rend la main au
  * shell au lieu de tuer le panneau.
  *
  * Une session `shell` ouvre le même shell sans rien y taper : c'est là qu'on
@@ -50,11 +50,11 @@ function loginShell() {
  * Environnement du shell.
  *
  * Trois nettoyages, tous pour la même raison — ce qui traîne dans
- * l'environnement du cockpit n'a rien à faire dans une session Claude neuve :
+ * l'environnement de l'ovrsee n'a rien à faire dans une session Claude neuve :
  *
  * - `ELECTRON_RUN_AS_NODE` et `NODE_OPTIONS` : posés par Electron, ils cassent
  *   tout `node` lancé depuis le terminal.
- * - `CLAUDE*` : si le cockpit a lui-même été lancé depuis une session Claude
+ * - `CLAUDE*` : si l'ovrsee a lui-même été lancé depuis une session Claude
  *   Code, il en hérite les marqueurs (`CLAUDE_CODE_CHILD_SESSION`,
  *   `CLAUDE_CODE_SESSION_ID`, `CLAUDE_CODE_MESSAGING_SOCKET`…). La session du
  *   panneau se croit alors fille d'une autre et cesse d'enregistrer son
@@ -84,7 +84,7 @@ let counter = 0
 /**
  * Ouvre une session dans le dossier d'un projet.
  *
- * Un projet sans `cockpit/` ouvre une session comme les autres : c'est là qu'on
+ * Un projet sans `ovrsee/` ouvre une session comme les autres : c'est là qu'on
  * l'équipe. L'appartenance au registre est vérifiée en amont, dans le
  * gestionnaire `pty:open` de `main.js` — la liste blanche vit avec les autres,
  * pas dupliquée ici.

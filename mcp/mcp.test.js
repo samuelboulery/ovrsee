@@ -1,7 +1,7 @@
 /**
  * Tests du dispatcher MCP.
  *
- * Utilise node:test + node:assert/strict, tmpdir, COCKPIT_REGISTRY isolé.
+ * Utilise node:test + node:assert/strict, tmpdir, OVRSEE_REGISTRY isolé.
  */
 
 import { test } from 'node:test'
@@ -15,22 +15,22 @@ import { dispatch } from './dispatch.js'
 
 // Isoler le registre du système réel
 const withRegistry = () => {
-  process.env.COCKPIT_REGISTRY = join(mkdtempSync(join(tmpdir(), 'cockpit-mcp-')), 'projects.json')
+  process.env.OVRSEE_REGISTRY = join(mkdtempSync(join(tmpdir(), 'ovrsee-mcp-')), 'projects.json')
 }
 
 // Créer un faux registre avec un projet
 const registerProject = (path) => {
-  const registryPath = process.env.COCKPIT_REGISTRY
+  const registryPath = process.env.OVRSEE_REGISTRY
   const projects = [{ path, name: 'test', lastOpened: new Date().toISOString() }]
   writeFileSync(registryPath, JSON.stringify(projects, null, 2) + '\n')
 }
 
 // Créer un dossier de projet minimal
 const projectDir = () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-proj-'))
-  mkdirSync(join(dir, 'cockpit', 'pages', 'shots'), { recursive: true })
-  mkdirSync(join(dir, 'cockpit', 'tickets'), { recursive: true })
-  writeFileSync(join(dir, 'cockpit', 'board.json'), JSON.stringify({
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-proj-'))
+  mkdirSync(join(dir, 'ovrsee', 'pages', 'shots'), { recursive: true })
+  mkdirSync(join(dir, 'ovrsee', 'tickets'), { recursive: true })
+  writeFileSync(join(dir, 'ovrsee', 'board.json'), JSON.stringify({
     colonnes: [{ id: 'backlog', titre: 'Backlog' }, { id: 'terminé', titre: 'Terminé' }],
   }) + '\n')
   return dir
@@ -100,7 +100,7 @@ test('getProjectSummary refuse un chemin inexistant', () => {
 test('getProjectSummary refuse un lien symbolique', () => {
   withRegistry()
   const dir = projectDir()
-  const linkPath = join(tmpdir(), 'cockpit-link-' + Math.random().toString(36).slice(2))
+  const linkPath = join(tmpdir(), 'ovrsee-link-' + Math.random().toString(36).slice(2))
   symlinkSync(dir, linkPath)
   registerProject(linkPath)
 
@@ -140,7 +140,7 @@ test('createTicket crée un ticket avec titre valide', () => {
   assert.ok(!result.isError)
   assert.ok(result.content.success)
   // Vérifier que le fichier a été créé (le format est T-XXXX-titre-en-minuscules.md)
-  const ticketsDir = join(dir, 'cockpit', 'tickets')
+  const ticketsDir = join(dir, 'ovrsee', 'tickets')
   const files = readdirSync(ticketsDir)
   assert.ok(files.length > 0)
   assert.ok(files.some(f => f.match(/^T-\d+-test-ticket\.md$/)))
@@ -185,7 +185,7 @@ test('moveTicket déplace un ticket vers une colonne', () => {
   dispatch('createTicket', { path: dir, titre: 'Ticket 1', colonne: 'backlog' })
 
   // Trouver le fichier créé
-  const ticketsDir = join(dir, 'cockpit', 'tickets')
+  const ticketsDir = join(dir, 'ovrsee', 'tickets')
   const file = readdirSync(ticketsDir)[0]
 
   const result = dispatch('moveTicket', {
@@ -261,8 +261,8 @@ test('listTickets rend les plus récents d\'abord, et pas plus que la limite', (
   dispatch('createTicket', { path: dir, titre: 'Recent', colonne: 'backlog' })
   // Vieillir le premier : sans cela les deux portent la même date du jour et
   // l'ordre rendu ne prouve rien. Le frontmatter est du JSON entre `---`.
-  const fichiers = readdirSync(join(dir, 'cockpit', 'tickets')).sort()
-  const ancien = join(dir, 'cockpit', 'tickets', fichiers[0])
+  const fichiers = readdirSync(join(dir, 'ovrsee', 'tickets')).sort()
+  const ancien = join(dir, 'ovrsee', 'tickets', fichiers[0])
   writeFileSync(ancien, readFileSync(ancien, 'utf8').replace(/"cree": "[^"]+"/, '"cree": "2020-01-01"'))
 
   const result = dispatch('listTickets', { path: dir, limit: 1 })
@@ -311,7 +311,7 @@ test('dispatch retourne une erreur pour un outil inconnu', () => {
 function parLeFil(demandes, registre) {
   const out = execFileSync(process.execPath, [join(import.meta.dirname, 'server.js')], {
     input: demandes.join('\n') + '\n',
-    env: { ...process.env, COCKPIT_REGISTRY: registre },
+    env: { ...process.env, OVRSEE_REGISTRY: registre },
     encoding: 'utf8',
   })
   return out.trim().split('\n').filter(Boolean).map(l => JSON.parse(l))
@@ -323,7 +323,7 @@ const demande = (id, method, params) =>
 test('le serveur annonce la capacité tools à l\'initialisation', () => {
   withRegistry()
 
-  const [rep] = parLeFil([demande(1, 'initialize', { protocolVersion: '2024-11-05' })], process.env.COCKPIT_REGISTRY)
+  const [rep] = parLeFil([demande(1, 'initialize', { protocolVersion: '2024-11-05' })], process.env.OVRSEE_REGISTRY)
 
   assert.equal(rep.id, 1)
   assert.equal(rep.result.protocolVersion, '2024-11-05')
@@ -337,7 +337,7 @@ test('le serveur ne répond pas à une notification', () => {
   const reps = parLeFil([
     JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' }),
     demande(2, 'tools/list'),
-  ], process.env.COCKPIT_REGISTRY)
+  ], process.env.OVRSEE_REGISTRY)
 
   assert.equal(reps.length, 1)
   assert.equal(reps[0].id, 2)
@@ -346,7 +346,7 @@ test('le serveur ne répond pas à une notification', () => {
 test('tools/list annonce des outils avec un schéma d\'entrée', () => {
   withRegistry()
 
-  const [rep] = parLeFil([demande(1, 'tools/list')], process.env.COCKPIT_REGISTRY)
+  const [rep] = parLeFil([demande(1, 'tools/list')], process.env.OVRSEE_REGISTRY)
 
   assert.ok(Array.isArray(rep.result.tools))
   assert.ok(rep.result.tools.every(t => t.name && t.description && t.inputSchema))
@@ -361,7 +361,7 @@ test('tools/call enveloppe le résultat dans content', () => {
 
   const [rep] = parLeFil(
     [demande(1, 'tools/call', { name: 'listProjects', arguments: {} })],
-    process.env.COCKPIT_REGISTRY,
+    process.env.OVRSEE_REGISTRY,
   )
 
   assert.equal(rep.error, undefined)
@@ -375,7 +375,7 @@ test('un refus d\'outil est un résultat isError, pas une erreur JSON-RPC', () =
 
   const [rep] = parLeFil(
     [demande(1, 'tools/call', { name: 'getProjectSummary', arguments: { path: '/tmp/inexistant-12345' } })],
-    process.env.COCKPIT_REGISTRY,
+    process.env.OVRSEE_REGISTRY,
   )
 
   // Une erreur JSON-RPC ferait disparaître le motif du refus côté modèle.
@@ -387,7 +387,7 @@ test('un refus d\'outil est un résultat isError, pas une erreur JSON-RPC', () =
 test('une méthode inconnue reste une erreur JSON-RPC', () => {
   withRegistry()
 
-  const [rep] = parLeFil([demande(1, 'resources/list')], process.env.COCKPIT_REGISTRY)
+  const [rep] = parLeFil([demande(1, 'resources/list')], process.env.OVRSEE_REGISTRY)
 
   assert.equal(rep.error.code, -32601)
 })

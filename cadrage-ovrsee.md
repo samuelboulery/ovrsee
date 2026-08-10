@@ -1,4 +1,4 @@
-# Cockpit — Document de cadrage
+# Ovrsee — Document de cadrage
 
 *Cadrage réalisé le 8 août 2026. Toutes les décisions actées ci-dessous sont révisables, mais elles ont été arbitrées, pas subies.*
 
@@ -39,7 +39,7 @@ Objectif : réduire le coût de reprise en main, et garder la maîtrise d'un cod
 - **Vue Backlog** — les plans ouverts, non exécutés
 - **Vue Données** et **Vue Stack** — lues depuis Graphify, non reconstruites
 - **Densité d'activité** — où le travail s'est concentré, ce qui dort
-- **Multi-projets** — liste des projets, chacun avec son cockpit
+- **Multi-projets** — liste des projets, chacun avec son ovrsee
 
 ### Dehors, et pourquoi
 
@@ -59,7 +59,7 @@ dans une fenêtre Claude, et le registre de projets (introduit pour le multi-pro
 lui-même) expose exactement ce qui manque. Le serveur MCP devient une traduction
 transparente des routes `/api/*` du serveur HTTP vers stdio JSON-RPC 2.0 : même
 interface, même validations (registre + symlinks refusés), ni lecture ni écriture
-en dehors de `cockpit/tickets/` et `cockpit/board.json`. Zéro dépendance, même
+en dehors de `ovrsee/tickets/` et `ovrsee/board.json`. Zéro dépendance, même
 standard de tests que `server/api.test.js`.
 
 ---
@@ -89,7 +89,7 @@ standard de tests que `server/api.test.js`.
 
 ## 5. Boucle de mise à jour
 
-**Principe directeur : le cockpit lit, il n'exécute jamais.** La vérité vit dans des fichiers markdown et des images, dans le repo, versionnés par git. L'application est une vue. Si elle disparaît, rien n'est perdu.
+**Principe directeur : l'ovrsee lit, il n'exécute jamais.** La vérité vit dans des fichiers markdown et des images, dans le repo, versionnés par git. L'application est une vue. Si elle disparaît, rien n'est perdu.
 
 ### Qui écrit quoi
 
@@ -110,7 +110,7 @@ standard de tests que `server/api.test.js`.
 
 **Une capture est datée, toujours.** C'est le seul endroit du système où la dérive est tolérable : une phrase fausse ment sans prévenir, une image marquée « il y a trois semaines » est honnête.
 
-**Un scan échoué s'écrit.** Si le crawl ne démarre pas, le cockpit inscrit « scan échoué le X » plutôt que de conserver silencieusement la capture précédente.
+**Un scan échoué s'écrit.** Si le crawl ne démarre pas, l'ovrsee inscrit « scan échoué le X » plutôt que de conserver silencieusement la capture précédente.
 
 **Rien ne s'écrit à la main.** Un fichier que Sam devrait maintenir lui-même serait faux en trois semaines.
 
@@ -130,7 +130,7 @@ Une fenêtre par projet, en onglets. Ce qu'on doit comprendre en cinq secondes s
 
 **Vue d'accueil multi-projets :** la liste des projets, avec pour chacun la date de dernière activité et le nombre de plans ouverts.
 
-**Technique :** coquille web embarquée (Tauri ou Electron), terminal Claude Code intégré via xterm.js et un pseudo-terminal. C'est le mécanisme du terminal intégré de VS Code — pas une version dégradée. Injecter du contexte depuis le cockpit revient à écrire dans ce terminal.
+**Technique :** coquille web embarquée (Tauri ou Electron), terminal Claude Code intégré via xterm.js et un pseudo-terminal. C'est le mécanisme du terminal intégré de VS Code — pas une version dégradée. Injecter du contexte depuis l'ovrsee revient à écrire dans ce terminal.
 
 *Point à vérifier au moment de l'implémentation :* un terminal embarqué lance le binaire en mode interactif, donc dans le régime de facturation habituel. Piloter Claude Code par l'Agent SDK en sortirait, avec un régime de facturation dont le statut actuel est incertain — les sources publiques se contredisent.
 
@@ -140,17 +140,17 @@ Une fenêtre par projet, en onglets. Ce qu'on doit comprendre en cinq secondes s
 
 ### v0.1 — La capture (aucune interface)
 
-Un skill et des hooks qui écrivent dans `/cockpit/plans/`. Un fichier par plan approuvé, clos au commit.
+Un skill et des hooks qui écrivent dans `/ovrsee/plans/`. Un fichier par plan approuvé, clos au commit.
 
 *Pourquoi en premier :* c'est le seul contenu périssable. Chaque semaine sans lui est définitivement perdue. La carte, elle, se génère aussi bien dans six mois.
 
-**Critère de succès :** ouvrir une session Claude Code, lui interdire de lire le code, ne lui donner que `/cockpit/`, demander un brief du projet. Si le brief est utilisable, c'est validé.
+**Critère de succès :** ouvrir une session Claude Code, lui interdire de lire le code, ne lui donner que `/ovrsee/`, demander un brief du projet. Si le brief est utilisable, c'est validé.
 
 *Reste ouvert :* la granularité du plan.
 
 ### v0.2 — Le crawl (aucune interface)
 
-Script post-commit : démarrage de l'app, extraction des routes, parcours, captures datées et graphe de navigation dans `/cockpit/pages/`. Sortie : un HTML statique brut.
+Script post-commit : démarrage de l'app, extraction des routes, parcours, captures datées et graphe de navigation dans `/ovrsee/pages/`. Sortie : un HTML statique brut.
 
 **Critère de succès :** ça passe sur le projet le plus tordu — authentification et routes dynamiques comprises.
 
@@ -182,7 +182,7 @@ Empaquetage en application de bureau, terminal Claude Code intégré, injection 
 
 ### Graves
 
-**Le crawl ne démarre pas.** L'application ne se lance plus — dépendances obsolètes, service externe disparu. C'est le scénario le plus probable sur un projet dormant, et c'est exactement celui où le cockpit est le plus utile. *Mitigation :* les captures sont un historique versionné, pas un scan à la demande. Le cockpit reste consultable sur un projet qui ne compile plus.
+**Le crawl ne démarre pas.** L'application ne se lance plus — dépendances obsolètes, service externe disparu. C'est le scénario le plus probable sur un projet dormant, et c'est exactement celui où l'ovrsee est le plus utile. *Mitigation :* les captures sont un historique versionné, pas un scan à la demande. L'ovrsee reste consultable sur un projet qui ne compile plus.
 
 **Les plans creux.** Si les plans capturés sont verbeux et sans substance, l'historique devient illisible et personne ne le relit. C'est le piège classique des changelogs générés par agent. *Mitigation :* le critère n'est pas l'importance mais le fait qu'une porte ait été fermée — une décision écarte explicitement une alternative, une trace ne fait qu'énoncer.
 

@@ -276,7 +276,7 @@ function Controls({
  *
  * Tout le reste est écarté, et c'est le fond du problème que cette règle
  * corrige. Une barre de navigation met sur chaque page un lien vers toutes les
- * autres : les cinq pages du cockpit produisent vingt liens, dont seize entre
+ * autres : les cinq pages de l'ovrsee produisent vingt liens, dont seize entre
  * frères de même niveau. Tracés, ils donnaient à `/stack` l'air de découler de
  * `/donnees`. Un lien frère ne dit rien de la structure — il dit qu'il y a un
  * menu. Un lien qui remonte non plus : toute page ramène à l'accueil.

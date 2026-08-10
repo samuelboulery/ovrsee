@@ -1,12 +1,12 @@
 /**
- * Préférences globales du cockpit, dans `~/.claude/cockpit/settings.json`.
+ * Préférences globales de l'ovrsee, dans `~/.claude/ovrsee/settings.json`.
  *
  * Module pur : pas d'accès réseau, pas de shell, pas d'état global. C'est le
  * cœur logique dont dépendent les deux hôtes (dev server et Electron) et
  * l'interface.
  *
- * Deux niveaux : global dans `~/.claude/cockpit/settings.json`, surcharges
- * par `cockpit.config.json` (versionné git du projet). Les champs personnels
+ * Deux niveaux : global dans `~/.claude/ovrsee/settings.json`, surcharges
+ * par `ovrsee.config.json` (versionné git du projet). Les champs personnels
  * (`langue`, `theme`, `densiteActivite`, `onboardingVu`, `claude`) ne se
  * surchargent pas.
  */
@@ -70,12 +70,12 @@ export const USAGES_CLAUDE = ['terminal', 'ide', 'desktop', 'autre']
 /**
  * Chemin du fichier de préférences globales.
  *
- * `COCKPIT_SETTINGS` env var pour les tests : ils écrivent réellement dans le
+ * `OVRSEE_SETTINGS` env var pour les tests : ils écrivent réellement dans le
  * fichier, et un test qui lisait dans le profil live de l'utilisateur serait
  * un test qui casse l'outil qu'il vérifie.
  */
 export const settingsPath = () =>
-  process.env.COCKPIT_SETTINGS ?? join(homedir(), '.claude', 'cockpit', 'settings.json')
+  process.env.OVRSEE_SETTINGS ?? join(homedir(), '.claude', 'ovrsee', 'settings.json')
 
 /**
  * Lit le profil global, fusionne avec les défauts. Un fichier corrompu ou
@@ -230,7 +230,7 @@ export function writeSettings(settings) {
  * présentation.
  *
  * @param {object} global profil utilisateur
- * @param {object} project surcharges du projet (cockpit.config.json)
+ * @param {object} project surcharges du projet (ovrsee.config.json)
  * @returns {object} fusionné
  */
 export function mergeSettings(global, project = {}) {

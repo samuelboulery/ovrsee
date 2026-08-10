@@ -36,12 +36,12 @@ export type Editeur = 'vscode' | 'cursor' | 'zed' | 'windsurf'
 
 declare global {
   interface Window {
-    cockpit?: {
+    ovrsee?: {
       terminal: TerminalBridge
       projects: {
         /** Sélecteur de dossier du système. Rend null si l'utilisateur annule. */
         pick: () => Promise<string | null>
-        /** Révèle le `cockpit/` du projet dans le Finder. */
+        /** Révèle le `ovrsee/` du projet dans le Finder. */
         reveal: (projectPath: string) => Promise<boolean>
         /** Ouvre le projet dans un éditeur, par schéma d'URL. */
         edit: (projectPath: string, editor: Editeur) => Promise<boolean>
@@ -61,7 +61,7 @@ declare global {
   }
 }
 
-export const terminalBridge = (): TerminalBridge | null => window.cockpit?.terminal ?? null
+export const terminalBridge = (): TerminalBridge | null => window.ovrsee?.terminal ?? null
 
 /**
  * Palette xterm thématisée, calculée au démarrage.

@@ -1,7 +1,7 @@
 /**
  * Le brief réinjecté au démarrage d'une session Claude Code.
  *
- * C'est la boucle inverse du cockpit : jusqu'ici il servait à ce que Sam
+ * C'est la boucle inverse de l'ovrsee : jusqu'ici il servait à ce que Sam
  * relise son projet ; ici il sert à ce que Claude Code le connaisse déjà.
  *
  * Contrainte gouvernante : ce texte est payé à CHAQUE session, sur chaque
@@ -46,20 +46,20 @@ const readJson = path => {
  * Lit l'état d'un dépôt.
  * @param {string} root racine du dépôt
  * @returns {{name: string, plans: Array, pageCount: number, scan: object|null}|null}
- *   null si le dépôt n'a pas de cockpit — il n'y a alors rien à dire.
+ *   null si le dépôt n'a pas de ovrsee — il n'y a alors rien à dire.
  */
-export function readCockpit(root) {
-  const cockpitDir = join(root, 'cockpit')
+export function readOvrsee(root) {
+  const ovrseeDir = join(root, 'ovrsee')
   // L'existence du dossier fait foi, pas la lisibilité de son contenu : un
-  // pages.json corrompu est un cockpit abîmé, pas un dépôt sans cockpit.
-  if (!existsSync(cockpitDir)) return null
+  // pages.json corrompu est un ovrsee abîmé, pas un dépôt sans ovrsee.
+  if (!existsSync(ovrseeDir)) return null
 
-  const plans = readPlans(cockpitDir)
-  const pages = readJson(join(cockpitDir, 'pages', 'pages.json'))
+  const plans = readPlans(ovrseeDir)
+  const pages = readJson(join(ovrseeDir, 'pages', 'pages.json'))
 
   let scans = []
   try {
-    scans = readFileSync(join(cockpitDir, 'pages', 'scans.jsonl'), 'utf8')
+    scans = readFileSync(join(ovrseeDir, 'pages', 'scans.jsonl'), 'utf8')
       .split('\n')
       .filter(Boolean)
       .flatMap(line => {
@@ -73,7 +73,7 @@ export function readCockpit(root) {
     scans = []
   }
 
-  const board = readBoard(cockpitDir)
+  const board = readBoard(ovrseeDir)
 
   return {
     name: basename(root),
@@ -81,7 +81,7 @@ export function readCockpit(root) {
     pageCount: Array.isArray(pages?.pages) ? pages.pages.length : 0,
     scan: scans.at(-1) ?? null,
     board,
-    tickets: sortTickets(readTickets(cockpitDir, board)).map(t => ({ file: t.file, ...t.meta })),
+    tickets: sortTickets(readTickets(ovrseeDir, board)).map(t => ({ file: t.file, ...t.meta })),
   }
 }
 
@@ -143,10 +143,10 @@ export function buildBrief(state, now = new Date()) {
 
   const aucunTicket = (state.tickets ?? []).length === 0
   if (state.pageCount === 0 && open.length === 0 && closed.length === 0 && !state.scan && aucunTicket) {
-    return '' // Un cockpit vide : mieux vaut se taire que produire un brief creux.
+    return '' // Un ovrsee vide : mieux vaut se taire que produire un brief creux.
   }
 
-  lines.push(`[cockpit] ${state.name} — état lu depuis cockpit/, sans ouvrir le code.`)
+  lines.push(`[ovrsee] ${state.name} — état lu depuis ovrsee/, sans ouvrir le code.`)
 
   if (state.pageCount > 0) {
     lines.push(`${state.pageCount} page(s) cartographiée(s).`)
@@ -176,7 +176,7 @@ export function buildBrief(state, now = new Date()) {
       lines.push(`  - ${plan.title} (${age(plan.opened, now)})`)
     }
     if (open.length > MAX_LISTED) {
-      lines.push(`  … et ${open.length - MAX_LISTED} autre(s), dans cockpit/plans/.`)
+      lines.push(`  … et ${open.length - MAX_LISTED} autre(s), dans ovrsee/plans/.`)
     }
   }
 
@@ -188,7 +188,7 @@ export function buildBrief(state, now = new Date()) {
   const restants = (state.tickets ?? []).filter(t => t.colonne !== fini)
 
   if (restants.length > 0) {
-    lines.push(`${restants.length} ticket(s) à faire — tableau dans cockpit/tickets/ :`)
+    lines.push(`${restants.length} ticket(s) à faire — tableau dans ovrsee/tickets/ :`)
     for (const ticket of restants.slice(0, MAX_LISTED)) {
       lines.push(
         `  - ${ticket.id} [${ticket.priorite}] ${ticket.titre} — ${titres.get(ticket.colonne) ?? ticket.colonne}`,
@@ -199,6 +199,6 @@ export function buildBrief(state, now = new Date()) {
     }
   }
 
-  lines.push('Le détail — intentions, alternatives écartées, captures — est dans cockpit/.')
+  lines.push('Le détail — intentions, alternatives écartées, captures — est dans ovrsee/.')
   return lines.join('\n')
 }

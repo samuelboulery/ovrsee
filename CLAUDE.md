@@ -1,21 +1,21 @@
-# Cockpit
+# Ovrsee
 
 Vue en lecture seule sur un projet vibecodé : plans capturés, pages crawlées,
 historique daté, tickets. Application Electron + interface Vite/React.
 
 Le cadrage — problème, alternatives écartées, périmètre — est dans
-[`cadrage-cockpit.md`](./cadrage-cockpit.md). Le mode d'emploi est dans
+[`cadrage-ovrsee.md`](./cadrage-ovrsee.md). Le mode d'emploi est dans
 [`README.md`](./README.md). Ce fichier ne dit que ce qui n'est pas déductible du code.
 
 ## L'invariant
 
-**Le cockpit lit ; il n'exécute que le terminal qu'on lui demande.**
+**L'ovrsee lit ; il n'exécute que le terminal qu'on lui demande.**
 
-La vérité vit dans `<repo>/cockpit/`, en markdown et en images, versionnée par git.
+La vérité vit dans `<repo>/ovrsee/`, en markdown et en images, versionnée par git.
 L'application n'est qu'une vue : si elle disparaît, rien n'est perdu.
 
 C'est la règle qui doit faire refuser une fonctionnalité. Toute proposition qui fait
-écrire l'application ailleurs que dans `cockpit/tickets/` et `cockpit/board.json`, ou
+écrire l'application ailleurs que dans `ovrsee/tickets/` et `ovrsee/board.json`, ou
 qui lui fait exécuter du code du projet observé, contredit le cadrage — le dire avant
 de l'implémenter.
 
@@ -34,7 +34,7 @@ locale. Une socket l'ouvrirait à tout processus tournant sous le même compte.
 | `electron/` | Processus principal, preload, pty | non — `.js`/`.cjs` |
 
 **`server/api.js` a trois hôtes, une seule implémentation** : le middleware du dev
-server Vite (`vite.config.js`), le gestionnaire du protocole `cockpit://` du
+server Vite (`vite.config.js`), le gestionnaire du protocole `ovrsee://` du
 processus principal (`electron/main.js`), et le serveur MCP (`mcp/dispatch.js`). 
 Les trois appellent la même fonction pure `resolve()`. Dédoubler cette logique est 
 la faute à ne pas commettre — trois implémentations divergeraient, et les bugs ne 
@@ -53,7 +53,7 @@ pnpm test         # node --test sur hooks/ crawl/ server/ mcp/, puis app/src com
 pnpm typecheck    # tsc, ne couvre QUE app/src
 pnpm build:ui     # vite build vers app/dist/
 pnpm package      # DMG dans release/ (arm64, non signé)
-pnpm cockpit:mcp  # serveur MCP stdio (JSON-RPC 2.0) pour Claude Code et Claude Desktop
+pnpm ovrsee:mcp  # serveur MCP stdio (JSON-RPC 2.0) pour Claude Code et Claude Desktop
 ```
 
 `pnpm test` n'utilise **aucun framework** : `node:test` et `node:assert` seuls.
@@ -70,11 +70,11 @@ page : pour ça, il faut lancer l'app.
 
 ## Zones à ne pas toucher
 
-- **`cockpit/`** est produit par les hooks. Seuls `cockpit/tickets/*.md` et
-  `cockpit/board.json` se saisissent — via le skill `cockpit-tickets`. Les plans, les
+- **`ovrsee/`** est produit par les hooks. Seuls `ovrsee/tickets/*.md` et
+  `ovrsee/board.json` se saisissent — via le skill `ovrsee-tickets`. Les plans, les
   pages, les scans et les captures s'écrivent tout seuls ; les corriger à la main
   produit un état que le prochain commit écrasera.
-- **`support.js`** (69 ko) et **`Cockpit-A-Nocturne.dc.html`** sont du code tiers
+- **`support.js`** (69 ko) et **`Ovrsee-A-Nocturne.dc.html`** sont du code tiers
   embarqué pour la maquette. Hors périmètre : ne pas relire, ne pas corriger, ne pas
   compter dans les métriques du projet.
 - **`_ds/`** est une bibliothèque de design systems. Seul `nocturne-*` est chargé.
@@ -84,13 +84,13 @@ page : pour ça, il faut lancer l'app.
 
 ## Pièges connus
 
-- **Un plan actif capte tous les commits.** Tant que `cockpit/.active-plan` existe, le
+- **Un plan actif capte tous les commits.** Tant que `ovrsee/.active-plan` existe, le
   hook post-commit rattache chaque commit au plan — y compris un correctif sans
-  rapport. `pnpm cockpit:close` avant de changer de sujet.
+  rapport. `pnpm ovrsee:close` avant de changer de sujet.
 - **Le registre est la seule source de projets.** `projects()` n'ajoute plus le dépôt
-  courant sous prétexte qu'il porte un `cockpit/` : sans quoi un clone frais s'ouvrait
+  courant sous prétexte qu'il porte un `ovrsee/` : sans quoi un clone frais s'ouvrait
   sur lui-même et personne ne voyait jamais l'écran de premier lancement. Conséquence
-  au dev server : il faut inscrire le dépôt cockpit une fois, comme n'importe quel
+  au dev server : il faut inscrire le dépôt ovrsee une fois, comme n'importe quel
   autre projet. Cette liste sert aussi de liste blanche aux routes — elle ne doit
   rien contenir d'implicite.
 - **Le crawl refuse de démarrer si `baseUrl` répond déjà.** C'est voulu : rien dans une

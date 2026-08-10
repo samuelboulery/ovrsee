@@ -1,5 +1,5 @@
 /**
- * Lecture, écriture et dérivations des plans de /cockpit/plans/.
+ * Lecture, écriture et dérivations des plans de /ovrsee/plans/.
  *
  * Module pur : pas d'accès réseau, pas de shell, pas d'état global. C'est le
  * cœur logique dont dépendent les deux hooks et l'interface.
@@ -64,8 +64,8 @@ export function serializePlan(meta, body) {
 }
 
 /**
- * Lit tous les plans d'un dossier cockpit.
- * @param {string} cockpitDir chemin de `<repo>/cockpit`
+ * Lit tous les plans d'un dossier ovrsee.
+ * @param {string} ovrseeDir chemin de `<repo>/ovrsee`
  * @param {Array<{file: string, quoi: string}>} [illisibles] collecteur des
  *   fichiers que la lecture n'a pas su ouvrir. Sans lui, un plan cassé
  *   disparaît de l'interface aussi sûrement que s'il n'existait pas, et rien
@@ -73,8 +73,8 @@ export function serializePlan(meta, body) {
  * @returns {Array<{file: string, meta: object, body: string}>} du plus récent
  *   au plus ancien.
  */
-export function readPlans(cockpitDir, illisibles = []) {
-  const dir = join(cockpitDir, 'plans')
+export function readPlans(ovrseeDir, illisibles = []) {
+  const dir = join(ovrseeDir, 'plans')
 
   let names
   try {
@@ -101,7 +101,7 @@ export function readPlans(cockpitDir, illisibles = []) {
       // ne doit pas disparaître en silence non plus : c'est précisément le
       // contenu qu'on ne peut pas reconstituer.
       illisibles.push({ file: `plans/${name}`, quoi: 'plan' })
-      process.stderr.write(`[cockpit] plan illisible, ignoré : ${name}\n`)
+      process.stderr.write(`[ovrsee] plan illisible, ignoré : ${name}\n`)
     }
   }
   return plans
@@ -113,14 +113,14 @@ export function readPlans(cockpitDir, illisibles = []) {
  * Seul chemin d'écriture d'un plan existant — les trois appelants (capture,
  * post-commit, CLI) passent par ici plutôt que de refaire chacun le cycle.
  *
- * @param {string} cockpitDir
+ * @param {string} ovrseeDir
  * @param {string} file nom de fichier, déjà validé par isSafePlanFileName
  * @param {(meta: object) => object | null} update rend la nouvelle meta, ou
  *   null pour renoncer à écrire.
  * @returns {boolean} true si le fichier a été réécrit
  */
-export function updatePlanMeta(cockpitDir, file, update) {
-  const path = join(cockpitDir, 'plans', file)
+export function updatePlanMeta(ovrseeDir, file, update) {
+  const path = join(ovrseeDir, 'plans', file)
 
   let plan
   try {
@@ -141,7 +141,7 @@ export function updatePlanMeta(cockpitDir, file, update) {
  * Les plans jamais clos.
  *
  * S'appelait `backlog` du temps où le backlog se déduisait des plans. Le
- * backlog se saisit maintenant, ticket par ticket, dans `cockpit/tickets/` —
+ * backlog se saisit maintenant, ticket par ticket, dans `ovrsee/tickets/` —
  * ceci reste l'intention approuvée et non soldée, ce qui n'est pas la même
  * chose.
  */
@@ -189,7 +189,7 @@ export function planFileName(title, date = new Date()) {
  * Écriture refusant les liens symboliques sur la cible et sur son dossier.
  *
  * Sécurité : git sait versionner un lien symbolique. Un dépôt hostile peut
- * livrer `cockpit/plans -> ~/.ssh`, et le lien est en place dès le `git clone`,
+ * livrer `ovrsee/plans -> ~/.ssh`, et le lien est en place dès le `git clone`,
  * avant toute action de l'utilisateur. Une écriture naïve suivrait le lien.
  * On refuse d'écrire, on ne « répare » pas : un lien à cet endroit n'a aucune
  * raison légitime d'exister.
@@ -238,12 +238,12 @@ export function writeFileNoFollow(path, content) {
  * le recomposer, sans quoi une lecture et une écriture pourraient viser deux
  * fichiers différents le jour où il bouge.
  *
- * `COCKPIT_REGISTRY` existe pour les tests : ils écrivent réellement dans le
+ * `OVRSEE_REGISTRY` existe pour les tests : ils écrivent réellement dans le
  * registre, et un test qui vide la liste de projets de la machine serait un
  * test qui casse l'outil qu'il vérifie.
  */
 export const registryPath = () =>
-  process.env.COCKPIT_REGISTRY ?? join(homedir(), '.claude', 'cockpit', 'projects.json')
+  process.env.OVRSEE_REGISTRY ?? join(homedir(), '.claude', 'ovrsee', 'projects.json')
 
 /** @returns {Array<{path: string, name: string, lastOpened?: string}>} */
 export function readRegistry() {
@@ -265,7 +265,7 @@ const writeRegistry = projects =>
  *
  * Vit ici pour la même raison que `closeOpenPlans` : le hook automatique et le
  * CLI de secours doivent produire exactement le même état. Un projet capturé à
- * la main qui n'apparaîtrait pas dans la liste serait un cockpit qui ment sur
+ * la main qui n'apparaîtrait pas dans la liste serait un ovrsee qui ment sur
  * ce qu'il connaît.
  *
  * `lastOpened` porte l'ordre de la barre latérale. Un projet qu'on vient
@@ -281,7 +281,7 @@ export function registerProject(root, now = new Date()) {
 
 /**
  * Retire un projet de la liste. **Aucun fichier du projet n'est touché** — ni
- * le dépôt, ni son dossier `cockpit/`. C'est un oubli, pas une suppression :
+ * le dépôt, ni son dossier `ovrsee/`. C'est un oubli, pas une suppression :
  * réenregistrer le même chemin retrouve tout l'historique intact.
  *
  * @returns {boolean} vrai si le projet y était
@@ -323,7 +323,7 @@ export function touchProject(root, now = new Date()) {
  * ouvert SANS commit n'est pas clos — c'est du travail approuvé puis
  * abandonné.
  *
- * Vit ici, et non dans le hook, parce que le chemin manuel (`/cockpit
+ * Vit ici, et non dans le hook, parce que le chemin manuel (`/ovrsee
  * capture`) doit se comporter exactement comme le chemin automatique. Deux
  * règles de clôture différentes produiraient deux historiques différents selon
  * la façon dont le plan a été capturé.
@@ -340,10 +340,10 @@ export function touchProject(root, now = new Date()) {
  *
  * @returns {string[]} fichiers effectivement clos
  */
-export function closeOpenPlans(cockpitDir, log = () => {}) {
+export function closeOpenPlans(ovrseeDir, log = () => {}) {
   const closed = []
 
-  for (const plan of readPlans(cockpitDir)) {
+  for (const plan of readPlans(ovrseeDir)) {
     const commits = plan.meta.commits ?? []
     if (plan.meta.status !== 'open' || commits.length === 0) continue
 
@@ -355,7 +355,7 @@ export function closeOpenPlans(cockpitDir, log = () => {}) {
       continue
     }
 
-    const written = updatePlanMeta(cockpitDir, plan.file, meta => ({
+    const written = updatePlanMeta(ovrseeDir, plan.file, meta => ({
       ...meta,
       status: 'closed',
       closed: date,
@@ -363,7 +363,7 @@ export function closeOpenPlans(cockpitDir, log = () => {}) {
     if (written) closed.push(plan.file)
   }
 
-  clearActivePlan(cockpitDir, closed)
+  clearActivePlan(ovrseeDir, closed)
   return closed
 }
 
@@ -384,13 +384,13 @@ export function closeOpenPlans(cockpitDir, log = () => {}) {
  * - **Sha déjà présent.** Un hook peut se rejouer ; l'historique ne doit pas
  *   compter deux fois le même commit.
  *
- * @param {string} cockpitDir
+ * @param {string} ovrseeDir
  * @param {string} file nom de fichier du plan, déjà validé
  * @param {{sha: string, date: string, files: string[]}} commit
  * @returns {boolean}
  */
-export function attachCommitToPlan(cockpitDir, file, commit) {
-  return updatePlanMeta(cockpitDir, file, meta => {
+export function attachCommitToPlan(ovrseeDir, file, commit) {
+  return updatePlanMeta(ovrseeDir, file, meta => {
     if (meta.status !== 'open') return null
 
     const commits = meta.commits ?? []
@@ -407,10 +407,10 @@ export function attachCommitToPlan(cockpitDir, file, commit) {
  * intentions. Un échec d'effacement l'est encore moins — le fichier est déjà
  * parti, ou n'a jamais existé.
  */
-function clearActivePlan(cockpitDir, closed) {
+function clearActivePlan(ovrseeDir, closed) {
   if (closed.length === 0) return
 
-  const pointer = join(cockpitDir, '.active-plan')
+  const pointer = join(ovrseeDir, '.active-plan')
   try {
     if (!closed.includes(readFileSync(pointer, 'utf8').trim())) return
     rmSync(pointer)

@@ -5,8 +5,8 @@
  * et `~/.claude/settings.json`, en appliquant un masquage des secrets côté
  * serveur avant que la route ne réponde. Aucun secret ne doit traverser l'API.
  *
- * Utilise `COCKPIT_CONFIG_CLAUDE_DIR` pour les tests — le même pattern que
- * `COCKPIT_SKILLS_DIR` dans `skills.js`.
+ * Utilise `OVRSEE_CONFIG_CLAUDE_DIR` pour les tests — le même pattern que
+ * `OVRSEE_SKILLS_DIR` dans `skills.js`.
  */
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
@@ -15,7 +15,7 @@ import { join } from 'node:path'
 
 /** Où Claude Code stocke sa configuration. */
 const configDir = () =>
-  process.env.COCKPIT_CONFIG_CLAUDE_DIR ?? join(homedir(), '.claude')
+  process.env.OVRSEE_CONFIG_CLAUDE_DIR ?? join(homedir(), '.claude')
 
 /**
  * Liste blanche de clés dont les valeurs scalaires peuvent être affichées.

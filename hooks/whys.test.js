@@ -6,7 +6,7 @@ import { join } from 'node:path'
 
 import { packageOf, readWhys, whysInSource } from './whys.js'
 
-const projet = () => mkdtempSync(join(tmpdir(), 'cockpit-why-'))
+const projet = () => mkdtempSync(join(tmpdir(), 'ovrsee-why-'))
 
 test('packageOf isole le nom du paquet', () => {
   assert.equal(packageOf('node-pty'), 'node-pty')

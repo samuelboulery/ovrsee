@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 
-import { crawlUtile } from './cockpit-post-commit.js'
+import { crawlUtile } from './ovrsee-post-commit.js'
 
 /**
  * Le crawl coûte le démarrage d'une application et d'un navigateur. Le
@@ -20,7 +20,7 @@ test('un commit qui touche du code déclenche le crawl', () => {
 })
 
 test('un commit sans fichier source ne déclenche rien', () => {
-  // `changedFiles()` a déjà retiré `cockpit/` et `graphify-out/` : une liste
+  // `changedFiles()` a déjà retiré `ovrsee/` et `graphify-out/` : une liste
   // vide veut dire « ce commit n'a touché que des sorties ».
   assert.equal(crawlUtile([]), false)
 })

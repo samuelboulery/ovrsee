@@ -13,8 +13,8 @@ import { CATALOGUE, bundledPath, installSkills, readSkills, skillsDir } from './
  * machine — un test qui casse l'outil qu'il vérifie.
  */
 const fixture = () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-skills-'))
-  process.env.COCKPIT_SKILLS_DIR = dir
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-skills-'))
+  process.env.OVRSEE_SKILLS_DIR = dir
   return dir
 }
 
@@ -30,7 +30,7 @@ test('chaque skill livré existe réellement dans le dépôt', () => {
 })
 
 test('le catalogue propose le skill de ticketing', () => {
-  assert.ok(bundled.includes('cockpit-tickets'))
+  assert.ok(bundled.includes('ovrsee-tickets'))
 })
 
 // --- bundledPath : liste blanche -------------------------------------------
@@ -40,7 +40,7 @@ test('un nom hors catalogue est refusé', () => {
 })
 
 test('un nom de traversée est refusé — il ne figure pas au catalogue', () => {
-  for (const nom of ['../../../etc/passwd', 'cockpit/../..', '/etc/passwd', '..']) {
+  for (const nom of ['../../../etc/passwd', 'ovrsee/../..', '/etc/passwd', '..']) {
     assert.throws(() => bundledPath(nom), /skill inconnu/)
   }
 })

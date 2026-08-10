@@ -40,7 +40,7 @@ interface Options {
   onResize?: (newSize: number) => void
 }
 
-const STORAGE_PREFIX = 'cockpit.size.'
+const STORAGE_PREFIX = 'ovrsee.size.'
 
 function restore(key: string, fallback: number): number {
   try {

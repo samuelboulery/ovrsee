@@ -37,7 +37,7 @@ const LIFECYCLE = new Set([
  * lecture directe y lèverait, et le test qui vérifie qu'aucun onglet ne lève
  * échouerait sur sa propre garde.
  *
- * La présence ne suffit pas, la forme est vérifiée : `window.cockpit` peut être
+ * La présence ne suffit pas, la forme est vérifiée : `window.ovrsee` peut être
  * un élément du document plutôt que le pont, car un `id` dans la page devient un
  * global. Les ancres du markdown sont préfixées pour que ça n'arrive plus
  * (`slug()`), mais s'y fier serait faire dépendre le mode Electron du contenu
@@ -45,7 +45,7 @@ const LIFECYCLE = new Set([
  */
 const pont = () => {
   if (typeof window === 'undefined') return undefined
-  const bridge = window.cockpit
+  const bridge = window.ovrsee
   return typeof bridge?.projects?.edit === 'function' ? bridge : undefined
 }
 
@@ -235,31 +235,31 @@ const derniere = (snapshot: Snapshot) => snapshot.timeline?.[0]?.date ?? null
  *
  * Aucune de ces actions n'exécute quoi que ce soit du projet observé. Ouvrir
  * l'éditeur passe par un schéma d'URL — `vscode://file/…` —, du même ordre
- * qu'ouvrir un lien : c'est le système qui décide, pas le cockpit. La liste des
+ * qu'ouvrir un lien : c'est le système qui décide, pas l'ovrsee. La liste des
  * schémas et la vérification du chemin vivent dans le processus principal
  * (`electron/main.js`), jamais ici.
  *
- * En navigateur, `window.cockpit` n'existe pas et il ne reste que la copie du
+ * En navigateur, `window.ovrsee` n'existe pas et il ne reste que la copie du
  * chemin — un bouton qui ne peut rien faire vaut mieux caché qu'inerte.
  */
 function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }) {
-  const cockpit = pont()
+  const ovrsee = pont()
   const [copie, setCopie] = useState(false)
   const [editeur, setEditeur] = useState<Editeur>(() => {
     if (typeof localStorage === 'undefined') return 'vscode'
-    const garde = localStorage.getItem('cockpit.editor')
+    const garde = localStorage.getItem('ovrsee.editor')
     return EDITEURS.some(([nom]) => nom === garde) ? (garde as Editeur) : 'vscode'
   })
 
   return (
     <div style={s('display: flex; flex-wrap: wrap; align-items: center; gap: 6px;')}>
-      {cockpit && (
+      {ovrsee && (
         <>
           <button
             type="button"
             className="btn btn-secondary"
             style={s(BOUTON)}
-            onClick={() => cockpit.projects.edit(root, editeur)}
+            onClick={() => ovrsee.projects.edit(root, editeur)}
           >
             {t('apercu.open_editor')}
           </button>
@@ -272,8 +272,8 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
               const choisi = event.target.value as Editeur
               setEditeur(choisi)
               // Une préférence d'affichage, pas un réglage du projet : elle n'a
-              // rien à faire dans `cockpit.config.json`, que git suit.
-              localStorage.setItem('cockpit.editor', choisi)
+              // rien à faire dans `ovrsee.config.json`, que git suit.
+              localStorage.setItem('ovrsee.editor', choisi)
             }}
             style={s('font-size: 12px; padding: 3px 6px; min-height: 0; width: auto;')}
           >
@@ -288,7 +288,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
             type="button"
             className="btn btn-secondary"
             style={s(BOUTON)}
-            onClick={() => cockpit.projects.reveal(root)}
+            onClick={() => ovrsee.projects.reveal(root)}
           >
             {t('apercu.reveal')}
           </button>
@@ -370,7 +370,7 @@ function Sommaire({
 /**
  * Les scripts du `package.json`, en texte.
  *
- * Du texte, pas des boutons. Le cockpit lit ; il n'exécute que le terminal
+ * Du texte, pas des boutons. L'ovrsee lit ; il n'exécute que le terminal
  * qu'on lui demande — un bouton qui lance `package` depuis une vue de lecture
  * serait un piège.
  */
@@ -415,7 +415,7 @@ function Lancement({ packageJson }: { packageJson: Snapshot['packageJson'] }) {
  * Export du coffre Obsidian.
  *
  * C'est un bouton, contrairement aux scripts du dessus qui restent du texte —
- * et la distinction tient : celui-ci lit `cockpit/` et écrit dans `cockpit/`,
+ * et la distinction tient : celui-ci lit `ovrsee/` et écrit dans `ovrsee/`,
  * exactement comme « Initialiser ». Il n'exécute rien du projet observé.
  *
  * Le graphe du code n'est pas de la partie : Graphify l'écrit lui-même dans le

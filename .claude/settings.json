@@ -9,8 +9,8 @@
       "Bash(pnpm build)",
       "Bash(pnpm dev)",
       "Bash(pnpm electron)",
-      "Bash(pnpm cockpit:status)",
-      "Bash(pnpm cockpit:brief)",
+      "Bash(pnpm ovrsee:status)",
+      "Bash(pnpm ovrsee:brief)",
       "Bash(node --test:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
@@ -24,14 +24,14 @@
     ],
     "ask": [
       "Bash(pnpm package)",
-      "Bash(pnpm cockpit:crawl:*)",
-      "Bash(pnpm cockpit:install:*)",
-      "Bash(pnpm cockpit:close)",
-      "Bash(pnpm cockpit:obsidian:*)"
+      "Bash(pnpm ovrsee:crawl:*)",
+      "Bash(pnpm ovrsee:install:*)",
+      "Bash(pnpm ovrsee:close)",
+      "Bash(pnpm ovrsee:obsidian:*)"
     ],
     "deny": [
-      "Read(./.cockpit-auth.json)",
-      "Read(./**/*.cockpit-auth.json)"
+      "Read(./.ovrsee-auth.json)",
+      "Read(./**/*.ovrsee-auth.json)"
     ]
   }
 }

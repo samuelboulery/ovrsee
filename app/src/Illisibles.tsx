@@ -2,15 +2,15 @@ import type { Illisible } from './data'
 import { s } from './style'
 
 /**
- * Les fichiers de `cockpit/` que la lecture n'a pas su ouvrir.
+ * Les fichiers de `ovrsee/` que la lecture n'a pas su ouvrir.
  *
  * Le crawl inscrit ses échecs — « scan échoué le X » plutôt que la capture
  * précédente présentée comme fraîche. La lecture, elle, avalait les siens : un
  * ticket au frontmatter cassé rendait un tableau vide, indistinguable d'un
  * projet sans tickets. C'est le même mensonge, du côté lecture.
  *
- * Le bandeau ne propose pas de réparer : le cockpit lit, il n'écrit pas dans
- * `cockpit/plans/`. Il nomme le fichier, ce qui suffit à l'ouvrir.
+ * Le bandeau ne propose pas de réparer : l'ovrsee lit, il n'écrit pas dans
+ * `ovrsee/plans/`. Il nomme le fichier, ce qui suffit à l'ouvrir.
  */
 export function Illisibles({ entries, quoi }: { entries: Illisible[]; quoi?: string }) {
   const listés = quoi ? entries.filter(e => e.quoi === quoi) : entries
@@ -25,8 +25,8 @@ export function Illisibles({ entries, quoi }: { entries: Illisible[]; quoi?: str
     >
       <div style={s('font-size: 11.5px; color: var(--color-accent-200); margin-bottom: 4px;')}>
         {listés.length === 1
-          ? '1 fichier de cockpit/ existe mais ne se lit pas.'
-          : `${listés.length} fichiers de cockpit/ existent mais ne se lisent pas.`}
+          ? '1 fichier de ovrsee/ existe mais ne se lit pas.'
+          : `${listés.length} fichiers de ovrsee/ existent mais ne se lisent pas.`}
       </div>
       {listés.map(entry => (
         <div
@@ -35,7 +35,7 @@ export function Illisibles({ entries, quoi }: { entries: Illisible[]; quoi?: str
             'font-family: ui-monospace, SFMono-Regular, monospace; font-size: 11px; color: var(--color-neutral-400);',
           )}
         >
-          cockpit/{entry.file}
+          ovrsee/{entry.file}
           {entry.lignes ? ` — ${entry.lignes} ligne(s) perdue(s)` : ''}
         </div>
       ))}

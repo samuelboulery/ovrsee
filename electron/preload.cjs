@@ -21,13 +21,13 @@
  * ce qu'un socket local aurait offert à tout le monde.
  *
  * Sa présence sert aussi de test de capacité : dans un navigateur, ce fichier
- * n'existe pas, `window.cockpit` est absent, et l'interface le dit franchement
+ * n'existe pas, `window.ovrsee` est absent, et l'interface le dit franchement
  * au lieu d'afficher un terminal qui ne marcherait pas.
  */
 
 const { contextBridge, ipcRenderer } = require('electron')
 
-contextBridge.exposeInMainWorld('cockpit', {
+contextBridge.exposeInMainWorld('ovrsee', {
   projects: {
     /**
      * Ouvre le sélecteur de dossier du système.
@@ -36,7 +36,7 @@ contextBridge.exposeInMainWorld('cockpit', {
     pick: () => ipcRenderer.invoke('projects:pick'),
 
     /**
-     * Révèle le `cockpit/` d'un projet dans le Finder.
+     * Révèle le `ovrsee/` d'un projet dans le Finder.
      *
      * Le chemin est vérifié contre le registre côté principal : ce qui n'y est
      * pas n'est pas révélé.

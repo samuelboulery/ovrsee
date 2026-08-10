@@ -3,7 +3,7 @@ import { useState, type CSSProperties } from 'react'
 /**
  * Convertit une chaîne de style CSS en objet React.
  *
- * La maquette (`Cockpit-A-Nocturne.dc.html`) porte tout son style en attributs
+ * La maquette (`Ovrsee-A-Nocturne.dc.html`) porte tout son style en attributs
  * `style="…"` inline. On garde ces chaînes telles quelles, caractère pour
  * caractère, et on les traduit ici : c'est la seule façon de garantir que le
  * rendu du port est indiscernable de la maquette. Les réécrire en objets JSX

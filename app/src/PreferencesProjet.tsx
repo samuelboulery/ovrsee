@@ -4,7 +4,7 @@
  * Trois blocs qui avaient chacun leur entrée de navigation et n'en méritaient
  * pas : les actions du terminal, les commandes jouées à l'initialisation, et
  * les deux réglages avancés. Ce qui les réunit est ce qui les distingue du
- * reste — ce sont les seuls réglages que `cockpit.config.json` peut surcharger
+ * reste — ce sont les seuls réglages que `ovrsee.config.json` peut surcharger
  * par projet (`hooks/settings.js`, `mergeSettings`), là où le thème et la
  * langue restent personnels.
  *

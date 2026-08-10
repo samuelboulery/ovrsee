@@ -102,7 +102,7 @@ test('serializePlan écrit une clé par ligne pour garder les diffs git lisibles
 // --- readPlans -------------------------------------------------------------
 
 test('readPlans lit le dossier, trie du plus récent au plus ancien et ignore le bruit', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
   const plansDir = join(dir, 'plans')
   mkdirSync(plansDir)
 
@@ -125,11 +125,11 @@ test('readPlans lit le dossier, trie du plus récent au plus ancien et ignore le
 })
 
 test('readPlans rend un tableau vide si le dossier n’existe pas', () => {
-  assert.deepEqual(readPlans(join(tmpdir(), 'cockpit-inexistant-' + process.pid)), [])
+  assert.deepEqual(readPlans(join(tmpdir(), 'ovrsee-inexistant-' + process.pid)), [])
 })
 
 test('readPlans rend un tableau vide si le dossier existe mais est vide', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
   mkdirSync(join(dir, 'plans'))
   assert.deepEqual(readPlans(dir), [])
 })
@@ -137,7 +137,7 @@ test('readPlans rend un tableau vide si le dossier existe mais est vide', () => 
 // --- updatePlanMeta : seul chemin d'écriture d'un plan existant ------------
 
 test('updatePlanMeta réécrit la meta et laisse le corps intact', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
   mkdirSync(join(dir, 'plans'))
   const body = '## Intention\nUn corps qui ne doit pas bouger.\n'
   writeFileSync(
@@ -156,7 +156,7 @@ test('updatePlanMeta réécrit la meta et laisse le corps intact', () => {
 })
 
 test('updatePlanMeta n’écrit rien quand la transformation renonce', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
   mkdirSync(join(dir, 'plans'))
   const avant = serializePlan({ status: 'open', title: 'P' }, 'corps\n')
   writeFileSync(join(dir, 'plans', 'p.md'), avant)
@@ -166,7 +166,7 @@ test('updatePlanMeta n’écrit rien quand la transformation renonce', () => {
 })
 
 test('updatePlanMeta rend false sur un plan absent ou illisible', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
   mkdirSync(join(dir, 'plans'))
   writeFileSync(join(dir, 'plans', 'casse.md'), 'pas de frontmatter')
 
@@ -246,11 +246,11 @@ test('planFileName préfixe par la date pour que le tri alphabétique soit chron
 })
 
 // --- écriture refusant les liens symboliques -------------------------------
-// Scénario visé : un dépôt hostile versionne `cockpit/plans` comme lien vers
+// Scénario visé : un dépôt hostile versionne `ovrsee/plans` comme lien vers
 // ~/.ssh. Le lien est en place dès le git clone.
 
 test('writeFileNoFollow écrit normalement et crée le dossier au besoin', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
   const path = join(dir, 'plans', 'a.md')
 
   writeFileNoFollow(path, 'contenu')
@@ -258,7 +258,7 @@ test('writeFileNoFollow écrit normalement et crée le dossier au besoin', () =>
 })
 
 test('writeFileNoFollow refuse d’écrire quand le dossier cible est un lien symbolique', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
   const victime = join(dir, 'victime')
   mkdirSync(victime)
   symlinkSync(victime, join(dir, 'plans'))
@@ -271,7 +271,7 @@ test('writeFileNoFollow refuse d’écrire quand le dossier cible est un lien sy
 })
 
 test('writeFileNoFollow refuse d’écrire quand le fichier cible est un lien symbolique', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
   const victime = join(dir, 'victime.md')
   writeFileSync(victime, 'original')
   symlinkSync(victime, join(dir, 'a.md'))
@@ -281,13 +281,13 @@ test('writeFileNoFollow refuse d’écrire quand le fichier cible est un lien sy
 })
 
 test('writeFileNoFollow ne laisse pas de fichier temporaire derrière lui', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
   writeFileNoFollow(join(dir, 'a.md'), 'contenu')
   assert.deepEqual(readdirSync(dir), ['a.md'])
 })
 
 test('writeFileNoFollow nettoie le fichier temporaire quand renameSync échoue', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
   const path = join(dir, 'a.md')
 
   // Crée un répertoire à la place du fichier pour forcer l'échec de renameSync
@@ -304,7 +304,7 @@ test('writeFileNoFollow nettoie le fichier temporaire quand renameSync échoue',
 })
 
 test("deux écritures successives vers le même chemin sans accumuler de fichiers temporaires", () => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
   const path = join(dir, 'a.md')
 
   // Effectue deux écritures consécutives
@@ -319,8 +319,8 @@ test("deux écritures successives vers le même chemin sans accumuler de fichier
 
 // --- clôture, règle partagée par le hook et le CLI -------------------------
 
-const cockpitWithPlans = entries => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
+const ovrseeWithPlans = entries => {
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
   mkdirSync(join(dir, 'plans'), { recursive: true })
   for (const [file, meta] of entries) {
     writeFileSync(join(dir, 'plans', file), serializePlan(meta, 'corps\n'))
@@ -329,7 +329,7 @@ const cockpitWithPlans = entries => {
 }
 
 test('closeOpenPlans clôt un plan ouvert portant un commit, à la date du dernier', () => {
-  const dir = cockpitWithPlans([
+  const dir = ovrseeWithPlans([
     [
       'a.md',
       {
@@ -351,14 +351,14 @@ test('closeOpenPlans clôt un plan ouvert portant un commit, à la date du derni
 })
 
 test('closeOpenPlans laisse ouvert un plan sans commit — c’est une intention, pas du travail fait', () => {
-  const dir = cockpitWithPlans([['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [] }]])
+  const dir = ovrseeWithPlans([['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [] }]])
 
   assert.deepEqual(closeOpenPlans(dir), [])
   assert.equal(readPlans(dir)[0].meta.status, 'open')
 })
 
 test('closeOpenPlans ne retouche pas un plan déjà clos', () => {
-  const dir = cockpitWithPlans([
+  const dir = ovrseeWithPlans([
     [
       'a.md',
       {
@@ -376,7 +376,7 @@ test('closeOpenPlans ne retouche pas un plan déjà clos', () => {
 })
 
 test('closeOpenPlans signale et laisse ouvert un plan dont le dernier commit n’a pas de date', () => {
-  const dir = cockpitWithPlans([
+  const dir = ovrseeWithPlans([
     ['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [{ sha: 'aaa', files: [] }] }],
   ])
 
@@ -394,7 +394,7 @@ const planOuvertAvecCommit = (title = 'A') => ({
 })
 
 test('clore retire .active-plan : après, un commit ne se rattache plus à rien', () => {
-  const dir = cockpitWithPlans([['a.md', planOuvertAvecCommit()]])
+  const dir = ovrseeWithPlans([['a.md', planOuvertAvecCommit()]])
   writeFileSync(join(dir, '.active-plan'), 'a.md\n')
 
   assert.deepEqual(closeOpenPlans(dir), ['a.md'])
@@ -402,7 +402,7 @@ test('clore retire .active-plan : après, un commit ne se rattache plus à rien'
 })
 
 test('clore garde le pointeur s’il désigne un autre plan, encore ouvert', () => {
-  const dir = cockpitWithPlans([
+  const dir = ovrseeWithPlans([
     ['a.md', planOuvertAvecCommit('A')],
     ['b.md', { status: 'open', title: 'B', opened: '2026-07-03', commits: [] }],
   ])
@@ -414,7 +414,7 @@ test('clore garde le pointeur s’il désigne un autre plan, encore ouvert', () 
 })
 
 test('clore sans pointeur ne panique pas', () => {
-  const dir = cockpitWithPlans([['a.md', planOuvertAvecCommit()]])
+  const dir = ovrseeWithPlans([['a.md', planOuvertAvecCommit()]])
 
   assert.deepEqual(closeOpenPlans(dir), ['a.md'])
   assert.equal(existsSync(join(dir, '.active-plan')), false)
@@ -425,14 +425,14 @@ test('clore sans pointeur ne panique pas', () => {
 const COMMIT = { sha: 'ccc', date: '2026-07-10', files: ['app/x.ts'] }
 
 test('attachCommitToPlan ajoute le commit à un plan ouvert', () => {
-  const dir = cockpitWithPlans([['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [] }]])
+  const dir = ovrseeWithPlans([['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [] }]])
 
   assert.equal(attachCommitToPlan(dir, 'a.md', COMMIT), true)
   assert.deepEqual(readPlans(dir)[0].meta.commits, [COMMIT])
 })
 
 test('attachCommitToPlan refuse un plan clos — une intention soldée ne grossit plus', () => {
-  const dir = cockpitWithPlans([
+  const dir = ovrseeWithPlans([
     [
       'a.md',
       {
@@ -451,7 +451,7 @@ test('attachCommitToPlan refuse un plan clos — une intention soldée ne grossi
 })
 
 test('attachCommitToPlan ne compte pas deux fois le même sha', () => {
-  const dir = cockpitWithPlans([
+  const dir = ovrseeWithPlans([
     ['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [COMMIT] }],
   ])
 
@@ -514,8 +514,8 @@ test('isSafePlanFileName rejette tout ce qui peut sortir du dossier plans', () =
 // Le registre est un vrai fichier dans le dossier personnel : un test qui
 // écrirait dedans effacerait la liste de projets de la machine. On le détourne.
 const withRegistry = () => {
-  process.env.COCKPIT_REGISTRY = join(mkdtempSync(join(tmpdir(), 'cockpit-reg-')), 'projects.json')
-  return process.env.COCKPIT_REGISTRY
+  process.env.OVRSEE_REGISTRY = join(mkdtempSync(join(tmpdir(), 'ovrsee-reg-')), 'projects.json')
+  return process.env.OVRSEE_REGISTRY
 }
 
 test('registerProject ajoute une fois, avec une date d’ouverture', () => {
@@ -575,12 +575,12 @@ test('projects() classe du dernier ouvert au plus ancien, les sans-date en fin',
 test('projects() ignore le dépôt courant : un clone frais s’ouvre vide', () => {
   withRegistry()
 
-  // La suite tourne depuis la racine du dépôt, qui porte son propre `cockpit/` :
+  // La suite tourne depuis la racine du dépôt, qui porte son propre `ovrsee/` :
   // le cas est donc réel, pas simulé.
-  assert.deepEqual(projects(), [], 'un cockpit/ sur place ne vaut pas inscription au registre')
+  assert.deepEqual(projects(), [], 'un ovrsee/ sur place ne vaut pas inscription au registre')
 
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-cwd-'))
-  mkdirSync(join(dir, 'cockpit'), { recursive: true })
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-cwd-'))
+  mkdirSync(join(dir, 'ovrsee'), { recursive: true })
 
   registerProject(dir, new Date('2020-01-01T00:00:00Z'))
   assert.deepEqual(projects().map(p => p.path), [dir], 'inscrit, il apparaît comme les autres')

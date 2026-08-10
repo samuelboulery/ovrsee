@@ -40,7 +40,7 @@ test('i18n: tous les dictionnaires ont les mêmes clés', () => {
     'pref.bootstrap_add', 'pref.bootstrap_ph', 'pref.bootstrap_remove',
     'menu.preferences',
     // Claude Code — section des préférences
-    'skills.installed_in', 'skills.learn_cockpit', 'skills.installing',
+    'skills.installed_in', 'skills.learn_ovrsee', 'skills.installing',
     'skills.nothing_to_install', 'skills.install_count',
     'config.loading', 'config.agents_desc', 'config.agents_empty', 'config.tools',
     'config.model', 'config.commands_desc', 'config.commands_empty',
@@ -52,8 +52,8 @@ test('i18n: tous les dictionnaires ont les mêmes clés', () => {
     'msg.weeks_ago', 'msg.month_ago', 'msg.months_ago', 'msg.no_intention',
     'msg.plan', 'msg.plans', 'msg.loading', 'msg.read_error',
     // Welcome
-    'welcome.title', 'welcome.description', 'welcome.what_is_cockpit_part1',
-    'welcome.what_is_cockpit_folder', 'welcome.what_is_cockpit_part2',
+    'welcome.title', 'welcome.description', 'welcome.what_is_ovrsee_part1',
+    'welcome.what_is_ovrsee_folder', 'welcome.what_is_ovrsee_part2',
     'welcome.no_execution', 'welcome.prerequisites_title', 'welcome.prerequisites_claude',
     'welcome.prerequisites_git', 'welcome.prerequisites_node', 'welcome.add_project',
     'welcome.install_command', 'welcome.install_description',
@@ -79,7 +79,7 @@ test('i18n: tous les dictionnaires ont les mêmes clés', () => {
     'a11y.delete', 'a11y.resize', 'a11y.session_active', 'a11y.terminal_available',
     'a11y.remove_from_list', 'a11y.last_plan',
     // Menus
-    'menu.file', 'menu.open_project', 'menu.reload_project', 'menu.reveal_cockpit',
+    'menu.file', 'menu.open_project', 'menu.reload_project', 'menu.reveal_ovrsee',
     'menu.close_window', 'menu.edit', 'menu.undo', 'menu.redo', 'menu.cut', 'menu.copy',
     'menu.paste', 'menu.select_all', 'menu.view', 'menu.toggle_terminal', 'menu.terminal_bottom',
     'menu.terminal_side', 'menu.terminal_full', 'menu.actual_size', 'menu.zoom_in',

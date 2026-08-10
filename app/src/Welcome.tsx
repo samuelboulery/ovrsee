@@ -2,7 +2,7 @@ import { t } from './i18n'
 import { s } from './style'
 
 /**
- * L'écran d'un cockpit sans projet, une fois la présentation passée.
+ * L'écran d'un ovrsee sans projet, une fois la présentation passée.
  *
  * `onAjouterProjet` absent — dans un navigateur — laisse la commande en ligne :
  * un bouton qui n'ouvrirait aucun sélecteur serait pire que pas de bouton.
@@ -25,11 +25,11 @@ export function Welcome({ onAjouterProjet }: { onAjouterProjet?: () => void }) {
 
       <div style={s('max-width: 52ch;')}>
         <p style={s('margin: 0 0 8px; font-size: 13px; color: var(--color-neutral-500); line-height: 1.5;')}>
-          {t('welcome.what_is_cockpit_part1')}
+          {t('welcome.what_is_ovrsee_part1')}
           <code style={s('font-family: monospace; color: var(--color-accent-500);')}>
-            {t('welcome.what_is_cockpit_folder')}
+            {t('welcome.what_is_ovrsee_folder')}
           </code>
-          {t('welcome.what_is_cockpit_part2')}
+          {t('welcome.what_is_ovrsee_part2')}
         </p>
         <p style={s('margin: 8px 0 0; font-size: 13px; color: var(--color-neutral-500); line-height: 1.5;')}>
           {t('welcome.no_execution')}

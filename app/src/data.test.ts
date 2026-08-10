@@ -41,7 +41,7 @@ setCurrentLanguage('fr')
 
 /**
  * Un instantané minimal mais valide. Les tests le dégradent champ par champ :
- * c'est la seule façon d'éprouver ce que le cockpit fait d'un projet dont les
+ * c'est la seule façon d'éprouver ce que l'ovrsee fait d'un projet dont les
  * fichiers ont mal vieilli, et c'est exactement le cas où il sert.
  */
 const snapshot = (patch: Partial<Snapshot> = {}): Snapshot =>
@@ -76,7 +76,7 @@ const plan = (patch: Partial<Plan> = {}): Plan =>
 
 // --- briefLines : le champ `pages` mal formé -------------------------------
 //
-// Un `cockpit/pages/pages.json` qui n'est pas un objet à tableau `pages` a
+// Un `ovrsee/pages/pages.json` qui n'est pas un objet à tableau `pages` a
 // vidé toute l'application le 9 août 2026 : `snapshot.pages?.pages.length`
 // protégeait `pages` d'être nul, pas `pages.pages` d'être absent.
 
@@ -417,15 +417,15 @@ test('commitsDeLaFrise survit à une frise absente ou mal formée', () => {
 // --- composerCommande : adaptation du gestionnaire de paquets ---------
 
 test('composerCommande compose la ligne adaptée au gestionnaire', () => {
-  assert.equal(composerCommande('cockpit:crawl', 'pnpm'), 'pnpm cockpit:crawl')
-  assert.equal(composerCommande('cockpit:crawl', 'npm'), 'npm run cockpit:crawl')
-  assert.equal(composerCommande('cockpit:crawl', 'yarn'), 'yarn cockpit:crawl')
-  assert.equal(composerCommande('cockpit:crawl', 'bun'), 'bun cockpit:crawl')
+  assert.equal(composerCommande('ovrsee:crawl', 'pnpm'), 'pnpm ovrsee:crawl')
+  assert.equal(composerCommande('ovrsee:crawl', 'npm'), 'npm run ovrsee:crawl')
+  assert.equal(composerCommande('ovrsee:crawl', 'yarn'), 'yarn ovrsee:crawl')
+  assert.equal(composerCommande('ovrsee:crawl', 'bun'), 'bun ovrsee:crawl')
 })
 
 test('composerCommande nécessite le gestionnaire explicite', () => {
   // Le paramètre packageManager est obligatoire pour éviter les défauts trompeurs
-  assert.equal(composerCommande('cockpit:crawl', 'pnpm'), 'pnpm cockpit:crawl')
+  assert.equal(composerCommande('ovrsee:crawl', 'pnpm'), 'pnpm ovrsee:crawl')
   assert.equal(composerCommande('test', 'npm'), 'npm run test')
 })
 
@@ -461,7 +461,7 @@ test('buildActions compose les actions livrées avec le gestionnaire pnpm', () =
   assert.equal(delivered.length, 3)
 
   // Première action : Crawl avec pnpm
-  assert.match(delivered[0].text, /^!pnpm cockpit:crawl/)
+  assert.match(delivered[0].text, /^!pnpm ovrsee:crawl/)
 })
 
 test('buildActions compose les actions livrées avec le gestionnaire npm', () => {
@@ -482,7 +482,7 @@ test('buildActions compose les actions livrées avec le gestionnaire npm', () =>
   const delivered = actions.filter((a): a is { label: string; text: string } => !('error' in a))
 
   // Première action : Crawl avec npm run
-  assert.match(delivered[0].text, /^!npm run cockpit:crawl/)
+  assert.match(delivered[0].text, /^!npm run ovrsee:crawl/)
 })
 
 test('buildActions inclut les actions personnalisées valides', () => {
@@ -539,9 +539,9 @@ test('buildActions rejette les actions personnalisées avec sauts de ligne', () 
 // --- decideInjection : contexte vs commande ---
 
 test('decideInjection : commande avec ! → mode command avec \\n', () => {
-  const result = decideInjection('!pnpm cockpit:crawl')
+  const result = decideInjection('!pnpm ovrsee:crawl')
   assert.equal(result.mode, 'command')
-  assert.equal(result.text, '!pnpm cockpit:crawl\n')
+  assert.equal(result.text, '!pnpm ovrsee:crawl\n')
 })
 
 test('decideInjection : commande avec / → mode command avec \\n', () => {

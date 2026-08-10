@@ -7,19 +7,19 @@ import { join } from 'node:path'
 import { exportVault, GRAPHE } from './obsidian.js'
 
 /**
- * Un dépôt observé jetable, avec un `cockpit/` complet : un plan clos, un plan
+ * Un dépôt observé jetable, avec un `ovrsee/` complet : un plan clos, un plan
  * ouvert, deux tickets dont un lié, deux pages liées et une capture.
  */
 function fixture({ scanOk = true } = {}) {
-  const root = mkdtempSync(join(tmpdir(), 'cockpit-obsidian-'))
-  const cockpitDir = join(root, 'cockpit')
-  mkdirSync(join(cockpitDir, 'plans'), { recursive: true })
-  mkdirSync(join(cockpitDir, 'tickets'), { recursive: true })
-  mkdirSync(join(cockpitDir, 'pages', 'shots', 'accueil'), { recursive: true })
+  const root = mkdtempSync(join(tmpdir(), 'ovrsee-obsidian-'))
+  const ovrseeDir = join(root, 'ovrsee')
+  mkdirSync(join(ovrseeDir, 'plans'), { recursive: true })
+  mkdirSync(join(ovrseeDir, 'tickets'), { recursive: true })
+  mkdirSync(join(ovrseeDir, 'pages', 'shots', 'accueil'), { recursive: true })
 
   const plan = (file, meta, body) =>
     writeFileSync(
-      join(cockpitDir, 'plans', file),
+      join(ovrseeDir, 'plans', file),
       `---\n${JSON.stringify(meta, null, 2)}\n---\n\n${body}\n`,
       'utf8',
     )
@@ -44,7 +44,7 @@ function fixture({ scanOk = true } = {}) {
 
   const ticket = (file, meta, body) =>
     writeFileSync(
-      join(cockpitDir, 'tickets', file),
+      join(ovrseeDir, 'tickets', file),
       `---\n${JSON.stringify(meta, null, 2)}\n---\n\n${body}\n`,
       'utf8',
     )
@@ -80,13 +80,13 @@ function fixture({ scanOk = true } = {}) {
   )
 
   writeFileSync(
-    join(cockpitDir, 'pages', 'shots', 'accueil', '2026-08-09-abc1234.png'),
+    join(ovrseeDir, 'pages', 'shots', 'accueil', '2026-08-09-abc1234.png'),
     'png-factice',
     'utf8',
   )
 
   writeFileSync(
-    join(cockpitDir, 'pages', 'pages.json'),
+    join(ovrseeDir, 'pages', 'pages.json'),
     JSON.stringify({
       date: '2026-08-09',
       commit: 'abc1234',
@@ -115,7 +115,7 @@ function fixture({ scanOk = true } = {}) {
   )
 
   writeFileSync(
-    join(cockpitDir, 'pages', 'scans.jsonl'),
+    join(ovrseeDir, 'pages', 'scans.jsonl'),
     JSON.stringify({ date: '2026-08-09', commit: 'abc1234', ok: scanOk, pages: 2 }) + '\n',
     'utf8',
   )
@@ -123,7 +123,7 @@ function fixture({ scanOk = true } = {}) {
   return root
 }
 
-const vault = root => join(root, 'cockpit', 'obsidian')
+const vault = root => join(root, 'ovrsee', 'obsidian')
 const lire = (root, ...parts) => readFileSync(join(vault(root), ...parts), 'utf8')
 
 /** Le frontmatter, sans les délimiteurs. */
@@ -286,7 +286,7 @@ test('un ticket supprimé disparaît du coffre au réexport', () => {
   exportVault(root)
   assert.ok(existsSync(join(vault(root), 'tickets', 'T-0002-fini.md')))
 
-  rmSync(join(root, 'cockpit', 'tickets', 'T-0002-fini.md'))
+  rmSync(join(root, 'ovrsee', 'tickets', 'T-0002-fini.md'))
 
   exportVault(root)
   assert.ok(!existsSync(join(vault(root), 'tickets', 'T-0002-fini.md')))
@@ -294,10 +294,10 @@ test('un ticket supprimé disparaît du coffre au réexport', () => {
 
 test('deux pages au même titre de document se distinguent par leur route', () => {
   const root = fixture()
-  const pages = join(root, 'cockpit', 'pages', 'pages.json')
+  const pages = join(root, 'ovrsee', 'pages', 'pages.json')
   const lu = JSON.parse(readFileSync(pages, 'utf8'))
   // Le cas d'une application à page unique : `document.title` partout pareil.
-  for (const page of lu.pages) page.title = 'Cockpit'
+  for (const page of lu.pages) page.title = 'Ovrsee'
   writeFileSync(pages, JSON.stringify(lu), 'utf8')
 
   exportVault(root)
@@ -311,7 +311,7 @@ test('deux pages au même titre de document se distinguent par leur route', () =
 
 test("un slug avec traversal de répertoire dans pages.json provoque une erreur", () => {
   const root = fixture()
-  const pages = join(root, 'cockpit', 'pages', 'pages.json')
+  const pages = join(root, 'ovrsee', 'pages', 'pages.json')
   const lu = JSON.parse(readFileSync(pages, 'utf8'))
   // Remplace le slug de la première page par un chemin d'échappement
   lu.pages[0].slug = '../../evil'
@@ -329,7 +329,7 @@ test("un slug avec traversal de répertoire dans pages.json provoque une erreur"
 
 test('un slug vide provoque une erreur', () => {
   const root = fixture()
-  const pages = join(root, 'cockpit', 'pages', 'pages.json')
+  const pages = join(root, 'ovrsee', 'pages', 'pages.json')
   const lu = JSON.parse(readFileSync(pages, 'utf8'))
   lu.pages[0].slug = ''
   writeFileSync(pages, JSON.stringify(lu), 'utf8')

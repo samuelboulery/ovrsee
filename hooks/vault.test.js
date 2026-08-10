@@ -8,7 +8,7 @@ import { frontmatterOf, MAX_FILES, parseYaml, readVault, wikilinks } from './vau
 
 /** Un coffre jetable. `notes` est un objet chemin relatif → contenu. */
 function coffre(notes) {
-  const root = mkdtempSync(join(tmpdir(), 'cockpit-vault-'))
+  const root = mkdtempSync(join(tmpdir(), 'ovrsee-vault-'))
   for (const [chemin, contenu] of Object.entries(notes)) {
     const file = join(root, chemin)
     mkdirSync(dirname(file), { recursive: true })

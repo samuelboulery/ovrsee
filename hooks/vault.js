@@ -2,12 +2,12 @@
  * Lecture d'un coffre Obsidian comme source de graphe.
  *
  * Le pendant en lecture de `obsidian.js`, et le seul : cet export-là traduit
- * `cockpit/` en coffre, celui-ci lit un coffre que quelqu'un a écrit à la main.
+ * `ovrsee/` en coffre, celui-ci lit un coffre que quelqu'un a écrit à la main.
  * Les deux ne se parlent pas et ne partagent rien — un coffre exporté ne porte
  * aucune note de table, le relire ne rendrait rien.
  *
  * La raison d'être : `graphify-out/graph.json` était la seule entrée de graphe
- * du cockpit. Qui documente son projet dans Obsidian plutôt qu'avec Graphify
+ * de l'ovrsee. Qui documente son projet dans Obsidian plutôt qu'avec Graphify
  * n'avait rien à afficher dans l'onglet Données.
  *
  * **La convention, et elle est étroite** : une note dont le frontmatter porte
@@ -22,7 +22,7 @@
  * lecture du graphe côté interface.
  *
  * ponytail: parseur YAML maison plutôt qu'une dépendance. `plans.js` explique
- * pourquoi le frontmatter du cockpit est du JSON — un mini-parseur YAML échoue
+ * pourquoi le frontmatter de l'ovrsee est du JSON — un mini-parseur YAML échoue
  * en silence. Ici on n'a pas le choix : le coffre est écrit par quelqu'un
  * d'autre, dans les conventions d'Obsidian. On borne donc le sous-ensemble
  * reconnu et on le documente, plutôt que de prétendre lire du YAML.

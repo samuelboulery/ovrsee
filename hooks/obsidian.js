@@ -1,7 +1,7 @@
 /**
- * Export de `cockpit/` en coffre Obsidian.
+ * Export de `ovrsee/` en coffre Obsidian.
  *
- * Le cockpit stocke déjà du markdown lié : des plans, des tickets qui citent un
+ * L'ovrsee stocke déjà du markdown lié : des plans, des tickets qui citent un
  * plan, des pages qui se lient entre elles. C'est un graphe de notes, et
  * Obsidian est fait pour ça. L'export ne calcule rien de neuf — il traduit ce
  * qui est sur le disque dans les conventions du coffre : frontmatter YAML,
@@ -9,12 +9,12 @@
  *
  * Deux traductions, et une seule raison à chacune :
  *
- * 1. **JSON → YAML.** Le frontmatter du cockpit est du JSON, lisible par ses
+ * 1. **JSON → YAML.** Le frontmatter de l'ovrsee est du JSON, lisible par ses
  *    propres outils. Obsidian et Dataview ne lisent que du YAML : un
  *    frontmatter JSON s'affiche comme du texte brut et ne se requête pas.
  * 2. **Captures copiées dans le coffre.** Obsidian n'affiche pas une image
  *    située hors du coffre. Une seule par page, la plus récente ; l'historique
- *    complet reste dans `cockpit/pages/shots/`.
+ *    complet reste dans `ovrsee/pages/shots/`.
  *
  * Cohabitation avec Graphify : Graphify écrit `index.md`, `graph.canvas` et un
  * fichier par nœud **à la racine** du dossier qu'on lui donne. Lui donner le
@@ -80,7 +80,7 @@ const puces = items => (items.length > 0 ? items.map(i => `- ${i}`).join('\n') :
  * Nom lisible d'une page. Même règle que `pageName` dans l'interface.
  *
  * `document.title` est souvent le même sur toutes les pages d'une application
- * à page unique : le reprendre tel quel donnerait six liens « Cockpit » dans
+ * à page unique : le reprendre tel quel donnerait six liens « Ovrsee » dans
  * l'index, c'est-à-dire six liens qu'on ne peut pas distinguer. On se rabat
  * alors sur la route, qui, elle, distingue toujours.
  */
@@ -108,7 +108,7 @@ function pageName(page, pages) {
  * @param {string} [dir] dossier du coffre
  * @returns {string[]}
  */
-export function exportVault(root, dir = join(root, 'cockpit', 'obsidian')) {
+export function exportVault(root, dir = join(root, 'ovrsee', 'obsidian')) {
   const snap = snapshot(root)
   const done = []
 
@@ -273,7 +273,7 @@ function ecrireIndex(dir, snap) {
 
   const corps = [
     frontmatter({
-      type: 'cockpit',
+      type: 'ovrsee',
       projet: nom,
       plans_ouverts: ouverts.length,
       tickets_restants: restants.length,
@@ -283,7 +283,7 @@ function ecrireIndex(dir, snap) {
     }),
     `# ${nom}`,
     '',
-    "Coffre écrit par Cockpit depuis `cockpit/`. C'est une vue : la source reste le dépôt.",
+    "Coffre écrit par Ovrsee depuis `ovrsee/`. C'est une vue : la source reste le dépôt.",
     '',
     '## Ce qui est ouvert',
     '',

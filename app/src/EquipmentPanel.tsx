@@ -350,7 +350,7 @@ export function EquipmentPanel({
         {busy ? t('equipment.initializing') : t('equipment.initialize_btn')}
       </button>
 
-      {/* Ce que le cockpit ne fait pas à ta place. Les deux boutons écrivent
+      {/* Ce que l'ovrsee ne fait pas à ta place. Les deux boutons écrivent
           dans le terminal sans envoyer, comme tous les boutons du panneau —
           lancer l'installateur de quelqu'un d'autre n'est pas son rôle. */}
       <div style={s(`width: min(560px, 100%); ${CARTE}`)}>

@@ -2,7 +2,7 @@
  * Coloration des blocs de code, en jetons.
  *
  * Pourquoi pas Shiki ou highlight.js : le projet a trois dépendances de
- * production et cette sobriété est un choix. Le code qu'affiche le cockpit
+ * production et cette sobriété est un choix. Le code qu'affiche l'ovrsee
  * vient de README et de plans — des extraits de quelques lignes, pas des
  * fichiers entiers. Un tokeniseur par expressions régulières les rend lisibles ;
  * plusieurs mégaoctets de grammaires les rendraient exacts, ce dont personne

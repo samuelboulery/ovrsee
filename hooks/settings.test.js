@@ -13,7 +13,7 @@ import {
   mergeSettings,
 } from './settings.js'
 
-const tempDir = () => mkdtempSync(join(tmpdir(), 'cockpit-settings-'))
+const tempDir = () => mkdtempSync(join(tmpdir(), 'ovrsee-settings-'))
 
 test('DEFAULT_SETTINGS a le schéma complet', () => {
   assert(DEFAULT_SETTINGS.langue === 'fr')
@@ -27,11 +27,11 @@ test('DEFAULT_SETTINGS a le schéma complet', () => {
 test('readSettings avec fichier absent → défaut', () => {
   const dir = tempDir()
   try {
-    process.env.COCKPIT_SETTINGS = join(dir, 'inexistant.json')
+    process.env.OVRSEE_SETTINGS = join(dir, 'inexistant.json')
     const settings = readSettings()
     assert.deepEqual(settings, DEFAULT_SETTINGS)
   } finally {
-    delete process.env.COCKPIT_SETTINGS
+    delete process.env.OVRSEE_SETTINGS
     rmSync(dir, { recursive: true })
   }
 })
@@ -41,11 +41,11 @@ test('readSettings avec fichier corrompu → défaut', () => {
   try {
     const file = join(dir, 'settings.json')
     writeFileSync(file, '{broken json')
-    process.env.COCKPIT_SETTINGS = file
+    process.env.OVRSEE_SETTINGS = file
     const settings = readSettings()
     assert.deepEqual(settings, DEFAULT_SETTINGS)
   } finally {
-    delete process.env.COCKPIT_SETTINGS
+    delete process.env.OVRSEE_SETTINGS
     rmSync(dir, { recursive: true })
   }
 })
@@ -150,14 +150,14 @@ test('writeSettings écrit et readSettings relit', () => {
   const dir = tempDir()
   try {
     const file = join(dir, 'settings.json')
-    process.env.COCKPIT_SETTINGS = file
+    process.env.OVRSEE_SETTINGS = file
     const custom = validateSettings({ langue: 'en', theme: 'dark' })
     writeSettings(custom)
     const read = readSettings()
     assert.equal(read.langue, 'en')
     assert.equal(read.theme, 'dark')
   } finally {
-    delete process.env.COCKPIT_SETTINGS
+    delete process.env.OVRSEE_SETTINGS
     rmSync(dir, { recursive: true })
   }
 })

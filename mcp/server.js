@@ -1,5 +1,5 @@
 /**
- * Serveur MCP stdio pour Cockpit.
+ * Serveur MCP stdio pour Ovrsee.
  *
  * Lit JSON-RPC 2.0 depuis stdin, valide le protocole, appelle `dispatch()`,
  * et envoie les résultats sur stdout. Aucune dépendance externe.
@@ -210,7 +210,7 @@ rl.on('line', (line) => {
         // que si le serveur annonce cette capacité. Un objet vide suffit —
         // aucune option (comme `listChanged`) n'est proposée.
         capabilities: { tools: {} },
-        serverInfo: { name: 'cockpit-mcp', version: '1.0.0' },
+        serverInfo: { name: 'ovrsee-mcp', version: '1.0.0' },
       })
     } else if (method === 'tools/list') {
       sendResult(id, { tools: TOOLS })

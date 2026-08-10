@@ -3,11 +3,11 @@ dist/
 .DS_Store
 
 # Cookies de session utilisés par le crawl — ne doit jamais être versionné.
-.cockpit-auth.json
-*.cockpit-auth.json
+.ovrsee-auth.json
+*.ovrsee-auth.json
 
 # graphify-out/graph.json est VOLONTAIREMENT versionné : l'onglet Données le lit,
-# et le cockpit doit rester consultable sur un projet qui ne compile plus. En
+# et l'ovrsee doit rester consultable sur un projet qui ne compile plus. En
 # revanche le cache et la visualisation se régénèrent depuis
 # lui — les versionner ne ferait que du bruit dans les diffs.
 graphify-out/cache/
@@ -20,14 +20,14 @@ graphify-out/graph.html
 # bouge pas d'un nœud (413 nœuds, 675 arêtes à chaque fois). D'où vient la
 # dérive du compte relève de graphify, pas d'ici.
 #
-# Aucun code du cockpit ne lit ce rapport : le versionner ne produisait qu'une
+# Aucun code de l'ovrsee ne lit ce rapport : le versionner ne produisait qu'une
 # ligne perpétuellement modifiée dans `git status`.
 graphify-out/GRAPH_REPORT.md
 
-# Coffre Obsidian : une traduction de cockpit/ et de graphify-out/, réécrite à
+# Coffre Obsidian : une traduction de ovrsee/ et de graphify-out/, réécrite à
 # chaque export. Le versionner mettrait chaque plan et chaque ticket deux fois
 # dans le dépôt, et chaque export ferait un diff qui n'apprend rien.
-cockpit/obsidian/
+ovrsee/obsidian/
 
 # Build de l app, reconstruit a la demande.
 app/dist/

@@ -4,24 +4,24 @@ import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { buildBrief, readCockpit } from './brief.js'
+import { buildBrief, readOvrsee } from './brief.js'
 import { serializePlan } from './plans.js'
 import { createTicket } from './tickets.js'
 
 const NOW = new Date('2026-08-08T12:00:00Z')
 
-const cockpitWith = ({ plans = [], pages = null, scans = [] }) => {
-  const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
-  mkdirSync(join(dir, 'cockpit', 'plans'), { recursive: true })
-  mkdirSync(join(dir, 'cockpit', 'pages'), { recursive: true })
+const ovrseeWith = ({ plans = [], pages = null, scans = [] }) => {
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
+  mkdirSync(join(dir, 'ovrsee', 'plans'), { recursive: true })
+  mkdirSync(join(dir, 'ovrsee', 'pages'), { recursive: true })
 
   for (const [file, meta, body] of plans) {
-    writeFileSync(join(dir, 'cockpit', 'plans', file), serializePlan(meta, body ?? ''))
+    writeFileSync(join(dir, 'ovrsee', 'plans', file), serializePlan(meta, body ?? ''))
   }
-  if (pages) writeFileSync(join(dir, 'cockpit', 'pages', 'pages.json'), JSON.stringify(pages))
+  if (pages) writeFileSync(join(dir, 'ovrsee', 'pages', 'pages.json'), JSON.stringify(pages))
   if (scans.length > 0) {
     writeFileSync(
-      join(dir, 'cockpit', 'pages', 'scans.jsonl'),
+      join(dir, 'ovrsee', 'pages', 'scans.jsonl'),
       scans.map(s => JSON.stringify(s)).join('\n') + '\n',
     )
   }
@@ -30,28 +30,28 @@ const cockpitWith = ({ plans = [], pages = null, scans = [] }) => {
 
 // --- lecture ---------------------------------------------------------------
 
-test('readCockpit rend null quand le dépôt n’a pas de dossier cockpit', () => {
-  assert.equal(readCockpit(mkdtempSync(join(tmpdir(), 'vide-'))), null)
+test('readOvrsee rend null quand le dépôt n’a pas de dossier ovrsee', () => {
+  assert.equal(readOvrsee(mkdtempSync(join(tmpdir(), 'vide-'))), null)
 })
 
-test('readCockpit lit plans, pages et scans', () => {
-  const dir = cockpitWith({
+test('readOvrsee lit plans, pages et scans', () => {
+  const dir = ovrseeWith({
     plans: [['2026-08-01-a.md', { status: 'open', title: 'A', opened: '2026-08-01', commits: [] }]],
     pages: { date: '2026-08-08', commit: 'abc1234', pages: [{ route: '/' }] },
     scans: [{ date: '2026-08-08', commit: 'abc1234', ok: true, pages: 1 }],
   })
 
-  const state = readCockpit(dir)
+  const state = readOvrsee(dir)
   assert.equal(state.plans.length, 1)
   assert.equal(state.pageCount, 1)
   assert.equal(state.scan.ok, true)
 })
 
-test('readCockpit survit à un pages.json corrompu plutôt que de tout perdre', () => {
-  const dir = cockpitWith({ plans: [] })
-  writeFileSync(join(dir, 'cockpit', 'pages', 'pages.json'), '{ pas du json')
+test('readOvrsee survit à un pages.json corrompu plutôt que de tout perdre', () => {
+  const dir = ovrseeWith({ plans: [] })
+  writeFileSync(join(dir, 'ovrsee', 'pages', 'pages.json'), '{ pas du json')
 
-  const state = readCockpit(dir)
+  const state = readOvrsee(dir)
   assert.equal(state.pageCount, 0)
   assert.deepEqual(state.plans, [])
 })
@@ -169,17 +169,17 @@ test('le brief reste court : une session ne doit pas commencer par un mur de tex
   assert.match(brief, /40 plan/, 'le total est dit même si la liste est tronquée')
 })
 
-test('un cockpit vide rend une chaîne vide plutôt qu’un brief creux', () => {
+test('un ovrsee vide rend une chaîne vide plutôt qu’un brief creux', () => {
   assert.equal(buildBrief({ name: 'neuf', pageCount: 0, plans: [], scan: null }, NOW), '')
 })
 
 // --- tickets ---------------------------------------------------------------
 
-test('readCockpit lit le tableau du projet', () => {
-  const dir = cockpitWith({ plans: [] })
-  createTicket(join(dir, 'cockpit'), { titre: 'Un ticket', priorite: 'haute' })
+test('readOvrsee lit le tableau du projet', () => {
+  const dir = ovrseeWith({ plans: [] })
+  createTicket(join(dir, 'ovrsee'), { titre: 'Un ticket', priorite: 'haute' })
 
-  const state = readCockpit(dir)
+  const state = readOvrsee(dir)
   assert.equal(state.tickets.length, 1)
   assert.equal(state.tickets[0].titre, 'Un ticket')
   assert.equal(state.board[0].id, 'backlog')
@@ -209,7 +209,7 @@ test('le brief annonce les tickets restants, pas ceux de la dernière colonne', 
   assert.doesNotMatch(brief, /Déjà fait/)
 })
 
-test('un cockpit sans plan ni page mais avec un ticket a quelque chose à dire', () => {
+test('un ovrsee sans plan ni page mais avec un ticket a quelque chose à dire', () => {
   const brief = buildBrief(
     {
       name: 'projet',

@@ -4,7 +4,7 @@
  * Sans lui, macOS affiche le menu par défaut d'Electron : en anglais, et qui ne
  * connaît ni les onglets, ni le terminal, ni les projets.
  *
- * Le menu **ne fait rien lui-même**. Chaque item propre à Cockpit envoie un mot
+ * Le menu **ne fait rien lui-même**. Chaque item propre à Ovrsee envoie un mot
  * au rendu, qui exécute le code qu'il exécute déjà au clic. Dupliquer ici le
  * moindre bout de logique métier créerait un second chemin qui divergerait — la
  * même faute que dédoubler `resolve()` de `server/api.js`.
@@ -86,7 +86,7 @@ export function buildMenu(lang = 'fr') {
       label: m('menu.file'),
       submenu: [
         { label: m('menu.open_project'), accelerator: 'CmdOrCtrl+O', click: send('project:open') },
-        // ⌘R relit `cockpit/` ; recharger la *page* est en ⇧⌘R, sous Affichage.
+        // ⌘R relit `ovrsee/` ; recharger la *page* est en ⇧⌘R, sous Affichage.
         // Un rechargement de page perdrait l'onglet Navigateur et la session du
         // terminal — ce n'est pas ce qu'on veut du raccourci le plus proche.
         {

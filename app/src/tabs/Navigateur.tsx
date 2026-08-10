@@ -79,7 +79,7 @@ const DOCKS: Array<[Dock, string]> = [
 /**
  * Thème de l'interface, pour que les DevTools s'y accordent.
  *
- * Le cockpit n'est aujourd'hui que sombre — d'où le repli. Le jour où il pose
+ * L'ovrsee n'est aujourd'hui que sombre — d'où le repli. Le jour où il pose
  * un `data-theme` sur la racine, les DevTools suivront sans qu'on y revienne.
  */
 const appTheme = (): 'dark' | 'light' =>
@@ -211,9 +211,9 @@ const describe = (picked: Picked): string =>
   ].join('\n')
 
 /**
- * Onglet Navigateur — l'application en cours de développement, dans le cockpit.
+ * Onglet Navigateur — l'application en cours de développement, dans l'ovrsee.
  *
- * Le cockpit ne lance pas le serveur : il s'y branche. La commande se tape dans
+ * L'ovrsee ne lance pas le serveur : il s'y branche. La commande se tape dans
  * un shell du panneau du bas, par l'utilisateur ou par Claude. Ce qu'on gagne
  * ici, c'est la boucle courte : cliquer l'élément qui cloche et que Claude en
  * reçoive le sélecteur, le texte et le HTML sans un copier-coller.
@@ -295,7 +295,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
     setLogs([])
     load(startUrl(snapshot))
     // `snapshot.root` seul : le reste du snapshot change à chaque relecture de
-    // `cockpit/`, et rechargerait la page inspectée pour rien.
+    // `ovrsee/`, et rechargerait la page inspectée pour rien.
   }, [snapshot.root])
 
   useEffect(() => {
@@ -423,7 +423,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
 
     const rect = box.getBoundingClientRect()
     try {
-      const ok = await window.cockpit?.preview.devtools(
+      const ok = await window.ovrsee?.preview.devtools(
         element.getWebContentsId(),
         { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
         appTheme(),
@@ -441,7 +441,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
   const toggleDevtools = () => {
     if (devtools) {
       setDevtools(false)
-      window.cockpit?.preview.devtoolsClose()
+      window.ovrsee?.preview.devtoolsClose()
       return
     }
     // L'ouverture attend le rendu suivant : la place n'existe qu'une fois le
@@ -483,7 +483,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
   // Conséquence en cascade : le crawl tourne dans un navigateur, donc il
   // photographiait ce blanc. La vignette de `/navigateur` dans l'onglet Produit
   // affirmait à chaque commit que la page était vide.
-  if (!window.cockpit?.preview) return <HorsApplication />
+  if (!window.ovrsee?.preview) return <HorsApplication />
 
   return (
     <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
@@ -579,7 +579,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
           }}
           src={initial.current}
           // Session à part : les cookies de l'application inspectée ne se
-          // mélangent pas à ceux du cockpit, et survivent à un changement
+          // mélangent pas à ceux de l'ovrsee, et survivent à un changement
           // d'onglet.
           partition="persist:navigateur"
           {...ALLOW_POPUPS}

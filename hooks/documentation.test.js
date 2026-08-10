@@ -35,7 +35,7 @@ function extractPnpmScripts(text) {
 
 /**
  * Extrait les chemins cités dans le texte.
- * Cherche les patterns comme `cockpit/`, `app/`, `hooks/`, etc.
+ * Cherche les patterns comme `ovrsee/`, `app/`, `hooks/`, etc.
  * @param {string} text
  * @returns {string[]} liste des chemins trouvés
  */
@@ -133,7 +133,7 @@ test('README.md mentionne le dossier mcp/', () => {
 
 test('les chemins cités dans README.md existent', () => {
   const paths = extractPaths(readmeFr)
-  const required = ['cockpit/', 'hooks/', 'crawl/', 'app/', 'electron/']
+  const required = ['ovrsee/', 'hooks/', 'crawl/', 'app/', 'electron/']
 
   for (const path of required) {
     assert(
@@ -145,7 +145,7 @@ test('les chemins cités dans README.md existent', () => {
 
 test('les chemins cités dans README.en.md existent', () => {
   const paths = extractPaths(readmeEn)
-  const required = ['cockpit/', 'hooks/', 'crawl/', 'app/', 'electron/']
+  const required = ['ovrsee/', 'hooks/', 'crawl/', 'app/', 'electron/']
 
   for (const path of required) {
     assert(
@@ -162,10 +162,10 @@ test('README.en.md existe', () => {
   )
 })
 
-test('les dossiers cockpit/pages/shots/ existent pour tous les onglets', () => {
+test('les dossiers ovrsee/pages/shots/ existent pour tous les onglets', () => {
   const tabs = ['accueil', 'navigateur', 'produit', 'historique', 'tableau', 'donnees', 'stack']
   for (const tab of tabs) {
-    const dir = join(root, 'cockpit', 'pages', 'shots', tab)
+    const dir = join(root, 'ovrsee', 'pages', 'shots', tab)
     assert(
       existsSync(dir),
       `Dossier de captures pour l'onglet '${tab}' n'existe pas`

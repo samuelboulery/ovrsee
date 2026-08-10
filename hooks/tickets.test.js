@@ -27,17 +27,17 @@ import {
   importOpenPlans,
 } from './tickets.js'
 
-/** Un dossier `cockpit/` jetable. */
+/** Un dossier `ovrsee/` jetable. */
 const fixture = () => {
-  const root = mkdtempSync(join(tmpdir(), 'cockpit-tickets-'))
-  const cockpitDir = join(root, 'cockpit')
-  mkdirSync(join(cockpitDir, 'tickets'), { recursive: true })
-  mkdirSync(join(cockpitDir, 'plans'), { recursive: true })
-  return cockpitDir
+  const root = mkdtempSync(join(tmpdir(), 'ovrsee-tickets-'))
+  const ovrseeDir = join(root, 'ovrsee')
+  mkdirSync(join(ovrseeDir, 'tickets'), { recursive: true })
+  mkdirSync(join(ovrseeDir, 'plans'), { recursive: true })
+  return ovrseeDir
 }
 
-const ecrireBoardBrut = (cockpitDir, content) =>
-  writeFileSync(join(cockpitDir, 'board.json'), content, 'utf8')
+const ecrireBoardBrut = (ovrseeDir, content) =>
+  writeFileSync(join(ovrseeDir, 'board.json'), content, 'utf8')
 
 // --- readBoard -------------------------------------------------------------
 
@@ -46,33 +46,33 @@ test('readBoard rend les colonnes par défaut quand board.json est absent', () =
 })
 
 test('readBoard rend les colonnes par défaut sur un board illisible', () => {
-  const cockpitDir = fixture()
-  ecrireBoardBrut(cockpitDir, '{ pas du json')
-  assert.deepEqual(readBoard(cockpitDir), DEFAULT_COLUMNS)
+  const ovrseeDir = fixture()
+  ecrireBoardBrut(ovrseeDir, '{ pas du json')
+  assert.deepEqual(readBoard(ovrseeDir), DEFAULT_COLUMNS)
 })
 
 test('readBoard refuse un board dont une colonne n’a pas d’id', () => {
-  const cockpitDir = fixture()
-  ecrireBoardBrut(cockpitDir, JSON.stringify({ colonnes: [{ titre: 'Sans id' }] }))
-  assert.deepEqual(readBoard(cockpitDir), DEFAULT_COLUMNS)
+  const ovrseeDir = fixture()
+  ecrireBoardBrut(ovrseeDir, JSON.stringify({ colonnes: [{ titre: 'Sans id' }] }))
+  assert.deepEqual(readBoard(ovrseeDir), DEFAULT_COLUMNS)
 })
 
 test('readBoard refuse un board aux id dupliqués', () => {
-  const cockpitDir = fixture()
+  const ovrseeDir = fixture()
   ecrireBoardBrut(
-    cockpitDir,
+    ovrseeDir,
     JSON.stringify({ colonnes: [{ id: 'a', titre: 'A' }, { id: 'a', titre: 'Encore A' }] }),
   )
-  assert.deepEqual(readBoard(cockpitDir), DEFAULT_COLUMNS)
+  assert.deepEqual(readBoard(ovrseeDir), DEFAULT_COLUMNS)
 })
 
 test('readBoard lit des colonnes personnalisées', () => {
-  const cockpitDir = fixture()
+  const ovrseeDir = fixture()
   ecrireBoardBrut(
-    cockpitDir,
+    ovrseeDir,
     JSON.stringify({ colonnes: [{ id: 'idees', titre: 'Idées' }, { id: 'fini', titre: 'Fini', wip: 2 }] }),
   )
-  assert.deepEqual(readBoard(cockpitDir), [
+  assert.deepEqual(readBoard(ovrseeDir), [
     { id: 'idees', titre: 'Idées' },
     { id: 'fini', titre: 'Fini', wip: 2 },
   ])
@@ -113,15 +113,15 @@ test('isSafeTicketFileName rejette tout ce qui pourrait sortir du dossier', () =
 // --- createTicket ----------------------------------------------------------
 
 test('createTicket écrit un fichier lisible par readTickets', () => {
-  const cockpitDir = fixture()
-  const written = createTicket(cockpitDir, { titre: 'Premier ticket', corps: '## Contexte\nParce que.' })
+  const ovrseeDir = fixture()
+  const written = createTicket(ovrseeDir, { titre: 'Premier ticket', corps: '## Contexte\nParce que.' })
 
   assert.equal(written.meta.id, 'T-0001')
   assert.equal(written.meta.colonne, 'backlog')
   assert.equal(written.meta.priorite, 'moyenne')
   assert.equal(written.file, 'T-0001-premier-ticket.md')
 
-  const tickets = readTickets(cockpitDir)
+  const tickets = readTickets(ovrseeDir)
   assert.equal(tickets.length, 1)
   assert.equal(tickets[0].meta.titre, 'Premier ticket')
   assert.match(tickets[0].body, /Parce que\./)
@@ -140,65 +140,65 @@ test('createTicket refuse une priorité inconnue', () => {
 })
 
 test('createTicket crée le dossier tickets/ s’il manque', () => {
-  const root = mkdtempSync(join(tmpdir(), 'cockpit-tickets-'))
-  const cockpitDir = join(root, 'cockpit')
-  createTicket(cockpitDir, { titre: 'Sans dossier' })
-  assert.deepEqual(readdirSync(join(cockpitDir, 'tickets')), ['T-0001-sans-dossier.md'])
+  const root = mkdtempSync(join(tmpdir(), 'ovrsee-tickets-'))
+  const ovrseeDir = join(root, 'ovrsee')
+  createTicket(ovrseeDir, { titre: 'Sans dossier' })
+  assert.deepEqual(readdirSync(join(ovrseeDir, 'tickets')), ['T-0001-sans-dossier.md'])
 })
 
 test('createTicket refuse d’écrire à travers un lien symbolique', () => {
-  const root = mkdtempSync(join(tmpdir(), 'cockpit-tickets-'))
-  const cockpitDir = join(root, 'cockpit')
-  mkdirSync(cockpitDir, { recursive: true })
-  // Un dépôt hostile peut livrer `cockpit/tickets -> ~/.ssh` : l'écriture doit
+  const root = mkdtempSync(join(tmpdir(), 'ovrsee-tickets-'))
+  const ovrseeDir = join(root, 'ovrsee')
+  mkdirSync(ovrseeDir, { recursive: true })
+  // Un dépôt hostile peut livrer `ovrsee/tickets -> ~/.ssh` : l'écriture doit
   // refuser le lien, pas le suivre.
-  symlinkSync(mkdtempSync(join(tmpdir(), 'cockpit-ailleurs-')), join(cockpitDir, 'tickets'))
+  symlinkSync(mkdtempSync(join(tmpdir(), 'ovrsee-ailleurs-')), join(ovrseeDir, 'tickets'))
 
-  assert.throws(() => createTicket(cockpitDir, { titre: 'X' }), /lien symbolique/)
+  assert.throws(() => createTicket(ovrseeDir, { titre: 'X' }), /lien symbolique/)
 })
 
 // --- readTickets et colonnes disparues -------------------------------------
 
 test('readTickets replie un ticket dont la colonne n’existe plus', () => {
-  const cockpitDir = fixture()
-  createTicket(cockpitDir, { titre: 'Orphelin', colonne: 'revue' })
-  ecrireBoardBrut(cockpitDir, JSON.stringify({ colonnes: [{ id: 'todo', titre: 'À faire' }] }))
+  const ovrseeDir = fixture()
+  createTicket(ovrseeDir, { titre: 'Orphelin', colonne: 'revue' })
+  ecrireBoardBrut(ovrseeDir, JSON.stringify({ colonnes: [{ id: 'todo', titre: 'À faire' }] }))
 
-  const [ticket] = readTickets(cockpitDir)
+  const [ticket] = readTickets(ovrseeDir)
   assert.equal(ticket.meta.colonne, 'todo')
 })
 
 test('readTickets ignore un fichier illisible sans emporter les autres', () => {
-  const cockpitDir = fixture()
-  createTicket(cockpitDir, { titre: 'Valide' })
-  writeFileSync(join(cockpitDir, 'tickets', 'T-9999-casse.md'), 'pas de frontmatter', 'utf8')
+  const ovrseeDir = fixture()
+  createTicket(ovrseeDir, { titre: 'Valide' })
+  writeFileSync(join(ovrseeDir, 'tickets', 'T-9999-casse.md'), 'pas de frontmatter', 'utf8')
 
-  assert.equal(readTickets(cockpitDir).length, 1)
+  assert.equal(readTickets(ovrseeDir).length, 1)
 })
 
 test('readTickets rend un tableau vide quand le dossier n’existe pas', () => {
-  const root = mkdtempSync(join(tmpdir(), 'cockpit-tickets-'))
-  assert.deepEqual(readTickets(join(root, 'cockpit')), [])
+  const root = mkdtempSync(join(tmpdir(), 'ovrsee-tickets-'))
+  assert.deepEqual(readTickets(join(root, 'ovrsee')), [])
 })
 
 // --- moveTicket / updateTicket / deleteTicket ------------------------------
 
 test('moveTicket ne change que la colonne et la date de mise à jour', () => {
-  const cockpitDir = fixture()
-  const { file, meta } = createTicket(cockpitDir, { titre: 'À déplacer' })
+  const ovrseeDir = fixture()
+  const { file, meta } = createTicket(ovrseeDir, { titre: 'À déplacer' })
 
-  assert.equal(moveTicket(cockpitDir, file, 'en-cours'), true)
+  assert.equal(moveTicket(ovrseeDir, file, 'en-cours'), true)
 
-  const [ticket] = readTickets(cockpitDir)
+  const [ticket] = readTickets(ovrseeDir)
   assert.equal(ticket.meta.colonne, 'en-cours')
   assert.equal(ticket.meta.titre, meta.titre)
   assert.equal(ticket.meta.cree, meta.cree)
 })
 
 test('moveTicket refuse une colonne inconnue', () => {
-  const cockpitDir = fixture()
-  const { file } = createTicket(cockpitDir, { titre: 'À déplacer' })
-  assert.throws(() => moveTicket(cockpitDir, file, 'nowhere'), /colonne/)
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'À déplacer' })
+  assert.throws(() => moveTicket(ovrseeDir, file, 'nowhere'), /colonne/)
 })
 
 test('moveTicket refuse un nom de fichier hors du dossier', () => {
@@ -206,12 +206,12 @@ test('moveTicket refuse un nom de fichier hors du dossier', () => {
 })
 
 test('updateTicket réécrit le corps et garde l’id', () => {
-  const cockpitDir = fixture()
-  const { file } = createTicket(cockpitDir, { titre: 'Titre initial', corps: 'ancien' })
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'Titre initial', corps: 'ancien' })
 
-  updateTicket(cockpitDir, file, { titre: 'Titre revu', priorite: 'haute', corps: 'nouveau' })
+  updateTicket(ovrseeDir, file, { titre: 'Titre revu', priorite: 'haute', corps: 'nouveau' })
 
-  const [ticket] = readTickets(cockpitDir)
+  const [ticket] = readTickets(ovrseeDir)
   assert.equal(ticket.meta.id, 'T-0001')
   assert.equal(ticket.meta.titre, 'Titre revu')
   assert.equal(ticket.meta.priorite, 'haute')
@@ -221,12 +221,12 @@ test('updateTicket réécrit le corps et garde l’id', () => {
 })
 
 test('deleteTicket retire le fichier', () => {
-  const cockpitDir = fixture()
-  const { file } = createTicket(cockpitDir, { titre: 'Jetable' })
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'Jetable' })
 
-  assert.equal(deleteTicket(cockpitDir, file), true)
-  assert.deepEqual(readTickets(cockpitDir), [])
-  assert.equal(deleteTicket(cockpitDir, file), false)
+  assert.equal(deleteTicket(ovrseeDir, file), true)
+  assert.deepEqual(readTickets(ovrseeDir), [])
+  assert.equal(deleteTicket(ovrseeDir, file), false)
 })
 
 // --- sortTickets -----------------------------------------------------------
@@ -246,30 +246,30 @@ test('sortTickets classe par priorité puis du plus récent au plus ancien', () 
 
 // --- importOpenPlans -------------------------------------------------------
 
-const writePlan = (cockpitDir, file, meta) =>
+const writePlan = (ovrseeDir, file, meta) =>
   writeFileSync(
-    join(cockpitDir, 'plans', file),
+    join(ovrseeDir, 'plans', file),
     `---\n${JSON.stringify(meta, null, 2)}\n---\n\n## Intention\nParce que.\n`,
     'utf8',
   )
 
 test('importOpenPlans crée un ticket par plan ouvert, et une seule fois', () => {
-  const cockpitDir = fixture()
-  writePlan(cockpitDir, '2026-08-01-jamais-commence.md', {
+  const ovrseeDir = fixture()
+  writePlan(ovrseeDir, '2026-08-01-jamais-commence.md', {
     status: 'open',
     title: 'Jamais commencé',
     opened: '2026-08-01',
     closed: null,
     commits: [],
   })
-  writePlan(cockpitDir, '2026-08-02-en-cours.md', {
+  writePlan(ovrseeDir, '2026-08-02-en-cours.md', {
     status: 'open',
     title: 'En cours',
     opened: '2026-08-02',
     closed: null,
     commits: [{ sha: 'abc1234', date: '2026-08-02T10:00:00+02:00', files: [] }],
   })
-  writePlan(cockpitDir, '2026-08-03-clos.md', {
+  writePlan(ovrseeDir, '2026-08-03-clos.md', {
     status: 'closed',
     title: 'Clos',
     opened: '2026-08-03',
@@ -277,16 +277,16 @@ test('importOpenPlans crée un ticket par plan ouvert, et une seule fois', () =>
     commits: [],
   })
 
-  const premier = importOpenPlans(cockpitDir)
+  const premier = importOpenPlans(ovrseeDir)
   assert.equal(premier.length, 2)
 
-  const parPlan = Object.fromEntries(readTickets(cockpitDir).map(t => [t.meta.plan, t.meta.colonne]))
+  const parPlan = Object.fromEntries(readTickets(ovrseeDir).map(t => [t.meta.plan, t.meta.colonne]))
   assert.equal(parPlan['2026-08-01-jamais-commence.md'], 'backlog')
   assert.equal(parPlan['2026-08-02-en-cours.md'], 'en-cours')
 
   // Second passage : rien de neuf, pas de doublon.
-  assert.deepEqual(importOpenPlans(cockpitDir), [])
-  assert.equal(readTickets(cockpitDir).length, 2)
+  assert.deepEqual(importOpenPlans(ovrseeDir), [])
+  assert.equal(readTickets(ovrseeDir).length, 2)
 })
 
 // --- colonneFinale ---------------------------------------------------------
@@ -300,27 +300,27 @@ test('colonneFinale est la dernière colonne, sauf s’il n’y en a qu’une', 
 // --- édition des colonnes --------------------------------------------------
 
 test('writeBoard écrit des colonnes valides et les relit', () => {
-  const cockpitDir = fixture()
-  writeBoard(cockpitDir, [{ id: 'a', titre: 'A' }, { id: 'b', titre: 'B', wip: 2 }])
+  const ovrseeDir = fixture()
+  writeBoard(ovrseeDir, [{ id: 'a', titre: 'A' }, { id: 'b', titre: 'B', wip: 2 }])
 
-  assert.deepEqual(readBoard(cockpitDir), [{ id: 'a', titre: 'A' }, { id: 'b', titre: 'B', wip: 2 }])
+  assert.deepEqual(readBoard(ovrseeDir), [{ id: 'a', titre: 'A' }, { id: 'b', titre: 'B', wip: 2 }])
 })
 
 test('writeBoard refuse ce que readBoard ne saurait pas relire', () => {
-  const cockpitDir = fixture()
-  assert.throws(() => writeBoard(cockpitDir, []), /vide/)
-  assert.throws(() => writeBoard(cockpitDir, [{ id: '', titre: 'A' }]), /identifiant/)
-  assert.throws(() => writeBoard(cockpitDir, [{ id: 'a', titre: '  ' }]), /titre/)
+  const ovrseeDir = fixture()
+  assert.throws(() => writeBoard(ovrseeDir, []), /vide/)
+  assert.throws(() => writeBoard(ovrseeDir, [{ id: '', titre: 'A' }]), /identifiant/)
+  assert.throws(() => writeBoard(ovrseeDir, [{ id: 'a', titre: '  ' }]), /titre/)
   assert.throws(
-    () => writeBoard(cockpitDir, [{ id: 'a', titre: 'A' }, { id: 'a', titre: 'Bis' }]),
+    () => writeBoard(ovrseeDir, [{ id: 'a', titre: 'A' }, { id: 'a', titre: 'Bis' }]),
     /deux fois/,
   )
-  assert.throws(() => writeBoard(cockpitDir, [{ id: 'a', titre: 'A', wip: 0 }]), /wip|limite/)
+  assert.throws(() => writeBoard(ovrseeDir, [{ id: 'a', titre: 'A', wip: 0 }]), /wip|limite/)
 })
 
 test('addColumn dérive l’identifiant du titre et l’ajoute à la fin', () => {
-  const cockpitDir = fixture()
-  const colonnes = addColumn(cockpitDir, { titre: 'À revoir', wip: 2 })
+  const ovrseeDir = fixture()
+  const colonnes = addColumn(ovrseeDir, { titre: 'À revoir', wip: 2 })
 
   assert.equal(colonnes.at(-1).id, 'a-revoir')
   assert.equal(colonnes.at(-1).titre, 'À revoir')
@@ -329,9 +329,9 @@ test('addColumn dérive l’identifiant du titre et l’ajoute à la fin', () =>
 })
 
 test('addColumn ne réutilise jamais un identifiant déjà pris', () => {
-  const cockpitDir = fixture()
-  addColumn(cockpitDir, { titre: 'Revue' })
-  const colonnes = addColumn(cockpitDir, { titre: 'Revue' })
+  const ovrseeDir = fixture()
+  addColumn(ovrseeDir, { titre: 'Revue' })
+  const colonnes = addColumn(ovrseeDir, { titre: 'Revue' })
 
   const ids = colonnes.map(c => c.id)
   assert.equal(new Set(ids).size, ids.length)
@@ -339,8 +339,8 @@ test('addColumn ne réutilise jamais un identifiant déjà pris', () => {
 })
 
 test('addColumn insère après une colonne donnée', () => {
-  const cockpitDir = fixture()
-  const colonnes = addColumn(cockpitDir, { titre: 'Bloqué', apres: 'pret' })
+  const ovrseeDir = fixture()
+  const colonnes = addColumn(ovrseeDir, { titre: 'Bloqué', apres: 'pret' })
 
   assert.deepEqual(
     colonnes.map(c => c.id),
@@ -349,22 +349,22 @@ test('addColumn insère après une colonne donnée', () => {
 })
 
 test('renameColumn ne touche pas à l’identifiant, donc pas aux tickets', () => {
-  const cockpitDir = fixture()
-  const { file } = createTicket(cockpitDir, { titre: 'Un ticket', colonne: 'revue' })
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'Un ticket', colonne: 'revue' })
 
-  renameColumn(cockpitDir, 'revue', { titre: 'Relecture', wip: 4 })
+  renameColumn(ovrseeDir, 'revue', { titre: 'Relecture', wip: 4 })
 
-  const colonne = readBoard(cockpitDir).find(c => c.id === 'revue')
+  const colonne = readBoard(ovrseeDir).find(c => c.id === 'revue')
   assert.equal(colonne.titre, 'Relecture')
   assert.equal(colonne.wip, 4)
-  assert.equal(readTickets(cockpitDir).find(t => t.file === file).meta.colonne, 'revue')
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'revue')
 })
 
 test('renameColumn retire la limite quand wip vaut null', () => {
-  const cockpitDir = fixture()
-  renameColumn(cockpitDir, 'en-cours', { wip: null })
+  const ovrseeDir = fixture()
+  renameColumn(ovrseeDir, 'en-cours', { wip: null })
 
-  assert.equal('wip' in readBoard(cockpitDir).find(c => c.id === 'en-cours'), false)
+  assert.equal('wip' in readBoard(ovrseeDir).find(c => c.id === 'en-cours'), false)
 })
 
 test('renameColumn refuse une colonne inconnue', () => {
@@ -372,68 +372,68 @@ test('renameColumn refuse une colonne inconnue', () => {
 })
 
 test('removeColumn déplace les tickets avant de retirer la colonne', () => {
-  const cockpitDir = fixture()
-  const { file } = createTicket(cockpitDir, { titre: 'Orphelin en puissance', colonne: 'revue' })
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'Orphelin en puissance', colonne: 'revue' })
 
-  removeColumn(cockpitDir, 'revue', 'fait')
+  removeColumn(ovrseeDir, 'revue', 'fait')
 
-  assert.equal(readBoard(cockpitDir).some(c => c.id === 'revue'), false)
+  assert.equal(readBoard(ovrseeDir).some(c => c.id === 'revue'), false)
   // Le fichier porte la nouvelle colonne : pas un repli d'affichage, une écriture.
-  assert.equal(readTickets(cockpitDir).find(t => t.file === file).meta.colonne, 'fait')
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'fait')
 })
 
 test('removeColumn exige une destination tant que la colonne porte des tickets', () => {
-  const cockpitDir = fixture()
-  createTicket(cockpitDir, { titre: 'Encore là', colonne: 'revue' })
+  const ovrseeDir = fixture()
+  createTicket(ovrseeDir, { titre: 'Encore là', colonne: 'revue' })
 
-  assert.throws(() => removeColumn(cockpitDir, 'revue'), /destination/)
-  assert.throws(() => removeColumn(cockpitDir, 'revue', 'revue'), /destination/)
-  assert.throws(() => removeColumn(cockpitDir, 'revue', 'nowhere'), /destination/)
+  assert.throws(() => removeColumn(ovrseeDir, 'revue'), /destination/)
+  assert.throws(() => removeColumn(ovrseeDir, 'revue', 'revue'), /destination/)
+  assert.throws(() => removeColumn(ovrseeDir, 'revue', 'nowhere'), /destination/)
 })
 
 test('removeColumn se passe de destination sur une colonne vide', () => {
-  const cockpitDir = fixture()
-  assert.equal(removeColumn(cockpitDir, 'revue').some(c => c.id === 'revue'), false)
+  const ovrseeDir = fixture()
+  assert.equal(removeColumn(ovrseeDir, 'revue').some(c => c.id === 'revue'), false)
 })
 
 test('removeColumn refuse de vider le tableau', () => {
-  const cockpitDir = fixture()
-  writeBoard(cockpitDir, [{ id: 'seule', titre: 'Seule' }])
+  const ovrseeDir = fixture()
+  writeBoard(ovrseeDir, [{ id: 'seule', titre: 'Seule' }])
 
-  assert.throws(() => removeColumn(cockpitDir, 'seule'), /dernière|seule colonne/)
+  assert.throws(() => removeColumn(ovrseeDir, 'seule'), /dernière|seule colonne/)
 })
 
 test('reorderColumn place une colonne à l’index demandé', () => {
-  const cockpitDir = fixture()
+  const ovrseeDir = fixture()
 
   assert.deepEqual(
-    reorderColumn(cockpitDir, 'fait', 0).map(c => c.id),
+    reorderColumn(ovrseeDir, 'fait', 0).map(c => c.id),
     ['fait', 'backlog', 'a-specifier', 'pret', 'en-cours', 'revue'],
   )
   assert.deepEqual(
-    reorderColumn(cockpitDir, 'fait', 5).map(c => c.id),
+    reorderColumn(ovrseeDir, 'fait', 5).map(c => c.id),
     ['backlog', 'a-specifier', 'pret', 'en-cours', 'revue', 'fait'],
   )
 })
 
 test('reorderColumn borne l’index au lieu de refuser le geste', () => {
-  const cockpitDir = fixture()
+  const ovrseeDir = fixture()
 
   assert.deepEqual(
-    reorderColumn(cockpitDir, 'backlog', 99).map(c => c.id),
+    reorderColumn(ovrseeDir, 'backlog', 99).map(c => c.id),
     ['a-specifier', 'pret', 'en-cours', 'revue', 'fait', 'backlog'],
   )
   assert.deepEqual(
-    reorderColumn(cockpitDir, 'backlog', -3).map(c => c.id),
+    reorderColumn(ovrseeDir, 'backlog', -3).map(c => c.id),
     ['backlog', 'a-specifier', 'pret', 'en-cours', 'revue', 'fait'],
   )
 })
 
 test('reorderColumn au même index ne réécrit rien', () => {
-  const cockpitDir = fixture()
+  const ovrseeDir = fixture()
 
   assert.deepEqual(
-    reorderColumn(cockpitDir, 'pret', 2).map(c => c.id),
+    reorderColumn(ovrseeDir, 'pret', 2).map(c => c.id),
     DEFAULT_COLUMNS.map(c => c.id),
   )
 })
@@ -445,82 +445,82 @@ test('reorderColumn refuse une colonne inconnue', () => {
 // --- epics (type et epic) --------------------------------------------------
 
 test("createTicket accepte un type 'epic'", () => {
-  const cockpitDir = fixture()
-  const written = createTicket(cockpitDir, { titre: 'Mon epic', type: 'epic' })
+  const ovrseeDir = fixture()
+  const written = createTicket(ovrseeDir, { titre: 'Mon epic', type: 'epic' })
 
   assert.equal(written.meta.type, 'epic')
 
-  const [ticket] = readTickets(cockpitDir)
+  const [ticket] = readTickets(ovrseeDir)
   assert.equal(ticket.meta.type, 'epic')
 })
 
 test('createTicket refuse un type invalide', () => {
-  const cockpitDir = fixture()
-  assert.throws(() => createTicket(cockpitDir, { titre: 'X', type: 'roadmap' }), /type/)
+  const ovrseeDir = fixture()
+  assert.throws(() => createTicket(ovrseeDir, { titre: 'X', type: 'roadmap' }), /type/)
 })
 
 test('createTicket accepte un epic parent', () => {
-  const cockpitDir = fixture()
-  const epic = createTicket(cockpitDir, { titre: 'Epic', type: 'epic' })
-  const enfant = createTicket(cockpitDir, { titre: 'Enfant', epic: epic.meta.id })
+  const ovrseeDir = fixture()
+  const epic = createTicket(ovrseeDir, { titre: 'Epic', type: 'epic' })
+  const enfant = createTicket(ovrseeDir, { titre: 'Enfant', epic: epic.meta.id })
 
   assert.equal(enfant.meta.epic, epic.meta.id)
 
-  const tickets = readTickets(cockpitDir)
+  const tickets = readTickets(ovrseeDir)
   assert.equal(tickets.find(t => t.meta.id === enfant.meta.id).meta.epic, epic.meta.id)
 })
 
 test('createTicket refuse un epic invalide', () => {
-  const cockpitDir = fixture()
-  assert.throws(() => createTicket(cockpitDir, { titre: 'X', epic: 'pas-un-id' }), /epic/)
-  assert.throws(() => createTicket(cockpitDir, { titre: 'X', epic: 'T-999-trop-long' }), /epic/)
+  const ovrseeDir = fixture()
+  assert.throws(() => createTicket(ovrseeDir, { titre: 'X', epic: 'pas-un-id' }), /epic/)
+  assert.throws(() => createTicket(ovrseeDir, { titre: 'X', epic: 'T-999-trop-long' }), /epic/)
 })
 
 test('updateTicket peut changer type et epic', () => {
-  const cockpitDir = fixture()
-  const { file } = createTicket(cockpitDir, { titre: 'Avant' })
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'Avant' })
 
-  updateTicket(cockpitDir, file, { type: 'epic' })
+  updateTicket(ovrseeDir, file, { type: 'epic' })
 
-  let [ticket] = readTickets(cockpitDir)
+  let [ticket] = readTickets(ovrseeDir)
   assert.equal(ticket.meta.type, 'epic')
 
-  const epic = createTicket(cockpitDir, { titre: 'Parent', type: 'epic' })
-  updateTicket(cockpitDir, file, { epic: epic.meta.id })
+  const epic = createTicket(ovrseeDir, { titre: 'Parent', type: 'epic' })
+  updateTicket(ovrseeDir, file, { epic: epic.meta.id })
 
-  ticket = readTickets(cockpitDir).find(t => t.meta.id === ticket.meta.id)
+  ticket = readTickets(ovrseeDir).find(t => t.meta.id === ticket.meta.id)
   assert.equal(ticket.meta.epic, epic.meta.id)
 })
 
 test('updateTicket peut détacher un enfant en mettant epic à null', () => {
-  const cockpitDir = fixture()
-  const epic = createTicket(cockpitDir, { titre: 'Parent', type: 'epic' })
-  const { file, meta } = createTicket(cockpitDir, { titre: 'Enfant', epic: epic.meta.id })
+  const ovrseeDir = fixture()
+  const epic = createTicket(ovrseeDir, { titre: 'Parent', type: 'epic' })
+  const { file, meta } = createTicket(ovrseeDir, { titre: 'Enfant', epic: epic.meta.id })
 
-  updateTicket(cockpitDir, file, { epic: null })
+  updateTicket(ovrseeDir, file, { epic: null })
 
-  const ticket = readTickets(cockpitDir).find(t => t.meta.id === meta.id)
+  const ticket = readTickets(ovrseeDir).find(t => t.meta.id === meta.id)
   assert.equal(ticket.meta.epic, undefined)
 })
 
 test('updateTicket peut retirer le type epic', () => {
-  const cockpitDir = fixture()
-  const { file } = createTicket(cockpitDir, { titre: 'Était epic', type: 'epic' })
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'Était epic', type: 'epic' })
 
-  updateTicket(cockpitDir, file, { type: null })
+  updateTicket(ovrseeDir, file, { type: null })
 
-  const [ticket] = readTickets(cockpitDir)
+  const [ticket] = readTickets(ovrseeDir)
   assert.equal(ticket.meta.type, undefined)
 })
 
 test("childrenOf retourne les enfants d'un epic triés", () => {
-  const cockpitDir = fixture()
-  const epic = createTicket(cockpitDir, { titre: 'Epic', type: 'epic' })
-  const enfant1 = createTicket(cockpitDir, { titre: 'Enfant 1', epic: epic.meta.id, priorite: 'moyenne' })
-  const enfant2 = createTicket(cockpitDir, { titre: 'Enfant 2', epic: epic.meta.id, priorite: 'haute' })
-  createTicket(cockpitDir, { titre: 'Autre' })
+  const ovrseeDir = fixture()
+  const epic = createTicket(ovrseeDir, { titre: 'Epic', type: 'epic' })
+  const enfant1 = createTicket(ovrseeDir, { titre: 'Enfant 1', epic: epic.meta.id, priorite: 'moyenne' })
+  const enfant2 = createTicket(ovrseeDir, { titre: 'Enfant 2', epic: epic.meta.id, priorite: 'haute' })
+  createTicket(ovrseeDir, { titre: 'Autre' })
 
-  const tickets = readTickets(cockpitDir)
+  const tickets = readTickets(ovrseeDir)
   const children = childrenOf(tickets, epic.meta.id)
 
   assert.equal(children.length, 2)
@@ -530,20 +530,20 @@ test("childrenOf retourne les enfants d'un epic triés", () => {
 })
 
 test('childrenOf retourne une liste vide si epic inexistant', () => {
-  const cockpitDir = fixture()
-  const tickets = readTickets(cockpitDir)
+  const ovrseeDir = fixture()
+  const tickets = readTickets(ovrseeDir)
   const children = childrenOf(tickets, 'T-999')
   assert.deepEqual(children, [])
 })
 
 test("orphanChildren détecte les enfants pointant un epic inexistant", () => {
-  const cockpitDir = fixture()
-  const epic = createTicket(cockpitDir, { titre: 'Epic', type: 'epic' })
-  const enfantVrai = createTicket(cockpitDir, { titre: 'Enfant vrai', epic: epic.meta.id })
-  const enfantOrphelin = createTicket(cockpitDir, { titre: 'Orphelin', epic: 'T-999' })
-  createTicket(cockpitDir, { titre: 'Ordinaire' })
+  const ovrseeDir = fixture()
+  const epic = createTicket(ovrseeDir, { titre: 'Epic', type: 'epic' })
+  const enfantVrai = createTicket(ovrseeDir, { titre: 'Enfant vrai', epic: epic.meta.id })
+  const enfantOrphelin = createTicket(ovrseeDir, { titre: 'Orphelin', epic: 'T-999' })
+  createTicket(ovrseeDir, { titre: 'Ordinaire' })
 
-  const tickets = readTickets(cockpitDir)
+  const tickets = readTickets(ovrseeDir)
   const orphans = orphanChildren(tickets)
 
   assert.equal(orphans.length, 1)

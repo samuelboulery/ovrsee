@@ -59,7 +59,7 @@ const readText = path => {
  *
  * Le registre est la seule source : rien n'entre dans la liste sans y avoir été
  * inscrit. Le dépôt courant était autrefois ajouté en tête s'il portait un
- * `cockpit/`, ce qui faisait qu'un clone frais s'ouvrait déjà sur lui-même et
+ * `ovrsee/`, ce qui faisait qu'un clone frais s'ouvrait déjà sur lui-même et
  * qu'on ne voyait jamais l'écran de premier lancement. Cette liste sert aussi de
  * liste blanche (`known()` de `server/api.js`, gardes d'`electron/main.js`) :
  * la vider de son implicite y est un gain, pas seulement une simplification.
@@ -83,7 +83,7 @@ export function projects() {
  * visionneuse. Le nom sert encore de départage stable à mtime égal.
  */
 export function shotsByPage(root) {
-  const base = join(root, 'cockpit', 'pages', 'shots')
+  const base = join(root, 'ovrsee', 'pages', 'shots')
   const out = {}
   try {
     for (const slug of readdirSync(base)) {
@@ -113,7 +113,7 @@ function scans(root, illisibles = []) {
   let cassees = 0
   let lignes = []
   try {
-    lignes = readFileSync(join(root, 'cockpit', 'pages', 'scans.jsonl'), 'utf8')
+    lignes = readFileSync(join(root, 'ovrsee', 'pages', 'scans.jsonl'), 'utf8')
       .split('\n')
       .filter(Boolean)
       .flatMap(line => {
@@ -136,7 +136,7 @@ function scans(root, illisibles = []) {
 /**
  * Journal git du projet, du plus récent au plus ancien.
  *
- * Les commits ne vivaient dans le cockpit que rattachés à un plan. Ceux faits
+ * Les commits ne vivaient dans l'ovrsee que rattachés à un plan. Ceux faits
  * hors plan n'existaient nulle part, et la chronologie sautait d'une intention
  * à l'autre sans montrer le travail entre les deux.
  *
@@ -171,15 +171,15 @@ function commits(root, limit = 300) {
  * le journal git serait du travail pour rien.
  */
 export function tableau(root, illisibles = []) {
-  const cockpitDir = join(root, 'cockpit')
-  const colonnes = readBoard(cockpitDir)
+  const ovrseeDir = join(root, 'ovrsee')
+  const colonnes = readBoard(ovrseeDir)
 
   return {
     board: colonnes,
     // Aplati comme les plans : l'interface lit `ticket.titre`, pas
     // `ticket.meta.titre`. Le corps prend son nom français au passage, pour ne
     // pas se confondre avec le `body` d'un plan dans les mêmes composants.
-    tickets: readTickets(cockpitDir, colonnes, illisibles).map(t => ({
+    tickets: readTickets(ovrseeDir, colonnes, illisibles).map(t => ({
       file: t.file,
       ...t.meta,
       corps: t.body,
@@ -222,14 +222,14 @@ function fileDate(path) {
  *
  * Trois niveaux de résolution pour `sourceGraphe` :
  * 1. Défaut : `'auto'` (Graphify si présent, sinon Obsidian)
- * 2. Profil global : `~/.claude/cockpit/settings.json`
- * 3. Dépôt : `cockpit.config.json` (plus spécifique prime)
+ * 2. Profil global : `~/.claude/ovrsee/settings.json`
+ * 3. Dépôt : `ovrsee.config.json` (plus spécifique prime)
  *
  * Retour enrichi : `{ graph, graphSource, sourceRequested, sourceMissing, sourceDate }`
  *
  * Deux sources possibles, jamais fusionnées : `graphify-out/graph.json`, écrit
  * par Graphify, ou un coffre Obsidian désigné par `obsidianVault` dans
- * `cockpit.config.json`. Fusionner deux vocabulaires d'identifiants coûterait
+ * `ovrsee.config.json`. Fusionner deux vocabulaires d'identifiants coûterait
  * plus que la fonctionnalité ne rapporte, et l'interface ne saurait plus dire
  * d'où vient une ligne.
  *
@@ -349,37 +349,37 @@ function getVaultDate(vaultRoot) {
 /** Tout ce que l'interface doit lire pour un projet, en une réponse. */
 export function snapshot(root) {
   // Ce que la lecture n'a pas su ouvrir, rassemblé au même endroit. C'est la
-  // seule chose que le cockpit ne peut pas se contenter de taire : un fichier
+  // seule chose que l'ovrsee ne peut pas se contenter de taire : un fichier
   // absent et un fichier illisible produisent le même écran vide, et seul le
   // second demande une intervention.
   const illisibles = []
-  const plans = readPlans(join(root, 'cockpit'), illisibles).map(p => ({
+  const plans = readPlans(join(root, 'ovrsee'), illisibles).map(p => ({
     file: p.file,
     ...p.meta,
     body: p.body,
   }))
 
-  const config = readJson(join(root, 'cockpit.config.json'))
+  const config = readJson(join(root, 'ovrsee.config.json'))
 
   return {
     root,
     ...tableau(root, illisibles),
-    // Un fait, pas une déduction : un `cockpit/` vide et un `cockpit/` absent
+    // Un fait, pas une déduction : un `ovrsee/` vide et un `ovrsee/` absent
     // se ressemblent une fois les plans lus, et l'interface ne doit pas
     // proposer d'initialiser ce qui l'est déjà.
-    equipped: existsSync(join(root, 'cockpit')),
+    equipped: existsSync(join(root, 'ovrsee')),
     plans,
     packageJson: readJson(join(root, 'package.json')),
     // Le crawler y lit déjà `dev` et `baseUrl`. L'onglet Navigateur s'en sert
     // comme URL par défaut : le projet a déjà déclaré où il s'affiche, le
     // redemander à l'utilisateur serait une deuxième vérité à tenir à jour.
     config,
-    // Le seul texte du cockpit qui ne vient pas de `cockpit/`. Il y a une bonne
+    // Le seul texte de l'ovrsee qui ne vient pas de `ovrsee/`. Il y a une bonne
     // raison : c'est le seul endroit du dépôt où quelqu'un a déjà écrit ce que
-    // le projet fait. Le recopier dans `cockpit/` en ferait une deuxième
+    // le projet fait. Le recopier dans `ovrsee/` en ferait une deuxième
     // version à maintenir, donc une version fausse en trois semaines.
     readme: readText(join(root, 'README.md')),
-    pages: readJson(join(root, 'cockpit', 'pages', 'pages.json')),
+    pages: readJson(join(root, 'ovrsee', 'pages', 'pages.json')),
     scans: scans(root, illisibles),
     // Les raisons d'être des dépendances, lues dans le code : un commentaire
     // `WHY:` posé au-dessus d'un import. L'onglet Stack les affichait comme
@@ -404,7 +404,7 @@ export function snapshot(root) {
  * servira aussi dans l'application empaquetée.
  */
 export function shotPath(root, relative) {
-  const base = join(root, 'cockpit', 'pages')
+  const base = join(root, 'ovrsee', 'pages')
   const file = normalize(join(base, relative ?? ''))
 
   if (!inside(base, file) || !existsSync(file)) return null

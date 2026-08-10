@@ -36,7 +36,7 @@ import { openSession, writeTo, resize, closeSession, closeAll } from './pty.js'
 const HERE = dirname(fileURLToPath(import.meta.url))
 const UI = join(HERE, '..', 'app', 'dist')
 
-const SCHEME = 'cockpit'
+const SCHEME = 'ovrsee'
 const ORIGIN = `${SCHEME}://app`
 
 const MIME = {
@@ -52,7 +52,7 @@ const MIME = {
 // En développement, `app.name` vaut « Electron » : le premier menu et les
 // dialogues du système porteraient ce nom-là. Le paquet, lui, tient son nom de
 // `productName` — les poser tous les deux rend les deux modes identiques.
-app.setName('Cockpit')
+app.setName('Ovrsee')
 
 /**
  * Les éditeurs qu'on sait ouvrir, par leur schéma d'URL.
@@ -226,27 +226,27 @@ function createWindow() {
     if (!url.startsWith(ORIGIN)) event.preventDefault()
   })
 
-  // `COCKPIT_ROUTE=/navigateur` ouvre la fenêtre sur un autre onglet : sans
+  // `OVRSEE_ROUTE=/navigateur` ouvre la fenêtre sur un autre onglet : sans
   // cela, la capture automatique ci-dessous ne peut vérifier que la page
   // d'arrivée, et les cinq autres onglets ne sont jamais regardés.
-  window.loadURL(ORIGIN + (process.env.COCKPIT_ROUTE ?? '/'))
+  window.loadURL(ORIGIN + (process.env.OVRSEE_ROUTE ?? '/'))
 
-  // `COCKPIT_CAPTURE=/chemin.png` : la fenêtre se photographie puis quitte.
+  // `OVRSEE_CAPTURE=/chemin.png` : la fenêtre se photographie puis quitte.
   // Une interface graphique doit pouvoir se vérifier sans qu'un humain la
   // regarde — sinon elle n'est jamais vérifiée automatiquement.
   //
-  // Le délai s'ajuste par `COCKPIT_CAPTURE_DELAY` : sur un démarrage à froid,
+  // Le délai s'ajuste par `OVRSEE_CAPTURE_DELAY` : sur un démarrage à froid,
   // 2,5 s ne suffisent pas toujours et la capture rend une image vide — le
   // seul résultat pire qu'une absence de vérification est une vérification qui
   // ment.
-  const capture = process.env.COCKPIT_CAPTURE
+  const capture = process.env.OVRSEE_CAPTURE
   if (capture) {
     window.webContents.once('did-finish-load', () => {
       setTimeout(async () => {
         const image = await window.webContents.capturePage()
         await writeFile(capture, image.toPNG())
         app.quit()
-      }, Number(process.env.COCKPIT_CAPTURE_DELAY ?? 2500))
+      }, Number(process.env.OVRSEE_CAPTURE_DELAY ?? 2500))
     })
   }
 
@@ -258,7 +258,7 @@ app.whenReady().then(() => {
   // copyright vient de `NSHumanReadableCopyright` dans l'application empaquetée,
   // et de nulle part en développement — le poser ici rend les deux identiques.
   app.setAboutPanelOptions({
-    applicationName: 'Cockpit',
+    applicationName: 'Ovrsee',
     applicationVersion: app.getVersion(),
     copyright: '© 2026 Samuel Boulery',
     credits: 'Vue en lecture seule sur un projet vibecodé.',
@@ -283,7 +283,7 @@ app.whenReady().then(() => {
   // Surface du terminal. Elle n'accepte jamais de nom de programme : le
   // processus lancé est décidé dans pty.js, pas par le rendu.
   //
-  // La liste blanche est le registre, et non la présence d'un `cockpit/` :
+  // La liste blanche est le registre, et non la présence d'un `ovrsee/` :
   // ouvrir un terminal sur un projet qu'on vient d'ajouter est la seule façon
   // d'y installer quoi que ce soit, et l'exiger équipé enfermait l'utilisateur
   // — l'écran d'équipement renvoyait au terminal, que le terminal refusait.
@@ -292,7 +292,7 @@ app.whenReady().then(() => {
   // `projects:reveal`.
   ipcMain.handle('pty:open', (event, projectPath, kind) => {
     if (typeof projectPath !== 'string' || !projects().some(p => p.path === projectPath)) {
-      return { error: "ce dossier n'est pas dans la liste des projets du cockpit" }
+      return { error: "ce dossier n'est pas dans la liste des projets de l'ovrsee" }
     }
     return openSession(event.sender, projectPath, kind)
   })
@@ -304,7 +304,7 @@ app.whenReady().then(() => {
    * Ouvrir — et positionner — le panneau de DevTools de l'aperçu.
    *
    * `webview.openDevTools()` ouvre une fenêtre séparée, et une fenêtre qui
-   * flotte à côté du cockpit annule ce que l'onglet Navigateur apporte.
+   * flotte à côté de l'ovrsee annule ce que l'onglet Navigateur apporte.
    * `setDevToolsWebContents` est la seule façon de les rendre ailleurs.
    *
    * L'hôte est une `WebContentsView`, pas une seconde `<webview>` : mesuré,
@@ -333,7 +333,7 @@ app.whenReady().then(() => {
     // n'est pas une option de l'API : `themeSource` est ce qui le décide.
     //
     // Le réglage vaut pour toute l'application, pas seulement pour les
-    // DevTools. C'est cohérent : le cockpit est sombre, et ses menus natifs,
+    // DevTools. C'est cohérent : l'ovrsee est sombre, et ses menus natifs,
     // ses ascenseurs et ses dialogues doivent l'être aussi. Le thème vient du
     // rendu parce qu'il est le seul à savoir ce qu'il affiche.
     //
@@ -385,7 +385,7 @@ app.whenReady().then(() => {
     return canceled ? null : (filePaths[0] ?? null)
   })
 
-  // Révéler le `cockpit/` d'un projet dans le Finder — la seule commande du menu
+  // Révéler le `ovrsee/` d'un projet dans le Finder — la seule commande du menu
   // qui touche au disque.
   //
   // `showItemInFolder` et jamais `openPath` : révéler sélectionne un dossier,
@@ -395,7 +395,7 @@ app.whenReady().then(() => {
   // n'importe où.
   ipcMain.handle('projects:reveal', (_event, path) => {
     if (typeof path !== 'string' || !projects().some(p => p.path === path)) return false
-    shell.showItemInFolder(join(path, 'cockpit'))
+    shell.showItemInFolder(join(path, 'ovrsee'))
     return true
   })
 
@@ -403,7 +403,7 @@ app.whenReady().then(() => {
    * Ouvrir un projet dans l'éditeur de l'utilisateur.
    *
    * Un schéma d'URL, jamais un `spawn` : `vscode://file/…` est de la même
-   * classe qu'ouvrir un lien web, et le cockpit ne gagne pas au passage le
+   * classe qu'ouvrir un lien web, et l'ovrsee ne gagne pas au passage le
    * droit de lancer des binaires. L'invariant du cadrage tient — il lit, et
    * n'exécute que le terminal qu'on lui demande.
    *

@@ -37,7 +37,7 @@ import {
 /**
  * Un dossier réel, désigné par un chemin absolu, qui n'est pas un lien.
  *
- * Le chemin vient du rendu. Il n'ouvre qu'une lecture du `cockpit/` qui s'y
+ * Le chemin vient du rendu. Il n'ouvre qu'une lecture du `ovrsee/` qui s'y
  * trouve — c'est le sens même d'« ouvrir un projet » — mais il n'a aucune raison
  * d'être relatif, de désigner un fichier, ni de passer par un lien symbolique.
  *
@@ -53,7 +53,7 @@ export const usableDirectory = path =>
   lstatSync(path).isDirectory()
 
 /**
- * Ce qu'on propose de mettre dans `cockpit.config.json`, pour que le formulaire
+ * Ce qu'on propose de mettre dans `ovrsee.config.json`, pour que le formulaire
  * d'équipement arrive pré-rempli plutôt que vide.
  *
  * ponytail: heuristique volontairement courte — le script `dev` ou `start` du
@@ -81,7 +81,7 @@ function detectDefaults(root) {
 
 /**
  * État détecté d'un dossier : est-ce un dépôt git ? a-t-il un lockfile ?
- * cockpit.config.json ? Est-ce équipé ? Et que proposer au formulaire ?
+ * ovrsee.config.json ? Est-ce équipé ? Et que proposer au formulaire ?
  */
 function getFolderState(root) {
   const hasGit = (() => {
@@ -96,7 +96,7 @@ function getFolderState(root) {
   const hasLockfile = ['pnpm-lock.yaml', 'package-lock.json', 'yarn.lock', 'bun.lockb']
     .some(name => existsSync(join(root, name)))
 
-  const hasConfig = existsSync(join(root, 'cockpit.config.json'))
+  const hasConfig = existsSync(join(root, 'ovrsee.config.json'))
 
   const defaults = detectDefaults(root)
 
@@ -130,9 +130,9 @@ const INVALID = Symbol('config invalide')
  *
  * Ce que cette validation vise, et ce qu'elle ne vise pas. `dev` finira dans un
  * `spawn(…, { shell: true })` du crawler : c'est une commande shell, et ça le
- * restera — c'est le sens du champ, exactement comme éditer `cockpit.config.json`
+ * restera — c'est le sens du champ, exactement comme éditer `ovrsee.config.json`
  * à la main. Prétendre l'assainir ici donnerait une fausse assurance. Ce qui
- * tient une page tierce à distance, c'est l'en-tête `X-Cockpit` et le registre
+ * tient une page tierce à distance, c'est l'en-tête `X-Ovrsee` et le registre
  * comme liste blanche, pas une expression rationnelle sur une ligne de commande.
  *
  * Restent deux refus qui valent la peine : un `baseUrl` qui n'est pas une URL
@@ -220,7 +220,7 @@ function projectAction(body) {
 
         // L'export s'orchestre ici plutôt que dans `install` : c'est déjà une
         // action de cette route, et l'équipement n'a pas à connaître Obsidian.
-        // Après, jamais avant — exporter un coffre d'un `cockpit/` inexistant
+        // Après, jamais avant — exporter un coffre d'un `ovrsee/` inexistant
         // ne produirait qu'un index vide.
         if (body?.obsidian === true) done.push(...exportVault(path))
 
@@ -241,7 +241,7 @@ function projectAction(body) {
 /**
  * Création, déplacement, modification, suppression d'un ticket.
  *
- * Les tickets sont la seule donnée du cockpit que l'interface écrit. Le geste
+ * Les tickets sont la seule donnée de l'ovrsee que l'interface écrit. Le geste
  * courant est le glisser-déposer, d'où une réponse réduite au tableau : relire
  * tout le projet après chaque déplacement serait payer le graphe et le journal
  * git pour un champ qui change.
@@ -255,42 +255,42 @@ function projectAction(body) {
  */
 function ticketAction(body, root) {
   const { action, file } = body ?? {}
-  const cockpitDir = join(root, 'cockpit')
+  const ovrseeDir = join(root, 'ovrsee')
   const list = () => ({ json: tableau(root) })
   const absent = () => ({ status: 404, json: { error: 'ticket introuvable' } })
 
   try {
     switch (action) {
       case 'create':
-        createTicket(cockpitDir, body)
+        createTicket(ovrseeDir, body)
         return list()
 
       case 'move':
-        return moveTicket(cockpitDir, file, body?.colonne) ? list() : absent()
+        return moveTicket(ovrseeDir, file, body?.colonne) ? list() : absent()
 
       case 'update':
-        return updateTicket(cockpitDir, file, body) ? list() : absent()
+        return updateTicket(ovrseeDir, file, body) ? list() : absent()
 
       case 'delete':
-        return deleteTicket(cockpitDir, file) ? list() : absent()
+        return deleteTicket(ovrseeDir, file) ? list() : absent()
 
       // Colonnes. L'identifiant n'est jamais modifiable : il est dérivé du
       // titre à la création et cité par les tickets. Renommer ne touche donc
       // que le titre, et retirer reloge les tickets avant d'écrire le board.
       case 'column-add':
-        addColumn(cockpitDir, body)
+        addColumn(ovrseeDir, body)
         return list()
 
       case 'column-rename':
-        renameColumn(cockpitDir, body?.id, body)
+        renameColumn(ovrseeDir, body?.id, body)
         return list()
 
       case 'column-remove':
-        removeColumn(cockpitDir, body?.id, body?.vers)
+        removeColumn(ovrseeDir, body?.id, body?.vers)
         return list()
 
       case 'column-reorder':
-        reorderColumn(cockpitDir, body?.id, body?.index)
+        reorderColumn(ovrseeDir, body?.id, body?.index)
         return list()
 
       default:
@@ -321,9 +321,9 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
 
       // Au dev server, n'importe quelle page ouverte dans le navigateur peut
       // poster vers localhost. Un en-tête personnalisé impose un préflight
-      // CORS, que le rendu du cockpit passe et qu'un formulaire distant non.
-      if (headers['x-cockpit'] !== '1') {
-        return { status: 403, json: { error: 'en-tête X-Cockpit manquant' } }
+      // CORS, que le rendu de l'ovrsee passe et qu'un formulaire distant non.
+      if (headers['x-ovrsee'] !== '1') {
+        return { status: 403, json: { error: 'en-tête X-Ovrsee manquant' } }
       }
       return projectAction(body)
 
@@ -332,8 +332,8 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
     // registre des projets mais le catalogue, appliqué dans `installSkills`.
     case '/api/skills': {
       if (method !== 'POST') return { json: readSkills() }
-      if (headers['x-cockpit'] !== '1') {
-        return { status: 403, json: { error: 'en-tête X-Cockpit manquant' } }
+      if (headers['x-ovrsee'] !== '1') {
+        return { status: 403, json: { error: 'en-tête X-Ovrsee manquant' } }
       }
       try {
         return { json: { done: installSkills(body?.noms), skills: readSkills() } }
@@ -355,8 +355,8 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
 
     case '/api/settings': {
       // L'en-tête vérification d'abord pour les écritures
-      if (method === 'POST' && headers['x-cockpit'] !== '1') {
-        return { status: 403, json: { error: 'en-tête X-Cockpit manquant' } }
+      if (method === 'POST' && headers['x-ovrsee'] !== '1') {
+        return { status: 403, json: { error: 'en-tête X-Ovrsee manquant' } }
       }
 
       const askedPath = url.searchParams.get('path')
@@ -370,7 +370,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
         if (!root) return { status: 404, json: { error: 'inconnu' } }
 
         // Fusionner global + projet — réutilise readJson de snapshot.js
-        const projectConfig = readJson(join(root, 'cockpit.config.json')) ?? {}
+        const projectConfig = readJson(join(root, 'ovrsee.config.json')) ?? {}
         return { json: mergeSettings(readSettings(), projectConfig) }
       }
 
@@ -385,8 +385,8 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
     case '/api/tickets': {
       // L'en-tête d'abord : rien de ce qui suit ne doit tourner pour une
       // requête qu'on refuse de toute façon, pas même une lecture du registre.
-      if (method === 'POST' && headers['x-cockpit'] !== '1') {
-        return { status: 403, json: { error: 'en-tête X-Cockpit manquant' } }
+      if (method === 'POST' && headers['x-ovrsee'] !== '1') {
+        return { status: 403, json: { error: 'en-tête X-Ovrsee manquant' } }
       }
 
       // Même liste blanche que partout ailleurs : le registre. Un chemin
@@ -413,7 +413,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
 
     // Les images et vidéos qu'un README cite. Même liste blanche de projets que
     // partout, plus une liste blanche d'extensions dans `mediaPath` : cette
-    // route lit à la racine du dépôt, pas dans le seul `cockpit/`.
+    // route lit à la racine du dépôt, pas dans le seul `ovrsee/`.
     case '/api/media': {
       const root = asked()
       const media = root ? mediaPath(root, url.searchParams.get('file') ?? '') : null

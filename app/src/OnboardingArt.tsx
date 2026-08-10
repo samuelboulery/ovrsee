@@ -2,7 +2,7 @@
  * Les deux visuels de la présentation, dessinés plutôt que photographiés.
  *
  * Aucune image binaire : rien à charger, rien à résoudre sous le protocole
- * `cockpit://`, rien qui pèse dans le DMG, et un dessin qui suit le thème
+ * `ovrsee://`, rien qui pèse dans le DMG, et un dessin qui suit le thème
  * puisqu'il est peint aux jetons Nocturne.
  *
  * WHY: le logo est transcrit de `build/icon.svg`, qui reste la source
@@ -15,7 +15,7 @@
 import { t } from './i18n'
 import { s } from './style'
 
-/** Le logo du cockpit : un nœud qui se ramifie en deux. */
+/** Le logo de l'ovrsee : un nœud qui se ramifie en deux. */
 export function Logo({ size = 64 }: { size?: number }) {
   return (
     <svg
@@ -79,7 +79,7 @@ const mouvementPermis = () =>
   !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 /**
- * La boucle qui remplit `cockpit/` : un plan approuvé, un commit qui le clôt,
+ * La boucle qui remplit `ovrsee/` : un plan approuvé, un commit qui le clôt,
  * une capture datée, et le dossier qui garde les trois.
  *
  * Le trait de retour est la seule chose animée de la présentation. La légende

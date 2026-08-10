@@ -3,7 +3,7 @@
  *
  * Ne décide de rien lui-même : chaque outil est un appel à `resolve()` de
  * `server/api.js`, la même fonction que le middleware Vite et le protocole
- * `cockpit://` d'Electron. C'est l'invariant du projet — trois implémentations
+ * `ovrsee://` d'Electron. C'est l'invariant du projet — trois implémentations
  * divergeraient, et les bugs ne se verraient que dans certains modes.
  *
  * Ce qui reste ici n'est donc que de la traduction : un nom d'outil vers une
@@ -14,19 +14,19 @@
 import { basename } from 'node:path'
 
 import { resolve, usableDirectory } from '../server/api.js'
-import { buildBrief, readCockpit } from '../hooks/brief.js'
+import { buildBrief, readOvrsee } from '../hooks/brief.js'
 
 /**
  * Origine factice. `resolve()` ne lit que `pathname` et `searchParams` ; en
  * stdio il n'y a pas d'hôte, mais `URL` en exige un.
  */
-const ORIGINE = 'http://cockpit'
+const ORIGINE = 'http://ovrsee'
 
 /**
  * Un appel à `resolve()`, traduit en résultat d'outil.
  *
  * `cwd` vide est délibéré : dans une session stdio il n'y a pas de dépôt
- * courant, et seul le registre doit faire liste blanche. L'en-tête `X-Cockpit`
+ * courant, et seul le registre doit faire liste blanche. L'en-tête `X-Ovrsee`
  * est la parade CORS du dev server — sans objet ici, mais `resolve()` l'exige
  * pour toute écriture, et la lui donner vaut mieux que la rendre optionnelle.
  *
@@ -38,7 +38,7 @@ function appel(route, chemin = null, requete = {}) {
   const url = new URL(route, ORIGINE)
   if (chemin) url.searchParams.set('path', chemin)
 
-  const out = resolve(url, '', { headers: { 'x-cockpit': '1' }, ...requete })
+  const out = resolve(url, '', { headers: { 'x-ovrsee': '1' }, ...requete })
 
   // `null` veut dire « pas notre route » côté HTTP. Ici, c'est une faute de
   // programmation dans la table ci-dessous, pas une requête d'un client.
@@ -120,7 +120,7 @@ const OUTILS = {
   // le terminal, que l'interface ne demande jamais au serveur. Le composer ici
   // ne duplique aucune logique de `resolve()`.
   getBrief: chemin => {
-    const state = readCockpit(chemin)
+    const state = readOvrsee(chemin)
     return { content: state ? buildBrief(state) : '' }
   },
 

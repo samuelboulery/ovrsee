@@ -14,7 +14,7 @@ import { SkillsList, useSkills } from './SkillsPanel'
  * séparation ne tenait pas — on se demande ce qui est installé et quels skills
  * le sont dans le même mouvement.
  *
- * Tout est en lecture seule sauf les skills : le cockpit écrit dans
+ * Tout est en lecture seule sauf les skills : l'ovrsee écrit dans
  * `~/.claude/skills/`, jamais dans les agents, les commandes ou les hooks de
  * quelqu'un d'autre. Le masquage des secrets se fait côté serveur
  * (`hooks/config-claude.js`) : la réponse ne contient aucun secret en clair.
@@ -58,7 +58,7 @@ function VueSkills() {
   return (
     <div>
       <div style={s('font-size: 11.5px; color: var(--color-neutral-600); margin-bottom: 12px;')}>
-        {t('skills.installed_in')} <code>~/.claude/skills/</code>. {t('skills.learn_cockpit')}
+        {t('skills.installed_in')} <code>~/.claude/skills/</code>. {t('skills.learn_ovrsee')}
       </div>
 
       <SkillsList skills={skills} choisis={choisis} onChoisis={setChoisis} />

@@ -139,6 +139,11 @@ export function buildMenu(lang = 'fr') {
         })),
         { type: 'separator' },
         {
+          label: m('menu.toggle_sidebar'),
+          accelerator: 'CmdOrCtrl+B',
+          click: send('sidebar:toggle'),
+        },
+        {
           label: m('menu.toggle_terminal'),
           accelerator: 'CmdOrCtrl+T',
           click: send('terminal:toggle'),

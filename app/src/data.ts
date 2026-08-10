@@ -259,6 +259,10 @@ export interface SettingsType {
   packageManager: string
   sourceGraphe: string
   customActions?: Action[]
+  /** La présentation de premier lancement a-t-elle été vue — ou passée ? */
+  onboardingVu?: boolean
+  /** Ce que la présentation a appris de l'usage de Claude Code. */
+  claude?: { niveau: string; usage: string }
 }
 
 export interface Snapshot {

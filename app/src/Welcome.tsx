@@ -1,7 +1,13 @@
 import { t } from './i18n'
 import { s } from './style'
 
-export function Welcome() {
+/**
+ * L'écran d'un cockpit sans projet, une fois la présentation passée.
+ *
+ * `onAjouterProjet` absent — dans un navigateur — laisse la commande en ligne :
+ * un bouton qui n'ouvrirait aucun sélecteur serait pire que pas de bouton.
+ */
+export function Welcome({ onAjouterProjet }: { onAjouterProjet?: () => void }) {
   return (
     <div
       style={s(
@@ -44,6 +50,12 @@ export function Welcome() {
           <li>{t('welcome.prerequisites_node')}</li>
         </ul>
       </div>
+
+      {onAjouterProjet && (
+        <button type="button" className="btn btn-primary" onClick={onAjouterProjet}>
+          {t('welcome.add_project')}
+        </button>
+      )}
 
       <div style={s('max-width: 52ch;')}>
         <p style={s('margin: 0 0 8px; font-size: 12px; color: var(--color-neutral-600);')}>

@@ -16,6 +16,18 @@ L'application capture les plans approuvés, photographie chaque écran à chaque
 
 ![Aperçu du cockpit](./cockpit/pages/shots/accueil/2026-08-09-24c3123.png)
 
+## Premier lancement
+
+Un cockpit fraîchement cloné, ou téléchargé, s'ouvre **vide** : aucun projet n'est
+observé tant qu'on n'en a pas désigné un. Une modale de trois écrans explique alors ce
+que fait l'application, règle l'interface d'après votre usage de Claude Code, et mène
+au choix du premier dépôt. Elle se passe d'un clic — ou de la touche Échap — et se
+rejoue depuis *Préférences → Général → Revoir la présentation*.
+
+Les réponses ne sont pas décoratives : elles choisissent les onglets affichés, la
+place du terminal et la commande proposée à l'ouverture d'un projet neuf. Tout
+reste modifiable ensuite dans les préférences.
+
 ## Mise en route — trois commandes
 
 ```bash

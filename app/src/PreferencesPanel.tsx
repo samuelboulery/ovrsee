@@ -124,7 +124,11 @@ type SectionProps = {
  * laisse hors de portée des surcharges de projet. C'est ce qui les met dans la
  * même section plutôt que la densité dans la sienne.
  */
-export function SectionGeneral({ settings, onSettings }: SectionProps) {
+export function SectionGeneral({
+  settings,
+  onSettings,
+  onRevoirPresentation,
+}: SectionProps & { onRevoirPresentation?: () => void }) {
   // Chaque cran fixe à la fois la granularité et la fenêtre : les deux ne se
   // combinent pas librement, et deux menus laisseraient composer des paires
   // qui n'ont pas de sens (un an au jour près).
@@ -185,6 +189,16 @@ export function SectionGeneral({ settings, onSettings }: SectionProps) {
           options={crans.map(({ value, label }) => ({ value, label }))}
         />
       </Row>
+
+      {/* La présentation ne se rouvre jamais d'elle-même : sans cette entrée,
+          elle serait perdue dès le premier projet ajouté. */}
+      {onRevoirPresentation && (
+        <div style={s('margin-top: 18px;')}>
+          <button type="button" className="btn btn-ghost" onClick={onRevoirPresentation}>
+            {t('onboard.replay')}
+          </button>
+        </div>
+      )}
     </>
   )
 }
@@ -432,11 +446,14 @@ export function SectionInterface({ settings, onSettings }: SectionProps) {
 export function PreferencesModal({
   onClose,
   onSaved,
+  onRevoirPresentation,
 }: {
   onClose: () => void
   /** Remonte les préférences réellement écrites : sans ça l'app garde son état
       d'avant l'enregistrement et les changements ne se voient qu'au rechargement. */
   onSaved?: (settings: SettingsType) => void
+  /** Rejoue la présentation de premier lancement. La modale se ferme d'abord. */
+  onRevoirPresentation?: () => void
 }) {
   const [settings, setSettings] = useState<SettingsType | null>(null)
   const [section, setSection] = useState<SectionId>('profils')
@@ -529,7 +546,8 @@ export function PreferencesModal({
   const corps = (courantes: SettingsType) => {
     const props = { settings: courantes, onSettings: applique }
     if (section === 'profils') return <SectionProfils {...props} />
-    if (section === 'general') return <SectionGeneral {...props} />
+    if (section === 'general')
+      return <SectionGeneral {...props} onRevoirPresentation={onRevoirPresentation} />
     if (section === 'interface') return <SectionInterface {...props} />
     if (section === 'claude') return <SectionClaude />
     return <SectionProjet {...props} />

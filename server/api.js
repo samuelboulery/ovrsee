@@ -166,10 +166,10 @@ function validateCrawlConfig(config) {
  * projet déjà enregistré, exactement comme `/api/project` et `/api/shot` : le
  * registre est la liste blanche de ce que cette application touche.
  */
-function projectAction(body, cwd) {
+function projectAction(body) {
   const { action, path } = body ?? {}
-  const known = () => projects(cwd).some(p => p.path === path)
-  const list = () => ({ json: { projects: projects(cwd) } })
+  const known = () => projects().some(p => p.path === path)
+  const list = () => ({ json: { projects: projects() } })
 
   switch (action) {
     case 'add':
@@ -191,7 +191,7 @@ function projectAction(body, cwd) {
     case 'export-obsidian': {
       if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
       try {
-        return { json: { projects: projects(cwd), done: exportVault(path) } }
+        return { json: { projects: projects(), done: exportVault(path) } }
       } catch (err) {
         return { status: 400, json: { error: String(err.message ?? err) } }
       }
@@ -224,7 +224,7 @@ function projectAction(body, cwd) {
         // ne produirait qu'un index vide.
         if (body?.obsidian === true) done.push(...exportVault(path))
 
-        return { json: { projects: projects(cwd), done } }
+        return { json: { projects: projects(), done } }
       } catch (err) {
         // Le cas courant : le dossier n'est pas un dépôt git. Le dire, plutôt
         // que d'installer à moitié un rattachement des commits qui ne peut pas
@@ -303,14 +303,16 @@ function ticketAction(body, root) {
 
 /**
  * @param {URL} url
- * @param {string} cwd dépôt courant, pour la liste des projets
+ * @param {string} cwd dépôt courant. Plus lu depuis que `projects()` ne consulte
+ *   que le registre ; l'argument reste pour ne pas décaler la position de
+ *   `request` chez les trois hôtes.
  * @param {{method?: string, headers?: Record<string, string>, body?: unknown}} [request]
  * @returns {{json: unknown} | {file: string, type?: string} | {status: number, json: unknown} | null}
  *   null quand la route n'est pas à nous : l'appelant passe la main.
  */
 export function resolve(url, cwd = process.cwd(), request = {}) {
   const { method = 'GET', headers = {}, body = null } = request
-  const known = () => projects(cwd)
+  const known = () => projects()
   const asked = () => known().find(p => p.path === url.searchParams.get('path'))?.path ?? null
 
   switch (url.pathname) {
@@ -323,7 +325,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
       if (headers['x-cockpit'] !== '1') {
         return { status: 403, json: { error: 'en-tête X-Cockpit manquant' } }
       }
-      return projectAction(body, cwd)
+      return projectAction(body)
 
     // Les skills vivent dans `~/.claude/`, pas dans un projet : c'est la seule
     // route qui ne prend pas de chemin. La liste blanche n'est donc pas le
@@ -364,7 +366,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
         if (!askedPath) return { json: readSettings() }
 
         // Avec projet : refuser si absent du registre
-        const root = projects(cwd).find(p => p.path === askedPath)?.path ?? null
+        const root = projects().find(p => p.path === askedPath)?.path ?? null
         if (!root) return { status: 404, json: { error: 'inconnu' } }
 
         // Fusionner global + projet — réutilise readJson de snapshot.js
@@ -390,7 +392,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
       // Même liste blanche que partout ailleurs : le registre. Un chemin
       // arbitraire ne doit pas devenir une écriture disque arbitraire.
       const asked = url.searchParams.get('path') ?? body?.path
-      const root = projects(cwd).find(p => p.path === asked)?.path ?? null
+      const root = projects().find(p => p.path === asked)?.path ?? null
       if (!root) return { status: 404, json: { error: 'projet inconnu' } }
 
       return method === 'POST' ? ticketAction(body, root) : { json: tableau(root) }

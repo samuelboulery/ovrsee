@@ -87,6 +87,12 @@ page : pour ça, il faut lancer l'app.
 - **Un plan actif capte tous les commits.** Tant que `cockpit/.active-plan` existe, le
   hook post-commit rattache chaque commit au plan — y compris un correctif sans
   rapport. `pnpm cockpit:close` avant de changer de sujet.
+- **Le registre est la seule source de projets.** `projects()` n'ajoute plus le dépôt
+  courant sous prétexte qu'il porte un `cockpit/` : sans quoi un clone frais s'ouvrait
+  sur lui-même et personne ne voyait jamais l'écran de premier lancement. Conséquence
+  au dev server : il faut inscrire le dépôt cockpit une fois, comme n'importe quel
+  autre projet. Cette liste sert aussi de liste blanche aux routes — elle ne doit
+  rien contenir d'implicite.
 - **Le crawl refuse de démarrer si `baseUrl` répond déjà.** C'est voulu : rien dans une
   réponse HTTP ne distingue son propre serveur de celui d'un autre projet.
 - **`node-pty` est un binaire natif.** Il est déballé de l'asar (`asarUnpack` dans

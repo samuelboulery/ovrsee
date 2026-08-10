@@ -10,7 +10,7 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { basename, extname, isAbsolute, join, normalize, sep } from 'node:path'
+import { extname, isAbsolute, join, normalize, sep } from 'node:path'
 
 import { readPlans, readRegistry } from './plans.js'
 import { readBoard, readTickets } from './tickets.js'
@@ -57,25 +57,19 @@ const readText = path => {
  * d'un registre écrit avant cette date — elle passe en fin de liste, dans son
  * ordre d'origine, plutôt que de prétendre à une fraîcheur qu'on ne connaît pas.
  *
- * Le dépôt courant est ajouté en tête s'il porte un `cockpit/` sans être
- * enregistré : au dev server lancé depuis le dépôt, cela évite un cockpit vide
- * au premier lancement. S'il est enregistré, c'est l'usage qui le classe.
- * Dans l'application empaquetée, il n'y a pas de dépôt courant et la liste vient
- * entièrement du registre.
- *
- * @param {string|null} [cwd]
+ * Le registre est la seule source : rien n'entre dans la liste sans y avoir été
+ * inscrit. Le dépôt courant était autrefois ajouté en tête s'il portait un
+ * `cockpit/`, ce qui faisait qu'un clone frais s'ouvrait déjà sur lui-même et
+ * qu'on ne voyait jamais l'écran de premier lancement. Cette liste sert aussi de
+ * liste blanche (`known()` de `server/api.js`, gardes d'`electron/main.js`) :
+ * la vider de son implicite y est un gain, pas seulement une simplification.
  */
-export function projects(cwd = process.cwd()) {
+export function projects() {
   const known = readRegistry()
 
   // Tri stable : `sort` l'est en JavaScript moderne, donc deux entrées sans
   // date gardent leur ordre d'écriture.
-  const ordered = [...known].sort((a, b) => (b.lastOpened ?? '').localeCompare(a.lastOpened ?? ''))
-
-  if (!cwd || !existsSync(join(cwd, 'cockpit'))) return ordered
-  if (ordered.some(p => p.path === cwd)) return ordered
-
-  return [{ path: cwd, name: basename(cwd) }, ...ordered]
+  return [...known].sort((a, b) => (b.lastOpened ?? '').localeCompare(a.lastOpened ?? ''))
 }
 
 /**

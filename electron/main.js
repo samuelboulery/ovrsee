@@ -291,7 +291,7 @@ app.whenReady().then(() => {
   // dans un dossier que l'utilisateur n'a jamais désigné : même garde que
   // `projects:reveal`.
   ipcMain.handle('pty:open', (event, projectPath, kind) => {
-    if (typeof projectPath !== 'string' || !projects(null).some(p => p.path === projectPath)) {
+    if (typeof projectPath !== 'string' || !projects().some(p => p.path === projectPath)) {
       return { error: "ce dossier n'est pas dans la liste des projets du cockpit" }
     }
     return openSession(event.sender, projectPath, kind)
@@ -394,7 +394,7 @@ app.whenReady().then(() => {
   // dans `server/api.js`. Sans elle, un rendu compromis ferait ouvrir le Finder
   // n'importe où.
   ipcMain.handle('projects:reveal', (_event, path) => {
-    if (typeof path !== 'string' || !projects(null).some(p => p.path === path)) return false
+    if (typeof path !== 'string' || !projects().some(p => p.path === path)) return false
     shell.showItemInFolder(join(path, 'cockpit'))
     return true
   })
@@ -414,7 +414,7 @@ app.whenReady().then(() => {
   ipcMain.handle('projects:edit', (_event, path, editor) => {
     const scheme = EDITORS[editor]
     if (!scheme) return false
-    if (typeof path !== 'string' || !projects(null).some(p => p.path === path)) return false
+    if (typeof path !== 'string' || !projects().some(p => p.path === path)) return false
     shell.openExternal(`${scheme}${path}`)
     return true
   })

@@ -7,7 +7,8 @@
  *
  * Deux niveaux : global dans `~/.claude/cockpit/settings.json`, surcharges
  * par `cockpit.config.json` (versionné git du projet). Les champs personnels
- * (`langue`, `theme`, `densiteActivite`) ne se surchargent pas.
+ * (`langue`, `theme`, `densiteActivite`, `onboardingVu`, `claude`) ne se
+ * surchargent pas.
  */
 
 import { homedir } from 'node:os'
@@ -27,6 +28,8 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
  *   packageManager: string,
  *   sourceGraphe: string,
  *   customActions: Array<{label: string, text: string}>,
+ *   onboardingVu: boolean,
+ *   claude: {niveau: string, usage: string},
  * }}
  */
 export const DEFAULT_SETTINGS = {
@@ -47,7 +50,22 @@ export const DEFAULT_SETTINGS = {
   packageManager: 'pnpm',
   sourceGraphe: 'auto',
   customActions: [],
+  // Faux tant que la présentation de premier lancement n'a pas été vue — ou
+  // passée, ce qui compte pour vue : un accueil qui rejoue est un accueil qui
+  // ment. Le défaut est le bon même sur un fichier abîmé : mieux vaut une
+  // présentation de trop qu'un premier lancement muet.
+  onboardingVu: false,
+  // Les réponses de l'accueil, gardées parce qu'elles servent après lui : le
+  // niveau décide des skills pré-cochés à l'équipement d'un projet. Le profil
+  // d'interface, lui, ne se garde pas — voir `app/src/PreferencesProfils.tsx`.
+  claude: { niveau: 'intermediaire', usage: 'terminal' },
 }
+
+/** Les valeurs admises pour `claude.niveau`, du plus neuf au plus aguerri. */
+export const NIVEAUX_CLAUDE = ['debutant', 'intermediaire', 'avance', 'expert']
+
+/** Les valeurs admises pour `claude.usage` — par quoi Claude Code est lancé. */
+export const USAGES_CLAUDE = ['terminal', 'ide', 'desktop', 'autre']
 
 /**
  * Chemin du fichier de préférences globales.
@@ -174,6 +192,21 @@ export function validateSettings(partial, defaults = DEFAULT_SETTINGS) {
     out.customActions = valides
   }
 
+  if (typeof partial.onboardingVu === 'boolean') {
+    out.onboardingVu = partial.onboardingVu
+  }
+
+  // Objet imbriqué : claude
+  if (partial.claude && typeof partial.claude === 'object') {
+    const { niveau, usage } = partial.claude
+    if (NIVEAUX_CLAUDE.includes(niveau)) {
+      out.claude.niveau = niveau
+    }
+    if (USAGES_CLAUDE.includes(usage)) {
+      out.claude.usage = usage
+    }
+  }
+
   return out
 }
 
@@ -191,8 +224,10 @@ export function writeSettings(settings) {
 /**
  * Fusionne le profil global avec les surcharges du projet.
  *
- * Les champs personnels (`langue`, `theme`, `densiteActivite`) ne se
- * surchargent jamais — c'est la préférence de l'utilisateur, pas du projet.
+ * Les champs personnels (`langue`, `theme`, `densiteActivite`, `onboardingVu`,
+ * `claude`) ne se surchargent jamais — c'est la préférence de l'utilisateur,
+ * pas du projet. Un dépôt cloné n'a surtout pas à décider qu'on a déjà vu la
+ * présentation.
  *
  * @param {object} global profil utilisateur
  * @param {object} project surcharges du projet (cockpit.config.json)

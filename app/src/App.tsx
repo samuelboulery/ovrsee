@@ -22,6 +22,7 @@ import {
   type Tableau as TableauData,
 } from './data'
 import { Garde } from './Garde'
+import { Onboarding } from './Onboarding'
 import { PreferencesModal } from './PreferencesPanel'
 import { Welcome } from './Welcome'
 import { EquipmentPanel } from './EquipmentPanel'
@@ -167,6 +168,11 @@ export function App() {
   // menu natif l'ouvre aussi, et son gestionnaire vit dans ce composant.
   const [preferencesOuvertes, setPreferencesOuvertes] = useState(false)
 
+  // Rejouer la présentation à la demande : sans cela elle serait perdue pour
+  // qui a déjà des projets, c'est-à-dire pour tout le monde après le premier
+  // jour. Elle ne se réaffiche jamais d'elle-même.
+  const [revoirPresentation, setRevoirPresentation] = useState(false)
+
   const [tab, setTab] = useState<TabId>(() => tabForPath(window.location.pathname))
   const [layout, setLayout] = useState<Layout>('bottom')
   const [terminal, setTerminal] = useState(true)
@@ -182,6 +188,26 @@ export function App() {
     max: 420,
     axis: 'x',
   })
+
+  // Rétractation de la barre latérale. Retenue d'une session à l'autre, comme
+  // sa largeur — sur un petit écran, la rouvrir à chaque lancement est une
+  // corvée. `localStorage` peut lever (mode privé) : la valeur par défaut est
+  // « ouverte ».
+  const [sidebarOuverte, setSidebarOuverte] = useState(() => {
+    try {
+      return localStorage.getItem('cockpit.sidebar') !== 'ferme'
+    } catch {
+      return true
+    }
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('cockpit.sidebar', sidebarOuverte ? 'ouvert' : 'ferme')
+    } catch {
+      /* Rien à faire : la préférence ne survivra pas à la session. */
+    }
+  }, [sidebarOuverte])
 
   // Précédent/Suivant du navigateur : l'URL fait foi, l'état la suit.
   useEffect(() => {
@@ -307,6 +333,26 @@ export function App() {
       .catch(err => setError(String(err.message ?? err)))
   }
 
+  /**
+   * Aligner l'état de la fenêtre sur des préférences qu'on vient d'écrire.
+   *
+   * Le terminal a un état local, que le menu et le bouton basculent sans rien
+   * écrire. Après une écriture, c'est le fichier qui fait foi — sinon appliquer
+   * un profil sans terminal masque les onglets et laisse le terminal ouvert.
+   * Les tailles, elles, ne se relisent pas : elles ont leur propre écriture
+   * différée au redimensionnement.
+   *
+   * Partagé par l'écran des préférences et par la présentation, qui écrivent
+   * le même fichier et doivent donc produire le même effet.
+   */
+  const appliquerReglages = (next: SettingsType) => {
+    setSettings(next)
+    setCurrentLanguage(next.langue)
+    applyTheme(next.theme)
+    setTerminal(next.terminal?.visible ?? true)
+    setLayout((next.terminal?.disposition ?? 'bottom') as Layout)
+  }
+
   /** Ajout, retrait : la liste vient du serveur, déjà triée. */
   const applyProjects = (list: Project[], select?: string | null) => {
     setProjects(list)
@@ -336,6 +382,7 @@ export function App() {
         if (current) window.cockpit?.projects.reveal(current)
         return
       }
+      if (command === 'sidebar:toggle') return setSidebarOuverte(ouverte => !ouverte)
       if (command === 'terminal:toggle') return setTerminal(ouvert => !ouvert)
 
       const disposition = command.startsWith('terminal:layout:') && command.slice(16)
@@ -374,6 +421,17 @@ export function App() {
   const contentVisible = !(layout === 'full' && terminal)
   const unequipped = snapshot ? isUnequipped(snapshot) : false
 
+  /**
+   * La présentation de premier lancement.
+   *
+   * Les deux conditions valent migration : quelqu'un qui a déjà des projets au
+   * registre ne la reverra jamais, même si sa clé `onboardingVu` manque parce
+   * que son fichier de préférences est plus vieux qu'elle. C'est aussi ce qui
+   * évite d'écrire un code de migration pour une seule clé.
+   */
+  const presentationDue = Boolean(settings) && !settings?.onboardingVu && projects.length === 0
+  const presentationOuverte = !error && (presentationDue || revoirPresentation)
+
   return (
     // La maquette dessinait une fausse fenêtre — pastilles, ombre portée,
     // 1320×860 posés sur un fond dégradé — parce qu'elle montrait à quoi
@@ -394,6 +452,22 @@ export function App() {
           'height: 44px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 82px; background: var(--theme-bg-tertiary); border-bottom: 1px solid var(--color-divider); -webkit-app-region: drag;',
         )}
       >
+        {/* `-webkit-app-region: no-drag` : sans cela le bouton est avalé par la
+            zone de déplacement de la fenêtre et le clic ne l'atteint jamais. */}
+        <button
+          type="button"
+          className="btn btn-ghost"
+          aria-label={t('sidebar.toggle')}
+          aria-expanded={sidebarOuverte}
+          title={t('sidebar.toggle')}
+          onClick={() => setSidebarOuverte(ouverte => !ouverte)}
+          style={s(
+            'font-size: 13px; line-height: 1; padding: 3px 7px; -webkit-app-region: no-drag;',
+          )}
+        >
+          {sidebarOuverte ? '⇤' : '⇥'}
+        </button>
+
         {/* Le seul `h1` de l'écran : la fenêtre porte le nom du projet, et les
             titres des onglets sont des `h2` sous celui-là. */}
         <h1
@@ -410,24 +484,30 @@ export function App() {
       <div style={s('flex: 1; display: flex; flex-direction: column; min-height: 0;')}>
 
         <div style={s('flex: 1; display: flex; min-height: 0;')}>
-          <Sidebar
-            projects={projects}
-            current={current}
-            snapshot={snapshot}
-            settings={settings}
-            width={sidebar.size}
-            onPick={path => {
-              setCurrent(path)
-              pushUrl(window.location.pathname, path)
-            }}
-            onProjects={applyProjects}
-            onError={setError}
-            onOpenPreferences={() => setPreferencesOuvertes(true)}
-            density={density(commitsDeLaFrise(snapshot?.timeline ?? []), {
-              fenetre: settings?.densiteActivite.fenetre,
-            })}
-          />
-          <Divider axis="x" resizable={sidebar} />
+          {/* Rétractée, la barre disparaît avec sa poignée : un séparateur seul
+              serait une poignée qui ne redimensionne rien de visible. */}
+          {sidebarOuverte && (
+            <>
+              <Sidebar
+                projects={projects}
+                current={current}
+                snapshot={snapshot}
+                settings={settings}
+                width={sidebar.size}
+                onPick={path => {
+                  setCurrent(path)
+                  pushUrl(window.location.pathname, path)
+                }}
+                onProjects={applyProjects}
+                onError={setError}
+                onOpenPreferences={() => setPreferencesOuvertes(true)}
+                density={density(commitsDeLaFrise(snapshot?.timeline ?? []), {
+                  fenetre: settings?.densiteActivite.fenetre,
+                })}
+              />
+              <Divider axis="x" resizable={sidebar} />
+            </>
+          )}
 
           <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0;')}>
             {/* Onglets — maquette l. 75-79.
@@ -491,7 +571,15 @@ export function App() {
                   style={s('flex: 1; overflow: hidden; display: flex; min-height: 0; min-width: 0;')}
                 >
                   {error && <Message text={`${t('msg.read_error')}: ${error}`} />}
-                  {!error && projects.length === 0 && <Welcome />}
+                  {!error && projects.length === 0 && (
+                    <Welcome
+                      onAjouterProjet={
+                        window.cockpit?.projects
+                          ? () => void openProject(applyProjects, setError)
+                          : undefined
+                      }
+                    />
+                  )}
                   {!error && projects.length > 0 && !snapshot && <Message text={t('msg.loading')} />}
                   {!error && snapshot && unequipped && (
                     <EquipmentPanel root={snapshot.root} onDone={reload} onError={setError} />
@@ -594,21 +682,31 @@ export function App() {
         </div>
       </div>
 
+      {/* Au-dessus des préférences : « Revoir la présentation » se clique
+          depuis leur écran, et les deux ne doivent pas se disputer le dessus. */}
+      {presentationOuverte && settings && (
+        <Onboarding
+          settings={settings}
+          onFini={next => {
+            setRevoirPresentation(false)
+            appliquerReglages(next)
+            updateSettings(next).catch(err => setError(String(err.message ?? err)))
+          }}
+          onAjouterProjet={
+            window.cockpit?.projects ? () => void openProject(applyProjects, setError) : undefined
+          }
+        />
+      )}
+
       {/* Au niveau de la fenêtre, pas dans la barre latérale : une modale
           `position: fixed` posée dans un `<aside>` marchait par accident. */}
       {preferencesOuvertes && (
         <PreferencesModal
           onClose={() => setPreferencesOuvertes(false)}
-          onSaved={next => {
-            setSettings(next)
-            setCurrentLanguage(next.langue)
-            // Le terminal a un état local, que le menu et le bouton basculent
-            // sans rien écrire. Après une écriture, c'est le fichier qui fait
-            // foi — sinon appliquer un profil sans terminal masque les onglets
-            // et laisse le terminal ouvert. Les tailles, elles, ne se relisent
-            // pas : elles ont leur propre écriture différée au redimensionnement.
-            setTerminal(next.terminal.visible)
-            setLayout(next.terminal.disposition as Layout)
+          onSaved={appliquerReglages}
+          onRevoirPresentation={() => {
+            setPreferencesOuvertes(false)
+            setRevoirPresentation(true)
           }}
         />
       )}

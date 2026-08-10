@@ -169,11 +169,19 @@ function CarteProfil({
 export function SectionProfils({
   settings,
   onSettings,
+  courant: force,
 }: {
   settings: SettingsType
   onSettings: (settings: SettingsType) => void
+  /**
+   * Le template à marquer courant, quand l'appelant le sait mieux que les
+   * réglages. La présentation s'en sert : elle suggère un template puis pose
+   * le terminal d'après l'usage déclaré, si bien qu'aucun template ne
+   * correspond plus exactement et que la galerie n'en montrerait aucun.
+   */
+  courant?: string | null
 }) {
-  const courant = profilCourant(settings)
+  const courant = force ?? profilCourant(settings)
 
   return (
     <>

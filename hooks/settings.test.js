@@ -285,3 +285,37 @@ test('DEFAULT_SETTINGS.customActions est un tableau vide', () => {
   assert(Array.isArray(DEFAULT_SETTINGS.customActions))
   assert.equal(DEFAULT_SETTINGS.customActions.length, 0)
 })
+
+test('DEFAULT_SETTINGS : la présentation est due au premier lancement', () => {
+  assert.equal(DEFAULT_SETTINGS.onboardingVu, false)
+  assert.equal(DEFAULT_SETTINGS.claude.niveau, 'intermediaire')
+  assert.equal(DEFAULT_SETTINGS.claude.usage, 'terminal')
+})
+
+test('validateSettings : onboardingVu non booléen retombe au défaut', () => {
+  assert.equal(validateSettings({ onboardingVu: 'oui' }).onboardingVu, false)
+  assert.equal(validateSettings({ onboardingVu: 1 }).onboardingVu, false)
+  assert.equal(validateSettings({ onboardingVu: true }).onboardingVu, true)
+})
+
+test('validateSettings : claude valide champ par champ', () => {
+  // Un niveau inconnu ne doit pas emporter l'usage, qui est bon.
+  const result = validateSettings({ claude: { niveau: 'gourou', usage: 'ide' } })
+  assert.equal(result.claude.niveau, 'intermediaire')
+  assert.equal(result.claude.usage, 'ide')
+})
+
+test('validateSettings : claude non-objet → défaut', () => {
+  assert.deepEqual(validateSettings({ claude: 'terminal' }).claude, DEFAULT_SETTINGS.claude)
+  assert.deepEqual(validateSettings({ claude: null }).claude, DEFAULT_SETTINGS.claude)
+})
+
+test('mergeSettings : un dépôt ne décide ni de la présentation ni du profil Claude', () => {
+  const global = { ...structuredClone(DEFAULT_SETTINGS), onboardingVu: false }
+  const merged = mergeSettings(global, {
+    onboardingVu: true,
+    claude: { niveau: 'expert', usage: 'desktop' },
+  })
+  assert.equal(merged.onboardingVu, false)
+  assert.deepEqual(merged.claude, DEFAULT_SETTINGS.claude)
+})

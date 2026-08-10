@@ -6,14 +6,24 @@ import { join } from 'node:path'
 
 import { resolve } from './api.js'
 import { mediaPath, shotPath } from '../hooks/snapshot.js'
+import { registerProject } from '../hooks/plans.js'
 
 const url = path => new URL(path, 'http://localhost')
 
+/**
+ * Un projet équipé, inscrit à un registre neuf.
+ *
+ * L'inscription n'est pas décorative : le registre est la seule liste blanche
+ * des routes, et un dossier qui n'y figure pas rend 404 même s'il porte un
+ * `cockpit/` en bonne et due forme.
+ */
 const projectWithShot = () => {
   const dir = mkdtempSync(join(tmpdir(), 'cockpit-'))
   mkdirSync(join(dir, 'cockpit', 'pages', 'shots', 'accueil'), { recursive: true })
   writeFileSync(join(dir, 'cockpit', 'pages', 'shots', 'accueil', '2026-08-08-abc.png'), 'png')
   writeFileSync(join(dir, 'secret.txt'), 'ne doit jamais sortir')
+  process.env.COCKPIT_REGISTRY = join(mkdtempSync(join(tmpdir(), 'cockpit-reg-')), 'projects.json')
+  registerProject(dir)
   return dir
 }
 
@@ -22,7 +32,7 @@ test('une route inconnue rend null pour que l’appelant passe la main', () => {
   assert.equal(resolve(url('/historique')), null)
 })
 
-test('/api/projects place le dépôt courant en tête', () => {
+test('/api/projects rend les projets du registre', () => {
   const dir = projectWithShot()
   const result = resolve(url('/api/projects'), dir)
 
@@ -178,8 +188,9 @@ test('POST add enregistre le dossier et le rend en tête', () => {
 })
 
 test('POST remove retire, et refuse un projet jamais enregistré', () => {
-  withRegistry()
   const dir = projectWithShot()
+  // Registre neuf après coup : le dossier existe, mais plus rien ne l'a inscrit.
+  withRegistry()
 
   assert.equal(post({ action: 'remove', path: dir }).status, 404)
 
@@ -188,8 +199,9 @@ test('POST remove retire, et refuse un projet jamais enregistré', () => {
 })
 
 test('POST touch remonte un projet connu, ignore un inconnu', () => {
-  withRegistry()
   const [ancien, recent] = [projectWithShot(), projectWithShot()]
+  // Après les dossiers, pour que seul ce que ce test inscrit compte.
+  withRegistry()
 
   post({ action: 'add', path: ancien })
   post({ action: 'add', path: recent })

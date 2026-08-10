@@ -566,26 +566,22 @@ test('projects() classe du dernier ouvert au plus ancien, les sans-date en fin',
     ]),
   )
 
-  // `null` : pas de dépôt courant, comme dans l'application empaquetée.
   assert.deepEqual(
-    projects(null).map(p => p.path),
+    projects().map(p => p.path),
     ['/tmp/recent', '/tmp/vieux', '/tmp/jamais-date', '/tmp/jamais-date-2'],
   )
 })
 
-test('projects() ajoute le dépôt courant en tête seulement s’il est inconnu', () => {
+test('projects() ignore le dépôt courant : un clone frais s’ouvre vide', () => {
   withRegistry()
+
+  // La suite tourne depuis la racine du dépôt, qui porte son propre `cockpit/` :
+  // le cas est donc réel, pas simulé.
+  assert.deepEqual(projects(), [], 'un cockpit/ sur place ne vaut pas inscription au registre')
 
   const dir = mkdtempSync(join(tmpdir(), 'cockpit-cwd-'))
   mkdirSync(join(dir, 'cockpit'), { recursive: true })
 
-  assert.equal(projects(dir)[0].path, dir, 'inconnu : en tête, sinon premier lancement vide')
-
-  registerProject('/tmp/autre', new Date('2030-01-01T00:00:00Z'))
   registerProject(dir, new Date('2020-01-01T00:00:00Z'))
-  assert.deepEqual(
-    projects(dir).map(p => p.path),
-    ['/tmp/autre', dir],
-    'enregistré : c’est l’usage qui classe',
-  )
+  assert.deepEqual(projects().map(p => p.path), [dir], 'inscrit, il apparaît comme les autres')
 })

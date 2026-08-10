@@ -10,6 +10,18 @@ Complete context: [`cadrage-cockpit.md`](./cadrage-cockpit.md) (French)
 
 ![Cockpit overview](./cockpit/pages/shots/accueil/2026-08-09-24c3123.png)
 
+## First launch
+
+A freshly cloned — or downloaded — cockpit opens **empty**: no project is watched
+until you point at one. A three-screen modal then explains what the app does, tunes
+the interface to how you use Claude Code, and leads to picking a first repository.
+It is skippable in one click — or with Escape — and replayable from *Preferences →
+General → Replay the walkthrough*.
+
+The answers are not decorative: they pick which tabs show, where the terminal sits,
+and which command is offered when a fresh project opens. Everything stays editable
+in Preferences afterwards.
+
 ## Quick start
 
 ```bash

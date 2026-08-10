@@ -6,6 +6,7 @@ import { join } from 'node:path'
 
 import { snapshot, vaultPath } from './snapshot.js'
 import { DEFAULT_SETTINGS, writeSettings } from './settings.js'
+import { writeIntegrations } from './integrations.js'
 
 const project = () => {
   const dir = mkdtempSync(join(tmpdir(), 'ovrsee-snap-'))
@@ -105,6 +106,33 @@ test('une ligne illisible de audits.jsonl est comptée, pas seulement sautée', 
   const { audits, illisibles } = snapshot(dir)
   assert.equal(audits.length, 1)
   assert.deepEqual(illisibles, [{ file: 'audits.jsonl', quoi: 'audit', lignes: 1 }])
+})
+
+test('snapshot sans intégration rend une liste vide', () => {
+  const dir = project()
+  const integrationsDir = mkdtempSync(join(tmpdir(), 'ovrsee-integrations-'))
+  process.env.OVRSEE_INTEGRATIONS = join(integrationsDir, 'integrations.json')
+
+  assert.deepEqual(snapshot(dir).integrations, [])
+
+  delete process.env.OVRSEE_INTEGRATIONS
+})
+
+test('snapshot rend les intégrations sans jamais le jeton chiffré', () => {
+  const dir = project()
+  const integrationsDir = mkdtempSync(join(tmpdir(), 'ovrsee-integrations-'))
+  process.env.OVRSEE_INTEGRATIONS = join(integrationsDir, 'integrations.json')
+
+  writeIntegrations(dir, [
+    { id: 'i1', provider: 'vercel', label: 'Prod', url: 'https://vercel.com/x/y', tokenCipher: 'secret-chiffre' },
+  ])
+
+  const integrations = snapshot(dir).integrations
+  assert.equal(integrations.length, 1)
+  assert.equal(integrations[0].hasToken, true)
+  assert.ok(!('tokenCipher' in integrations[0]))
+
+  delete process.env.OVRSEE_INTEGRATIONS
 })
 
 test('un dépôt hors git rend un gitStatus vide plutôt que de lever', () => {

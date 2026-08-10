@@ -650,6 +650,8 @@ export function App() {
                           sourceDate={snapshot.sourceDate}
                           vaultDeclared={Boolean(snapshot.config?.obsidianVault)}
                           config={snapshot.config}
+                          root={snapshot.root}
+                          integrations={snapshot.integrations ?? []}
                         />
                       )}
                       {tab === 'stack' && <Stack snapshot={snapshot} />}
@@ -723,6 +725,8 @@ export function App() {
             setPreferencesOuvertes(false)
             setRevoirPresentation(true)
           }}
+          root={snapshot?.root}
+          integrations={snapshot?.integrations}
         />
       )}
     </div>

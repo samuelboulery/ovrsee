@@ -388,6 +388,13 @@ export interface Snapshot {
   gitStatus: GitStatus
   /** Revues capturées, de la plus récente à la plus ancienne dans le fichier. */
   audits: Audit[]
+  /**
+   * Intégrations déploiements/base de données — jamais le jeton, `hasToken`
+   * seulement. Ajouter, éditer, supprimer une intégration et vérifier son
+   * statut passent par `window.ovrsee.integrations` (IPC Electron), jamais
+   * par une route HTTP : voir le corollaire dans `CLAUDE.md`.
+   */
+  integrations: Integration[]
 }
 
 /** Un fichier de `ovrsee/` présent sur le disque mais que l'ovrsee ne sait pas lire. */
@@ -761,6 +768,31 @@ export async function updateSettings(settings: Partial<SettingsType>): Promise<S
   const result = await response.json()
   if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
   return result
+}
+
+export type IntegrationProvider = 'vercel' | 'netlify' | 'supabase' | 'autre'
+
+/** Jamais de jeton ici — `hasToken` seulement. Voir `hooks/integrations.js`. */
+export interface Integration {
+  id: string
+  provider: IntegrationProvider
+  label: string
+  url?: string
+  hasToken: boolean
+}
+
+export type IntegrationState = 'ok' | 'error' | 'building' | 'unknown'
+
+export interface IntegrationStatus {
+  state: IntegrationState
+  detail: string
+  checkedAt: string
+}
+
+/** Une table du schéma public, lue en direct — Supabase uniquement en v1. */
+export interface SchemaTable {
+  name: string
+  columns: string[]
 }
 
 /**

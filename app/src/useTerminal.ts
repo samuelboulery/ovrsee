@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import type { Integration, IntegrationProvider, IntegrationStatus, SchemaTable } from './data'
 import { getTerminalTheme } from './theme'
 // WHY: xterm est le terminal de VS Code, pas une imitation. Un rendu maison
 // devrait réimplémenter les séquences ANSI, le défilement et la sélection —
@@ -34,10 +35,33 @@ export interface TerminalBridge {
 /** Les éditeurs dont le processus principal connaît le schéma d'URL. */
 export type Editeur = 'vscode' | 'cursor' | 'zed' | 'windsurf'
 
+/**
+ * Passerelle des secrets d'intégration — voir `electron/preload.cjs`.
+ *
+ * Un jeton entre par `save` et ne ressort jamais : `save`/`remove` ne
+ * rendent que `hasToken`, `checkStatus` qu'un statut déjà résolu. La lecture
+ * seule (sans jeton) vient de `snapshot.integrations`, servi sur les trois
+ * hôtes — pas besoin d'un `list` ici.
+ */
+export interface IntegrationsBridge {
+  save: (
+    projectPath: string,
+    entry: { id?: string; provider: IntegrationProvider; label: string; url?: string; token?: string },
+  ) => Promise<Integration[] | { error: string }>
+  remove: (projectPath: string, id: string) => Promise<Integration[]>
+  checkStatus: (projectPath: string, id: string) => Promise<IntegrationStatus>
+  /** Introspection lecture-seule du schéma public, Supabase uniquement. */
+  fetchSchema: (
+    projectPath: string,
+    id: string,
+  ) => Promise<{ tables: SchemaTable[] } | { error: string }>
+}
+
 declare global {
   interface Window {
     ovrsee?: {
       terminal: TerminalBridge
+      integrations: IntegrationsBridge
       projects: {
         /** Sélecteur de dossier du système. Rend null si l'utilisateur annule. */
         pick: () => Promise<string | null>

@@ -19,6 +19,7 @@ import { readWhys } from './whys.js'
 import { timeline } from './timeline.js'
 import { readSettings, mergeSettings } from './settings.js'
 import { gitStatus } from './git-status.js'
+import { readIntegrations } from './integrations.js'
 
 export const readJson = path => {
   try {
@@ -426,6 +427,12 @@ export function snapshot(root) {
     // État local, jamais rafraîchi par un fetch réseau ici — voir
     // `gitStatus.lastFetch` pour dater ce que le dépôt sait du distant.
     gitStatus: gitStatus(root),
+    // Jamais le jeton : `readIntegrations` le rend chiffré, `tokenCipher` est
+    // retiré ici pour que la seule route qui l'expose reste l'IPC Electron.
+    integrations: readIntegrations(root).map(({ tokenCipher, ...rest }) => ({
+      ...rest,
+      hasToken: Boolean(tokenCipher),
+    })),
     audits: audits(root, illisibles),
   }
 }

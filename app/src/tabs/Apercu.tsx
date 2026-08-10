@@ -13,6 +13,7 @@ import {
   type Snapshot,
 } from '../data'
 import { Branches } from './Branches'
+import { Deploiements } from './Deploiements'
 import { Environnements } from './Environnements'
 import { Illisibles } from '../Illisibles'
 import { Markdown, headings } from '../markdown'
@@ -236,6 +237,7 @@ export function Apercu({
           <Sante snapshot={snapshot} gitStatus={gitStatus} />
           <Branches root={root} gitStatus={gitStatus} onGitStatus={setGitStatus} />
           <Environnements config={snapshot.config} gitStatus={gitStatus} />
+          <Deploiements root={root} integrations={snapshot.integrations ?? []} />
 
           <div style={s('margin-top: 18px;')}>
             <Lancement packageJson={packageJson} />

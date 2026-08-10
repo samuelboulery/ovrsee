@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { SectionClaude } from './ClaudeConfigPanel'
-import { fetchSettings, updateSettings, type SettingsType } from './data'
+import { fetchSettings, updateSettings, type Integration, type SettingsType } from './data'
 import { setCurrentLanguage, t, type TranslationKey } from './i18n'
 import {
   ErrorBox,
@@ -447,6 +447,8 @@ export function PreferencesModal({
   onClose,
   onSaved,
   onRevoirPresentation,
+  root,
+  integrations = [],
 }: {
   onClose: () => void
   /** Remonte les préférences réellement écrites : sans ça l'app garde son état
@@ -454,6 +456,10 @@ export function PreferencesModal({
   onSaved?: (settings: SettingsType) => void
   /** Rejoue la présentation de premier lancement. La modale se ferme d'abord. */
   onRevoirPresentation?: () => void
+  /** Le projet ouvert, pour la section Projet — absent avant tout choix de projet. */
+  root?: string
+  /** Ses intégrations déploiements/base de données, jamais leur jeton. */
+  integrations?: Integration[]
 }) {
   const [settings, setSettings] = useState<SettingsType | null>(null)
   const [section, setSection] = useState<SectionId>('profils')
@@ -550,7 +556,7 @@ export function PreferencesModal({
       return <SectionGeneral {...props} onRevoirPresentation={onRevoirPresentation} />
     if (section === 'interface') return <SectionInterface {...props} />
     if (section === 'claude') return <SectionClaude />
-    return <SectionProjet {...props} />
+    return <SectionProjet {...props} root={root} integrations={integrations} />
   }
 
   return (

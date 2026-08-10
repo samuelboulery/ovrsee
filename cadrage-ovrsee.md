@@ -48,8 +48,38 @@ Objectif : réduire le coût de reprise en main, et garder la maîtrise d'un cod
 | Construire la cartographie technique et la vue base de données | Graphify le fait mieux, gratuitement, et à jour à chaque commit |
 | Un objet `feature` | Non définissable de façon stable. Se calcule à partir des plans |
 | Captures des états d'écran (modale, erreur, liste vide) | Reporté en v2 — coût élevé, bénéfice non démontré |
-| Gestion des accès et credentials | Un gestionnaire de mots de passe et un fichier `ACCESS.md` suffisent |
+| Gestion des accès et credentials | Un gestionnaire de mots de passe et un fichier `ACCESS.md` suffisent — **revu**, voir « Révision du cadrage — Intégrations » ci-dessous |
 | Application native Swift | Le terminal embarqué est aussi bon en web. Voir §6 |
+
+**Révision du cadrage — Intégrations déploiements et base de données**
+
+Rouvert le 10 août 2026 : afficher, sur l'onglet Aperçu, l'état des services de
+mise en prod (Vercel, Netlify, autre) et de la base de données, avec un lien et
+une clé API par intégration ; faire remonter un schéma de base de données réel
+dans l'onglet Données. Ça élargit explicitement la ligne « Gestion des accès et
+credentials » ci-dessus — l'ovrsee stocke désormais des secrets, ce qu'il ne
+faisait pas jusqu'ici.
+
+Le principe directeur (§5, « l'ovrsee lit, il n'exécute jamais ») reste entier :
+consulter le statut d'un déploiement est une lecture, pas une exécution. Ce qui
+change, ce sont les garde-fous qui rendent le stockage d'un secret sûr :
+
+- **Jamais dans `<repo>/ovrsee/`** — les intégrations vivent dans
+  `~/.claude/ovrsee/integrations.json`, hors dépôt, jamais versionné par git.
+- **Chiffrement** du jeton via `safeStorage` d'Electron (lié au trousseau OS),
+  quand disponible.
+- **Écriture, déchiffrement et appel réseau au fournisseur : IPC Electron
+  uniquement**, jamais par `/api/*` — même exception, et même raison, que le
+  terminal (voir `electron/preload.cjs`) : `/api/*` est aussi servi par le dev
+  server Vite, en HTTP local non-authentifié.
+- **Pas de polling automatique.** Un bouton « Vérifier » manuel par
+  intégration.
+- **Zéro nouvelle dépendance** — `fetch` natif pour parler aux API
+  Vercel/Netlify/Supabase.
+
+Portée v1 : Vercel, Netlify, Supabase (avec introspection lecture-seule du
+schéma pour l'onglet Données), et « Autre » — un lien sans appel API, pour ne
+pas construire une intégration bespoke par service tiers possible.
 
 **Révision du cadrage — Serveur MCP**
 

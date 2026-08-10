@@ -1,6 +1,20 @@
-import { frDate, tablesFrom, type GraphifyGraph, type Snapshot } from '../data'
+import { useState } from 'react'
+
+import { frDate, tablesFrom, type GraphifyGraph, type Integration, type Snapshot } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
+import type { IntegrationsBridge } from '../useTerminal'
+
+/**
+ * Lu directement sur `window`, sans importer `useTerminal.ts` : ce module
+ * charge `@xterm/xterm` (et sa feuille de style), absent du rendu serveur des
+ * tests (`render.test.tsx`). Seul le *type* du pont est importé — effacé à la
+ * compilation.
+ */
+const bridge = (): IntegrationsBridge | null => {
+  if (typeof window === 'undefined') return null
+  return window.ovrsee?.integrations ?? null
+}
 
 type Source = Snapshot['graphSource']
 
@@ -113,11 +127,15 @@ function CoffreIgnore() {
   )
 }
 
-function confStyle(conf: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS'): string {
+function confStyle(conf: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS' | 'LIVE'): string {
   const styles = {
     EXTRACTED: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-accent-200); border: 1px solid var(--color-accent-700);',
     INFERRED: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-300); border: 1px solid var(--color-neutral-700);',
     AMBIGUOUS: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-400); border: 1px dashed var(--color-neutral-600);',
+    // Vérifiée en direct sur la base elle-même, pas déduite du code : le
+    // second accent du design system (`--color-accent-2-*`) la distingue des
+    // trois confiances ci-dessus, qui restent des lectures de Graphify.
+    LIVE: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-accent-2-200); border: 1px solid var(--color-accent-2-700);',
   }
   return styles[conf]
 }
@@ -130,6 +148,8 @@ export function Donnees({
   sourceDate,
   vaultDeclared = false,
   config = null,
+  root,
+  integrations = [],
 }: {
   graph: GraphifyGraph | null
   source: Source
@@ -138,6 +158,8 @@ export function Donnees({
   sourceDate?: string | null
   vaultDeclared?: boolean
   config?: { obsidianVault?: string } | null
+  root?: string
+  integrations?: Integration[]
 }) {
   const PROVENANCE: Record<'graphify' | 'obsidian', { badge: string; intro: string }> = {
     graphify: {
@@ -157,6 +179,35 @@ export function Donnees({
   // pourquoi il ne sert pas plutôt que de laisser chercher.
   const coffreIgnore = vaultDeclared && source === 'graphify'
 
+  // Une seule intégration Supabase suffit à activer le bouton : le schéma
+  // n'a pas de sens pour plusieurs bases à la fois, et v1 ne cherche pas à
+  // les distinguer.
+  const supabase = integrations.find(integ => integ.provider === 'supabase' && integ.hasToken)
+  const ovrsee = bridge()
+  const [liveTables, setLiveTables] = useState<string[] | null>(null)
+  const [liveOnly, setLiveOnly] = useState<string[]>([])
+  const [liveBusy, setLiveBusy] = useState(false)
+  const [liveErreur, setLiveErreur] = useState<string | null>(null)
+
+  const verifierSchema = () => {
+    if (!ovrsee || !root || !supabase) return
+    setLiveBusy(true)
+    setLiveErreur(null)
+    ovrsee
+      .fetchSchema(root, supabase.id)
+      .then(result => {
+        if ('error' in result) {
+          setLiveErreur(result.error)
+          return
+        }
+        const noms = result.tables.map(table => table.name)
+        const connues = new Set(tables.map(table => table.name))
+        setLiveTables(noms)
+        setLiveOnly(noms.filter(nom => !connues.has(nom)))
+      })
+      .finally(() => setLiveBusy(false))
+  }
+
   return (
     <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
       <div style={s('display: flex; align-items: baseline; gap: 10px;')}>
@@ -169,9 +220,31 @@ export function Donnees({
             {sourceDate && ` — ${sourceDate}`}
           </span>
         )}
+        {supabase && (
+          <button
+            type="button"
+            className="btn btn-secondary"
+            style={s('font-size: 11.5px; padding: 3px 9px; margin-left: auto;')}
+            disabled={!ovrsee || liveBusy}
+            title={ovrsee ? undefined : t('deploiements.electron_only')}
+            onClick={verifierSchema}
+          >
+            {liveBusy ? t('donnees.live_checking') : t('donnees.live_check')}
+          </button>
+        )}
       </div>
 
       {sourceMissing && <SourceAlert sourceRequested={sourceRequested} config={config} />}
+
+      {liveErreur && (
+        <div
+          style={s(
+            'margin-bottom: 16px; font-size: 12px; color: var(--color-accent-300); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
+          )}
+        >
+          {liveErreur}
+        </div>
+      )}
 
       {tables.length === 0 ? (
         <div>
@@ -203,10 +276,14 @@ export function Donnees({
                   <td style={s('color: var(--color-neutral-500);')}>{table.cols}</td>
                   <td style={s('color: var(--color-neutral-400);')}>{table.used}</td>
                   <td>
-                    {/* `declared` posé — même à null — signe une ligne du coffre.
+                    {/* Une table confirmée en direct l'emporte sur la confiance
+                        déduite du code : la base elle-même est la vérité. */}
+                    {liveTables?.includes(table.name) ? (
+                      <span style={s(confStyle('LIVE'))}>{t('donnees.live_badge')}</span>
+                    ) : /* `declared` posé — même à null — signe une ligne du coffre.
                         Elle n'a pas de confiance à afficher : elle a une date, ou
-                        l'aveu qu'elle n'en a pas. */}
-                    {table.declared === undefined ? (
+                        l'aveu qu'elle n'en a pas. */
+                    table.declared === undefined ? (
                       <span style={s(confStyle(table.conf))}>{table.conf}</span>
                     ) : table.declared ? (
                       <span style={s('color: var(--color-neutral-400);')}>{frDate(table.declared)}</span>
@@ -218,6 +295,16 @@ export function Donnees({
               ))}
             </tbody>
           </table>
+
+          {liveOnly.length > 0 && (
+            <div
+              style={s(
+                'margin-top: 16px; font-size: 11.5px; color: var(--color-neutral-500); padding-left: 10px; border-left: 1px solid var(--color-neutral-700);',
+              )}
+            >
+              {t('donnees.live_only', { tables: liveOnly.join(', ') })}
+            </div>
+          )}
         </div>
       )}
     </div>

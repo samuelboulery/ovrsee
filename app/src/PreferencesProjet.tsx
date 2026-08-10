@@ -14,8 +14,9 @@
 
 import { useState } from 'react'
 
-import type { SettingsType } from './data'
+import type { Integration, SettingsType } from './data'
 import { t, type TranslationKey } from './i18n'
+import { BlocIntegrations } from './PreferencesIntegrations'
 import { ErrorBox, Field, GroupLabel, Row, SectionTitle } from './PreferencesControls'
 import { s } from './style'
 
@@ -273,8 +274,13 @@ export function BlocAvance({ settings, onSettings }: SectionProps) {
   )
 }
 
-/** Les trois blocs, sous un seul titre. */
-export function SectionProjet({ settings, onSettings }: SectionProps) {
+/** Les quatre blocs, sous un seul titre. */
+export function SectionProjet({
+  settings,
+  onSettings,
+  root,
+  integrations = [],
+}: SectionProps & { root?: string; integrations?: Integration[] }) {
   return (
     <>
       <SectionTitle>{t('pref.project')}</SectionTitle>
@@ -284,6 +290,8 @@ export function SectionProjet({ settings, onSettings }: SectionProps) {
       <BlocDemarrage settings={settings} onSettings={onSettings} />
       <GroupLabel>{t('pref.advanced')}</GroupLabel>
       <BlocAvance settings={settings} onSettings={onSettings} />
+      <GroupLabel>{t('pref.integrations_title')}</GroupLabel>
+      <BlocIntegrations root={root} integrations={integrations} />
     </>
   )
 }

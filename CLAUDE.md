@@ -22,6 +22,15 @@ de l'implémenter.
 Corollaire déjà arbitré : le terminal passe par IPC Electron et **pas** par une socket
 locale. Une socket l'ouvrirait à tout processus tournant sous le même compte.
 
+Même corollaire pour les secrets d'intégration (Vercel/Netlify/Supabase, onglet
+Aperçu) : ils vivent dans `~/.claude/ovrsee/integrations.json`, **hors du dépôt
+observé** — ni `ovrsee/tickets/`, ni `ovrsee/board.json`, ni aucun autre fichier
+versionné n'en contiennent jamais un octet. Leur écriture, leur déchiffrement
+(`safeStorage`) et l'appel réseau au fournisseur passent par IPC Electron, jamais
+par `/api/*` : cette route est aussi servie par le dev server Vite, en HTTP local
+non-authentifié, et un secret n'y transite jamais. Voir `electron/main.js` et
+`electron/preload.cjs`.
+
 ## Les couches
 
 | Dossier | Rôle | Typé ? |

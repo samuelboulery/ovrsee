@@ -676,3 +676,4 @@ test('POST init sans config ne déclenche pas la validation', () => {
   assert.equal(result.status, 400)
   assert.doesNotMatch(result.json.error, /config de crawl invalide/)
 })
+

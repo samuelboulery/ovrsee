@@ -14,6 +14,9 @@
  *
  * Tout le reste — enregistrer, retirer, initialiser un projet — passe par
  * `/api`, partagé avec le dev server : deux chemins d'écriture divergeraient.
+ * Seconde exception à `/api`, pour la même raison que le terminal : les
+ * secrets d'intégration (`integrations`, plus bas) — un token ne doit jamais
+ * transiter par le dev server HTTP local, non-authentifié.
  *
  * Ce qui est tapé ensuite dans le terminal s'exécute, évidemment : c'est un
  * terminal. L'isolation par IPC ne sert pas à brider l'utilisateur, elle sert à
@@ -124,5 +127,43 @@ contextBridge.exposeInMainWorld('ovrsee', {
         ipcRenderer.off('pty:exit', exit)
       }
     },
+  },
+
+  integrations: {
+    /**
+     * Crée ou met à jour une intégration. `token` est write-only : omis, il
+     * laisse le jeton déjà enregistré intact ; fourni, il le remplace.
+     *
+     * @param {string} projectPath
+     * @param {{id?: string, provider: string, label: string, url?: string, token?: string}} entry
+     * @returns {Promise<Array<object> | {error: string}>}
+     */
+    save: (projectPath, entry) => ipcRenderer.invoke('integrations:save', projectPath, entry),
+
+    /**
+     * @param {string} projectPath
+     * @param {string} id
+     * @returns {Promise<Array<object>>}
+     */
+    remove: (projectPath, id) => ipcRenderer.invoke('integrations:remove', projectPath, id),
+
+    /**
+     * Déchiffre le jeton côté principal, interroge le fournisseur, rend un
+     * statut déjà résolu — jamais le jeton.
+     *
+     * @param {string} projectPath
+     * @param {string} id
+     * @returns {Promise<{state: 'ok'|'error'|'building'|'unknown', detail: string, checkedAt: string}>}
+     */
+    checkStatus: (projectPath, id) => ipcRenderer.invoke('integrations:checkStatus', projectPath, id),
+
+    /**
+     * Introspection lecture-seule du schéma public, Supabase uniquement.
+     *
+     * @param {string} projectPath
+     * @param {string} id
+     * @returns {Promise<{tables: Array<{name: string, columns: string[]}>} | {error: string}>}
+     */
+    fetchSchema: (projectPath, id) => ipcRenderer.invoke('integrations:fetchSchema', projectPath, id),
   },
 })

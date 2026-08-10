@@ -19,11 +19,13 @@ import {
   Menu,
   nativeTheme,
   protocol,
+  safeStorage,
   shell,
   webContents,
   WebContentsView,
 } from 'electron'
 import { readFile, writeFile } from 'node:fs/promises'
+import { randomUUID } from 'node:crypto'
 import { dirname, extname, join, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -31,6 +33,8 @@ import { fetchHandler } from '../server/api.js'
 import { projects } from '../hooks/snapshot.js'
 import { buildMenu } from './menu.js'
 import { readSettings } from '../hooks/settings.js'
+import { readIntegrations, writeIntegrations } from '../hooks/integrations.js'
+import { checkVercel, checkNetlify, checkSupabase, fetchSupabaseSchema } from '../hooks/integrationProviders.js'
 import { openSession, writeTo, resize, closeSession, closeAll } from './pty.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -299,6 +303,88 @@ app.whenReady().then(() => {
   ipcMain.handle('pty:write', (_event, id, data) => writeTo(id, data))
   ipcMain.handle('pty:resize', (_event, id, cols, rows) => resize(id, cols, rows))
   ipcMain.handle('pty:close', (_event, id) => closeSession(id))
+
+  // Secrets d'intégration (Vercel/Netlify/Supabase). Même exception que le
+  // terminal, et pour la même raison : `/api` est servi par `server/api.js`
+  // sur les trois hôtes, dont le dev server Vite en HTTP local non-authentifié
+  // (le header `X-Ovrsee` est un marqueur, pas une auth). Un token qui y
+  // transiterait serait lisible par tout processus tournant sous le même
+  // compte. Ici, seul le renderer de *cette* fenêtre peut appeler ces canaux,
+  // et il ne reçoit jamais un token en clair — seulement des statuts déjà
+  // résolus. La lecture (sans jeton) est déjà dans le snapshot, servi par les
+  // trois hôtes ; seules l'écriture et la vérification de statut ont besoin de
+  // cette exception.
+  const redact = ({ tokenCipher, ...rest }) => ({ ...rest, hasToken: Boolean(tokenCipher) })
+
+  ipcMain.handle('integrations:save', (_event, projectPath, entry) => {
+    if (typeof projectPath !== 'string' || !projects().some(p => p.path === projectPath)) {
+      return { error: "ce dossier n'est pas dans la liste des projets de l'ovrsee" }
+    }
+    if (!entry || typeof entry !== 'object') return { error: 'intégration invalide' }
+
+    const { id, provider, label, url, token } = entry
+    const existing = readIntegrations(projectPath)
+    const finalId = typeof id === 'string' && id ? id : randomUUID()
+    const previous = existing.find(i => i.id === finalId)
+
+    // Un token vide ne remplace pas un token déjà enregistré : le champ est
+    // write-only côté rendu, il ne peut donc jamais renvoyer l'ancien pour le
+    // reposer tel quel.
+    const tokenCipher =
+      typeof token === 'string' && token
+        ? safeStorage.isEncryptionAvailable()
+          ? safeStorage.encryptString(token).toString('base64')
+          : undefined
+        : previous?.tokenCipher
+
+    const next = [
+      ...existing.filter(i => i.id !== finalId),
+      { id: finalId, provider, label, url, tokenCipher },
+    ]
+    writeIntegrations(projectPath, next)
+    return readIntegrations(projectPath).map(redact)
+  })
+
+  ipcMain.handle('integrations:remove', (_event, projectPath, id) => {
+    if (typeof projectPath !== 'string' || !projects().some(p => p.path === projectPath)) return []
+    const next = readIntegrations(projectPath).filter(i => i.id !== id)
+    writeIntegrations(projectPath, next)
+    return next.map(redact)
+  })
+
+  ipcMain.handle('integrations:checkStatus', async (_event, projectPath, id) => {
+    const inconnu = detail => ({ state: 'unknown', detail, checkedAt: new Date().toISOString() })
+    if (typeof projectPath !== 'string' || !projects().some(p => p.path === projectPath)) {
+      return inconnu("ce dossier n'est pas dans la liste des projets de l'ovrsee")
+    }
+    const entry = readIntegrations(projectPath).find(i => i.id === id)
+    if (!entry) return inconnu('intégration introuvable')
+    if (entry.provider === 'autre') return inconnu('pas de vérification automatique pour ce fournisseur')
+    if (!entry.tokenCipher || !safeStorage.isEncryptionAvailable()) {
+      return inconnu('aucun jeton déchiffrable sur cette machine')
+    }
+
+    const token = safeStorage.decryptString(Buffer.from(entry.tokenCipher, 'base64'))
+    const checker = { vercel: checkVercel, netlify: checkNetlify, supabase: checkSupabase }[entry.provider]
+    return checker(token, entry.url ?? '')
+  })
+
+  // Introspection lecture-seule du schéma, pour l'onglet Données. Supabase
+  // seul en v1 : Vercel et Netlify n'ont pas de base de données à décrire.
+  ipcMain.handle('integrations:fetchSchema', async (_event, projectPath, id) => {
+    if (typeof projectPath !== 'string' || !projects().some(p => p.path === projectPath)) {
+      return { error: "ce dossier n'est pas dans la liste des projets de l'ovrsee" }
+    }
+    const entry = readIntegrations(projectPath).find(i => i.id === id)
+    if (!entry) return { error: 'intégration introuvable' }
+    if (entry.provider !== 'supabase') return { error: 'schéma disponible pour Supabase uniquement' }
+    if (!entry.tokenCipher || !safeStorage.isEncryptionAvailable()) {
+      return { error: 'aucun jeton déchiffrable sur cette machine' }
+    }
+
+    const token = safeStorage.decryptString(Buffer.from(entry.tokenCipher, 'base64'))
+    return fetchSupabaseSchema(token, entry.url ?? '')
+  })
 
   /**
    * Ouvrir — et positionner — le panneau de DevTools de l'aperçu.

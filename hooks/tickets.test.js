@@ -139,6 +139,42 @@ test('createTicket refuse une priorité inconnue', () => {
   assert.throws(() => createTicket(fixture(), { titre: 'X', priorite: 'urgentissime' }), /priorit/)
 })
 
+test('createTicket accepte une charge valide', () => {
+  const ovrseeDir = fixture()
+  const written = createTicket(ovrseeDir, { titre: 'X', charge: 'l' })
+
+  assert.equal(written.meta.charge, 'l')
+
+  const [ticket] = readTickets(ovrseeDir)
+  assert.equal(ticket.meta.charge, 'l')
+})
+
+test('createTicket sans charge n’écrit pas le champ', () => {
+  const written = createTicket(fixture(), { titre: 'X' })
+  assert.equal(written.meta.charge, undefined)
+})
+
+test('createTicket refuse une charge inconnue', () => {
+  assert.throws(() => createTicket(fixture(), { titre: 'X', charge: 'xxl' }), /charge/)
+})
+
+test('updateTicket peut poser puis retirer la charge', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'X' })
+
+  updateTicket(ovrseeDir, file, { charge: 's' })
+  assert.equal(readTickets(ovrseeDir)[0].meta.charge, 's')
+
+  updateTicket(ovrseeDir, file, { charge: null })
+  assert.equal(readTickets(ovrseeDir)[0].meta.charge, undefined)
+})
+
+test('updateTicket refuse une charge inconnue', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'X' })
+  assert.throws(() => updateTicket(ovrseeDir, file, { charge: 'xxl' }), /charge/)
+})
+
 test('createTicket crée le dossier tickets/ s’il manque', () => {
   const root = mkdtempSync(join(tmpdir(), 'ovrsee-tickets-'))
   const ovrseeDir = join(root, 'ovrsee')

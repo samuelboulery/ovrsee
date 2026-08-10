@@ -40,6 +40,15 @@ export const PRIORITES = ['haute', 'moyenne', 'basse']
 
 const DEFAULT_PRIORITE = 'moyenne'
 
+/**
+ * Estimation en taille de t-shirt, de la plus petite à la plus grande.
+ *
+ * Un ordre de grandeur, pas un engagement : contrairement à `priorite`, ce
+ * champ n'a pas de défaut et reste absent tant que personne n'a une idée de
+ * la charge. Un ticket sans `charge` est un ticket valide.
+ */
+export const CHARGES = ['xs', 's', 'm', 'l', 'xl']
+
 const today = (now = new Date()) => now.toISOString().slice(0, 10)
 
 /**
@@ -319,6 +328,13 @@ const requirePriorite = priorite => {
   return priorite
 }
 
+const requireCharge = charge => {
+  if (!CHARGES.includes(charge)) {
+    throw new Error(`charge inconnue : ${charge}`)
+  }
+  return charge
+}
+
 const requireFile = file => {
   if (!isSafeTicketFileName(file)) throw new Error(`nom de fichier refusé : ${file}`)
   return file
@@ -330,7 +346,7 @@ const ticketPath = (ovrseeDir, file) => join(ovrseeDir, 'tickets', requireFile(f
  * Crée un ticket et l'écrit.
  *
  * @param {string} ovrseeDir
- * @param {{titre: string, colonne?: string, priorite?: string, tags?: string[], corps?: string, plan?: string|null, type?: string, epic?: string}} champs
+ * @param {{titre: string, colonne?: string, priorite?: string, charge?: string, tags?: string[], corps?: string, plan?: string|null, type?: string, epic?: string}} champs
  * @param {Date} [now]
  * @returns {{file: string, meta: object, body: string}}
  */
@@ -366,6 +382,11 @@ export function createTicket(ovrseeDir, champs, now = new Date()) {
       throw new Error('epic doit être un ID T-XXXX ou être absent')
     }
     meta.epic = champs.epic
+  }
+
+  // Valider et ajouter charge si présente
+  if (champs?.charge !== undefined && champs.charge !== null) {
+    meta.charge = requireCharge(champs.charge)
   }
 
   const body = String(champs?.corps ?? '').trim() + '\n'
@@ -417,7 +438,7 @@ export function moveTicket(ovrseeDir, file, colonne, now = new Date()) {
  * Le fichier n'est jamais renommé quand le titre change : l'identifiant est la
  * clé, et renommer casserait toute référence déjà écrite ailleurs.
  *
- * @param {{titre?: string, priorite?: string, tags?: string[], plan?: string|null, corps?: string, type?: string|null, epic?: string|null}} patch
+ * @param {{titre?: string, priorite?: string, charge?: string|null, tags?: string[], plan?: string|null, corps?: string, type?: string|null, epic?: string|null}} patch
  */
 export function updateTicket(ovrseeDir, file, patch, now = new Date()) {
   requireFile(file)
@@ -453,6 +474,13 @@ export function updateTicket(ovrseeDir, file, patch, now = new Date()) {
         meta.epic = patch.epic
       } else if (patch?.epic === null) {
         delete meta.epic
+      }
+
+      // Gérer charge
+      if (patch?.charge !== undefined && patch.charge !== null) {
+        meta.charge = requireCharge(patch.charge)
+      } else if (patch?.charge === null) {
+        delete meta.charge
       }
 
       const body = patch?.corps === undefined ? ticket.body : String(patch.corps).trim() + '\n'

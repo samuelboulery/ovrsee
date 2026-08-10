@@ -188,6 +188,11 @@ export type Priorite = 'haute' | 'moyenne' | 'basse'
 /** De la plus urgente à la moins urgente : l'ordre du tableau est l'ordre du tri. */
 export const PRIORITES: Priorite[] = ['haute', 'moyenne', 'basse']
 
+export type Charge = 'xs' | 's' | 'm' | 'l' | 'xl'
+
+/** Un ordre de grandeur, pas un engagement — contrairement à `priorite`, pas de valeur par défaut. */
+export const CHARGES: Charge[] = ['xs', 's', 'm', 'l', 'xl']
+
 export interface Colonne {
   id: string
   titre: string
@@ -208,6 +213,8 @@ export interface Ticket {
   titre: string
   colonne: string
   priorite: Priorite
+  /** Estimation en taille de t-shirt, absente tant que personne ne l'a évaluée. */
+  charge?: Charge
   tags: string[]
   cree: string
   maj: string

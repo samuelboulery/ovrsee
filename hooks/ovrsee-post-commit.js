@@ -16,6 +16,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { attachCommitToPlan, isSafePlanFileName } from './plans.js'
+import { readBoard, readTickets, moveTicket } from './tickets.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 
@@ -80,6 +81,39 @@ function attachCommit(ovrseeDir, root, sources) {
   return attachCommitToPlan(ovrseeDir, file, commit) ? file : null
 }
 
+const EN_COURS = 'en-cours'
+
+/**
+ * Avance vers « en cours » les tickets liés à ce plan, s'ils n'y sont pas
+ * déjà et n'y sont jamais allés au-delà — par ordre du board, pas par un
+ * statut dédié.
+ *
+ * Idempotent à dessein : appelé à chaque commit du plan, pas seulement au
+ * premier, plutôt que de suivre « est-ce le premier commit ? ». Un ticket
+ * déjà en « en cours », en revue ou plus loin n'est jamais reculé — l'avancée
+ * manuelle d'un ticket reste toujours plus vraie que cette règle automatique.
+ *
+ * Silencieuse si le board n'a pas de colonne `en-cours` : un board reconfiguré
+ * sans cet id ne doit jamais faire échouer un commit.
+ */
+export function avancerTicketsDuPlan(ovrseeDir, planFile) {
+  const colonnes = readBoard(ovrseeDir)
+  const iCible = colonnes.findIndex(c => c.id === EN_COURS)
+  if (iCible === -1) return
+
+  const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
+  for (const ticket of readTickets(ovrseeDir, colonnes)) {
+    if (ticket.meta.plan !== planFile) continue
+    if ((rangDe.get(ticket.meta.colonne) ?? 0) >= iCible) continue
+
+    try {
+      moveTicket(ovrseeDir, ticket.file, EN_COURS)
+    } catch {
+      // Un ticket qui ne peut pas être déplacé ne doit jamais faire échouer le commit.
+    }
+  }
+}
+
 /**
  * Lance le crawl détaché : un commit ne doit jamais attendre le démarrage
  * d'une application et d'un navigateur.
@@ -110,7 +144,10 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     if (existsSync(ovrseeDir)) {
       const sources = changedFiles(root)
       const file = attachCommit(ovrseeDir, root, sources)
-      if (file) process.stdout.write(`[ovrsee] commit rattaché à ${file}\n`)
+      if (file) {
+        process.stdout.write(`[ovrsee] commit rattaché à ${file}\n`)
+        avancerTicketsDuPlan(ovrseeDir, file)
+      }
       if (crawlUtile(sources)) spawnCrawl(root)
     }
   } catch (err) {

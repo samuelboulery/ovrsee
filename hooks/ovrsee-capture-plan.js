@@ -15,12 +15,17 @@
  *   effets <repo>/ovrsee/plans/<date>-<slug>.md   (status: open)
  *          <repo>/ovrsee/.active-plan
  *          ~/.claude/ovrsee/projects.json
+ *   stdout {"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"..."}}
+ *          Jamais `decision: "block"` : le hook signale, il ne fait jamais
+ *          échouer l'outil. `additionalContext` pousse Claude à décomposer le
+ *          plan en tickets dans le même tour, sans le bloquer.
  */
 
 import { execFileSync } from 'node:child_process'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 import {
   serializePlan,
@@ -29,6 +34,7 @@ import {
   closeOpenPlans,
   registerProject,
 } from './plans.js'
+import { readBoard, readTickets, moveTicket, colonneFinale } from './tickets.js'
 
 function readStdin() {
   try {
@@ -122,6 +128,32 @@ function titleOf(planText) {
   return 'Plan sans titre'
 }
 
+/**
+ * Avance en colonne finale les tickets liés à un plan qui vient de se fermer.
+ *
+ * Silencieuse si le board n'a qu'une seule colonne (`colonneFinale` rend déjà
+ * `null` dans ce cas) — pas de colonne « finale » à viser sur un tableau à une
+ * seule case.
+ */
+export function avancerTicketsClos(ovrseeDir, plansClos) {
+  if (plansClos.length === 0) return
+
+  const colonnes = readBoard(ovrseeDir)
+  const finale = colonneFinale(colonnes)
+  if (!finale) return
+
+  const clos = new Set(plansClos)
+  for (const ticket of readTickets(ovrseeDir, colonnes)) {
+    if (!clos.has(ticket.meta.plan) || ticket.meta.colonne === finale) continue
+
+    try {
+      moveTicket(ovrseeDir, ticket.file, finale)
+    } catch {
+      // Un ticket qui ne peut pas être déplacé ne doit jamais faire échouer la capture du plan.
+    }
+  }
+}
+
 function main() {
   const raw = readStdin()
   if (!raw.trim()) return
@@ -140,7 +172,8 @@ function main() {
   if (!root) return // Hors dépôt git : rien à capturer, sortie silencieuse.
 
   const ovrseeDir = join(root, 'ovrsee')
-  closeOpenPlans(ovrseeDir, message => process.stderr.write(`[ovrsee] ${message}\n`))
+  const plansClos = closeOpenPlans(ovrseeDir, message => process.stderr.write(`[ovrsee] ${message}\n`))
+  avancerTicketsClos(ovrseeDir, plansClos)
 
   const title = titleOf(planText)
   const now = new Date()
@@ -157,13 +190,31 @@ function main() {
   writeFileNoFollow(join(ovrseeDir, '.active-plan'), file + '\n')
   registerProject(root)
 
-  process.stdout.write(`[ovrsee] plan capturé : ovrsee/plans/${file}\n`)
+  // additionalContext plutôt qu'un simple message : le hook ne doit jamais
+  // bloquer l'outil (exit 0 toujours), mais peut pousser Claude à agir dans
+  // le même tour sans attendre qu'on le lui demande.
+  process.stdout.write(
+    JSON.stringify({
+      hookSpecificOutput: {
+        hookEventName: 'PostToolUse',
+        additionalContext: `[ovrsee] Plan capturé : ovrsee/plans/${file}. Décompose-le maintenant en tickets via le skill cockpit-tickets — priorité et charge (xs–xl) pour chacun, champ plan renseigné sur ${file}. Un plan simple peut ne produire qu'un seul ticket : ne pas forcer le découpage.`,
+      },
+    }),
+  )
 }
 
-try {
-  main()
-} catch (err) {
-  // Dernier filet : on signale, on ne bloque jamais.
-  process.stderr.write(`[ovrsee] capture ignorée : ${err?.message ?? err}\n`)
+/**
+ * Le corps ne tourne que si le fichier est lancé comme hook.
+ *
+ * Sans cette garde, l'importer pour en éprouver une décision (`avancerTicketsClos`,
+ * `planFrom`, `titleOf`) lirait stdin et écrirait des fichiers à chaque `pnpm test`.
+ */
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try {
+    main()
+  } catch (err) {
+    // Dernier filet : on signale, on ne bloque jamais.
+    process.stderr.write(`[ovrsee] capture ignorée : ${err?.message ?? err}\n`)
+  }
+  process.exit(0)
 }
-process.exit(0)

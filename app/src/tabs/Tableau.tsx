@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 
 import {
+  CHARGES,
   childrenOf,
   colonneFinale,
   epicProgress,
@@ -8,6 +9,7 @@ import {
   PRIORITES,
   sortTickets,
   ticketAction,
+  type Charge,
   type Colonne,
   type Illisible,
   type Priorite,
@@ -51,6 +53,22 @@ type Insertion = { index: number; apres: boolean }
  * l'aveugle, et un réordonnancement par flèches ne dit jamais où la colonne va
  * tomber.
  */
+
+/**
+ * Ce qu'un ticket peut recevoir en modification.
+ *
+ * `charge`, `type` et `epic` acceptent `null` pour effacer le champ — un
+ * ticket redevient non estimé, non-epic, ou détaché. `Partial<Ticket>` seul ne
+ * le permettrait pas : ses champs optionnels acceptent `undefined` (ne pas
+ * toucher), pas `null` (effacer). D'où l'exclusion puis la redéfinition.
+ */
+type TicketPatch = Partial<Omit<Ticket, 'charge' | 'type' | 'epic'>> & {
+  corps?: string
+  charge?: Charge | null
+  type?: 'epic' | null
+  epic?: string | null
+}
+
 export function Tableau({
   root,
   board,
@@ -113,9 +131,18 @@ export function Tableau({
     ecrire({ board, tickets }, 'create', { titre, colonne })
   }
 
-  const modifier = (file: string, patch: Partial<Ticket> & { corps?: string }) =>
+  /** Fusionne un patch dans un ticket : `null` efface le champ plutôt que d'être stocké tel quel. */
+  const fusionnerPatch = (ticket: Ticket, patch: TicketPatch): Ticket => {
+    const suivant: Ticket = { ...ticket, ...patch } as Ticket
+    if (patch.charge === null) delete suivant.charge
+    if (patch.type === null) delete suivant.type
+    if (patch.epic === null) delete suivant.epic
+    return suivant
+  }
+
+  const modifier = (file: string, patch: TicketPatch) =>
     ecrire(
-      { board, tickets: tickets.map(t => (t.file === file ? { ...t, ...patch } : t)) },
+      { board, tickets: tickets.map(t => (t.file === file ? fusionnerPatch(t, patch) : t)) },
       'update',
       { file, ...patch },
     )
@@ -181,9 +208,10 @@ export function Tableau({
   }
 
   const selection = tickets.find(t => t.file === ouverte) ?? null
-  const ticketsAffichables = filtreEpic
-    ? tickets.filter(t => t.epic === filtreEpic)
-    : tickets.filter(t => !t.type || t.type !== 'epic')
+  // Sans filtre, tout s'affiche — epics, leurs enfants, les orphelins. « Voir
+  // enfants » isole les enfants d'un epic donné ; ça n'a jamais eu vocation à
+  // cacher les epics eux-mêmes de la vue par défaut.
+  const ticketsAffichables = filtreEpic ? tickets.filter(t => t.epic === filtreEpic) : tickets
 
   return (
     <div style={s('flex: 1; display: flex; flex-direction: column; overflow: hidden;')}>
@@ -289,6 +317,7 @@ export function Tableau({
             key={selection.file}
             ticket={selection}
             colonnes={board}
+            allTickets={tickets}
             onFermer={() => setOuverte(null)}
             onModifier={patch => modifier(selection.file, patch)}
             onDeplacer={colonne => deplacer(selection.file, colonne)}
@@ -350,7 +379,7 @@ function ColonneVue({
   filtreEpic: string | null
   setFiltreEpic: (epic: string | null) => void
   allTickets: Ticket[]
-  onModifier: (file: string, patch: Partial<Ticket> & { corps?: string }) => void
+  onModifier: (file: string, patch: TicketPatch) => void
   boardColonnes: Colonne[]
 }) {
   const [saisie, setSaisie] = useState<string | null>(null)
@@ -685,7 +714,7 @@ function Carte({
   filtreEpic: string | null
   setFiltreEpic: (epic: string | null) => void
   allTickets: Ticket[]
-  onModifier: (patch: Partial<Ticket> & { corps?: string }) => void
+  onModifier: (patch: TicketPatch) => void
   boardColonnes: Colonne[]
 }) {
   const isEpic = ticket.type === 'epic'
@@ -706,6 +735,14 @@ function Carte({
           style={s(`width: 7px; height: 7px; border-radius: 50%; flex: none; background: ${COULEUR[ticket.priorite] ?? COULEUR.moyenne};`)}
           title={`${t('tableau.priority_label')} ${ticket.priorite}`}
         />
+        {ticket.charge && (
+          <span
+            style={s('font-size: 9px; color: var(--color-neutral-500); text-transform: uppercase; letter-spacing: 0.02em; flex: none;')}
+            title={`${t('tableau.charge_label')} ${ticket.charge}`}
+          >
+            {ticket.charge}
+          </span>
+        )}
         {isEpic && (
           <span
             className="tag tag-outline"
@@ -782,7 +819,7 @@ function Carte({
             style={s('font-size: 10px; padding: 3px 6px; flex: 1;')}
             onClick={(e) => {
               e.stopPropagation()
-              onModifier({ epic: null } as unknown as Partial<Ticket> & { corps?: string })
+              onModifier({ epic: null })
             }}
           >
             {t('tableau.detach')}
@@ -796,6 +833,7 @@ function Carte({
 function Detail({
   ticket,
   colonnes,
+  allTickets,
   onFermer,
   onModifier,
   onDeplacer,
@@ -803,8 +841,9 @@ function Detail({
 }: {
   ticket: Ticket
   colonnes: Colonne[]
+  allTickets: Ticket[]
   onFermer: () => void
-  onModifier: (patch: { titre?: string; priorite?: Priorite; tags?: string[]; corps?: string }) => void
+  onModifier: (patch: TicketPatch) => void
   onDeplacer: (colonne: string) => void
   onSupprimer: () => void
 }) {
@@ -858,6 +897,49 @@ function Detail({
             </option>
           ))}
         </select>
+        <select
+          className="input"
+          value={ticket.charge ?? ''}
+          onChange={event => onModifier({ charge: (event.target.value || null) as Charge | null })}
+          style={s('font-size: 12px; flex: 1;')}
+        >
+          <option value="">{t('tableau.charge_none')}</option>
+          {CHARGES.map(charge => (
+            <option key={charge} value={charge}>
+              {charge}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div style={s('display: flex; align-items: center; gap: 8px; margin-top: 8px;')}>
+        <label style={s('display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--color-neutral-500); white-space: nowrap;')}>
+          <input
+            type="checkbox"
+            checked={ticket.type === 'epic'}
+            disabled={Boolean(ticket.epic)}
+            title={ticket.epic ? t('tableau.epic_checkbox_disabled') : undefined}
+            onChange={event => onModifier({ type: event.target.checked ? 'epic' : null })}
+          />
+          {t('tableau.epic_checkbox')}
+        </label>
+        {ticket.type !== 'epic' && (
+          <select
+            className="input"
+            value={ticket.epic ?? ''}
+            onChange={event => onModifier({ epic: event.target.value || null })}
+            style={s('font-size: 12px; flex: 1;')}
+          >
+            <option value="">{t('tableau.no_epic_parent')}</option>
+            {allTickets
+              .filter(t => t.type === 'epic' && t.id !== ticket.id)
+              .map(epic => (
+                <option key={epic.id} value={epic.id}>
+                  {epic.titre}
+                </option>
+              ))}
+          </select>
+        )}
       </div>
 
       <input

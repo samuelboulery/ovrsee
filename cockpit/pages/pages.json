@@ -1,13 +1,13 @@
 {
   "date": "2026-08-10",
-  "commit": "4675a8f",
+  "commit": "8371369",
   "pages": [
     {
       "route": "/",
       "slug": "accueil",
       "title": "Cockpit",
       "sample": "/",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 05839a8\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n12 mois\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\ncockpit\n/Users/sam/code/cockpit\nVue en lecture seule sur un projet vibecodé : plans capturés, pages crawlées, historiqu",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 4675a8f\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\ncockpit\n/Users/sam/code/cockpit\nVue en lecture seule sur un projet vibecodé : plans capturés, pages crawlées, historiqu",
       "links": [
         "/navigateur",
         "/produit",
@@ -16,7 +16,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/accueil/2026-08-10-4675a8f.png",
+      "shot": "shots/accueil/2026-08-10-8371369.png",
       "shotDate": "2026-08-10",
       "shotSize": {
         "width": 1280,
@@ -28,7 +28,7 @@
       "slug": "navigateur",
       "title": "Cockpit",
       "sample": "/navigateur",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 05839a8\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n12 mois\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nLe navigateur intégré n'existe que dans l'application.\nInspecter une page demande une vue native et des DevTools, que l",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 4675a8f\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nLe navigateur intégré n'existe que dans l'application.\nInspecter une page demande une vue native et des DevTools, que l",
       "links": [
         "/",
         "/produit",
@@ -37,7 +37,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/navigateur/2026-08-10-4675a8f.png",
+      "shot": "shots/navigateur/2026-08-10-8371369.png",
       "shotDate": "2026-08-10",
       "shotSize": {
         "width": 1280,
@@ -49,7 +49,7 @@
       "slug": "produit",
       "title": "Cockpit",
       "sample": "/produit",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 05839a8\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n12 mois\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nGraphe de navigation\n7 7 pages · 42 42 liens · reconstruit au commit\nMÈNE À\nENTRÉE DE L'APP\nAccueil\n/\naucun plan\n10 aoû",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 4675a8f\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nGraphe de navigation\n7 7 pages · 42 42 liens · reconstruit au commit\nMÈNE À\nENTRÉE DE L'APP\nAccueil\n/\naucun plan\n10 aoû",
       "links": [
         "/",
         "/navigateur",
@@ -58,7 +58,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/produit/2026-08-10-4675a8f.png",
+      "shot": "shots/produit/2026-08-10-8371369.png",
       "shotDate": "2026-08-10",
       "shotSize": {
         "width": 1280,
@@ -70,7 +70,7 @@
       "slug": "historique",
       "title": "Cockpit",
       "sample": "/historique",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 05839a8\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n12 mois\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nChronologie du projet\nChaque commit, dans l'ordre, et les plans qui les expliquent. Un plan est clos par le commit qui ",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 4675a8f\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nChronologie du projet\nChaque commit, dans l'ordre, et les plans qui les expliquent. Un plan est clos par le commit qui ",
       "links": [
         "/",
         "/navigateur",
@@ -79,7 +79,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/historique/2026-08-10-4675a8f.png",
+      "shot": "shots/historique/2026-08-10-8371369.png",
       "shotDate": "2026-08-10",
       "shotSize": {
         "width": 1280,
@@ -91,7 +91,7 @@
       "slug": "tableau",
       "title": "Cockpit",
       "sample": "/tableau",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 05839a8\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n12 mois\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nTableau\nÉditer les colonnes\nUn fichier par ticket dans cockpit/tickets/, colonnes réglées dans cockpit/board.json. Écri",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 4675a8f\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nTableau\nÉditer les colonnes\nUn fichier par ticket dans cockpit/tickets/, colonnes réglées dans cockpit/board.json. Écri",
       "links": [
         "/",
         "/navigateur",
@@ -100,7 +100,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/tableau/2026-08-10-4675a8f.png",
+      "shot": "shots/tableau/2026-08-10-8371369.png",
       "shotDate": "2026-08-10",
       "shotSize": {
         "width": 1280,
@@ -112,7 +112,7 @@
       "slug": "donnees",
       "title": "Cockpit",
       "sample": "/donnees",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 05839a8\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n12 mois\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nTables\nlu depuis Graphify — 2026-08-10\nAucun schéma de base détecté par Graphify dans ce projet.\nCe n'est pas une panne",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 4675a8f\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nTables\nlu depuis Graphify — 2026-08-10\nAucun schéma de base détecté par Graphify dans ce projet.\nCe n'est pas une panne",
       "links": [
         "/",
         "/navigateur",
@@ -121,7 +121,7 @@
         "/tableau",
         "/stack"
       ],
-      "shot": "shots/donnees/2026-08-10-4675a8f.png",
+      "shot": "shots/donnees/2026-08-10-8371369.png",
       "shotDate": "2026-08-10",
       "shotSize": {
         "width": 1280,
@@ -133,7 +133,7 @@
       "slug": "stack",
       "title": "Cockpit",
       "sample": "/stack",
-      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 05839a8\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n12 mois\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nStack\nCe qui est utilisé, et pourquoi. Une raison est un commentaire WHY: posé juste au-dessus de l'import du paquet — ",
+      "excerpt": "Cockpit — cockpit\ndernier scan · 10 août 2026 · commit 4675a8f\nPROJETS\ncockpit\nà jour\naujourd'hui\nmiette\nà jour\njamais\nSkills Claude Code\n⚙ Préférences\n⌘ Ma configuration Claude Code\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nStack\nCe qui est utilisé, et pourquoi. Une raison est un commentaire WHY: posé juste au-dessus de l'import du paquet — ",
       "links": [
         "/",
         "/navigateur",
@@ -142,7 +142,7 @@
         "/tableau",
         "/donnees"
       ],
-      "shot": "shots/stack/2026-08-10-4675a8f.png",
+      "shot": "shots/stack/2026-08-10-8371369.png",
       "shotDate": "2026-08-10",
       "shotSize": {
         "width": 1280,

@@ -1,10 +1,29 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Installation d'un projet en un écran, terminal toujours ouvrable",
   "opened": "2026-08-10",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-10",
+  "commits": [
+    {
+      "sha": "8371369",
+      "date": "2026-08-10",
+      "files": [
+        "app/src/EquipmentPanel.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/data.ts",
+        "app/src/i18n.test.ts",
+        "electron/main.js",
+        "electron/pty.js",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/install-options.test.js",
+        "hooks/install.js",
+        "server/api.js",
+        "server/api.test.js"
+      ]
+    }
+  ]
 }
 ---
 

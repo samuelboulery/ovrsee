@@ -9,12 +9,12 @@
       a { color: var(--color-accent-300); text-decoration: none; }
       a:hover { color: var(--color-accent-200); }
       @keyframes blink { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
-      * { scrollbar-width: thin; scrollbar-color: #3f424d #13141f; }
+      * { scrollbar-width: thin; scrollbar-color: var(--color-neutral-700) var(--color-bg); }
       ::-webkit-scrollbar { width: 10px; height: 10px; }
-      ::-webkit-scrollbar-track { background: #13141f; }
-      ::-webkit-scrollbar-thumb { background: #3f424d; border-radius: 5px; border: 2px solid #13141f; }
-      ::-webkit-scrollbar-thumb:hover { background: #595d6c; }
-      ::-webkit-scrollbar-corner { background: #13141f; }
+      ::-webkit-scrollbar-track { background: var(--color-bg); }
+      ::-webkit-scrollbar-thumb { background: var(--color-neutral-700); border-radius: 5px; border: 2px solid var(--color-bg); }
+      ::-webkit-scrollbar-thumb:hover { background: var(--color-neutral-600); }
+      ::-webkit-scrollbar-corner { background: var(--color-bg); }
     </style>
   </head>
   <body>

@@ -9516,8 +9516,8 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/profilage.ts",
       "source_location": "L112",
       "weight": 1.0,
-      "_src": "profilage_reponsesinitiales",
-      "_tgt": "preferencesprofils_profilcourant",
+      "_src": "preferencesprofils_profilcourant",
+      "_tgt": "profilage_reponsesinitiales",
       "source": "preferencesprofils_profilcourant",
       "target": "profilage_reponsesinitiales"
     },

@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Profils d'interface : la sélection pilote aussi `terminal.disabled`",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-11",
   "commits": [
     {
       "sha": "28b8211",
@@ -23,6 +23,11 @@
     },
     {
       "sha": "ec27941",
+      "date": "2026-08-11",
+      "files": []
+    },
+    {
+      "sha": "59c5fb6",
       "date": "2026-08-11",
       "files": []
     }

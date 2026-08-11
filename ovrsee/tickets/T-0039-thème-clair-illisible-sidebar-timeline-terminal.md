@@ -2,7 +2,7 @@
 {
   "id": "T-0039",
   "titre": "Thème clair illisible : sidebar, timeline, terminal figé sur le sombre",
-  "colonne": "en-cours",
+  "colonne": "revue",
   "priorite": "moyenne",
   "tags": [
     "ui",
@@ -10,11 +10,16 @@
   ],
   "cree": "2026-08-11",
   "maj": "2026-08-11",
-  "plan": "2026-08-11-corriger-le-theme-clair-liste-projets-timeline-plan-terminal.md"
+  "plan": "2026-08-11-refonte-ui-ovrsee-mise-en-uvre-des-maquettes.md"
 }
 ---
 
 ## Contexte
+
+Repris par T-0045 (refonte : nouveau système de tokens) — le plan « Thème
+clair round 2 » qui portait ce ticket est remplacé par la refonte UI, dont
+le nouveau système de tokens règle ce contraste par construction plutôt
+qu'au cas par cas.
 
 En thème clair, trois zones restent illisibles ou incohérentes avec la palette Nocturne claire :
 

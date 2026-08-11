@@ -22,597 +22,12 @@
       "norm_label": "ovrseedata()"
     },
     {
-      "label": "support.js",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1",
-      "id": "users_sam_code_cockpit_support_js",
-      "community": 1,
-      "norm_label": "support.js"
-    },
-    {
-      "label": "getReact()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L9",
-      "id": "support_getreact",
-      "community": 1,
-      "norm_label": "getreact()"
-    },
-    {
-      "label": "getReactDOM()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L14",
-      "id": "support_getreactdom",
-      "community": 1,
-      "norm_label": "getreactdom()"
-    },
-    {
-      "label": "parseDcDocument()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L24",
-      "id": "support_parsedcdocument",
-      "community": 1,
-      "norm_label": "parsedcdocument()"
-    },
-    {
-      "label": "parseDcText()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L38",
-      "id": "support_parsedctext",
-      "community": 1,
-      "norm_label": "parsedctext()"
-    },
-    {
-      "label": "parseDataProps()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L56",
-      "id": "support_parsedataprops",
-      "community": 1,
-      "norm_label": "parsedataprops()"
-    },
-    {
-      "label": "dcNameFromPath()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L75",
-      "id": "support_dcnamefrompath",
-      "community": 1,
-      "norm_label": "dcnamefrompath()"
-    },
-    {
-      "label": "rootNameForDocument()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L133",
-      "id": "support_rootnamefordocument",
-      "community": 1,
-      "norm_label": "rootnamefordocument()"
-    },
-    {
-      "label": "safeDecode()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L143",
-      "id": "support_safedecode",
-      "community": 1,
-      "norm_label": "safedecode()"
-    },
-    {
-      "label": "boot()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L150",
-      "id": "support_boot",
-      "community": 1,
-      "norm_label": "boot()"
-    },
-    {
-      "label": "resolve()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L205",
-      "id": "support_resolve",
-      "community": 1,
-      "norm_label": "resolve()"
-    },
-    {
-      "label": "parensWrapWhole()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L237",
-      "id": "support_parenswrapwhole",
-      "community": 1,
-      "norm_label": "parenswrapwhole()"
-    },
-    {
-      "label": "findTopLevelEquality()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L248",
-      "id": "support_findtoplevelequality",
-      "community": 1,
-      "norm_label": "findtoplevelequality()"
-    },
-    {
-      "label": "resolvePath()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L263",
-      "id": "support_resolvepath",
-      "community": 1,
-      "norm_label": "resolvepath()"
-    },
-    {
-      "label": "encodeCamelAttrs()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L366",
-      "id": "support_encodecamelattrs",
-      "community": 1,
-      "norm_label": "encodecamelattrs()"
-    },
-    {
-      "label": "encodeCase()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L372",
-      "id": "support_encodecase",
-      "community": 1,
-      "norm_label": "encodecase()"
-    },
-    {
-      "label": "kebabToCamel()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L388",
-      "id": "support_kebabtocamel",
-      "community": 1,
-      "norm_label": "kebabtocamel()"
-    },
-    {
-      "label": "cssToObj()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L391",
-      "id": "support_csstoobj",
-      "community": 1,
-      "norm_label": "csstoobj()"
-    },
-    {
-      "label": "compileAttr()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L401",
-      "id": "support_compileattr",
-      "community": 1,
-      "norm_label": "compileattr()"
-    },
-    {
-      "label": "collectProps()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L415",
-      "id": "support_collectprops",
-      "community": 1,
-      "norm_label": "collectprops()"
-    },
-    {
-      "label": "hostPositionStyle()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L457",
-      "id": "support_hostpositionstyle",
-      "community": 1,
-      "norm_label": "hostpositionstyle()"
-    },
-    {
-      "label": "compileTemplate()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L467",
-      "id": "support_compiletemplate",
-      "community": 1,
-      "norm_label": "compiletemplate()"
-    },
-    {
-      "label": "walkChildren()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L483",
-      "id": "support_walkchildren",
-      "community": 1,
-      "norm_label": "walkchildren()"
-    },
-    {
-      "label": "isDeckMountTag()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L489",
-      "id": "support_isdeckmounttag",
-      "community": 1,
-      "norm_label": "isdeckmounttag()"
-    },
-    {
-      "label": "walkDeckChildren()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L493",
-      "id": "support_walkdeckchildren",
-      "community": 1,
-      "norm_label": "walkdeckchildren()"
-    },
-    {
-      "label": "renderDeckKids()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L543",
-      "id": "support_renderdeckkids",
-      "community": 1,
-      "norm_label": "renderdeckkids()"
-    },
-    {
-      "label": "walk()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L550",
-      "id": "support_walk",
-      "community": 1,
-      "norm_label": "walk()"
-    },
-    {
-      "label": "warnUnresolved()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L563",
-      "id": "support_warnunresolved",
-      "community": 1,
-      "norm_label": "warnunresolved()"
-    },
-    {
-      "label": "walkText()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L569",
-      "id": "support_walktext",
-      "community": 1,
-      "norm_label": "walktext()"
-    },
-    {
-      "label": "walkFor()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L611",
-      "id": "support_walkfor",
-      "community": 1,
-      "norm_label": "walkfor()"
-    },
-    {
-      "label": "walkIf()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L646",
-      "id": "support_walkif",
-      "community": 1,
-      "norm_label": "walkif()"
-    },
-    {
-      "label": "walkComponent()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L661",
-      "id": "support_walkcomponent",
-      "community": 1,
-      "norm_label": "walkcomponent()"
-    },
-    {
-      "label": "walkXImport()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L690",
-      "id": "support_walkximport",
-      "community": 1,
-      "norm_label": "walkximport()"
-    },
-    {
-      "label": "contentKey()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L771",
-      "id": "support_contentkey",
-      "community": 1,
-      "norm_label": "contentkey()"
-    },
-    {
-      "label": "walkElement()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L787",
-      "id": "support_walkelement",
-      "community": 1,
-      "norm_label": "walkelement()"
-    },
-    {
-      "label": "constructor()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L818",
-      "id": "support_constructor",
-      "community": 1,
-      "norm_label": "constructor()"
-    },
-    {
-      "label": "setState()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L825",
-      "id": "support_setstate",
-      "community": 1,
-      "norm_label": "setstate()"
-    },
-    {
-      "label": "forceUpdate()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L828",
-      "id": "support_forceupdate",
-      "community": 1,
-      "norm_label": "forceupdate()"
-    },
-    {
-      "label": "componentDidMount()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L831",
-      "id": "support_componentdidmount",
-      "community": 1,
-      "norm_label": "componentdidmount()"
-    },
-    {
-      "label": "componentDidUpdate()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L833",
-      "id": "support_componentdidupdate",
-      "community": 1,
-      "norm_label": "componentdidupdate()"
-    },
-    {
-      "label": "componentWillUnmount()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L835",
-      "id": "support_componentwillunmount",
-      "community": 1,
-      "norm_label": "componentwillunmount()"
-    },
-    {
-      "label": "renderVals()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L838",
-      "id": "support_rendervals",
-      "community": 1,
-      "norm_label": "rendervals()"
-    },
-    {
-      "label": "evalDcLogic()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L842",
-      "id": "support_evaldclogic",
-      "community": 1,
-      "norm_label": "evaldclogic()"
-    },
-    {
-      "label": "shallowEqual()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L854",
-      "id": "support_shallowequal",
-      "community": 1,
-      "norm_label": "shallowequal()"
-    },
-    {
-      "label": "Placeholder()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L862",
-      "id": "support_placeholder",
-      "community": 1,
-      "norm_label": "placeholder()"
-    },
-    {
-      "label": "hintToMin()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L883",
-      "id": "support_hinttomin",
-      "community": 1,
-      "norm_label": "hinttomin()"
-    },
-    {
-      "label": "createComponentFactory()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L888",
-      "id": "support_createcomponentfactory",
-      "community": 1,
-      "norm_label": "createcomponentfactory()"
-    },
-    {
-      "label": "bundledBlob()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1136",
-      "id": "support_bundledblob",
-      "community": 1,
-      "norm_label": "bundledblob()"
-    },
-    {
-      "label": "cdnScriptFor()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1149",
-      "id": "support_cdnscriptfor",
-      "community": 1,
-      "norm_label": "cdnscriptfor()"
-    },
-    {
-      "label": "isRenderableType()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1157",
-      "id": "support_isrenderabletype",
-      "community": 1,
-      "norm_label": "isrenderabletype()"
-    },
-    {
-      "label": "resolveDottedPath()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1161",
-      "id": "support_resolvedottedpath",
-      "community": 1,
-      "norm_label": "resolvedottedpath()"
-    },
-    {
-      "label": "createExternalModules()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1171",
-      "id": "support_createexternalmodules",
-      "community": 1,
-      "norm_label": "createexternalmodules()"
-    },
-    {
-      "label": "isElementClass()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1348",
-      "id": "support_iselementclass",
-      "community": 1,
-      "norm_label": "iselementclass()"
-    },
-    {
-      "label": "createHelmetManager()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1366",
-      "id": "support_createhelmetmanager",
-      "community": 1,
-      "norm_label": "createhelmetmanager()"
-    },
-    {
-      "label": "scanUnquotedUrl()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1498",
-      "id": "support_scanunquotedurl",
-      "community": 1,
-      "norm_label": "scanunquotedurl()"
-    },
-    {
-      "label": "stripComments()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1511",
-      "id": "support_stripcomments",
-      "community": 1,
-      "norm_label": "stripcomments()"
-    },
-    {
-      "label": "importantify()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1542",
-      "id": "support_importantify",
-      "community": 1,
-      "norm_label": "importantify()"
-    },
-    {
-      "label": "createPseudoSheet()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1567",
-      "id": "support_createpseudosheet",
-      "community": 1,
-      "norm_label": "createpseudosheet()"
-    },
-    {
-      "label": "createRegistry()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1592",
-      "id": "support_createregistry",
-      "community": 1,
-      "norm_label": "createregistry()"
-    },
-    {
-      "label": "createRuntime()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1623",
-      "id": "support_createruntime",
-      "community": 1,
-      "norm_label": "createruntime()"
-    },
-    {
-      "label": "createStreamTracker()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1792",
-      "id": "support_createstreamtracker",
-      "community": 1,
-      "norm_label": "createstreamtracker()"
-    },
-    {
-      "label": "hideRawTemplate()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1818",
-      "id": "support_hiderawtemplate",
-      "community": 1,
-      "norm_label": "hiderawtemplate()"
-    },
-    {
-      "label": "loadScript()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1823",
-      "id": "support_loadscript",
-      "community": 1,
-      "norm_label": "loadscript()"
-    },
-    {
-      "label": "loadReactUmd()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1838",
-      "id": "support_loadreactumd",
-      "community": 1,
-      "norm_label": "loadreactumd()"
-    },
-    {
-      "label": "init()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1848",
-      "id": "support_init",
-      "community": 1,
-      "norm_label": "init()"
-    },
-    {
       "label": "data.ts",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_data_ts",
-      "community": 3,
+      "community": 2,
       "norm_label": "data.ts"
     },
     {
@@ -621,7 +36,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L24",
       "id": "data_liste",
-      "community": 3,
+      "community": 2,
       "norm_label": "liste()"
     },
     {
@@ -630,7 +45,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L43",
       "id": "data_section",
-      "community": 3,
+      "community": 2,
       "norm_label": "section()"
     },
     {
@@ -639,7 +54,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L61",
       "id": "data_stripmarkdown",
-      "community": 3,
+      "community": 2,
       "norm_label": "stripmarkdown()"
     },
     {
@@ -648,7 +63,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L72",
       "id": "data_firstparagraph",
-      "community": 3,
+      "community": 2,
       "norm_label": "firstparagraph()"
     },
     {
@@ -657,7 +72,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L86",
       "id": "data_planwhy",
-      "community": 3,
+      "community": 2,
       "norm_label": "planwhy()"
     },
     {
@@ -666,7 +81,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L98",
       "id": "data_planrejected",
-      "community": 3,
+      "community": 2,
       "norm_label": "planrejected()"
     },
     {
@@ -675,7 +90,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L105",
       "id": "data_planfiles",
-      "community": 3,
+      "community": 2,
       "norm_label": "planfiles()"
     },
     {
@@ -684,7 +99,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L131",
       "id": "data_shotratio",
-      "community": 3,
+      "community": 2,
       "norm_label": "shotratio()"
     },
     {
@@ -693,7 +108,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L435",
       "id": "data_shotdate",
-      "community": 3,
+      "community": 2,
       "norm_label": "shotdate()"
     },
     {
@@ -711,7 +126,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L493",
       "id": "data_layoutgraph",
-      "community": 3,
+      "community": 2,
       "norm_label": "layoutgraph()"
     },
     {
@@ -720,7 +135,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L578",
       "id": "data_json",
-      "community": 3,
+      "community": 2,
       "norm_label": "json()"
     },
     {
@@ -729,7 +144,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L585",
       "id": "data_estabandon",
-      "community": 3,
+      "community": 2,
       "norm_label": "estabandon()"
     },
     {
@@ -738,7 +153,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L588",
       "id": "data_fetchprojects",
-      "community": 3,
+      "community": 2,
       "norm_label": "fetchprojects()"
     },
     {
@@ -747,7 +162,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L604",
       "id": "data_projectaction",
-      "community": 3,
+      "community": 2,
       "norm_label": "projectaction()"
     },
     {
@@ -756,7 +171,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L627",
       "id": "data_gitfetch",
-      "community": 3,
+      "community": 2,
       "norm_label": "gitfetch()"
     },
     {
@@ -765,7 +180,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L649",
       "id": "data_getfolderstate",
-      "community": 3,
+      "community": 2,
       "norm_label": "getfolderstate()"
     },
     {
@@ -774,7 +189,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L679",
       "id": "data_fetchskills",
-      "community": 3,
+      "community": 2,
       "norm_label": "fetchskills()"
     },
     {
@@ -783,7 +198,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L681",
       "id": "data_installskills",
-      "community": 3,
+      "community": 2,
       "norm_label": "installskills()"
     },
     {
@@ -792,7 +207,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L717",
       "id": "data_ticketaction",
-      "community": 3,
+      "community": 2,
       "norm_label": "ticketaction()"
     },
     {
@@ -801,7 +216,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L737",
       "id": "data_fetchtableau",
-      "community": 3,
+      "community": 2,
       "norm_label": "fetchtableau()"
     },
     {
@@ -810,7 +225,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L741",
       "id": "data_isunequipped",
-      "community": 3,
+      "community": 2,
       "norm_label": "isunequipped()"
     },
     {
@@ -819,7 +234,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L751",
       "id": "data_fetchsnapshot",
-      "community": 3,
+      "community": 2,
       "norm_label": "fetchsnapshot()"
     },
     {
@@ -828,7 +243,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L754",
       "id": "data_shoturl",
-      "community": 3,
+      "community": 2,
       "norm_label": "shoturl()"
     },
     {
@@ -837,7 +252,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L764",
       "id": "data_mediaurl",
-      "community": 3,
+      "community": 2,
       "norm_label": "mediaurl()"
     },
     {
@@ -846,7 +261,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L773",
       "id": "data_fetchsettings",
-      "community": 3,
+      "community": 2,
       "norm_label": "fetchsettings()"
     },
     {
@@ -855,7 +270,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L785",
       "id": "data_updatesettings",
-      "community": 3,
+      "community": 2,
       "norm_label": "updatesettings()"
     },
     {
@@ -864,7 +279,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L846",
       "id": "data_composercommande",
-      "community": 3,
+      "community": 2,
       "norm_label": "composercommande()"
     },
     {
@@ -873,7 +288,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L861",
       "id": "data_plansouverts",
-      "community": 3,
+      "community": 2,
       "norm_label": "plansouverts()"
     },
     {
@@ -882,7 +297,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L870",
       "id": "data_sorttickets",
-      "community": 3,
+      "community": 2,
       "norm_label": "sorttickets()"
     },
     {
@@ -891,7 +306,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L880",
       "id": "data_childrenof",
-      "community": 3,
+      "community": 2,
       "norm_label": "childrenof()"
     },
     {
@@ -900,7 +315,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L892",
       "id": "data_epicprogress",
-      "community": 3,
+      "community": 2,
       "norm_label": "epicprogress()"
     },
     {
@@ -909,7 +324,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L909",
       "id": "data_colonnefinale",
-      "community": 3,
+      "community": 2,
       "norm_label": "colonnefinale()"
     },
     {
@@ -918,7 +333,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L922",
       "id": "data_restant",
-      "community": 3,
+      "community": 2,
       "norm_label": "restant()"
     },
     {
@@ -927,7 +342,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L944",
       "id": "data_history",
-      "community": 3,
+      "community": 2,
       "norm_label": "history()"
     },
     {
@@ -936,7 +351,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L972",
       "id": "data_commitsdelafrise",
-      "community": 3,
+      "community": 2,
       "norm_label": "commitsdelafrise()"
     },
     {
@@ -945,7 +360,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L989",
       "id": "data_plansforpage",
-      "community": 3,
+      "community": 2,
       "norm_label": "plansforpage()"
     },
     {
@@ -954,7 +369,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1005",
       "id": "data_lastscan",
-      "community": 3,
+      "community": 2,
       "norm_label": "lastscan()"
     },
     {
@@ -963,7 +378,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1008",
       "id": "data_lastaudit",
-      "community": 3,
+      "community": 2,
       "norm_label": "lastaudit()"
     },
     {
@@ -972,7 +387,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1016",
       "id": "data_scanfailed",
-      "community": 3,
+      "community": 2,
       "norm_label": "scanfailed()"
     },
     {
@@ -981,7 +396,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1021",
       "id": "data_getmonth",
-      "community": 3,
+      "community": 2,
       "norm_label": "getmonth()"
     },
     {
@@ -999,7 +414,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1049",
       "id": "data_frdate",
-      "community": 3,
+      "community": 2,
       "norm_label": "frdate()"
     },
     {
@@ -1008,7 +423,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1057",
       "id": "data_frdateshort",
-      "community": 3,
+      "community": 2,
       "norm_label": "frdateshort()"
     },
     {
@@ -1017,7 +432,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1082",
       "id": "data_confidenceof",
-      "community": 3,
+      "community": 2,
       "norm_label": "confidenceof()"
     },
     {
@@ -1026,7 +441,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1089",
       "id": "data_isschemanode",
-      "community": 3,
+      "community": 2,
       "norm_label": "isschemanode()"
     },
     {
@@ -1035,7 +450,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1100",
       "id": "data_tablesfrom",
-      "community": 3,
+      "community": 2,
       "norm_label": "tablesfrom()"
     },
     {
@@ -1044,7 +459,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1149",
       "id": "data_stackfrom",
-      "community": 3,
+      "community": 2,
       "norm_label": "stackfrom()"
     },
     {
@@ -1053,7 +468,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1206",
       "id": "data_fetchconfigclaude",
-      "community": 3,
+      "community": 2,
       "norm_label": "fetchconfigclaude()"
     },
     {
@@ -1062,7 +477,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1215",
       "id": "data_brieflines",
-      "community": 3,
+      "community": 2,
       "norm_label": "brieflines()"
     },
     {
@@ -1071,7 +486,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1257",
       "id": "data_buildinjections",
-      "community": 3,
+      "community": 2,
       "norm_label": "buildinjections()"
     },
     {
@@ -1089,7 +504,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/data.ts",
       "source_location": "L1343",
       "id": "data_buildactions",
-      "community": 3,
+      "community": 2,
       "norm_label": "buildactions()"
     },
     {
@@ -1197,7 +612,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L384",
       "id": "app_reload",
-      "community": 0,
+      "community": 2,
       "norm_label": "reload()"
     },
     {
@@ -1251,7 +666,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L915",
       "id": "app_getdatelabel",
-      "community": 3,
+      "community": 2,
       "norm_label": "getdatelabel()"
     },
     {
@@ -1494,7 +909,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/highlight.ts",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_highlight_ts",
-      "community": 13,
+      "community": 14,
       "norm_label": "highlight.ts"
     },
     {
@@ -1503,7 +918,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/highlight.ts",
       "source_location": "L87",
       "id": "highlight_esc",
-      "community": 13,
+      "community": 14,
       "norm_label": "esc()"
     },
     {
@@ -1512,7 +927,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/highlight.ts",
       "source_location": "L105",
       "id": "highlight_rulesfor",
-      "community": 13,
+      "community": 14,
       "norm_label": "rulesfor()"
     },
     {
@@ -1521,7 +936,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/highlight.ts",
       "source_location": "L131",
       "id": "highlight_rules",
-      "community": 13,
+      "community": 14,
       "norm_label": "rules()"
     },
     {
@@ -1530,7 +945,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/highlight.ts",
       "source_location": "L140",
       "id": "highlight_nextchar",
-      "community": 13,
+      "community": 14,
       "norm_label": "nextchar()"
     },
     {
@@ -1539,7 +954,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/highlight.ts",
       "source_location": "L147",
       "id": "highlight_word",
-      "community": 13,
+      "community": 14,
       "norm_label": "word()"
     },
     {
@@ -1548,7 +963,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/highlight.ts",
       "source_location": "L160",
       "id": "highlight_tokens",
-      "community": 13,
+      "community": 14,
       "norm_label": "tokens()"
     },
     {
@@ -1944,7 +1359,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useResizable.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_useresizable_tsx",
-      "community": 0,
+      "community": 12,
       "norm_label": "useresizable.tsx"
     },
     {
@@ -1953,7 +1368,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useResizable.tsx",
       "source_location": "L45",
       "id": "useresizable_restore",
-      "community": 0,
+      "community": 12,
       "norm_label": "restore()"
     },
     {
@@ -1962,7 +1377,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useResizable.tsx",
       "source_location": "L54",
       "id": "useresizable_useresizable",
-      "community": 0,
+      "community": 12,
       "norm_label": "useresizable()"
     },
     {
@@ -1971,7 +1386,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useResizable.tsx",
       "source_location": "L152",
       "id": "useresizable_s",
-      "community": 0,
+      "community": 12,
       "norm_label": "s()"
     },
     {
@@ -2385,7 +1800,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/highlight.test.ts",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_app_src_highlight_test_ts",
-      "community": 13,
+      "community": 14,
       "norm_label": "highlight.test.ts"
     },
     {
@@ -2394,7 +1809,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/highlight.test.ts",
       "source_location": "L7",
       "id": "highlight_test_rendu",
-      "community": 13,
+      "community": 14,
       "norm_label": "rendu()"
     },
     {
@@ -2403,7 +1818,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/highlight.test.ts",
       "source_location": "L38",
       "id": "highlight_test_kind",
-      "community": 13,
+      "community": 14,
       "norm_label": "kind()"
     },
     {
@@ -2547,7 +1962,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_tabs_navigateur_tsx",
-      "community": 0,
+      "community": 12,
       "norm_label": "navigateur.tsx"
     },
     {
@@ -2556,7 +1971,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L67",
       "id": "navigateur_url_key",
-      "community": 0,
+      "community": 12,
       "norm_label": "url_key()"
     },
     {
@@ -2565,7 +1980,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L85",
       "id": "navigateur_apptheme",
-      "community": 0,
+      "community": 12,
       "norm_label": "apptheme()"
     },
     {
@@ -2574,7 +1989,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L94",
       "id": "navigateur_starturl",
-      "community": 0,
+      "community": 12,
       "norm_label": "starturl()"
     },
     {
@@ -2592,7 +2007,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L115",
       "id": "navigateur_pickelement",
-      "community": 0,
+      "community": 12,
       "norm_label": "pickelement()"
     },
     {
@@ -2601,7 +2016,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L196",
       "id": "navigateur_devtoolsstyle",
-      "community": 0,
+      "community": 12,
       "norm_label": "devtoolsstyle()"
     },
     {
@@ -2610,7 +2025,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L205",
       "id": "navigateur_describe",
-      "community": 0,
+      "community": 12,
       "norm_label": "describe()"
     },
     {
@@ -2619,7 +2034,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L221",
       "id": "navigateur_navigateur",
-      "community": 0,
+      "community": 12,
       "norm_label": "navigateur()"
     },
     {
@@ -2628,7 +2043,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L525",
       "id": "navigateur_picking",
-      "community": 0,
+      "community": 12,
       "norm_label": "picking()"
     },
     {
@@ -2637,7 +2052,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L549",
       "id": "navigateur_s",
-      "community": 0,
+      "community": 12,
       "norm_label": "s()"
     },
     {
@@ -2812,6 +2227,591 @@
       "norm_label": "branches.tsx"
     },
     {
+      "label": "support.js",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1",
+      "id": "users_sam_code_ovrsee_legacy_support_js",
+      "community": 1,
+      "norm_label": "support.js"
+    },
+    {
+      "label": "getReact()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L9",
+      "id": "support_getreact",
+      "community": 1,
+      "norm_label": "getreact()"
+    },
+    {
+      "label": "getReactDOM()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L14",
+      "id": "support_getreactdom",
+      "community": 1,
+      "norm_label": "getreactdom()"
+    },
+    {
+      "label": "parseDcDocument()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L24",
+      "id": "support_parsedcdocument",
+      "community": 1,
+      "norm_label": "parsedcdocument()"
+    },
+    {
+      "label": "parseDcText()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L38",
+      "id": "support_parsedctext",
+      "community": 1,
+      "norm_label": "parsedctext()"
+    },
+    {
+      "label": "parseDataProps()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L56",
+      "id": "support_parsedataprops",
+      "community": 1,
+      "norm_label": "parsedataprops()"
+    },
+    {
+      "label": "dcNameFromPath()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L75",
+      "id": "support_dcnamefrompath",
+      "community": 1,
+      "norm_label": "dcnamefrompath()"
+    },
+    {
+      "label": "rootNameForDocument()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L133",
+      "id": "support_rootnamefordocument",
+      "community": 1,
+      "norm_label": "rootnamefordocument()"
+    },
+    {
+      "label": "safeDecode()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L143",
+      "id": "support_safedecode",
+      "community": 1,
+      "norm_label": "safedecode()"
+    },
+    {
+      "label": "boot()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L150",
+      "id": "support_boot",
+      "community": 1,
+      "norm_label": "boot()"
+    },
+    {
+      "label": "resolve()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L205",
+      "id": "support_resolve",
+      "community": 1,
+      "norm_label": "resolve()"
+    },
+    {
+      "label": "parensWrapWhole()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L237",
+      "id": "support_parenswrapwhole",
+      "community": 1,
+      "norm_label": "parenswrapwhole()"
+    },
+    {
+      "label": "findTopLevelEquality()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L248",
+      "id": "support_findtoplevelequality",
+      "community": 1,
+      "norm_label": "findtoplevelequality()"
+    },
+    {
+      "label": "resolvePath()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L263",
+      "id": "support_resolvepath",
+      "community": 1,
+      "norm_label": "resolvepath()"
+    },
+    {
+      "label": "encodeCamelAttrs()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L366",
+      "id": "support_encodecamelattrs",
+      "community": 1,
+      "norm_label": "encodecamelattrs()"
+    },
+    {
+      "label": "encodeCase()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L372",
+      "id": "support_encodecase",
+      "community": 1,
+      "norm_label": "encodecase()"
+    },
+    {
+      "label": "kebabToCamel()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L388",
+      "id": "support_kebabtocamel",
+      "community": 1,
+      "norm_label": "kebabtocamel()"
+    },
+    {
+      "label": "cssToObj()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L391",
+      "id": "support_csstoobj",
+      "community": 1,
+      "norm_label": "csstoobj()"
+    },
+    {
+      "label": "compileAttr()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L401",
+      "id": "support_compileattr",
+      "community": 1,
+      "norm_label": "compileattr()"
+    },
+    {
+      "label": "collectProps()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L415",
+      "id": "support_collectprops",
+      "community": 1,
+      "norm_label": "collectprops()"
+    },
+    {
+      "label": "hostPositionStyle()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L457",
+      "id": "support_hostpositionstyle",
+      "community": 1,
+      "norm_label": "hostpositionstyle()"
+    },
+    {
+      "label": "compileTemplate()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L467",
+      "id": "support_compiletemplate",
+      "community": 1,
+      "norm_label": "compiletemplate()"
+    },
+    {
+      "label": "walkChildren()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L483",
+      "id": "support_walkchildren",
+      "community": 1,
+      "norm_label": "walkchildren()"
+    },
+    {
+      "label": "isDeckMountTag()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L489",
+      "id": "support_isdeckmounttag",
+      "community": 1,
+      "norm_label": "isdeckmounttag()"
+    },
+    {
+      "label": "walkDeckChildren()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L493",
+      "id": "support_walkdeckchildren",
+      "community": 1,
+      "norm_label": "walkdeckchildren()"
+    },
+    {
+      "label": "renderDeckKids()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L543",
+      "id": "support_renderdeckkids",
+      "community": 1,
+      "norm_label": "renderdeckkids()"
+    },
+    {
+      "label": "walk()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L550",
+      "id": "support_walk",
+      "community": 1,
+      "norm_label": "walk()"
+    },
+    {
+      "label": "warnUnresolved()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L563",
+      "id": "support_warnunresolved",
+      "community": 1,
+      "norm_label": "warnunresolved()"
+    },
+    {
+      "label": "walkText()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L569",
+      "id": "support_walktext",
+      "community": 1,
+      "norm_label": "walktext()"
+    },
+    {
+      "label": "walkFor()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L611",
+      "id": "support_walkfor",
+      "community": 1,
+      "norm_label": "walkfor()"
+    },
+    {
+      "label": "walkIf()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L646",
+      "id": "support_walkif",
+      "community": 1,
+      "norm_label": "walkif()"
+    },
+    {
+      "label": "walkComponent()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L661",
+      "id": "support_walkcomponent",
+      "community": 1,
+      "norm_label": "walkcomponent()"
+    },
+    {
+      "label": "walkXImport()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L690",
+      "id": "support_walkximport",
+      "community": 1,
+      "norm_label": "walkximport()"
+    },
+    {
+      "label": "contentKey()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L771",
+      "id": "support_contentkey",
+      "community": 1,
+      "norm_label": "contentkey()"
+    },
+    {
+      "label": "walkElement()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L787",
+      "id": "support_walkelement",
+      "community": 1,
+      "norm_label": "walkelement()"
+    },
+    {
+      "label": "constructor()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L818",
+      "id": "support_constructor",
+      "community": 1,
+      "norm_label": "constructor()"
+    },
+    {
+      "label": "setState()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L825",
+      "id": "support_setstate",
+      "community": 1,
+      "norm_label": "setstate()"
+    },
+    {
+      "label": "forceUpdate()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L828",
+      "id": "support_forceupdate",
+      "community": 1,
+      "norm_label": "forceupdate()"
+    },
+    {
+      "label": "componentDidMount()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L831",
+      "id": "support_componentdidmount",
+      "community": 1,
+      "norm_label": "componentdidmount()"
+    },
+    {
+      "label": "componentDidUpdate()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L833",
+      "id": "support_componentdidupdate",
+      "community": 1,
+      "norm_label": "componentdidupdate()"
+    },
+    {
+      "label": "componentWillUnmount()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L835",
+      "id": "support_componentwillunmount",
+      "community": 1,
+      "norm_label": "componentwillunmount()"
+    },
+    {
+      "label": "renderVals()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L838",
+      "id": "support_rendervals",
+      "community": 1,
+      "norm_label": "rendervals()"
+    },
+    {
+      "label": "evalDcLogic()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L842",
+      "id": "support_evaldclogic",
+      "community": 1,
+      "norm_label": "evaldclogic()"
+    },
+    {
+      "label": "shallowEqual()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L854",
+      "id": "support_shallowequal",
+      "community": 1,
+      "norm_label": "shallowequal()"
+    },
+    {
+      "label": "Placeholder()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L862",
+      "id": "support_placeholder",
+      "community": 1,
+      "norm_label": "placeholder()"
+    },
+    {
+      "label": "hintToMin()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L883",
+      "id": "support_hinttomin",
+      "community": 1,
+      "norm_label": "hinttomin()"
+    },
+    {
+      "label": "createComponentFactory()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L888",
+      "id": "support_createcomponentfactory",
+      "community": 1,
+      "norm_label": "createcomponentfactory()"
+    },
+    {
+      "label": "bundledBlob()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1136",
+      "id": "support_bundledblob",
+      "community": 1,
+      "norm_label": "bundledblob()"
+    },
+    {
+      "label": "cdnScriptFor()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1149",
+      "id": "support_cdnscriptfor",
+      "community": 1,
+      "norm_label": "cdnscriptfor()"
+    },
+    {
+      "label": "isRenderableType()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1157",
+      "id": "support_isrenderabletype",
+      "community": 1,
+      "norm_label": "isrenderabletype()"
+    },
+    {
+      "label": "resolveDottedPath()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1161",
+      "id": "support_resolvedottedpath",
+      "community": 1,
+      "norm_label": "resolvedottedpath()"
+    },
+    {
+      "label": "createExternalModules()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1171",
+      "id": "support_createexternalmodules",
+      "community": 1,
+      "norm_label": "createexternalmodules()"
+    },
+    {
+      "label": "isElementClass()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1348",
+      "id": "support_iselementclass",
+      "community": 1,
+      "norm_label": "iselementclass()"
+    },
+    {
+      "label": "createHelmetManager()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1366",
+      "id": "support_createhelmetmanager",
+      "community": 1,
+      "norm_label": "createhelmetmanager()"
+    },
+    {
+      "label": "scanUnquotedUrl()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1498",
+      "id": "support_scanunquotedurl",
+      "community": 1,
+      "norm_label": "scanunquotedurl()"
+    },
+    {
+      "label": "stripComments()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1511",
+      "id": "support_stripcomments",
+      "community": 1,
+      "norm_label": "stripcomments()"
+    },
+    {
+      "label": "importantify()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1542",
+      "id": "support_importantify",
+      "community": 1,
+      "norm_label": "importantify()"
+    },
+    {
+      "label": "createPseudoSheet()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1567",
+      "id": "support_createpseudosheet",
+      "community": 1,
+      "norm_label": "createpseudosheet()"
+    },
+    {
+      "label": "createRegistry()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1592",
+      "id": "support_createregistry",
+      "community": 1,
+      "norm_label": "createregistry()"
+    },
+    {
+      "label": "createRuntime()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1623",
+      "id": "support_createruntime",
+      "community": 1,
+      "norm_label": "createruntime()"
+    },
+    {
+      "label": "createStreamTracker()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1792",
+      "id": "support_createstreamtracker",
+      "community": 1,
+      "norm_label": "createstreamtracker()"
+    },
+    {
+      "label": "hideRawTemplate()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1818",
+      "id": "support_hiderawtemplate",
+      "community": 1,
+      "norm_label": "hiderawtemplate()"
+    },
+    {
+      "label": "loadScript()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1823",
+      "id": "support_loadscript",
+      "community": 1,
+      "norm_label": "loadscript()"
+    },
+    {
+      "label": "loadReactUmd()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1838",
+      "id": "support_loadreactumd",
+      "community": 1,
+      "norm_label": "loadreactumd()"
+    },
+    {
+      "label": "init()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1848",
+      "id": "support_init",
+      "community": 1,
+      "norm_label": "init()"
+    },
+    {
       "label": "api.test.js",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
@@ -2952,7 +2952,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L170",
       "id": "api_projectaction",
-      "community": 2,
+      "community": 3,
       "norm_label": "projectaction()"
     },
     {
@@ -3114,7 +3114,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_mcp_mcp_test_js",
-      "community": 19,
+      "community": 21,
       "norm_label": "mcp.test.js"
     },
     {
@@ -3123,7 +3123,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L17",
       "id": "mcp_test_withregistry",
-      "community": 19,
+      "community": 21,
       "norm_label": "withregistry()"
     },
     {
@@ -3132,7 +3132,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L22",
       "id": "mcp_test_registerproject",
-      "community": 19,
+      "community": 21,
       "norm_label": "registerproject()"
     },
     {
@@ -3141,7 +3141,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L29",
       "id": "mcp_test_projectdir",
-      "community": 19,
+      "community": 21,
       "norm_label": "projectdir()"
     },
     {
@@ -3150,7 +3150,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L311",
       "id": "mcp_test_parlefil",
-      "community": 19,
+      "community": 21,
       "norm_label": "parlefil()"
     },
     {
@@ -3159,7 +3159,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L320",
       "id": "mcp_test_demande",
-      "community": 19,
+      "community": 21,
       "norm_label": "demande()"
     },
     {
@@ -3456,7 +3456,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_plans_test_js",
-      "community": 2,
+      "community": 3,
       "norm_label": "plans.test.js"
     },
     {
@@ -3465,7 +3465,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.test.js",
       "source_location": "L179",
       "id": "plans_test_p",
-      "community": 2,
+      "community": 3,
       "norm_label": "p()"
     },
     {
@@ -3474,7 +3474,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.test.js",
       "source_location": "L322",
       "id": "plans_test_ovrseewithplans",
-      "community": 2,
+      "community": 3,
       "norm_label": "ovrseewithplans()"
     },
     {
@@ -3483,7 +3483,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.test.js",
       "source_location": "L389",
       "id": "plans_test_planouvertaveccommit",
-      "community": 2,
+      "community": 3,
       "norm_label": "planouvertaveccommit()"
     },
     {
@@ -3492,7 +3492,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.test.js",
       "source_location": "L516",
       "id": "plans_test_withregistry",
-      "community": 2,
+      "community": 3,
       "norm_label": "withregistry()"
     },
     {
@@ -3573,7 +3573,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_timeline_test_js",
-      "community": 15,
+      "community": 16,
       "norm_label": "timeline.test.js"
     },
     {
@@ -3582,7 +3582,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.test.js",
       "source_location": "L6",
       "id": "timeline_test_commit",
-      "community": 15,
+      "community": 16,
       "norm_label": "commit()"
     },
     {
@@ -3591,7 +3591,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.test.js",
       "source_location": "L8",
       "id": "timeline_test_plan",
-      "community": 15,
+      "community": 16,
       "norm_label": "plan()"
     },
     {
@@ -3600,7 +3600,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.test.js",
       "source_location": "L18",
       "id": "timeline_test_ticket",
-      "community": 15,
+      "community": 16,
       "norm_label": "ticket()"
     },
     {
@@ -3672,7 +3672,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/brief.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_brief_js",
-      "community": 18,
+      "community": 19,
       "norm_label": "brief.js"
     },
     {
@@ -3681,7 +3681,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/brief.js",
       "source_location": "L25",
       "id": "brief_openplans",
-      "community": 18,
+      "community": 19,
       "norm_label": "openplans()"
     },
     {
@@ -3690,7 +3690,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/brief.js",
       "source_location": "L30",
       "id": "brief_closedplans",
-      "community": 18,
+      "community": 19,
       "norm_label": "closedplans()"
     },
     {
@@ -3708,7 +3708,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/brief.js",
       "source_location": "L86",
       "id": "brief_frdate",
-      "community": 18,
+      "community": 19,
       "norm_label": "frdate()"
     },
     {
@@ -3717,7 +3717,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/brief.js",
       "source_location": "L92",
       "id": "brief_age",
-      "community": 18,
+      "community": 19,
       "norm_label": "age()"
     },
     {
@@ -3726,7 +3726,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/brief.js",
       "source_location": "L103",
       "id": "brief_intention",
-      "community": 18,
+      "community": 19,
       "norm_label": "intention()"
     },
     {
@@ -3735,7 +3735,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/brief.js",
       "source_location": "L132",
       "id": "brief_buildbrief",
-      "community": 18,
+      "community": 19,
       "norm_label": "buildbrief()"
     },
     {
@@ -3744,7 +3744,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-audit.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_capture_audit_js",
-      "community": 16,
+      "community": 17,
       "norm_label": "ovrsee-capture-audit.js"
     },
     {
@@ -3753,7 +3753,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-audit.js",
       "source_location": "L44",
       "id": "ovrsee_capture_audit_skillfromslashcommand",
-      "community": 16,
+      "community": 17,
       "norm_label": "skillfromslashcommand()"
     },
     {
@@ -3762,7 +3762,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-audit.js",
       "source_location": "L51",
       "id": "ovrsee_capture_audit_readstdin",
-      "community": 16,
+      "community": 17,
       "norm_label": "readstdin()"
     },
     {
@@ -3771,7 +3771,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-audit.js",
       "source_location": "L64",
       "id": "ovrsee_capture_audit_reporoot",
-      "community": 16,
+      "community": 17,
       "norm_label": "reporoot()"
     },
     {
@@ -3780,7 +3780,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-audit.js",
       "source_location": "L81",
       "id": "ovrsee_capture_audit_logaudit",
-      "community": 16,
+      "community": 17,
       "norm_label": "logaudit()"
     },
     {
@@ -3789,7 +3789,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-audit.js",
       "source_location": "L96",
       "id": "ovrsee_capture_audit_pendingauditpath",
-      "community": 16,
+      "community": 17,
       "norm_label": "pendingauditpath()"
     },
     {
@@ -3798,7 +3798,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-audit.js",
       "source_location": "L98",
       "id": "ovrsee_capture_audit_nudge_text",
-      "community": 16,
+      "community": 17,
       "norm_label": "nudge_text()"
     },
     {
@@ -3807,7 +3807,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-audit.js",
       "source_location": "L106",
       "id": "ovrsee_capture_audit_nudge",
-      "community": 16,
+      "community": 17,
       "norm_label": "nudge()"
     },
     {
@@ -3816,7 +3816,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-audit.js",
       "source_location": "L121",
       "id": "ovrsee_capture_audit_main",
-      "community": 16,
+      "community": 17,
       "norm_label": "main()"
     },
     {
@@ -4248,7 +4248,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/brief.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_brief_test_js",
-      "community": 2,
+      "community": 3,
       "norm_label": "brief.test.js"
     },
     {
@@ -4257,7 +4257,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/brief.test.js",
       "source_location": "L13",
       "id": "brief_test_ovrseewith",
-      "community": 2,
+      "community": 3,
       "norm_label": "ovrseewith()"
     },
     {
@@ -4518,7 +4518,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_config_claude_js",
-      "community": 14,
+      "community": 15,
       "norm_label": "config-claude.js"
     },
     {
@@ -4527,7 +4527,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L17",
       "id": "config_claude_configdir",
-      "community": 14,
+      "community": 15,
       "norm_label": "configdir()"
     },
     {
@@ -4536,7 +4536,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L44",
       "id": "config_claude_masksecrets",
-      "community": 14,
+      "community": 15,
       "norm_label": "masksecrets()"
     },
     {
@@ -4545,7 +4545,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L70",
       "id": "config_claude_parsefrontmatter",
-      "community": 14,
+      "community": 15,
       "norm_label": "parsefrontmatter()"
     },
     {
@@ -4554,7 +4554,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L137",
       "id": "config_claude_readagents",
-      "community": 14,
+      "community": 15,
       "norm_label": "readagents()"
     },
     {
@@ -4563,7 +4563,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L172",
       "id": "config_claude_readcommands",
-      "community": 14,
+      "community": 15,
       "norm_label": "readcommands()"
     },
     {
@@ -4572,7 +4572,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L207",
       "id": "config_claude_readplugins",
-      "community": 14,
+      "community": 15,
       "norm_label": "readplugins()"
     },
     {
@@ -4581,7 +4581,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L235",
       "id": "config_claude_readhooks",
-      "community": 14,
+      "community": 15,
       "norm_label": "readhooks()"
     },
     {
@@ -4590,7 +4590,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L258",
       "id": "config_claude_readenv",
-      "community": 14,
+      "community": 15,
       "norm_label": "readenv()"
     },
     {
@@ -4599,7 +4599,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L284",
       "id": "config_claude_readconfigclaude",
-      "community": 14,
+      "community": 15,
       "norm_label": "readconfigclaude()"
     },
     {
@@ -4662,7 +4662,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_capture_plan_js",
-      "community": 2,
+      "community": 3,
       "norm_label": "ovrsee-capture-plan.js"
     },
     {
@@ -4671,7 +4671,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L39",
       "id": "ovrsee_capture_plan_readstdin",
-      "community": 2,
+      "community": 3,
       "norm_label": "readstdin()"
     },
     {
@@ -4680,7 +4680,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L52",
       "id": "ovrsee_capture_plan_reporoot",
-      "community": 2,
+      "community": 3,
       "norm_label": "reporoot()"
     },
     {
@@ -4689,7 +4689,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L70",
       "id": "ovrsee_capture_plan_readornull",
-      "community": 2,
+      "community": 3,
       "norm_label": "readornull()"
     },
     {
@@ -4698,7 +4698,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L94",
       "id": "ovrsee_capture_plan_planfrom",
-      "community": 2,
+      "community": 3,
       "norm_label": "planfrom()"
     },
     {
@@ -4707,7 +4707,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L122",
       "id": "ovrsee_capture_plan_titleof",
-      "community": 2,
+      "community": 3,
       "norm_label": "titleof()"
     },
     {
@@ -4716,7 +4716,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L131",
       "id": "ovrsee_capture_plan_main",
-      "community": 2,
+      "community": 3,
       "norm_label": "main()"
     },
     {
@@ -4725,7 +4725,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_obsidian_js",
-      "community": 2,
+      "community": 3,
       "norm_label": "obsidian.js"
     },
     {
@@ -4734,7 +4734,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L46",
       "id": "obsidian_scalar",
-      "community": 2,
+      "community": 3,
       "norm_label": "scalar()"
     },
     {
@@ -4743,7 +4743,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L53",
       "id": "obsidian_frontmatter",
-      "community": 2,
+      "community": 3,
       "norm_label": "frontmatter()"
     },
     {
@@ -4752,7 +4752,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L73",
       "id": "obsidian_notename",
-      "community": 2,
+      "community": 3,
       "norm_label": "notename()"
     },
     {
@@ -4761,7 +4761,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L75",
       "id": "obsidian_link",
-      "community": 2,
+      "community": 3,
       "norm_label": "link()"
     },
     {
@@ -4770,7 +4770,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L77",
       "id": "obsidian_puces",
-      "community": 2,
+      "community": 3,
       "norm_label": "puces()"
     },
     {
@@ -4779,7 +4779,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L87",
       "id": "obsidian_pagename",
-      "community": 2,
+      "community": 3,
       "norm_label": "pagename()"
     },
     {
@@ -4788,7 +4788,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L111",
       "id": "obsidian_exportvault",
-      "community": 2,
+      "community": 3,
       "norm_label": "exportvault()"
     },
     {
@@ -4797,7 +4797,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L133",
       "id": "obsidian_ecrireplans",
-      "community": 2,
+      "community": 3,
       "norm_label": "ecrireplans()"
     },
     {
@@ -4806,7 +4806,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L165",
       "id": "obsidian_ecriretickets",
-      "community": 2,
+      "community": 3,
       "norm_label": "ecriretickets()"
     },
     {
@@ -4815,7 +4815,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L203",
       "id": "obsidian_ecrirepages",
-      "community": 2,
+      "community": 3,
       "norm_label": "ecrirepages()"
     },
     {
@@ -4824,7 +4824,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L266",
       "id": "obsidian_ecrireindex",
-      "community": 2,
+      "community": 3,
       "norm_label": "ecrireindex()"
     },
     {
@@ -4878,7 +4878,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_install_js",
-      "community": 2,
+      "community": 3,
       "norm_label": "install.js"
     },
     {
@@ -4887,7 +4887,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L56",
       "id": "install_shq",
-      "community": 2,
+      "community": 3,
       "norm_label": "shq()"
     },
     {
@@ -4896,7 +4896,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L67",
       "id": "install_commandfor",
-      "community": 2,
+      "community": 3,
       "norm_label": "commandfor()"
     },
     {
@@ -4905,7 +4905,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L77",
       "id": "install_installpostcommit",
-      "community": 2,
+      "community": 3,
       "norm_label": "installpostcommit()"
     },
     {
@@ -4914,7 +4914,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L112",
       "id": "install_isovrsee",
-      "community": 2,
+      "community": 3,
       "norm_label": "isovrsee()"
     },
     {
@@ -4923,7 +4923,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L114",
       "id": "install_installclaudehooks",
-      "community": 2,
+      "community": 3,
       "norm_label": "installclaudehooks()"
     },
     {
@@ -4932,7 +4932,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L195",
       "id": "install_writeovrseeconfig",
-      "community": 2,
+      "community": 3,
       "norm_label": "writeovrseeconfig()"
     },
     {
@@ -4941,7 +4941,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L233",
       "id": "install_install",
-      "community": 2,
+      "community": 3,
       "norm_label": "install()"
     },
     {
@@ -4995,7 +4995,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L69",
       "id": "snapshot_projects",
-      "community": 2,
+      "community": 3,
       "norm_label": "projects()"
     },
     {
@@ -5121,7 +5121,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_integrations_js",
-      "community": 6,
+      "community": 20,
       "norm_label": "integrations.js"
     },
     {
@@ -5130,7 +5130,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L26",
       "id": "integrations_integrationspath",
-      "community": 6,
+      "community": 20,
       "norm_label": "integrationspath()"
     },
     {
@@ -5139,7 +5139,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L35",
       "id": "integrations_readall",
-      "community": 6,
+      "community": 20,
       "norm_label": "readall()"
     },
     {
@@ -5148,7 +5148,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L53",
       "id": "integrations_isvalidintegration",
-      "community": 6,
+      "community": 20,
       "norm_label": "isvalidintegration()"
     },
     {
@@ -5157,7 +5157,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L70",
       "id": "integrations_validateintegrationlist",
-      "community": 6,
+      "community": 20,
       "norm_label": "validateintegrationlist()"
     },
     {
@@ -5166,7 +5166,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L81",
       "id": "integrations_readintegrations",
-      "community": 6,
+      "community": 20,
       "norm_label": "readintegrations()"
     },
     {
@@ -5175,7 +5175,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L94",
       "id": "integrations_writeintegrations",
-      "community": 6,
+      "community": 20,
       "norm_label": "writeintegrations()"
     },
     {
@@ -5247,7 +5247,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_git_status_js",
-      "community": 20,
+      "community": 6,
       "norm_label": "git-status.js"
     },
     {
@@ -5256,7 +5256,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L16",
       "id": "git_status_git",
-      "community": 20,
+      "community": 6,
       "norm_label": "git()"
     },
     {
@@ -5265,7 +5265,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L29",
       "id": "git_status_dirty",
-      "community": 20,
+      "community": 6,
       "norm_label": "dirty()"
     },
     {
@@ -5274,7 +5274,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L52",
       "id": "git_status_branches",
-      "community": 20,
+      "community": 6,
       "norm_label": "branches()"
     },
     {
@@ -5283,7 +5283,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L70",
       "id": "git_status_lastfetch",
-      "community": 20,
+      "community": 6,
       "norm_label": "lastfetch()"
     },
     {
@@ -5292,7 +5292,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L82",
       "id": "git_status_gitstatus",
-      "community": 20,
+      "community": 6,
       "norm_label": "gitstatus()"
     },
     {
@@ -5301,7 +5301,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/density.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_hooks_density_js",
-      "community": 21,
+      "community": 2,
       "norm_label": "density.js"
     },
     {
@@ -5310,7 +5310,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/density.js",
       "source_location": "L24",
       "id": "density_bucketindex",
-      "community": 21,
+      "community": 2,
       "norm_label": "bucketindex()"
     },
     {
@@ -5319,7 +5319,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/density.js",
       "source_location": "L69",
       "id": "density_granulariteforfenetre",
-      "community": 21,
+      "community": 2,
       "norm_label": "granulariteforfenetre()"
     },
     {
@@ -5328,7 +5328,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/density.js",
       "source_location": "L84",
       "id": "density_bucketcount",
-      "community": 21,
+      "community": 2,
       "norm_label": "bucketcount()"
     },
     {
@@ -5337,7 +5337,7 @@
       "source_file": "/Users/sam/code/cockpit/hooks/density.js",
       "source_location": "L109",
       "id": "density_density",
-      "community": 21,
+      "community": 2,
       "norm_label": "density()"
     },
     {
@@ -5346,7 +5346,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/vault.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_vault_js",
-      "community": 12,
+      "community": 13,
       "norm_label": "vault.js"
     },
     {
@@ -5355,7 +5355,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/vault.js",
       "source_location": "L56",
       "id": "vault_scalar",
-      "community": 12,
+      "community": 13,
       "norm_label": "scalar()"
     },
     {
@@ -5364,7 +5364,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/vault.js",
       "source_location": "L68",
       "id": "vault_inlinelist",
-      "community": 12,
+      "community": 13,
       "norm_label": "inlinelist()"
     },
     {
@@ -5373,7 +5373,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/vault.js",
       "source_location": "L95",
       "id": "vault_parseyaml",
-      "community": 12,
+      "community": 13,
       "norm_label": "parseyaml()"
     },
     {
@@ -5382,7 +5382,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/vault.js",
       "source_location": "L163",
       "id": "vault_frontmatterof",
-      "community": 12,
+      "community": 13,
       "norm_label": "frontmatterof()"
     },
     {
@@ -5391,7 +5391,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/vault.js",
       "source_location": "L188",
       "id": "vault_wikilinks",
-      "community": 12,
+      "community": 13,
       "norm_label": "wikilinks()"
     },
     {
@@ -5400,7 +5400,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/vault.js",
       "source_location": "L209",
       "id": "vault_dateof",
-      "community": 12,
+      "community": 13,
       "norm_label": "dateof()"
     },
     {
@@ -5409,7 +5409,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/vault.js",
       "source_location": "L215",
       "id": "vault_noteid",
-      "community": 12,
+      "community": 13,
       "norm_label": "noteid()"
     },
     {
@@ -5418,7 +5418,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/vault.js",
       "source_location": "L225",
       "id": "vault_notes",
-      "community": 12,
+      "community": 13,
       "norm_label": "notes()"
     },
     {
@@ -5427,7 +5427,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/vault.js",
       "source_location": "L279",
       "id": "vault_resoudre",
-      "community": 12,
+      "community": 13,
       "norm_label": "resoudre()"
     },
     {
@@ -5436,7 +5436,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/vault.js",
       "source_location": "L304",
       "id": "vault_readvault",
-      "community": 12,
+      "community": 13,
       "norm_label": "readvault()"
     },
     {
@@ -5769,7 +5769,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_plans_js",
-      "community": 2,
+      "community": 3,
       "norm_label": "plans.js"
     },
     {
@@ -5787,7 +5787,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L62",
       "id": "plans_serializeplan",
-      "community": 2,
+      "community": 3,
       "norm_label": "serializeplan()"
     },
     {
@@ -5805,7 +5805,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L122",
       "id": "plans_updateplanmeta",
-      "community": 2,
+      "community": 3,
       "norm_label": "updateplanmeta()"
     },
     {
@@ -5814,7 +5814,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L148",
       "id": "plans_plansouverts",
-      "community": 2,
+      "community": 3,
       "norm_label": "plansouverts()"
     },
     {
@@ -5823,7 +5823,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L155",
       "id": "plans_history",
-      "community": 2,
+      "community": 3,
       "norm_label": "history()"
     },
     {
@@ -5841,7 +5841,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L184",
       "id": "plans_planfilename",
-      "community": 2,
+      "community": 3,
       "norm_label": "planfilename()"
     },
     {
@@ -5850,7 +5850,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L200",
       "id": "plans_writefilenofollow",
-      "community": 2,
+      "community": 3,
       "norm_label": "writefilenofollow()"
     },
     {
@@ -5859,7 +5859,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L245",
       "id": "plans_registrypath",
-      "community": 2,
+      "community": 3,
       "norm_label": "registrypath()"
     },
     {
@@ -5868,7 +5868,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L249",
       "id": "plans_readregistry",
-      "community": 2,
+      "community": 3,
       "norm_label": "readregistry()"
     },
     {
@@ -5877,7 +5877,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L260",
       "id": "plans_writeregistry",
-      "community": 2,
+      "community": 3,
       "norm_label": "writeregistry()"
     },
     {
@@ -5886,7 +5886,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L274",
       "id": "plans_registerproject",
-      "community": 2,
+      "community": 3,
       "norm_label": "registerproject()"
     },
     {
@@ -5895,7 +5895,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L289",
       "id": "plans_unregisterproject",
-      "community": 2,
+      "community": 3,
       "norm_label": "unregisterproject()"
     },
     {
@@ -5904,7 +5904,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L308",
       "id": "plans_touchproject",
-      "community": 2,
+      "community": 3,
       "norm_label": "touchproject()"
     },
     {
@@ -5913,7 +5913,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L343",
       "id": "plans_closeopenplans",
-      "community": 2,
+      "community": 3,
       "norm_label": "closeopenplans()"
     },
     {
@@ -5922,7 +5922,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L392",
       "id": "plans_attachcommittoplan",
-      "community": 2,
+      "community": 3,
       "norm_label": "attachcommittoplan()"
     },
     {
@@ -5931,7 +5931,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L410",
       "id": "plans_clearactiveplan",
-      "community": 2,
+      "community": 3,
       "norm_label": "clearactiveplan()"
     },
     {
@@ -5940,7 +5940,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L427",
       "id": "plans_issafeslug",
-      "community": 2,
+      "community": 3,
       "norm_label": "issafeslug()"
     },
     {
@@ -5958,7 +5958,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_obsidian_test_js",
-      "community": 15,
+      "community": 16,
       "norm_label": "obsidian.test.js"
     },
     {
@@ -5967,7 +5967,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L13",
       "id": "obsidian_test_fixture",
-      "community": 15,
+      "community": 16,
       "norm_label": "fixture()"
     },
     {
@@ -5976,7 +5976,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L126",
       "id": "obsidian_test_vault",
-      "community": 15,
+      "community": 16,
       "norm_label": "vault()"
     },
     {
@@ -5985,7 +5985,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L127",
       "id": "obsidian_test_lire",
-      "community": 15,
+      "community": 16,
       "norm_label": "lire()"
     },
     {
@@ -5994,7 +5994,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L130",
       "id": "obsidian_test_frontmatter",
-      "community": 15,
+      "community": 16,
       "norm_label": "frontmatter()"
     },
     {
@@ -6003,7 +6003,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L137",
       "id": "obsidian_test_wikilinks",
-      "community": 15,
+      "community": 16,
       "norm_label": "wikilinks()"
     },
     {
@@ -6318,7 +6318,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_electron_pty_js",
-      "community": 17,
+      "community": 18,
       "norm_label": "pty.js"
     },
     {
@@ -6327,7 +6327,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L44",
       "id": "pty_loginshell",
-      "community": 17,
+      "community": 18,
       "norm_label": "loginshell()"
     },
     {
@@ -6336,7 +6336,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L66",
       "id": "pty_sessionenv",
-      "community": 17,
+      "community": 18,
       "norm_label": "sessionenv()"
     },
     {
@@ -6345,7 +6345,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L97",
       "id": "pty_opensession",
-      "community": 17,
+      "community": 18,
       "norm_label": "opensession()"
     },
     {
@@ -6354,7 +6354,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L148",
       "id": "pty_writeto",
-      "community": 17,
+      "community": 18,
       "norm_label": "writeto()"
     },
     {
@@ -6363,7 +6363,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L153",
       "id": "pty_resize",
-      "community": 17,
+      "community": 18,
       "norm_label": "resize()"
     },
     {
@@ -6372,7 +6372,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L161",
       "id": "pty_closesession",
-      "community": 17,
+      "community": 18,
       "norm_label": "closesession()"
     },
     {
@@ -6381,7 +6381,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L173",
       "id": "pty_closeall",
-      "community": 17,
+      "community": 18,
       "norm_label": "closeall()"
     },
     {
@@ -6423,1470 +6423,6 @@
       "_tgt": "vite_config_ovrseedata",
       "source": "users_sam_code_ovrsee_vite_config_js",
       "target": "vite_config_ovrseedata",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L9",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_getreact",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_getreact",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L14",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_getreactdom",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_getreactdom",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L24",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_parsedcdocument",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_parsedcdocument",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L38",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_parsedctext",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_parsedctext",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L56",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_parsedataprops",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_parsedataprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L75",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_dcnamefrompath",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_dcnamefrompath",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L133",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_rootnamefordocument",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_rootnamefordocument",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L143",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_safedecode",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_safedecode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L150",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_boot",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_boot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L205",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_resolve",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_resolve",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L237",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_parenswrapwhole",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_parenswrapwhole",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L248",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_findtoplevelequality",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_findtoplevelequality",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L263",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_resolvepath",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_resolvepath",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L366",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_encodecamelattrs",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_encodecamelattrs",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L372",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_encodecase",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_encodecase",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L388",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_kebabtocamel",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_kebabtocamel",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L391",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_csstoobj",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_csstoobj",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L401",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_compileattr",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_compileattr",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L415",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_collectprops",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_collectprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L457",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_hostpositionstyle",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_hostpositionstyle",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L467",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_compiletemplate",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_compiletemplate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L483",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_walkchildren",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_walkchildren",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L489",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_isdeckmounttag",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_isdeckmounttag",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L493",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_walkdeckchildren",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_walkdeckchildren",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L543",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_renderdeckkids",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_renderdeckkids",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L550",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_walk",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_walk",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L563",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_warnunresolved",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_warnunresolved",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L569",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_walktext",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_walktext",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L611",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_walkfor",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_walkfor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L646",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_walkif",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_walkif",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L661",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_walkcomponent",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_walkcomponent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L690",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_walkximport",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L771",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_contentkey",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_contentkey",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L787",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_walkelement",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L818",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_constructor",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_constructor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L825",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_setstate",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_setstate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L828",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_forceupdate",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_forceupdate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L831",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_componentdidmount",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_componentdidmount",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L833",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_componentdidupdate",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_componentdidupdate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L835",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_componentwillunmount",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_componentwillunmount",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L838",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_rendervals",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_rendervals",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L842",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_evaldclogic",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_evaldclogic",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L854",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_shallowequal",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_shallowequal",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L862",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_placeholder",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_placeholder",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L883",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_hinttomin",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_hinttomin",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L888",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_createcomponentfactory",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_createcomponentfactory",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1136",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_bundledblob",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_bundledblob",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1149",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_cdnscriptfor",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_cdnscriptfor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1157",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_isrenderabletype",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_isrenderabletype",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1161",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_resolvedottedpath",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_resolvedottedpath",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1171",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_createexternalmodules",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_createexternalmodules",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1348",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_iselementclass",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_iselementclass",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1366",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_createhelmetmanager",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_createhelmetmanager",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1498",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_scanunquotedurl",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_scanunquotedurl",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1511",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_stripcomments",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_stripcomments",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1542",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_importantify",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_importantify",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1567",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_createpseudosheet",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_createpseudosheet",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1592",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_createregistry",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_createregistry",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1623",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_createruntime",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_createruntime",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1792",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_createstreamtracker",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_createstreamtracker",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1818",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_hiderawtemplate",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_hiderawtemplate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1823",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_loadscript",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_loadscript",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1838",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_loadreactumd",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_loadreactumd",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1848",
-      "weight": 1.0,
-      "_src": "users_sam_code_cockpit_support_js",
-      "_tgt": "support_init",
-      "source": "users_sam_code_cockpit_support_js",
-      "target": "support_init",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L153",
-      "weight": 1.0,
-      "_src": "support_boot",
-      "_tgt": "support_getreact",
-      "source": "support_getreact",
-      "target": "support_boot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L850",
-      "weight": 1.0,
-      "_src": "support_evaldclogic",
-      "_tgt": "support_getreact",
-      "source": "support_getreact",
-      "target": "support_evaldclogic",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L889",
-      "weight": 1.0,
-      "_src": "support_createcomponentfactory",
-      "_tgt": "support_getreact",
-      "source": "support_getreact",
-      "target": "support_createcomponentfactory",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L195",
-      "weight": 1.0,
-      "_src": "support_boot",
-      "_tgt": "support_getreactdom",
-      "source": "support_getreactdom",
-      "target": "support_boot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L28",
-      "weight": 1.0,
-      "_src": "support_parsedcdocument",
-      "_tgt": "support_parsedataprops",
-      "source": "support_parsedcdocument",
-      "target": "support_parsedataprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L151",
-      "weight": 1.0,
-      "_src": "support_boot",
-      "_tgt": "support_parsedcdocument",
-      "source": "support_parsedcdocument",
-      "target": "support_boot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L46",
-      "weight": 1.0,
-      "_src": "support_parsedctext",
-      "_tgt": "support_parsedataprops",
-      "source": "support_parsedctext",
-      "target": "support_parsedataprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L141",
-      "weight": 1.0,
-      "_src": "support_rootnamefordocument",
-      "_tgt": "support_dcnamefrompath",
-      "source": "support_dcnamefrompath",
-      "target": "support_rootnamefordocument",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L135",
-      "weight": 1.0,
-      "_src": "support_rootnamefordocument",
-      "_tgt": "support_safedecode",
-      "source": "support_rootnamefordocument",
-      "target": "support_safedecode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L154",
-      "weight": 1.0,
-      "_src": "support_boot",
-      "_tgt": "support_rootnamefordocument",
-      "source": "support_rootnamefordocument",
-      "target": "support_boot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L197",
-      "weight": 1.0,
-      "_src": "support_boot",
-      "_tgt": "make_icon_render",
-      "source": "support_boot",
-      "target": "make_icon_render"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L208",
-      "weight": 1.0,
-      "_src": "support_resolve",
-      "_tgt": "support_parenswrapwhole",
-      "source": "support_resolve",
-      "target": "support_parenswrapwhole",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L211",
-      "weight": 1.0,
-      "_src": "support_resolve",
-      "_tgt": "support_findtoplevelequality",
-      "source": "support_resolve",
-      "target": "support_findtoplevelequality",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L286",
-      "weight": 1.0,
-      "_src": "support_resolvepath",
-      "_tgt": "support_resolve",
-      "source": "support_resolve",
-      "target": "support_resolvepath",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1840",
-      "weight": 1.0,
-      "_src": "support_loadreactumd",
-      "_tgt": "support_resolve",
-      "source": "support_resolve",
-      "target": "support_loadreactumd",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L379",
-      "weight": 1.0,
-      "_src": "support_encodecase",
-      "_tgt": "support_encodecamelattrs",
-      "source": "support_encodecamelattrs",
-      "target": "support_encodecase",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L470",
-      "weight": 1.0,
-      "_src": "support_compiletemplate",
-      "_tgt": "support_encodecase",
-      "source": "support_encodecase",
-      "target": "support_compiletemplate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L397",
-      "weight": 1.0,
-      "_src": "support_csstoobj",
-      "_tgt": "support_kebabtocamel",
-      "source": "support_kebabtocamel",
-      "target": "support_csstoobj",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L423",
-      "weight": 1.0,
-      "_src": "support_collectprops",
-      "_tgt": "support_kebabtocamel",
-      "source": "support_kebabtocamel",
-      "target": "support_collectprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L458",
-      "weight": 1.0,
-      "_src": "support_hostpositionstyle",
-      "_tgt": "support_csstoobj",
-      "source": "support_csstoobj",
-      "target": "support_hostpositionstyle",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L441",
-      "weight": 1.0,
-      "_src": "support_collectprops",
-      "_tgt": "support_compileattr",
-      "source": "support_compileattr",
-      "target": "support_collectprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L612",
-      "weight": 1.0,
-      "_src": "support_walkfor",
-      "_tgt": "support_compileattr",
-      "source": "support_compileattr",
-      "target": "support_walkfor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L647",
-      "weight": 1.0,
-      "_src": "support_walkif",
-      "_tgt": "support_compileattr",
-      "source": "support_compileattr",
-      "target": "support_walkif",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L668",
-      "weight": 1.0,
-      "_src": "support_walkcomponent",
-      "_tgt": "support_compileattr",
-      "source": "support_compileattr",
-      "target": "support_walkcomponent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L691",
-      "weight": 1.0,
-      "_src": "support_walkximport",
-      "_tgt": "support_compileattr",
-      "source": "support_compileattr",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L669",
-      "weight": 1.0,
-      "_src": "support_walkcomponent",
-      "_tgt": "support_collectprops",
-      "source": "support_collectprops",
-      "target": "support_walkcomponent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L706",
-      "weight": 1.0,
-      "_src": "support_walkximport",
-      "_tgt": "support_collectprops",
-      "source": "support_collectprops",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L792",
-      "weight": 1.0,
-      "_src": "support_walkelement",
-      "_tgt": "support_collectprops",
-      "source": "support_collectprops",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L478",
-      "weight": 1.0,
-      "_src": "support_compiletemplate",
-      "_tgt": "support_walkchildren",
-      "source": "support_compiletemplate",
-      "target": "support_walkchildren",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L615",
-      "weight": 1.0,
-      "_src": "support_walkfor",
-      "_tgt": "support_walkchildren",
-      "source": "support_walkchildren",
-      "target": "support_walkfor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L650",
-      "weight": 1.0,
-      "_src": "support_walkif",
-      "_tgt": "support_walkchildren",
-      "source": "support_walkchildren",
-      "target": "support_walkif",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L670",
-      "weight": 1.0,
-      "_src": "support_walkcomponent",
-      "_tgt": "support_walkchildren",
-      "source": "support_walkchildren",
-      "target": "support_walkcomponent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L709",
-      "weight": 1.0,
-      "_src": "support_walkximport",
-      "_tgt": "support_walkchildren",
-      "source": "support_walkchildren",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L794",
-      "weight": 1.0,
-      "_src": "support_walkelement",
-      "_tgt": "support_walkchildren",
-      "source": "support_walkchildren",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L708",
-      "weight": 1.0,
-      "_src": "support_walkximport",
-      "_tgt": "support_isdeckmounttag",
-      "source": "support_isdeckmounttag",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L793",
-      "weight": 1.0,
-      "_src": "support_walkelement",
-      "_tgt": "support_isdeckmounttag",
-      "source": "support_isdeckmounttag",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L708",
-      "weight": 1.0,
-      "_src": "support_walkximport",
-      "_tgt": "support_walkdeckchildren",
-      "source": "support_walkdeckchildren",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L793",
-      "weight": 1.0,
-      "_src": "support_walkelement",
-      "_tgt": "support_walkdeckchildren",
-      "source": "support_walkdeckchildren",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L551",
-      "weight": 1.0,
-      "_src": "support_walk",
-      "_tgt": "support_walktext",
-      "source": "support_walk",
-      "target": "support_walktext",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L555",
-      "weight": 1.0,
-      "_src": "support_walk",
-      "_tgt": "support_walkfor",
-      "source": "support_walk",
-      "target": "support_walkfor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L556",
-      "weight": 1.0,
-      "_src": "support_walk",
-      "_tgt": "support_walkif",
-      "source": "support_walk",
-      "target": "support_walkif",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L557",
-      "weight": 1.0,
-      "_src": "support_walk",
-      "_tgt": "support_walkximport",
-      "source": "support_walk",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L559",
-      "weight": 1.0,
-      "_src": "support_walk",
-      "_tgt": "support_walkcomponent",
-      "source": "support_walk",
-      "target": "support_walkcomponent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L560",
-      "weight": 1.0,
-      "_src": "support_walk",
-      "_tgt": "support_walkelement",
-      "source": "support_walk",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L791",
-      "weight": 1.0,
-      "_src": "support_walkelement",
-      "_tgt": "support_contentkey",
-      "source": "support_contentkey",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1631",
-      "weight": 1.0,
-      "_src": "support_createruntime",
-      "_tgt": "support_createcomponentfactory",
-      "source": "support_createcomponentfactory",
-      "target": "support_createruntime",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1841",
-      "weight": 1.0,
-      "_src": "support_loadreactumd",
-      "_tgt": "support_cdnscriptfor",
-      "source": "support_cdnscriptfor",
-      "target": "support_loadreactumd",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1158",
-      "weight": 1.0,
-      "_src": "support_isrenderabletype",
-      "_tgt": "support_iselementclass",
-      "source": "support_isrenderabletype",
-      "target": "support_iselementclass",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1630",
-      "weight": 1.0,
-      "_src": "support_createruntime",
-      "_tgt": "support_createexternalmodules",
-      "source": "support_createexternalmodules",
-      "target": "support_createruntime",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1626",
-      "weight": 1.0,
-      "_src": "support_createruntime",
-      "_tgt": "support_createhelmetmanager",
-      "source": "support_createhelmetmanager",
-      "target": "support_createruntime",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1532",
-      "weight": 1.0,
-      "_src": "support_stripcomments",
-      "_tgt": "support_scanunquotedurl",
-      "source": "support_scanunquotedurl",
-      "target": "support_stripcomments",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1560",
-      "weight": 1.0,
-      "_src": "support_importantify",
-      "_tgt": "support_scanunquotedurl",
-      "source": "support_scanunquotedurl",
-      "target": "support_importantify",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1543",
-      "weight": 1.0,
-      "_src": "support_importantify",
-      "_tgt": "support_stripcomments",
-      "source": "support_stripcomments",
-      "target": "support_importantify",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1625",
-      "weight": 1.0,
-      "_src": "support_createruntime",
-      "_tgt": "support_createpseudosheet",
-      "source": "support_createpseudosheet",
-      "target": "support_createruntime",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1624",
-      "weight": 1.0,
-      "_src": "support_createruntime",
-      "_tgt": "support_createregistry",
-      "source": "support_createregistry",
-      "target": "support_createruntime",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1849",
-      "weight": 1.0,
-      "_src": "support_init",
-      "_tgt": "support_createruntime",
-      "source": "support_createruntime",
-      "target": "support_init",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1870",
-      "weight": 1.0,
-      "_src": "support_init",
-      "_tgt": "support_createstreamtracker",
-      "source": "support_createstreamtracker",
-      "target": "support_init",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/cockpit/support.js",
-      "source_location": "L1844",
-      "weight": 1.0,
-      "_src": "support_loadreactumd",
-      "_tgt": "support_loadscript",
-      "source": "support_loadscript",
-      "target": "support_loadreactumd",
       "confidence_score": 1.0
     },
     {
@@ -11775,6 +10311,1470 @@
       "_tgt": "deploiements_bridge",
       "source": "users_sam_code_ovrsee_app_src_tabs_deploiements_tsx",
       "target": "deploiements_bridge",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_getreact",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_getreact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_getreactdom",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_getreactdom",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_parsedcdocument",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_parsedcdocument",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_parsedctext",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_parsedctext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_parsedataprops",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_parsedataprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L75",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_dcnamefrompath",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_dcnamefrompath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L133",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_rootnamefordocument",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_rootnamefordocument",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L143",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_safedecode",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_safedecode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L150",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_boot",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_boot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L205",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_resolve",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_resolve",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L237",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_parenswrapwhole",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_parenswrapwhole",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L248",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_findtoplevelequality",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_findtoplevelequality",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L263",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_resolvepath",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_resolvepath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L366",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_encodecamelattrs",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_encodecamelattrs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L372",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_encodecase",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_encodecase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L388",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_kebabtocamel",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_kebabtocamel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L391",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_csstoobj",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_csstoobj",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L401",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_compileattr",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_compileattr",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L415",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_collectprops",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_collectprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L457",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_hostpositionstyle",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_hostpositionstyle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L467",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_compiletemplate",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_compiletemplate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L483",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_walkchildren",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_walkchildren",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L489",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_isdeckmounttag",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_isdeckmounttag",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L493",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_walkdeckchildren",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_walkdeckchildren",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L543",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_renderdeckkids",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_renderdeckkids",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L550",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_walk",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_walk",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L563",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_warnunresolved",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_warnunresolved",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L569",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_walktext",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_walktext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L611",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_walkfor",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_walkfor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L646",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_walkif",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_walkif",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L661",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_walkcomponent",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_walkcomponent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L690",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_walkximport",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_walkximport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L771",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_contentkey",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_contentkey",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L787",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_walkelement",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_walkelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L818",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_constructor",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_constructor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L825",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_setstate",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_setstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L828",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_forceupdate",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_forceupdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L831",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_componentdidmount",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_componentdidmount",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L833",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_componentdidupdate",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_componentdidupdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L835",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_componentwillunmount",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_componentwillunmount",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L838",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_rendervals",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_rendervals",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L842",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_evaldclogic",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_evaldclogic",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L854",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_shallowequal",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_shallowequal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L862",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_placeholder",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_placeholder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L883",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_hinttomin",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_hinttomin",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L888",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_createcomponentfactory",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_createcomponentfactory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1136",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_bundledblob",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_bundledblob",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1149",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_cdnscriptfor",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_cdnscriptfor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1157",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_isrenderabletype",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_isrenderabletype",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1161",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_resolvedottedpath",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_resolvedottedpath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1171",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_createexternalmodules",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_createexternalmodules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1348",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_iselementclass",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_iselementclass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1366",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_createhelmetmanager",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_createhelmetmanager",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1498",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_scanunquotedurl",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_scanunquotedurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1511",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_stripcomments",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_stripcomments",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1542",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_importantify",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_importantify",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1567",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_createpseudosheet",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_createpseudosheet",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1592",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_createregistry",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_createregistry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1623",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_createruntime",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_createruntime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1792",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_createstreamtracker",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_createstreamtracker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1818",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_hiderawtemplate",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_hiderawtemplate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1823",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_loadscript",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_loadscript",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1838",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_loadreactumd",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_loadreactumd",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1848",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_legacy_support_js",
+      "_tgt": "support_init",
+      "source": "users_sam_code_ovrsee_legacy_support_js",
+      "target": "support_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L153",
+      "weight": 1.0,
+      "_src": "support_boot",
+      "_tgt": "support_getreact",
+      "source": "support_getreact",
+      "target": "support_boot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L850",
+      "weight": 1.0,
+      "_src": "support_evaldclogic",
+      "_tgt": "support_getreact",
+      "source": "support_getreact",
+      "target": "support_evaldclogic",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L889",
+      "weight": 1.0,
+      "_src": "support_createcomponentfactory",
+      "_tgt": "support_getreact",
+      "source": "support_getreact",
+      "target": "support_createcomponentfactory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L195",
+      "weight": 1.0,
+      "_src": "support_boot",
+      "_tgt": "support_getreactdom",
+      "source": "support_getreactdom",
+      "target": "support_boot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_src": "support_parsedcdocument",
+      "_tgt": "support_parsedataprops",
+      "source": "support_parsedcdocument",
+      "target": "support_parsedataprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L151",
+      "weight": 1.0,
+      "_src": "support_boot",
+      "_tgt": "support_parsedcdocument",
+      "source": "support_parsedcdocument",
+      "target": "support_boot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_src": "support_parsedctext",
+      "_tgt": "support_parsedataprops",
+      "source": "support_parsedctext",
+      "target": "support_parsedataprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L141",
+      "weight": 1.0,
+      "_src": "support_rootnamefordocument",
+      "_tgt": "support_dcnamefrompath",
+      "source": "support_dcnamefrompath",
+      "target": "support_rootnamefordocument",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L135",
+      "weight": 1.0,
+      "_src": "support_rootnamefordocument",
+      "_tgt": "support_safedecode",
+      "source": "support_rootnamefordocument",
+      "target": "support_safedecode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L154",
+      "weight": 1.0,
+      "_src": "support_boot",
+      "_tgt": "support_rootnamefordocument",
+      "source": "support_rootnamefordocument",
+      "target": "support_boot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/cockpit/support.js",
+      "source_location": "L197",
+      "weight": 1.0,
+      "_src": "support_boot",
+      "_tgt": "make_icon_render",
+      "source": "support_boot",
+      "target": "make_icon_render"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L208",
+      "weight": 1.0,
+      "_src": "support_resolve",
+      "_tgt": "support_parenswrapwhole",
+      "source": "support_resolve",
+      "target": "support_parenswrapwhole",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L211",
+      "weight": 1.0,
+      "_src": "support_resolve",
+      "_tgt": "support_findtoplevelequality",
+      "source": "support_resolve",
+      "target": "support_findtoplevelequality",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L286",
+      "weight": 1.0,
+      "_src": "support_resolvepath",
+      "_tgt": "support_resolve",
+      "source": "support_resolve",
+      "target": "support_resolvepath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1840",
+      "weight": 1.0,
+      "_src": "support_loadreactumd",
+      "_tgt": "support_resolve",
+      "source": "support_resolve",
+      "target": "support_loadreactumd",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L379",
+      "weight": 1.0,
+      "_src": "support_encodecase",
+      "_tgt": "support_encodecamelattrs",
+      "source": "support_encodecamelattrs",
+      "target": "support_encodecase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L470",
+      "weight": 1.0,
+      "_src": "support_compiletemplate",
+      "_tgt": "support_encodecase",
+      "source": "support_encodecase",
+      "target": "support_compiletemplate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L397",
+      "weight": 1.0,
+      "_src": "support_csstoobj",
+      "_tgt": "support_kebabtocamel",
+      "source": "support_kebabtocamel",
+      "target": "support_csstoobj",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L423",
+      "weight": 1.0,
+      "_src": "support_collectprops",
+      "_tgt": "support_kebabtocamel",
+      "source": "support_kebabtocamel",
+      "target": "support_collectprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L458",
+      "weight": 1.0,
+      "_src": "support_hostpositionstyle",
+      "_tgt": "support_csstoobj",
+      "source": "support_csstoobj",
+      "target": "support_hostpositionstyle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L441",
+      "weight": 1.0,
+      "_src": "support_collectprops",
+      "_tgt": "support_compileattr",
+      "source": "support_compileattr",
+      "target": "support_collectprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L612",
+      "weight": 1.0,
+      "_src": "support_walkfor",
+      "_tgt": "support_compileattr",
+      "source": "support_compileattr",
+      "target": "support_walkfor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L647",
+      "weight": 1.0,
+      "_src": "support_walkif",
+      "_tgt": "support_compileattr",
+      "source": "support_compileattr",
+      "target": "support_walkif",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L668",
+      "weight": 1.0,
+      "_src": "support_walkcomponent",
+      "_tgt": "support_compileattr",
+      "source": "support_compileattr",
+      "target": "support_walkcomponent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L691",
+      "weight": 1.0,
+      "_src": "support_walkximport",
+      "_tgt": "support_compileattr",
+      "source": "support_compileattr",
+      "target": "support_walkximport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L669",
+      "weight": 1.0,
+      "_src": "support_walkcomponent",
+      "_tgt": "support_collectprops",
+      "source": "support_collectprops",
+      "target": "support_walkcomponent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L706",
+      "weight": 1.0,
+      "_src": "support_walkximport",
+      "_tgt": "support_collectprops",
+      "source": "support_collectprops",
+      "target": "support_walkximport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L792",
+      "weight": 1.0,
+      "_src": "support_walkelement",
+      "_tgt": "support_collectprops",
+      "source": "support_collectprops",
+      "target": "support_walkelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L478",
+      "weight": 1.0,
+      "_src": "support_compiletemplate",
+      "_tgt": "support_walkchildren",
+      "source": "support_compiletemplate",
+      "target": "support_walkchildren",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L615",
+      "weight": 1.0,
+      "_src": "support_walkfor",
+      "_tgt": "support_walkchildren",
+      "source": "support_walkchildren",
+      "target": "support_walkfor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L650",
+      "weight": 1.0,
+      "_src": "support_walkif",
+      "_tgt": "support_walkchildren",
+      "source": "support_walkchildren",
+      "target": "support_walkif",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L670",
+      "weight": 1.0,
+      "_src": "support_walkcomponent",
+      "_tgt": "support_walkchildren",
+      "source": "support_walkchildren",
+      "target": "support_walkcomponent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L709",
+      "weight": 1.0,
+      "_src": "support_walkximport",
+      "_tgt": "support_walkchildren",
+      "source": "support_walkchildren",
+      "target": "support_walkximport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L794",
+      "weight": 1.0,
+      "_src": "support_walkelement",
+      "_tgt": "support_walkchildren",
+      "source": "support_walkchildren",
+      "target": "support_walkelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L708",
+      "weight": 1.0,
+      "_src": "support_walkximport",
+      "_tgt": "support_isdeckmounttag",
+      "source": "support_isdeckmounttag",
+      "target": "support_walkximport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L793",
+      "weight": 1.0,
+      "_src": "support_walkelement",
+      "_tgt": "support_isdeckmounttag",
+      "source": "support_isdeckmounttag",
+      "target": "support_walkelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L708",
+      "weight": 1.0,
+      "_src": "support_walkximport",
+      "_tgt": "support_walkdeckchildren",
+      "source": "support_walkdeckchildren",
+      "target": "support_walkximport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L793",
+      "weight": 1.0,
+      "_src": "support_walkelement",
+      "_tgt": "support_walkdeckchildren",
+      "source": "support_walkdeckchildren",
+      "target": "support_walkelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L551",
+      "weight": 1.0,
+      "_src": "support_walk",
+      "_tgt": "support_walktext",
+      "source": "support_walk",
+      "target": "support_walktext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L555",
+      "weight": 1.0,
+      "_src": "support_walk",
+      "_tgt": "support_walkfor",
+      "source": "support_walk",
+      "target": "support_walkfor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L556",
+      "weight": 1.0,
+      "_src": "support_walk",
+      "_tgt": "support_walkif",
+      "source": "support_walk",
+      "target": "support_walkif",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L557",
+      "weight": 1.0,
+      "_src": "support_walk",
+      "_tgt": "support_walkximport",
+      "source": "support_walk",
+      "target": "support_walkximport",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L559",
+      "weight": 1.0,
+      "_src": "support_walk",
+      "_tgt": "support_walkcomponent",
+      "source": "support_walk",
+      "target": "support_walkcomponent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L560",
+      "weight": 1.0,
+      "_src": "support_walk",
+      "_tgt": "support_walkelement",
+      "source": "support_walk",
+      "target": "support_walkelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L791",
+      "weight": 1.0,
+      "_src": "support_walkelement",
+      "_tgt": "support_contentkey",
+      "source": "support_contentkey",
+      "target": "support_walkelement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1631",
+      "weight": 1.0,
+      "_src": "support_createruntime",
+      "_tgt": "support_createcomponentfactory",
+      "source": "support_createcomponentfactory",
+      "target": "support_createruntime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1841",
+      "weight": 1.0,
+      "_src": "support_loadreactumd",
+      "_tgt": "support_cdnscriptfor",
+      "source": "support_cdnscriptfor",
+      "target": "support_loadreactumd",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1158",
+      "weight": 1.0,
+      "_src": "support_isrenderabletype",
+      "_tgt": "support_iselementclass",
+      "source": "support_isrenderabletype",
+      "target": "support_iselementclass",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1630",
+      "weight": 1.0,
+      "_src": "support_createruntime",
+      "_tgt": "support_createexternalmodules",
+      "source": "support_createexternalmodules",
+      "target": "support_createruntime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1626",
+      "weight": 1.0,
+      "_src": "support_createruntime",
+      "_tgt": "support_createhelmetmanager",
+      "source": "support_createhelmetmanager",
+      "target": "support_createruntime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1532",
+      "weight": 1.0,
+      "_src": "support_stripcomments",
+      "_tgt": "support_scanunquotedurl",
+      "source": "support_scanunquotedurl",
+      "target": "support_stripcomments",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1560",
+      "weight": 1.0,
+      "_src": "support_importantify",
+      "_tgt": "support_scanunquotedurl",
+      "source": "support_scanunquotedurl",
+      "target": "support_importantify",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1543",
+      "weight": 1.0,
+      "_src": "support_importantify",
+      "_tgt": "support_stripcomments",
+      "source": "support_stripcomments",
+      "target": "support_importantify",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1625",
+      "weight": 1.0,
+      "_src": "support_createruntime",
+      "_tgt": "support_createpseudosheet",
+      "source": "support_createpseudosheet",
+      "target": "support_createruntime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1624",
+      "weight": 1.0,
+      "_src": "support_createruntime",
+      "_tgt": "support_createregistry",
+      "source": "support_createregistry",
+      "target": "support_createruntime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1849",
+      "weight": 1.0,
+      "_src": "support_init",
+      "_tgt": "support_createruntime",
+      "source": "support_createruntime",
+      "target": "support_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1870",
+      "weight": 1.0,
+      "_src": "support_init",
+      "_tgt": "support_createstreamtracker",
+      "source": "support_createstreamtracker",
+      "target": "support_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
+      "source_location": "L1844",
+      "weight": 1.0,
+      "_src": "support_loadreactumd",
+      "_tgt": "support_loadscript",
+      "source": "support_loadscript",
+      "target": "support_loadreactumd",
       "confidence_score": 1.0
     },
     {

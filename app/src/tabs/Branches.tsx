@@ -67,7 +67,7 @@ export function Branches({
           <tbody>
             {gitStatus.branches.map(branche => (
               <tr key={branche.name}>
-                <td style={s('padding: 4px 10px 4px 0; font-family: ui-monospace, monospace;')}>
+                <td style={s('padding: 4px 10px 4px 0; font-family: var(--font-mono);')}>
                   {branche.name === gitStatus.branch ? <strong>{branche.name}</strong> : branche.name}
                 </td>
                 <td style={s('padding: 4px 10px; color: var(--color-neutral-500);')}>

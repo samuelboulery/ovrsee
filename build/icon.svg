@@ -1,29 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <defs>
     <linearGradient id="fond" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1e2033"/>
-      <stop offset="100%" stop-color="#161826"/>
+      <stop offset="0%" stop-color="#101114"/>
+      <stop offset="100%" stop-color="#08090a"/>
     </linearGradient>
-    <filter id="lueur" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="26" result="flou"/>
-      <feMerge><feMergeNode in="flou"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
   </defs>
 
   <rect width="1024" height="1024" rx="228" fill="url(#fond)"/>
   <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none"
-        stroke="#2f3350" stroke-width="12"/>
+        stroke="#1c1d24" stroke-width="12"/>
 
-  <!-- Le groupe est descendu de 66 : sans cela le dessin flotte dans le haut
-       du cadre. Une icône macOS se cale optiquement, pas géométriquement. -->
-  <g transform="translate(0 66)">
-    <g stroke="#6b62a8" stroke-width="26" stroke-linecap="round" fill="none">
-      <path d="M 512 358 V 448 H 350 V 536"/>
-      <path d="M 512 358 V 448 H 674 V 536"/>
-    </g>
-
-    <circle cx="512" cy="300" r="92" fill="#9184d9" filter="url(#lueur)"/>
-    <circle cx="350" cy="606" r="74" fill="#4c5397"/>
-    <circle cx="674" cy="606" r="74" fill="#4c5397"/>
+  <g>
+    <rect x="350" y="233" width="90" height="90" fill="#495969"/>
+    <rect x="467" y="233" width="90" height="90" fill="#495969"/>
+    <rect x="584" y="233" width="90" height="90" fill="#495969"/>
+    <rect x="233" y="350" width="90" height="90" fill="#8799ab"/>
+    <rect x="701" y="350" width="90" height="90" fill="#8799ab"/>
+    <rect x="116" y="467" width="90" height="90" fill="#8799ab"/>
+    <rect x="350" y="467" width="90" height="90" fill="#7d76f0"/>
+    <rect x="467" y="467" width="90" height="90" fill="#7d76f0"/>
+    <rect x="584" y="467" width="90" height="90" fill="#7d76f0"/>
+    <rect x="818" y="467" width="90" height="90" fill="#8799ab"/>
+    <rect x="233" y="584" width="90" height="90" fill="#8799ab"/>
+    <rect x="701" y="584" width="90" height="90" fill="#8799ab"/>
+    <rect x="350" y="701" width="90" height="90" fill="#495969"/>
+    <rect x="467" y="701" width="90" height="90" fill="#495969"/>
+    <rect x="584" y="701" width="90" height="90" fill="#495969"/>
   </g>
 </svg>

@@ -183,7 +183,7 @@ function CommitRow({ commit }: { commit: GitCommit }) {
   return (
     <div style={s('display: flex; align-items: baseline; gap: 10px; padding: 4px 0;')}>
       <span style={s('width: 5px; height: 5px; border-radius: 50%; background: var(--color-neutral-600); flex: none; align-self: center;')} />
-      <span style={s('font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-accent); flex: none;')}>
+      <span style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-accent); flex: none;')}>
         {commit.sha}
       </span>
       <span style={s('font-size: 12.5px; color: var(--color-neutral-300); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>
@@ -215,7 +215,7 @@ function TicketCard({ ticket, onOuvrir }: { ticket: Ticket; onOuvrir: (file: str
         style={s(`width: 7px; height: 7px; border-radius: 50%; flex: none; background: ${COULEUR_PRIORITE[ticket.priorite] ?? COULEUR_PRIORITE.moyenne};`)}
         title={`${t('tableau.priority_label')} ${ticket.priorite}`}
       />
-      <span style={s('font-family: ui-monospace, monospace; font-size: 10.5px; color: var(--color-accent); flex: none;')}>
+      <span style={s('font-family: var(--font-mono); font-size: 10.5px; color: var(--color-accent); flex: none;')}>
         {ticket.id}
       </span>
       <span style={s('font-size: 12.5px; color: var(--color-neutral-300); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>
@@ -329,7 +329,7 @@ function PlanDetail({ plan }: { plan: Plan }) {
         {planFiles(plan).map(file => (
           <span
             key={file}
-            style={s('font-family: ui-monospace, monospace; font-size: 10.5px; color: var(--color-neutral-500); border: 1px solid var(--color-neutral-800); border-radius: 4px; padding: 3px 7px;')}
+            style={s('font-family: var(--font-mono); font-size: 10.5px; color: var(--color-neutral-500); border: 1px solid var(--color-neutral-800); border-radius: 4px; padding: 3px 7px;')}
           >
             {file}
           </span>

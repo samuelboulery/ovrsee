@@ -186,7 +186,7 @@ export function Apercu({
             </h2>
             <div
               style={s(
-                'font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-neutral-600);',
+                'font-family: var(--font-mono); font-size: 11px; color: var(--color-neutral-600);',
               )}
             >
               {root}
@@ -464,7 +464,7 @@ function Lancement({ packageJson }: { packageJson: Snapshot['packageJson'] }) {
             key={script}
             title={packageJson?.scripts?.[script]}
             style={s(
-              'font-family: ui-monospace, monospace; font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--color-neutral-800); color: var(--color-neutral-400); user-select: all;',
+              'font-family: var(--font-mono); font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--color-neutral-800); color: var(--color-neutral-400); user-select: all;',
             )}
           >
             pnpm {script}

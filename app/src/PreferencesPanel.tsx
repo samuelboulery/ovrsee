@@ -26,6 +26,7 @@ import { SectionProfils } from './PreferencesProfils'
 import { SectionProjet } from './PreferencesProjet'
 import { s } from './style'
 import { applyTheme } from './theme'
+import { TAB_ICONS, type TabId } from './views'
 
 /**
  * L'écran des préférences.
@@ -358,6 +359,16 @@ export function SectionInterface({ settings, onSettings }: SectionProps) {
               >
                 <IconGrip />
               </span>
+              {(() => {
+                const Icon = TAB_ICONS[id as TabId] ?? TAB_ICONS.apercu
+                return (
+                  <Icon
+                    size={14}
+                    aria-hidden="true"
+                    color={actif ? 'var(--color-text-tertiary)' : 'var(--color-neutral-600)'}
+                  />
+                )
+              })()}
               <span
                 style={s(
                   'flex: 1; min-width: 0; font-size: 13px;' +
@@ -623,10 +634,14 @@ export function PreferencesModal({
               aria-current={section === item.id ? 'page' : undefined}
               onClick={() => setSection(item.id)}
               style={s(
-                'display: block; width: 100%; text-align: left; padding: 7px 10px; margin-top: 2px; border: 0; border-radius: 6px; cursor: pointer; font-family: var(--font-body); font-size: 13px;' +
+                'display: block; width: 100%; text-align: left; padding: 7px 10px; margin-top: 2px; border: 0; border-radius: var(--radius-sm); cursor: pointer; font-family: var(--font-body); font-size: 13px;' +
+                  // `--color-surface-active`, pas `--color-neutral-900` : ce
+                  // dernier s'inverse en clair (T-0045) et devient la teinte
+                  // la plus claire de la rampe — une surface « sélectionnée »
+                  // presque invisible sur le fond clair de ce panneau.
                   (section === item.id
-                    ? ' background: var(--color-neutral-900); color: var(--color-text);'
-                    : ' background: transparent; color: var(--color-neutral-500);'),
+                    ? ' background: var(--color-surface-active); color: var(--color-text);'
+                    : ' background: transparent; color: var(--color-text-tertiary);'),
               )}
             >
               {t(item.cle)}

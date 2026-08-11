@@ -210,7 +210,7 @@ const translations = {
     'onboard.loop_caption': 'La boucle tourne seule : rien à saisir à la main.',
     'onboard.prerequisites_note':
       'claude est l\'agent Claude en ligne de commande. Rien ne les installe à votre place — l\'ovrsee vérifie, il ne décide pas.',
-    'onboard.you_title': 'Vous et Claude Code',
+    'onboard.you_title': 'Composition et vues',
     'onboard.you_desc':
       'Deux questions, et l\'interface se règle en conséquence. Tout reste modifiable ensuite dans les Préférences.',
     'onboard.usage_question': 'Comment lancez-vous Claude Code ?',
@@ -227,7 +227,7 @@ const translations = {
     'onboard.effect_terminal_side': 'Terminal ouvert, à droite.',
     'onboard.effect_terminal_bottom': 'Terminal ouvert, en bas.',
     'onboard.effect_terminal_hidden': 'Terminal masqué.',
-    'onboard.settings_title': 'Réglages et premier projet',
+    'onboard.settings_title': 'Le premier dépôt',
     'onboard.settings_desc': 'Les trois réglages qui se voient tout de suite.',
     'onboard.bootstrap_label': 'Proposer /project-setup',
     'onboard.bootstrap_hint':
@@ -698,7 +698,16 @@ const translations = {
     'scan.last': 'dernier scan',
     'scan.failed': 'scan échoué',
     'sidebar.projects': 'Projets',
-    'sidebar.toggle': 'Afficher ou masquer les projets',
+    'sidebar.views': 'Vues',
+    'sidebar.toggle': 'Réduire ou déployer la barre latérale',
+    // Palette ⌘K
+    'palette.placeholder': 'Rechercher, aller à…',
+    'palette.tickets': 'Tickets',
+    'palette.commands': 'Commandes',
+    'palette.no_results': 'Aucun résultat',
+    'palette.hint_navigate': 'naviguer',
+    'palette.hint_open': 'ouvrir',
+    'palette.hint_close': 'fermer',
     'action.crawl': 'Crawler le projet',
     'action.graph': 'Graphe complet',
     'action.graph_obsidian': 'Graphe → coffre Obsidian',
@@ -891,7 +900,7 @@ const translations = {
     'onboard.loop_caption': 'The loop runs on its own: nothing to fill in by hand.',
     'onboard.prerequisites_note':
       'claude is the Claude command-line agent. Nothing installs them for you — Ovrsee checks, it does not decide.',
-    'onboard.you_title': 'You and Claude Code',
+    'onboard.you_title': 'Composition and views',
     'onboard.you_desc':
       'Two questions, and the interface follows. Everything stays editable later in Preferences.',
     'onboard.usage_question': 'How do you run Claude Code?',
@@ -908,7 +917,7 @@ const translations = {
     'onboard.effect_terminal_side': 'Terminal open, on the right.',
     'onboard.effect_terminal_bottom': 'Terminal open, at the bottom.',
     'onboard.effect_terminal_hidden': 'Terminal hidden.',
-    'onboard.settings_title': 'Settings and first project',
+    'onboard.settings_title': 'The first repository',
     'onboard.settings_desc': 'The three settings you notice right away.',
     'onboard.bootstrap_label': 'Offer /project-setup',
     'onboard.bootstrap_hint':
@@ -1379,7 +1388,16 @@ const translations = {
     'scan.last': 'last scan',
     'scan.failed': 'scan failed',
     'sidebar.projects': 'Projects',
-    'sidebar.toggle': 'Show or hide projects',
+    'sidebar.views': 'Views',
+    'sidebar.toggle': 'Collapse or expand the sidebar',
+    // Command palette
+    'palette.placeholder': 'Search, jump to…',
+    'palette.tickets': 'Tickets',
+    'palette.commands': 'Commands',
+    'palette.no_results': 'No results',
+    'palette.hint_navigate': 'navigate',
+    'palette.hint_open': 'open',
+    'palette.hint_close': 'close',
     'action.crawl': 'Crawl the project',
     'action.graph': 'Full graph',
     'action.graph_obsidian': 'Graph → Obsidian vault',

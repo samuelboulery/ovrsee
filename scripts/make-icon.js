@@ -4,9 +4,11 @@
  *
  *   node scripts/make-icon.js
  *
- * L'icône est le graphe de navigation lui-même : trois nœuds reliés en
- * descente, celui d'entrée en accent — ce que montre l'onglet Produit, dans le
- * sens vertical qu'il a adopté.
+ * L'icône est la marque de l'ovrsee : un œil en grille de pixels 7×5
+ * (maquette 2a, refonte T-0050) — mêmes coordonnées que `Logo` dans
+ * `app/src/OnboardingArt.tsx`, en hex littéral parce qu'un SVG rendu hors
+ * navigateur n'a pas de variables CSS à résoudre. Les deux formes sont à
+ * garder d'accord — voir le WHY de ce fichier-là.
  *
  * Le dessin vit dans ce fichier plutôt que comme binaire opaque dans le dépôt :
  * on peut le relire, le corriger, et le régénérer. Playwright fait le rendu —
@@ -25,47 +27,61 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const BUILD = join(ROOT, 'build')
 const ICONSET = join(BUILD, 'icon.iconset')
 
-// Palette Nocturne, reprise du design system.
-const GROUND = '#161826'
-const ACCENT = '#9184d9'
-const MUTED = '#4c5397'
-const EDGE = '#6b62a8'
+// Palette du système Ovrsee (T-0045), littérale : ce SVG est rendu hors
+// navigateur, il n'a pas les variables CSS de `_ds/ovrsee/styles.css`.
+const GROUND = '#08090a'
+const PANEL = '#101114'
+const DIVIDER = '#1c1d24'
+const ACCENT = '#7d76f0'
+const OUTER = '#495969' // neutral-700
+const MID = '#8799ab' // neutral-500
 
 /**
- * Le dessin, en unités de 1024.
+ * Le dessin, en unités de 1024. Grille de pixels 7×5, module carré, gouttière
+ * à 30 % du module (maquette 2a) — mêmes coordonnées que `Logo` dans
+ * `app/src/OnboardingArt.tsx`.
  *
  * Volontairement pauvre en détails : dans le Dock, l'icône fait 32 pixels de
- * côté. Trois formes et deux traits sont ce qui reste lisible à cette taille —
- * un graphe fidèle y deviendrait une tache.
+ * côté. Un pixel de la grille y vaut environ 2 pixels d'écran — la forme
+ * générale (le losange de l'œil) reste lisible, le détail interne non, et
+ * ce n'est pas grave : c'est la silhouette qui doit se reconnaître.
  */
+const MODULE = 90
+const GUTTER = 27
+const STEP = MODULE + GUTTER
+const GRID_W = 7 * MODULE + 6 * GUTTER
+const GRID_H = 5 * MODULE + 4 * GUTTER
+const OFFSET_X = (1024 - GRID_W) / 2
+const OFFSET_Y = (1024 - GRID_H) / 2
+
+const PIXELS = [
+  [0, 2, OUTER], [0, 3, OUTER], [0, 4, OUTER],
+  [1, 1, MID], [1, 5, MID],
+  [2, 0, MID], [2, 2, ACCENT], [2, 3, ACCENT], [2, 4, ACCENT], [2, 6, MID],
+  [3, 1, MID], [3, 5, MID],
+  [4, 2, OUTER], [4, 3, OUTER], [4, 4, OUTER],
+]
+
+const pixelRects = PIXELS.map(
+  ([ligne, colonne, fill]) =>
+    `<rect x="${OFFSET_X + colonne * STEP}" y="${OFFSET_Y + ligne * STEP}" width="${MODULE}" height="${MODULE}" fill="${fill}"/>`,
+).join('\n    ')
+
 const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <defs>
     <linearGradient id="fond" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1e2033"/>
+      <stop offset="0%" stop-color="${PANEL}"/>
       <stop offset="100%" stop-color="${GROUND}"/>
     </linearGradient>
-    <filter id="lueur" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="26" result="flou"/>
-      <feMerge><feMergeNode in="flou"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
   </defs>
 
   <rect width="1024" height="1024" rx="228" fill="url(#fond)"/>
   <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none"
-        stroke="#2f3350" stroke-width="12"/>
+        stroke="${DIVIDER}" stroke-width="12"/>
 
-  <!-- Le groupe est descendu de 66 : sans cela le dessin flotte dans le haut
-       du cadre. Une icône macOS se cale optiquement, pas géométriquement. -->
-  <g transform="translate(0 66)">
-    <g stroke="${EDGE}" stroke-width="26" stroke-linecap="round" fill="none">
-      <path d="M 512 358 V 448 H 350 V 536"/>
-      <path d="M 512 358 V 448 H 674 V 536"/>
-    </g>
-
-    <circle cx="512" cy="300" r="92" fill="${ACCENT}" filter="url(#lueur)"/>
-    <circle cx="350" cy="606" r="74" fill="${MUTED}"/>
-    <circle cx="674" cy="606" r="74" fill="${MUTED}"/>
+  <g>
+    ${pixelRects}
   </g>
 </svg>`
 

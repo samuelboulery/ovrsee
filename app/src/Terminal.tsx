@@ -315,7 +315,7 @@ export function Terminal({
         <div
           hidden={available}
           style={s(
-            'flex: 1; overflow: auto; padding: 12px 14px; font-family: ui-monospace, SFMono-Regular, monospace; font-size: 12px; line-height: 1.75; min-width: 0;',
+            'flex: 1; overflow: auto; padding: 12px 14px; font-family: var(--font-mono); font-size: 12px; line-height: 1.75; min-width: 0;',
           )}
         >
           {briefLines(snapshot).map((line, i) => (

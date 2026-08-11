@@ -106,7 +106,7 @@ export function Lightbox({
       >
         <div style={s('display: flex; align-items: baseline; gap: 9px;')}>
           <span style={s('font-size: 13px; color: var(--color-text);')}>{frDate(shotDate(file))}</span>
-          <span style={s('font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-accent);')}>
+          <span style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-accent);')}>
             {shotSha(file)}
           </span>
           <span style={s('font-size: 11px; color: var(--color-neutral-600);')}>

@@ -106,10 +106,11 @@ async function serveUi(pathname) {
           "script-src 'self'",
           // `unsafe-inline` pour les styles est nécessaire : toute la mise en
           // forme du port est en attributs `style`, copiés de la maquette.
-          // Les deux origines Google servent la police Inter, importée par le
-          // design system Nocturne. Aucun script distant n'est autorisé.
-          "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-          'font-src https://fonts.gstatic.com',
+          // Le système Ovrsee (T-0045) ne charge plus de police par CDN — la
+          // pile système sert tant que les woff2 IBM Plex ne sont pas
+          // auto-hébergés (voir le plan de refonte) — donc plus d'origine
+          // Google à autoriser ici. Aucun script distant n'est autorisé.
+          "style-src 'self' 'unsafe-inline'",
           "img-src 'self' data:",
           "connect-src 'self'",
           "object-src 'none'",

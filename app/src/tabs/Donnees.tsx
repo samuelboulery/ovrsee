@@ -272,7 +272,7 @@ export function Donnees({
             <tbody>
               {tables.map((table) => (
                 <tr key={table.name}>
-                  <td style={s('font-family: ui-monospace, monospace;')}>{table.name}</td>
+                  <td style={s('font-family: var(--font-mono);')}>{table.name}</td>
                   <td style={s('color: var(--color-neutral-500);')}>{table.cols}</td>
                   <td style={s('color: var(--color-neutral-400);')}>{table.used}</td>
                   <td>

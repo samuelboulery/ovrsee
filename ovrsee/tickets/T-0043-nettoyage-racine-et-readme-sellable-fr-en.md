@@ -2,7 +2,7 @@
 {
   "id": "T-0043",
   "titre": "Nettoyage racine (legacy/) et README sellable FR/EN",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "docs",

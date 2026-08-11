@@ -1340,14 +1340,15 @@ export function decideInjection(text: string): { mode: 'command' | 'context'; te
  *
  * Une action perso qui contient `\n` retourne une erreur dans le tableau.
  */
-export function buildActions(
-  snapshot: Snapshot | null,
-  settings: SettingsType,
-): Array<Action | { label: string; error: string }> {
+/**
+ * Les trois commandes livrées avec l'ovrsee, composées avec le gestionnaire
+ * de paquets du projet — extraites de `buildActions()` pour que la palette
+ * ⌘K (T-0048) les propose sans les mêler aux actions personnalisées.
+ */
+export function deliveredActions(settings: SettingsType): Action[] {
   const packageManager = settings.packageManager
 
-  // Actions livrées, composées avec le gestionnaire
-  const delivered = [
+  return [
     {
       label: `⟳ ${t('action.crawl')}`,
       text: `!${composerCommande('ovrsee:crawl', packageManager)}`,
@@ -1361,7 +1362,12 @@ export function buildActions(
       text: '/graphify . --obsidian --obsidian-dir ovrsee/obsidian/graphe',
     },
   ]
+}
 
+export function buildActions(
+  snapshot: Snapshot | null,
+  settings: SettingsType,
+): Array<Action | { label: string; error: string }> {
   // Actions personnalisées, validées
   const custom = (settings.customActions ?? []).map(action => {
     // Rejette les sauts de ligne
@@ -1374,5 +1380,5 @@ export function buildActions(
     return action
   })
 
-  return [...delivered, ...custom]
+  return [...deliveredActions(settings), ...custom]
 }

@@ -116,8 +116,8 @@ function pickElement(): Promise<Picked | null> {
   return new Promise(resolve => {
     const overlay = document.createElement('div')
     overlay.style.cssText =
-      'position:fixed;z-index:2147483647;pointer-events:none;border:2px solid #9184d9;' +
-      'background:rgba(145,132,217,.18);border-radius:2px;transition:all .05s;'
+      'position:fixed;z-index:2147483647;pointer-events:none;border:2px solid #7d76f0;' +
+      'background:rgba(125,118,240,.18);border-radius:2px;transition:all .05s;'
     document.body.appendChild(overlay)
 
     let target: Element | null = null
@@ -512,7 +512,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
             onChange={event => setUrl(event.target.value)}
             spellCheck={false}
             style={s(
-              'flex: 1; min-width: 0; font-family: ui-monospace, SFMono-Regular, monospace; font-size: 11.5px; padding: 5px 9px; border-radius: 6px; border: 1px solid var(--color-neutral-800); background: var(--color-surface); color: var(--color-text);',
+              'flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 11.5px; padding: 5px 9px; border-radius: 6px; border: 1px solid var(--color-neutral-800); background: var(--color-surface); color: var(--color-text);',
             )}
           />
         </form>
@@ -598,7 +598,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
               {snapshot.config?.dev ? (
                 <>
                   {' '}et lancez{' '}
-                  <span style={s('font-family: ui-monospace, monospace; color: var(--color-accent);')}>
+                  <span style={s('font-family: var(--font-mono); color: var(--color-accent);')}>
                     {snapshot.config.dev}
                   </span>
                 </>
@@ -634,7 +634,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
             </button>
             <div
               style={s(
-                'flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: ui-monospace, monospace; color: var(--color-neutral-600);',
+                'flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); color: var(--color-neutral-600);',
               )}
             >
               {logs.at(-1)?.message}
@@ -653,7 +653,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
             </button>
           </div>
           {logsOpen && (
-            <div style={s('max-height: 168px; overflow: auto; padding: 0 12px 8px; font-family: ui-monospace, monospace;')}>
+            <div style={s('max-height: 168px; overflow: auto; padding: 0 12px 8px; font-family: var(--font-mono);')}>
               {logs.map((log, i) => (
                 <div
                   key={i}
@@ -724,7 +724,7 @@ function HorsApplication() {
         )}
       >
         {t('navigateur.not_packaged_desc')}{' '}
-        <span style={s('font-family: ui-monospace, monospace; color: var(--color-accent);')}>
+        <span style={s('font-family: var(--font-mono); color: var(--color-accent);')}>
           pnpm electron
         </span>{' '}
         {t('navigateur.not_packaged_help')}

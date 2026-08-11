@@ -26,7 +26,7 @@ export function Welcome({ onAjouterProjet }: { onAjouterProjet?: () => void }) {
       <div style={s('max-width: 52ch;')}>
         <p style={s('margin: 0 0 8px; font-size: 13px; color: var(--color-neutral-500); line-height: 1.5;')}>
           {t('welcome.what_is_ovrsee_part1')}
-          <code style={s('font-family: monospace; color: var(--color-accent-500);')}>
+          <code style={s('font-family: var(--font-mono); color: var(--color-accent-500);')}>
             {t('welcome.what_is_ovrsee_folder')}
           </code>
           {t('welcome.what_is_ovrsee_part2')}
@@ -63,7 +63,7 @@ export function Welcome({ onAjouterProjet }: { onAjouterProjet?: () => void }) {
         </p>
         <code
           style={s(
-            'display: block; padding: 12px; background: var(--theme-bg-secondary); border-radius: 4px; font-family: monospace; font-size: 11px; color: var(--color-accent-500); word-break: break-all;',
+            'display: block; padding: 12px; background: var(--theme-bg-secondary); border-radius: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--color-accent-500); word-break: break-all;',
           )}
         >
           {t('welcome.install_command')}

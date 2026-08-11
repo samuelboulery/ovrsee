@@ -11,6 +11,7 @@ import {
   commitsDeLaFrise,
   composerCommande,
   decideInjection,
+  deliveredActions,
   epicProgress,
   frDate,
   humanAge,
@@ -483,6 +484,26 @@ test('buildActions compose les actions livrées avec le gestionnaire npm', () =>
 
   // Première action : Crawl avec npm run
   assert.match(delivered[0].text, /^!npm run ovrsee:crawl/)
+})
+
+test('deliveredActions retourne les trois commandes livrées, sans les personnalisées', () => {
+  const settings = {
+    langue: 'fr',
+    theme: 'auto',
+    densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
+    onglets: { actifs: [], ordre: [] },
+    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
+    bootstrap: [],
+    packageManager: 'pnpm',
+    sourceGraphe: 'auto',
+    customActions: [{ label: 'perso', text: 'echo hi' }],
+  } as SettingsType
+
+  const actions = deliveredActions(settings)
+
+  assert.equal(actions.length, 3)
+  assert.match(actions[0].text, /^!pnpm ovrsee:crawl/)
+  assert.ok(actions.every(a => a.label !== 'perso'))
 })
 
 test('buildActions inclut les actions personnalisées valides', () => {

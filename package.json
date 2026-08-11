@@ -39,6 +39,7 @@
     "vite": "^8.2.1"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "6.0.0",
     "node-pty": "1.1.0"

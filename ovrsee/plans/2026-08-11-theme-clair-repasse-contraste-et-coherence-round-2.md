@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Thème clair — repasse contraste et cohérence (round 2)",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-11",
   "commits": [
     {
       "sha": "76accb0",
@@ -60,6 +60,11 @@
       "files": [
         "app/index.html"
       ]
+    },
+    {
+      "sha": "cd798c7",
+      "date": "2026-08-11",
+      "files": []
     }
   ]
 }

@@ -152,7 +152,7 @@ export function Deploiements({
 
               <div
                 style={s(
-                  'font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-neutral-500); margin-top: 3px;',
+                  'font-family: var(--font-mono); font-size: 11px; color: var(--color-neutral-500); margin-top: 3px;',
                 )}
               >
                 {integ.provider}
@@ -232,7 +232,7 @@ function LigneDeploiement({ d }: { d: DeploymentInfo }) {
         {d.environment}
       </span>
       {d.commit && (
-        <span style={s('font-family: ui-monospace, monospace; font-size: 10.5px; color: var(--color-neutral-500);')}>
+        <span style={s('font-family: var(--font-mono); font-size: 10.5px; color: var(--color-neutral-500);')}>
           {d.commit}
         </span>
       )}

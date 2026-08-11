@@ -92,7 +92,7 @@ export function BlocActions({ settings, onSettings }: SectionProps) {
             onChange={event => setTexte(event.target.value)}
             placeholder={t('pref.actions_text_ph')}
             maxLength={2000}
-            style={s('font-size: 13px; min-height: 32px; font-family: ui-monospace, monospace;')}
+            style={s('font-size: 13px; min-height: 32px; font-family: var(--font-mono);')}
           />
         </Field>
 
@@ -143,7 +143,7 @@ export function BlocActions({ settings, onSettings }: SectionProps) {
               </div>
               <div
                 style={s(
-                  'font-size: 11px; color: var(--color-neutral-600); font-family: ui-monospace, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
+                  'font-size: 11px; color: var(--color-neutral-600); font-family: var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
                 )}
               >
                 {action.text}
@@ -208,7 +208,7 @@ export function BlocDemarrage({ settings, onSettings }: SectionProps) {
                   bootstrap: bootstrap.map((autre, i) => (i === index ? event.target.value : autre)),
                 })
               }
-              style={s('font-size: 12.5px; min-height: 32px; font-family: ui-monospace, monospace;')}
+              style={s('font-size: 12.5px; min-height: 32px; font-family: var(--font-mono);')}
             />
             <button
               type="button"

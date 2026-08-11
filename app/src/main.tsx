@@ -4,10 +4,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-// Le design system Nocturne, importé sans modification. Toutes les couleurs et
-// tous les espacements du port en viennent — c'est ce qui garantit que le
-// rendu reste celui de la maquette.
-import '../../_ds/nocturne-16d90168-f621-47c2-b3bb-29511cfd6dd0/styles.css'
+// Le design system Ovrsee (refonte T-0045, remplace Nocturne). Toutes les
+// couleurs et tous les espacements du port en viennent — c'est ce qui
+// garantit que le rendu reste celui de la maquette.
+import '../../_ds/ovrsee/styles.css'
 
 import { App } from './App'
 import { initializeTheme } from './theme'

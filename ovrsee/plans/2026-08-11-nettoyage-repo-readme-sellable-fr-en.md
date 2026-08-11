@@ -1,10 +1,30 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Nettoyage repo + README sellable (FR/EN)",
   "opened": "2026-08-11",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-11",
+  "commits": [
+    {
+      "sha": "6571542",
+      "date": "2026-08-11",
+      "files": [
+        "AUDIT-2026-08-09.md",
+        "Ovrsee-A-Nocturne.dc.html",
+        "README.en.md",
+        "README.md",
+        "docs/screenshots/apercu.png",
+        "docs/screenshots/historique.png",
+        "docs/screenshots/navigateur.png",
+        "docs/screenshots/produit.png",
+        "docs/screenshots/tableau.png",
+        "legacy/AUDIT-2026-08-09.md",
+        "legacy/Ovrsee-A-Nocturne.dc.html",
+        "legacy/support.js",
+        "support.js"
+      ]
+    }
+  ]
 }
 ---
 

@@ -73,7 +73,7 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
         </h2>
         <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
           {t('produit.no_pages')}{' '}
-          <span style={s('font-family: ui-monospace, monospace;')}>node crawl/index.js</span>.
+          <span style={s('font-family: var(--font-mono);')}>node crawl/index.js</span>.
         </div>
       </div>
     )
@@ -318,10 +318,10 @@ function Edges({ placed, width, height }: { placed: Placed[]; width: number; hei
     >
       <defs>
         <marker id="na" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#796cbf" />
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#8682cf" />
         </marker>
       </defs>
-      <g fill="none" stroke="#796cbf" strokeWidth="1.25" markerEnd="url(#na)">
+      <g fill="none" stroke="#8682cf" strokeWidth="1.25" markerEnd="url(#na)">
         {forward.map((d, i) => (
           <path key={i} d={d} />
         ))}
@@ -376,7 +376,7 @@ function PageCard({
           {pageName(page, pages)}
         </span>
       </div>
-      <div style={s('font-family: ui-monospace, monospace; font-size: 10.5px; color: var(--color-accent); margin-top: 3px;')}>
+      <div style={s('font-family: var(--font-mono); font-size: 10.5px; color: var(--color-accent); margin-top: 3px;')}>
         {page.route}
       </div>
 
@@ -460,7 +460,7 @@ function DetailPanel({
       <div style={s('font-family: var(--font-heading); font-size: 17px; margin-top: 8px;')}>
         {pageName(page, pages)}
       </div>
-      <div style={s('font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-accent); margin-top: 3px;')}>
+      <div style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-accent); margin-top: 3px;')}>
         {page.route}
       </div>
       <div style={s('font-size: 12px; color: var(--color-neutral-400); margin-top: 9px; line-height: 1.5; text-wrap: pretty;')}>
@@ -683,7 +683,7 @@ function Redirects({ redirects }: { redirects: Record<string, string> }) {
       </div>
       <div style={s('display: flex; flex-direction: column; gap: 6px;')}>
         {Object.entries(redirects).map(([from, to]) => (
-          <div key={from} style={s('font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-neutral-500);')}>
+          <div key={from} style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-neutral-500);')}>
             {from} <span style={s('color: var(--color-neutral-700);')}>→</span> {to}
           </div>
         ))}

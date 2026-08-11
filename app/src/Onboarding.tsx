@@ -121,9 +121,10 @@ const PREREQUIS = ['onboard.req_claude', 'onboard.req_git', 'onboard.req_node'] 
  * Posé sur son propre fond, pleine largeur, il devient l'objet solide autour
  * duquel le texte s'organise — et il porte à lui seul ce que l'écran a à dire.
  *
- * Le reste tient volontairement en aplats de gris : Inter est la seule famille
- * du design system, donc la hiérarchie se fait au poids, à la taille et à la
- * couleur, pas au mélange de fontes.
+ * Le reste tient volontairement en aplats de gris : IBM Plex Sans est la
+ * seule famille du design system pour le texte courant (le mono reste
+ * réservé aux chemins/ids/dates), donc la hiérarchie se fait au poids, à la
+ * taille et à la couleur, pas au mélange de fontes.
  */
 function EcranPresentation() {
   return (
@@ -193,7 +194,7 @@ function EcranPresentation() {
           <span
             key={cle}
             style={s(
-              'padding: 2px 8px; border-radius: var(--radius-sm); background: var(--theme-bg-tertiary); font-family: monospace; font-size: 11.5px; color: var(--color-neutral-400);',
+              'padding: 2px 8px; border-radius: var(--radius-sm); background: var(--theme-bg-tertiary); font-family: var(--font-mono); font-size: 11.5px; color: var(--color-neutral-400);',
             )}
           >
             {t(cle)}
@@ -378,7 +379,7 @@ function EcranReglages({
           // commande plutôt qu'un bouton qui ne ferait rien.
           <code
             style={s(
-              'display: block; padding: 12px; background: var(--theme-bg-tertiary); border-radius: var(--radius-sm); font-family: monospace; font-size: 11.5px; color: var(--color-accent-500); word-break: break-all;',
+              'display: block; padding: 12px; background: var(--theme-bg-tertiary); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11.5px; color: var(--color-accent-500); word-break: break-all;',
             )}
           >
             {t('welcome.install_command')}

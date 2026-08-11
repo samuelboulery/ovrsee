@@ -192,7 +192,7 @@ export function BlocIntegrations({
             value={url}
             onChange={event => setUrl(event.target.value)}
             placeholder="https://…"
-            style={s('font-size: 13px; min-height: 32px; font-family: ui-monospace, monospace;')}
+            style={s('font-size: 13px; min-height: 32px; font-family: var(--font-mono);')}
           />
         </Field>
         <Field
@@ -265,7 +265,7 @@ export function BlocIntegrations({
               {integ.url && (
                 <div
                   style={s(
-                    'font-size: 11px; color: var(--color-neutral-600); font-family: ui-monospace, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
+                    'font-size: 11px; color: var(--color-neutral-600); font-family: var(--font-mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
                   )}
                 >
                   {integ.url}

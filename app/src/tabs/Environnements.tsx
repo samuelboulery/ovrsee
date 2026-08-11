@@ -41,7 +41,7 @@ export function Environnements({
             {env.branche && (
               <div
                 style={s(
-                  'font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-neutral-500); margin-top: 3px;',
+                  'font-family: var(--font-mono); font-size: 11px; color: var(--color-neutral-500); margin-top: 3px;',
                 )}
               >
                 {env.branche}

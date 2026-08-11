@@ -20,8 +20,8 @@ import test from 'node:test'
  * d'exister, à condition qu'on l'ait dit ici.
  */
 const EXCEPTIONS = new Set([
-  '#9184d9', // marque
-  '#796cbf', // marque, tracé du graphe
+  '#7d76f0', // marque
+  '#8682cf', // marque, tracé du graphe
   '#ffffff', // fond du webview Chromium, qui n'est pas l'ovrsee
   '#fff',
   '#000', // mask-image

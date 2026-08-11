@@ -7,3 +7,12 @@
 # de binaire, donc pas de terminal.
 onlyBuiltDependencies:
   - node-pty
+
+# @phosphor-icons/react publie dist/index.cjs.js (syntaxe CommonJS) sous un
+# package.json racine "type": "module", sans package.json imbriqué dans
+# dist/ pour corriger la détection — Node lit donc ce fichier comme de
+# l'ESM et plante sur `exports is not defined`. Le patch ajoute juste ce
+# package.json manquant (dist/ → "type": "commonjs"), sans toucher au code
+# du paquet. Casse `pnpm test` (app/.test-build compilé en CommonJS) sinon.
+patchedDependencies:
+  '@phosphor-icons/react': patches/@phosphor-icons__react.patch

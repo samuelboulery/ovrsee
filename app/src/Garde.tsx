@@ -74,7 +74,7 @@ export function Panne({ quoi, message }: { quoi: string; message: string }) {
       </div>
       <div
         style={s(
-          'font-family: ui-monospace, monospace; font-size: 11.5px; color: var(--color-accent); max-width: 72ch; word-break: break-word;',
+          'font-family: var(--font-mono); font-size: 11.5px; color: var(--color-accent); max-width: 72ch; word-break: break-word;',
         )}
       >
         {message}

@@ -1,0 +1,9 @@
+diff --git a/dist/package.json b/dist/package.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..5bbefffbabee392d1855491b84dc0a716b6a3bf2
+--- /dev/null
++++ b/dist/package.json
+@@ -0,0 +1,3 @@
++{
++  "type": "commonjs"
++}

@@ -8,37 +8,40 @@
  * Catégories :
  * - Thématiques (sombre/clair) : bg primaire/secondaire, text
  * - xterm : couleurs du terminal
- * - Marque/UI (non thématisées) : #9184d9, #796cbf, #ffffff (webview), #000 (mask)
+ * - Marque/UI (non thématisées) : #7d76f0, #8682cf, #ffffff (webview), #000 (mask)
  */
 
 /**
  * Palette sombre (défaut).
  */
 export const darkTheme = {
-  // Fonds principaux (statusbar, panneaux terminal)
-  bgPrimary: '#101120',
-  // Fonds secondaires (sidebars détails, modales)
-  bgSecondary: '#13141f',
-  // Fonds alternatifs
-  bgTertiary: '#1b1d2b',
-  bgQuaternary: '#171927',
-  bgError: '#0a0b10', // Erreurs terminal
+  // Fonds principaux (statusbar, panneaux terminal) — niveau "rails et
+  // panneaux" du système Ovrsee (T-0045).
+  bgPrimary: '#0b0c0e',
+  // Fonds secondaires (sidebars détails, modales) — niveau "contrôles",
+  // plus clair, pour lire comme élevé au-dessus du panneau.
+  bgSecondary: '#101114',
+  // Fonds alternatifs — niveau "actif/élevé".
+  bgTertiary: '#1c1d24',
+  bgQuaternary: '#0b0c0e',
+  bgError: '#08090a', // Erreurs terminal
   bgAlerte: '#3a3a1a', // Encadré d'avertissement (source de graphe introuvable)
-  bgLightbox: '#0b0c16', // Fond lightbox
+  bgLightbox: '#08090a', // Fond lightbox
   // xterm
-  xtermBg: '#101120',
-  xtermFg: '#c9cad3',
-  xtermCursor: '#9184d9',
-  xtermSelection: '#353b80',
-  xtermBlack: '#161826',
-  xtermBrightBlack: '#595d6c',
-  xtermWhite: '#e9e9ed',
+  xtermBg: '#0b0c0e',
+  xtermFg: '#e1e6ea',
+  xtermCursor: '#7d76f0',
+  xtermSelection: '#4c46b4',
+  xtermBlack: '#1d242a',
+  xtermBrightBlack: '#495969',
+  xtermWhite: '#e1e6ea',
   xtermBrightWhite: '#ffffff',
-  xtermMagenta: '#9184d9',
-  xtermBrightMagenta: '#b3a9e6',
+  xtermMagenta: '#7d76f0',
+  xtermBrightMagenta: '#857ef1',
   // Les 10 couleurs ANSI restantes n'étaient pas définies : xterm retombait
   // sur ses défauts internes, calibrés pour un fond noir. Fixées ici pour ne
-  // plus en dépendre — proches des défauts xterm, assorties au violet Nocturne.
+  // plus en dépendre — proches des défauts xterm, non touchées par la refonte
+  // T-0045 (couleurs ANSI sémantiques, indépendantes de la teinte de marque).
   xtermRed: '#e5677a',
   xtermBrightRed: '#f08a99',
   xtermGreen: '#7fc97f',
@@ -53,26 +56,27 @@ export const darkTheme = {
 
 /**
  * Palette claire (mode light).
- * Basée sur les jetons du design system Nocturne.
+ * Basée sur les jetons du design system Ovrsee (T-0045) — mêmes rampes que
+ * le sombre, indices inversés (voir `ovrseeClair` plus bas).
  */
 export const lightTheme = {
-  bgPrimary: '#f2f2f3', // Fond principal clair
-  bgSecondary: '#e8e8eb', // Fond secondaire
-  bgTertiary: '#dcdce0',
-  bgQuaternary: '#e0e0e3',
+  bgPrimary: '#f3f5f7', // Fond principal clair
+  bgSecondary: '#ffffff', // Fond secondaire, le plus élevé
+  bgTertiary: '#e1e6ea',
+  bgQuaternary: '#f3f5f7',
   bgError: '#fafafa',
   bgAlerte: '#fdf6dd',
   bgLightbox: '#ffffff',
-  xtermBg: '#f2f2f3',
-  xtermFg: '#2d2d30',
-  xtermCursor: '#9184d9',
-  xtermSelection: '#e5e0f0',
+  xtermBg: '#ffffff',
+  xtermFg: '#1d242a',
+  xtermCursor: '#3227e7',
+  xtermSelection: '#d8d6fa',
   xtermBlack: '#000000',
   xtermBrightBlack: '#666666',
   xtermWhite: '#e9e9ed',
   xtermBrightWhite: '#ffffff',
-  xtermMagenta: '#9184d9',
-  xtermBrightMagenta: '#b3a9e6',
+  xtermMagenta: '#3227e7',
+  xtermBrightMagenta: '#5e55ec',
   // Mêmes 10 couleurs, assombries pour rester lisibles sur le fond clair —
   // sans elles xterm retombait sur ses défauts calibrés pour un fond noir
   // (ex. le vert et le jaune par défaut sont quasi invisibles sur blanc).
@@ -92,8 +96,8 @@ export const lightTheme = {
  * Constantes non thématisées (marque, webview, masques).
  */
 export const unthemedColors = {
-  brand: '#9184d9', // Marque Ovrsee (curseur xterm, bordures)
-  brandAlt: '#796cbf', // Marque secondaire (SVG)
+  brand: '#7d76f0', // Marque Ovrsee (curseur xterm, bordures)
+  brandAlt: '#8682cf', // Marque secondaire (SVG)
   webviewBg: '#ffffff', // Fond webview Chromium
   maskBlack: '#000', // mask-image
 } as const
@@ -132,16 +136,16 @@ export function applyTheme(theme: string): void {
  */
 function getCSSVariables(): string {
   /**
-   * Le thème sombre ne redéfinit AUCUN jeton Nocturne.
+   * Le thème sombre ne redéfinit AUCUN jeton `--color-*` du système Ovrsee.
    *
    * Une première version en recopiait les quatre-vingt-dix valeurs pour les
-   * « thématiser » — et l'accent passait au passage du violet `#9184d9` au bleu,
-   * le fond de `#161826` à `#16181f`. L'apparence par défaut de l'application
-   * changeait sans que personne l'ait demandé.
+   * « thématiser » — et l'accent changeait de teinte au passage, le fond
+   * dérivait. L'apparence par défaut de l'application changeait sans que
+   * personne l'ait demandé.
    *
-   * Nocturne EST le thème sombre : il est déjà chargé, il fait autorité. Ne
-   * sont déclarés ici que les jetons `--theme-*`, ceux qui remplacent les
-   * couleurs autrefois écrites en dur dans les composants.
+   * `_ds/ovrsee/styles.css` EST le thème sombre : il est déjà chargé, il
+   * fait autorité. Ne sont déclarés ici que les jetons `--theme-*`, ceux qui
+   * remplacent les couleurs autrefois écrites en dur dans les composants.
    */
   const themeTokens = (palette: typeof darkTheme) => ({
     '--theme-bg-primary': palette.bgPrimary,
@@ -164,36 +168,63 @@ function getCSSVariables(): string {
   })
 
   /**
-   * Le thème clair, lui, doit bien renverser Nocturne — sinon un texte prévu
-   * pour un fond sombre s'affiche en gris pâle sur blanc. La rampe neutre
-   * s'inverse (le 100 le plus clair devient le plus sombre) ; l'accent garde
-   * sa teinte et s'assombrit juste assez pour rester lisible sur du blanc.
+   * Le thème clair doit bien renverser le système Ovrsee — sinon un texte
+   * prévu pour un fond sombre s'affiche en gris pâle sur blanc. T-0039
+   * (sidebar sélectionnée, onglet terminal actif, cartes PLAN de la frise)
+   * venait précisément de là : la rampe neutre s'inversait bien, mais les
+   * paliers 700-900 de la rampe accent gardaient des valeurs sombres dans
+   * les deux thèmes — un fond `--color-accent-900` pensé pour se fondre
+   * dans un `--color-bg` sombre restait un carré violet sur fond clair.
+   *
+   * Ici, les trois rampes (neutre, accent, accent-2) réutilisent exactement
+   * les 9 couleurs de `_ds/ovrsee/styles.css`, juste réassignées en ordre
+   * inverse (100 ↔ 900) — jamais une teinte recalculée à part, donc jamais
+   * un palier oublié à mi-chemin.
    */
-  const nocturneClair = {
-    '--color-bg': '#f4f4f6',
+  const ovrseeClair = {
+    '--color-bg': '#f3f5f7',
     '--color-surface': '#ffffff',
-    '--color-text': '#1a1b22',
-    '--color-accent': '#5f52a8',
-    '--color-accent-2': '#6b5fb0',
-    '--color-divider': 'color-mix(in srgb, #1a1b22 14%, transparent)',
-    '--color-neutral-100': '#1a1b22',
-    '--color-neutral-200': '#2b2d36',
-    '--color-neutral-300': '#3d3f4a',
-    '--color-neutral-400': '#54566180',
-    '--color-neutral-500': '#6b6d78',
-    '--color-neutral-600': '#5c5e69',
-    '--color-neutral-700': '#8a8c96',
-    '--color-neutral-800': '#c9cad1',
-    '--color-neutral-900': '#e6e7ec',
-    '--color-accent-100': '#efedf9',
-    '--color-accent-200': '#ddd9f2',
-    '--color-accent-300': '#c4bce8',
-    '--color-accent-400': '#a89ddb',
-    '--color-accent-500': '#8b7ecd',
-    '--color-accent-600': '#7264bd',
-    '--color-accent-700': '#5f52a8',
-    '--color-accent-800': '#4a3f88',
-    '--color-accent-900': '#352d64',
+    '--color-surface-card': '#f3f5f7',
+    '--color-surface-control': '#e1e6ea',
+    '--color-surface-active': '#c9d1d9',
+    '--color-text': '#1d242a',
+    '--color-text-secondary': 'color-mix(in srgb, #1d242a 78%, transparent)',
+    '--color-text-tertiary': 'color-mix(in srgb, #1d242a 60%, transparent)',
+    '--color-text-quaternary': 'color-mix(in srgb, #1d242a 45%, transparent)',
+    '--color-text-discrete': 'color-mix(in srgb, #1d242a 32%, transparent)',
+    '--color-accent': '#3227e7',
+    '--color-accent-2': '#4c46b4',
+    '--color-divider': 'color-mix(in srgb, #1d242a 14%, transparent)',
+    // Rampe neutre, indices inversés.
+    '--color-neutral-100': '#1d242a',
+    '--color-neutral-200': '#323d48',
+    '--color-neutral-300': '#495969',
+    '--color-neutral-400': '#63788d',
+    '--color-neutral-500': '#8799ab',
+    '--color-neutral-600': '#abb8c4',
+    '--color-neutral-700': '#c9d1d9',
+    '--color-neutral-800': '#e1e6ea',
+    '--color-neutral-900': '#f3f5f7',
+    // Rampe accent, indices inversés.
+    '--color-accent-100': '#0e0a57',
+    '--color-accent-200': '#160f8a',
+    '--color-accent-300': '#1f15c1',
+    '--color-accent-400': '#3227e7',
+    '--color-accent-500': '#5e55ec',
+    '--color-accent-600': '#857ef1',
+    '--color-accent-700': '#b5b1f6',
+    '--color-accent-800': '#d8d6fa',
+    '--color-accent-900': '#eeedfd',
+    // Rampe accent-2, indices inversés.
+    '--color-accent-2-100': '#2a2663',
+    '--color-accent-2-200': '#3b368c',
+    '--color-accent-2-300': '#4c46b4',
+    '--color-accent-2-400': '#6a65c3',
+    '--color-accent-2-500': '#8682cf',
+    '--color-accent-2-600': '#a39fda',
+    '--color-accent-2-700': '#c3c1e7',
+    '--color-accent-2-800': '#dfdef2',
+    '--color-accent-2-900': '#f1f0f9',
     ...themeTokens(lightTheme),
   }
 
@@ -202,21 +233,22 @@ function getCSSVariables(): string {
       .map(([key, val]) => `${indent}${key}: ${val};`)
       .join('\n')
 
-  // `:root` ne porte que les jetons sombres ; Nocturne fournit le reste.
-  // Le clair s'applique sur choix explicite, ou en `auto` quand le système le
-  // demande — d'où le `:not([data-theme="dark"])`, qui laisse le choix primer.
+  // `:root` ne porte que les jetons sombres ; `_ds/ovrsee/styles.css` fournit
+  // le reste. Le clair s'applique sur choix explicite, ou en `auto` quand le
+  // système le demande — d'où le `:not([data-theme="dark"])`, qui laisse le
+  // choix primer.
   return `
     :root {
 ${bloc(themeTokens(darkTheme), '      ')}
     }
 
     :root[data-theme="light"] {
-${bloc(nocturneClair, '      ')}
+${bloc(ovrseeClair, '      ')}
     }
 
     @media (prefers-color-scheme: light) {
       :root:not([data-theme="dark"]) {
-${bloc(nocturneClair, '        ')}
+${bloc(ovrseeClair, '        ')}
       }
     }
   `

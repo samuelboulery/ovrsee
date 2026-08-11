@@ -14,6 +14,8 @@
 
 import type { ReactNode } from 'react'
 
+import { DotsSixVertical, Monitor, Moon, Sun } from '@phosphor-icons/react'
+
 import { s } from './style'
 
 /**
@@ -223,68 +225,21 @@ export function ErrorBox({ children }: { children: ReactNode }) {
 }
 
 /*
- * Les icônes — Phosphor (regular), tracées à la main plutôt qu'importées.
- *
- * Le design system prescrit Phosphor ; le projet tient à trois dépendances de
- * production et le paquet d'icônes en pèserait une quatrième pour trois
- * glyphes. `currentColor` les fait suivre l'état du segment sans code.
+ * Les icônes — Phosphor (regular), importées depuis @phosphor-icons/react
+ * (T-0046). Avant la refonte, trois glyphes étaient tracés à la main pour
+ * éviter une quatrième dépendance de production ; la maquette en utilise
+ * ~20 (rail de navigation compris), au-delà de quoi les dessiner à la main
+ * coûte plus cher que le paquet.
  */
 
-const icon = (children: ReactNode) => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 256 256"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="16"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-    focusable="false"
-  >
-    {children}
-  </svg>
-)
-
 /** Moniteur — le thème suit le système. */
-export const IconSystem = () =>
-  icon(
-    <>
-      <rect x="32" y="48" width="192" height="144" rx="8" />
-      <path d="M160 224H96" />
-      <path d="M128 192v32" />
-    </>,
-  )
+export const IconSystem = () => <Monitor size={16} aria-hidden="true" />
 
 /** Soleil — thème clair. */
-export const IconLight = () =>
-  icon(
-    <>
-      <circle cx="128" cy="128" r="52" />
-      <path d="M128 36V16M128 240v-20M188 68l14-14M54 202l14-14M220 128h20M16 128h20M188 188l14 14M54 54l14 14" />
-    </>,
-  )
+export const IconLight = () => <Sun size={16} aria-hidden="true" />
 
 /** Lune — thème sombre. */
-export const IconDark = () =>
-  icon(<path d="M216 152A88 88 0 0 1 104 40a88 88 0 1 0 112 112Z" />)
+export const IconDark = () => <Moon size={16} aria-hidden="true" />
 
 /** Poignée de préhension — six points, la convention du glisser-déposer. */
-export const IconGrip = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 256 256"
-    fill="currentColor"
-    aria-hidden="true"
-    focusable="false"
-  >
-    <circle cx="100" cy="60" r="14" />
-    <circle cx="156" cy="60" r="14" />
-    <circle cx="100" cy="128" r="14" />
-    <circle cx="156" cy="128" r="14" />
-    <circle cx="100" cy="196" r="14" />
-    <circle cx="156" cy="196" r="14" />
-  </svg>
-)
+export const IconGrip = () => <DotsSixVertical size={14} aria-hidden="true" />

@@ -3,7 +3,7 @@
  *
  * Aucune image binaire : rien à charger, rien à résoudre sous le protocole
  * `ovrsee://`, rien qui pèse dans le DMG, et un dessin qui suit le thème
- * puisqu'il est peint aux jetons Nocturne.
+ * puisqu'il est peint aux jetons du système Ovrsee.
  *
  * WHY: le logo est transcrit de `build/icon.svg`, qui reste la source
  * d'empaquetage (icône macOS). Il n'est pas importé : `scripts/test-ui.js`
@@ -15,7 +15,41 @@
 import { t } from './i18n'
 import { s } from './style'
 
-/** Le logo de l'ovrsee : un nœud qui se ramifie en deux. */
+/**
+ * La grille de pixels de la marque — 7×5 modules carrés, gouttière à 30 %
+ * du module (maquette 2a). Un œil : paupières en deux gris (cap haut/bas
+ * plus sombre, ailes latérales plus claires), iris de 3 modules en accent
+ * au centre de la ligne médiane.
+ *
+ * Coordonnées partagées avec `scripts/make-icon.js` — la même grille y est
+ * redessinée en hex littéral (pas de variables CSS dans un SVG rendu hors
+ * navigateur). Un changement ici doit s'y répercuter, voir le WHY plus haut.
+ */
+const MODULE = 90
+const GUTTER = 27
+const STEP = MODULE + GUTTER
+const GRID_W = 7 * MODULE + 6 * GUTTER
+const GRID_H = 5 * MODULE + 4 * GUTTER
+const OFFSET_X = (1024 - GRID_W) / 2
+const OFFSET_Y = (1024 - GRID_H) / 2
+
+type Ton = 'exterieur' | 'milieu' | 'iris'
+
+const PIXELS: Array<[ligne: number, colonne: number, ton: Ton]> = [
+  [0, 2, 'exterieur'], [0, 3, 'exterieur'], [0, 4, 'exterieur'],
+  [1, 1, 'milieu'], [1, 5, 'milieu'],
+  [2, 0, 'milieu'], [2, 2, 'iris'], [2, 3, 'iris'], [2, 4, 'iris'], [2, 6, 'milieu'],
+  [3, 1, 'milieu'], [3, 5, 'milieu'],
+  [4, 2, 'exterieur'], [4, 3, 'exterieur'], [4, 4, 'exterieur'],
+]
+
+const TON_REMPLISSAGE: Record<Ton, string> = {
+  exterieur: 'var(--color-neutral-700)',
+  milieu: 'var(--color-neutral-500)',
+  iris: 'var(--color-accent)',
+}
+
+/** Le logo de l'ovrsee : un œil en grille de pixels. */
 export function Logo({ size = 64 }: { size?: number }) {
   return (
     <svg
@@ -36,20 +70,16 @@ export function Logo({ size = 64 }: { size?: number }) {
         stroke="var(--color-divider)"
         strokeWidth="12"
       />
-      <g transform="translate(0 66)">
-        <g
-          stroke="var(--color-accent-700)"
-          strokeWidth="26"
-          strokeLinecap="round"
-          fill="none"
-        >
-          <path d="M 512 358 V 448 H 350 V 536" />
-          <path d="M 512 358 V 448 H 674 V 536" />
-        </g>
-        <circle cx="512" cy="300" r="92" fill="var(--color-accent)" />
-        <circle cx="350" cy="606" r="74" fill="var(--color-accent-700)" />
-        <circle cx="674" cy="606" r="74" fill="var(--color-accent-700)" />
-      </g>
+      {PIXELS.map(([ligne, colonne, ton]) => (
+        <rect
+          key={`${ligne}-${colonne}`}
+          x={OFFSET_X + colonne * STEP}
+          y={OFFSET_Y + ligne * STEP}
+          width={MODULE}
+          height={MODULE}
+          fill={TON_REMPLISSAGE[ton]}
+        />
+      ))}
     </svg>
   )
 }
@@ -122,7 +152,7 @@ export function SchemaBoucle() {
               fill={depot ? 'var(--color-accent-300)' : 'var(--color-text)'}
               style={s(
                 depot
-                  ? 'font-size: 12.5px; font-family: monospace;'
+                  ? 'font-size: 12.5px; font-family: var(--font-mono);'
                   : 'font-size: 12.5px; font-family: var(--font-body);',
               )}
             >

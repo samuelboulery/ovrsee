@@ -32,7 +32,7 @@ export function Illisibles({ entries, quoi }: { entries: Illisible[]; quoi?: str
         <div
           key={entry.file}
           style={s(
-            'font-family: ui-monospace, SFMono-Regular, monospace; font-size: 11px; color: var(--color-accent-200);',
+            'font-family: var(--font-mono); font-size: 11px; color: var(--color-accent-200);',
           )}
         >
           ovrsee/{entry.file}

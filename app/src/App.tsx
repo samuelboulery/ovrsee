@@ -23,6 +23,7 @@ import {
   type Snapshot,
   type Tableau as TableauData,
 } from './data'
+import { CommandPalette } from './CommandPalette'
 import { Garde } from './Garde'
 import { Onboarding } from './Onboarding'
 import { PreferencesModal, type SectionId } from './PreferencesPanel'
@@ -38,33 +39,7 @@ import { Donnees } from './tabs/Donnees'
 import { Stack } from './tabs/Stack'
 import { Terminal, type Layout } from './Terminal'
 import { Divider, useResizable } from './useResizable'
-
-/**
- * Chaque onglet a sa route.
- *
- * Ce n'est pas du confort : un crawler découvre les écrans en suivant les
- * `<a href>`. Tant que les onglets vivaient dans un état React, Ovrsee
- * produisait une carte à une seule page de lui-même — exactement la limite
- * relevée sur `associa`.
- *
- * Aperçu tient `/`, sans redirection : ouvrir un projet doit d'abord dire de
- * quoi il s'agit, et la page d'entrée du graphe est alors celle par où on entre
- * vraiment. Produit descend sur `/produit` — une vraie route de plus, pas une
- * page fantôme : la carte gagne un nœud, elle n'en perd aucun. Les captures
- * déjà prises de l'ancien `/` ont suivi dans `shots/produit/`, sans quoi vingt
- * images du graphe passeraient pour l'historique visuel d'Aperçu.
- */
-export const TABS = [
-  ['apercu', 'tabs.apercu', '/'],
-  ['navigateur', 'tabs.navigateur', '/navigateur'],
-  ['produit', 'tabs.produit', '/produit'],
-  ['historique', 'tabs.historique', '/historique'],
-  ['tableau', 'tabs.tableau', '/tableau'],
-  ['donnees', 'tabs.donnees', '/donnees'],
-  ['stack', 'tabs.stack', '/stack'],
-] as const
-
-export type TabId = (typeof TABS)[number][0]
+import { TABS, TAB_ICONS, activeTabsInOrder, type TabId } from './views'
 
 const tabForPath = (pathname: string): TabId =>
   TABS.find(([, , path]) => path === pathname)?.[0] ?? 'apercu'
@@ -77,47 +52,6 @@ const tabForPath = (pathname: string): TabId =>
  */
 export const labelOf = (id: TabId): string =>
   t(TABS.find(([tab]) => tab === id)?.[1] ?? 'tabs.apercu')
-
-/**
- * Onglets actifs selon les préférences, dans l'ordre de l'ordre configuré.
- *
- * Si les préférences ne sont pas chargées, retourne tous les onglets pour
- * éviter un écran vide au démarrage.
- *
- * @param settings préférences chargées (ou null au démarrage)
- * @returns liste des onglets actifs dans l'ordre configuré
- */
-const activeTabsInOrder = (settings: SettingsType | null) => {
-  if (!settings) return TABS
-  const active = new Set(settings.onglets.actifs)
-  return TABS.filter(([id]) => active.has(id)).sort(
-    (a, b) => settings.onglets.ordre.indexOf(a[0]) - settings.onglets.ordre.indexOf(b[0]),
-  )
-}
-
-/**
- * Un élément défilant déborde-t-il ?
- *
- * Rendre la barre d'onglets défilante ne suffisait pas : sur macOS, la barre de
- * défilement ne s'affiche que pendant le geste, donc rien ne signalait qu'un
- * onglet était hors champ — c'est exactement le défaut qu'on corrige. Il faut
- * mesurer pour pouvoir le dire.
- */
-function useDeborde() {
-  const [deborde, setDeborde] = useState(false)
-  const [element, setElement] = useState<HTMLElement | null>(null)
-
-  useEffect(() => {
-    if (!element) return
-    const mesurer = () => setDeborde(element.scrollWidth > element.clientWidth + 1)
-    mesurer()
-    const observer = new ResizeObserver(mesurer)
-    observer.observe(element)
-    return () => observer.disconnect()
-  }, [element])
-
-  return { deborde, ref: setElement }
-}
 
 /**
  * Le projet courant vit dans la requête, pas dans le chemin.
@@ -176,6 +110,9 @@ export function App() {
   // menu natif l'ouvre aussi, et son gestionnaire vit dans ce composant.
   const [preferencesOuvertes, setPreferencesOuvertes] = useState(false)
 
+  /** Palette de commandes ⌘K (T-0048) — voir `CommandPalette.tsx`. */
+  const [paletteOuverte, setPaletteOuverte] = useState(false)
+
   // La carte Déploiements de l'Aperçu ouvre directement sur la section Projet,
   // provider présélectionné — sans ça, le CTA amènerait sur « Profils » et
   // laisserait chercher.
@@ -204,8 +141,6 @@ export function App() {
   const [terminal, setTerminal] = useState(true)
   const [terminalHeight, setTerminalHeight] = useState(244)
   const [terminalWidth, setTerminalWidth] = useState(468)
-
-  const onglets = useDeborde()
 
   const sidebar = useResizable({
     key: 'sidebar',
@@ -461,15 +396,42 @@ export function App() {
 
   // ⌘, hors Electron : dans un navigateur il n'y a pas de menu natif pour
   // porter le raccourci, et c'est le geste qu'on essaie en premier.
+  //
+  // ⌘K (T-0048) n'a jamais eu de porteur, ni menu natif ni navigateur : la
+  // palette est neuve, ce raccourci global est sa seule entrée au clavier.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== ',' || !(event.metaKey || event.ctrlKey)) return
-      setPreferencesOuvertes(true)
-      event.preventDefault()
+      if (!(event.metaKey || event.ctrlKey)) return
+      if (event.key === ',') {
+        setPreferencesOuvertes(true)
+        event.preventDefault()
+      } else if (event.key.toLowerCase() === 'k') {
+        setPaletteOuverte(before => !before)
+        event.preventDefault()
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
+
+  /**
+   * Changer de vue — rail (`Sidebar`) et palette ⌘K (`CommandPalette`) font
+   * le même geste, une seule fois défini.
+   */
+  const onTabPick = (id: TabId, path: string) => {
+    setTab(id)
+    // Même correction qu'au clic d'onglet historique : plein écran est une
+    // vue du terminal, on n'y reste pas en changeant de vue.
+    setLayout(l => (l === 'full' ? 'bottom' : l))
+    pushUrl(path, current)
+  }
+
+  /** Ouvrir un ticket dans Tableau — depuis la frise Historique ou la palette ⌘K. */
+  const onOuvrirTicket = (file: string) => {
+    setTab('tableau')
+    setFocusTicket(file)
+    pushUrl('/tableau', current, file)
+  }
 
   const plans = snapshot?.plans ?? []
   const scan = lastScan(snapshot?.scans ?? [])
@@ -539,80 +501,34 @@ export function App() {
       <div style={s('flex: 1; display: flex; flex-direction: column; min-height: 0;')}>
 
         <div style={s('flex: 1; display: flex; min-height: 0;')}>
-          {/* Rétractée, la barre disparaît avec sa poignée : un séparateur seul
-              serait une poignée qui ne redimensionne rien de visible. */}
-          {sidebarOuverte && (
-            <>
-              <Sidebar
-                projects={projects}
-                current={current}
-                snapshot={snapshot}
-                settings={settings}
-                width={sidebar.size}
-                onPick={path => {
-                  setCurrent(path)
-                  pushUrl(window.location.pathname, path)
-                }}
-                onProjects={applyProjects}
-                onError={setError}
-                onOpenPreferences={() => setPreferencesOuvertes(true)}
-                density={density(commitsDeLaFrise(snapshot?.timeline ?? []), {
-                  fenetre: settings?.densiteActivite.fenetre,
-                })}
-              />
-              <Divider axis="x" resizable={sidebar} />
-            </>
-          )}
+          {/* Le rail de navigation (T-0047) vit dans la barre latérale : repliée,
+              elle passe en icône-seule plutôt que de disparaître — c'est ce qui
+              garde les 7 vues à un clic sans réserver la largeur d'une barre
+              ouverte. Le redimensionnement (Divider) ne vaut que déployée : une
+              largeur d'icônes ne se règle pas à la souris. */}
+          <Sidebar
+            collapsed={!sidebarOuverte}
+            projects={projects}
+            current={current}
+            snapshot={snapshot}
+            settings={settings}
+            width={sidebar.size}
+            tab={tab}
+            onTabPick={onTabPick}
+            onPick={path => {
+              setCurrent(path)
+              pushUrl(window.location.pathname, path)
+            }}
+            onProjects={applyProjects}
+            onError={setError}
+            onOpenPreferences={() => setPreferencesOuvertes(true)}
+            density={density(commitsDeLaFrise(snapshot?.timeline ?? []), {
+              fenetre: settings?.densiteActivite.fenetre,
+            })}
+          />
+          {sidebarOuverte && <Divider axis="x" resizable={sidebar} />}
 
           <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0;')}>
-            {/* Onglets — maquette l. 75-79.
-                `overflow-x: auto` et `flex: none` sur chaque lien : sous 800 px
-                de large, la barre débordait sans barre de défilement et
-                l'onglet Stack sortait de la fenêtre sans que rien ne le dise. */}
-            <nav
-              ref={onglets.ref}
-              aria-label="Onglets du projet"
-              style={s(
-                'height: 44px; flex: none; display: flex; align-items: stretch; gap: 2px; padding: 0 12px; border-bottom: 1px solid var(--color-divider); background: var(--theme-bg-quaternary); overflow-x: auto; overflow-y: hidden; scrollbar-width: none;' +
-                  // Le dégradé n'apparaît que quand il y a réellement quelque
-                  // chose de coupé : posé en permanence, il estomperait le
-                  // dernier onglet d'une barre qui tient tout entière.
-                  (onglets.deborde
-                    ? ' mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);'
-                    : ''),
-              )}
-            >
-              {activeTabsInOrder(settings).map(([id, cle, path]) => (
-                // Un vrai lien, pas un bouton : c'est ce que lit
-                // `page.$$eval('a[href]')` dans crawl/index.js. Le href doit
-                // exister pour que l'onglet soit découvrable.
-                <a
-                  key={id}
-                  href={path}
-                  onClick={event => {
-                    // Laisser passer cmd-clic, ctrl-clic et clic molette :
-                    // ouvrir un onglet dans une nouvelle fenêtre reste possible.
-                    if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
-                    event.preventDefault()
-                    setTab(id)
-                    setLayout(l => (l === 'full' ? 'bottom' : l))
-                    pushUrl(path, current)
-                  }}
-                  style={s(
-                    // `display: flex; align-items: center; text-decoration: none`
-                    // rattrape la mise en forme par défaut d'un lien ; le reste
-                    // est copié de la maquette l. 75-79.
-                    'display: flex; align-items: center; flex: none; white-space: nowrap; text-decoration: none; background: transparent; border: 0; cursor: pointer; font-family: var(--font-body); font-size: 13px; padding: 0 14px; letter-spacing: .01em; ' +
-                      (tab === id
-                        ? 'color: var(--color-text); box-shadow: inset 0 -2px 0 var(--color-accent);'
-                        : 'color: var(--color-neutral-500);'),
-                  )}
-                >
-                  {t(cle)}
-                </a>
-              ))}
-            </nav>
-
             <div
               style={s(
                 layout === 'side'
@@ -678,11 +594,7 @@ export function App() {
                           timeline={snapshot.timeline ?? []}
                           ticketTimeline={snapshot.ticketTimeline ?? []}
                           illisibles={snapshot.illisibles ?? []}
-                          onOuvrirTicket={file => {
-                            setTab('tableau')
-                            setFocusTicket(file)
-                            pushUrl('/tableau', current, file)
-                          }}
+                          onOuvrirTicket={onOuvrirTicket}
                         />
                       )}
                       {tab === 'tableau' && (
@@ -791,6 +703,17 @@ export function App() {
           integrations={snapshot?.integrations}
           initialSection={preferencesInitial?.section}
           initialProvider={preferencesInitial?.provider}
+        />
+      )}
+
+      {paletteOuverte && (
+        <CommandPalette
+          settings={settings}
+          tickets={snapshot?.tickets ?? []}
+          onClose={() => setPaletteOuverte(false)}
+          onTabPick={onTabPick}
+          onOpenPreferences={() => setPreferencesOuvertes(true)}
+          onOpenTicket={onOuvrirTicket}
         />
       )}
     </div>
@@ -955,25 +878,42 @@ function DensityHeatmap({ bars }: { bars: number[] }) {
   )
 }
 
-/** Barre latérale — maquette l. 45-71. */
+/** Largeur fixe du rail replié — juste assez pour un picto 16px centré. */
+const RAIL_COLLAPSED_WIDTH = 52
+
+/**
+ * Barre latérale — maquette l. 45-71, rail des vues intégré (T-0047, maquette
+ * 1b/2b : Projets puis Vues dans une seule colonne).
+ *
+ * Repliée (`collapsed`), elle ne montre que les 7 pictos de vue, sans projets
+ * ni activité — c'est la lecture « rail replié » de la maquette 2k. Les
+ * Préférences restent joignables par ⌘, dans ce mode : pas besoin d'un
+ * bouton en plus dans une colonne de 52px.
+ */
 function Sidebar({
+  collapsed,
   projects,
   current,
   snapshot,
   settings,
   width,
+  tab,
+  onTabPick,
   onPick,
   onProjects,
   onError,
   onOpenPreferences,
   density: bars,
 }: {
+  collapsed: boolean
   projects: Project[]
   current: string | null
   /** L'instantané du projet affiché, pour que sa pastille suive le tableau. */
   snapshot: Snapshot | null
   settings: SettingsType | null
   width: number
+  tab: TabId
+  onTabPick: (id: TabId, path: string) => void
   onPick: (path: string) => void
   onProjects: (list: Project[], select?: string | null) => void
   onError: (message: string) => void
@@ -985,6 +925,22 @@ function Sidebar({
   // navigateur, le bouton est absent plutôt que présent et inerte — même
   // franchise que pour le terminal.
   const picker = window.ovrsee?.projects
+  const views = activeTabsInOrder(settings)
+
+  if (collapsed) {
+    return (
+      <aside
+        aria-label={t('sidebar.projects')}
+        style={s(
+          `width: ${RAIL_COLLAPSED_WIDTH}px; flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; background: var(--theme-bg-secondary); border-right: 1px solid var(--color-divider); padding: 14px 0;`,
+        )}
+      >
+        {views.map(([id, cle, path]) => (
+          <RailLink key={id} id={id} label={t(cle)} path={path} active={tab === id} onTabPick={onTabPick} compact />
+        ))}
+      </aside>
+    )
+  }
 
   return (
     <aside
@@ -1029,6 +985,19 @@ function Sidebar({
         ))}
       </div>
 
+      <div
+        style={s(
+          'padding: 12px 14px 6px; display: flex; align-items: center; gap: 8px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);',
+        )}
+      >
+        {t('sidebar.views')}
+      </div>
+      <div style={s('display: flex; flex-direction: column; gap: 1px; padding: 0 8px;')}>
+        {views.map(([id, cle, path]) => (
+          <RailLink key={id} id={id} label={t(cle)} path={path} active={tab === id} onTabPick={onTabPick} />
+        ))}
+      </div>
+
       <div style={s('flex: 1;')} />
 
       {/* Une seule porte vers la configuration. Les skills et la lecture de
@@ -1067,6 +1036,69 @@ function Sidebar({
         )}
       </div>
     </aside>
+  )
+}
+
+/**
+ * Une ligne du rail des vues — icône Phosphor (plein à l'état actif, sinon
+ * contour) plus libellé, ou icône seule en rail replié (`compact`).
+ *
+ * Un vrai `<a href>`, jamais un bouton : `crawl/index.js` découvre les
+ * routes via `page.$$eval('a[href]')` (même contrainte que l'ancienne barre
+ * d'onglets, voir `App.tsx` plus haut).
+ *
+ * L'état actif est une surface élevée, jamais un filet de couleur — maquette
+ * 2a : « au repos, survol, actif — picto plein ». Pas de ligne d'accent
+ * comme sur `ProjectRow`, volontairement : ce composant est celui que la
+ * maquette encadre nommément sur ce point.
+ */
+function RailLink({
+  id,
+  label,
+  path,
+  active,
+  compact,
+  onTabPick,
+}: {
+  id: TabId
+  label: string
+  path: string
+  active: boolean
+  compact?: boolean
+  onTabPick: (id: TabId, path: string) => void
+}) {
+  const [hover, setHover] = useState(false)
+  const Icon = TAB_ICONS[id]
+
+  return (
+    <a
+      href={path}
+      title={compact ? label : undefined}
+      aria-current={active ? 'page' : undefined}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onClick={event => {
+        // Laisser passer cmd-clic, ctrl-clic et clic molette : ouvrir une vue
+        // dans une nouvelle fenêtre reste possible.
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
+        event.preventDefault()
+        onTabPick(id, path)
+      }}
+      style={s(
+        (compact
+          ? 'width: 36px; height: 36px; justify-content: center;'
+          : 'padding: 7px 8px; gap: 10px;') +
+          ' display: flex; align-items: center; text-decoration: none; border-radius: var(--radius-sm); font-size: 13px; ' +
+          (active
+            ? 'background: var(--color-surface-active); color: var(--color-text);'
+            : hover
+              ? 'background: color-mix(in srgb, var(--color-text) 7%, transparent); color: var(--color-text-secondary);'
+              : 'color: var(--color-text-tertiary);'),
+      )}
+    >
+      <Icon size={16} weight={active ? 'fill' : 'regular'} aria-hidden="true" />
+      {!compact && label}
+    </a>
   )
 }
 

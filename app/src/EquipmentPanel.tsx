@@ -122,7 +122,7 @@ function Champ({
         value={valeur}
         onChange={event => onValeur(event.target.value)}
         spellCheck={false}
-        style={s('margin-top: 4px; font-family: monospace; font-size: 12px;')}
+        style={s('margin-top: 4px; font-family: var(--font-mono); font-size: 12px;')}
       />
     </label>
   )

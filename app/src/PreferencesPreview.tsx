@@ -121,40 +121,36 @@ export function PreferencesPreview({ settings }: { settings: SettingsType }) {
       </div>
 
       <div style={s('flex: 1; display: flex; min-height: 0;')}>
-        {/* Barre latérale des projets. */}
+        {/* Barre latérale — projets puis vues, une seule colonne, comme le
+            rail (T-0047). Le premier onglet visible porte une surface
+            élevée, jamais un liseré de couleur — même règle que le vrai
+            rail (`App.tsx`, maquette 2a). */}
         <div
           style={s(
-            'flex: none; width: 38px; display: flex; flex-direction: column; gap: 5px; padding: 7px 5px; background: var(--theme-bg-secondary); border-right: 1px solid var(--color-divider);',
+            'flex: none; width: 42px; display: flex; flex-direction: column; gap: 5px; padding: 7px 5px; background: var(--theme-bg-secondary); border-right: 1px solid var(--color-divider); overflow: hidden;',
           )}
         >
-          <Ligne width={22} />
-          <Ligne width={16} dim />
-          <Ligne width={19} dim />
+          <Ligne width={26} />
+          <Ligne width={18} dim />
+
+          <div style={s('height: 1px; margin: 1px 0; background: var(--color-divider);')} />
+
+          {onglets.map((id, index) => (
+            <div
+              key={id}
+              style={s(
+                'display: flex; align-items: center; height: 10px; padding: 0 3px; border-radius: 2px; font-size: 7px; white-space: nowrap; overflow: hidden;' +
+                  (index === 0
+                    ? ' background: var(--color-surface-active); color: var(--color-text);'
+                    : ' color: var(--color-neutral-600);'),
+              )}
+            >
+              {t(TAB_KEYS[id] ?? 'tabs.apercu')}
+            </div>
+          ))}
         </div>
 
         <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0;')}>
-          {/* La barre d'onglets : le cœur de l'aperçu. Le premier onglet
-              visible porte le liseré d'accent, comme la vraie nav. */}
-          <div
-            style={s(
-              'flex: none; height: 18px; display: flex; align-items: stretch; gap: 1px; padding: 0 5px; background: var(--theme-bg-quaternary); border-bottom: 1px solid var(--color-divider); overflow: hidden;',
-            )}
-          >
-            {onglets.map((id, index) => (
-              <span
-                key={id}
-                style={s(
-                  'display: flex; align-items: center; flex: none; white-space: nowrap; padding: 0 5px; font-size: 8px; letter-spacing: .01em;' +
-                    (index === 0
-                      ? ' color: var(--color-text); box-shadow: inset 0 -2px 0 var(--color-accent);'
-                      : ' color: var(--color-neutral-600);'),
-                )}
-              >
-                {t(TAB_KEYS[id] ?? 'tabs.apercu')}
-              </span>
-            ))}
-          </div>
-
           <div
             style={s(
               disposition === 'side'

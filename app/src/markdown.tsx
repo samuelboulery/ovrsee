@@ -62,8 +62,11 @@ const isExternal = (href: string) => /^https?:\/\//i.test(href)
 const inlinePattern = () =>
   /(`[^`]+`)|(!\[[^\]]*\]\([^)\s]+\))|(\*\*[^*]+\*\*)|(\*[^*\n]+\*)|(\[[^\]]*\]\([^)\s]+\))/g
 
+// `--color-surface-control`, pas `--color-neutral-900` : ce dernier vaut
+// exactement `--color-bg` en thème clair (T-0045, rampe inversée) — un code
+// « surligné » qui se fond dans le fond de la page.
 const CODE_STYLE =
-  'font-family: ui-monospace, monospace; font-size: .92em; background: var(--color-neutral-900); border: 1px solid var(--color-neutral-800); border-radius: 4px; padding: 1px 5px;'
+  'font-family: var(--font-mono); font-size: .92em; background: var(--color-surface-control); border: 1px solid var(--color-neutral-800); border-radius: 4px; padding: 1px 5px;'
 
 /**
  * Une image ou une vidéo du dépôt, ou rien.
@@ -88,7 +91,7 @@ function media(src: string, alt: string, key: string, root?: string): ReactNode 
     return (
       <span key={key} style={s('color: var(--color-neutral-500);')}>
         {alt || t('markdown.image')}
-        <span style={s('font-family: ui-monospace, monospace; font-size: .88em;')}>
+        <span style={s('font-family: var(--font-mono); font-size: .88em;')}>
           {` (${src})`}
         </span>
       </span>
@@ -181,7 +184,7 @@ function inline(text: string, keyPrefix: string, root?: string): ReactNode[] {
           // vaut mieux qu'un mot souligné qui ne mènerait nulle part.
           <span key={key} style={s('color: var(--color-neutral-500);')}>
             {texte}
-            <span style={s('font-family: ui-monospace, monospace; font-size: .88em;')}>
+            <span style={s('font-family: var(--font-mono); font-size: .88em;')}>
               {` (${href})`}
             </span>
           </span>
@@ -224,7 +227,7 @@ function Bloc({ code, language }: { code: string; language: string }) {
   return (
     <div
       style={s(
-        'margin: 12px 0; border: 1px solid var(--color-neutral-800); border-radius: 8px; background: var(--color-neutral-900); overflow: hidden;',
+        'margin: 12px 0; border: 1px solid var(--color-neutral-800); border-radius: 8px; background: var(--color-surface-control); overflow: hidden;',
       )}
     >
       <div
@@ -257,7 +260,7 @@ function Bloc({ code, language }: { code: string; language: string }) {
       </div>
       <pre
         style={s(
-          'margin: 0; padding: 12px 14px; overflow-x: auto; font-family: ui-monospace, monospace; font-size: 11.5px; line-height: 1.6; color: var(--color-neutral-300);',
+          'margin: 0; padding: 12px 14px; overflow-x: auto; font-family: var(--font-mono); font-size: 11.5px; line-height: 1.6; color: var(--color-neutral-300);',
         )}
       >
         <code>

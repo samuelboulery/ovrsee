@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Refonte de la sélection de profil d'interface à l'onboarding",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-11",
   "commits": [
     {
       "sha": "c0b34f7",
@@ -28,6 +28,11 @@
     },
     {
       "sha": "ce483ed",
+      "date": "2026-08-11",
+      "files": []
+    },
+    {
+      "sha": "87120e2",
       "date": "2026-08-11",
       "files": []
     }

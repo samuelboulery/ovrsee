@@ -4,7 +4,24 @@
   "title": "Frise historique : vue par tickets + vue par commits",
   "opened": "2026-08-11",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "15c9408",
+      "date": "2026-08-11",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/data.ts",
+        "app/src/render.test.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Tableau.tsx",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/snapshot.js",
+        "hooks/timeline.js",
+        "hooks/timeline.test.js"
+      ]
+    }
+  ]
 }
 ---
 

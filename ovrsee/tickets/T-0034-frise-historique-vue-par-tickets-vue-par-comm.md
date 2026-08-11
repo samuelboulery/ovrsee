@@ -2,7 +2,7 @@
 {
   "id": "T-0034",
   "titre": "Frise historique : vue par tickets (défaut) et vue par commits",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "l",
   "tags": [

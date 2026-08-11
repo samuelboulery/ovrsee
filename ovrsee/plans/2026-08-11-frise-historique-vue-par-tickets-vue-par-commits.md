@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Frise historique : vue par tickets + vue par commits",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-11",
   "commits": [
     {
       "sha": "15c9408",
@@ -28,6 +28,11 @@
     },
     {
       "sha": "f548acb",
+      "date": "2026-08-11",
+      "files": []
+    },
+    {
+      "sha": "0cf2997",
       "date": "2026-08-11",
       "files": []
     }

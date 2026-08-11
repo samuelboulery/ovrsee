@@ -4,7 +4,21 @@
   "title": "Tracer aussi les tâches hors plan / hors audit sous forme de ticket",
   "opened": "2026-08-11",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "f5acc08",
+      "date": "2026-08-11",
+      "files": [
+        "CLAUDE.md",
+        "hooks/ovrsee-capture-plan.js",
+        "hooks/ovrsee-tool-edit-gate.js",
+        "hooks/ovrsee-tool-edit-gate.test.js",
+        "hooks/tickets.js",
+        "hooks/tickets.test.js",
+        "skills/ovrsee-tickets/SKILL.md"
+      ]
+    }
+  ]
 }
 ---
 

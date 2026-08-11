@@ -2,7 +2,7 @@
 {
   "id": "T-0032",
   "titre": "Tracer les tâches hors plan/audit sous forme de ticket (.active-ticket)",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "m",
   "tags": [

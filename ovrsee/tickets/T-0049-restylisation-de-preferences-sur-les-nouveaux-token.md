@@ -2,7 +2,7 @@
 {
   "id": "T-0049",
   "titre": "Restylisation de Préférences sur les nouveaux tokens",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

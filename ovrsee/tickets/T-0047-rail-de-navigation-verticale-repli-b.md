@@ -2,7 +2,7 @@
 {
   "id": "T-0047",
   "titre": "Rail de navigation verticale, repli ⌘B",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

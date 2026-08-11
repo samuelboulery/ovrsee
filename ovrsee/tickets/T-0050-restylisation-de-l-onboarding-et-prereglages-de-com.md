@@ -2,7 +2,7 @@
 {
   "id": "T-0050",
   "titre": "Restylisation de l'Onboarding et préréglages de composition",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

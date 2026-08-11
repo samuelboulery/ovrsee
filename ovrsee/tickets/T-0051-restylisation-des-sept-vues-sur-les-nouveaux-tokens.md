@@ -2,7 +2,7 @@
 {
   "id": "T-0051",
   "titre": "Restylisation des sept vues sur les nouveaux tokens",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui"

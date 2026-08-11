@@ -2,7 +2,7 @@
 {
   "id": "T-0045",
   "titre": "Nouveau système de tokens : rampe, typographie, contraste",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

@@ -2,7 +2,7 @@
 {
   "id": "T-0044",
   "titre": "Refonte UI Ovrsee — identité, châssis et restylisation",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

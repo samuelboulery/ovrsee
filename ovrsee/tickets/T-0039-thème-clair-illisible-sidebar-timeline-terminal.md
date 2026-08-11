@@ -2,7 +2,7 @@
 {
   "id": "T-0039",
   "titre": "Thème clair illisible : sidebar, timeline, terminal figé sur le sombre",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

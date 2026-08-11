@@ -2,7 +2,7 @@
 {
   "id": "T-0046",
   "titre": "Icônes Phosphor : dépendance et remplacement des pictos",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

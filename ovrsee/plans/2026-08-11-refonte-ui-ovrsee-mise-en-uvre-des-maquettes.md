@@ -4,7 +4,59 @@
   "title": "Refonte UI Ovrsee — mise en œuvre des maquettes",
   "opened": "2026-08-11",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "f666ce1",
+      "date": "2026-08-11",
+      "files": [
+        "_ds/ovrsee/styles.css",
+        "app/index.html",
+        "app/src/App.tsx",
+        "app/src/CommandPalette.tsx",
+        "app/src/EquipmentPanel.tsx",
+        "app/src/Garde.tsx",
+        "app/src/Illisibles.tsx",
+        "app/src/Lightbox.tsx",
+        "app/src/Onboarding.tsx",
+        "app/src/OnboardingArt.tsx",
+        "app/src/PreferencesControls.tsx",
+        "app/src/PreferencesIntegrations.tsx",
+        "app/src/PreferencesPanel.tsx",
+        "app/src/PreferencesPreview.tsx",
+        "app/src/PreferencesProjet.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/Welcome.tsx",
+        "app/src/data.test.ts",
+        "app/src/data.ts",
+        "app/src/main.tsx",
+        "app/src/markdown.tsx",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Branches.tsx",
+        "app/src/tabs/Deploiements.tsx",
+        "app/src/tabs/Donnees.tsx",
+        "app/src/tabs/Environnements.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/Produit.tsx",
+        "app/src/theme.test.ts",
+        "app/src/theme.ts",
+        "app/src/views.ts",
+        "build/icon.icns",
+        "build/icon.ico",
+        "build/icon.svg",
+        "electron/main.js",
+        "hooks/couleurs.test.js",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "\"ovrsee/tickets/T-0039-th\\303\\250me-clair-illisible-sidebar-timeline-terminal.md\"",
+        "package.json",
+        "patches/@phosphor-icons__react.patch",
+        "pnpm-lock.yaml",
+        "pnpm-workspace.yaml",
+        "scripts/make-icon.js"
+      ]
+    }
+  ]
 }
 ---
 

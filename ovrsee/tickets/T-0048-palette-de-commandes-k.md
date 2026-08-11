@@ -2,7 +2,7 @@
 {
   "id": "T-0048",
   "titre": "Palette de commandes ⌘K",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

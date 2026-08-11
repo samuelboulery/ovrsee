@@ -34,7 +34,7 @@ import {
   closeOpenPlans,
   registerProject,
 } from './plans.js'
-import { clearActiveTicket, avancerTicketsClos } from './tickets.js'
+import { avancerTicketActifEclipse, clearActiveTicket, avancerTicketsClos } from './tickets.js'
 
 function readStdin() {
   try {
@@ -162,6 +162,7 @@ function main() {
 
   writeFileNoFollow(join(ovrseeDir, 'plans', file), serializePlan(meta, planText))
   writeFileNoFollow(join(ovrseeDir, '.active-plan'), file + '\n')
+  avancerTicketActifEclipse(ovrseeDir) // pousse en revue le ticket ad hoc en cours, avant de l'éclipser
   clearActiveTicket(ovrseeDir) // un plan qui démarre éclipse tout ticket ad hoc en cours
   registerProject(root)
 

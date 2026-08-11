@@ -604,6 +604,40 @@ export function clearActiveTicket(ovrseeDir, ticketId = null) {
   }
 }
 
+/**
+ * Avance en « revue » le ticket ad hoc actif, avant qu'un plan ne l'éclipse.
+ *
+ * Un ticket sans plan (`meta.plan === null`) qui satisfaisait le gate hors-plan
+ * n'est plus suivi par aucun hook une fois `.active-ticket` effacé : ni
+ * `avancerTicketsEnRevue` (`ovrsee-tool-stop.js`) ni `avancerTicketsDuPlan`
+ * (`ovrsee-post-commit.js`) ne le voient jamais passer, puisque tous deux ne
+ * suivent que les tickets dont `meta.plan` cite le plan actif. Sans ce geste,
+ * un ticket ad hoc en cours au moment où un plan démarre resterait figé en
+ * « en cours » indéfiniment — plus rien ne le fait avancer.
+ *
+ * À appeler avant `clearActiveTicket`, pendant que le pointeur désigne encore
+ * le ticket à éclipser. Silencieux si le ticket actif n'est pas en
+ * `en-cours`, cite déjà un plan, ou si le tableau n'a pas de colonne `revue`.
+ *
+ * @param {string} ovrseeDir
+ */
+export function avancerTicketActifEclipse(ovrseeDir) {
+  const id = readActiveTicket(ovrseeDir)
+  if (!id) return
+
+  const colonnes = readBoard(ovrseeDir)
+  if (!colonnes.some(c => c.id === 'revue')) return
+
+  const ticket = readTickets(ovrseeDir, colonnes).find(t => t.meta.id === id)
+  if (!ticket || ticket.meta.plan !== null || ticket.meta.colonne !== 'en-cours') return
+
+  try {
+    moveTicket(ovrseeDir, ticket.file, 'revue')
+  } catch {
+    // Un ticket qui ne peut pas être déplacé ne doit jamais faire échouer la capture.
+  }
+}
+
 /** L'id porté par un nom de fichier de ticket (`T-0012-slug.md` → `T-0012`), ou `null`. */
 const idFromFile = file => /^(T-\d+)-/.exec(file)?.[1] ?? null
 

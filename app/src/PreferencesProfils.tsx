@@ -24,7 +24,7 @@ type Profil = {
   cle: TranslationKey
   cleDesc: TranslationKey
   actifs: string[]
-  terminal: { visible: boolean; disposition: string }
+  terminal: { visible: boolean; disposition: string; disabled: boolean }
 }
 
 /**
@@ -40,28 +40,28 @@ export const PROFILS: Profil[] = [
     cle: 'pref.profile_complet',
     cleDesc: 'pref.profile_complet_desc',
     actifs: [...ORDRE_USINE],
-    terminal: { visible: true, disposition: 'bottom' },
+    terminal: { visible: true, disposition: 'bottom', disabled: false },
   },
   {
     id: 'sobre',
     cle: 'pref.profile_sobre',
     cleDesc: 'pref.profile_sobre_desc',
-    actifs: ['apercu', 'tableau', 'donnees'],
-    terminal: { visible: false, disposition: 'bottom' },
+    actifs: ['apercu', 'tableau', 'historique'],
+    terminal: { visible: false, disposition: 'bottom', disabled: true },
   },
   {
     id: 'revue',
     cle: 'pref.profile_revue',
     cleDesc: 'pref.profile_revue_desc',
     actifs: ['apercu', 'navigateur', 'produit', 'historique'],
-    terminal: { visible: false, disposition: 'bottom' },
+    terminal: { visible: false, disposition: 'bottom', disabled: true },
   },
   {
     id: 'dev',
     cle: 'pref.profile_dev',
     cleDesc: 'pref.profile_dev_desc',
     actifs: ['apercu', 'tableau', 'stack', 'historique'],
-    terminal: { visible: true, disposition: 'side' },
+    terminal: { visible: true, disposition: 'side', disabled: false },
   },
 ]
 
@@ -111,7 +111,8 @@ export function profilCourant(settings: SettingsType): string | null {
       terminal?.visible === profil.terminal.visible &&
       // La disposition ne compte que si le terminal est visible : masqué, elle
       // ne se voit nulle part et n'a pas à disqualifier un template.
-      (!profil.terminal.visible || terminal?.disposition === profil.terminal.disposition),
+      (!profil.terminal.visible || terminal?.disposition === profil.terminal.disposition) &&
+      (terminal?.disabled ?? false) === profil.terminal.disabled,
   )
   return trouve?.id ?? null
 }

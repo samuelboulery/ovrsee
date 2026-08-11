@@ -225,6 +225,15 @@ test('appliquerProfil : ne touche que les onglets et le terminal', () => {
   assert.equal(apres.terminal.hauteur, 300)
   assert.equal(apres.terminal.largeur, 500)
   assert.equal(apres.terminal.visible, false)
+  assert.equal(apres.terminal.disabled, true)
+})
+
+test('appliquerProfil : reprend `disabled` au template, même s’il avait été rouvert à la main', () => {
+  const avant = settings({
+    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468, disabled: false },
+  })
+  const apres = appliquerProfil(avant, profil('sobre'))
+  assert.equal(apres.terminal.disabled, true)
 })
 
 test('profilCourant : reconnaît le réglage d’usine, et rien d’autre', () => {
@@ -239,4 +248,10 @@ test('profilCourant : terminal masqué, la disposition ne départage pas', () =>
   const sobre = appliquerProfil(settings(), profil('sobre'))
   const autre = { ...sobre, terminal: { ...sobre.terminal, disposition: 'full' } }
   assert.equal(profilCourant(autre), 'sobre')
+})
+
+test('profilCourant : un terminal réactivé à la main sort du template', () => {
+  const sobre = appliquerProfil(settings(), profil('sobre'))
+  const reactive = { ...sobre, terminal: { ...sobre.terminal, disabled: false } }
+  assert.equal(profilCourant(reactive), null)
 })

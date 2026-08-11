@@ -6,6 +6,7 @@ import { join } from 'node:path'
 
 import {
   DEFAULT_COLUMNS,
+  avancerTicketActifEclipse,
   avancerTicketsClos,
   childrenOf,
   colonneFinale,
@@ -777,4 +778,67 @@ test('moveTicket vers en-cours ne pose pas .active-ticket si un plan est actif',
 
   moveTicket(ovrseeDir, file, 'en-cours')
   assert.equal(readActiveTicket(ovrseeDir), null)
+})
+
+// --- avancerTicketActifEclipse ---------------------------------------------
+
+test('avancerTicketActifEclipse : ticket ad hoc en cours part en revue', () => {
+  const ovrseeDir = fixture()
+  const { file, meta } = createTicket(ovrseeDir, { titre: 'Ad hoc', colonne: 'en-cours' })
+
+  avancerTicketActifEclipse(ovrseeDir)
+
+  const relu = readTickets(ovrseeDir).find(t => t.meta.id === meta.id)
+  assert.equal(relu.meta.colonne, 'revue')
+  assert.equal(relu.file, file)
+})
+
+test('avancerTicketActifEclipse : ticket pas encore commencé ne bouge pas', () => {
+  const ovrseeDir = fixture()
+  const { meta } = createTicket(ovrseeDir, { titre: 'Pas commencé', colonne: 'pret' })
+
+  avancerTicketActifEclipse(ovrseeDir)
+
+  const relu = readTickets(ovrseeDir).find(t => t.meta.id === meta.id)
+  assert.equal(relu.meta.colonne, 'pret')
+})
+
+test('avancerTicketActifEclipse : ticket lié à un plan ne bouge pas, même si .active-ticket le désigne', () => {
+  const ovrseeDir = fixture()
+  // createTicket ne pose jamais .active-ticket pour un ticket lié à un plan :
+  // on force le pointeur pour éprouver la garde `meta.plan !== null` elle-même.
+  const { file, meta } = createTicket(ovrseeDir, {
+    titre: 'Sous plan',
+    colonne: 'en-cours',
+    plan: '2026-08-10-x.md',
+  })
+  writeFileSync(join(ovrseeDir, '.active-ticket'), meta.id + '\n', 'utf8')
+
+  avancerTicketActifEclipse(ovrseeDir)
+
+  const relu = readTickets(ovrseeDir).find(t => t.file === file)
+  assert.equal(relu.meta.colonne, 'en-cours')
+})
+
+test('avancerTicketActifEclipse : silencieux sans .active-ticket', () => {
+  const ovrseeDir = fixture()
+  createTicket(ovrseeDir, { titre: 'Ad hoc', colonne: 'en-cours' })
+  clearActiveTicket(ovrseeDir)
+
+  assert.doesNotThrow(() => avancerTicketActifEclipse(ovrseeDir))
+})
+
+test('avancerTicketActifEclipse : silencieux si le board n’a pas de colonne revue', () => {
+  const ovrseeDir = fixture()
+  writeBoard(ovrseeDir, [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'en-cours', titre: 'En cours' },
+    { id: 'fait', titre: 'Fait' },
+  ])
+  const { meta } = createTicket(ovrseeDir, { titre: 'Ad hoc', colonne: 'en-cours' })
+
+  avancerTicketActifEclipse(ovrseeDir)
+
+  const relu = readTickets(ovrseeDir).find(t => t.meta.id === meta.id)
+  assert.equal(relu.meta.colonne, 'en-cours')
 })

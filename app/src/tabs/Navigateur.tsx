@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
-import type { Snapshot } from '../data'
+import { ticketAction, type Snapshot } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
 import { pasteToClaude } from '../useTerminal'
@@ -210,6 +210,26 @@ const describe = (picked: Picked): string =>
     `html      : ${picked.html}`,
   ].join('\n')
 
+/** Le titre proposé par défaut — le texte de l'élément d'abord, sa route sinon. */
+const titreDepuis = (picked: Picked): string =>
+  picked.text ? picked.text.slice(0, 80) : `Élément de ${picked.route}`
+
+/** Le corps du ticket : même contexte que `describe()`, en markdown plutôt qu'en texte pour Claude. */
+const corpsDepuis = (picked: Picked): string =>
+  [
+    '## Contexte',
+    '',
+    `Élément sélectionné dans l'aperçu, route \`${picked.route}\`.`,
+    '',
+    `Sélecteur : \`${picked.selector}\``,
+    '',
+    `Texte : « ${picked.text} »`,
+    '',
+    '```html',
+    picked.html,
+    '```',
+  ].join('\n')
+
 /**
  * Onglet Navigateur — l'application en cours de développement, dans l'ovrsee.
  *
@@ -233,6 +253,8 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
   const [logs, setLogs] = useState<Log[]>([])
   const [logsOpen, setLogsOpen] = useState(false)
   const [picking, setPicking] = useState(false)
+  const [picked, setPicked] = useState<Picked | null>(null)
+  const [ticketing, setTicketing] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
 
   // Les DevTools sont une vue native posée au-dessus du DOM par le processus
@@ -400,12 +422,36 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
 
     setPicking(true)
     try {
-      const picked = (await element.executeJavaScript(`(${pickElement})()`)) as Picked | null
-      if (picked) await send('Élément', describe(picked))
+      const result = (await element.executeJavaScript(`(${pickElement})()`)) as Picked | null
+      if (result) setPicked(result)
     } catch (err) {
       say(t('navigateur.selection_failed', { error: err instanceof Error ? err.message : String(err) }))
     } finally {
       setPicking(false)
+    }
+  }
+
+  const envoyerAClaude = async () => {
+    if (!picked) return
+    await send('Élément', describe(picked))
+    setPicked(null)
+  }
+
+  const creerTicket = async () => {
+    if (!picked) return
+    setTicketing(true)
+    try {
+      await ticketAction('create', snapshot.root, {
+        titre: titreDepuis(picked),
+        tags: ['navigateur'],
+        corps: corpsDepuis(picked),
+      })
+      say(t('navigateur.ticket_created'))
+      setPicked(null)
+    } catch (err) {
+      say(t('navigateur.ticket_failed', { error: err instanceof Error ? err.message : String(err) }))
+    } finally {
+      setTicketing(false)
     }
   }
 
@@ -670,6 +716,40 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {picked && (
+        <div
+          style={s(
+            'flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-top: 1px solid var(--color-divider); background: var(--color-surface); font-size: 11.5px;',
+          )}
+        >
+          <span style={s('font-family: var(--font-mono); color: var(--color-accent); flex: none;')}>
+            {picked.selector}
+          </span>
+          <span
+            style={s(
+              'flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--color-neutral-600);',
+            )}
+          >
+            {picked.text}
+          </span>
+          <button type="button" onClick={envoyerAClaude} className="btn btn-secondary" style={s('font-size: 11px; padding: 3px 9px;')}>
+            {t('navigateur.send_to_claude')}
+          </button>
+          <button
+            type="button"
+            onClick={creerTicket}
+            disabled={ticketing}
+            className="btn btn-secondary"
+            style={s('font-size: 11px; padding: 3px 9px;')}
+          >
+            {ticketing ? t('navigateur.ticket_creating') : t('navigateur.create_ticket')}
+          </button>
+          <button type="button" onClick={() => setPicked(null)} className="btn btn-ghost" style={s('font-size: 11px; padding: 3px 8px;')}>
+            {t('navigateur.dismiss_selection')}
+          </button>
         </div>
       )}
 

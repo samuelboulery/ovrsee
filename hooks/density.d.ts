@@ -8,3 +8,11 @@ export function density(
   commits: Array<{ date: string }>,
   options?: { fenetre?: string; now?: Date },
 ): number[]
+
+export function dailyCounts(
+  entries: Array<{ date: string }>,
+  days: number,
+  now?: Date,
+): number[]
+
+export function foldWeekly(daily: number[]): number[]

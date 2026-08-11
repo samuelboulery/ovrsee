@@ -827,10 +827,19 @@ export interface IntegrationStatus {
   deployments?: DeploymentInfo[]
 }
 
+/** Une colonne d'une table lue en direct, avec sa clé primaire et sa clé étrangère éventuelle. */
+export interface SchemaColumn {
+  name: string
+  type: string
+  pk: boolean
+  /** `table.colonne` référencée, ou `null` si la colonne ne porte pas de clé étrangère. */
+  fk: string | null
+}
+
 /** Une table du schéma public, lue en direct — Supabase uniquement en v1. */
 export interface SchemaTable {
   name: string
-  columns: string[]
+  columns: SchemaColumn[]
 }
 
 /**
@@ -958,8 +967,8 @@ export const history = (plans: Plan[]): Plan[] =>
  * dans le bundle du navigateur se fait externaliser par Vite, et l'application
  * tombe à la première lecture au lieu de refuser de compiler.
  */
-import { density } from '../../hooks/density'
-export { density }
+import { density, dailyCounts, foldWeekly } from '../../hooks/density'
+export { density, dailyCounts, foldWeekly }
 
 /**
  * Tous les commits de la frise, ceux des plans comme les autres.
@@ -972,6 +981,16 @@ export { density }
 export const commitsDeLaFrise = (timeline: TimelineEntry[]): GitCommit[] =>
   liste(timeline).flatMap(entry =>
     entry.kind === 'plan' ? (entry.commits ?? []) : entry.commit ? [entry.commit] : [],
+  )
+
+/** Une entrée par plan de la frise commits — sa date est celle du commit qui l'a ouvert. */
+export const planEntriesDeLaFrise = (timeline: TimelineEntry[]): TimelineEntry[] =>
+  liste(timeline).filter(entry => entry.kind === 'plan')
+
+/** Tous les tickets de la frise tickets, ceux des bandes de plan comme les autres — même principe que `commitsDeLaFrise`. */
+export const ticketsDeLaFrise = (ticketTimeline: TicketTimelineEntry[]): Ticket[] =>
+  liste(ticketTimeline).flatMap(entry =>
+    entry.kind === 'plan' ? (entry.tickets ?? []) : entry.ticket ? [entry.ticket] : [],
   )
 
 /**

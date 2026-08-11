@@ -123,3 +123,51 @@ export function density(commits, { fenetre, now = new Date() } = {}) {
 
   return buckets
 }
+
+const DAY_MS = 24 * 60 * 60 * 1000
+
+/**
+ * Nombre d'entrées par jour calendaire, sur une fenêtre de `days` jours se
+ * terminant aujourd'hui. Du plus ancien au plus récent, comme `density()`.
+ *
+ * Primitive volontairement plus simple que `density()` : celle-ci choisit sa
+ * granularité selon une fenêtre nommée (jour/semaine/mois/an), utile pour un
+ * seul réglage à l'écran. Le graphe d'activité de l'onglet Historique a besoin
+ * de fenêtres fixes en jours (14, 30) et d'un repliage en semaines (12×7) —
+ * une seule primitive suffit aux trois, pas besoin d'étendre `density()`.
+ *
+ * @param {Array<{date: string}>} entries
+ * @param {number} days
+ * @param {Date} [now]
+ * @returns {number[]}
+ */
+export function dailyCounts(entries, days, now = new Date()) {
+  const buckets = new Array(days).fill(0)
+  const nowDays = Math.floor(now.getTime() / DAY_MS)
+
+  for (const entry of Array.isArray(entries) ? entries : []) {
+    const at = Date.parse(entry?.date)
+    if (Number.isNaN(at)) continue
+    const age = nowDays - Math.floor(at / DAY_MS)
+    if (age >= 0 && age < days) buckets[days - 1 - age] += 1
+  }
+
+  return buckets
+}
+
+/**
+ * Replie une série journalière (plus ancien → plus récent) en sommes
+ * hebdomadaires, même ordre. `daily.length` doit être un multiple de 7 —
+ * appelant contrôlé (`dailyCounts(entries, weeks * 7)`), pas une entrée
+ * externe à valider.
+ *
+ * @param {number[]} daily
+ * @returns {number[]}
+ */
+export function foldWeekly(daily) {
+  const weeks = []
+  for (let i = 0; i < daily.length; i += 7) {
+    weeks.push(daily.slice(i, i + 7).reduce((sum, n) => sum + n, 0))
+  }
+  return weeks
+}

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { frDate, tablesFrom, type GraphifyGraph, type Integration, type Snapshot } from '../data'
+import { frDate, tablesFrom, type GraphifyGraph, type Integration, type SchemaTable, type Snapshot } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
 import type { IntegrationsBridge } from '../useTerminal'
@@ -186,6 +186,7 @@ export function Donnees({
   const ovrsee = bridge()
   const [liveTables, setLiveTables] = useState<string[] | null>(null)
   const [liveOnly, setLiveOnly] = useState<string[]>([])
+  const [liveSchema, setLiveSchema] = useState<SchemaTable[] | null>(null)
   const [liveBusy, setLiveBusy] = useState(false)
   const [liveErreur, setLiveErreur] = useState<string | null>(null)
 
@@ -204,6 +205,7 @@ export function Donnees({
         const connues = new Set(tables.map(table => table.name))
         setLiveTables(noms)
         setLiveOnly(noms.filter(nom => !connues.has(nom)))
+        setLiveSchema(result.tables)
       })
       .finally(() => setLiveBusy(false))
   }
@@ -307,6 +309,72 @@ export function Donnees({
           )}
         </div>
       )}
+
+      {liveSchema && liveSchema.length > 0 && <LiveSchema tables={liveSchema} />}
+    </div>
+  )
+}
+
+/**
+ * Le schéma tel que la base le voit, distincte de la table lue depuis
+ * Graphify au-dessus : PK et FK n'existent nulle part dans le code source,
+ * seulement dans la base — Graphify ne peut donc pas les fournir.
+ */
+function LiveSchema({ tables }: { tables: SchemaTable[] }) {
+  return (
+    <div style={s('margin-top: 28px;')}>
+      <div style={s('display: flex; align-items: center; gap: 8px; margin-bottom: 12px;')}>
+        <h3 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 14px; margin: 0;')}>
+          {t('donnees.schema_title')}
+        </h3>
+        <span style={s(confStyle('LIVE'))}>{t('donnees.live_badge')}</span>
+      </div>
+      <div style={s('display: flex; flex-direction: column; gap: 16px;')}>
+        {tables.map(table => (
+          <div key={table.name} style={s('border: 1px solid var(--color-divider); border-radius: 6px; overflow: hidden;')}>
+            <div
+              style={s(
+                'font-family: var(--font-mono); font-size: 12.5px; padding: 7px 11px; background: var(--theme-bg-secondary); border-bottom: 1px solid var(--color-divider);',
+              )}
+            >
+              {table.name}
+            </div>
+            <table className="table" style={s('width: 100%; font-size: 12px;')}>
+              <thead>
+                <tr>
+                  <th>{t('donnees.schema_column')}</th>
+                  <th>{t('donnees.schema_type')}</th>
+                  <th>{t('donnees.schema_key')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {table.columns.map(column => (
+                  <tr key={column.name}>
+                    <td style={s('font-family: var(--font-mono);')}>{column.name}</td>
+                    <td style={s('color: var(--color-neutral-500);')}>{column.type}</td>
+                    <td>
+                      {column.pk && (
+                        <span
+                          style={s(
+                            'font-size: 10px; padding: 1px 6px; border-radius: 999px; color: var(--color-accent); border: 1px solid var(--color-accent-700); margin-right: 5px;',
+                          )}
+                        >
+                          {t('donnees.schema_pk')}
+                        </span>
+                      )}
+                      {column.fk && (
+                        <span style={s('font-size: 11px; color: var(--color-neutral-500); font-family: var(--font-mono);')}>
+                          → {column.fk}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

@@ -241,12 +241,18 @@ export async function checkSupabase(token, url, fetchImpl = fetch) {
  * Introspection lecture-seule du schéma public, pour l'onglet Données.
  *
  * Une requête sur `information_schema` — jamais un `select *` sur une table
- * de données — via l'API Management, le même token que `checkSupabase`.
+ * de données — via l'API Management, le même token que `checkSupabase`. Les
+ * sous-requêtes corrélées cherchent, par colonne, si elle porte une clé
+ * primaire (`table_constraints`/`key_column_usage`) et, si elle porte une
+ * clé étrangère, la table.colonne qu'elle référence
+ * (`constraint_column_usage`) — un seul aller-retour réseau, pas un par
+ * table : la vue Tables/Schéma affiche potentiellement des dizaines de
+ * tables, et une requête par table y serait sensible à la latence Supabase.
  *
  * @param {string} token déjà déchiffré
  * @param {string} url dashboard Supabase du projet
  * @param {typeof fetch} [fetchImpl]
- * @returns {Promise<{tables: Array<{name: string, columns: string[]}>} | {error: string}>}
+ * @returns {Promise<{tables: Array<{name: string, columns: Array<{name: string, type: string, pk: boolean, fk: string | null}>}>} | {error: string}>}
  */
 export async function fetchSupabaseSchema(token, url, fetchImpl = fetch) {
   const ref = parseSupabaseRef(url)
@@ -258,8 +264,32 @@ export async function fetchSupabaseSchema(token, url, fetchImpl = fetch) {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        query:
-          "select table_name, column_name from information_schema.columns where table_schema = 'public' order by table_name, ordinal_position",
+        query: `
+          select
+            c.table_name,
+            c.column_name,
+            c.data_type,
+            exists (
+              select 1
+              from information_schema.key_column_usage kcu
+              join information_schema.table_constraints tc
+                on tc.constraint_name = kcu.constraint_name and tc.constraint_type = 'PRIMARY KEY'
+              where kcu.table_name = c.table_name and kcu.column_name = c.column_name
+            ) as is_pk,
+            (
+              select ccu.table_name || '.' || ccu.column_name
+              from information_schema.key_column_usage kcu
+              join information_schema.table_constraints tc
+                on tc.constraint_name = kcu.constraint_name and tc.constraint_type = 'FOREIGN KEY'
+              join information_schema.constraint_column_usage ccu
+                on ccu.constraint_name = kcu.constraint_name
+              where kcu.table_name = c.table_name and kcu.column_name = c.column_name
+              limit 1
+            ) as fk_ref
+          from information_schema.columns c
+          where c.table_schema = 'public'
+          order by c.table_name, c.ordinal_position
+        `,
       }),
     })
   } catch (err) {
@@ -270,9 +300,10 @@ export async function fetchSupabaseSchema(token, url, fetchImpl = fetch) {
   const rows = await res.json()
   const tables = []
   for (const row of Array.isArray(rows) ? rows : []) {
+    const column = { name: row.column_name, type: row.data_type, pk: row.is_pk === true, fk: row.fk_ref ?? null }
     const table = tables.find(t => t.name === row.table_name)
-    if (table) table.columns.push(row.column_name)
-    else tables.push({ name: row.table_name, columns: [row.column_name] })
+    if (table) table.columns.push(column)
+    else tables.push({ name: row.table_name, columns: [column] })
   }
   return { tables }
 }

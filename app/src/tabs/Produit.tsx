@@ -438,6 +438,7 @@ function DetailPanel({
   // Index de la capture agrandie, ou null. Toutes les captures sont
   // atteignables depuis la visionneuse, pas seulement les cinq du rail.
   const [zoom, setZoom] = useState<number | null>(null)
+  const [compare, setCompare] = useState(false)
 
   return (
     <div
@@ -517,14 +518,24 @@ function DetailPanel({
                 </div>
               ))}
             </div>
-            <button
-              type="button"
-              onClick={() => setZoom(0)}
-              className="btn btn-ghost"
-              style={s('font-size: 11px; padding: 4px 9px; margin-top: 9px;')}
-            >
-              {t('produit.view_all_screenshots', { n: shots.length })}
-            </button>
+            <div style={s('display: flex; gap: 8px; margin-top: 9px;')}>
+              <button
+                type="button"
+                onClick={() => setZoom(0)}
+                className="btn btn-ghost"
+                style={s('font-size: 11px; padding: 4px 9px;')}
+              >
+                {t('produit.view_all_screenshots', { n: shots.length })}
+              </button>
+              <button
+                type="button"
+                onClick={() => setCompare(true)}
+                className="btn btn-ghost"
+                style={s('font-size: 11px; padding: 4px 9px;')}
+              >
+                {t('produit.compare_dates')}
+              </button>
+            </div>
           </>
         ) : (
           <Empty text={t('produit.single_screenshot')} />
@@ -572,6 +583,112 @@ function DetailPanel({
           onClose={() => setZoom(null)}
           label={`${pageName(page, pages)} · ${page.route}`}
         />
+      )}
+
+      {compare && (
+        <CompareModal
+          root={snapshot.root}
+          slug={page.slug}
+          files={shots}
+          label={`${pageName(page, pages)} · ${page.route}`}
+          onClose={() => setCompare(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+/**
+ * Deux captures de la même page, côte à côte. Pas de diff pixel : les deux
+ * images suffisent à voir ce qui a changé, et un diff automatique sur une
+ * page qui peut contenir des données dynamiques (dates, IDs) produirait plus
+ * de faux positifs qu'il n'en évite.
+ */
+function CompareModal({
+  root,
+  slug,
+  files,
+  label,
+  onClose,
+}: {
+  root: string
+  slug: string
+  files: string[]
+  label: string
+  onClose: () => void
+}) {
+  // Plus récent à droite : la lecture gauche→droite suit alors le temps.
+  const [leftAt, setLeftAt] = useState(Math.min(1, files.length - 1))
+  const [rightAt, setRightAt] = useState(0)
+
+  return (
+    <div
+      onClick={onClose}
+      style={s(
+        'position: fixed; inset: 0; z-index: 50; background: rgba(6,7,14,.88); backdrop-filter: blur(3px); display: flex; flex-direction: column; padding: 16px 20px 14px;',
+      )}
+    >
+      <div style={s('display: flex; align-items: center; gap: 12px; flex: none;')}>
+        <button type="button" onClick={onClose} className="btn btn-ghost" style={s('font-size: 12px; padding: 4px 10px;')}>
+          ✕ {t('produit.close')}
+        </button>
+        <div style={s('font-size: 12.5px; color: var(--color-neutral-400);')}>{t('produit.compare_title')} — {label}</div>
+      </div>
+
+      <div
+        onClick={event => event.stopPropagation()}
+        style={s('flex: 1; min-height: 0; display: flex; gap: 14px; padding: 14px 0;')}
+      >
+        <CompareSide root={root} slug={slug} files={files} label={t('produit.compare_left')} at={leftAt} onAt={setLeftAt} />
+        <CompareSide root={root} slug={slug} files={files} label={t('produit.compare_right')} at={rightAt} onAt={setRightAt} />
+      </div>
+    </div>
+  )
+}
+
+function CompareSide({
+  root,
+  slug,
+  files,
+  label,
+  at,
+  onAt,
+}: {
+  root: string
+  slug: string
+  files: string[]
+  label: string
+  at: number
+  onAt: (index: number) => void
+}) {
+  const file = files[at]
+  return (
+    <div style={s('flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px;')} onClick={event => event.stopPropagation()}>
+      <div style={s('display: flex; align-items: center; gap: 8px;')}>
+        <span style={s('font-size: 11px; color: var(--color-neutral-500);')}>{label}</span>
+        <select
+          className="btn btn-ghost"
+          style={s('font-size: 11px; padding: 3px 7px;')}
+          value={at}
+          onChange={event => onAt(Number(event.target.value))}
+        >
+          {files.map((candidate, index) => (
+            <option key={candidate} value={index}>
+              {frDate(shotDate(candidate))}
+            </option>
+          ))}
+        </select>
+      </div>
+      {file ? (
+        <img
+          src={shotUrl(root, `shots/${slug}/${file}`)}
+          alt={`${label} — ${frDate(shotDate(file))}`}
+          style={s(
+            'flex: 1; min-height: 0; width: 100%; object-fit: contain; border-radius: 8px; border: 1px solid var(--color-neutral-800); background: var(--theme-bg-lightbox);',
+          )}
+        />
+      ) : (
+        <Empty text={t('produit.no_screenshot')} />
       )}
     </div>
   )

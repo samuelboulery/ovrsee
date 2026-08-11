@@ -1,11 +1,16 @@
 import { useState, type ReactNode } from 'react'
 
 import {
+  commitsDeLaFrise,
+  dailyCounts,
+  foldWeekly,
   frDate,
   humanAge,
+  planEntriesDeLaFrise,
   planFiles,
   planRejected,
   planWhy,
+  ticketsDeLaFrise,
   type GitCommit,
   type Illisible,
   type Plan,
@@ -24,7 +29,7 @@ const day = (date: string): string => date.slice(0, 10)
 /** `2026-08-08T12:00:00+02:00` → `12:00`. Vide pour une date sans heure. */
 const hour = (date: string): string => (date.length > 10 ? date.slice(11, 16) : '')
 
-type Vue = 'tickets' | 'commits'
+type Vue = 'tickets' | 'commits' | 'graphe'
 
 /**
  * Chronologie du projet : deux lectures du même fil.
@@ -51,7 +56,7 @@ export function Historique({
 }) {
   const [vue, setVue] = useState<Vue>('tickets')
   const byFile = new Map(plans.map(plan => [plan.file, plan]))
-  const isEmpty = vue === 'tickets' ? ticketTimeline.length === 0 : timeline.length === 0
+  const isEmpty = vue === 'tickets' ? ticketTimeline.length === 0 : vue === 'commits' ? timeline.length === 0 : false
 
   return (
     <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
@@ -76,8 +81,10 @@ export function Historique({
         </div>
       ) : vue === 'tickets' ? (
         <TicketFrise entries={ticketTimeline} byFile={byFile} onOuvrirTicket={onOuvrirTicket} />
-      ) : (
+      ) : vue === 'commits' ? (
         <CommitFrise entries={timeline} byFile={byFile} />
+      ) : (
+        <ActivityGraph timeline={timeline} ticketTimeline={ticketTimeline} />
       )}
     </div>
   )
@@ -100,6 +107,217 @@ function ViewSwitch({ vue, onChange }: { vue: Vue; onChange: (vue: Vue) => void 
     <div style={s('display: flex; gap: 4px; flex: none;')}>
       {option('tickets', t('historique.view_tickets'))}
       {option('commits', t('historique.view_commits'))}
+      {option('graphe', t('historique.view_graph'))}
+    </div>
+  )
+}
+
+type SousVue = 'empile' | 'densite' | 'type'
+
+/** commit → accent, plan → accent-2, ticket → neutral : la seule autre paire de teintes du système. */
+const COULEUR_SERIE = {
+  commits: 'var(--color-accent-500)',
+  plans: 'var(--color-accent-2-500)',
+  tickets: 'var(--color-neutral-400)',
+} as const
+
+/**
+ * Trois lectures du même fil que les frises, en comptage plutôt qu'en liste :
+ * ce que la fréquence dit et qu'un défilement de cartes ne montre pas.
+ *
+ * Les dates viennent des mêmes props que les frises (`timeline`,
+ * `ticketTimeline`) — aucune agrégation côté serveur, aucun nouvel appel
+ * réseau. `hooks/density.js` reste la seule source du calcul de seaux, comme
+ * pour la densité de la barre latérale.
+ */
+function ActivityGraph({ timeline, ticketTimeline }: { timeline: TimelineEntry[]; ticketTimeline: TicketTimelineEntry[] }) {
+  const [sousVue, setSousVue] = useState<SousVue>('empile')
+
+  const commits = commitsDeLaFrise(timeline)
+  const plans = planEntriesDeLaFrise(timeline)
+  const tickets = ticketsDeLaFrise(ticketTimeline).map(ticket => ({ date: ticket.maj }))
+
+  const total = commits.length + plans.length + tickets.length
+
+  return (
+    <div>
+      <div style={s('display: flex; gap: 4px; margin-bottom: 16px;')}>
+        {(
+          [
+            ['empile', t('historique.graph_stacked')],
+            ['densite', t('historique.graph_density')],
+            ['type', t('historique.graph_by_type')],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            className={sousVue === id ? 'btn btn-primary' : 'btn btn-ghost'}
+            style={s('font-size: 11px; padding: 5px 11px;')}
+            onClick={() => setSousVue(id)}
+            aria-pressed={sousVue === id}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {total === 0 ? (
+        <div style={s('padding: 40px 0; display: flex; align-items: center; justify-content: center;')}>
+          <div style={s('font-size: 12px; color: var(--color-neutral-600); text-align: center; max-width: 46ch; line-height: 1.6;')}>
+            {t('historique.graph_empty')}
+          </div>
+        </div>
+      ) : sousVue === 'empile' ? (
+        <StackedBars commits={commits} plans={plans} tickets={tickets} days={14} />
+      ) : sousVue === 'densite' ? (
+        <WeeklyDensity commits={commits} plans={plans} tickets={tickets} weeks={12} />
+      ) : (
+        <ByTypeBars commits={commits} plans={plans} tickets={tickets} days={30} />
+      )}
+
+      <Legend />
+    </div>
+  )
+}
+
+function Legend() {
+  return (
+    <div style={s('display: flex; gap: 16px; margin-top: 16px; font-size: 11px; color: var(--color-neutral-500);')}>
+      {(
+        [
+          ['commits', t('historique.view_commits')],
+          ['plans', t('historique.plan_label')],
+          ['tickets', t('historique.ticket_label')],
+        ] as const
+      ).map(([key, label]) => (
+        <div key={key} style={s('display: flex; align-items: center; gap: 6px;')}>
+          <span style={s(`width: 8px; height: 8px; border-radius: 2px; background: ${COULEUR_SERIE[key]}; display: block;`)} />
+          {label}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** Barres empilées, un jour par colonne : ce qui s'est passé chaque jour, et de quelle nature. */
+function StackedBars({
+  commits,
+  plans,
+  tickets,
+  days,
+}: {
+  commits: Array<{ date: string }>
+  plans: Array<{ date: string }>
+  tickets: Array<{ date: string }>
+  days: number
+}) {
+  const c = dailyCounts(commits, days)
+  const p = dailyCounts(plans, days)
+  const k = dailyCounts(tickets, days)
+  const totals = c.map((v, i) => v + p[i] + k[i])
+  const max = Math.max(1, ...totals)
+  const HEIGHT = 120
+
+  return (
+    <div style={s('display: flex; gap: 5px; align-items: flex-end; height: ' + HEIGHT + 'px;')}>
+      {totals.map((total, i) => {
+        const scale = total === 0 ? 0 : (HEIGHT * (total / max)) / total
+        return (
+          <div
+            key={i}
+            title={`${total} · ${c[i]} commit(s), ${p[i]} plan(s), ${k[i]} ticket(s)`}
+            style={s('flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: 1px;')}
+          >
+            {k[i] > 0 && <div style={s(`background: ${COULEUR_SERIE.tickets}; height: ${Math.max(2, k[i] * scale)}px; border-radius: 1px;`)} />}
+            {p[i] > 0 && <div style={s(`background: ${COULEUR_SERIE.plans}; height: ${Math.max(2, p[i] * scale)}px; border-radius: 1px;`)} />}
+            {c[i] > 0 && <div style={s(`background: ${COULEUR_SERIE.commits}; height: ${Math.max(2, c[i] * scale)}px; border-radius: 1px;`)} />}
+            {total === 0 && <div style={s('background: var(--color-neutral-800); height: 3px; border-radius: 1px;')} />}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/** Densité combinée, en semaines : la même lecture d'intensité que la barre latérale, mais sur tout le fil, pas les seuls commits. */
+function WeeklyDensity({
+  commits,
+  plans,
+  tickets,
+  weeks,
+}: {
+  commits: Array<{ date: string }>
+  plans: Array<{ date: string }>
+  tickets: Array<{ date: string }>
+  weeks: number
+}) {
+  const days = weeks * 7
+  const combined = [...commits, ...plans, ...tickets]
+  const bars = foldWeekly(dailyCounts(combined, days))
+  const max = Math.max(1, ...bars)
+  const HEIGHT = 90
+
+  return (
+    <div style={s('display: flex; gap: 6px; align-items: flex-end; height: ' + HEIGHT + 'px;')}>
+      {bars.map((value, i) => {
+        const height = value === 0 ? 3 : Math.max(4, Math.round((value / max) * HEIGHT))
+        const color = value === 0 ? 'var(--color-neutral-800)' : value / max > 0.6 ? 'var(--color-accent-500)' : 'var(--color-accent-700)'
+        return (
+          <div
+            key={i}
+            title={`${value} activité(s)`}
+            style={s(`flex: 1; height: ${height}px; border-radius: 2px; background: ${color};`)}
+            role="img"
+            aria-label={`semaine ${i + 1} : ${value} activité(s)`}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+/** Trois séries côte à côte plutôt qu'empilées : compare le rythme d'une nature d'activité à l'autre. */
+function ByTypeBars({
+  commits,
+  plans,
+  tickets,
+  days,
+}: {
+  commits: Array<{ date: string }>
+  plans: Array<{ date: string }>
+  tickets: Array<{ date: string }>
+  days: number
+}) {
+  const series = [
+    ['commits', dailyCounts(commits, days)],
+    ['plans', dailyCounts(plans, days)],
+    ['tickets', dailyCounts(tickets, days)],
+  ] as const
+
+  return (
+    <div style={s('display: flex; flex-direction: column; gap: 12px;')}>
+      {series.map(([key, values]) => {
+        const max = Math.max(1, ...values)
+        return (
+          <div key={key} style={s('display: flex; align-items: center; gap: 10px;')}>
+            <div style={s('width: 60px; flex: none; font-size: 11px; color: var(--color-neutral-500); text-align: right;')}>
+              {key === 'commits' ? t('historique.view_commits') : key === 'plans' ? t('historique.plan_label') : t('historique.ticket_label')}
+            </div>
+            <div style={s('flex: 1; display: flex; gap: 2px; align-items: flex-end; height: 30px;')}>
+              {values.map((value, i) => (
+                <div
+                  key={i}
+                  title={`${value}`}
+                  style={s(
+                    `flex: 1; height: ${value === 0 ? 2 : Math.max(3, Math.round((value / max) * 30))}px; background: ${value === 0 ? 'var(--color-neutral-800)' : COULEUR_SERIE[key]}; border-radius: 1px;`,
+                  )}
+                />
+              ))}
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }

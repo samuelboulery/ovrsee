@@ -223,18 +223,31 @@ test('fetchSupabaseSchema : URL non reconnue rend une erreur sans appel réseau'
   assert.equal(appelé, false)
 })
 
-test('fetchSupabaseSchema : regroupe les colonnes par table', async () => {
+test('fetchSupabaseSchema : regroupe les colonnes par table, avec type, PK et FK', async () => {
   const fetchImpl = async () =>
     jsonResponse([
-      { table_name: 'users', column_name: 'id' },
-      { table_name: 'users', column_name: 'email' },
-      { table_name: 'posts', column_name: 'id' },
+      { table_name: 'users', column_name: 'id', data_type: 'uuid', is_pk: true, fk_ref: null },
+      { table_name: 'users', column_name: 'email', data_type: 'text', is_pk: false, fk_ref: null },
+      { table_name: 'posts', column_name: 'id', data_type: 'uuid', is_pk: true, fk_ref: null },
+      { table_name: 'posts', column_name: 'author_id', data_type: 'uuid', is_pk: false, fk_ref: 'users.id' },
     ])
   const result = await fetchSupabaseSchema('token', 'https://supabase.com/dashboard/project/abcdefgh', fetchImpl)
   assert.ok('tables' in result)
   assert.deepEqual(result.tables, [
-    { name: 'users', columns: ['id', 'email'] },
-    { name: 'posts', columns: ['id'] },
+    {
+      name: 'users',
+      columns: [
+        { name: 'id', type: 'uuid', pk: true, fk: null },
+        { name: 'email', type: 'text', pk: false, fk: null },
+      ],
+    },
+    {
+      name: 'posts',
+      columns: [
+        { name: 'id', type: 'uuid', pk: true, fk: null },
+        { name: 'author_id', type: 'uuid', pk: false, fk: 'users.id' },
+      ],
+    },
   ])
 })
 

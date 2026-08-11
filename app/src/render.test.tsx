@@ -88,7 +88,7 @@ const DEGRADES: Array<[string, Snapshot]> = [
 ]
 
 const RENDUS: Array<[string, (snap: Snapshot) => ReactElement]> = [
-  ['Aperçu', snap => <Apercu snapshot={snap} />],
+  ['Aperçu', snap => <Apercu snapshot={snap} onOpenPreferences={() => {}} />],
   ['Produit', snap => <Produit snapshot={snap} layout="bottom" />],
   ['Historique', snap => <Historique plans={snap.plans ?? []} timeline={snap.timeline ?? []} />],
   [

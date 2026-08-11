@@ -787,10 +787,24 @@ export interface Integration {
 
 export type IntegrationState = 'ok' | 'error' | 'building' | 'unknown'
 
+/** Une ligne de la liste des déploiements récents — Vercel/Netlify seulement. */
+export interface DeploymentInfo {
+  id: string
+  state: IntegrationState
+  environment: string
+  /** Lien direct vers le déploiement, cliquable — `null` s'il n'y en a pas. */
+  url: string | null
+  branch?: string
+  commit?: string
+  createdAt: string
+}
+
 export interface IntegrationStatus {
   state: IntegrationState
   detail: string
   checkedAt: string
+  /** Absent pour Supabase/Autre : ces fournisseurs n'ont qu'un seul « déploiement ». */
+  deployments?: DeploymentInfo[]
 }
 
 /** Une table du schéma public, lue en direct — Supabase uniquement en v1. */

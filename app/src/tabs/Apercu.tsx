@@ -10,6 +10,7 @@ import {
   restant,
   stackFrom,
   type GitStatus,
+  type IntegrationProvider,
   type Snapshot,
 } from '../data'
 import { Branches } from './Branches'
@@ -79,13 +80,18 @@ const BOUTON = 'font-size: 12px; padding: 4px 9px;'
  *
  * @param onTerminal ouvre le panneau du terminal. Il vit dans l'état de `App` —
  *   ouvrir un pty depuis ici créerait une session que le panneau ignore.
+ * @param onOpenPreferences ouvre la modale Préférences sur la section Projet,
+ *   provider d'intégration présélectionné le cas échéant — utilisé par la
+ *   carte Déploiements pour amener directement au bon formulaire.
  */
 export function Apercu({
   snapshot,
   onTerminal,
+  onOpenPreferences,
 }: {
   snapshot: Snapshot
   onTerminal?: () => void
+  onOpenPreferences: (opts?: { provider?: IntegrationProvider }) => void
 }) {
   const { packageJson, readme, root } = snapshot
   const plans = snapshot.plans ?? []
@@ -237,7 +243,11 @@ export function Apercu({
           <Sante snapshot={snapshot} gitStatus={gitStatus} />
           <Branches root={root} gitStatus={gitStatus} onGitStatus={setGitStatus} />
           <Environnements config={snapshot.config} gitStatus={gitStatus} />
-          <Deploiements root={root} integrations={snapshot.integrations ?? []} />
+          <Deploiements
+            root={root}
+            integrations={snapshot.integrations ?? []}
+            onOpenPreferences={onOpenPreferences}
+          />
 
           <div style={s('margin-top: 18px;')}>
             <Lancement packageJson={packageJson} />

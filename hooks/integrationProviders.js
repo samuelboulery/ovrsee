@@ -70,6 +70,42 @@ function mapVercelState(state) {
   return 'unknown'
 }
 
+/** @param {string | null | undefined} target */
+function vercelEnvironment(target) {
+  if (target === 'production') return 'Production'
+  if (target === 'staging') return 'Staging'
+  return 'Preview'
+}
+
+/**
+ * Branche/commit ne sont pas documentés pour l'endpoint de liste — seulement
+ * observés en pratique dans `meta`, sous des clés qui varient par fournisseur
+ * git. Best-effort : une ligne sans ces infos reste utile (environnement,
+ * statut, date), pas une raison d'échouer ou de faire une requête de plus.
+ *
+ * @param {Record<string, string> | undefined} meta
+ */
+function vercelGitInfo(meta) {
+  const branch = meta?.githubCommitRef ?? meta?.gitlabCommitRef ?? meta?.bitbucketCommitRef
+  const sha = meta?.githubCommitSha ?? meta?.gitlabCommitSha ?? meta?.bitbucketCommitSha
+  return { branch, commit: sha?.slice(0, 7) }
+}
+
+/** @param {Record<string, unknown>} deployment */
+function toVercelDeployment(deployment) {
+  const { branch, commit } = vercelGitInfo(deployment.meta)
+  const created = deployment.createdAt ?? deployment.created
+  return {
+    id: String(deployment.uid ?? deployment.id ?? deployment.url),
+    state: mapVercelState(deployment.state),
+    environment: vercelEnvironment(deployment.target),
+    url: deployment.url ? `https://${deployment.url}` : null,
+    branch,
+    commit,
+    createdAt: created ? new Date(created).toISOString() : new Date().toISOString(),
+  }
+}
+
 function mapNetlifyState(state) {
   if (state === 'ready') return 'ok'
   if (state === 'error') return 'error'
@@ -77,6 +113,27 @@ function mapNetlifyState(state) {
     return 'building'
   }
   return 'unknown'
+}
+
+/** @param {string | undefined} context */
+function netlifyEnvironment(context) {
+  if (context === 'production') return 'Production'
+  if (context === 'deploy-preview') return 'Preview'
+  if (context === 'branch-deploy') return 'Branch'
+  return context ?? 'Preview'
+}
+
+/** @param {Record<string, unknown>} deploy */
+function toNetlifyDeployment(deploy) {
+  return {
+    id: String(deploy.id ?? deploy.deploy_ssl_url),
+    state: mapNetlifyState(deploy.state),
+    environment: netlifyEnvironment(deploy.context),
+    url: deploy.deploy_ssl_url ?? deploy.deploy_url ?? null,
+    branch: deploy.branch ?? undefined,
+    commit: deploy.commit_ref?.slice(0, 7),
+    createdAt: deploy.created_at ?? new Date().toISOString(),
+  }
 }
 
 function mapSupabaseState(status) {
@@ -99,7 +156,7 @@ export async function checkVercel(token, url, fetchImpl = fetch) {
   let res
   try {
     res = await fetchImpl(
-      `https://api.vercel.com/v6/deployments?limit=1&target=production&projectId=${encodeURIComponent(project)}`,
+      `https://api.vercel.com/v6/deployments?limit=5&projectId=${encodeURIComponent(project)}`,
       { headers: { Authorization: `Bearer ${token}` } },
     )
   } catch (err) {
@@ -115,6 +172,7 @@ export async function checkVercel(token, url, fetchImpl = fetch) {
     state: mapVercelState(deployment.state),
     detail: deployment.url ?? deployment.state ?? '',
     checkedAt: new Date().toISOString(),
+    deployments: data.deployments.map(toVercelDeployment),
   }
 }
 
@@ -131,7 +189,7 @@ export async function checkNetlify(token, url, fetchImpl = fetch) {
   let res
   try {
     res = await fetchImpl(
-      `https://api.netlify.com/api/v1/sites/${encodeURIComponent(site)}/deploys?per_page=1`,
+      `https://api.netlify.com/api/v1/sites/${encodeURIComponent(site)}/deploys?per_page=5`,
       { headers: { Authorization: `Bearer ${token}` } },
     )
   } catch (err) {
@@ -147,6 +205,7 @@ export async function checkNetlify(token, url, fetchImpl = fetch) {
     state: mapNetlifyState(deploy.state),
     detail: deploy.deploy_ssl_url ?? deploy.state ?? '',
     checkedAt: new Date().toISOString(),
+    deployments: deploys.map(toNetlifyDeployment),
   }
 }
 

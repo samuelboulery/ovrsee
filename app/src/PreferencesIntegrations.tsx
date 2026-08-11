@@ -36,9 +36,52 @@ const PROVIDERS: Array<[IntegrationProvider, string]> = [
   ['autre', 'Autre'],
 ]
 
-export function BlocIntegrations({ root, integrations: initiales }: { root?: string; integrations: Integration[] }) {
+/**
+ * L'URL demandée n'est pas décorative : `hooks/integrationProviders.js` y
+ * extrait l'identifiant du projet/site pour appeler l'API du fournisseur
+ * (nom de projet Vercel, site Netlify, ref Supabase). L'exemple doit donc
+ * coller exactement à la forme attendue, pas à un fournisseur générique.
+ */
+const URL_HINT: Record<IntegrationProvider, TranslationKey> = {
+  vercel: 'pref.integrations_url_hint_vercel',
+  netlify: 'pref.integrations_url_hint_netlify',
+  supabase: 'pref.integrations_url_hint_supabase',
+  autre: 'pref.integrations_url_hint_autre',
+}
+
+/**
+ * Le jeton, lui, n'a pas qu'une forme — pour Supabase en particulier, la clé
+ * `anon`/`service_role` du projet (très visible dans Project Settings → API)
+ * n'est pas ce qu'attend l'API Management appelée pour lire le statut. Un
+ * mauvais choix ici échoue silencieusement côté utilisateur, d'où l'avertissement
+ * explicite plutôt qu'un simple « Jeton API ».
+ */
+const TOKEN_HINT: Record<IntegrationProvider, TranslationKey> = {
+  vercel: 'pref.integrations_token_hint_vercel',
+  netlify: 'pref.integrations_token_hint_netlify',
+  supabase: 'pref.integrations_token_hint_supabase',
+  autre: 'pref.integrations_token_hint_autre',
+}
+
+const TOKEN_HELP_URL: Record<IntegrationProvider, string | null> = {
+  vercel: 'https://vercel.com/account/tokens',
+  netlify: 'https://app.netlify.com/user/applications#personal-access-tokens',
+  supabase: 'https://supabase.com/dashboard/account/tokens',
+  autre: null,
+}
+
+export function BlocIntegrations({
+  root,
+  integrations: initiales,
+  initialProvider,
+}: {
+  root?: string
+  integrations: Integration[]
+  /** Présélectionné quand on arrive du CTA « Ajouter » de la carte Déploiements de l'Aperçu. */
+  initialProvider?: IntegrationProvider
+}) {
   const [integrations, setIntegrations] = useState(initiales)
-  const [provider, setProvider] = useState<IntegrationProvider>('vercel')
+  const [provider, setProvider] = useState<IntegrationProvider>(initialProvider ?? 'vercel')
   const [label, setLabel] = useState('')
   const [url, setUrl] = useState('')
   const [token, setToken] = useState('')
@@ -142,7 +185,7 @@ export function BlocIntegrations({ root, integrations: initiales }: { root?: str
             style={s('font-size: 13px; min-height: 32px;')}
           />
         </Field>
-        <Field label={t('pref.integrations_url')} hint={t('pref.integrations_url_hint')}>
+        <Field label={t('pref.integrations_url')} hint={t(URL_HINT[provider])}>
           <input
             className="input"
             type="text"
@@ -154,7 +197,27 @@ export function BlocIntegrations({ root, integrations: initiales }: { root?: str
         </Field>
         <Field
           label={t('pref.integrations_token')}
-          hint={edite !== null ? t('pref.integrations_token_hint_edit') : undefined}
+          hint={
+            <>
+              {t(TOKEN_HINT[provider])}
+              {TOKEN_HELP_URL[provider] && (
+                <>
+                  {' '}
+                  <a
+                    href={TOKEN_HELP_URL[provider]!}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={s('color: var(--color-accent-300);')}
+                  >
+                    {t('pref.integrations_token_create_link', {
+                      provider: PROVIDERS.find(([valeur]) => valeur === provider)?.[1] ?? '',
+                    })}
+                  </a>
+                </>
+              )}
+              {edite !== null && <> · {t('pref.integrations_token_hint_edit')}</>}
+            </>
+          }
         >
           <input
             className="input"

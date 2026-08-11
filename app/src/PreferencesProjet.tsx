@@ -12,9 +12,9 @@
  * fichier-là dépassait déjà les 800 lignes de `CLAUDE.md`.
  */
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import type { Integration, SettingsType } from './data'
+import type { Integration, IntegrationProvider, SettingsType } from './data'
 import { t, type TranslationKey } from './i18n'
 import { BlocIntegrations } from './PreferencesIntegrations'
 import { ErrorBox, Field, GroupLabel, Row, SectionTitle, Switch } from './PreferencesControls'
@@ -302,7 +302,16 @@ export function SectionProjet({
   onSettings,
   root,
   integrations = [],
-}: SectionProps & { root?: string; integrations?: Integration[] }) {
+  initialProvider,
+}: SectionProps & { root?: string; integrations?: Integration[]; initialProvider?: IntegrationProvider }) {
+  // Le bloc Intégrations est le dernier des cinq : arrivé ici depuis le CTA de
+  // l'Aperçu (provider présélectionné), il faut le faire défiler jusqu'à la
+  // vue plutôt que le laisser sous la ligne de flottaison.
+  const integrationsRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (initialProvider) integrationsRef.current?.scrollIntoView({ block: 'start' })
+  }, [])
+
   return (
     <>
       <SectionTitle>{t('pref.project')}</SectionTitle>
@@ -314,8 +323,10 @@ export function SectionProjet({
       <BlocAvance settings={settings} onSettings={onSettings} />
       <GroupLabel>{t('pref.gitignore_title')}</GroupLabel>
       <BlocGitignore settings={settings} onSettings={onSettings} />
-      <GroupLabel>{t('pref.integrations_title')}</GroupLabel>
-      <BlocIntegrations root={root} integrations={integrations} />
+      <div ref={integrationsRef}>
+        <GroupLabel>{t('pref.integrations_title')}</GroupLabel>
+        <BlocIntegrations root={root} integrations={integrations} initialProvider={initialProvider} />
+      </div>
     </>
   )
 }

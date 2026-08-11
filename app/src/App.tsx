@@ -17,6 +17,7 @@ import {
   projectAction,
   restant,
   updateSettings,
+  type IntegrationProvider,
   type Project,
   type SettingsType,
   type Snapshot,
@@ -24,7 +25,7 @@ import {
 } from './data'
 import { Garde } from './Garde'
 import { Onboarding } from './Onboarding'
-import { PreferencesModal } from './PreferencesPanel'
+import { PreferencesModal, type SectionId } from './PreferencesPanel'
 import { Welcome } from './Welcome'
 import { EquipmentPanel } from './EquipmentPanel'
 import { s } from './style'
@@ -168,6 +169,14 @@ export function App() {
   // L'écran des préférences s'ouvre d'ici et pas de la barre latérale : le
   // menu natif l'ouvre aussi, et son gestionnaire vit dans ce composant.
   const [preferencesOuvertes, setPreferencesOuvertes] = useState(false)
+
+  // La carte Déploiements de l'Aperçu ouvre directement sur la section Projet,
+  // provider présélectionné — sans ça, le CTA amènerait sur « Profils » et
+  // laisserait chercher.
+  const [preferencesInitial, setPreferencesInitial] = useState<{
+    section: SectionId
+    provider?: IntegrationProvider
+  } | null>(null)
 
   // Rejouer la présentation à la demande : sans cela elle serait perdue pour
   // qui a déjà des projets, c'est-à-dire pour tout le monde après le premier
@@ -622,7 +631,14 @@ export function App() {
                         // Le terminal a son état ici : l'Aperçu demande son
                         // ouverture, il ne lance pas de session lui-même —
                         // sinon le panneau en ignorerait l'existence.
-                        <Apercu snapshot={snapshot} onTerminal={() => setTerminal(true)} />
+                        <Apercu
+                          snapshot={snapshot}
+                          onTerminal={() => setTerminal(true)}
+                          onOpenPreferences={opts => {
+                            setPreferencesInitial({ section: 'projet', provider: opts?.provider })
+                            setPreferencesOuvertes(true)
+                          }}
+                        />
                       )}
 
                       {/* Le seul onglet qui reste monté quand on le quitte :
@@ -734,14 +750,20 @@ export function App() {
           `position: fixed` posée dans un `<aside>` marchait par accident. */}
       {preferencesOuvertes && (
         <PreferencesModal
-          onClose={() => setPreferencesOuvertes(false)}
+          onClose={() => {
+            setPreferencesOuvertes(false)
+            setPreferencesInitial(null)
+          }}
           onSaved={appliquerReglages}
           onRevoirPresentation={() => {
             setPreferencesOuvertes(false)
+            setPreferencesInitial(null)
             setRevoirPresentation(true)
           }}
           root={snapshot?.root}
           integrations={snapshot?.integrations}
+          initialSection={preferencesInitial?.section}
+          initialProvider={preferencesInitial?.provider}
         />
       )}
     </div>

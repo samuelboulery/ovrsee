@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { SectionClaude } from './ClaudeConfigPanel'
-import { fetchSettings, updateSettings, type Integration, type SettingsType } from './data'
+import {
+  fetchSettings,
+  updateSettings,
+  type Integration,
+  type IntegrationProvider,
+  type SettingsType,
+} from './data'
 import { setCurrentLanguage, t, type TranslationKey } from './i18n'
 import {
   ErrorBox,
@@ -42,7 +48,7 @@ import { applyTheme } from './theme'
  * et Claude Code dans `ClaudeConfigPanel.tsx`.
  */
 
-type SectionId = 'profils' | 'general' | 'interface' | 'claude' | 'projet'
+export type SectionId = 'profils' | 'general' | 'interface' | 'claude' | 'projet'
 
 /** Les sections, dans l'ordre de la barre latérale. */
 const SECTIONS: Array<{ id: SectionId; cle: TranslationKey }> = [
@@ -449,6 +455,8 @@ export function PreferencesModal({
   onRevoirPresentation,
   root,
   integrations = [],
+  initialSection,
+  initialProvider,
 }: {
   onClose: () => void
   /** Remonte les préférences réellement écrites : sans ça l'app garde son état
@@ -460,9 +468,13 @@ export function PreferencesModal({
   root?: string
   /** Ses intégrations déploiements/base de données, jamais leur jeton. */
   integrations?: Integration[]
+  /** Section ouverte au montage — sinon toujours « Profils ». */
+  initialSection?: SectionId
+  /** Fournisseur présélectionné dans le formulaire d'intégration de la section Projet. */
+  initialProvider?: IntegrationProvider
 }) {
   const [settings, setSettings] = useState<SettingsType | null>(null)
-  const [section, setSection] = useState<SectionId>('profils')
+  const [section, setSection] = useState<SectionId>(initialSection ?? 'profils')
   const [etat, setEtat] = useState<'vide' | 'chargement' | 'ecriture' | 'ecrit'>('chargement')
   const [erreur, setErreur] = useState<string | null>(null)
 
@@ -556,7 +568,9 @@ export function PreferencesModal({
       return <SectionGeneral {...props} onRevoirPresentation={onRevoirPresentation} />
     if (section === 'interface') return <SectionInterface {...props} />
     if (section === 'claude') return <SectionClaude />
-    return <SectionProjet {...props} root={root} integrations={integrations} />
+    return (
+      <SectionProjet {...props} root={root} integrations={integrations} initialProvider={initialProvider} />
+    )
   }
 
   return (

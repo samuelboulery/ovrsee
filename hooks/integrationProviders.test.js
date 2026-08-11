@@ -109,6 +109,42 @@ test('checkVercel : fetch qui lève → unknown', async () => {
   assert.match(status.detail, /offline/)
 })
 
+test('checkVercel : liste des déploiements avec environnement, branche et commit', async () => {
+  const fetchImpl = async () =>
+    jsonResponse({
+      deployments: [
+        {
+          uid: 'dpl_1',
+          state: 'READY',
+          target: 'production',
+          url: 'mon-projet.vercel.app',
+          createdAt: 1700000000000,
+          meta: { githubCommitRef: 'main', githubCommitSha: '0123456789abcdef' },
+        },
+        {
+          uid: 'dpl_2',
+          state: 'BUILDING',
+          target: null,
+          url: 'mon-projet-git-preview.vercel.app',
+          createdAt: 1700000100000,
+        },
+      ],
+    })
+  const status = await checkVercel('token', 'https://vercel.com/equipe/mon-projet', fetchImpl)
+  assert.equal(status.deployments.length, 2)
+  assert.deepEqual(status.deployments[0], {
+    id: 'dpl_1',
+    state: 'ok',
+    environment: 'Production',
+    url: 'https://mon-projet.vercel.app',
+    branch: 'main',
+    commit: '0123456',
+    createdAt: new Date(1700000000000).toISOString(),
+  })
+  assert.equal(status.deployments[1].environment, 'Preview')
+  assert.equal(status.deployments[1].branch, undefined)
+})
+
 test('checkNetlify : dernier déploiement prêt → ok', async () => {
   const fetchImpl = async () => jsonResponse([{ state: 'ready', deploy_ssl_url: 'https://mon-site.netlify.app' }])
   const status = await checkNetlify('token', 'https://app.netlify.com/sites/mon-site/overview', fetchImpl)
@@ -120,6 +156,42 @@ test('checkNetlify : dernier déploiement en erreur → error', async () => {
   const fetchImpl = async () => jsonResponse([{ state: 'error' }])
   const status = await checkNetlify('token', 'https://app.netlify.com/sites/mon-site/overview', fetchImpl)
   assert.equal(status.state, 'error')
+})
+
+test('checkNetlify : liste des déploiements avec contexte, branche et commit', async () => {
+  const fetchImpl = async () =>
+    jsonResponse([
+      {
+        id: 'dep_1',
+        state: 'ready',
+        context: 'production',
+        deploy_ssl_url: 'https://mon-site.netlify.app',
+        branch: 'main',
+        commit_ref: '0123456789abcdef',
+        created_at: '2026-08-11T12:00:00.000Z',
+      },
+      {
+        id: 'dep_2',
+        state: 'ready',
+        context: 'deploy-preview',
+        deploy_ssl_url: 'https://deploy-preview-3--mon-site.netlify.app',
+        branch: 'feature/x',
+        commit_ref: 'fedcba9876543210',
+        created_at: '2026-08-11T11:00:00.000Z',
+      },
+    ])
+  const status = await checkNetlify('token', 'https://app.netlify.com/sites/mon-site/overview', fetchImpl)
+  assert.equal(status.deployments.length, 2)
+  assert.deepEqual(status.deployments[0], {
+    id: 'dep_1',
+    state: 'ok',
+    environment: 'Production',
+    url: 'https://mon-site.netlify.app',
+    branch: 'main',
+    commit: '0123456',
+    createdAt: '2026-08-11T12:00:00.000Z',
+  })
+  assert.equal(status.deployments[1].environment, 'Preview')
 })
 
 test('checkSupabase : projet actif et sain → ok', async () => {

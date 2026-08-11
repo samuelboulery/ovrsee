@@ -121,8 +121,24 @@ const translations = {
     'pref.integrations_provider': 'Fournisseur',
     'pref.integrations_label': 'Libellé',
     'pref.integrations_url': 'URL du tableau de bord',
-    'pref.integrations_url_hint': 'Ex. : https://vercel.com/<équipe>/<projet>',
+    'pref.integrations_url_hint_vercel':
+      "Ouvrez le projet dans Vercel et copiez l'URL de son tableau de bord — ex. https://vercel.com/<équipe>/<projet>.",
+    'pref.integrations_url_hint_netlify':
+      "Ouvrez le site dans Netlify et copiez l'URL de son tableau de bord — ex. https://app.netlify.com/sites/<site>/overview.",
+    'pref.integrations_url_hint_supabase':
+      "Ouvrez le projet dans Supabase et copiez l'URL de son tableau de bord — ex. https://supabase.com/dashboard/project/<ref>.",
+    'pref.integrations_url_hint_autre':
+      'Lien affiché tel quel sur la carte — aucune vérification automatique pour ce fournisseur.',
     'pref.integrations_token': 'Jeton API',
+    'pref.integrations_token_hint_vercel':
+      "Depuis Vercel : Account Settings → Tokens. Limitez-le au projet (et à l'équipe) concernés — inutile de renseigner un identifiant d'équipe séparé.",
+    'pref.integrations_token_hint_netlify':
+      'Depuis Netlify : User settings → Applications → Personal access tokens. Ce jeton donne accès à tous les sites du compte, Netlify ne propose pas de portée plus fine.',
+    'pref.integrations_token_hint_supabase':
+      "Un jeton de l'API Management (Compte → Access Tokens) — pas la clé anon/service_role du projet, qui ne donne pas accès à son statut.",
+    'pref.integrations_token_hint_autre':
+      "Optionnel, non utilisé — ce fournisseur n'a pas de vérification automatique.",
+    'pref.integrations_token_create_link': 'Créer un jeton ${provider} →',
     'pref.integrations_token_hint_edit': 'Laisser vide pour garder le jeton déjà enregistré.',
     'pref.integrations_add': 'Ajouter',
     'pref.integrations_update': 'Mettre à jour',
@@ -389,7 +405,11 @@ const translations = {
     'deploiements.title': 'Déploiements',
     'deploiements.check': 'Vérifier',
     'deploiements.checking': 'Vérification…',
-    'deploiements.no_integration': 'Aucune intégration configurée.',
+    'deploiements.empty_desc':
+      "Suivez l'état de vos déploiements (Vercel, Netlify…) et de votre base de données (Supabase) directement depuis l'app.",
+    'deploiements.add_deploy': 'Ajouter un service de déploiement',
+    'deploiements.add_db': 'Ajouter une base de données',
+    'deploiements.hide': 'Masquer',
     'deploiements.electron_only': 'Ajouter ou vérifier une intégration nécessite l\'app Electron.',
     'deploiements.state_ok': 'actif',
     'deploiements.state_error': 'en erreur',
@@ -779,8 +799,24 @@ const translations = {
     'pref.integrations_provider': 'Provider',
     'pref.integrations_label': 'Label',
     'pref.integrations_url': 'Dashboard URL',
-    'pref.integrations_url_hint': 'E.g. https://vercel.com/<team>/<project>',
+    'pref.integrations_url_hint_vercel':
+      "Open the project in Vercel and copy its dashboard URL — e.g. https://vercel.com/<team>/<project>.",
+    'pref.integrations_url_hint_netlify':
+      'Open the site in Netlify and copy its dashboard URL — e.g. https://app.netlify.com/sites/<site>/overview.',
+    'pref.integrations_url_hint_supabase':
+      'Open the project in Supabase and copy its dashboard URL — e.g. https://supabase.com/dashboard/project/<ref>.',
+    'pref.integrations_url_hint_autre':
+      'Shown as-is on the card — no automatic check for this provider.',
     'pref.integrations_token': 'API token',
+    'pref.integrations_token_hint_vercel':
+      "From Vercel: Account Settings → Tokens. Scope it to the project (and team) involved — no separate team ID needed.",
+    'pref.integrations_token_hint_netlify':
+      'From Netlify: User settings → Applications → Personal access tokens. This token grants access to every site on the account — Netlify has no finer-grained scope.',
+    'pref.integrations_token_hint_supabase':
+      "A Management API token (Account → Access Tokens) — not the project's anon/service_role key, which cannot read its status.",
+    'pref.integrations_token_hint_autre':
+      'Optional, unused — this provider has no automatic check.',
+    'pref.integrations_token_create_link': 'Create a ${provider} token →',
     'pref.integrations_token_hint_edit': 'Leave empty to keep the already saved token.',
     'pref.integrations_add': 'Add',
     'pref.integrations_update': 'Update',
@@ -1047,7 +1083,11 @@ const translations = {
     'deploiements.title': 'Deployments',
     'deploiements.check': 'Check',
     'deploiements.checking': 'Checking…',
-    'deploiements.no_integration': 'No integration configured.',
+    'deploiements.empty_desc':
+      'Track the state of your deployments (Vercel, Netlify…) and your database (Supabase) right from the app.',
+    'deploiements.add_deploy': 'Add a deployment service',
+    'deploiements.add_db': 'Add a database',
+    'deploiements.hide': 'Hide',
     'deploiements.electron_only': 'Adding or checking an integration requires the Electron app.',
     'deploiements.state_ok': 'active',
     'deploiements.state_error': 'error',

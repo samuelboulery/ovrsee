@@ -8115,8 +8115,8 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/CommandPalette.tsx",
       "source_location": "L103",
       "weight": 1.0,
-      "_src": "commandpalette_activate",
-      "_tgt": "app_ontabpick",
+      "_src": "app_ontabpick",
+      "_tgt": "commandpalette_activate",
       "source": "app_ontabpick",
       "target": "commandpalette_activate"
     },

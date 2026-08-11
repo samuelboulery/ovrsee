@@ -55,6 +55,13 @@
         "pnpm-workspace.yaml",
         "scripts/make-icon.js"
       ]
+    },
+    {
+      "sha": "56ffbbb",
+      "date": "2026-08-11",
+      "files": [
+        "\"ovrsee/tickets/T-0039-th\\303\\250me-clair-illisible-sidebar-timeline-terminal.md\""
+      ]
     }
   ]
 }

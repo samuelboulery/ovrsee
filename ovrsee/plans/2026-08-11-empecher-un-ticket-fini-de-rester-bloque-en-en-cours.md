@@ -1,10 +1,23 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Empêcher un ticket fini de rester bloqué en « en cours »",
   "opened": "2026-08-11",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-11",
+  "commits": [
+    {
+      "sha": "175859f",
+      "date": "2026-08-11",
+      "files": [
+        "hooks/ovrsee-capture-plan.js",
+        "hooks/ovrsee-capture-plan.test.js",
+        "hooks/ovrsee-cli.js",
+        "hooks/ovrsee-post-commit.js",
+        "hooks/tickets.js",
+        "hooks/tickets.test.js"
+      ]
+    }
+  ]
 }
 ---
 

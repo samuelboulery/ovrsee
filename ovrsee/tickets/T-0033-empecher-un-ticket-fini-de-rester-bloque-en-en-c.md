@@ -2,7 +2,7 @@
 {
   "id": "T-0033",
   "titre": "Empêcher un ticket fini de rester bloqué en « en cours »",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "s",
   "tags": [

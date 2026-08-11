@@ -4,7 +4,37 @@
   "title": "Thème clair — repasse contraste et cohérence (round 2)",
   "opened": "2026-08-11",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "76accb0",
+      "date": "2026-08-11",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/ClaudeConfigPanel.tsx",
+        "app/src/Garde.tsx",
+        "app/src/Illisibles.tsx",
+        "app/src/Lightbox.tsx",
+        "app/src/PreferencesControls.tsx",
+        "app/src/PreferencesIntegrations.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/data.ts",
+        "app/src/highlight.ts",
+        "app/src/markdown.tsx",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Branches.tsx",
+        "app/src/tabs/Deploiements.tsx",
+        "app/src/tabs/Donnees.tsx",
+        "app/src/tabs/Environnements.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/Produit.tsx",
+        "app/src/tabs/Tableau.tsx",
+        "app/src/theme.ts",
+        "app/src/useTerminal.ts",
+        "\"ovrsee/tickets/T-0039-th\\303\\250me-clair-illisible-sidebar-timeline-terminal.md\""
+      ]
+    }
+  ]
 }
 ---
 

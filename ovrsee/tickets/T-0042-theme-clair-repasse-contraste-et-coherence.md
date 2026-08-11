@@ -2,7 +2,7 @@
 {
   "id": "T-0042",
   "titre": "Thème clair : repasse contraste et cohérence des couleurs",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

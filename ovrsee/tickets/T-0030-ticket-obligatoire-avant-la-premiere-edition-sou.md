@@ -2,7 +2,7 @@
 {
   "id": "T-0030",
   "titre": "Ticket obligatoire avant la première édition sous un plan actif",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "hooks",

@@ -6,6 +6,7 @@ import { join } from 'node:path'
 
 import {
   DEFAULT_COLUMNS,
+  avancerTicketsClos,
   childrenOf,
   colonneFinale,
   orphanChildren,
@@ -587,6 +588,69 @@ test("orphanChildren détecte les enfants pointant un epic inexistant", () => {
 
   assert.equal(orphans.length, 1)
   assert.equal(orphans[0].meta.titre, 'Orphelin')
+})
+
+// --- avancerTicketsClos ------------------------------------------------------
+
+/** Un plan `.md` jetable, au même format frontmatter JSON que les tickets. */
+const ecrirePlanBrut = (ovrseeDir, file, meta) =>
+  writeFileSync(join(ovrseeDir, 'plans', file), `---\n${JSON.stringify(meta, null, 2)}\n---\n\ncorps\n`, 'utf8')
+
+test('avancerTicketsClos ne fait rien sans plan fermé', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'backlog', plan: '2026-08-10-x.md' })
+
+  assert.deepEqual(avancerTicketsClos(ovrseeDir), [])
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'backlog')
+})
+
+test('avancerTicketsClos déplace en colonne finale les tickets d’un plan fermé', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'en-cours', plan: '2026-08-10-x.md' })
+  ecrirePlanBrut(ovrseeDir, '2026-08-10-x.md', { status: 'closed', title: 'X', opened: '2026-08-10', closed: '2026-08-10', commits: [] })
+
+  assert.deepEqual(avancerTicketsClos(ovrseeDir), [file])
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'fait')
+})
+
+test('avancerTicketsClos rattrape un plan fermé de longue date, pas seulement le tout dernier', () => {
+  const ovrseeDir = fixture()
+  // Simule la dérive de T-0030 : le plan a été fermé (à la main, ou par un
+  // appelant qui a oublié d’avancer ses tickets), mais son ticket est resté
+  // en retard depuis. avancerTicketsClos rescanne tout, pas seulement ce
+  // qu'on vient de clore.
+  const { file } = createTicket(ovrseeDir, { titre: 'Vieux ticket', colonne: 'en-cours', plan: '2026-01-01-ancien.md' })
+  ecrirePlanBrut(ovrseeDir, '2026-01-01-ancien.md', { status: 'closed', title: 'Ancien', opened: '2026-01-01', closed: '2026-01-02', commits: [] })
+
+  assert.deepEqual(avancerTicketsClos(ovrseeDir), [file])
+})
+
+test('avancerTicketsClos ignore les tickets d’un plan encore ouvert', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'backlog', plan: '2026-08-10-x.md' })
+  ecrirePlanBrut(ovrseeDir, '2026-08-10-x.md', { status: 'open', title: 'X', opened: '2026-08-10', closed: null, commits: [] })
+
+  assert.deepEqual(avancerTicketsClos(ovrseeDir), [])
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'backlog')
+})
+
+test('avancerTicketsClos ignore les tickets d’un autre plan', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'backlog', plan: '2026-08-10-autre.md' })
+  ecrirePlanBrut(ovrseeDir, '2026-08-10-x.md', { status: 'closed', title: 'X', opened: '2026-08-10', closed: '2026-08-10', commits: [] })
+
+  assert.deepEqual(avancerTicketsClos(ovrseeDir), [])
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'backlog')
+})
+
+test('avancerTicketsClos ne fait rien sur un board à une seule colonne', () => {
+  const ovrseeDir = fixture()
+  ecrireBoardBrut(ovrseeDir, JSON.stringify({ colonnes: [{ id: 'seul', titre: 'Seul' }] }))
+  const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'seul', plan: '2026-08-10-x.md' })
+  ecrirePlanBrut(ovrseeDir, '2026-08-10-x.md', { status: 'closed', title: 'X', opened: '2026-08-10', closed: '2026-08-10', commits: [] })
+
+  assert.doesNotThrow(() => avancerTicketsClos(ovrseeDir))
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'seul')
 })
 
 // --- .active-ticket ----------------------------------------------------------

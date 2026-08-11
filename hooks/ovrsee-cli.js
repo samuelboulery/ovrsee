@@ -36,6 +36,8 @@ import {
 import { exportVault } from './obsidian.js'
 
 import {
+  avancerTicketsClos,
+  colonneFinale,
   createTicket,
   importOpenPlans,
   moveTicket,
@@ -72,6 +74,21 @@ const commands = {
     // Afficher les épics avec leurs enfants
     const colonnes = readBoard(ovrseeDir)
     const tickets = sortTickets(readTickets(ovrseeDir, colonnes))
+
+    // Un ticket lié à un plan ouvert sans commit ne peut jamais avancer tout
+    // seul : closeOpenPlans() refuse de clore un plan sans commit, et rien
+    // d'autre ne fait le lien. Le signaler évite qu'il pourrisse en silence.
+    const finale = colonneFinale(colonnes)
+    const enRetard = tickets.filter(t => {
+      if (!t.meta.plan || t.meta.colonne === finale) return false
+      const plan = plans.find(p => p.file === t.meta.plan)
+      return plan?.meta.status === 'open' && (plan.meta.commits ?? []).length === 0
+    })
+    if (enRetard.length > 0) {
+      console.log(`\n⚠ ${enRetard.length} ticket(s) lié(s) à un plan sans aucun commit :`)
+      for (const t of enRetard) console.log(`  ${t.meta.id}  ${t.meta.titre}  (plan: ${t.meta.plan})`)
+    }
+
     const epics = tickets.filter(t => t.meta?.type === 'epic')
 
     if (epics.length > 0) {
@@ -88,6 +105,7 @@ const commands = {
 
   close() {
     const closed = closeOpenPlans(ovrseeDir, console.error)
+    avancerTicketsClos(ovrseeDir) // les tickets liés doivent suivre la fermeture, pas seulement le hook automatique
     if (closed.length === 0) {
       console.log('aucun plan ouvert portant un commit — rien à clore')
       return

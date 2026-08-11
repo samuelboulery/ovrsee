@@ -16,7 +16,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { attachCommitToPlan, isSafePlanFileName } from './plans.js'
-import { colonneFinale, readBoard, readTickets, moveTicket } from './tickets.js'
+import { avancerTicketsClos, colonneFinale, readBoard, readTickets, moveTicket } from './tickets.js'
 import { readSettings, mergeSettings } from './settings.js'
 import { syncGitignore } from './gitignore-sync.js'
 import { readJson } from './snapshot.js'
@@ -156,6 +156,9 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
         process.stdout.write(`[ovrsee] commit rattaché à ${file}\n`)
         avancerTicketsDuPlan(ovrseeDir, file)
       }
+      // Filet à chaque commit : rattrape un ticket resté en retard, quelle
+      // que soit la raison (CLI qui aurait oublié d'avancer, dérive passée).
+      avancerTicketsClos(ovrseeDir)
       if (crawlUtile(sources)) spawnCrawl(root)
     }
   } catch (err) {

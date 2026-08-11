@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Ticket obligatoire avant intégration (pas après)",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-11",
   "commits": []
 }
 ---

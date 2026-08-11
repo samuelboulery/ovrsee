@@ -608,6 +608,41 @@ export function clearActiveTicket(ovrseeDir, ticketId = null) {
 const idFromFile = file => /^(T-\d+)-/.exec(file)?.[1] ?? null
 
 /**
+ * Avance vers la colonne finale les tickets dont le plan lié est déjà fermé.
+ *
+ * Rescanne tous les plans `status: "closed"` à chaque appel plutôt que de se
+ * limiter à ceux qu'on vient de clore : un ticket resté en retard — parce
+ * qu'un appelant a oublié d'avancer ses tickets à la fermeture, ou pour toute
+ * autre raison — se rattrape au prochain appel, d'où qu'il vienne. Idempotent
+ * comme ses cousines (`avancerTicketsDuPlan`, `avancerTicketsEnRevue`) : un
+ * ticket déjà en colonne finale n'est jamais retouché.
+ *
+ * @param {string} ovrseeDir
+ * @returns {string[]} fichiers de tickets avancés
+ */
+export function avancerTicketsClos(ovrseeDir) {
+  const colonnes = readBoard(ovrseeDir)
+  const finale = colonneFinale(colonnes)
+  if (!finale) return []
+
+  const plansFermes = new Set(readPlans(ovrseeDir).filter(p => p.meta.status === 'closed').map(p => p.file))
+  if (plansFermes.size === 0) return []
+
+  const avances = []
+  for (const ticket of readTickets(ovrseeDir, colonnes)) {
+    if (!plansFermes.has(ticket.meta.plan) || ticket.meta.colonne === finale) continue
+
+    try {
+      moveTicket(ovrseeDir, ticket.file, finale)
+      avances.push(ticket.file)
+    } catch {
+      // Un ticket qui ne peut pas être déplacé ne doit jamais faire échouer l'appelant.
+    }
+  }
+  return avances
+}
+
+/**
  * Priorité d'abord, puis du plus récent au plus ancien.
  *
  * Pas de champ de rang : le réordonnancement manuel obligerait à réécrire

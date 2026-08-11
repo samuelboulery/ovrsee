@@ -34,7 +34,7 @@ import {
   closeOpenPlans,
   registerProject,
 } from './plans.js'
-import { readBoard, readTickets, moveTicket, colonneFinale, clearActiveTicket } from './tickets.js'
+import { clearActiveTicket, avancerTicketsClos } from './tickets.js'
 
 function readStdin() {
   try {
@@ -128,32 +128,6 @@ function titleOf(planText) {
   return 'Plan sans titre'
 }
 
-/**
- * Avance en colonne finale les tickets liés à un plan qui vient de se fermer.
- *
- * Silencieuse si le board n'a qu'une seule colonne (`colonneFinale` rend déjà
- * `null` dans ce cas) — pas de colonne « finale » à viser sur un tableau à une
- * seule case.
- */
-export function avancerTicketsClos(ovrseeDir, plansClos) {
-  if (plansClos.length === 0) return
-
-  const colonnes = readBoard(ovrseeDir)
-  const finale = colonneFinale(colonnes)
-  if (!finale) return
-
-  const clos = new Set(plansClos)
-  for (const ticket of readTickets(ovrseeDir, colonnes)) {
-    if (!clos.has(ticket.meta.plan) || ticket.meta.colonne === finale) continue
-
-    try {
-      moveTicket(ovrseeDir, ticket.file, finale)
-    } catch {
-      // Un ticket qui ne peut pas être déplacé ne doit jamais faire échouer la capture du plan.
-    }
-  }
-}
-
 function main() {
   const raw = readStdin()
   if (!raw.trim()) return
@@ -172,8 +146,8 @@ function main() {
   if (!root) return // Hors dépôt git : rien à capturer, sortie silencieuse.
 
   const ovrseeDir = join(root, 'ovrsee')
-  const plansClos = closeOpenPlans(ovrseeDir, message => process.stderr.write(`[ovrsee] ${message}\n`))
-  avancerTicketsClos(ovrseeDir, plansClos)
+  closeOpenPlans(ovrseeDir, message => process.stderr.write(`[ovrsee] ${message}\n`))
+  avancerTicketsClos(ovrseeDir)
 
   const title = titleOf(planText)
   const now = new Date()
@@ -207,8 +181,8 @@ function main() {
 /**
  * Le corps ne tourne que si le fichier est lancé comme hook.
  *
- * Sans cette garde, l'importer pour en éprouver une décision (`avancerTicketsClos`,
- * `planFrom`, `titleOf`) lirait stdin et écrirait des fichiers à chaque `pnpm test`.
+ * Sans cette garde, l'importer pour en éprouver une décision (`planFrom`,
+ * `titleOf`) lirait stdin et écrirait des fichiers à chaque `pnpm test`.
  */
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {

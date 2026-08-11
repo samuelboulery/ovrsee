@@ -27,6 +27,13 @@ asar: true
 asarUnpack:
   - node_modules/node-pty/**
 
+# Publie sur l'onglet Releases du dépôt (privé) — la CI y attache les
+# installeurs à chaque tag `v*`, voir .github/workflows/release.yml.
+publish:
+  provider: github
+  owner: samuelboulery
+  repo: ovrsee
+
 mac:
   category: public.app-category.developer-tools
   target:
@@ -37,3 +44,12 @@ mac:
   # Gatekeeper se contourne au premier lancement. Elles deviendront
   # obligatoires le jour d'une distribution publique.
   identity: null
+  # Sans version dans le nom : un lien /releases/latest/download/… reste
+  # valable d'une sortie à l'autre.
+  artifactName: 'Ovrsee-mac-${arch}.${ext}'
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  artifactName: 'Ovrsee-win-${arch}.${ext}'

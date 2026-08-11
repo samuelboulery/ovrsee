@@ -1,13 +1,13 @@
 {
   "date": "2026-08-11",
-  "commit": "28b8211",
+  "commit": "3a5c704",
   "pages": [
     {
       "route": "/",
       "slug": "accueil",
       "title": "Ovrsee",
       "sample": "/",
-      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit c0b34f7\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\novrsee\n/Users/sam/code/ovrsee\nCopier le chemin\nVue en lecture seule sur un projet vibecodé : plans capturés, pages crawlées, historique daté.\n3pages\ncartographiées\n39p",
+      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit 28b8211\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\novrsee\n/Users/sam/code/ovrsee\nCopier le chemin\nVue en lecture seule sur un projet vibecodé : plans capturés, pages crawlées, historique daté.\n7pages\ncartographiées\n39p",
       "links": [
         "/navigateur",
         "/produit",
@@ -16,7 +16,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/accueil/2026-08-11-28b8211.png",
+      "shot": "shots/accueil/2026-08-11-3a5c704.png",
       "shotDate": "2026-08-11",
       "shotSize": {
         "width": 1280,
@@ -28,7 +28,7 @@
       "slug": "navigateur",
       "title": "Ovrsee",
       "sample": "/navigateur",
-      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit c0b34f7\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nLe navigateur intégré n'existe que dans l'application.\nInspecter une page demande une vue native et des DevTools, que la coquille Electron fournit et qu'un onglet de n",
+      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit 28b8211\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nLe navigateur intégré n'existe que dans l'application.\nInspecter une page demande une vue native et des DevTools, que la coquille Electron fournit et qu'un onglet de n",
       "links": [
         "/",
         "/produit",
@@ -37,7 +37,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/navigateur/2026-08-11-28b8211.png",
+      "shot": "shots/navigateur/2026-08-11-3a5c704.png",
       "shotDate": "2026-08-11",
       "shotSize": {
         "width": 1280,
@@ -49,7 +49,7 @@
       "slug": "produit",
       "title": "Ovrsee",
       "sample": "/produit",
-      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit c0b34f7\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nGraphe de navigation\n3 3 pages · 6 6 liens · reconstruit au commit\nMÈNE À\nENTRÉE DE L'APP\nAccueil\n/\naucun plan\n11 août\nTableau\n/tableau\n7 7 plans\n11 août\nDonnees\n/donn",
+      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit 28b8211\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nGraphe de navigation\n7 7 pages · 42 42 liens · reconstruit au commit\nMÈNE À\nENTRÉE DE L'APP\nAccueil\n/\naucun plan\n11 août\nNavigateur\n/navigateur\n3 3 plans\n11 août\nProdu",
       "links": [
         "/",
         "/navigateur",
@@ -58,7 +58,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/produit/2026-08-11-28b8211.png",
+      "shot": "shots/produit/2026-08-11-3a5c704.png",
       "shotDate": "2026-08-11",
       "shotSize": {
         "width": 1280,
@@ -70,7 +70,7 @@
       "slug": "historique",
       "title": "Ovrsee",
       "sample": "/historique",
-      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit c0b34f7\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nChronologie du projet\nTickets\nCommits\nChaque commit, dans l'ordre, et les plans qui les expliquent. Un plan est clos par le commit qui l'exécute.\n11 AOÛT 2026\nT-0038\nU",
+      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit 28b8211\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nChronologie du projet\nTickets\nCommits\nChaque commit, dans l'ordre, et les plans qui les expliquent. Un plan est clos par le commit qui l'exécute.\n11 AOÛT 2026\nT-0038\nU",
       "links": [
         "/",
         "/navigateur",
@@ -79,7 +79,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/historique/2026-08-11-28b8211.png",
+      "shot": "shots/historique/2026-08-11-3a5c704.png",
       "shotDate": "2026-08-11",
       "shotSize": {
         "width": 1280,
@@ -91,7 +91,7 @@
       "slug": "tableau",
       "title": "Ovrsee",
       "sample": "/tableau",
-      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit c0b34f7\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nTableau\nÉditer les colonnes\nUn fichier par ticket dans ovrsee/tickets/, colonnes réglées dans ovrsee/board.json. Écrit ici comme depuis le terminal.\nBacklog\n0\n+\nÀ spéc",
+      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit 28b8211\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nTableau\nÉditer les colonnes\nUn fichier par ticket dans ovrsee/tickets/, colonnes réglées dans ovrsee/board.json. Écrit ici comme depuis le terminal.\nBacklog\n0\n+\nÀ spéc",
       "links": [
         "/",
         "/navigateur",
@@ -100,7 +100,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/tableau/2026-08-11-28b8211.png",
+      "shot": "shots/tableau/2026-08-11-3a5c704.png",
       "shotDate": "2026-08-11",
       "shotSize": {
         "width": 1280,
@@ -112,7 +112,7 @@
       "slug": "donnees",
       "title": "Ovrsee",
       "sample": "/donnees",
-      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit c0b34f7\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nTables\nlu depuis Graphify — 2026-08-11\nAucun schéma de base détecté par Graphify dans ce projet.\nCe n'est pas une panne : ce projet n'a pas de base à cartographier.\ncl",
+      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit 28b8211\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nTables\nlu depuis Graphify — 2026-08-11\nAucun schéma de base détecté par Graphify dans ce projet.\nCe n'est pas une panne : ce projet n'a pas de base à cartographier.\ncl",
       "links": [
         "/",
         "/navigateur",
@@ -121,7 +121,7 @@
         "/tableau",
         "/stack"
       ],
-      "shot": "shots/donnees/2026-08-11-28b8211.png",
+      "shot": "shots/donnees/2026-08-11-3a5c704.png",
       "shotDate": "2026-08-11",
       "shotSize": {
         "width": 1280,
@@ -133,7 +133,7 @@
       "slug": "stack",
       "title": "Ovrsee",
       "sample": "/stack",
-      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit c0b34f7\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nStack\nCe qui est utilisé, et pourquoi. Une raison est un commentaire WHY: posé juste au-dessus de l'import du paquet — rien d'autre n'est lu, pour qu'aucune ligne ne d",
+      "excerpt": "⇤\nOvrsee — ovrsee\ndernier scan · 11 août 2026 · commit 28b8211\nPROJETS\novrsee\n1 à faire\naujourd'hui\nmiette\nà jour\njamais\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nStack\nCe qui est utilisé, et pourquoi. Une raison est un commentaire WHY: posé juste au-dessus de l'import du paquet — rien d'autre n'est lu, pour qu'aucune ligne ne d",
       "links": [
         "/",
         "/navigateur",
@@ -142,7 +142,7 @@
         "/tableau",
         "/donnees"
       ],
-      "shot": "shots/stack/2026-08-11-28b8211.png",
+      "shot": "shots/stack/2026-08-11-3a5c704.png",
       "shotDate": "2026-08-11",
       "shotSize": {
         "width": 1280,

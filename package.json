@@ -23,7 +23,8 @@
     "electron": "pnpm build:ui && electron .",
     "build:ui": "vite build",
     "postinstall": "node scripts/fix-pty-permissions.js",
-    "package": "pnpm build:ui && electron-builder --mac"
+    "package:mac": "pnpm build:ui && electron-builder --mac",
+    "package:win": "pnpm build:ui && electron-builder --win"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",

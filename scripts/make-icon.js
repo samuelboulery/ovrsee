@@ -15,7 +15,7 @@
  */
 
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -83,6 +83,39 @@ const SIZES = [
   ['icon_512x512@2x.png', 1024],
 ]
 
+/**
+ * Empaquette des PNG en `.ico` : ICONDIR + une ICONDIRENTRY par image, données
+ * PNG brutes à la suite — format supporté nativement depuis Windows Vista, pas
+ * besoin de réencoder en bitmap. Pas de dépendance : juste des buffers.
+ */
+function packIco(pngBuffers) {
+  const HEADER = 6
+  const ENTRY = 16
+  const offset = HEADER + ENTRY * pngBuffers.length
+
+  const header = Buffer.alloc(HEADER)
+  header.writeUInt16LE(0, 0) // reserved
+  header.writeUInt16LE(1, 2) // type = icon
+  header.writeUInt16LE(pngBuffers.length, 4)
+
+  let cursor = offset
+  const entries = pngBuffers.map(({ size, data }) => {
+    const entry = Buffer.alloc(ENTRY)
+    entry.writeUInt8(size >= 256 ? 0 : size, 0) // width, 0 = 256
+    entry.writeUInt8(size >= 256 ? 0 : size, 1) // height, 0 = 256
+    entry.writeUInt8(0, 2) // palette
+    entry.writeUInt8(0, 3) // reserved
+    entry.writeUInt16LE(1, 4) // planes
+    entry.writeUInt16LE(32, 6) // bitcount
+    entry.writeUInt32LE(data.length, 8)
+    entry.writeUInt32LE(cursor, 12)
+    cursor += data.length
+    return entry
+  })
+
+  return Buffer.concat([header, ...entries, ...pngBuffers.map(p => p.data)])
+}
+
 async function render() {
   mkdirSync(ICONSET, { recursive: true })
   const master = join(BUILD, 'icon-1024.png')
@@ -110,12 +143,23 @@ async function render() {
   }
 
   execFileSync('iconutil', ['-c', 'icns', ICONSET, '-o', join(BUILD, 'icon.icns')])
+
+  // Tailles conventionnelles d'un .ico Windows. 48 n'est pas dans l'iconset
+  // mac, rendu à part.
+  const ICO_SIZES = [16, 32, 48, 256]
+  const ico48 = join(ICONSET, 'icon_48x48.png')
+  execFileSync('sips', ['-z', '48', '48', master, '--out', ico48], { stdio: 'ignore' })
+  const icoSource = { 16: 'icon_16x16.png', 32: 'icon_32x32.png', 48: 'icon_48x48.png', 256: 'icon_256x256.png' }
+  const pngBuffers = ICO_SIZES.map(size => ({ size, data: readFileSync(join(ICONSET, icoSource[size])) }))
+  writeFileSync(join(BUILD, 'icon.ico'), packIco(pngBuffers))
+
   rmSync(ICONSET, { recursive: true, force: true })
 
-  // electron-builder lit `build/` (buildResources) et reprend icon.icns
-  // automatiquement. Le PNG maître sert aussi de source pour d'autres usages.
+  // electron-builder lit `build/` (buildResources) et reprend icon.icns /
+  // icon.ico automatiquement. Le PNG maître sert aussi de source pour
+  // d'autres usages.
   writeFileSync(join(BUILD, 'icon.svg'), svg.trim() + '\n', 'utf8')
-  console.log('build/icon.icns écrit')
+  console.log('build/icon.icns et build/icon.ico écrits')
 }
 
 render().catch(err => {

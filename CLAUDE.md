@@ -61,7 +61,8 @@ pnpm electron     # build:ui puis l'app complète, terminal compris
 pnpm test         # node --test sur hooks/ crawl/ server/ mcp/, puis app/src compilé
 pnpm typecheck    # tsc, ne couvre QUE app/src
 pnpm build:ui     # vite build vers app/dist/
-pnpm package      # DMG dans release/ (arm64, non signé)
+pnpm package:mac  # DMG dans release/ (arm64, non signé)
+pnpm package:win  # installeur NSIS dans release/ (x64, non signé) — à lancer depuis Windows
 pnpm ovrsee:mcp  # serveur MCP stdio (JSON-RPC 2.0) pour Claude Code et Claude Desktop
 ```
 
@@ -108,6 +109,17 @@ page : pour ça, il faut lancer l'app.
   `electron-builder.yml`) et `spawn-helper` doit garder son bit d'exécution — d'où
   `scripts/fix-pty-permissions.js` en postinstall. C'est le point de rupture classique
   de l'empaquetage, et il ne se voit qu'à l'exécution du DMG, jamais en dev.
+- **`pnpm package:win` ne se lance pas depuis ce Mac.** `node-pty` se compile à
+  l'installation (node-gyp) pour la plateforme courante ; pas de cross-compile
+  mac→windows fiable. Il faut `pnpm install` puis `pnpm package:win` sur une
+  vraie machine Windows (ou un runner CI Windows).
+- **Sortir une version se fait par tag, pas en local.** Bump `version` dans
+  `package.json`, commit, puis `git tag vX.Y.Z && git push --tags`.
+  `.github/workflows/release.yml` construit le DMG et l'installeur NSIS sur
+  des runners mac/windows natifs et les publie sur l'onglet Releases (dépôt
+  privé — les destinataires doivent être invités comme collaborateurs pour
+  voir cet onglet et télécharger). `pnpm package:mac`/`package:win` en local
+  ne publient rien (pas de `--publish`, pas besoin de `GH_TOKEN`).
 - **Le stdout du serveur MCP est le transport, pas un journal.** Un `console.log`
   ajouté dans n'importe quel module de `hooks/` ou `server/` se retrouve au milieu
   d'un flux JSON-RPC et coupe la conversation. Les traces vont sur stderr. Et

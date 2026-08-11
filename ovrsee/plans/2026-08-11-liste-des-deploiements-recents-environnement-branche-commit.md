@@ -12,6 +12,24 @@
         "hooks/ovrsee-tool-edit-gate.js",
         "hooks/ovrsee-tool-edit-gate.test.js"
       ]
+    },
+    {
+      "sha": "52c9032",
+      "date": "2026-08-11",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/PreferencesIntegrations.tsx",
+        "app/src/PreferencesPanel.tsx",
+        "app/src/PreferencesProjet.tsx",
+        "app/src/data.ts",
+        "app/src/render.test.tsx",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Deploiements.tsx",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/integrationProviders.js",
+        "hooks/integrationProviders.test.js"
+      ]
     }
   ]
 }

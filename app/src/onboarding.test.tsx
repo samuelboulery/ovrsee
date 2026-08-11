@@ -6,7 +6,6 @@ import type { SettingsType } from './data'
 import {
   appliquerReponses,
   apercuReponses,
-  bootstrapPourNiveau,
   profilSuggere,
   reponsesInitiales,
   terminalPourUsage,
@@ -33,7 +32,7 @@ const settings = (patch: Record<string, unknown> = {}): SettingsType =>
     theme: 'auto',
     densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
     onglets: { actifs: [...ORDRE], ordre: [...ORDRE] },
-    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
+    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468, disabled: false },
     bootstrap: ['/project-setup'],
     packageManager: 'pnpm',
     sourceGraphe: 'auto',
@@ -44,7 +43,6 @@ const settings = (patch: Record<string, unknown> = {}): SettingsType =>
   }) as unknown as SettingsType
 
 const reponses = (patch: Partial<Reponses> = {}): Reponses => ({
-  niveau: 'intermediaire',
   usage: 'terminal',
   profil: 'complet',
   bootstrap: true,
@@ -53,50 +51,26 @@ const reponses = (patch: Partial<Reponses> = {}): Reponses => ({
 
 /* — profilSuggere — */
 
-test('profilSuggere : les quatre combinaisons tombent sur quatre templates', () => {
-  assert.equal(profilSuggere('debutant', 'terminal'), 'complet')
-  assert.equal(profilSuggere('intermediaire', 'ide'), 'complet')
-  assert.equal(profilSuggere('avance', 'terminal'), 'dev')
-  assert.equal(profilSuggere('expert', 'ide'), 'dev')
-  assert.equal(profilSuggere('debutant', 'desktop'), 'sobre')
-  assert.equal(profilSuggere('expert', 'autre'), 'revue')
-})
-
-test('profilSuggere : chaque question compte, aucune n’est décorative', () => {
-  // Changer le niveau à usage constant change la suggestion…
-  assert.notEqual(
-    profilSuggere('debutant', 'terminal'),
-    profilSuggere('expert', 'terminal'),
-  )
-  // …et changer l'usage à niveau constant aussi.
-  assert.notEqual(
-    profilSuggere('expert', 'terminal'),
-    profilSuggere('expert', 'desktop'),
-  )
+test('profilSuggere : avec terminal, complet ; sans, sobre', () => {
+  assert.equal(profilSuggere('terminal'), 'complet')
+  assert.equal(profilSuggere('ide'), 'complet')
+  assert.equal(profilSuggere('desktop'), 'sobre')
+  assert.equal(profilSuggere('autre'), 'sobre')
 })
 
 /* — terminalPourUsage — */
 
-test('terminalPourUsage : l’usage décide de la place du terminal', () => {
-  assert.deepEqual(terminalPourUsage('terminal'), { visible: true, disposition: 'side' })
-  assert.deepEqual(terminalPourUsage('ide'), { visible: true, disposition: 'bottom' })
-  assert.deepEqual(terminalPourUsage('desktop'), { visible: false })
-  assert.deepEqual(terminalPourUsage('autre'), { visible: false })
+test('terminalPourUsage : l’usage décide de la place du terminal, et du disable', () => {
+  assert.deepEqual(terminalPourUsage('terminal'), { visible: true, disposition: 'side', disabled: false })
+  assert.deepEqual(terminalPourUsage('ide'), { visible: true, disposition: 'bottom', disabled: false })
+  assert.deepEqual(terminalPourUsage('desktop'), { visible: false, disabled: true })
+  assert.deepEqual(terminalPourUsage('autre'), { visible: false, disabled: true })
 })
 
 test('terminalPourUsage : sans terminal, aucune disposition n’est imposée', () => {
   // Masqué, la disposition ne se voit nulle part : l'écraser effacerait le
   // réglage de quelqu'un qui rouvrira le terminal plus tard.
   assert.equal('disposition' in terminalPourUsage('desktop'), false)
-})
-
-/* — bootstrapPourNiveau — */
-
-test('bootstrapPourNiveau : proposé à qui découvre, tu à qui sait', () => {
-  assert.equal(bootstrapPourNiveau('debutant'), true)
-  assert.equal(bootstrapPourNiveau('intermediaire'), true)
-  assert.equal(bootstrapPourNiveau('avance'), false)
-  assert.equal(bootstrapPourNiveau('expert'), false)
 })
 
 /* — appliquerReponses — */
@@ -115,9 +89,15 @@ test('appliquerReponses : l’usage l’emporte sur la disposition du template',
   assert.equal(result.terminal.disposition, 'bottom')
 })
 
-test('appliquerReponses : sans terminal, il est masqué quel que soit le template', () => {
+test('appliquerReponses : sans terminal, il est masqué et désactivé quel que soit le template', () => {
   const result = appliquerReponses(settings(), reponses({ usage: 'desktop', profil: 'complet' }))
   assert.equal(result.terminal.visible, false)
+  assert.equal(result.terminal.disabled, true)
+})
+
+test('appliquerReponses : avec terminal, il n’est pas désactivé', () => {
+  const result = appliquerReponses(settings(), reponses({ usage: 'terminal' }))
+  assert.equal(result.terminal.disabled, false)
 })
 
 test('appliquerReponses : `ordre` garde ses sept identifiants', () => {
@@ -137,10 +117,10 @@ test('appliquerReponses : les tailles du terminal ne bougent pas', () => {
   assert.equal(result.terminal.largeur, 500)
 })
 
-test('appliquerReponses : le bootstrap suit la case, pas le niveau', () => {
+test('appliquerReponses : le bootstrap suit la case', () => {
   assert.deepEqual(appliquerReponses(settings(), reponses({ bootstrap: false })).bootstrap, [])
   assert.deepEqual(
-    appliquerReponses(settings(), reponses({ niveau: 'expert', bootstrap: true })).bootstrap,
+    appliquerReponses(settings(), reponses({ bootstrap: true })).bootstrap,
     ['/project-setup'],
   )
 })
@@ -153,18 +133,18 @@ test('appliquerReponses : langue, thème et densité restent intacts', () => {
   assert.deepEqual(result.densiteActivite, avant.densiteActivite)
 })
 
-test('appliquerReponses : marque la présentation comme vue et garde les réponses', () => {
-  const result = appliquerReponses(settings(), reponses({ niveau: 'expert', usage: 'desktop' }))
+test('appliquerReponses : marque la présentation comme vue et garde l’usage', () => {
+  const result = appliquerReponses(settings(), reponses({ usage: 'desktop' }))
   assert.equal(result.onboardingVu, true)
-  assert.deepEqual(result.claude, { niveau: 'expert', usage: 'desktop' })
+  assert.deepEqual(result.claude, { niveau: 'intermediaire', usage: 'desktop' })
 })
 
 test('appliquerReponses : un profil inconnu retombe sur la suggestion', () => {
   const result = appliquerReponses(
     settings(),
-    reponses({ niveau: 'expert', usage: 'terminal', profil: 'inexistant' }),
+    reponses({ usage: 'terminal', profil: 'inexistant' }),
   )
-  assert.deepEqual(result.onglets.actifs, ['apercu', 'tableau', 'stack', 'historique'])
+  assert.deepEqual(result.onglets.actifs, ORDRE)
 })
 
 test('appliquerReponses : ne mute pas les préférences reçues', () => {
@@ -180,18 +160,28 @@ test('apercuReponses : montre le résultat sans clore la présentation', () => {
 
 /* — reponsesInitiales — */
 
-test('reponsesInitiales : reprend ce que les préférences savent déjà', () => {
+test('reponsesInitiales : reprend le profil courant s’il en matche un', () => {
+  // Onglets et terminal du fixture `settings()` matchent le template `complet`.
   const result = reponsesInitiales(settings({ claude: { niveau: 'expert', usage: 'ide' } }))
-  assert.equal(result.niveau, 'expert')
   assert.equal(result.usage, 'ide')
-  assert.equal(result.profil, 'dev')
-  assert.equal(result.bootstrap, false)
+  assert.equal(result.profil, 'complet')
+  assert.equal(result.bootstrap, true)
 })
 
-test('reponsesInitiales : des réponses absentes ou abîmées donnent le milieu', () => {
+test('reponsesInitiales : sans profil courant reconnu, retombe sur la suggestion par usage', () => {
+  const result = reponsesInitiales(
+    settings({
+      claude: { niveau: 'expert', usage: 'desktop' },
+      onglets: { actifs: ['apercu'], ordre: [...ORDRE] },
+    }),
+  )
+  assert.equal(result.usage, 'desktop')
+  assert.equal(result.profil, 'sobre')
+})
+
+test('reponsesInitiales : un usage absent ou abîmé donne terminal', () => {
   for (const claude of [undefined, null, { niveau: 'gourou', usage: 'fax' }]) {
     const result = reponsesInitiales(settings({ claude }))
-    assert.equal(result.niveau, 'intermediaire')
     assert.equal(result.usage, 'terminal')
   }
 })

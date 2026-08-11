@@ -11,38 +11,29 @@
  */
 
 import type { SettingsType } from './data'
-import { PROFILS, appliquerProfil } from './PreferencesProfils'
+import { PROFILS, appliquerProfil, profilCourant } from './PreferencesProfils'
 
-export type Niveau = 'debutant' | 'intermediaire' | 'avance' | 'expert'
 export type Usage = 'terminal' | 'ide' | 'desktop' | 'autre'
 
-export const NIVEAUX: Niveau[] = ['debutant', 'intermediaire', 'avance', 'expert']
 export const USAGES: Usage[] = ['terminal', 'ide', 'desktop', 'autre']
 
 /** Ce que la présentation retient d'une personne. */
 export type Reponses = {
-  niveau: Niveau
   usage: Usage
-  /** Le template retenu, déduit puis éventuellement écrasé à la main. */
+  /** Le template retenu : choisi directement dans la galerie, plus jamais déduit d'une matrice. */
   profil: string
   /** Proposer une commande à l'ouverture d'un projet neuf. */
   bootstrap: boolean
 }
 
 /**
- * Le template suggéré : l'usage décide de la place du terminal, le niveau de la
- * surface montrée.
- *
- * Débutant ou occasionnel, on ne cache rien — un onglet masqué qu'on ignore est
- * un onglet qu'on ne redécouvrira jamais. Aguerri, on resserre sur ce qui sert
- * tous les jours. Sans terminal (Claude Desktop, autre), les onglets qui
- * supposent une session ouverte n'ont plus de raison d'occuper la barre.
+ * Le template suggéré par défaut, avant que la galerie ne devienne le vrai
+ * choix : sans terminal, les onglets qui supposent une session ouverte n'ont
+ * plus de raison d'occuper la barre.
  */
-export function profilSuggere(niveau: Niveau, usage: Usage): string {
-  const aguerri = niveau === 'avance' || niveau === 'expert'
+export function profilSuggere(usage: Usage): string {
   const avecTerminal = usage === 'terminal' || usage === 'ide'
-  if (avecTerminal) return aguerri ? 'dev' : 'complet'
-  return aguerri ? 'revue' : 'sobre'
+  return avecTerminal ? 'complet' : 'sobre'
 }
 
 /**
@@ -50,24 +41,24 @@ export function profilSuggere(niveau: Niveau, usage: Usage): string {
  *
  * Appliquée *après* le template : un template range les onglets, mais c'est
  * l'usage réel qui sait si une session tourne à côté et où elle doit tenir.
+ * Sans terminal (Claude Desktop, autre), `disabled` coupe aussi la pastille de
+ * réouverture — pas seulement `visible`, qui ne fait que replier le panneau.
  */
-export function terminalPourUsage(usage: Usage): { visible: boolean; disposition?: string } {
-  if (usage === 'terminal') return { visible: true, disposition: 'side' }
-  if (usage === 'ide') return { visible: true, disposition: 'bottom' }
-  return { visible: false }
+export function terminalPourUsage(
+  usage: Usage,
+): { visible: boolean; disposition?: string; disabled: boolean } {
+  if (usage === 'terminal') return { visible: true, disposition: 'side', disabled: false }
+  if (usage === 'ide') return { visible: true, disposition: 'bottom', disabled: false }
+  return { visible: false, disabled: true }
 }
 
 /**
  * La commande proposée par défaut à l'ouverture d'un projet neuf.
  *
- * `/project-setup` sert à qui découvre ; un expert a ses propres habitudes et
- * n'a pas à voir une commande qu'il n'a pas demandée.
+ * `/project-setup` sert à qui découvre ; l'écran 3 laisse ensuite un switch
+ * explicite pour qui n'en veut pas.
  */
 export const BOOTSTRAP_DEFAUT = ['/project-setup']
-
-/** Le réglage de démarrage suggéré pour un niveau. */
-export const bootstrapPourNiveau = (niveau: Niveau): boolean =>
-  niveau === 'debutant' || niveau === 'intermediaire'
 
 /**
  * Les préférences telles qu'elles seront après la présentation.
@@ -83,7 +74,7 @@ export const bootstrapPourNiveau = (niveau: Niveau): boolean =>
 export function appliquerReponses(settings: SettingsType, reponses: Reponses): SettingsType {
   const id = PROFILS.some(p => p.id === reponses.profil)
     ? reponses.profil
-    : profilSuggere(reponses.niveau, reponses.usage)
+    : profilSuggere(reponses.usage)
   const profil = PROFILS.find(p => p.id === id) ?? PROFILS[0]
 
   const applique = appliquerProfil(settings, profil)
@@ -92,7 +83,7 @@ export function appliquerReponses(settings: SettingsType, reponses: Reponses): S
     ...applique,
     terminal: { ...applique.terminal, ...terminalPourUsage(reponses.usage) },
     bootstrap: reponses.bootstrap ? BOOTSTRAP_DEFAUT : [],
-    claude: { niveau: reponses.niveau, usage: reponses.usage },
+    claude: { niveau: settings.claude?.niveau ?? 'intermediaire', usage: reponses.usage },
     onboardingVu: true,
   }
 }
@@ -113,16 +104,12 @@ export const apercuReponses = (settings: SettingsType, reponses: Reponses): Sett
  * cas d'un « Revoir la présentation » : on ne redemande pas ce qu'on sait.
  */
 export function reponsesInitiales(settings: SettingsType): Reponses {
-  const niveau = (NIVEAUX as string[]).includes(settings.claude?.niveau ?? '')
-    ? (settings.claude?.niveau as Niveau)
-    : 'intermediaire'
   const usage = (USAGES as string[]).includes(settings.claude?.usage ?? '')
     ? (settings.claude?.usage as Usage)
     : 'terminal'
   return {
-    niveau,
     usage,
-    profil: profilSuggere(niveau, usage),
-    bootstrap: bootstrapPourNiveau(niveau),
+    profil: profilCourant(settings) ?? profilSuggere(usage),
+    bootstrap: true,
   }
 }

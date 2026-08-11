@@ -284,8 +284,10 @@ export function SectionInterface({ settings, onSettings }: SectionProps) {
     disposition: 'bottom',
     hauteur: 244,
     largeur: 468,
+    disabled: false,
   }
   const visible = terminal.visible === true
+  const desactive = terminal.disabled === true
 
   const deplacer = (de: number, vers: number) => {
     const suivant = deplacerOnglet(ordre, de, vers)
@@ -401,46 +403,62 @@ export function SectionInterface({ settings, onSettings }: SectionProps) {
 
       <GroupLabel>{t('pref.terminal')}</GroupLabel>
 
-      <Row label={t('pref.terminal_visible')}>
-        <Switch
-          label={t('pref.terminal_visible')}
-          checked={visible}
-          onChange={checked =>
-            onSettings({ ...settings, terminal: { ...terminal, visible: checked } })
-          }
-        />
-      </Row>
-      <Row
-        label={t('pref.terminal_layout')}
-        hint={visible ? undefined : t('pref.terminal_hidden_note')}
-        stacked
-        last
-      >
-        <div
-          role="radiogroup"
-          aria-label={t('pref.terminal_layout')}
-          style={s('display: flex; gap: 8px;')}
-        >
-          {(
-            [
-              ['bottom', 'pref.terminal_bottom'],
-              ['side', 'pref.terminal_side'],
-              ['full', 'pref.terminal_full'],
-            ] as const
-          ).map(([valeur, cle]) => (
-            <CarteDisposition
-              key={valeur}
-              valeur={valeur}
-              label={t(cle)}
-              choisi={terminal.disposition === valeur}
-              disabled={!visible}
-              onChoose={disposition =>
-                onSettings({ ...settings, terminal: { ...terminal, disposition } })
+      {desactive ? (
+        <Row label={t('pref.terminal_visible')} hint={t('pref.terminal_disabled_note')} last>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() =>
+              onSettings({ ...settings, terminal: { ...terminal, disabled: false, visible: true } })
+            }
+          >
+            {t('pref.terminal_enable')}
+          </button>
+        </Row>
+      ) : (
+        <>
+          <Row label={t('pref.terminal_visible')}>
+            <Switch
+              label={t('pref.terminal_visible')}
+              checked={visible}
+              onChange={checked =>
+                onSettings({ ...settings, terminal: { ...terminal, visible: checked } })
               }
             />
-          ))}
-        </div>
-      </Row>
+          </Row>
+          <Row
+            label={t('pref.terminal_layout')}
+            hint={visible ? undefined : t('pref.terminal_hidden_note')}
+            stacked
+            last
+          >
+            <div
+              role="radiogroup"
+              aria-label={t('pref.terminal_layout')}
+              style={s('display: flex; gap: 8px;')}
+            >
+              {(
+                [
+                  ['bottom', 'pref.terminal_bottom'],
+                  ['side', 'pref.terminal_side'],
+                  ['full', 'pref.terminal_full'],
+                ] as const
+              ).map(([valeur, cle]) => (
+                <CarteDisposition
+                  key={valeur}
+                  valeur={valeur}
+                  label={t(cle)}
+                  choisi={terminal.disposition === valeur}
+                  disabled={!visible}
+                  onChoose={disposition =>
+                    onSettings({ ...settings, terminal: { ...terminal, disposition } })
+                  }
+                />
+              ))}
+            </div>
+          </Row>
+        </>
+      )}
     </>
   )
 }

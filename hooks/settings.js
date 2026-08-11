@@ -45,6 +45,9 @@ export const DEFAULT_SETTINGS = {
   terminal: {
     visible: true,
     disposition: 'bottom',
+    // Coupé pour de bon quand l'accueil détecte un usage sans terminal — pas
+    // seulement replié. Voir `app/src/profilage.ts:terminalPourUsage()`.
+    disabled: false,
     hauteur: 244,
     largeur: 468,
   },
@@ -57,9 +60,9 @@ export const DEFAULT_SETTINGS = {
   // ment. Le défaut est le bon même sur un fichier abîmé : mieux vaut une
   // présentation de trop qu'un premier lancement muet.
   onboardingVu: false,
-  // Les réponses de l'accueil, gardées parce qu'elles servent après lui : le
-  // niveau décide des skills pré-cochés à l'équipement d'un projet. Le profil
-  // d'interface, lui, ne se garde pas — voir `app/src/PreferencesProfils.tsx`.
+  // `usage` vient de l'accueil et s'y met à jour. `niveau` n'est plus posé par
+  // l'accueil (la galerie de profils remplace la question) — le champ reste
+  // pour compatibilité mais retombe toujours sur son défaut.
   claude: { niveau: 'intermediaire', usage: 'terminal' },
   // Alignés sur l'état constaté du dépôt ovrsee lui-même au moment d'écrire
   // ce réglage : captures ignorées, plans/tickets versionnés.
@@ -166,6 +169,9 @@ export function validateSettings(partial, defaults = DEFAULT_SETTINGS) {
   if (partial.terminal && typeof partial.terminal === 'object') {
     if (typeof partial.terminal.visible === 'boolean') {
       out.terminal.visible = partial.terminal.visible
+    }
+    if (typeof partial.terminal.disabled === 'boolean') {
+      out.terminal.disabled = partial.terminal.disabled
     }
     if (['bottom', 'side', 'full'].includes(partial.terminal.disposition)) {
       out.terminal.disposition = partial.terminal.disposition

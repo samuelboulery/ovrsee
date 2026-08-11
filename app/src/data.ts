@@ -326,7 +326,7 @@ export interface SettingsType {
   theme: string
   densiteActivite: { granularite: string; fenetre: string }
   onglets: { actifs: string[]; ordre: string[] }
-  terminal: { visible: boolean; disposition: string; hauteur: number; largeur: number }
+  terminal: { visible: boolean; disposition: string; hauteur: number; largeur: number; disabled?: boolean }
   bootstrap: string[]
   packageManager: string
   sourceGraphe: string

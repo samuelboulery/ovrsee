@@ -21,14 +21,11 @@ import type { SettingsType } from './data'
 import { t } from './i18n'
 import { Logo, SchemaBoucle } from './OnboardingArt'
 import {
-  NIVEAUX,
   USAGES,
   apercuReponses,
   appliquerReponses,
-  bootstrapPourNiveau,
   profilSuggere,
   reponsesInitiales,
-  type Niveau,
   type Reponses,
   type Usage,
 } from './profilage'
@@ -272,7 +269,7 @@ function EcranProfil({
                   onReponses({
                     ...reponses,
                     usage: usage as Usage,
-                    profil: profilSuggere(reponses.niveau, usage as Usage),
+                    profil: profilSuggere(usage as Usage),
                   })
                 }
               />
@@ -281,38 +278,17 @@ function EcranProfil({
         </div>
 
         <div>
-          <div style={s('font-size: 12px; color: var(--color-text); margin-bottom: 8px;')}>
-            {t('onboard.level_question')}
-          </div>
-          <Segmented
-            name="onboard-niveau"
-            ariaLabel={t('onboard.level_question')}
-            value={reponses.niveau}
-            onChange={niveau =>
-              onReponses({
-                ...reponses,
-                niveau: niveau as Niveau,
-                profil: profilSuggere(niveau as Niveau, reponses.usage),
-                bootstrap: bootstrapPourNiveau(niveau as Niveau),
-              })
-            }
-            options={NIVEAUX.map(niveau => ({
-              value: niveau,
-              label: t(`onboard.level_${niveau}`),
-            }))}
-          />
-
-          <div style={s('margin-top: 16px;')}>
-            <PreferencesPreview settings={apercu} />
-            <Consequence apercu={apercu} />
-          </div>
+          <PreferencesPreview settings={apercu} />
+          <Consequence apercu={apercu} />
         </div>
       </div>
 
       <div style={s('margin-top: 22px;')}>
-        {/* La galerie des préférences, telle quelle : le template déduit est
-            déjà celui qui s'y montre courant, et « Appliquer » sert ici à
-            écraser la suggestion. */}
+        <div style={s('font-size: 12px; color: var(--color-text); margin-bottom: 8px;')}>
+          {t('onboard.profile_question')}
+        </div>
+        {/* La galerie elle-même est la question : un clic sur une carte vaut
+            réponse, sans matrice cachée entre les deux. */}
         <SectionProfils
           settings={apercu}
           courant={reponses.profil}

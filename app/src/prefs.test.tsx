@@ -134,6 +134,21 @@ for (const [nomSection, Section] of SECTIONS) {
   }
 }
 
+test('SectionInterface : terminal désactivé montre le bouton d’activation, pas le switch', () => {
+  const desactive = settings({
+    terminal: { visible: false, disposition: 'bottom', hauteur: 244, largeur: 468, disabled: true },
+  })
+  const html = renderToStaticMarkup(<SectionInterface settings={desactive} onSettings={() => {}} />)
+  assert(html.includes('Enable terminal'), 'bouton d’activation absent')
+  assert.equal(html.includes('Layout'), false, 'disposition affichée malgré la désactivation')
+})
+
+test('SectionInterface : terminal actif montre le switch, pas le bouton d’activation', () => {
+  const html = renderToStaticMarkup(<SectionInterface settings={settings()} onSettings={() => {}} />)
+  assert(html.includes('Show terminal'), 'switch absent')
+  assert.equal(html.includes('Enable terminal'), false, 'bouton d’activation affiché sans raison')
+})
+
 test('aperçu : les trois dispositions et le terminal masqué', () => {
   for (const disposition of ['bottom', 'side', 'full']) {
     const html = renderToStaticMarkup(

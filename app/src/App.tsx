@@ -277,7 +277,7 @@ export function App() {
         setTerminalHeight(s.terminal.hauteur)
         setTerminalWidth(s.terminal.largeur)
         setLayout(s.terminal.disposition as Layout)
-        setTerminal(s.terminal.visible)
+        setTerminal(s.terminal.visible && !s.terminal.disabled)
         applyTheme(s.theme)
       })
       .catch(err => setError(String(err.message ?? err)))
@@ -715,7 +715,7 @@ export function App() {
                 </main>
               )}
 
-              {terminal && (
+              {terminal && !settings?.terminal?.disabled && (
                 <Terminal
                   layout={layout}
                   onLayout={setLayout}
@@ -731,7 +731,10 @@ export function App() {
               )}
             </div>
 
-            {!terminal && (
+            {/* Pas de pastille de réouverture si le terminal est désactivé :
+                sinon rien n'empêche `setTerminal(true)` de rouvrir un panneau
+                qu'on vient de dire ne jamais vouloir. */}
+            {!terminal && !settings?.terminal?.disabled && (
               <div
                 style={s(
                   'height: 32px; flex: none; border-top: 1px solid var(--color-divider); background: var(--theme-bg-primary); display: flex; align-items: center; gap: 10px; padding: 0 14px;',

@@ -2,7 +2,7 @@
 {
   "id": "T-0035",
   "titre": "Refonte sélection du profil d'interface à l'onboarding",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "onboarding",

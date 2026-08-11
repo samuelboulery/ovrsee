@@ -4,7 +4,24 @@
   "title": "Refonte de la sélection de profil d'interface à l'onboarding",
   "opened": "2026-08-11",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "c0b34f7",
+      "date": "2026-08-11",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Onboarding.tsx",
+        "app/src/PreferencesPanel.tsx",
+        "app/src/data.ts",
+        "app/src/onboarding.test.tsx",
+        "app/src/prefs.test.tsx",
+        "app/src/profilage.ts",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/settings.js"
+      ]
+    }
+  ]
 }
 ---
 

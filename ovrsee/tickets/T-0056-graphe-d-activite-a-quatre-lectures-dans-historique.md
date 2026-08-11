@@ -2,7 +2,7 @@
 {
   "id": "T-0056",
   "titre": "Graphe d'activité à quatre lectures dans Historique",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

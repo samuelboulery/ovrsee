@@ -2,7 +2,7 @@
 {
   "id": "T-0054",
   "titre": "Ticket depuis un élément sélectionné",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

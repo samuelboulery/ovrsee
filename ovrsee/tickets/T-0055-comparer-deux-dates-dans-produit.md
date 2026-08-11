@@ -2,7 +2,7 @@
 {
   "id": "T-0055",
   "titre": "Comparer deux dates dans Produit",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

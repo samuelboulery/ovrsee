@@ -2,7 +2,7 @@
 {
   "id": "T-0052",
   "titre": "Refonte UI Ovrsee — Phase 2 : fonctionnalités neuves",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

@@ -77,6 +77,24 @@
       "sha": "3d819ff",
       "date": "2026-08-11",
       "files": []
+    },
+    {
+      "sha": "87d26f9",
+      "date": "2026-08-12",
+      "files": [
+        "app/src/data.ts",
+        "app/src/tabs/Donnees.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/Produit.tsx",
+        "hooks/density.d.ts",
+        "hooks/density.js",
+        "hooks/density.test.js",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/integrationProviders.js",
+        "hooks/integrationProviders.test.js"
+      ]
     }
   ]
 }

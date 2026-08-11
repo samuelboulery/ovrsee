@@ -2,7 +2,7 @@
 {
   "id": "T-0057",
   "titre": "Schéma DB dans Données",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "basse",
   "tags": [
     "ui",

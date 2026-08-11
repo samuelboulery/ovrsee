@@ -2,7 +2,7 @@
 {
   "id": "T-0037",
   "titre": "La sélection d'un profil d'interface pose aussi terminal.disabled",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

@@ -4,7 +4,19 @@
   "title": "Profils d'interface : la sélection pilote aussi `terminal.disabled`",
   "opened": "2026-08-11",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "28b8211",
+      "date": "2026-08-11",
+      "files": [
+        "app/src/PreferencesProfils.tsx",
+        "app/src/prefs.test.tsx",
+        "hooks/ovrsee-capture-plan.js",
+        "hooks/tickets.js",
+        "hooks/tickets.test.js"
+      ]
+    }
+  ]
 }
 ---
 

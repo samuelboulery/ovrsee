@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Tracer aussi les tâches hors plan / hors audit sous forme de ticket",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-11",
   "commits": [
     {
       "sha": "f5acc08",
@@ -25,6 +25,11 @@
     },
     {
       "sha": "4b3fcc3",
+      "date": "2026-08-11",
+      "files": []
+    },
+    {
+      "sha": "53755ac",
       "date": "2026-08-11",
       "files": []
     }

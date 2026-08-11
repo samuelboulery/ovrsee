@@ -238,7 +238,7 @@ function Controls({
   onFit: () => void
 }) {
   const button =
-    'cursor: pointer; font-family: var(--font-body); font-size: 11px; padding: 4px 9px; border-radius: 5px; border: 1px solid var(--color-neutral-800); background: rgba(19,20,31,.86); color: var(--color-neutral-400);'
+    'cursor: pointer; font-family: var(--font-body); font-size: 11px; padding: 4px 9px; border-radius: 5px; border: 1px solid var(--color-neutral-800); background: rgba(19,20,31,.86); color: rgba(233,233,237,.92);'
 
   return (
     <div
@@ -376,7 +376,7 @@ function PageCard({
           {pageName(page, pages)}
         </span>
       </div>
-      <div style={s('font-family: ui-monospace, monospace; font-size: 10.5px; color: var(--color-accent-300); margin-top: 3px;')}>
+      <div style={s('font-family: ui-monospace, monospace; font-size: 10.5px; color: var(--color-accent); margin-top: 3px;')}>
         {page.route}
       </div>
 
@@ -394,7 +394,7 @@ function PageCard({
       ) : (
         <div
           style={s(
-            `width: 100%; aspect-ratio: ${shotRatio(page)}; border-radius: 5px; border: 1px dashed var(--color-neutral-700); margin-top: 9px; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-accent-300);`,
+            `width: 100%; aspect-ratio: ${shotRatio(page)}; border-radius: 5px; border: 1px dashed var(--color-neutral-700); margin-top: 9px; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-accent);`,
           )}
         >
           {t('produit.scan_failed')}
@@ -460,7 +460,7 @@ function DetailPanel({
       <div style={s('font-family: var(--font-heading); font-size: 17px; margin-top: 8px;')}>
         {pageName(page, pages)}
       </div>
-      <div style={s('font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-accent-300); margin-top: 3px;')}>
+      <div style={s('font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-accent); margin-top: 3px;')}>
         {page.route}
       </div>
       <div style={s('font-size: 12px; color: var(--color-neutral-400); margin-top: 9px; line-height: 1.5; text-wrap: pretty;')}>

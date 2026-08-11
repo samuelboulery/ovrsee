@@ -264,7 +264,7 @@ export function SectionClaude() {
                       <div
                         className="tag"
                         style={s(
-                          `font-size: 10px;${plugin.status === 'enabled' ? ' color: var(--color-accent-300);' : ''}`,
+                          `font-size: 10px;${plugin.status === 'enabled' ? ' color: var(--color-accent);' : ''}`,
                         )}
                       >
                         {plugin.status}

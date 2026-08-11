@@ -13,8 +13,8 @@ import { s } from '../style'
 import type { IntegrationsBridge } from '../useTerminal'
 
 const ETAT_STYLE: Record<IntegrationState, string> = {
-  ok: 'color: var(--color-accent-200); border: 1px solid var(--color-accent-700);',
-  error: 'color: var(--color-accent-300); border: 1px solid var(--color-accent-700);',
+  ok: 'color: var(--color-accent); border: 1px solid var(--color-accent-700);',
+  error: 'color: var(--color-accent); border: 1px solid var(--color-accent-700);',
   building: 'color: var(--color-neutral-300); border: 1px solid var(--color-neutral-700);',
   unknown: 'color: var(--color-neutral-500); border: 1px dashed var(--color-neutral-700);',
 }
@@ -163,7 +163,7 @@ export function Deploiements({
                   href={integ.url}
                   target="_blank"
                   rel="noreferrer"
-                  style={s('font-size: 11px; color: var(--color-accent-300); margin-top: 3px; display: block;')}
+                  style={s('font-size: 11px; color: var(--color-accent); margin-top: 3px; display: block;')}
                 >
                   {integ.url}
                 </a>

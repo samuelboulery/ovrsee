@@ -207,7 +207,7 @@ export function BlocIntegrations({
                     href={TOKEN_HELP_URL[provider]!}
                     target="_blank"
                     rel="noreferrer"
-                    style={s('color: var(--color-accent-300);')}
+                    style={s('color: var(--color-accent);')}
                   >
                     {t('pref.integrations_token_create_link', {
                       provider: PROVIDERS.find(([valeur]) => valeur === provider)?.[1] ?? '',

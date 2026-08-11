@@ -212,9 +212,9 @@ export function tokens(code: string, language?: string): Token[] {
 /** La couleur d'un jeton. `plain` n'en a pas : il hérite du bloc. */
 export const KIND_STYLES: Record<Exclude<Kind, 'plain'>, string> = {
   comment: 'color: var(--color-neutral-600); font-style: italic;',
-  string: 'color: var(--color-accent-2-300);',
-  number: 'color: var(--color-accent-2-200);',
-  keyword: 'color: var(--color-accent-300);',
+  string: 'color: var(--color-accent-2);',
+  number: 'color: var(--color-accent-2);',
+  keyword: 'color: var(--color-accent);',
   call: 'color: var(--color-neutral-100);',
-  flag: 'color: var(--color-accent-2-400);',
+  flag: 'color: var(--color-accent-2);',
 }

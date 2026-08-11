@@ -36,6 +36,19 @@ export const darkTheme = {
   xtermBrightWhite: '#ffffff',
   xtermMagenta: '#9184d9',
   xtermBrightMagenta: '#b3a9e6',
+  // Les 10 couleurs ANSI restantes n'étaient pas définies : xterm retombait
+  // sur ses défauts internes, calibrés pour un fond noir. Fixées ici pour ne
+  // plus en dépendre — proches des défauts xterm, assorties au violet Nocturne.
+  xtermRed: '#e5677a',
+  xtermBrightRed: '#f08a99',
+  xtermGreen: '#7fc97f',
+  xtermBrightGreen: '#a3dba3',
+  xtermYellow: '#e0c46f',
+  xtermBrightYellow: '#f0d98f',
+  xtermBlue: '#7fa6d9',
+  xtermBrightBlue: '#a3c2e8',
+  xtermCyan: '#7fc9c9',
+  xtermBrightCyan: '#a3dbdb',
 }
 
 /**
@@ -60,6 +73,19 @@ export const lightTheme = {
   xtermBrightWhite: '#ffffff',
   xtermMagenta: '#9184d9',
   xtermBrightMagenta: '#b3a9e6',
+  // Mêmes 10 couleurs, assombries pour rester lisibles sur le fond clair —
+  // sans elles xterm retombait sur ses défauts calibrés pour un fond noir
+  // (ex. le vert et le jaune par défaut sont quasi invisibles sur blanc).
+  xtermRed: '#c41a16',
+  xtermBrightRed: '#d93a35',
+  xtermGreen: '#1a7f37',
+  xtermBrightGreen: '#2c9a4a',
+  xtermYellow: '#9a6700',
+  xtermBrightYellow: '#b8821a',
+  xtermBlue: '#1a4fd6',
+  xtermBrightBlue: '#3a6ae8',
+  xtermCyan: '#0e7490',
+  xtermBrightCyan: '#1592b3',
 }
 
 /**
@@ -227,6 +253,16 @@ export function getTerminalTheme(): {
   brightWhite: string
   magenta: string
   brightMagenta: string
+  red: string
+  brightRed: string
+  green: string
+  brightGreen: string
+  yellow: string
+  brightYellow: string
+  blue: string
+  brightBlue: string
+  cyan: string
+  brightCyan: string
 } {
   const currentTheme = document.documentElement.dataset.theme || 'auto'
   const palette = resolveTheme(currentTheme)
@@ -242,5 +278,15 @@ export function getTerminalTheme(): {
     brightWhite: palette.xtermBrightWhite,
     magenta: palette.xtermMagenta,
     brightMagenta: palette.xtermBrightMagenta,
+    red: palette.xtermRed,
+    brightRed: palette.xtermBrightRed,
+    green: palette.xtermGreen,
+    brightGreen: palette.xtermBrightGreen,
+    yellow: palette.xtermYellow,
+    brightYellow: palette.xtermBrightYellow,
+    blue: palette.xtermBlue,
+    brightBlue: palette.xtermBrightBlue,
+    cyan: palette.xtermCyan,
+    brightCyan: palette.xtermBrightCyan,
   }
 }

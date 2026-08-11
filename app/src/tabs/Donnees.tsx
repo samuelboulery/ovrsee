@@ -129,13 +129,13 @@ function CoffreIgnore() {
 
 function confStyle(conf: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS' | 'LIVE'): string {
   const styles = {
-    EXTRACTED: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-accent-200); border: 1px solid var(--color-accent-700);',
+    EXTRACTED: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-accent); border: 1px solid var(--color-accent-700);',
     INFERRED: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-300); border: 1px solid var(--color-neutral-700);',
     AMBIGUOUS: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-400); border: 1px dashed var(--color-neutral-600);',
     // Vérifiée en direct sur la base elle-même, pas déduite du code : le
     // second accent du design system (`--color-accent-2-*`) la distingue des
     // trois confiances ci-dessus, qui restent des lectures de Graphify.
-    LIVE: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-accent-2-200); border: 1px solid var(--color-accent-2-700);',
+    LIVE: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-accent-2); border: 1px solid var(--color-accent-2-700);',
   }
   return styles[conf]
 }
@@ -239,7 +239,7 @@ export function Donnees({
       {liveErreur && (
         <div
           style={s(
-            'margin-bottom: 16px; font-size: 12px; color: var(--color-accent-300); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
+            'margin-bottom: 16px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
           )}
         >
           {liveErreur}

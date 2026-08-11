@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Publier des installeurs pré-empaquetés sur GitHub Releases",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-11",
   "commits": [
     {
       "sha": "7e3837d",
@@ -19,6 +19,11 @@
     },
     {
       "sha": "802ef4b",
+      "date": "2026-08-11",
+      "files": []
+    },
+    {
+      "sha": "8cb357f",
       "date": "2026-08-11",
       "files": []
     }

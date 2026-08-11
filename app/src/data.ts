@@ -1226,7 +1226,7 @@ export function briefLines(snapshot: Snapshot | null): Array<{ text: string; sty
     { text: '$ claude', style: 'color: var(--color-neutral-500);' },
     {
       text: `◆ ${t('brief.readable_in', { root: snapshot.root })} — ${t(pages > 1 ? 'brief.pages_plural' : 'brief.pages', { n: pages })}, ${t(closed > 1 ? 'brief.closed_plural' : 'brief.closed', { n: closed })}, ${t(open.length > 1 ? 'brief.open_plural' : 'brief.open', { n: open.length })}`,
-      style: 'color: var(--color-accent-300);',
+      style: 'color: var(--color-accent);',
     },
     { text: '', style: '' },
   ]
@@ -1239,7 +1239,7 @@ export function briefLines(snapshot: Snapshot | null): Array<{ text: string; sty
             date: frDate(scan.date),
             error: scan.error ?? t('brief.no_reason'),
           }),
-      style: scan.ok ? dim : 'color: var(--color-accent-200);',
+      style: scan.ok ? dim : 'color: var(--color-accent);',
     })
   } else {
     lines.push({ text: t('brief.no_scan'), style: dim })

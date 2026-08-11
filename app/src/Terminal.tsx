@@ -343,7 +343,7 @@ export function Terminal({
           {snapshot && !snapshot.equipped && (
             <div
               style={s(
-                'font-size: 11px; color: var(--color-accent-300); border: 1px solid var(--color-accent-700); border-radius: 4px; padding: 6px 8px; margin-bottom: 12px;',
+                'font-size: 11px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 4px; padding: 6px 8px; margin-bottom: 12px;',
               )}
             >
               <div style={s('font-weight: 500;')}>{t('terminal.not_equipped')}</div>
@@ -381,7 +381,7 @@ export function Terminal({
                 <div
                   key={err.label}
                   style={s(
-                    'font-size: 11px; color: var(--color-accent-300); border: 1px solid var(--color-accent-700); border-radius: 4px; padding: 6px 8px;',
+                    'font-size: 11px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 4px; padding: 6px 8px;',
                   )}
                 >
                   <div style={s('font-weight: 500;')}>{err.label}</div>

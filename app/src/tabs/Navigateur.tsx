@@ -598,7 +598,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
               {snapshot.config?.dev ? (
                 <>
                   {' '}et lancez{' '}
-                  <span style={s('font-family: ui-monospace, monospace; color: var(--color-accent-300);')}>
+                  <span style={s('font-family: ui-monospace, monospace; color: var(--color-accent);')}>
                     {snapshot.config.dev}
                   </span>
                 </>
@@ -659,7 +659,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
                   key={i}
                   style={s(
                     'padding: 2px 0; line-height: 1.5; color: ' +
-                      (log.level === 'error' ? 'var(--color-accent-200);' : 'var(--color-neutral-500);'),
+                      (log.level === 'error' ? 'var(--color-accent);' : 'var(--color-neutral-500);'),
                   )}
                 >
                   {log.message}
@@ -724,7 +724,7 @@ function HorsApplication() {
         )}
       >
         {t('navigateur.not_packaged_desc')}{' '}
-        <span style={s('font-family: ui-monospace, monospace; color: var(--color-accent-300);')}>
+        <span style={s('font-family: ui-monospace, monospace; color: var(--color-accent);')}>
           pnpm electron
         </span>{' '}
         {t('navigateur.not_packaged_help')}

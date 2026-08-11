@@ -288,7 +288,7 @@ export function Tableau({
           {edition ? t('tableau.edit_mode_help') : t('tableau.read_mode_help')}
         </div>
         {erreur && (
-          <div style={s('margin-top: 10px; font-size: 12px; color: var(--color-accent-300); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;')}>
+          <div style={s('margin-top: 10px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;')}>
             {erreur}
           </div>
         )}
@@ -461,7 +461,7 @@ function ColonneVue({
         COLONNE_LARGEUR +
           COLONNE_FOND +
           (survolee
-            ? 'background: var(--color-accent-900); outline: 1px dashed var(--color-accent-600);'
+            ? 'background: color-mix(in srgb, var(--color-accent) 22%, transparent); outline: 1px dashed var(--color-accent-600);'
             : 'background: color-mix(in srgb, var(--color-surface) 55%, transparent);') +
           liseré,
       )}
@@ -513,7 +513,7 @@ function ColonneVue({
 
         {deborde && !edition && (
           <div
-            style={s('font-size: 10.5px; color: var(--color-accent-300);')}
+            style={s('font-size: 10.5px; color: var(--color-accent);')}
             title={t('tableau.over_wip', { n: colonne.wip ?? 0 })}
           >
             ⚠ {tickets.length}/{colonne.wip}

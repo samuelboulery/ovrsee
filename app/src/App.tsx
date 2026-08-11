@@ -1142,7 +1142,7 @@ function ProjectRow({
       style={s(
         'padding: 9px 14px; cursor: pointer; ' +
           (active
-            ? 'background: var(--color-accent-900); box-shadow: inset 2px 0 0 var(--color-accent); color: var(--color-text);'
+            ? 'background: color-mix(in srgb, var(--color-accent) 22%, transparent); box-shadow: inset 2px 0 0 var(--color-accent); color: var(--color-text);'
             : 'color: var(--color-neutral-300);'),
       )}
     >
@@ -1162,7 +1162,7 @@ function ProjectRow({
             style={s(
               'font-size: 10px; padding: 1px 6px; border-radius: 999px; ' +
                 (vivant.open && vivant.equipped
-                  ? 'color: var(--color-accent-200); border: 1px solid var(--color-accent-700);'
+                  ? 'color: var(--color-accent); border: 1px solid var(--color-accent-700);'
                   : 'color: var(--color-neutral-600); border: 1px solid var(--color-neutral-800);'),
             )}
           >
@@ -1184,7 +1184,7 @@ function ProjectRow({
             className="btn btn-ghost"
             style={s(
               'font-size: 10px; line-height: 1; padding: 2px 6px; ' +
-                (confirming ? 'color: var(--color-accent-200);' : 'color: var(--color-neutral-500);'),
+                (confirming ? 'color: var(--color-accent);' : 'color: var(--color-neutral-500);'),
             )}
           >
             {confirming ? 'retirer ?' : '×'}

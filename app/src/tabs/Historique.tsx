@@ -183,7 +183,7 @@ function CommitRow({ commit }: { commit: GitCommit }) {
   return (
     <div style={s('display: flex; align-items: baseline; gap: 10px; padding: 4px 0;')}>
       <span style={s('width: 5px; height: 5px; border-radius: 50%; background: var(--color-neutral-600); flex: none; align-self: center;')} />
-      <span style={s('font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-accent-300); flex: none;')}>
+      <span style={s('font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-accent); flex: none;')}>
         {commit.sha}
       </span>
       <span style={s('font-size: 12.5px; color: var(--color-neutral-300); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>
@@ -215,7 +215,7 @@ function TicketCard({ ticket, onOuvrir }: { ticket: Ticket; onOuvrir: (file: str
         style={s(`width: 7px; height: 7px; border-radius: 50%; flex: none; background: ${COULEUR_PRIORITE[ticket.priorite] ?? COULEUR_PRIORITE.moyenne};`)}
         title={`${t('tableau.priority_label')} ${ticket.priorite}`}
       />
-      <span style={s('font-family: ui-monospace, monospace; font-size: 10.5px; color: var(--color-accent-300); flex: none;')}>
+      <span style={s('font-family: ui-monospace, monospace; font-size: 10.5px; color: var(--color-accent); flex: none;')}>
         {ticket.id}
       </span>
       <span style={s('font-size: 12.5px; color: var(--color-neutral-300); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>
@@ -356,7 +356,7 @@ function PlanBandShell({
   return (
     <div
       style={s(
-        'border-left: 2px solid var(--color-accent-700); padding: 8px 0 8px 12px; margin: 6px 0 6px 1px; background: linear-gradient(90deg, var(--color-accent-900) 0%, transparent 60%); border-radius: 0 6px 6px 0;',
+        'border-left: 2px solid var(--color-accent-700); padding: 8px 0 8px 12px; margin: 6px 0 6px 1px; background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 22%, transparent) 0%, transparent 60%); border-radius: 0 6px 6px 0;',
       )}
     >
       <button
@@ -366,7 +366,7 @@ function PlanBandShell({
           'display: flex; align-items: baseline; gap: 9px; width: 100%; text-align: left; background: transparent; border: 0; padding: 0; cursor: pointer; font-family: var(--font-body); color: inherit;',
         )}
       >
-        <span style={s('font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-accent-300); flex: none;')}>
+        <span style={s('font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-accent); flex: none;')}>
           {t('historique.plan_label')}
         </span>
         <span style={s('font-size: 14px; font-weight: 500; color: var(--color-text);')}>{title}</span>

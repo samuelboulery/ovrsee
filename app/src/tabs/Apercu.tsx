@@ -515,7 +515,7 @@ function Obsidian({ root }: { root: string }) {
       {erreur && (
         <div
           style={s(
-            'margin-top: 8px; font-size: 12px; color: var(--color-accent-300); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
+            'margin-top: 8px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
           )}
         >
           {erreur}
@@ -562,7 +562,7 @@ function Chiffre({
       <div
         style={s(
           'font-size: 17px; font-weight: 500; ' +
-            (accent ? 'color: var(--color-accent-200);' : 'color: var(--color-text);'),
+            (accent ? 'color: var(--color-accent);' : 'color: var(--color-text);'),
         )}
       >
         {valeur}

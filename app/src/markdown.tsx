@@ -172,7 +172,7 @@ function inline(text: string, keyPrefix: string, root?: string): ReactNode[] {
             href={href}
             target="_blank"
             rel="noreferrer noopener"
-            style={s('color: var(--color-accent-300); text-underline-offset: 2px;')}
+            style={s('color: var(--color-accent); text-underline-offset: 2px;')}
           >
             {texte}
           </a>
@@ -249,7 +249,7 @@ function Bloc({ code, language }: { code: string; language: string }) {
           }}
           style={s(
             'background: none; border: 0; padding: 2px 4px; cursor: pointer; font-size: 10px; letter-spacing: .04em; color: ' +
-              (copie ? 'var(--color-accent-300);' : 'var(--color-neutral-600);'),
+              (copie ? 'var(--color-accent);' : 'var(--color-neutral-600);'),
           )}
         >
           {copie ? t('markdown.copied') : t('markdown.copy')}

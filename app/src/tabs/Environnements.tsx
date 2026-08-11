@@ -52,7 +52,7 @@ export function Environnements({
                 href={env.url}
                 target="_blank"
                 rel="noreferrer"
-                style={s('font-size: 11px; color: var(--color-accent-300); margin-top: 3px; display: block;')}
+                style={s('font-size: 11px; color: var(--color-accent); margin-top: 3px; display: block;')}
               >
                 {env.url}
               </a>

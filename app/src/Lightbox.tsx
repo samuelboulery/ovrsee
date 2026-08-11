@@ -106,7 +106,7 @@ export function Lightbox({
       >
         <div style={s('display: flex; align-items: baseline; gap: 9px;')}>
           <span style={s('font-size: 13px; color: var(--color-text);')}>{frDate(shotDate(file))}</span>
-          <span style={s('font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-accent-300);')}>
+          <span style={s('font-family: ui-monospace, monospace; font-size: 11px; color: var(--color-accent);')}>
             {shotSha(file)}
           </span>
           <span style={s('font-size: 11px; color: var(--color-neutral-600);')}>
@@ -165,8 +165,8 @@ function Arrow({
       style={s(
         'flex: none; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--color-neutral-800); background: rgba(19,20,31,.8); font-size: 19px; line-height: 1; ' +
           (disabled
-            ? 'color: var(--color-neutral-700); cursor: default;'
-            : 'color: var(--color-neutral-300); cursor: pointer;'),
+            ? 'color: rgba(233,233,237,.4); cursor: default;'
+            : 'color: rgba(233,233,237,.92); cursor: pointer;'),
       )}
     >
       {label}

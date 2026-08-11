@@ -115,6 +115,12 @@ page : pour ça, il faut lancer l'app.
   qu'un protocole non conforme est passé sous une suite verte.
 - **Un secret collé dans un plan approuvé part dans git en clair.** La parade est en
   amont : ne pas en coller.
+- **Un plan actif éclipse un ticket actif, jamais l'inverse.** `ovrsee/.active-ticket`
+  (le ticket qui satisfait le gate hors-plan) et `.active-plan` ne coexistent jamais
+  en pratique : capturer un plan efface le ticket actif, et tant qu'un plan est
+  actif le gate ignore `.active-ticket`. Un ticket ad hoc resté ouvert après la
+  fermeture du plan ne redevient pas actif tout seul — il faut le rouvrir
+  explicitement (`moveTicket` vers `en-cours`) ou en créer un nouveau.
 
 ## Conventions
 

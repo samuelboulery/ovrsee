@@ -15,7 +15,7 @@
  * `serializePlan` sont réutilisés tels quels plutôt que redéfinis ici.
  */
 
-import { mkdirSync, readdirSync, readFileSync, unlinkSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { parsePlan, readPlans, serializePlan, slugify, writeFileNoFollow } from './plans.js'
@@ -395,6 +395,14 @@ export function createTicket(ovrseeDir, champs, now = new Date()) {
   mkdirSync(join(ovrseeDir, 'tickets'), { recursive: true })
   writeFileNoFollow(ticketPath(ovrseeDir, file), serializePlan(meta, body))
 
+  // Un ticket créé sans plan, alors qu'aucun plan n'est actif, devient le
+  // ticket actif : seule façon hors-plan de satisfaire le gate sans étape
+  // manuelle supplémentaire. Écrase silencieusement un `.active-ticket`
+  // déjà posé, comme `ovrsee-capture-plan.js` réécrit toujours `.active-plan`.
+  if (meta.plan === null && meta.colonne !== colonneFinale(colonnes) && !existsSync(join(ovrseeDir, '.active-plan'))) {
+    writeFileNoFollow(join(ovrseeDir, '.active-ticket'), meta.id + '\n')
+  }
+
   return { file, meta, body }
 }
 
@@ -424,12 +432,49 @@ function rewrite(ovrseeDir, file, transform, now) {
   return true
 }
 
-/** Déplace un ticket d'une colonne à l'autre. Ne touche à rien d'autre. */
+/**
+ * Déplace un ticket d'une colonne à l'autre. Ne touche à rien d'autre — sauf
+ * `.active-ticket`, dont ce déplacement est le seul chemin d'écriture commun
+ * à tous les appelants (route UI, MCP, hooks) :
+ *
+ * - vers la colonne finale : efface `.active-ticket` s'il désignait ce ticket
+ *   (travail terminé, peu importe si c'est un commit, un drag kanban, ou un
+ *   appel MCP) ;
+ * - vers `en-cours`, pour un ticket sans plan et sans plan actif : pose
+ *   `.active-ticket` — reprendre un ticket déjà ouvert (ex. issu d'un audit)
+ *   n'oblige pas à en recréer un.
+ */
 export function moveTicket(ovrseeDir, file, colonne, now = new Date()) {
   requireFile(file)
-  requireColonne(readBoard(ovrseeDir), colonne)
+  const colonnes = readBoard(ovrseeDir)
+  requireColonne(colonnes, colonne)
 
-  return rewrite(ovrseeDir, file, ticket => ({ meta: { ...ticket.meta, colonne }, body: ticket.body }), now)
+  let planDuTicket
+  const ok = rewrite(
+    ovrseeDir,
+    file,
+    ticket => {
+      planDuTicket = ticket.meta.plan
+      return { meta: { ...ticket.meta, colonne }, body: ticket.body }
+    },
+    now,
+  )
+  if (!ok) return false
+
+  const id = idFromFile(file)
+  const finale = colonneFinale(colonnes)
+  if (id && colonne === finale) {
+    clearActiveTicket(ovrseeDir, id)
+  } else if (
+    id &&
+    colonne === 'en-cours' &&
+    (planDuTicket === null || planDuTicket === undefined) &&
+    !existsSync(join(ovrseeDir, '.active-plan'))
+  ) {
+    writeFileNoFollow(join(ovrseeDir, '.active-ticket'), id + '\n')
+  }
+
+  return true
 }
 
 /**
@@ -512,6 +557,55 @@ export function deleteTicket(ovrseeDir, file) {
 export function colonneFinale(colonnes) {
   return colonnes.length > 1 ? (colonnes.at(-1)?.id ?? null) : null
 }
+
+/**
+ * Un id de ticket est-il sûr à recoller à une comparaison ?
+ *
+ * `ovrsee/.active-ticket` est la seule valeur relue du disque puis réinjectée
+ * dans une comparaison d'id — même regex que la validation d'`epic` plus haut.
+ */
+export function isSafeTicketId(id) {
+  return typeof id === 'string' && /^T-\d+$/.test(id)
+}
+
+/**
+ * L'id du ticket actif, ou `null`.
+ *
+ * Absent, illisible ou mal formé retombent tous sur `null` — un `.active-ticket`
+ * douteux ne doit jamais faire planter un appelant, seulement se comporter comme
+ * s'il n'existait pas.
+ */
+export function readActiveTicket(ovrseeDir) {
+  try {
+    const id = readFileSync(join(ovrseeDir, '.active-ticket'), 'utf8').trim()
+    return isSafeTicketId(id) ? id : null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Retire `.active-ticket`.
+ *
+ * @param {string} ovrseeDir
+ * @param {string|null} [ticketId] fourni : n'efface que si le pointeur désigne
+ *   bien ce ticket (mirroring `clearActivePlan` de `plans.js`). Omis : efface
+ *   sans condition — un plan qui démarre éclipse tout ticket actif ad hoc.
+ * @returns {boolean} vrai si le fichier a été supprimé
+ */
+export function clearActiveTicket(ovrseeDir, ticketId = null) {
+  const pointer = join(ovrseeDir, '.active-ticket')
+  try {
+    if (ticketId !== null && readFileSync(pointer, 'utf8').trim() !== ticketId) return false
+    unlinkSync(pointer)
+    return true
+  } catch {
+    return false // Pas de pointeur, ou illisible : rien à retirer.
+  }
+}
+
+/** L'id porté par un nom de fichier de ticket (`T-0012-slug.md` → `T-0012`), ou `null`. */
+const idFromFile = file => /^(T-\d+)-/.exec(file)?.[1] ?? null
 
 /**
  * Priorité d'abord, puis du plus récent au plus ancien.

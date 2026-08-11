@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtempSync, mkdirSync, writeFileSync, readdirSync, symlinkSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, symlinkSync, existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -25,6 +25,9 @@ import {
   deleteTicket,
   sortTickets,
   importOpenPlans,
+  isSafeTicketId,
+  readActiveTicket,
+  clearActiveTicket,
 } from './tickets.js'
 
 /** Un dossier `ovrsee/` jetable. */
@@ -584,4 +587,130 @@ test("orphanChildren détecte les enfants pointant un epic inexistant", () => {
 
   assert.equal(orphans.length, 1)
   assert.equal(orphans[0].meta.titre, 'Orphelin')
+})
+
+// --- .active-ticket ----------------------------------------------------------
+
+test('isSafeTicketId accepte un id T-XXXX', () => {
+  assert.equal(isSafeTicketId('T-0001'), true)
+  assert.equal(isSafeTicketId('T-12345'), true)
+})
+
+test('isSafeTicketId refuse un format invalide', () => {
+  assert.equal(isSafeTicketId(''), false)
+  assert.equal(isSafeTicketId('../T-0001'), false)
+  assert.equal(isSafeTicketId('T-abc'), false)
+  assert.equal(isSafeTicketId(undefined), false)
+})
+
+test('readActiveTicket rend null quand .active-ticket est absent', () => {
+  assert.equal(readActiveTicket(fixture()), null)
+})
+
+test('readActiveTicket rend null sur un contenu corrompu', () => {
+  const ovrseeDir = fixture()
+  writeFileSync(join(ovrseeDir, '.active-ticket'), 'pas-un-id\n', 'utf8')
+  assert.equal(readActiveTicket(ovrseeDir), null)
+})
+
+test('readActiveTicket lit l’id posé', () => {
+  const ovrseeDir = fixture()
+  writeFileSync(join(ovrseeDir, '.active-ticket'), 'T-0007\n', 'utf8')
+  assert.equal(readActiveTicket(ovrseeDir), 'T-0007')
+})
+
+test('clearActiveTicket sans id efface toujours', () => {
+  const ovrseeDir = fixture()
+  writeFileSync(join(ovrseeDir, '.active-ticket'), 'T-0007\n', 'utf8')
+  assert.equal(clearActiveTicket(ovrseeDir), true)
+  assert.equal(existsSync(join(ovrseeDir, '.active-ticket')), false)
+})
+
+test('clearActiveTicket avec un id qui ne correspond pas laisse le fichier intact', () => {
+  const ovrseeDir = fixture()
+  writeFileSync(join(ovrseeDir, '.active-ticket'), 'T-0007\n', 'utf8')
+  assert.equal(clearActiveTicket(ovrseeDir, 'T-0099'), false)
+  assert.equal(readActiveTicket(ovrseeDir), 'T-0007')
+})
+
+test('clearActiveTicket est silencieux si .active-ticket est absent', () => {
+  assert.equal(clearActiveTicket(fixture(), 'T-0007'), false)
+})
+
+test('createTicket sans plan, sans plan actif, pose .active-ticket', () => {
+  const ovrseeDir = fixture()
+  const { meta } = createTicket(ovrseeDir, { titre: 'Ad hoc' })
+  assert.equal(readActiveTicket(ovrseeDir), meta.id)
+})
+
+test('createTicket lié à un plan ne pose pas .active-ticket', () => {
+  const ovrseeDir = fixture()
+  createTicket(ovrseeDir, { titre: 'Sous plan', plan: '2026-08-10-x.md' })
+  assert.equal(readActiveTicket(ovrseeDir), null)
+})
+
+test('createTicket ne pose pas .active-ticket si un plan est actif', () => {
+  const ovrseeDir = fixture()
+  writeFileSync(join(ovrseeDir, '.active-plan'), '2026-08-10-x.md\n', 'utf8')
+  createTicket(ovrseeDir, { titre: 'Ad hoc pendant un plan' })
+  assert.equal(readActiveTicket(ovrseeDir), null)
+})
+
+test('createTicket ne pose pas .active-ticket si la colonne d’arrivée est déjà finale', () => {
+  const ovrseeDir = fixture()
+  createTicket(ovrseeDir, { titre: 'Déjà fini', colonne: 'fait' })
+  assert.equal(readActiveTicket(ovrseeDir), null)
+})
+
+test('createTicket écrase un .active-ticket déjà posé', () => {
+  const ovrseeDir = fixture()
+  const premier = createTicket(ovrseeDir, { titre: 'Premier' })
+  const second = createTicket(ovrseeDir, { titre: 'Second' })
+  assert.notEqual(premier.meta.id, second.meta.id)
+  assert.equal(readActiveTicket(ovrseeDir), second.meta.id)
+})
+
+test('moveTicket vers la colonne finale efface .active-ticket s’il désignait ce ticket', () => {
+  const ovrseeDir = fixture()
+  const { file, meta } = createTicket(ovrseeDir, { titre: 'Actif' })
+  assert.equal(readActiveTicket(ovrseeDir), meta.id)
+
+  moveTicket(ovrseeDir, file, 'fait')
+  assert.equal(readActiveTicket(ovrseeDir), null)
+})
+
+test('moveTicket vers la colonne finale ignore un .active-ticket qui désigne un autre ticket', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'À clore', plan: '2026-08-10-x.md' })
+  writeFileSync(join(ovrseeDir, '.active-ticket'), 'T-0099\n', 'utf8')
+
+  moveTicket(ovrseeDir, file, 'fait')
+  assert.equal(readActiveTicket(ovrseeDir), 'T-0099')
+})
+
+test('moveTicket vers en-cours pose .active-ticket pour un ticket sans plan, sans plan actif', () => {
+  const ovrseeDir = fixture()
+  const { file, meta } = createTicket(ovrseeDir, { titre: 'Issu d’un audit', colonne: 'backlog' })
+  clearActiveTicket(ovrseeDir) // simule une reprise dans une nouvelle session
+
+  moveTicket(ovrseeDir, file, 'en-cours')
+  assert.equal(readActiveTicket(ovrseeDir), meta.id)
+})
+
+test('moveTicket vers en-cours ne pose pas .active-ticket pour un ticket lié à un plan', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'Sous plan', colonne: 'backlog', plan: '2026-08-10-x.md' })
+
+  moveTicket(ovrseeDir, file, 'en-cours')
+  assert.equal(readActiveTicket(ovrseeDir), null)
+})
+
+test('moveTicket vers en-cours ne pose pas .active-ticket si un plan est actif', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'Ad hoc pendant un plan', colonne: 'backlog' })
+  writeFileSync(join(ovrseeDir, '.active-plan'), '2026-08-10-x.md\n', 'utf8')
+  clearActiveTicket(ovrseeDir)
+
+  moveTicket(ovrseeDir, file, 'en-cours')
+  assert.equal(readActiveTicket(ovrseeDir), null)
 })

@@ -98,9 +98,28 @@ contraire.
 d'une ligne, et c'est voulu : un fichier par ticket évite qu'un déplacement
 depuis l'interface et un déplacement écrit ici se marchent dessus.
 
-**Suivre le travail.** Quand le travail sur un ticket démarre, le passer en
-colonne « en cours » ; quand il est commité, en colonne finale (la dernière du
-board). Le dire à l'utilisateur plutôt que de le faire sans prévenir.
+**Suivre le travail — c'est automatique.** Trois hooks font ce mouvement sans
+intervention : la première édition sous un plan actif passe le ticket en
+« en cours » (`ovrsee-tool-edit.js`), une fin de tour avec du code non commité
+le passe en « revue » (`ovrsee-tool-stop.js`), un commit le passe en colonne
+finale (`ovrsee-post-commit.js`). N'utiliser `moveTicket`/`updateTicket` à la
+main que pour corriger un déplacement, ou pour un ticket sans `plan` renseigné
+— ces hooks ne suivent que les tickets liés au plan actif.
+
+**Le ticket actif hors-plan (`ovrsee/.active-ticket`).** Sans plan actif,
+`ovrsee-tool-edit-gate.js` exige quand même un ticket avant la première édition
+de code — fix rapide, réponse ad hoc, correction d'un constat d'audit déjà
+capturé. Ce ticket actif se pose sans geste supplémentaire :
+
+- `createTicket` sans `plan`, tant qu'aucun plan n'est actif, active
+  automatiquement le ticket qu'il vient de créer.
+- Déplacer un ticket déjà existant vers « en cours » (`moveTicket`) l'active
+  aussi, s'il n'a pas de `plan` — pour reprendre un constat d'audit déjà
+  ticketé sans en recréer un.
+- Déplacer le ticket actif vers la colonne finale l'efface.
+
+Un plan qui démarre efface le ticket actif : le plan reprend la main, et le
+gate redemande un ticket qui cite ce plan — jamais l'ancien ticket ad hoc.
 
 **Lier à un plan.** Un plan approuvé qui correspond à un ticket se cite dans
 `plan`. Les deux stocks restent indépendants : un ticket n'est pas un plan, un

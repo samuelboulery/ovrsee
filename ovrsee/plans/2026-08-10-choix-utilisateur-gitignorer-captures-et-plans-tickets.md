@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Choix utilisateur : gitignorer captures et plans/tickets",
   "opened": "2026-08-10",
-  "closed": null,
+  "closed": "2026-08-10",
   "commits": [
     {
       "sha": "f837d74",
@@ -39,6 +39,11 @@
         "hooks/ovrsee-tool-stop.js",
         "hooks/ovrsee-tool-stop.test.js"
       ]
+    },
+    {
+      "sha": "d84ee82",
+      "date": "2026-08-10",
+      "files": []
     }
   ]
 }

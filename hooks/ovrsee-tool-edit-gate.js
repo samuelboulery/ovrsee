@@ -20,7 +20,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { readBoard, readTickets } from './tickets.js'
+import { colonneFinale, readActiveTicket, readBoard, readTickets } from './tickets.js'
 import { isSafePlanFileName } from './plans.js'
 import { estUneEditionSource } from './ovrsee-tool-edit.js'
 
@@ -68,6 +68,24 @@ export function ticketManquant(ovrseeDir, planFile) {
   return !tickets.some(t => t.meta.plan === planFile)
 }
 
+/**
+ * Le ticket actif (`.active-ticket`, hors plan) existe-t-il encore et est-il
+ * ouvert ? Absent, introuvable ou en colonne finale comptent également comme
+ * manquant : dans les trois cas la sortie est la même, en créer un.
+ *
+ * @param {string} ovrseeDir
+ * @returns {boolean}
+ */
+export function ticketActifManquant(ovrseeDir) {
+  const id = readActiveTicket(ovrseeDir)
+  if (!id) return true
+
+  const colonnes = readBoard(ovrseeDir)
+  const finale = colonneFinale(colonnes)
+  const ticket = readTickets(ovrseeDir, colonnes).find(t => t.meta.id === id)
+  return !ticket || ticket.meta.colonne === finale
+}
+
 function main() {
   const raw = readStdin()
   if (!raw.trim()) return
@@ -87,20 +105,31 @@ function main() {
 
   if (!estUneEditionSource(root, payload?.tool_input?.file_path)) return
 
-  const pointer = join(ovrseeDir, '.active-plan')
-  if (!existsSync(pointer)) return // Pas de plan actif : rien à imposer.
+  const planPointer = join(ovrseeDir, '.active-plan')
+  if (existsSync(planPointer)) {
+    const planFile = readFileSync(planPointer, 'utf8').trim()
+    if (!isSafePlanFileName(planFile)) return
 
-  const planFile = readFileSync(pointer, 'utf8').trim()
-  if (!isSafePlanFileName(planFile)) return
+    if (ticketManquant(ovrseeDir, planFile)) {
+      process.stderr.write(
+        `Bloqué : le plan actif (ovrsee/plans/${planFile}) n'a encore aucun ticket lié.\n` +
+          `Crée-le d'abord — skill ovrsee-tickets, ou MCP createTicket avec plan: "${planFile}" —\n` +
+          `avant d'éditer du code sous ce plan.\n`,
+      )
+      process.exit(2) // 2 = block the tool call, stderr goes back to the model
+    }
+    return // Plan actif et ticket lié : rien d'autre à imposer.
+  }
 
-  if (!ticketManquant(ovrseeDir, planFile)) return // Déjà lié : rien à bloquer.
-
-  process.stderr.write(
-    `Bloqué : le plan actif (ovrsee/plans/${planFile}) n'a encore aucun ticket lié.\n` +
-      `Crée-le d'abord — skill ovrsee-tickets, ou MCP createTicket avec plan: "${planFile}" —\n` +
-      `avant d'éditer du code sous ce plan.\n`,
-  )
-  process.exit(2) // 2 = block the tool call, stderr goes back to the model
+  // Pas de plan actif : un ticket actif hors-plan (`.active-ticket`) doit
+  // couvrir cette édition, sinon rien ne trace ce travail.
+  if (ticketActifManquant(ovrseeDir)) {
+    process.stderr.write(
+      `Bloqué : ni plan actif ni ticket actif.\n` +
+        `Crée un ticket — skill ovrsee-tickets, ou MCP createTicket — avant d'éditer du code.\n`,
+    )
+    process.exit(2)
+  }
 }
 
 /**

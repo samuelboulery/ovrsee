@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Liste des déploiements récents (environnement, branche, commit, lien direct)",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-11",
   "commits": [
     {
       "sha": "af718fa",
@@ -30,6 +30,11 @@
         "hooks/integrationProviders.js",
         "hooks/integrationProviders.test.js"
       ]
+    },
+    {
+      "sha": "a0a7e00",
+      "date": "2026-08-11",
+      "files": []
     }
   ]
 }

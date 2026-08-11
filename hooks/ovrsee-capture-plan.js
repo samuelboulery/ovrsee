@@ -34,7 +34,7 @@ import {
   closeOpenPlans,
   registerProject,
 } from './plans.js'
-import { readBoard, readTickets, moveTicket, colonneFinale } from './tickets.js'
+import { readBoard, readTickets, moveTicket, colonneFinale, clearActiveTicket } from './tickets.js'
 
 function readStdin() {
   try {
@@ -188,6 +188,7 @@ function main() {
 
   writeFileNoFollow(join(ovrseeDir, 'plans', file), serializePlan(meta, planText))
   writeFileNoFollow(join(ovrseeDir, '.active-plan'), file + '\n')
+  clearActiveTicket(ovrseeDir) // un plan qui démarre éclipse tout ticket ad hoc en cours
   registerProject(root)
 
   // additionalContext plutôt qu'un simple message : le hook ne doit jamais

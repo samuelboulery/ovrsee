@@ -104,6 +104,40 @@ export function readSettings() {
 }
 
 /**
+ * Pose `out[cle]` si `valeur` est une chaîne admise par `options`. Motif
+ * répété pour chaque champ à énumération fermée (langue, theme, disposition…).
+ */
+function validerEnum(out, cle, valeur, options) {
+  if (typeof valeur === 'string' && options.includes(valeur)) out[cle] = valeur
+}
+
+/** Valide `input.actifs`/`input.ordre` contre `ordreDefaut`, écrit dans `out`. */
+function validerOnglets(input, out, ordreDefaut) {
+  if (!input || typeof input !== 'object') return
+  if (Array.isArray(input.actifs)) {
+    const valides = input.actifs.filter(t => typeof t === 'string' && ordreDefaut.includes(t))
+    if (valides.length > 0) out.actifs = valides
+  }
+  if (Array.isArray(input.ordre)) {
+    const valides = input.ordre.filter(t => typeof t === 'string' && ordreDefaut.includes(t))
+    if (valides.length === ordreDefaut.length) out.ordre = valides
+  }
+}
+
+/**
+ * Valide les champs communs de `input` (terminal) et écrit dans `out`.
+ * `disabled` n'en fait pas partie : seul `validateSettings` le pose, un
+ * projet ne doit pas pouvoir désactiver le terminal de l'utilisateur.
+ */
+function validerTerminal(input, out) {
+  if (!input || typeof input !== 'object') return
+  if (typeof input.visible === 'boolean') out.visible = input.visible
+  validerEnum(out, 'disposition', input.disposition, ['bottom', 'side', 'full'])
+  if (typeof input.hauteur === 'number' && input.hauteur > 0) out.hauteur = input.hauteur
+  if (typeof input.largeur === 'number' && input.largeur > 0) out.largeur = input.largeur
+}
+
+/**
  * Validation par champ : chaque champ invalide retombe à son défaut.
  *
  * Pas de validation tout-ou-rien. Un `theme: 42` ne vide pas tout l'objet —
@@ -118,70 +152,25 @@ export function validateSettings(partial, defaults = DEFAULT_SETTINGS) {
   if (!partial || typeof partial !== 'object' || Array.isArray(partial)) return out
 
   // Champs de premier niveau
-  if (typeof partial.langue === 'string' && ['fr', 'en'].includes(partial.langue)) {
-    out.langue = partial.langue
-  }
-  if (typeof partial.theme === 'string' && ['light', 'dark', 'auto'].includes(partial.theme)) {
-    out.theme = partial.theme
-  }
-  if (typeof partial.packageManager === 'string' && ['pnpm', 'npm', 'yarn', 'bun'].includes(partial.packageManager)) {
-    out.packageManager = partial.packageManager
-  }
-  if (
-    typeof partial.sourceGraphe === 'string' &&
-    ['auto', 'graphify', 'obsidian'].includes(partial.sourceGraphe)
-  ) {
-    out.sourceGraphe = partial.sourceGraphe
-  }
+  validerEnum(out, 'langue', partial.langue, ['fr', 'en'])
+  validerEnum(out, 'theme', partial.theme, ['light', 'dark', 'auto'])
+  validerEnum(out, 'packageManager', partial.packageManager, ['pnpm', 'npm', 'yarn', 'bun'])
+  validerEnum(out, 'sourceGraphe', partial.sourceGraphe, ['auto', 'graphify', 'obsidian'])
 
   // Objet imbriqué : densiteActivite
   if (partial.densiteActivite && typeof partial.densiteActivite === 'object') {
     const { granularite, fenetre } = partial.densiteActivite
-    if (['jour', 'semaine', 'mois'].includes(granularite)) {
-      out.densiteActivite.granularite = granularite
-    }
-    if (['jour', 'semaine', 'mois', '3mois', 'an'].includes(fenetre)) {
-      out.densiteActivite.fenetre = fenetre
-    }
+    validerEnum(out.densiteActivite, 'granularite', granularite, ['jour', 'semaine', 'mois'])
+    validerEnum(out.densiteActivite, 'fenetre', fenetre, ['jour', 'semaine', 'mois', '3mois', 'an'])
   }
 
   // Objet imbriqué : onglets
-  if (partial.onglets && typeof partial.onglets === 'object') {
-    if (Array.isArray(partial.onglets.actifs)) {
-      const valides = partial.onglets.actifs.filter(
-        t => typeof t === 'string' && defaults.onglets.ordre.includes(t),
-      )
-      if (valides.length > 0) {
-        out.onglets.actifs = valides
-      }
-    }
-    if (Array.isArray(partial.onglets.ordre)) {
-      const valides = partial.onglets.ordre.filter(
-        t => typeof t === 'string' && defaults.onglets.ordre.includes(t),
-      )
-      if (valides.length === defaults.onglets.ordre.length) {
-        out.onglets.ordre = valides
-      }
-    }
-  }
+  validerOnglets(partial.onglets, out.onglets, defaults.onglets.ordre)
 
   // Objet imbriqué : terminal
-  if (partial.terminal && typeof partial.terminal === 'object') {
-    if (typeof partial.terminal.visible === 'boolean') {
-      out.terminal.visible = partial.terminal.visible
-    }
-    if (typeof partial.terminal.disabled === 'boolean') {
-      out.terminal.disabled = partial.terminal.disabled
-    }
-    if (['bottom', 'side', 'full'].includes(partial.terminal.disposition)) {
-      out.terminal.disposition = partial.terminal.disposition
-    }
-    if (typeof partial.terminal.hauteur === 'number' && partial.terminal.hauteur > 0) {
-      out.terminal.hauteur = partial.terminal.hauteur
-    }
-    if (typeof partial.terminal.largeur === 'number' && partial.terminal.largeur > 0) {
-      out.terminal.largeur = partial.terminal.largeur
-    }
+  validerTerminal(partial.terminal, out.terminal)
+  if (partial.terminal && typeof partial.terminal.disabled === 'boolean') {
+    out.terminal.disabled = partial.terminal.disabled
   }
 
   // Tableau : bootstrap
@@ -257,39 +246,8 @@ export function mergeSettings(global, project = {}) {
   if (!project || typeof project !== 'object' || Array.isArray(project)) return out
 
   // Champs surchargeables, validés comme dans validateSettings
-  if (typeof project.onglets === 'object') {
-    if (Array.isArray(project.onglets.actifs)) {
-      const valides = project.onglets.actifs.filter(
-        t => typeof t === 'string' && DEFAULT_SETTINGS.onglets.ordre.includes(t),
-      )
-      if (valides.length > 0) {
-        out.onglets.actifs = valides
-      }
-    }
-    if (Array.isArray(project.onglets.ordre)) {
-      const valides = project.onglets.ordre.filter(
-        t => typeof t === 'string' && DEFAULT_SETTINGS.onglets.ordre.includes(t),
-      )
-      if (valides.length === DEFAULT_SETTINGS.onglets.ordre.length) {
-        out.onglets.ordre = valides
-      }
-    }
-  }
-
-  if (typeof project.terminal === 'object') {
-    if (typeof project.terminal.visible === 'boolean') {
-      out.terminal.visible = project.terminal.visible
-    }
-    if (['bottom', 'side', 'full'].includes(project.terminal.disposition)) {
-      out.terminal.disposition = project.terminal.disposition
-    }
-    if (typeof project.terminal.hauteur === 'number' && project.terminal.hauteur > 0) {
-      out.terminal.hauteur = project.terminal.hauteur
-    }
-    if (typeof project.terminal.largeur === 'number' && project.terminal.largeur > 0) {
-      out.terminal.largeur = project.terminal.largeur
-    }
-  }
+  validerOnglets(project.onglets, out.onglets, DEFAULT_SETTINGS.onglets.ordre)
+  validerTerminal(project.terminal, out.terminal)
 
   if (Array.isArray(project.bootstrap)) {
     if (project.bootstrap.every(x => typeof x === 'string')) {
@@ -297,13 +255,8 @@ export function mergeSettings(global, project = {}) {
     }
   }
 
-  if (typeof project.packageManager === 'string' && ['pnpm', 'npm', 'yarn', 'bun'].includes(project.packageManager)) {
-    out.packageManager = project.packageManager
-  }
-
-  if (typeof project.sourceGraphe === 'string' && ['auto', 'graphify', 'obsidian'].includes(project.sourceGraphe)) {
-    out.sourceGraphe = project.sourceGraphe
-  }
+  validerEnum(out, 'packageManager', project.packageManager, ['pnpm', 'npm', 'yarn', 'bun'])
+  validerEnum(out, 'sourceGraphe', project.sourceGraphe, ['auto', 'graphify', 'obsidian'])
 
   if (typeof project.gitignoreShots === 'boolean') {
     out.gitignoreShots = project.gitignoreShots

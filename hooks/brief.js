@@ -16,6 +16,7 @@ import { basename, join } from 'node:path'
 
 import { readPlans } from './plans.js'
 import { colonneFinale, readBoard, readTickets, sortTickets } from './tickets.js'
+import { readJson } from './snapshot.js'
 
 // Les plans manipulés ici sont APLATIS (`{status, title, …}`), pas emboîtés
 // dans `meta` comme ceux que rend readPlans : un brief se lit mieux ainsi.
@@ -33,14 +34,6 @@ const closedPlans = plans =>
 
 /** Nombre de plans ouverts listés nommément avant de basculer sur un total. */
 const MAX_LISTED = 5
-
-const readJson = path => {
-  try {
-    return JSON.parse(readFileSync(path, 'utf8'))
-  } catch {
-    return null
-  }
-}
 
 /**
  * Lit l'état d'un dépôt.

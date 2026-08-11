@@ -1,20 +1,74 @@
-# Ovrsee
+<p align="center">
+  <a href="./README.md"><img alt="Français" src="https://img.shields.io/badge/🇫🇷-Fran%C3%A7ais-4c3f91?style=for-the-badge"></a>
+  <a href="./README.en.md"><img alt="English" src="https://img.shields.io/badge/🇬🇧-English-3a3d4d?style=for-the-badge"></a>
+</p>
+
+<div align="center">
+  <img src="./build/icon.svg" alt="Ovrsee" width="96" height="96">
+
+  # Ovrsee
+
+  **Vue en lecture seule sur ce que vous avez vibecodé.**
+
+  ![version](https://img.shields.io/badge/version-0.9.0--beta-6c5ce7?style=flat-square)
+  ![stack](https://img.shields.io/badge/stack-Electron%20%2B%20React%20%2B%20TypeScript-2d3436?style=flat-square)
+  ![deps prod](https://img.shields.io/badge/d%C3%A9pendances%20prod-3-00b894?style=flat-square)
+</div>
 
 Une vue en lecture seule sur un projet développé en vibecoding : ce qui a été fait,
 pourquoi, ce qui reste ouvert, et à quoi l'application ressemblait à chaque commit.
 
-**L'ovrsee lit ; il n'exécute que le terminal qu'on lui demande.** La vérité vit dans `<repo>/ovrsee/`, en
-markdown et en images, versionnée par git. L'application n'est qu'une vue : si elle
-disparaît, rien n'est perdu.
+> **L'ovrsee lit ; il n'exécute que le terminal qu'on lui demande.** La vérité vit dans `<repo>/ovrsee/`, en
+> markdown et en images, versionnée par git. L'application n'est qu'une vue : si elle
+> disparaît, rien n'est perdu.
 
-Contexte complet : [`cadrage-ovrsee.md`](./cadrage-ovrsee.md) — [`README.en.md`](./README.en.md)
+Contexte complet : [`cadrage-ovrsee.md`](./cadrage-ovrsee.md)
 
 ## Ce qu'on y voit
 
-L'application capture les plans approuvés, photographie chaque écran à chaque commit,
-énumère les pages et leurs dépendances, et tient l'historique daté — tout dans `ovrsee/`.
+- Capture automatiquement les plans approuvés dans Claude Code — pourquoi une décision a
+  été prise, pas seulement ce qui a changé.
+- Photographie chaque écran à chaque commit : l'historique visuel de l'application, daté.
+- Cartographie les pages du projet observé et leurs dépendances.
+- Tient un tableau de tickets et une chronologie du travail, reliés aux plans qui les expliquent.
+- Tout est stocké en markdown et en images versionnés — rien ne dépend de l'application
+  elle-même pour rester lisible.
 
-![Aperçu de l'ovrsee](./ovrsee/pages/shots/accueil/2026-08-09-24c3123.png)
+## En images
+
+### Aperçu — l'état du projet en un coup d'œil
+![Onglet Aperçu](./docs/screenshots/apercu.png)
+
+Compteurs (pages, plans, tickets, dépendances), plans ouverts, statut des branches, et le
+terminal intégré avec ses commandes rapides (crawl, graphe, export Obsidian).
+
+### Historique — chaque commit et le plan qui l'explique
+![Onglet Historique](./docs/screenshots/historique.png)
+
+La chronologie du projet : un plan est clos par le commit qui l'exécute, chaque ticket lié
+apparaît avec son statut.
+
+### Produit — le graphe de navigation
+![Onglet Produit](./docs/screenshots/produit.png)
+
+La carte des pages du projet crawlé, miniatures de captures à l'appui, avec un panneau de
+détail par page et l'historique de ses captures précédentes.
+
+### Tableau — le kanban des tickets
+![Onglet Tableau](./docs/screenshots/tableau.png)
+
+Un fichier par ticket dans `ovrsee/tickets/`, colonnes réglées dans `ovrsee/board.json`.
+Écrit ici comme depuis le terminal intégré.
+
+### Navigateur — parcourir l'application observée sans quitter l'ovrsee
+![Onglet Navigateur](./docs/screenshots/navigateur.png)
+
+Un navigateur intégré (barre d'adresse, DevTools, sélecteur d'élément) pour inspecter
+l'application observée directement depuis l'interface.
+
+**Deux autres onglets, sans capture pour l'instant :** **Données** (tables et relations,
+lues depuis Graphify ou un coffre Obsidian) et **Stack** (dépendances et choix techniques,
+alimentés par les commentaires `WHY:` de Graphify).
 
 ## Premier lancement
 
@@ -145,6 +199,53 @@ celui d'un autre projet produirait des captures datées d'aujourd'hui montrant l
 | `electron/` | Processus principal, preload, pty (terminal intégré) |
 | `scripts/` | Utilitaires de build et test |
 
+## Téléchargement
+
+> Dépôt **privé** — l'onglet [Releases](https://github.com/samuelboulery/ovrsee/releases)
+> n'est visible qu'aux collaborateurs invités sur le repo GitHub.
+
+| Plateforme | Format |
+|---|---|
+| macOS (arm64) | `.dmg`, non signé |
+| Windows (x64) | Installeur NSIS, non signé |
+
+Construits automatiquement par `.github/workflows/release.yml` à chaque tag `vX.Y.Z`
+poussé, publiés sur l'onglet Releases. En local, sans publication :
+
+```bash
+pnpm package:mac    # DMG dans release/ (arm64)
+pnpm package:win    # installeur NSIS dans release/ (x64, depuis Windows uniquement)
+```
+
+## Dépendances
+
+Sobriété délibérée : **3 dépendances de production**, le reste est du Node et du React nus.
+
+**Production**
+
+| Paquet | Version |
+|---|---|
+| `@xterm/xterm` | 6.0.0 |
+| `@xterm/addon-fit` | ^0.11.0 |
+| `node-pty` | 1.1.0 |
+
+**Développement**
+
+| Paquet | Version |
+|---|---|
+| `react` | ^19.2.8 |
+| `react-dom` | ^19.2.8 |
+| `typescript` | ^7.0.2 |
+| `vite` | ^8.2.1 |
+| `electron` | 43.3.0 |
+| `electron-builder` | ^26.15.3 |
+| `playwright-core` | ^1.62.1 |
+| `@vitejs/plugin-react` | ^6.0.5 |
+| `@types/react` | ^19.2.18 |
+| `@types/react-dom` | ^19.2.4 |
+
+Gestionnaire de paquets : `pnpm@10.12.1`, épinglé dans `package.json` et fait respecter par Corepack.
+
 ## Pièges connus
 
 **Un plan actif capte tous les commits.**
@@ -238,3 +339,18 @@ retirer demande une réécriture. Ne pas l'ignorer via `.gitignore` — un plan 
 versionné ne sert à rien. La parade est en amont — ne pas coller de clé, de jeton
 ni de mot de passe dans un plan. Les identifiants vivent dans un gestionnaire et dans
 un `ACCESS.md` non versionné.
+
+## Tests
+
+```bash
+pnpm test       # node --test sur hooks/ crawl/ server/ mcp/, puis app/src compilé
+pnpm typecheck  # tsc, ne couvre que app/src
+```
+
+Aucun framework de test : `node:test` et `node:assert` seuls, dans tout le dépôt.
+
+## Voir aussi
+
+- [`README.en.md`](./README.en.md) — version anglaise
+- [`cadrage-ovrsee.md`](./cadrage-ovrsee.md) — problème, alternatives écartées, périmètre
+- [`CLAUDE.md`](./CLAUDE.md) — référence technique du projet

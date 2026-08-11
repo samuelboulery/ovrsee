@@ -103,6 +103,7 @@ export function Tableau({
   illisibles = [],
   gitStatus,
   onChange,
+  focusTicket = null,
 }: {
   root: string
   board: Colonne[]
@@ -110,11 +111,13 @@ export function Tableau({
   illisibles?: Illisible[]
   gitStatus?: GitStatus
   onChange: (tableau: TableauData) => void
+  /** Fichier du ticket à ouvrir au montage — arrivée depuis la frise Historique. */
+  focusTicket?: string | null
 }) {
   const [erreur, setErreur] = useState<string | null>(null)
   const [survolee, setSurvolee] = useState<string | null>(null)
   const [insertion, setInsertion] = useState<Insertion | null>(null)
-  const [ouverte, setOuverte] = useState<string | null>(null)
+  const [ouverte, setOuverte] = useState<string | null>(focusTicket)
   const [edition, setEdition] = useState(false)
   const [filtreEpic, setFiltreEpic] = useState<string | null>(null)
 
@@ -725,7 +728,7 @@ function TuileAjout({
 }
 
 /** Une pastille par priorité — c'est ce qui se lit avant le titre. */
-const COULEUR: Record<Priorite, string> = {
+export const COULEUR_PRIORITE: Record<Priorite, string> = {
   haute: 'var(--color-accent-400)',
   moyenne: 'var(--color-neutral-500)',
   basse: 'var(--color-neutral-700)',
@@ -775,7 +778,7 @@ function Carte({
     >
       <div style={s('display: flex; align-items: center; gap: 7px;')}>
         <span
-          style={s(`width: 7px; height: 7px; border-radius: 50%; flex: none; background: ${COULEUR[ticket.priorite] ?? COULEUR.moyenne};`)}
+          style={s(`width: 7px; height: 7px; border-radius: 50%; flex: none; background: ${COULEUR_PRIORITE[ticket.priorite] ?? COULEUR_PRIORITE.moyenne};`)}
           title={`${t('tableau.priority_label')} ${ticket.priorite}`}
         />
         {ticket.charge && (

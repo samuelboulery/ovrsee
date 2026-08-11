@@ -94,3 +94,78 @@ export function timeline(commits, plans) {
   // Tri stable : deux entrées du même jour gardent l'ordre du journal git.
   return entries.sort((a, b) => b.date.localeCompare(a.date))
 }
+
+/**
+ * @typedef {{
+ *   kind: 'plan',
+ *   date: string,
+ *   plan: string,
+ *   title: string,
+ *   status: 'open' | 'closed',
+ *   tickets: object[],
+ * }} TicketPlanEntry
+ * @typedef {{kind: 'ticket', date: string, ticket: object}} TicketEntry
+ * @typedef {TicketPlanEntry | TicketEntry} TicketTimelineEntry
+ */
+
+/**
+ * Même frise que `timeline()`, mais groupée par ticket plutôt que par commit.
+ *
+ * Contrairement aux commits, les tickets n'ont pas d'ordre git : pas de repli
+ * « consécutif » ici, tous les tickets d'un même plan tiennent dans une seule
+ * bande. Un plan sans aucun ticket qui le cite ne figure pas dans cette
+ * frise — la vue commits garde les plans jamais commencés parce que git ne
+ * les connaît pas encore, mais un plan sans ticket est simplement un plan
+ * dont le travail n'a pas commencé, rien à montrer.
+ *
+ * @param {object[]} tickets
+ * @param {Array<{file: string, title: string, status: 'open'|'closed'}>} plans
+ * @returns {TicketTimelineEntry[]}
+ */
+export function ticketTimeline(tickets, plans) {
+  const planByFile = new Map((plans ?? []).map(plan => [plan.file, plan]))
+  const byPlan = new Map()
+
+  /** @type {TicketTimelineEntry[]} */
+  const entries = []
+
+  for (const ticket of tickets ?? []) {
+    if (!ticket.plan) {
+      entries.push({ kind: 'ticket', date: ticket.maj, ticket })
+      continue
+    }
+
+    let band = byPlan.get(ticket.plan)
+    if (!band) {
+      const plan = planByFile.get(ticket.plan)
+      band = {
+        kind: 'plan',
+        date: ticket.maj,
+        plan: ticket.plan,
+        title: plan?.title ?? ticket.plan,
+        status: plan?.status ?? 'open',
+        tickets: [],
+      }
+      byPlan.set(ticket.plan, band)
+      entries.push(band)
+    }
+    band.tickets.push(ticket)
+    if (ticket.maj > band.date) band.date = ticket.maj
+  }
+
+  // `maj` ne porte que le jour, pas l'heure : deux tickets touchés le même
+  // jour sont à égalité sur `date`, et un tri égal aurait gardé l'ordre
+  // d'entrée — alphabétique par identifiant — au lieu du plus récent en
+  // premier. L'identifiant croît avec la création, jamais réutilisé ; à
+  // égalité de jour, le plus grand est la meilleure approximation de « touché
+  // en dernier » qu'on puisse tirer d'une date sans heure.
+  const idNum = ticket => Number(/^T-(\d+)$/.exec(ticket?.id ?? '')?.[1] ?? 0)
+
+  for (const band of byPlan.values()) {
+    band.tickets.sort((a, b) => b.maj.localeCompare(a.maj) || idNum(b) - idNum(a))
+  }
+
+  const repId = entry => idNum(entry.kind === 'ticket' ? entry.ticket : entry.tickets[0])
+
+  return entries.sort((a, b) => b.date.localeCompare(a.date) || repId(b) - repId(a))
+}

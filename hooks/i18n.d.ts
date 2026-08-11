@@ -454,6 +454,10 @@ export type TranslationKey =
   | 'historique.rejected'
   | 'historique.no_commits'
   | 'historique.plan_file_missing'
+  | 'historique.view_tickets'
+  | 'historique.view_commits'
+  | 'historique.ticket_label'
+  | 'historique.no_tickets'
   // Stack
   | 'stack.no_dependencies'
   | 'stack.why_subtitle'

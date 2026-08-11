@@ -16,7 +16,7 @@ import { readPlans, readRegistry } from './plans.js'
 import { readBoard, readTickets } from './tickets.js'
 import { readVault } from './vault.js'
 import { readWhys } from './whys.js'
-import { timeline } from './timeline.js'
+import { timeline, ticketTimeline } from './timeline.js'
 import { readSettings, mergeSettings } from './settings.js'
 import { gitStatus } from './git-status.js'
 import { readIntegrations } from './integrations.js'
@@ -392,9 +392,11 @@ export function snapshot(root) {
 
   const config = readJson(join(root, 'ovrsee.config.json'))
 
+  const tableauData = tableau(root, illisibles)
+
   return {
     root,
-    ...tableau(root, illisibles),
+    ...tableauData,
     // Un fait, pas une déduction : un `ovrsee/` vide et un `ovrsee/` absent
     // se ressemblent une fois les plans lus, et l'interface ne doit pas
     // proposer d'initialiser ce qui l'est déjà.
@@ -424,6 +426,7 @@ export function snapshot(root) {
     // Les commits bruts ne sont pas renvoyés en plus : la frise porte déjà
     // sha, date et sujet, et deux copies de la même liste divergeraient.
     timeline: timeline(commits(root), plans),
+    ticketTimeline: ticketTimeline(tableauData.tickets, plans),
     // État local, jamais rafraîchi par un fetch réseau ici — voir
     // `gitStatus.lastFetch` pour dater ce que le dépôt sait du distant.
     gitStatus: gitStatus(root),

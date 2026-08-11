@@ -128,9 +128,15 @@ function useDeborde() {
  */
 const projectFromUrl = () => new URLSearchParams(window.location.search).get('p')
 
-function pushUrl(path: string, project: string | null) {
-  const query = project ? `?p=${encodeURIComponent(project)}` : ''
-  window.history.pushState(null, '', path + query)
+/** Ticket à ouvrir au montage de l'onglet Tableau — voir `onOuvrirTicket`. */
+const ticketFromUrl = () => new URLSearchParams(window.location.search).get('ticket')
+
+function pushUrl(path: string, project: string | null, ticket: string | null = null) {
+  const params = new URLSearchParams()
+  if (project) params.set('p', project)
+  if (ticket) params.set('ticket', ticket)
+  const query = params.toString()
+  window.history.pushState(null, '', path + (query ? `?${query}` : ''))
 }
 
 /**
@@ -184,6 +190,16 @@ export function App() {
   const [revoirPresentation, setRevoirPresentation] = useState(false)
 
   const [tab, setTab] = useState<TabId>(() => tabForPath(window.location.pathname))
+  // Ticket ouvert au clic depuis la frise Historique — voir `onOuvrirTicket`.
+  const [focusTicket, setFocusTicket] = useState<string | null>(() => ticketFromUrl())
+
+  // Consommé une fois : `Tableau` lit `focusTicket` à son montage (`useState`
+  // initial), donc l'effacer ici après coup ne change rien à ce montage-là —
+  // seulement à une prochaine visite de l'onglet, qui ne doit pas rouvrir le
+  // même ticket.
+  useEffect(() => {
+    if (tab === 'tableau' && focusTicket) setFocusTicket(null)
+  }, [tab])
   const [layout, setLayout] = useState<Layout>('bottom')
   const [terminal, setTerminal] = useState(true)
   const [terminalHeight, setTerminalHeight] = useState(244)
@@ -224,6 +240,7 @@ export function App() {
     const onPop = () => {
       setTab(tabForPath(window.location.pathname))
       setCurrent(projectFromUrl())
+      setFocusTicket(ticketFromUrl())
     }
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
@@ -659,7 +676,13 @@ export function App() {
                         <Historique
                           plans={plans}
                           timeline={snapshot.timeline ?? []}
+                          ticketTimeline={snapshot.ticketTimeline ?? []}
                           illisibles={snapshot.illisibles ?? []}
+                          onOuvrirTicket={file => {
+                            setTab('tableau')
+                            setFocusTicket(file)
+                            pushUrl('/tableau', current, file)
+                          }}
                         />
                       )}
                       {tab === 'tableau' && (
@@ -670,6 +693,7 @@ export function App() {
                           illisibles={snapshot.illisibles ?? []}
                           gitStatus={snapshot.gitStatus}
                           onChange={setTableau}
+                          focusTicket={focusTicket}
                         />
                       )}
                       {tab === 'donnees' && (

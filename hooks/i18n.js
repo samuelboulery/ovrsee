@@ -425,6 +425,10 @@ const translations = {
     'historique.rejected': 'Écarté',
     'historique.no_commits': 'Aucun commit — ce plan n\'a pas encore été commencé.',
     'historique.plan_file_missing': 'Le fichier de ce plan n\'est plus dans ovrsee/plans/.',
+    'historique.view_tickets': 'Tickets',
+    'historique.view_commits': 'Commits',
+    'historique.ticket_label': 'Ticket',
+    'historique.no_tickets': 'Aucun ticket ne cite ce plan.',
     // Stack
     'stack.no_dependencies': 'Aucune dépendance déclarée dans package.json.',
     'stack.why_subtitle': 'Ce qui est utilisé, et pourquoi. Une raison est un commentaire WHY: posé juste au-dessus de l\'import du paquet — rien d\'autre n\'est lu, pour qu\'aucune ligne ne dise du faux.',
@@ -1103,6 +1107,10 @@ const translations = {
     'historique.rejected': 'Rejected',
     'historique.no_commits': 'No commits — this plan has not yet been started.',
     'historique.plan_file_missing': 'This plan\'s file is no longer in ovrsee/plans/.',
+    'historique.view_tickets': 'Tickets',
+    'historique.view_commits': 'Commits',
+    'historique.ticket_label': 'Ticket',
+    'historique.no_tickets': 'No ticket cites this plan.',
     // Stack
     'stack.no_dependencies': 'No dependencies declared in package.json.',
     'stack.why_subtitle': 'What\'s used and why. A reason is a WHY: comment placed just above the package import — nothing else is read, so no line says anything false.',

@@ -159,6 +159,24 @@ export type TimelineEntry =
     }
   | { kind: 'commit'; date: string; commit: GitCommit }
 
+/**
+ * Même frise que `TimelineEntry`, groupée par ticket plutôt que par commit.
+ *
+ * Calculée par `hooks/timeline.js::ticketTimeline()`. Un plan sans aucun
+ * ticket qui le cite n'y figure pas — contrairement à `TimelineEntry`, qui
+ * garde les plans jamais commencés parce que git ne les connaît pas encore.
+ */
+export type TicketTimelineEntry =
+  | {
+      kind: 'plan'
+      date: string
+      plan: string
+      title: string
+      status: 'open' | 'closed'
+      tickets: Ticket[]
+    }
+  | { kind: 'ticket'; date: string; ticket: Ticket }
+
 export interface Scan {
   date: string
   commit: string
@@ -373,6 +391,8 @@ export interface Snapshot {
   shots: Record<string, string[]>
   /** Commits et plans mêlés, du plus récent au plus ancien. */
   timeline: TimelineEntry[]
+  /** Même frise, groupée par ticket plutôt que par commit. */
+  ticketTimeline: TicketTimelineEntry[]
   /**
    * Nom de paquet → commentaire `WHY:` posé au-dessus de son import.
    *

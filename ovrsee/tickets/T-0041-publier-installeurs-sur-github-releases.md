@@ -2,7 +2,7 @@
 {
   "id": "T-0041",
   "titre": "Publier les installeurs sur GitHub Releases via CI",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "packaging",

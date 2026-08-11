@@ -4,7 +4,20 @@
   "title": "Publier des installeurs pré-empaquetés sur GitHub Releases",
   "opened": "2026-08-11",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "7e3837d",
+      "date": "2026-08-11",
+      "files": [
+        ".github/workflows/release.yml",
+        "CLAUDE.md",
+        "build/icon.ico",
+        "electron-builder.yml",
+        "package.json",
+        "scripts/make-icon.js"
+      ]
+    }
+  ]
 }
 ---
 

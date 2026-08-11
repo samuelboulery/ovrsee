@@ -2,11 +2,11 @@
 {
   "id": "T-0036",
   "titre": "Profil sobre : Historique au lieu de Données",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": ["ui", "onboarding", "preferences"],
   "cree": "2026-08-11",
-  "maj": "2026-08-11",
+  "maj": "2026-08-12",
   "plan": null
 }
 ---
@@ -19,5 +19,5 @@ place dans ce profil minimal ; l'Historique est plus utile.
 
 ## Critères d'acceptation
 
-- [ ] Le profil `sobre` active `['apercu', 'tableau', 'historique']` au lieu
+- [x] Le profil `sobre` active `['apercu', 'tableau', 'historique']` au lieu
       de `['apercu', 'tableau', 'donnees']`.

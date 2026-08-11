@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Refonte UI Ovrsee — mise en œuvre des maquettes",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-12",
   "commits": [
     {
       "sha": "f666ce1",
@@ -103,6 +103,11 @@
     },
     {
       "sha": "ab09bcf",
+      "date": "2026-08-12",
+      "files": []
+    },
+    {
+      "sha": "05b3a73",
       "date": "2026-08-12",
       "files": []
     }

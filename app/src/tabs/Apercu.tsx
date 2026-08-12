@@ -89,10 +89,15 @@ export function Apercu({
   snapshot,
   onTerminal,
   onOpenPreferences,
+  onReload,
+  onVoirTousLesPlans,
 }: {
   snapshot: Snapshot
   onTerminal?: () => void
   onOpenPreferences: (opts?: { provider?: IntegrationProvider }) => void
+  /** Relit `ovrsee/` — après avoir clos le plan actif, l'Aperçu ne le sait pas seul. */
+  onReload: () => void
+  onVoirTousLesPlans: () => void
 }) {
   const { packageJson, readme, root } = snapshot
   const plans = snapshot.plans ?? []
@@ -208,7 +213,12 @@ export function Apercu({
 
       <div style={s('flex: 1; display: flex; min-height: 0;')}>
         <div style={s('flex: 1; min-width: 0; overflow-y: auto; padding: 18px 22px 32px;')}>
-          <Sante snapshot={snapshot} gitStatus={gitStatus} />
+          <Sante
+            snapshot={snapshot}
+            gitStatus={gitStatus}
+            onReload={onReload}
+            onVoirTousLesPlans={onVoirTousLesPlans}
+          />
           <Branches root={root} gitStatus={gitStatus} onGitStatus={setGitStatus} />
           <Environnements config={snapshot.config} gitStatus={gitStatus} />
 

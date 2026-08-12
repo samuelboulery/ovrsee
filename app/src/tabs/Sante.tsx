@@ -1,4 +1,6 @@
-import { humanAge, lastAudit, plansOuverts, type GitStatus, type Snapshot } from '../data'
+import { useState } from 'react'
+
+import { closeActivePlans, humanAge, lastAudit, plansOuverts, type GitStatus, type Snapshot } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
 
@@ -14,12 +16,35 @@ import { s } from '../style'
  * c'est ce qu'un clic sur Rafraîchir (dans `Branches`) met à jour sans
  * attendre un rechargement complet du projet.
  */
-export function Sante({ snapshot, gitStatus }: { snapshot: Snapshot; gitStatus: GitStatus }) {
+export function Sante({
+  snapshot,
+  gitStatus,
+  onReload,
+  onVoirTousLesPlans,
+}: {
+  snapshot: Snapshot
+  gitStatus: GitStatus
+  /** Relit `ovrsee/` — après avoir clos le plan actif, il faut relire pour le voir disparaître. */
+  onReload: () => void
+  onVoirTousLesPlans: () => void
+}) {
   const git = gitStatus
   const ouverts = plansOuverts(snapshot.plans ?? [])
   const audit = lastAudit(snapshot.audits ?? [])
   const fichiersModifies = git.dirty.staged + git.dirty.unstaged + git.dirty.untracked
   const ahead = git.branches.find(b => b.name === git.branch)?.ahead ?? 0
+  const [clotureEnCours, setClotureEnCours] = useState(false)
+  const [erreurCloture, setErreurCloture] = useState<string | null>(null)
+
+  const clorePlanActif = () => {
+    if (clotureEnCours) return
+    setClotureEnCours(true)
+    setErreurCloture(null)
+    closeActivePlans(snapshot.root)
+      .then(() => onReload())
+      .catch(err => setErreurCloture(String(err.message ?? err)))
+      .finally(() => setClotureEnCours(false))
+  }
 
   return (
     <div style={s('margin-top: 18px;')}>
@@ -52,24 +77,78 @@ export function Sante({ snapshot, gitStatus }: { snapshot: Snapshot; gitStatus: 
       </div>
 
       <div style={s('margin-top: 10px;')}>
-        <div style={s('font-size: 11px; color: var(--color-neutral-600); margin-bottom: 6px;')}>
-          {ouverts.length > 0 ? `${t('sante.open_plans')} · ${ouverts.length}` : t('sante.no_open_plans')}
+        <div style={s('display: flex; align-items: center; gap: 8px; margin-bottom: 6px;')}>
+          <div style={s('font-size: 11px; color: var(--color-neutral-600); flex: 1;')}>
+            {ouverts.length > 0 ? `${t('sante.open_plans')} · ${ouverts.length}` : t('sante.no_open_plans')}
+          </div>
+          {snapshot.activePlan && ouverts.some(p => p.file === snapshot.activePlan) && (
+            <button
+              type="button"
+              disabled={clotureEnCours}
+              onClick={clorePlanActif}
+              style={s(
+                'cursor: pointer; font-size: 10.5px; padding: 3px 8px; border-radius: 5px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+              )}
+            >
+              {clotureEnCours ? t('sante.closing_plan') : t('sante.close_active_plan')}
+            </button>
+          )}
+          {ouverts.length > 0 && (
+            <button
+              type="button"
+              onClick={onVoirTousLesPlans}
+              style={s(
+                'cursor: pointer; font-size: 10.5px; padding: 3px 8px; border-radius: 5px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+              )}
+            >
+              {t('sante.see_all_plans')}
+            </button>
+          )}
         </div>
+
+        {erreurCloture && (
+          <div style={s('font-size: 11px; color: #e5677a; margin-bottom: 8px;')}>{erreurCloture}</div>
+        )}
+
         {ouverts.length > 0 && (
-          <div style={s('display: flex; flex-direction: column; gap: 3px;')}>
-            {ouverts.map(plan => (
-              <div
-                key={plan.file}
-                style={s('font-size: 11.5px; color: var(--color-neutral-400); display: flex; gap: 8px;')}
-              >
-                <span style={s('flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>
-                  {plan.title}
-                </span>
-                <span style={s('color: var(--color-neutral-600); flex: none;')}>
-                  {humanAge(plan.opened)}
-                </span>
-              </div>
-            ))}
+          <div style={s('border: 1px solid #1c1d22; border-radius: 8px; background: #0c0d10; overflow: hidden;')}>
+            {ouverts.map((plan, index) => {
+              const actif = plan.file === snapshot.activePlan
+              return (
+                <div
+                  key={plan.file}
+                  style={s(
+                    'display: flex; align-items: center; gap: 8px; padding: 8px 10px; ' +
+                      (index < ouverts.length - 1 ? 'border-bottom: 1px solid #17181d;' : ''),
+                  )}
+                >
+                  <span
+                    style={s(
+                      `width: 5px; height: 5px; border-radius: 50%; flex: none; background: ${actif ? '#7d76f0' : '#33353c'};`,
+                    )}
+                  />
+                  <span
+                    style={s(
+                      'flex: 1; font-size: 11.5px; color: #d5d8dd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
+                    )}
+                  >
+                    {plan.title}
+                  </span>
+                  {actif && (
+                    <span
+                      style={s(
+                        'flex: none; font-size: 9.5px; padding: 1px 6px; border-radius: 4px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660;',
+                      )}
+                    >
+                      {t('sante.active_badge')}
+                    </span>
+                  )}
+                  <span style={s('flex: none; font-family: var(--font-mono); font-size: 10.5px; color: #62666e;')}>
+                    {humanAge(plan.opened)}
+                  </span>
+                </div>
+              )
+            })}
           </div>
         )}
       </div>

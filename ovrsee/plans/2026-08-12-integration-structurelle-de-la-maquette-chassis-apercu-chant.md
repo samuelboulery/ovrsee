@@ -39,6 +39,14 @@
         "hooks/i18n.d.ts",
         "hooks/i18n.js"
       ]
+    },
+    {
+      "sha": "d07b2b5",
+      "date": "2026-08-12",
+      "files": [
+        "app/src/Terminal.tsx",
+        "app/src/data.ts"
+      ]
     }
   ]
 }

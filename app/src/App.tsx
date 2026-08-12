@@ -583,6 +583,8 @@ export function App() {
                             setPreferencesInitial({ section: 'projet', provider: opts?.provider })
                             setPreferencesOuvertes(true)
                           }}
+                          onReload={reload}
+                          onVoirTousLesPlans={() => onTabPick('historique', '/historique')}
                         />
                       )}
 

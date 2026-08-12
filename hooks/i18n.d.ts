@@ -423,6 +423,10 @@ export type TranslationKey =
   | 'sante.no_audit'
   | 'sante.open_plans'
   | 'sante.no_open_plans'
+  | 'sante.close_active_plan'
+  | 'sante.closing_plan'
+  | 'sante.see_all_plans'
+  | 'sante.active_badge'
   // Branches
   | 'branches.title'
   | 'branches.refresh'

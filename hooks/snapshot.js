@@ -12,7 +12,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { extname, isAbsolute, join, normalize, sep } from 'node:path'
 
-import { readPlans, readRegistry } from './plans.js'
+import { isSafePlanFileName, readPlans, readRegistry } from './plans.js'
 import { readBoard, readTickets } from './tickets.js'
 import { readVault } from './vault.js'
 import { readWhys } from './whys.js'
@@ -390,6 +390,12 @@ export function snapshot(root) {
     body: p.body,
   }))
 
+  // Le pointeur `.active-plan`, lu tel quel : dit lequel des plans ouverts
+  // capterait le prochain commit — voir hooks/plans.js et le badge « actif »
+  // de l'Aperçu.
+  const activePlanPointer = join(root, 'ovrsee', '.active-plan')
+  const activePlan = existsSync(activePlanPointer) ? readFileSync(activePlanPointer, 'utf8').trim() : null
+
   const config = readJson(join(root, 'ovrsee.config.json'))
 
   const tableauData = tableau(root, illisibles)
@@ -402,6 +408,7 @@ export function snapshot(root) {
     // proposer d'initialiser ce qui l'est déjà.
     equipped: existsSync(join(root, 'ovrsee')),
     plans,
+    activePlan: isSafePlanFileName(activePlan) ? activePlan : null,
     packageJson: readJson(join(root, 'package.json')),
     // Le crawler y lit déjà `dev` et `baseUrl`. L'onglet Navigateur s'en sert
     // comme URL par défaut : le projet a déjà déclaré où il s'affiche, le

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Cursor, X } from '@phosphor-icons/react'
 
-import { ticketAction, type Snapshot } from '../data'
+import { type Snapshot } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
@@ -212,10 +212,6 @@ const describe = (picked: Picked): string =>
     `html      : ${picked.html}`,
   ].join('\n')
 
-/** Le titre proposé par défaut — le texte de l'élément d'abord, sa route sinon. */
-const titreDepuis = (picked: Picked): string =>
-  picked.text ? picked.text.slice(0, 80) : `Élément de ${picked.route}`
-
 /** Le corps du ticket : même contexte que `describe()`, en markdown plutôt qu'en texte pour Claude. */
 const corpsDepuis = (picked: Picked): string =>
   [
@@ -245,12 +241,15 @@ export function Navigateur({
   visible,
   focusRoute,
   onFocusHandled,
+  onCreerTicketDepuisElement,
 }: {
   snapshot: Snapshot
   visible: boolean
   /** Route à charger depuis « Ouvrir dans le Navigateur » (Produit) — voir `App.tsx`. */
   focusRoute?: string | null
   onFocusHandled?: () => void
+  /** Bascule sur Tableau et attache le contexte de l'élément au prochain ticket créé — voir `App.tsx`. */
+  onCreerTicketDepuisElement: (corps: string, tags: string[]) => void
 }) {
   const view = useRef<Webview | null>(null)
   const [url, setUrl] = useState(() => startUrl(snapshot))
@@ -269,7 +268,6 @@ export function Navigateur({
   const [logsOpen, setLogsOpen] = useState(false)
   const [picking, setPicking] = useState(false)
   const [picked, setPicked] = useState<Picked | null>(null)
-  const [ticketing, setTicketing] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
 
   // Les DevTools sont une vue native posée au-dessus du DOM par le processus
@@ -299,6 +297,15 @@ export function Navigateur({
     invert: true,
   })
   const pane = dock === 'side' ? paneWidth : paneHeight
+
+  const elementPanelWidth = useResizable({
+    key: 'navigateur.element-panel',
+    initial: 340,
+    min: 280,
+    max: () => window.innerWidth * 0.5,
+    axis: 'x',
+    invert: true,
+  })
 
   const moveDock = (next: Dock) => {
     setDock(next)
@@ -487,22 +494,10 @@ export function Navigateur({
     setPicked(null)
   }
 
-  const creerTicket = async () => {
+  const onTicketDepuisElement = () => {
     if (!picked) return
-    setTicketing(true)
-    try {
-      await ticketAction('create', snapshot.root, {
-        titre: titreDepuis(picked),
-        tags: ['navigateur'],
-        corps: corpsDepuis(picked),
-      })
-      say(t('navigateur.ticket_created'))
-      setPicked(null)
-    } catch (err) {
-      say(t('navigateur.ticket_failed', { error: err instanceof Error ? err.message : String(err) }))
-    } finally {
-      setTicketing(false)
-    }
+    onCreerTicketDepuisElement(corpsDepuis(picked), ['navigateur'])
+    setPicked(null)
   }
 
   /**
@@ -677,8 +672,8 @@ export function Navigateur({
       </div>
 
       {/* La colonne aperçu+DevTools+journal à gauche, le panneau de
-          l'élément sélectionné à droite — persistant, maquette 2c, plutôt
-          qu'une barre qui n'apparaissait qu'un élément choisi. */}
+          l'élément sélectionné à droite — ouvert seulement le temps d'une
+          sélection. */}
       <div style={s('flex: 1; display: flex; min-height: 0; min-width: 0;')}>
       <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
 
@@ -826,15 +821,20 @@ export function Navigateur({
       )}
       </div>
 
-      <ElementPanel
-        picked={picked}
-        routes={snapshot.pages?.pages?.map(page => page.route) ?? []}
-        currentRoute={currentRoute}
-        onSend={envoyerAClaude}
-        onTicket={creerTicket}
-        ticketing={ticketing}
-        onClose={() => setPicked(null)}
-      />
+      {picked && (
+        <>
+          <Divider axis="x" resizable={elementPanelWidth} />
+          <ElementPanel
+            picked={picked}
+            width={elementPanelWidth.size}
+            routes={snapshot.pages?.pages?.map(page => page.route) ?? []}
+            currentRoute={currentRoute}
+            onSend={envoyerAClaude}
+            onTicket={onTicketDepuisElement}
+            onClose={() => setPicked(null)}
+          />
+        </>
+      )}
       </div>
 
       <StatusBar
@@ -850,90 +850,73 @@ export function Navigateur({
 }
 
 /**
- * Panneau de l'élément sélectionné — maquette 2c, colonne fixe à droite.
- *
- * Remplace la barre du bas qui n'apparaissait qu'une fois un élément choisi :
- * la maquette le pose en permanence, avec un état vide tant que rien n'est
- * sélectionné.
+ * Panneau de l'élément sélectionné — ouvert seulement le temps d'une
+ * sélection (maquette 2c posait la colonne en permanence ; à l'usage, elle
+ * gênait plus qu'elle n'aidait quand rien n'était sélectionné), et
+ * redimensionnable comme les autres panneaux de l'onglet.
  */
 function ElementPanel({
   picked,
+  width,
   routes,
   currentRoute,
   onSend,
   onTicket,
-  ticketing,
   onClose,
 }: {
-  picked: Picked | null
+  picked: Picked
+  width: number
   routes: string[]
   currentRoute: string | null
   onSend: () => void
   onTicket: () => void
-  ticketing: boolean
   onClose: () => void
 }) {
   return (
     <div
       style={s(
-        'width: 340px; flex: none; border-left: 1px solid var(--color-divider); background: var(--color-surface); display: flex; flex-direction: column; overflow-y: auto;',
+        `width: ${width}px; flex: none; border-left: 1px solid var(--color-divider); background: var(--color-surface); display: flex; flex-direction: column; overflow-y: auto;`,
       )}
     >
       <div style={s('height: 38px; flex: none; display: flex; align-items: center; padding: 0 12px; border-bottom: 1px solid var(--color-divider);')}>
         <div style={s('font-size: 12px; font-weight: 500; flex: 1;')}>{t('navigateur.selected_element')}</div>
-        {picked && (
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={t('navigateur.dismiss_selection')}
-            style={s('background: transparent; border: 0; cursor: pointer; color: var(--color-neutral-600); display: flex; padding: 0;')}
-          >
-            <X size={14} weight="regular" aria-hidden="true" />
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t('navigateur.dismiss_selection')}
+          style={s('background: transparent; border: 0; cursor: pointer; color: var(--color-neutral-600); display: flex; padding: 0;')}
+        >
+          <X size={14} weight="regular" aria-hidden="true" />
+        </button>
       </div>
 
       <div style={s('padding: 14px; display: flex; flex-direction: column; gap: 14px;')}>
-        {picked ? (
-          <>
-            <PanelField label={t('navigateur.selector_label')}>
-              <div
-                style={s(
-                  'font-family: var(--font-mono); font-size: 11px; color: var(--color-plan); background: var(--color-surface-control); border: 1px solid var(--color-divider); border-radius: var(--radius-md); padding: 9px 10px; line-height: 1.6; word-break: break-all;',
-                )}
-              >
-                {picked.selector}
-              </div>
-            </PanelField>
-            <PanelField label={t('navigateur.text_label')}>
-              <div style={s('font-size: 12.5px; color: var(--color-neutral-400); line-height: 1.6;')}>{picked.text || '—'}</div>
-            </PanelField>
-            <PanelField label={t('navigateur.route_label')}>
-              <div style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-neutral-500);')}>{picked.route}</div>
-            </PanelField>
-
-            <div style={s('height: 1px; background: var(--color-divider);')} />
-
-            <div style={s('display: flex; flex-direction: column; gap: 8px;')}>
-              <button type="button" onClick={onSend} className="btn btn-primary" style={s('justify-content: center; font-size: 12px;')}>
-                {t('navigateur.paste_in_claude')}
-              </button>
-              <button
-                type="button"
-                onClick={onTicket}
-                disabled={ticketing}
-                className="btn btn-secondary"
-                style={s('justify-content: center; font-size: 12px;')}
-              >
-                {ticketing ? t('navigateur.ticket_creating') : t('navigateur.open_ticket_from_element')}
-              </button>
-            </div>
-          </>
-        ) : (
-          <div style={s('font-size: 12px; color: var(--color-neutral-600); line-height: 1.6;')}>
-            {t('navigateur.no_element_selected')}
+        <PanelField label={t('navigateur.selector_label')}>
+          <div
+            style={s(
+              'font-family: var(--font-mono); font-size: 11px; color: var(--color-plan); background: var(--color-surface-control); border: 1px solid var(--color-divider); border-radius: var(--radius-md); padding: 9px 10px; line-height: 1.6; word-break: break-all;',
+            )}
+          >
+            {picked.selector}
           </div>
-        )}
+        </PanelField>
+        <PanelField label={t('navigateur.text_label')}>
+          <div style={s('font-size: 12.5px; color: var(--color-neutral-400); line-height: 1.6;')}>{picked.text || '—'}</div>
+        </PanelField>
+        <PanelField label={t('navigateur.route_label')}>
+          <div style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-neutral-500);')}>{picked.route}</div>
+        </PanelField>
+
+        <div style={s('height: 1px; background: var(--color-divider);')} />
+
+        <div style={s('display: flex; flex-direction: column; gap: 8px;')}>
+          <button type="button" onClick={onSend} className="btn btn-primary" style={s('justify-content: center; font-size: 12px;')}>
+            {t('navigateur.paste_in_claude')}
+          </button>
+          <button type="button" onClick={onTicket} className="btn btn-secondary" style={s('justify-content: center; font-size: 12px;')}>
+            {t('navigateur.open_ticket_from_element')}
+          </button>
+        </div>
 
         {routes.length > 0 && (
           <>

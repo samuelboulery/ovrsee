@@ -147,13 +147,18 @@ export function App() {
   const [tab, setTab] = useState<TabId>(() => tabForPath(window.location.pathname))
   // Ticket ouvert au clic depuis la frise Historique — voir `onOuvrirTicket`.
   const [focusTicket, setFocusTicket] = useState<string | null>(() => ticketFromUrl())
+  // Contexte d'un élément du Navigateur, à joindre au prochain ticket créé
+  // dans Tableau — voir `onCreerTicketDepuisElement`.
+  const [contexteElement, setContexteElement] = useState<{ corps: string; tags: string[] } | null>(null)
 
-  // Consommé une fois : `Tableau` lit `focusTicket` à son montage (`useState`
-  // initial), donc l'effacer ici après coup ne change rien à ce montage-là —
-  // seulement à une prochaine visite de l'onglet, qui ne doit pas rouvrir le
-  // même ticket.
+  // Consommés une fois : `Tableau` lit `focusTicket`/`contexteElement` à son
+  // montage (`useState` initial), donc les effacer ici après coup ne change
+  // rien à ce montage-là — seulement à une prochaine visite de l'onglet, qui
+  // ne doit pas rouvrir le même ticket ni rejoindre le même contexte.
   useEffect(() => {
-    if (tab === 'tableau' && focusTicket) setFocusTicket(null)
+    if (tab !== 'tableau') return
+    if (focusTicket) setFocusTicket(null)
+    if (contexteElement) setContexteElement(null)
   }, [tab])
 
   // Route à charger dans Navigateur depuis « Ouvrir dans le Navigateur »
@@ -465,6 +470,14 @@ export function App() {
     pushUrl('/navigateur', current, null, route)
   }
 
+  /** Ouvrir la création de ticket dans Tableau, contexte d'élément joint — depuis Navigateur. */
+  const onCreerTicketDepuisElement = (corps: string, tags: string[]) => {
+    setTab('tableau')
+    setLayout(l => (l === 'full' ? 'bottom' : l))
+    setContexteElement({ corps, tags })
+    pushUrl('/tableau', current)
+  }
+
   const plans = snapshot?.plans ?? []
   const scan = lastScan(snapshot?.scans ?? [])
   const contentVisible = !(layout === 'full' && terminal)
@@ -639,6 +652,7 @@ export function App() {
                           visible={tab === 'navigateur'}
                           focusRoute={focusRoute}
                           onFocusHandled={() => setFocusRoute(null)}
+                          onCreerTicketDepuisElement={onCreerTicketDepuisElement}
                         />
                       </div>
 
@@ -672,6 +686,7 @@ export function App() {
                           gitStatus={snapshot.gitStatus}
                           onChange={setTableau}
                           focusTicket={focusTicket}
+                          contexteElement={contexteElement}
                         />
                       )}
                       {tab === 'donnees' && (

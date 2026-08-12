@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import {
   CHARGES,
@@ -98,6 +98,9 @@ type TicketPatch = Partial<Omit<Ticket, 'charge' | 'type' | 'epic'>> & {
   epic?: string | null
 }
 
+/** Contexte d'un élément du Navigateur, à joindre au prochain ticket créé. */
+type ContexteElement = { corps: string; tags: string[] }
+
 export function Tableau({
   projet,
   root,
@@ -107,6 +110,7 @@ export function Tableau({
   gitStatus,
   onChange,
   focusTicket = null,
+  contexteElement = null,
 }: {
   /** Nom affiché du projet, pour le fil d'Ariane de la barre de vue. */
   projet: string
@@ -118,6 +122,8 @@ export function Tableau({
   onChange: (tableau: TableauData) => void
   /** Fichier du ticket à ouvrir au montage — arrivée depuis la frise Historique. */
   focusTicket?: string | null
+  /** Contexte d'un élément du Navigateur à joindre au prochain ticket créé — voir `App.tsx`. */
+  contexteElement?: ContexteElement | null
 }) {
   const [erreur, setErreur] = useState<string | null>(null)
   const [survolee, setSurvolee] = useState<string | null>(null)
@@ -125,6 +131,7 @@ export function Tableau({
   const [ouverte, setOuverte] = useState<string | null>(focusTicket)
   const [edition, setEdition] = useState(false)
   const [filtreEpic, setFiltreEpic] = useState<string | null>(null)
+  const [enAttente, setEnAttente] = useState<ContexteElement | null>(contexteElement)
 
   /**
    * Applique une écriture, en montrant le résultat avant la réponse du serveur.
@@ -161,11 +168,34 @@ export function Tableau({
     )
   }
 
-  const creer = (titre: string, colonne: string) => {
+  const creer = async (titre: string, colonne: string) => {
     if (!titre.trim()) return
     // Pas d'aperçu optimiste : l'identifiant vient du serveur, et inventer un
     // `T-00xx` qui changerait une seconde plus tard serait un mensonge court.
-    ecrire({ board, tickets }, 'create', { titre, colonne })
+    if (!enAttente) {
+      ecrire({ board, tickets }, 'create', { titre, colonne })
+      return
+    }
+
+    // Un ticket depuis un élément du Navigateur : le contexte se joint à la
+    // création elle-même, et le ticket s'ouvre aussitôt pour que le reste
+    // (priorité, charge…) se remplisse à la main.
+    setErreur(null)
+    try {
+      const avant = new Set(tickets.map(ticket => ticket.file))
+      const suivant = await ticketAction('create', root, {
+        titre,
+        colonne,
+        corps: enAttente.corps,
+        tags: enAttente.tags,
+      })
+      onChange(suivant)
+      const nouveau = suivant.tickets.find(ticket => !avant.has(ticket.file))
+      if (nouveau) setOuverte(nouveau.file)
+      setEnAttente(null)
+    } catch (err) {
+      setErreur(String((err as Error).message ?? err))
+    }
   }
 
   /** Fusionne un patch dans un ticket : `null` efface le champ plutôt que d'être stocké tel quel. */
@@ -266,6 +296,22 @@ export function Tableau({
         </button>
       </ViewBar>
       <div style={s('padding: 12px 22px 12px;')}>
+        {enAttente && (
+          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: #101114; border: 1px solid #24252b; display: flex; align-items: center; gap: 10px;')}>
+            <div style={s('font-size: 12px; color: var(--color-text);')}>
+              {t('tableau.element_context_banner')}
+            </div>
+            <div style={s('flex: 1;')} />
+            <button
+              type="button"
+              className="btn btn-ghost"
+              style={s('font-size: 11.5px; padding: 4px 8px;')}
+              onClick={() => setEnAttente(null)}
+            >
+              {t('tableau.element_context_cancel')}
+            </button>
+          </div>
+        )}
         {filtreEpic && (
           <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: #101114; border: 1px solid #24252b; display: flex; align-items: center; gap: 10px;')}>
             <span className="tag tag-accent" style={s('font-size: 10px;')}>epic</span>
@@ -330,6 +376,7 @@ export function Tableau({
               allTickets={tickets}
               onModifier={modifier}
               boardColonnes={board}
+              saisieOuverte={index === 0 && Boolean(enAttente) && !edition}
             />
           ))}
 
@@ -398,6 +445,7 @@ function ColonneVue({
   allTickets,
   onModifier,
   boardColonnes,
+  saisieOuverte = false,
 }: {
   colonne: Colonne
   index: number
@@ -422,11 +470,19 @@ function ColonneVue({
   allTickets: Ticket[]
   onModifier: (file: string, patch: TicketPatch) => void
   boardColonnes: Colonne[]
+  /** Ouvre la saisie du titre au montage — arrivée d'un contexte d'élément depuis Navigateur. */
+  saisieOuverte?: boolean
 }) {
-  const [saisie, setSaisie] = useState<string | null>(null)
+  const [saisie, setSaisie] = useState<string | null>(() => (saisieOuverte ? '' : null))
   const [confirme, setConfirme] = useState(false)
   const [vers, setVers] = useState('')
   const corps = useRef<HTMLDivElement>(null)
+
+  // `saisieOuverte` retombe à `false` (contexte annulé, ou déjà consommé par
+  // la création) : la saisie ouverte pour lui se referme avec.
+  useEffect(() => {
+    if (!saisieOuverte) setSaisie(null)
+  }, [saisieOuverte])
 
   const deborde = colonne.wip !== undefined && tickets.length > colonne.wip
   const autres = colonnes.filter(c => c.id !== colonne.id)

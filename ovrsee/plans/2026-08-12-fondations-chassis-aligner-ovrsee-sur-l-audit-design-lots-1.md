@@ -48,6 +48,11 @@
         "app/src/Onboarding.tsx",
         "app/src/PreferencesPanel.tsx"
       ]
+    },
+    {
+      "sha": "88419a7",
+      "date": "2026-08-12",
+      "files": []
     }
   ]
 }

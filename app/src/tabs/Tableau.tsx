@@ -579,7 +579,8 @@ function ColonneVue({
 
       {edition && (
         <div style={s('font-size: 10px; color: var(--color-neutral-600); padding: 0 3px;')}>
-          {colonne.id} · {tickets.length} ticket(s){finale ? ` · ${t('tableau.final_column')}` : ''}
+          {colonne.id} · {tickets.length} {tickets.length > 1 ? 'tickets' : 'ticket'}
+          {finale ? ` · ${t('tableau.final_column')}` : ''}
         </div>
       )}
 
@@ -608,7 +609,7 @@ function ColonneVue({
         <div style={s('border: 1px solid var(--color-accent-700); border-radius: 8px; padding: 10px; background: var(--color-surface);')}>
           <div style={s('font-size: 11px; color: var(--color-neutral-400); line-height: 1.5;')}>
             {tickets.length > 0
-              ? t('tableau.tickets_to_relocate', { n: tickets.length })
+              ? t(tickets.length > 1 ? 'tableau.tickets_to_relocate_plural' : 'tableau.tickets_to_relocate', { n: tickets.length })
               : t('tableau.empty_column')}
           </div>
           {tickets.length > 0 && (

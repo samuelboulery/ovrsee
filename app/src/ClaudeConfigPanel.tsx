@@ -94,7 +94,7 @@ function VueSkills() {
             ? t('skills.installing')
             : choisis.length === 0
               ? t('skills.nothing_to_install')
-              : t('skills.install_count', { count: choisis.length })}
+              : t(choisis.length > 1 ? 'skills.install_count_plural' : 'skills.install_count', { count: choisis.length })}
         </button>
       </div>
     </div>
@@ -303,7 +303,7 @@ export function SectionClaude() {
                             )}
                             {item.hooks && Array.isArray(item.hooks) && (
                               <div style={s('color: var(--color-neutral-500); margin-top: 2px;')}>
-                                {item.hooks.length} {t('config.hooks_label')}{' '}
+                                {item.hooks.length} {t(item.hooks.length > 1 ? 'config.hooks_label_plural' : 'config.hooks_label')}{' '}
                                 {item.hooks.map((h: any) => h.type).join(', ')}
                               </div>
                             )}

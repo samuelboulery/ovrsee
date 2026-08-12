@@ -90,7 +90,11 @@ export function Historique({
 
           {isEmpty ? (
             <div style={s('padding: 40px 0; display: flex; align-items: center; justify-content: center;')}>
-              <div style={s('font-size: 12px; color: var(--color-neutral-600); text-align: center; max-width: 46ch; line-height: 1.6;')}>
+              <div
+                style={s(
+                  'padding: 48px 20px; max-width: 46ch; text-align: center; border: 1px dashed #24252b; border-radius: 9px; font-size: 12.5px; color: var(--color-neutral-500); line-height: 1.6;',
+                )}
+              >
                 {t('apercu.project_timeline_empty')}
               </div>
             </div>

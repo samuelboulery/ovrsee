@@ -56,14 +56,18 @@ export function Sante({
             git.branch === null
               ? t('sante.no_branch')
               : fichiersModifies > 0
-                ? t('sante.tree_dirty', { n: fichiersModifies })
+                ? t(fichiersModifies > 1 ? 'sante.tree_dirty_plural' : 'sante.tree_dirty', { n: fichiersModifies })
                 : t('sante.tree_clean')
           }
         />
         {git.branch !== null && (
           <Badge
             etat={ahead > 0 ? 'attention' : 'ok'}
-            texte={ahead > 0 ? t('sante.unpushed', { n: ahead }) : t('sante.unpushed_none')}
+            texte={
+              ahead > 0
+                ? t(ahead > 1 ? 'sante.unpushed_plural' : 'sante.unpushed', { n: ahead })
+                : t('sante.unpushed_none')
+            }
           />
         )}
         <Badge

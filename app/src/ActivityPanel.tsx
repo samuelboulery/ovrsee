@@ -18,6 +18,9 @@ type SousVue = 'empile' | 'densite' | 'type'
 
 /** Valeurs littérales de l'audit design (§4.4) — pas les rampes de token,
     dont ni le mapping ni les teintes ne correspondaient à la maquette. */
+/** Accord singulier/pluriel — règle d'or §5.7, jamais de parenthèse. */
+const plur = (n: number, mot: string) => `${n} ${mot}${n > 1 ? 's' : ''}`
+
 const COULEUR_SERIE = {
   plans: '#7d76f0',
   tickets: '#4b46a3',
@@ -268,7 +271,7 @@ function StackedBars({
         return (
           <div
             key={i}
-            title={`${total} · ${p[i]} plan(s), ${k[i]} ticket(s), ${c[i]} commit(s)`}
+            title={`${total} · ${plur(p[i], 'plan')}, ${plur(k[i], 'ticket')}, ${plur(c[i], 'commit')}`}
             style={s('flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: 1px;')}
           >
             {c[i] > 0 && <div style={s(`background: ${COULEUR_SERIE.commits}; height: ${Math.max(2, c[i] * scale)}px; border-radius: 1px;`)} />}
@@ -328,9 +331,9 @@ function WeeklyDensityGrid({
           return (
             <div
               key={`${row}-${col}`}
-              title={`${value} activité(s)`}
+              title={plur(value, 'activité')}
               role="img"
-              aria-label={`${value} activité(s)`}
+              aria-label={plur(value, 'activité')}
               style={s(`background: ${couleur(value)}; border-radius: 2px;`)}
             />
           )

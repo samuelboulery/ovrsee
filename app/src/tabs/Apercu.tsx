@@ -299,7 +299,9 @@ export function Apercu({
         left={[
           gitStatus.branch ?? t('sante.no_branch'),
           ...(scan?.commit ? [scan.commit.slice(0, 7)] : []),
-          gitDirtyTotal === 0 ? t('sante.tree_clean') : t('sante.tree_dirty', { n: gitDirtyTotal }),
+          gitDirtyTotal === 0
+            ? t('sante.tree_clean')
+            : t(gitDirtyTotal > 1 ? 'sante.tree_dirty_plural' : 'sante.tree_dirty', { n: gitDirtyTotal }),
         ]}
         right={planActif ? [t('statusbar.active_plan', { title: planActif.title })] : []}
       />

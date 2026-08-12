@@ -34,7 +34,9 @@ export function Illisibles({ entries, quoi }: { entries: Illisible[]; quoi?: str
           style={s('font-family: var(--font-mono); font-size: 11px; color: #e3b341;')}
         >
           ovrsee/{entry.file}
-          {entry.lignes ? ` — ${entry.lignes} ligne(s) perdue(s)` : ''}
+          {entry.lignes
+            ? ` — ${entry.lignes} ligne${entry.lignes > 1 ? 's perdues' : ' perdue'}`
+            : ''}
         </div>
       ))}
     </div>

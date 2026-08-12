@@ -88,10 +88,16 @@ export function Produit({
     return (
       <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
         <ViewBar projet={projectDisplayName(snapshot)} vue={t('produit.title')} />
-        <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
-          <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
-            {t('produit.no_pages')}{' '}
-            <span style={s('font-family: var(--font-mono);')}>node crawl/index.js</span>.
+        <div style={s('flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px 22px; overflow: auto;')}>
+          <div
+            style={s(
+              'display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding: 48px 20px; max-width: 46ch; border: 1px dashed #24252b; border-radius: 9px;',
+            )}
+          >
+            <div style={s('font-size: 12.5px; color: var(--color-neutral-500); line-height: 1.5;')}>
+              {t('produit.no_pages')}
+            </div>
+            <CrawlButton packageManager={packageManager} />
           </div>
         </div>
         <StatusBar />

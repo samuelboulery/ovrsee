@@ -32,7 +32,7 @@ async function envoyerAuTerminal(
   const toutesPassees = envoyees.every(({ text }) => pasteToClaude(text))
 
   if (toutesPassees && envoyees.length > 0) {
-    dire(`${envoyees.length} commande(s) écrite(s) dans la session Claude`)
+    dire(`${envoyees.length} commande${envoyees.length > 1 ? 's écrites' : ' écrite'} dans la session Claude`)
     return
   }
 

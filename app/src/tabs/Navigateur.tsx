@@ -766,7 +766,12 @@ export function Navigateur({
               className="btn btn-ghost"
               style={s('font-size: 11px; padding: 3px 8px;')}
             >
-              {logsOpen ? '▾' : '▸'} {t('navigateur.console_title', { errors, warnings: logs.length - errors })}
+              {logsOpen ? '▾' : '▸'} {t('navigateur.console_label')} —{' '}
+              {t(errors > 1 ? 'navigateur.console_errors_plural' : 'navigateur.console_errors', { n: errors })},{' '}
+              {t(
+                logs.length - errors > 1 ? 'navigateur.console_warnings_plural' : 'navigateur.console_warnings',
+                { n: logs.length - errors },
+              )}
             </button>
             <div
               style={s(

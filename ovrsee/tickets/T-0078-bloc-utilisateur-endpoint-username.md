@@ -2,7 +2,7 @@
 {
   "id": "T-0078",
   "titre": "Bloc utilisateur (bas de sidebar) + endpoint nom d'utilisateur système",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

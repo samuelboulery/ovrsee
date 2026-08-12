@@ -2,7 +2,7 @@
 {
   "id": "T-0082",
   "titre": "Branches : remplacer le tableau par des chips horizontaux",
-  "colonne": "en-cours",
+  "colonne": "pret",
   "priorite": "moyenne",
   "tags": [
     "ui"

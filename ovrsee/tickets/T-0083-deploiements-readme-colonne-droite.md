@@ -2,7 +2,7 @@
 {
   "id": "T-0083",
   "titre": "Déploiements + README : restructurer la colonne droite de l'Aperçu",
-  "colonne": "en-cours",
+  "colonne": "pret",
   "priorite": "haute",
   "tags": [
     "ui"

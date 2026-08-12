@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Refonte châssis + Aperçu — port littéral depuis `Ovrsee App.dc.html`",
   "opened": "2026-08-12",
-  "closed": null,
+  "closed": "2026-08-12",
   "commits": [
     {
       "sha": "bc6a8ac",
@@ -22,6 +22,11 @@
     },
     {
       "sha": "2aac372",
+      "date": "2026-08-12",
+      "files": []
+    },
+    {
+      "sha": "e09f624",
       "date": "2026-08-12",
       "files": []
     }

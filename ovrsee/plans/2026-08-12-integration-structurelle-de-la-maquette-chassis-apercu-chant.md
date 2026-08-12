@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Intégration structurelle de la maquette — châssis + Aperçu (chantier 3)",
   "opened": "2026-08-12",
-  "closed": null,
+  "closed": "2026-08-12",
   "commits": [
     {
       "sha": "78b9c2b",
@@ -67,6 +67,16 @@
       "date": "2026-08-12",
       "files": [
         "app/src/tabs/Branches.tsx"
+      ]
+    },
+    {
+      "sha": "e4cd9db",
+      "date": "2026-08-12",
+      "files": [
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Deploiements.tsx",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js"
       ]
     }
   ]

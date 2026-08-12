@@ -1396,15 +1396,15 @@ export function deliveredActions(settings: SettingsType): Action[] {
 
   return [
     {
-      label: `⟳ ${t('action.crawl')}`,
+      label: t('action.crawl'),
       text: `!${composerCommande('ovrsee:crawl', packageManager)}`,
     },
     {
-      label: `◆ ${t('action.graph')}`,
+      label: t('action.graph'),
       text: '/graphify',
     },
     {
-      label: `◈ ${t('action.graph_obsidian')}`,
+      label: t('action.graph_obsidian'),
       text: '/graphify . --obsidian --obsidian-dir ovrsee/obsidian/graphe',
     },
   ]

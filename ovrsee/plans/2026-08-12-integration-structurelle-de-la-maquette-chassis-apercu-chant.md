@@ -27,6 +27,18 @@
       "sha": "b79fb51",
       "date": "2026-08-12",
       "files": []
+    },
+    {
+      "sha": "e99d1b5",
+      "date": "2026-08-12",
+      "files": [
+        "app/src/ActivityPanel.tsx",
+        "app/src/App.tsx",
+        "app/src/tabs/Historique.tsx",
+        "hooks/couleurs.test.js",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js"
+      ]
     }
   ]
 }

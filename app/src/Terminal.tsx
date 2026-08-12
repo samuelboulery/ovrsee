@@ -1,10 +1,27 @@
-import { useState } from 'react'
+import { useState, type ComponentType } from 'react'
+import { Compass, GitFork, NotePencil, type IconProps } from '@phosphor-icons/react'
 
 import { briefLines, buildActions, type Snapshot, type SettingsType } from './data'
 import { s } from './style'
 import { t, type TranslationKey } from './i18n'
 import { useTerminals, pasteToClaude } from './useTerminal'
 import { Divider, useResizable } from './useResizable'
+
+/**
+ * Icône par commande livrée — maquette l. 555-558. `buildActions()` compose le
+ * libellé traduit tel quel (T-0080 a retiré les glyphes Unicode qui y étaient
+ * concaténés, remplacés ici par de vraies icônes) ; les actions
+ * personnalisées, elles, n'ont pas d'icône dédiée.
+ *
+ * Calculée à chaque rendu, pas au chargement du module : les clés sont des
+ * libellés traduits, et une bascule de langue à chaud les changerait sous les
+ * pieds d'une table figée une fois pour toutes.
+ */
+const iconeCommande = (): Record<string, ComponentType<IconProps>> => ({
+  [t('action.crawl')]: Compass,
+  [t('action.graph')]: GitFork,
+  [t('action.graph_obsidian')]: NotePencil,
+})
 
 export type Layout = 'bottom' | 'side' | 'full'
 
@@ -164,6 +181,7 @@ export function Terminal({
     return !a.text.startsWith('!') && !a.text.startsWith('/')
   })
   const actionErrors = allActions.filter((a): a is { label: string; error: string } => 'error' in a)
+  const icones = iconeCommande()
 
   return (
     <>
@@ -356,19 +374,23 @@ export function Terminal({
             {t('terminal.commands_section')}
           </div>
           <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
-            {commands.map(action => (
-              <button
-                key={action.label}
-                type="button"
-                onClick={() => activate(action.label, action.text)}
-                style={s(
-                  'cursor: pointer; text-align: left; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
-                )}
-                title={action.text}
-              >
-                {action.label}
-              </button>
-            ))}
+            {commands.map(action => {
+              const Icone = icones[action.label]
+              return (
+                <button
+                  key={action.label}
+                  type="button"
+                  onClick={() => activate(action.label, action.text)}
+                  style={s(
+                    'cursor: pointer; display: flex; align-items: center; gap: 8px; text-align: left; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+                  )}
+                  title={action.text}
+                >
+                  {Icone && <Icone size={14} weight="regular" aria-hidden="true" color="#7d76f0" />}
+                  {action.label}
+                </button>
+              )
+            })}
           </div>
 
           {/* Affiche les erreurs si présentes */}

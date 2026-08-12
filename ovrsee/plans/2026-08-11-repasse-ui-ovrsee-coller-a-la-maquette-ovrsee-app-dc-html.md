@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Repasse UI ovrsee — coller à la maquette « Ovrsee App.dc.html »",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-12",
   "commits": [
     {
       "sha": "a36966b",
@@ -44,6 +44,11 @@
     },
     {
       "sha": "90474b2",
+      "date": "2026-08-12",
+      "files": []
+    },
+    {
+      "sha": "4b6ec80",
       "date": "2026-08-12",
       "files": []
     }

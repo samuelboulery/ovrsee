@@ -4,7 +4,21 @@
   "title": "Audit design pixel-perfect vs `Ovrsee App.dc.html`",
   "opened": "2026-08-12",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "56d5573",
+      "date": "2026-08-12",
+      "files": [
+        "_ds/ovrsee/styles.css",
+        "app/src/PreferencesControls.tsx",
+        "app/src/PreferencesProfils.tsx",
+        "app/src/tabs/Donnees.tsx",
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/Produit.tsx",
+        "app/src/tabs/Stack.tsx"
+      ]
+    }
+  ]
 }
 ---
 

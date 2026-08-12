@@ -24,33 +24,23 @@ const COULEUR_SERIE = {
 } as const
 
 /**
- * Panneau d'activité — maquette 2e (Historique) et maquette 2a/2b (sidebar,
- * en version compacte). Trois lectures du même fil, en comptage plutôt qu'en
- * liste : ce que la fréquence dit et qu'un défilement de cartes ne montre pas.
+ * Panneau d'activité — maquette 2e (Historique), panneau droit permanent de
+ * 300px. Trois lectures du même fil, en comptage plutôt qu'en liste : ce que
+ * la fréquence dit et qu'un défilement de cartes ne montre pas.
  *
- * Extrait de `tabs/Historique.tsx` (T-0079) : la maquette montre le même
- * triplet de bascules ("14 j"/"12 s"/"type") et la même section "Filtrer"
- * dans la sidebar que dans l'onglet Historique — ce n'est pas une coïncidence,
- * c'est la même vue en plus compact. Un seul composant, deux appelants,
- * plutôt que deux implémentations qui divergent.
- *
- * `plans` est optionnel : seule la sidebar l'utilise, pour la section
- * "Plans rejetés" de la maquette — Historique.tsx n'a pas de liste de plans
- * bruts à ce niveau et n'affiche pas cette section.
+ * `plans` est optionnel : n'affiche la section « Plans rejetés » que si
+ * l'appelant les fournit.
  */
 export function ActivityPanel({
   timeline,
   ticketTimeline,
   scans,
   plans,
-  compact = false,
 }: {
   timeline: TimelineEntry[]
   ticketTimeline: TicketTimelineEntry[]
   scans: Scan[]
   plans?: Plan[]
-  /** Sidebar : le parent porte déjà la largeur, la bordure et le fond. */
-  compact?: boolean
 }) {
   const [sousVue, setSousVue] = useState<SousVue>('empile')
   const [avecPlans, setAvecPlans] = useState(true)
@@ -75,15 +65,13 @@ export function ActivityPanel({
   return (
     <div
       style={s(
-        compact
-          ? 'display: flex; flex-direction: column; gap: 12px;'
-          : 'width: 300px; flex: none; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); padding: 16px 14px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;',
+        'width: 300px; flex: none; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); padding: 16px 14px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;',
       )}
     >
       <div style={s('display: flex; align-items: center; gap: 8px;')}>
         <div
           style={s(
-            `font-size: ${compact ? '10px' : '10.5px'}; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-600); flex: 1;`,
+            'font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-600); flex: 1;',
           )}
         >
           {t('historique.view_graph')}

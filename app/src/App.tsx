@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { CaretDown, GearSix, MagnifyingGlass, TerminalWindow } from '@phosphor-icons/react'
+import {
+  CaretDown,
+  DotsSixVertical,
+  GearSix,
+  MagnifyingGlass,
+  SidebarSimple,
+  TerminalWindow,
+} from '@phosphor-icons/react'
 
 import { applyTheme } from './theme'
 import { t, setCurrentLanguage } from './i18n'
@@ -17,20 +24,17 @@ import {
   projectAction,
   restant,
   updateSettings,
+  projectDisplayName,
   type IntegrationProvider,
-  type Plan,
   type Project,
-  type Scan,
   type SettingsType,
   type Snapshot,
   type Tableau as TableauData,
-  type TicketTimelineEntry,
-  type TimelineEntry,
 } from './data'
-import { ActivityPanel } from './ActivityPanel'
 import { CommandPalette } from './CommandPalette'
 import { Garde } from './Garde'
 import { Onboarding } from './Onboarding'
+import { Logo } from './OnboardingArt'
 import { PreferencesModal, type SectionId } from './PreferencesPanel'
 import { Welcome } from './Welcome'
 import { EquipmentPanel } from './EquipmentPanel'
@@ -478,16 +482,17 @@ export function App() {
             zone de déplacement de la fenêtre et le clic ne l'atteint jamais. */}
         <button
           type="button"
-          className="btn btn-ghost"
           aria-label={t('sidebar.toggle')}
           aria-expanded={sidebarOuverte}
           title={t('sidebar.toggle')}
           onClick={() => setSidebarOuverte(ouverte => !ouverte)}
           style={s(
-            'font-size: 13px; line-height: 1; padding: 3px 7px; -webkit-app-region: no-drag;',
+            sidebarOuverte
+              ? 'width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 0; background: transparent; color: #62666e; cursor: pointer; -webkit-app-region: no-drag;'
+              : 'width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 0; background: #1c1d24; color: #b6bac1; cursor: pointer; -webkit-app-region: no-drag;',
           )}
         >
-          {sidebarOuverte ? '⇤' : '⇥'}
+          <SidebarSimple size={14} weight="regular" aria-hidden="true" />
         </button>
 
         <ProjectSwitcher
@@ -510,10 +515,17 @@ export function App() {
           aria-pressed={terminal}
           onClick={() => setTerminal(ouvert => !ouvert)}
           style={s(
-            'width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 5px; border: 0; background: transparent; cursor: pointer; -webkit-app-region: no-drag;',
+            terminal
+              ? 'width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 0; background: #1c1d24; cursor: pointer; -webkit-app-region: no-drag;'
+              : 'width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 0; background: transparent; cursor: pointer; -webkit-app-region: no-drag;',
           )}
         >
-          <TerminalWindow size={14} weight="fill" aria-hidden="true" color="#b6bac1" />
+          <TerminalWindow
+            size={14}
+            weight={terminal ? 'fill' : 'regular'}
+            aria-hidden="true"
+            color={terminal ? '#b6bac1' : '#62666e'}
+          />
         </button>
       </header>
 
@@ -532,11 +544,12 @@ export function App() {
             tab={tab}
             onTabPick={onTabPick}
             onOpenPreferences={() => setPreferencesOuvertes(true)}
+            onOpenPreferencesInterface={() => {
+              setPreferencesInitial({ section: 'interface' })
+              setPreferencesOuvertes(true)
+            }}
             onOpenPalette={() => setPaletteOuverte(true)}
-            timeline={snapshot?.timeline ?? []}
-            ticketTimeline={snapshot?.ticketTimeline ?? []}
-            scans={snapshot?.scans ?? []}
-            plans={snapshot?.plans ?? []}
+            ticketsRestant={snapshot ? restant(snapshot.tickets ?? [], snapshot.board ?? []) : 0}
           />
           {sidebarOuverte && <Divider axis="x" resizable={sidebar} />}
 
@@ -606,6 +619,7 @@ export function App() {
                       )}
                       {tab === 'historique' && (
                         <Historique
+                          projet={projectDisplayName(snapshot)}
                           plans={plans}
                           timeline={snapshot.timeline ?? []}
                           ticketTimeline={snapshot.ticketTimeline ?? []}
@@ -616,6 +630,7 @@ export function App() {
                       )}
                       {tab === 'tableau' && (
                         <Tableau
+                          projet={projectDisplayName(snapshot)}
                           root={snapshot.root}
                           board={snapshot.board ?? []}
                           tickets={snapshot.tickets ?? []}
@@ -627,6 +642,7 @@ export function App() {
                       )}
                       {tab === 'donnees' && (
                         <Donnees
+                          projet={projectDisplayName(snapshot)}
                           graph={snapshot.graph}
                           source={snapshot.graphSource}
                           sourceRequested={snapshot.sourceRequested}
@@ -666,18 +682,17 @@ export function App() {
             {!terminal && !settings?.terminal?.disabled && (
               <div
                 style={s(
-                  'height: 32px; flex: none; border-top: 1px solid var(--color-divider); background: var(--theme-bg-primary); display: flex; align-items: center; gap: 10px; padding: 0 14px;',
+                  'height: 32px; flex: none; border-top: 1px solid #17181d; background: #0b0c0e; display: flex; align-items: center; gap: 10px; padding: 0 14px;',
                 )}
               >
                 <button
                   type="button"
                   onClick={() => setTerminal(true)}
-                  className="btn btn-ghost"
-                  style={s('font-size: 11px; padding: 3px 9px;')}
+                  style={s('cursor: pointer; border: 0; background: transparent; font-size: 11px; color: #62666e;')}
                 >
                   Terminal · claude
                 </button>
-                <span style={s('font-size: 10.5px; color: var(--color-neutral-600);')}>
+                <span style={s('font-size: 10.5px; color: #62666e;')}>
                   réduit — la session tourne toujours
                 </span>
               </div>
@@ -768,7 +783,7 @@ function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
             : 'width: 5px; height: 5px; border-radius: 50%; background: #e5677a; display: block;',
         )}
       />
-      {scan.ok ? t('scan.last') : t('scan.failed')} · {frDate(scan.date)} · commit {scan.commit}
+      {scan.ok ? t('scan.last') : t('scan.failed')} · {frDate(scan.date)} · {scan.commit}
     </div>
   )
 }
@@ -785,8 +800,8 @@ function Message({ text }: { text: string }) {
   )
 }
 
-/** Largeur fixe du rail replié — juste assez pour un picto 16px centré. */
-const RAIL_COLLAPSED_WIDTH = 52
+/** Largeur fixe du rail replié — logo + picto 17px centrés (maquette 2a/2k). */
+const RAIL_COLLAPSED_WIDTH = 56
 
 /**
  * Barre latérale — maquette l. 45-71, rail des vues intégré (T-0047, maquette
@@ -804,11 +819,9 @@ function Sidebar({
   tab,
   onTabPick,
   onOpenPreferences,
+  onOpenPreferencesInterface,
   onOpenPalette,
-  timeline,
-  ticketTimeline,
-  scans,
-  plans,
+  ticketsRestant,
 }: {
   collapsed: boolean
   settings: SettingsType | null
@@ -817,11 +830,12 @@ function Sidebar({
   onTabPick: (id: TabId, path: string) => void
   /** La modale vit dans `App` : le menu natif l'ouvre par le même chemin. */
   onOpenPreferences: () => void
+  /** Ouvre les Préférences directement sur la section Interface — depuis la
+      ligne « Réordonner, masquer… » de la liste de vues. */
+  onOpenPreferencesInterface: () => void
   onOpenPalette: () => void
-  timeline: TimelineEntry[]
-  ticketTimeline: TicketTimelineEntry[]
-  scans: Scan[]
-  plans: Plan[]
+  /** Seul décompte affiché en sidebar aujourd'hui : le Tableau (maquette 2b). */
+  ticketsRestant: number
 }) {
   const views = activeTabsInOrder(settings)
   const [username, setUsername] = useState<string | null>(null)
@@ -840,6 +854,9 @@ function Sidebar({
           `width: ${RAIL_COLLAPSED_WIDTH}px; flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; background: #0b0c0e; border-right: 1px solid #17181d; padding: 10px 0;`,
         )}
       >
+        <div style={s('padding-bottom: 8px;')}>
+          <Logo size={28} />
+        </div>
         {views.map(([id, cle, path]) => (
           <RailLink key={id} id={id} label={t(cle)} path={path} active={tab === id} onTabPick={onTabPick} compact />
         ))}
@@ -894,9 +911,29 @@ function Sidebar({
         <span>{views.length}</span>
       </div>
       <div style={s('display: flex; flex-direction: column; gap: 2px; padding: 0 10px;')}>
-        {views.map(([id, cle, path]) => (
-          <RailLink key={id} id={id} label={t(cle)} path={path} active={tab === id} onTabPick={onTabPick} />
+        {views.map(([id, cle, path], index) => (
+          <RailLink
+            key={id}
+            id={id}
+            label={t(cle)}
+            path={path}
+            active={tab === id}
+            onTabPick={onTabPick}
+            shortcut={index + 1}
+            count={id === 'tableau' ? ticketsRestant : undefined}
+          />
         ))}
+        <button
+          type="button"
+          onClick={onOpenPreferencesInterface}
+          title={t('sidebar.reorder_views')}
+          style={s(
+            'height: 31px; padding: 0 8px; display: flex; align-items: center; gap: 10px; border-radius: 6px; border: 0; background: transparent; cursor: pointer; text-align: left; color: #4e5158; font-size: 12.5px;',
+          )}
+        >
+          <DotsSixVertical size={15} aria-hidden="true" color="#3f424a" />
+          {t('sidebar.reorder_views')}
+        </button>
       </div>
 
       <div style={s('flex: 1;')} />
@@ -932,10 +969,6 @@ function Sidebar({
           </span>
           <GearSix size={15} weight="regular" aria-hidden="true" color="#62666e" />
         </button>
-      </div>
-
-      <div style={s('padding: 10px 10px 0; border-top: 1px solid #17181d; margin-top: 10px;')}>
-        <ActivityPanel compact timeline={timeline} ticketTimeline={ticketTimeline} scans={scans} plans={plans} />
       </div>
     </aside>
   )
@@ -995,12 +1028,12 @@ function ProjectSwitcher({
         aria-expanded={open}
         aria-label={t('sidebar.switch_project')}
         style={s(
-          'display: flex; align-items: center; gap: 8px; height: 24px; padding: 0 8px; margin: 0 -8px; border-radius: 6px; border: 0; background: transparent; cursor: pointer;',
+          'display: flex; align-items: center; gap: 8px; height: 24px; padding: 0 9px; border-radius: 6px; border: 1px solid #1c1d22; background: #101114; cursor: pointer;',
         )}
       >
         <span style={s('width: 5px; height: 5px; border-radius: 2px; background: #7d76f0; flex: none;')} />
         <span style={s('font-size: 12px; font-weight: 500; color: #f2f3f5; white-space: nowrap;')}>
-          Ovrsee — {active?.name ?? '…'}
+          {active?.name ?? '…'}
         </span>
         <CaretDown size={10} weight="bold" aria-hidden="true" color="#55585f" />
       </button>
@@ -1008,7 +1041,7 @@ function ProjectSwitcher({
       {open && (
         <div
           style={s(
-            'position: absolute; top: 30px; left: -8px; width: 260px; z-index: 20; padding: 6px; border-radius: 9px; border: 1px solid #1c1d22; background: #101114; box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
+            'position: absolute; top: 30px; left: 0; width: 260px; z-index: 20; padding: 6px; border-radius: 9px; border: 1px solid #1c1d22; background: #101114; box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
           )}
         >
           {projects.map(project => (
@@ -1068,6 +1101,8 @@ function RailLink({
   path,
   active,
   compact,
+  shortcut,
+  count,
   onTabPick,
 }: {
   id: TabId
@@ -1075,6 +1110,10 @@ function RailLink({
   path: string
   active: boolean
   compact?: boolean
+  /** Numéro de raccourci ⌘N, affiché à droite de la ligne (maquette 2b). */
+  shortcut?: number
+  /** Pastille de compte à droite, quand la vue en a un (ex. Tableau). */
+  count?: number
   onTabPick: (id: TabId, path: string) => void
 }) {
   const [hover, setHover] = useState(false)
@@ -1096,23 +1135,41 @@ function RailLink({
       }}
       style={s(
         (compact
-          ? 'width: 36px; height: 31px; justify-content: center;'
-          : 'height: 31px; padding: 0 8px; gap: 10px;') +
-          ' display: flex; align-items: center; text-decoration: none; border-radius: 6px; font-size: 12.5px; ' +
+          ? 'width: 34px; height: 32px; justify-content: center; border-radius: 8px;'
+          : 'height: 31px; padding: 0 8px; gap: 10px; border-radius: 6px;') +
+          ' display: flex; align-items: center; text-decoration: none; font-size: 12.5px; ' +
           (active
             ? 'background: #1c1d24; font-weight: 500; color: #f2f3f5;'
             : hover
-              ? 'background: color-mix(in srgb, #f2f3f5 6%, transparent); color: #b6bac1;'
+              ? 'background: #131418; color: #b6bac1;'
               : 'color: #b6bac1;'),
       )}
     >
       <Icon
-        size={16}
+        size={compact ? 17 : 16}
         weight={active ? 'fill' : 'regular'}
         aria-hidden="true"
         color={active ? '#7d76f0' : '#62666e'}
       />
-      {!compact && label}
+      {!compact && (
+        <>
+          <span style={s('flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>{label}</span>
+          {typeof shortcut === 'number' && shortcut > 0 && shortcut <= 9 && (
+            <span style={s('font-family: var(--font-mono); font-size: 10px; color: #4e5158; flex: none;')}>
+              {shortcut}
+            </span>
+          )}
+          {typeof count === 'number' && count > 0 && (
+            <span
+              style={s(
+                'display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 17px; padding: 0 5px; border-radius: 4px; background: #24252c; font-family: var(--font-mono); font-size: 10px; color: #9096a0; flex: none;',
+              )}
+            >
+              {count}
+            </span>
+          )}
+        </>
+      )}
     </a>
   )
 }

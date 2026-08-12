@@ -1,5 +1,5 @@
 import { useState, type ComponentType } from 'react'
-import { Compass, GitFork, NotePencil, type IconProps } from '@phosphor-icons/react'
+import { Compass, GitFork, NotePencil, Plus, type IconProps } from '@phosphor-icons/react'
 
 import { briefLines, buildActions, type Snapshot, type SettingsType } from './data'
 import { s } from './style'
@@ -189,7 +189,7 @@ export function Terminal({
       <div style={s(panelStyle(layout, sizing.size))}>
       <div
         style={s(
-          'height: 34px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid #17181d;',
+          'height: 36px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid #17181d;',
         )}
       >
         <span
@@ -208,16 +208,21 @@ export function Terminal({
             <div
               key={session.key}
               style={s(
-                'display: flex; align-items: center; border-radius: 5px; border: 1px solid ' +
-                  (active === session.key ? '#2a2660; background: #14132a;' : 'transparent; background: transparent;'),
+                'display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px 0 10px; border-radius: 6px; ' +
+                  (active === session.key ? 'background: #1c1d24;' : 'background: transparent;'),
               )}
             >
+              <span
+                style={s(
+                  `width: 5px; height: 5px; border-radius: 50%; flex: none; background: ${active === session.key ? '#7d76f0' : '#3f424a'};`,
+                )}
+              />
               <button
                 type="button"
                 onClick={() => setActive(session.key)}
                 style={s(
-                  'cursor: pointer; font-family: var(--font-body); font-size: 11px; letter-spacing: .04em; padding: 3px 8px; border: 0; background: transparent; color: ' +
-                    (active === session.key ? '#a49dfa;' : '#9096a0;'),
+                  'cursor: pointer; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .02em; padding: 0; border: 0; background: transparent; color: ' +
+                    (active === session.key ? '#f2f3f5;' : '#9096a0;'),
                 )}
               >
                 {session.label}
@@ -229,7 +234,7 @@ export function Terminal({
                   aria-label={t('terminal.close_session_aria', { label: session.label })}
                   onClick={() => closeShell(session.key)}
                   style={s(
-                    'cursor: pointer; border: 0; background: transparent; color: #62666e; font-size: 12px; line-height: 1; padding: 3px 6px 3px 0;',
+                    'cursor: pointer; border: 0; background: transparent; color: #62666e; font-size: 12px; line-height: 1; padding: 0;',
                   )}
                 >
                   ×
@@ -244,43 +249,32 @@ export function Terminal({
             aria-label={t('terminal.open_shell')}
             disabled={!available}
             style={s(
-              'cursor: pointer; font-family: var(--font-body); font-size: 13px; line-height: 1; padding: 3px 8px; border-radius: 5px; border: 1px solid transparent; background: transparent; color: #62666e;',
+              'cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; padding: 0; border-radius: 6px; border: 0; background: transparent;',
             )}
           >
-            +
+            <Plus size={13} weight="regular" aria-hidden="true" color="#55585f" />
           </button>
         </div>
 
         <div style={s('flex: 1;')} />
-        <span
-          style={s(
-            'font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #55585f;',
-          )}
-        >
-          {t('terminal.layouts')}
-        </span>
-        <div style={s('display: flex; gap: 2px;')}>
-          {LAYOUT_IDS.map((id) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => onLayout(id)}
-              style={s(
-                'cursor: pointer; font-family: var(--font-body); font-size: 10.5px; letter-spacing: .06em; padding: 3px 9px; border-radius: 5px; border: 1px solid ' +
-                  (layout === id
-                    ? '#24252c; background: #24252c; color: #f2f3f5;'
-                    : '#22232a; background: transparent; color: #9096a0;'),
-              )}
-            >
+        <span className="kicker">{t('terminal.layouts')}</span>
+        <div className="seg">
+          {LAYOUT_IDS.map(id => (
+            <label key={id} className="seg-opt">
+              <input
+                type="radio"
+                name="terminal-layout"
+                checked={layout === id}
+                onChange={() => onLayout(id)}
+              />
               {layoutLabel(id)}
-            </button>
+            </label>
           ))}
         </div>
         <button
           type="button"
           onClick={onToggle}
-          className="btn btn-ghost"
-          style={s('font-size: 11px; padding: 4px 9px;')}
+          style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #62666e;')}
         >
           {t('terminal.reduce')}
         </button>
@@ -382,7 +376,7 @@ export function Terminal({
                   type="button"
                   onClick={() => activate(action.label, action.text)}
                   style={s(
-                    'cursor: pointer; display: flex; align-items: center; gap: 8px; text-align: left; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+                    'cursor: pointer; display: flex; align-items: center; gap: 8px; height: 28px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
                   )}
                   title={action.text}
                 >
@@ -427,7 +421,7 @@ export function Terminal({
                     type="button"
                     onClick={() => activate(action.label, action.text)}
                     style={s(
-                      'cursor: pointer; text-align: left; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+                      'cursor: pointer; display: flex; align-items: center; height: 28px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
                     )}
                     title={action.text}
                   >
@@ -446,7 +440,7 @@ export function Terminal({
               type="button"
               onClick={onReload}
               style={s(
-                'cursor: pointer; width: 100%; text-align: left; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+                'cursor: pointer; display: flex; align-items: center; width: 100%; height: 28px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
               )}
             >
               {t('terminal.refresh_ovrsee')}

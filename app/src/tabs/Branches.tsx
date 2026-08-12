@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { GitBranch } from '@phosphor-icons/react'
 
 import { gitFetch, humanAge, type GitStatus } from '../data'
 import { t } from '../i18n'
@@ -62,31 +63,49 @@ export function Branches({
         </div>
       )}
 
-      <div className="table" style={s('font-size: 12px;')}>
-        <table style={s('width: 100%; border-collapse: collapse;')}>
-          <tbody>
-            {gitStatus.branches.map(branche => (
-              <tr key={branche.name}>
-                <td style={s('padding: 4px 10px 4px 0; font-family: var(--font-mono);')}>
-                  {branche.name === gitStatus.branch ? <strong>{branche.name}</strong> : branche.name}
-                </td>
-                <td style={s('padding: 4px 10px; color: var(--color-neutral-500);')}>
-                  {branche.upstream ?? t('branches.no_upstream')}
-                </td>
-                <td style={s('padding: 4px 0; color: var(--color-neutral-500); text-align: right;')}>
-                  {branche.ahead === 0 && branche.behind === 0
-                    ? t('branches.up_to_date')
-                    : [
-                        branche.ahead > 0 ? t('branches.ahead', { n: branche.ahead }) : null,
-                        branche.behind > 0 ? t('branches.behind', { n: branche.behind }) : null,
-                      ]
-                        .filter(Boolean)
-                        .join(' · ')}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div style={s('display: flex; flex-direction: column; gap: 6px;')}>
+        {gitStatus.branches.map(branche => {
+          const upToDate = branche.ahead === 0 && branche.behind === 0
+          return (
+            <div
+              key={branche.name}
+              style={s(
+                'display: flex; align-items: center; gap: 12px; height: 28px; padding: 0 12px; border-radius: 4px; border: 1px solid #1c1d22; background: #101114;',
+              )}
+            >
+              <GitBranch size={14} weight="regular" aria-hidden="true" color="#b6bac1" />
+              <span
+                style={s(
+                  `font-family: var(--font-mono); font-size: 12px; color: #d5d8dd; flex: none; font-weight: ${branche.name === gitStatus.branch ? '600' : '400'};`,
+                )}
+              >
+                {branche.name}
+              </span>
+              <span
+                style={s(
+                  'font-family: var(--font-mono); font-size: 11.5px; color: #62666e; flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
+                )}
+              >
+                {branche.upstream ?? t('branches.no_upstream')}
+              </span>
+              <div style={s('flex: 1;')} />
+              <span
+                style={s(
+                  `font-family: var(--font-mono); font-size: 11.5px; flex: none; color: ${upToDate ? '#4cc38a' : '#9096a0'};`,
+                )}
+              >
+                {upToDate
+                  ? t('branches.up_to_date')
+                  : [
+                      branche.ahead > 0 ? t('branches.ahead', { n: branche.ahead }) : null,
+                      branche.behind > 0 ? t('branches.behind', { n: branche.behind }) : null,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+              </span>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

@@ -47,6 +47,20 @@
         "app/src/Terminal.tsx",
         "app/src/data.ts"
       ]
+    },
+    {
+      "sha": "4134922",
+      "date": "2026-08-12",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/data.ts",
+        "app/src/render.test.tsx",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Sante.tsx",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/snapshot.js"
+      ]
     }
   ]
 }

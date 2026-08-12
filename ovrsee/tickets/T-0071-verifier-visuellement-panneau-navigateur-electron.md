@@ -10,7 +10,7 @@
   ],
   "cree": "2026-08-12",
   "maj": "2026-08-12",
-  "plan": "2026-08-12-audit-design-pixel-perfect-vs-ovrsee-app-dc-html.md",
+  "plan": null,
   "epic": "T-0070",
   "charge": "s"
 }

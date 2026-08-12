@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Audit design pixel-perfect vs `Ovrsee App.dc.html`",
   "opened": "2026-08-12",
-  "closed": null,
+  "closed": "2026-08-12",
   "commits": [
     {
       "sha": "56d5573",
@@ -17,6 +17,11 @@
         "app/src/tabs/Produit.tsx",
         "app/src/tabs/Stack.tsx"
       ]
+    },
+    {
+      "sha": "b7fc8a4",
+      "date": "2026-08-12",
+      "files": []
     }
   ]
 }

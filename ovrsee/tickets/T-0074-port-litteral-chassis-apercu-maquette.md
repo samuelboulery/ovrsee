@@ -2,7 +2,7 @@
 {
   "id": "T-0074",
   "titre": "Port littéral châssis + Aperçu depuis Ovrsee App.dc.html",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

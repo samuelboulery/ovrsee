@@ -4,7 +4,23 @@
   "title": "Refonte châssis + Aperçu — port littéral depuis `Ovrsee App.dc.html`",
   "opened": "2026-08-12",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "bc6a8ac",
+      "date": "2026-08-12",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Branches.tsx",
+        "app/src/tabs/Deploiements.tsx",
+        "app/src/tabs/Sante.tsx",
+        "app/src/theme.test.ts",
+        "app/src/theme.ts",
+        "hooks/couleurs.test.js"
+      ]
+    }
+  ]
 }
 ---
 

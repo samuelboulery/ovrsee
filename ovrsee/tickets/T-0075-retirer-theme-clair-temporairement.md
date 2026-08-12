@@ -2,7 +2,7 @@
 {
   "id": "T-0075",
   "titre": "Retirer le thème clair (pas de maquette claire pour l'instant)",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

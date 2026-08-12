@@ -9183,8 +9183,8 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Deploiements.tsx",
       "source_location": "L150",
       "weight": 1.0,
-      "_src": "deploiements_s",
-      "_tgt": "i18n_t",
+      "_src": "i18n_t",
+      "_tgt": "deploiements_s",
       "source": "i18n_t",
       "target": "deploiements_s"
     },

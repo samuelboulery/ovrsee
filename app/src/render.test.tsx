@@ -94,7 +94,7 @@ const RENDUS: Array<[string, (snap: Snapshot) => ReactElement]> = [
       <Apercu snapshot={snap} onOpenPreferences={() => {}} onReload={() => {}} onVoirTousLesPlans={() => {}} />
     ),
   ],
-  ['Produit', snap => <Produit snapshot={snap} layout="bottom" packageManager="pnpm" />],
+  ['Produit', snap => <Produit snapshot={snap} layout="bottom" packageManager="pnpm" onOuvrirDansNavigateur={() => {}} />],
   [
     'Historique',
     snap => (

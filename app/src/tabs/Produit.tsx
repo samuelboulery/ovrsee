@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Compass, GitDiff } from '@phosphor-icons/react'
+import { ArrowsOutSimple, Compass, GitDiff, Minus, Plus } from '@phosphor-icons/react'
 
 import {
   CARD_H,
@@ -35,10 +35,12 @@ export function Produit({
   snapshot,
   layout,
   packageManager,
+  onOuvrirDansNavigateur,
 }: {
   snapshot: Snapshot
   layout: Layout
   packageManager: string
+  onOuvrirDansNavigateur: (route: string) => void
 }) {
   const pages = snapshot.pages?.pages ?? []
   const redirects = snapshot.pages?.redirects ?? {}
@@ -146,7 +148,7 @@ export function Produit({
           style={s(
             // `user-select: none` : sans lui, glisser le canevas surligne les
             // titres des cartes au passage.
-            `flex: 1; position: relative; overflow: hidden; min-height: 0; touch-action: none; user-select: none; padding-right: ${side && panel ? rail.size : 0}px; ` +
+            `flex: 1; position: relative; overflow: hidden; min-height: 0; touch-action: none; user-select: none; padding-right: ${side && panel ? rail.size : 0}px; background: #08090a radial-gradient(#16171c 1px, transparent 1px) 0 0 / 22px 22px; ` +
               (canvas.panning ? 'cursor: grabbing;' : 'cursor: grab;'),
           )}
         >
@@ -163,6 +165,7 @@ export function Produit({
                 pages={pages}
                 snapshot={snapshot}
                 isEntry={item.depth === 0}
+                isSelected={item.page.route === selected}
                 onPick={() =>
                   setSelected(prev => {
                     if (prev === item.page.route && panel) {
@@ -198,6 +201,7 @@ export function Produit({
             side={side}
             width={rail.size}
             onClose={() => setPanel(false)}
+            onOuvrirDansNavigateur={() => onOuvrirDansNavigateur(current.route)}
           />
         </>
       ) : (
@@ -313,30 +317,33 @@ function Controls({
   onFit: () => void
 }) {
   const button =
-    'cursor: pointer; font-family: var(--font-body); font-size: 11px; padding: 4px 9px; border-radius: 5px; border: 1px solid var(--color-neutral-800); background: rgba(19,20,31,.86); color: rgba(233,233,237,.92);'
+    'cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 22px; border-radius: 5px; border: none; background: transparent; color: #b6bac1;'
 
   return (
     <div
       style={s(
-        'position: absolute; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 4px; z-index: 4;',
+        'position: absolute; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 3px; padding: 3px; border-radius: 8px; border: 1px solid #1e1f25; background: #0e0f12; z-index: 4;',
       )}
     >
       <button type="button" title={t('produit.zoom_out')} onClick={() => onZoom(1 / 1.2)} style={s(button)}>
-        −
+        <Minus size={13} aria-hidden="true" />
       </button>
       <button
         type="button"
         title={t('produit.zoom_100')}
         onClick={onReset}
-        style={s(button + ' min-width: 52px; font-variant-numeric: tabular-nums;')}
+        style={s(
+          'cursor: pointer; min-width: 40px; border: none; background: transparent; font-family: var(--font-mono); font-size: 11px; color: #b6bac1; font-variant-numeric: tabular-nums;',
+        )}
       >
         {Math.round(zoom * 100)} %
       </button>
       <button type="button" title={t('produit.zoom_in')} onClick={() => onZoom(1.2)} style={s(button)}>
-        +
+        <Plus size={13} aria-hidden="true" />
       </button>
+      <div style={s('width: 1px; height: 14px; background: #1e1f25;')} />
       <button type="button" title={t('produit.fit_window')} onClick={onFit} style={s(button)}>
-        ⤢
+        <ArrowsOutSimple size={13} aria-hidden="true" />
       </button>
     </div>
   )
@@ -393,10 +400,10 @@ function Edges({ placed, width, height }: { placed: Placed[]; width: number; hei
     >
       <defs>
         <marker id="na" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#8682cf" />
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#24252c" />
         </marker>
       </defs>
-      <g fill="none" stroke="#8682cf" strokeWidth="1.25" markerEnd="url(#na)">
+      <g fill="none" stroke="#24252c" strokeWidth="1.25" markerEnd="url(#na)">
         {forward.map((d, i) => (
           <path key={i} d={d} />
         ))}
@@ -411,12 +418,14 @@ function PageCard({
   pages,
   snapshot,
   isEntry,
+  isSelected,
   onPick,
 }: {
   item: Placed
   pages: Page[]
   snapshot: Snapshot
   isEntry: boolean
+  isSelected: boolean
   onPick: () => void
 }) {
   const hover = useHover()
@@ -426,14 +435,18 @@ function PageCard({
 
   // Hauteur fixe : les arêtes s'ancrent sur CARD_H, une carte qui grandit avec
   // son titre les décrocherait.
-  const base = `position: absolute; left: ${x}px; top: ${y}px; width: ${CARD_W}px; height: ${CARD_H}px; overflow: hidden; box-sizing: border-box; display: flex; flex-direction: column; padding: 11px 13px; border-radius: 10px; background: var(--color-surface); border: 1px solid var(--color-neutral-800); cursor: pointer;`
+  const base = `position: absolute; left: ${x}px; top: ${y}px; width: ${CARD_W}px; height: ${CARD_H}px; overflow: hidden; box-sizing: border-box; display: flex; flex-direction: column; padding: 11px 13px; border-radius: 10px; cursor: pointer;`
+  // Jamais de filet accent pour signifier un état (règle d'or §5.1) — le
+  // survol et la sélection restent dans la même gamme neutre que le reste
+  // de l'app, la sélection se distinguant par un halo, pas une couleur.
+  const etat = isSelected
+    ? 'background: #16171d; border: 1px solid #383a44; box-shadow: var(--ring-selected);'
+    : hover.on
+      ? 'background: var(--color-surface); border: 1px solid #383a44;'
+      : 'background: var(--color-surface); border: 1px solid var(--color-neutral-800);'
 
   return (
-    <div
-      {...hover.props}
-      onClick={onPick}
-      style={s(hover.on ? base + ' border-color: var(--color-accent-600);' : base)}
-    >
+    <div {...hover.props} onClick={onPick} style={s(base + etat)}>
       <div style={s('display: flex; align-items: center; gap: 7px;')}>
         {isEntry && (
           <span
@@ -451,7 +464,7 @@ function PageCard({
           {pageName(page, pages)}
         </span>
       </div>
-      <div style={s('font-family: var(--font-mono); font-size: 10.5px; color: var(--color-accent); margin-top: 3px;')}>
+      <div style={s('font-family: var(--font-mono); font-size: 10.5px; color: #55585f; margin-top: 3px;')}>
         {page.route}
       </div>
 
@@ -469,7 +482,7 @@ function PageCard({
       ) : (
         <div
           style={s(
-            `width: 100%; aspect-ratio: ${shotRatio(page)}; border-radius: 5px; border: 1px dashed var(--color-neutral-700); margin-top: 9px; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-accent);`,
+            `width: 100%; aspect-ratio: ${shotRatio(page)}; border-radius: 5px; border: 1px dashed var(--color-neutral-700); margin-top: 9px; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-600);`,
           )}
         >
           {t('produit.scan_failed')}
@@ -499,6 +512,7 @@ function DetailPanel({
   side,
   width,
   onClose,
+  onOuvrirDansNavigateur,
 }: {
   page: Page
   pages: Page[]
@@ -506,6 +520,7 @@ function DetailPanel({
   side: boolean
   width: number
   onClose: () => void
+  onOuvrirDansNavigateur: () => void
 }) {
   const shots = snapshot.shots[page.slug] ?? []
   const plans = plansForPage(snapshot.plans, page)
@@ -541,6 +556,15 @@ function DetailPanel({
       <div style={s('font-size: 12px; color: var(--color-neutral-400); margin-top: 9px; line-height: 1.5; text-wrap: pretty;')}>
         {page.excerpt?.trim() || t('produit.no_excerpt')}
       </div>
+
+      <button
+        type="button"
+        className="btn btn-secondary"
+        style={s('font-size: 11px; margin-top: 10px; width: 100%; justify-content: center;')}
+        onClick={onOuvrirDansNavigateur}
+      >
+        {t('produit.open_in_navigateur')}
+      </button>
 
       {shots[0] ? (
         <img

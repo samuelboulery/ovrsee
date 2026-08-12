@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { X } from '@phosphor-icons/react'
+import { Cursor, X } from '@phosphor-icons/react'
 
 import { ticketAction, type Snapshot } from '../data'
 import { t } from '../i18n'
@@ -240,7 +240,18 @@ const corpsDepuis = (picked: Picked): string =>
  * ici, c'est la boucle courte : cliquer l'élément qui cloche et que Claude en
  * reçoive le sélecteur, le texte et le HTML sans un copier-coller.
  */
-export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible: boolean }) {
+export function Navigateur({
+  snapshot,
+  visible,
+  focusRoute,
+  onFocusHandled,
+}: {
+  snapshot: Snapshot
+  visible: boolean
+  /** Route à charger depuis « Ouvrir dans le Navigateur » (Produit) — voir `App.tsx`. */
+  focusRoute?: string | null
+  onFocusHandled?: () => void
+}) {
   const view = useRef<Webview | null>(null)
   const [url, setUrl] = useState(() => startUrl(snapshot))
   // `src` n'est posé qu'une fois, puis toute navigation passe par `loadURL` :
@@ -314,6 +325,15 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
     },
     [snapshot.root, load],
   )
+
+  // « Ouvrir dans le Navigateur » (Produit) : la route est relative à
+  // l'origine actuellement chargée, pas forcément à `baseUrl` — l'utilisateur
+  // a pu naviguer ailleurs entre-temps.
+  useEffect(() => {
+    if (!focusRoute) return
+    go(new URL(focusRoute, url || snapshot.config?.baseUrl || 'http://localhost:3000').href)
+    onFocusHandled?.()
+  }, [focusRoute])
 
   // Changer de projet change ce qu'on regarde. L'onglet, lui, reste monté :
   // le démonter rechargerait l'application inspectée à chaque va-et-vient.
@@ -602,7 +622,7 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
             onChange={event => setUrl(event.target.value)}
             spellCheck={false}
             style={s(
-              'flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 11.5px; padding: 5px 9px; border-radius: 6px; border: 1px solid var(--color-neutral-800); background: var(--color-surface); color: var(--color-text);',
+              'flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 11.5px; padding: 5px 9px; border-radius: 6px; border: 1px solid var(--color-border-card); background: var(--color-surface-control); color: var(--color-text);',
             )}
           />
         </form>
@@ -610,10 +630,15 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
         <button
           type="button"
           onClick={select}
-          className={picking ? 'btn btn-primary' : 'btn btn-secondary'}
-          style={s('font-size: 11.5px; padding: 5px 10px;')}
+          style={s(
+            'display: flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; cursor: pointer; ' +
+              (picking
+                ? 'background: #24252c; border: 1px solid #383a44; color: #f2f3f5;'
+                : 'background: transparent; border: 1px solid var(--color-border-control); color: var(--color-neutral-500);'),
+          )}
           title={picking ? t('navigateur.pick_element') : t('navigateur.pick_element_inactive')}
         >
+          <Cursor size={13} weight={picking ? 'fill' : 'regular'} color={picking ? 'var(--color-accent)' : undefined} aria-hidden="true" />
           {picking ? t('navigateur.cancel_selection') : t('navigateur.select_element')}
         </button>
         <button
@@ -667,8 +692,23 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
         )}
       >
       <div
-        style={s('flex: 1; position: relative; min-height: 0; min-width: 0; background: #ffffff;')}
+        style={s(
+          `flex: 1; position: relative; min-height: 0; min-width: 0; background: ${
+            url
+              ? '#ffffff'
+              : 'repeating-linear-gradient(135deg, #101116 0 10px, #0b0c10 10px 20px)'
+          };`,
+        )}
       >
+        {!url && (
+          <div
+            style={s(
+              'position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: #4e5158;',
+            )}
+          >
+            {t('navigateur.no_url')}
+          </div>
+        )}
         <webview
           ref={element => {
             view.current = element as Webview | null
@@ -754,13 +794,14 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
                 <div
                   key={i}
                   style={s(
-                    'padding: 2px 0; line-height: 1.5; color: ' +
-                      (log.level === 'error' ? 'var(--color-accent);' : 'var(--color-neutral-500);'),
+                    'padding: 2px 0; line-height: 1.9; color: ' +
+                      (log.level === 'error' ? 'var(--color-err);' : 'var(--color-warn);'),
                   )}
                 >
-                  {log.message}
+                  <span aria-hidden="true">{log.level === 'error' ? '✕' : '▲'}</span>{' '}
+                  <span style={s('color: var(--color-neutral-500);')}>{log.message}</span>
                   {log.source && (
-                    <span style={s('color: var(--color-neutral-700);')}> ({log.source})</span>
+                    <span style={s('color: #4e5158;')}> · {log.source}</span>
                   )}
                 </div>
               ))}
@@ -830,7 +871,7 @@ function ElementPanel({
   return (
     <div
       style={s(
-        'width: 340px; flex: none; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); display: flex; flex-direction: column; overflow-y: auto;',
+        'width: 340px; flex: none; border-left: 1px solid var(--color-divider); background: var(--color-surface); display: flex; flex-direction: column; overflow-y: auto;',
       )}
     >
       <div style={s('height: 38px; flex: none; display: flex; align-items: center; padding: 0 12px; border-bottom: 1px solid var(--color-divider);')}>
@@ -853,7 +894,7 @@ function ElementPanel({
             <PanelField label={t('navigateur.selector_label')}>
               <div
                 style={s(
-                  'font-family: var(--font-mono); font-size: 11px; color: var(--color-accent); background: var(--color-surface-control); border: 1px solid var(--color-divider); border-radius: var(--radius-md); padding: 9px 10px; line-height: 1.6; word-break: break-all;',
+                  'font-family: var(--font-mono); font-size: 11px; color: var(--color-plan); background: var(--color-surface-control); border: 1px solid var(--color-divider); border-radius: var(--radius-md); padding: 9px 10px; line-height: 1.6; word-break: break-all;',
                 )}
               >
                 {picked.selector}

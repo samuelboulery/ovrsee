@@ -74,10 +74,19 @@ const projectFromUrl = () => new URLSearchParams(window.location.search).get('p'
 /** Ticket à ouvrir au montage de l'onglet Tableau — voir `onOuvrirTicket`. */
 const ticketFromUrl = () => new URLSearchParams(window.location.search).get('ticket')
 
-function pushUrl(path: string, project: string | null, ticket: string | null = null) {
+/** Route à charger au montage de l'onglet Navigateur — voir `onOuvrirDansNavigateur`. */
+const routeFromUrl = () => new URLSearchParams(window.location.search).get('route')
+
+function pushUrl(
+  path: string,
+  project: string | null,
+  ticket: string | null = null,
+  route: string | null = null,
+) {
   const params = new URLSearchParams()
   if (project) params.set('p', project)
   if (ticket) params.set('ticket', ticket)
+  if (route) params.set('route', route)
   const query = params.toString()
   window.history.pushState(null, '', path + (query ? `?${query}` : ''))
 }
@@ -146,6 +155,12 @@ export function App() {
   useEffect(() => {
     if (tab === 'tableau' && focusTicket) setFocusTicket(null)
   }, [tab])
+
+  // Route à charger dans Navigateur depuis « Ouvrir dans le Navigateur »
+  // (Produit) — contrairement à `focusTicket`, `Navigateur` reste monté en
+  // permanence (`visible` bascule juste l'affichage) : un effet dans
+  // `Navigateur` réagit donc à chaque changement, pas seulement au montage.
+  const [focusRoute, setFocusRoute] = useState<string | null>(() => routeFromUrl())
   const [layout, setLayout] = useState<Layout>('bottom')
   const [terminal, setTerminal] = useState(true)
   const [terminalHeight, setTerminalHeight] = useState(244)
@@ -442,6 +457,14 @@ export function App() {
     pushUrl('/tableau', current, file)
   }
 
+  /** Ouvrir une route dans Navigateur — depuis le panneau de détail de Produit. */
+  const onOuvrirDansNavigateur = (route: string) => {
+    setTab('navigateur')
+    setLayout(l => (l === 'full' ? 'bottom' : l))
+    setFocusRoute(route)
+    pushUrl('/navigateur', current, null, route)
+  }
+
   const plans = snapshot?.plans ?? []
   const scan = lastScan(snapshot?.scans ?? [])
   const contentVisible = !(layout === 'full' && terminal)
@@ -611,11 +634,21 @@ export function App() {
                             : 'display: none;',
                         )}
                       >
-                        <Navigateur snapshot={snapshot} visible={tab === 'navigateur'} />
+                        <Navigateur
+                          snapshot={snapshot}
+                          visible={tab === 'navigateur'}
+                          focusRoute={focusRoute}
+                          onFocusHandled={() => setFocusRoute(null)}
+                        />
                       </div>
 
                       {tab === 'produit' && (
-                        <Produit snapshot={snapshot} layout={layout} packageManager={settings?.packageManager ?? 'pnpm'} />
+                        <Produit
+                          snapshot={snapshot}
+                          layout={layout}
+                          packageManager={settings?.packageManager ?? 'pnpm'}
+                          onOuvrirDansNavigateur={onOuvrirDansNavigateur}
+                        />
                       )}
                       {tab === 'historique' && (
                         <Historique

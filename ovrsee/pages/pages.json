@@ -1,13 +1,13 @@
 {
-  "date": "2026-08-11",
-  "commit": "87d26f9",
+  "date": "2026-08-12",
+  "commit": "a36966b",
   "pages": [
     {
       "route": "/",
       "slug": "accueil",
       "title": "Ovrsee",
       "sample": "/",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawler le projet\n◆ Graphe c",
+      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nPréférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawle",
       "links": [
         "/navigateur",
         "/produit",
@@ -16,8 +16,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/accueil/2026-08-11-87d26f9.png",
-      "shotDate": "2026-08-11",
+      "shot": "shots/accueil/2026-08-12-a36966b.png",
+      "shotDate": "2026-08-12",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -28,7 +28,7 @@
       "slug": "navigateur",
       "title": "Ovrsee",
       "sample": "/navigateur",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawler le projet\n◆ Graphe c",
+      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nPréférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawle",
       "links": [
         "/",
         "/produit",
@@ -37,8 +37,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/navigateur/2026-08-11-87d26f9.png",
-      "shotDate": "2026-08-11",
+      "shot": "shots/navigateur/2026-08-12-a36966b.png",
+      "shotDate": "2026-08-12",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -49,7 +49,7 @@
       "slug": "produit",
       "title": "Ovrsee",
       "sample": "/produit",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawler le projet\n◆ Graphe c",
+      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nPréférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawle",
       "links": [
         "/",
         "/navigateur",
@@ -58,8 +58,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/produit/2026-08-11-87d26f9.png",
-      "shotDate": "2026-08-11",
+      "shot": "shots/produit/2026-08-12-a36966b.png",
+      "shotDate": "2026-08-12",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -70,7 +70,7 @@
       "slug": "historique",
       "title": "Ovrsee",
       "sample": "/historique",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawler le projet\n◆ Graphe c",
+      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nPréférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawle",
       "links": [
         "/",
         "/navigateur",
@@ -79,8 +79,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/historique/2026-08-11-87d26f9.png",
-      "shotDate": "2026-08-11",
+      "shot": "shots/historique/2026-08-12-a36966b.png",
+      "shotDate": "2026-08-12",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -91,7 +91,7 @@
       "slug": "tableau",
       "title": "Ovrsee",
       "sample": "/tableau",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawler le projet\n◆ Graphe c",
+      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nPréférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawle",
       "links": [
         "/",
         "/navigateur",
@@ -100,8 +100,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/tableau/2026-08-11-87d26f9.png",
-      "shotDate": "2026-08-11",
+      "shot": "shots/tableau/2026-08-12-a36966b.png",
+      "shotDate": "2026-08-12",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -112,7 +112,7 @@
       "slug": "donnees",
       "title": "Ovrsee",
       "sample": "/donnees",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawler le projet\n◆ Graphe c",
+      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nPréférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawle",
       "links": [
         "/",
         "/navigateur",
@@ -121,8 +121,8 @@
         "/tableau",
         "/stack"
       ],
-      "shot": "shots/donnees/2026-08-11-87d26f9.png",
-      "shotDate": "2026-08-11",
+      "shot": "shots/donnees/2026-08-12-a36966b.png",
+      "shotDate": "2026-08-12",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -133,7 +133,7 @@
       "slug": "stack",
       "title": "Ovrsee",
       "sample": "/stack",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\n⚙ Préférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawler le projet\n◆ Graphe c",
+      "excerpt": "⇤\nOvrsee — …\nno scan recorded\nSearch, jump to…\n⌘K\nPROJECTS\nVIEWS\nOverview\nNavigator\nProduct\nHistory\nBoard\nData\nStack\nPreferences\nACTIVITY DENSITY\n13 weeks\ntoday\nOvrsee\n\nOvrsee is a read-only view of a vibe-coded project.\n\nIt captures approved plans, crawled pages, dated commit history, and project tickets, versioned inovrsee/as you go.\n\nOvrsee cannot execute code — it only reads and writes the ovr",
       "links": [
         "/",
         "/navigateur",
@@ -142,8 +142,8 @@
         "/tableau",
         "/donnees"
       ],
-      "shot": "shots/stack/2026-08-11-87d26f9.png",
-      "shotDate": "2026-08-11",
+      "shot": "shots/stack/2026-08-12-a36966b.png",
+      "shotDate": "2026-08-12",
       "shotSize": {
         "width": 1280,
         "height": 800

@@ -22,6 +22,8 @@ import { Illisibles } from '../Illisibles'
 import { t } from '../i18n'
 import { Markdown } from '../markdown'
 import { s } from '../style'
+import { StatusBar } from '../StatusBar'
+import { ViewBar } from '../ViewBar'
 
 /**
  * Deux glisser-déposer partagent la même surface : les cartes et les colonnes.
@@ -97,6 +99,7 @@ type TicketPatch = Partial<Omit<Ticket, 'charge' | 'type' | 'epic'>> & {
 }
 
 export function Tableau({
+  projet,
   root,
   board,
   tickets,
@@ -105,6 +108,8 @@ export function Tableau({
   onChange,
   focusTicket = null,
 }: {
+  /** Nom affiché du projet, pour le fil d'Ariane de la barre de vue. */
+  projet: string
   root: string
   board: Colonne[]
   tickets: Ticket[]
@@ -247,25 +252,20 @@ export function Tableau({
 
   return (
     <div style={s('flex: 1; display: flex; flex-direction: column; overflow: hidden;')}>
-      <div style={s('padding: 20px 22px 12px;')}>
-        <div style={s('display: flex; align-items: baseline; gap: 10px;')}>
-          <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
-            {t('tableau.title')}
-          </h2>
-          <div style={s('flex: 1;')} />
-          <button
-            type="button"
-            className={edition ? 'btn btn-primary' : 'btn btn-ghost'}
-            style={s('font-size: 11.5px; padding: 5px 11px;')}
-            onClick={() => {
-              setOuverte(null)
-              setEdition(!edition)
-            }}
-          >
-            {edition ? t('tableau.finish_editing') : t('tableau.edit_columns')}
-          </button>
-        </div>
-
+      <ViewBar projet={projet} vue={t('tableau.title')} meta={`${tickets.length} tickets · ovrsee/tickets/`}>
+        <button
+          type="button"
+          className={edition ? 'btn btn-primary' : 'btn btn-ghost'}
+          style={s('font-size: 11.5px; padding: 5px 11px;')}
+          onClick={() => {
+            setOuverte(null)
+            setEdition(!edition)
+          }}
+        >
+          {edition ? t('tableau.finish_editing') : t('tableau.edit_columns')}
+        </button>
+      </ViewBar>
+      <div style={s('padding: 12px 22px 12px;')}>
         {filtreEpic && (
           <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: color-mix(in srgb, var(--color-accent) 15%, transparent); border-left: 3px solid var(--color-accent); display: flex; align-items: center; gap: 10px;')}>
             <div style={s('font-size: 12px; color: var(--color-text);')}>
@@ -359,6 +359,8 @@ export function Tableau({
           />
         )}
       </div>
+
+      <StatusBar />
     </div>
   )
 }

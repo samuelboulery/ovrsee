@@ -4,6 +4,7 @@ import { X } from '@phosphor-icons/react'
 import { ticketAction, type Snapshot } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
+import { StatusBar } from '../StatusBar'
 import { pasteToClaude } from '../useTerminal'
 import { Divider, useResizable } from '../useResizable'
 
@@ -251,6 +252,8 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
   const pending = useRef<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [failure, setFailure] = useState<string | null>(null)
+  const [loadMs, setLoadMs] = useState<number | null>(null)
+  const loadStarted = useRef<number | null>(null)
   const [logs, setLogs] = useState<Log[]>([])
   const [logsOpen, setLogsOpen] = useState(false)
   const [picking, setPicking] = useState(false)
@@ -321,12 +324,36 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
     // `ovrsee/`, et rechargerait la page inspectée pour rien.
   }, [snapshot.root])
 
+  // ⇧⌘E bascule le sélecteur — annoncé par la barre d'état (maquette 2c).
+  // Bindé seulement onglet visible : sinon un raccourci global s'active en
+  // arrière-plan pendant qu'on tape ailleurs dans l'application.
+  useEffect(() => {
+    if (!visible) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey && event.shiftKey && event.key.toLowerCase() === 'e') {
+        event.preventDefault()
+        setPicking(p => !p)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [visible])
+
   useEffect(() => {
     const element = view.current
     if (!element) return
 
-    const start = () => setLoading(true)
-    const stop = () => setLoading(false)
+    const start = () => {
+      loadStarted.current = Date.now()
+      setLoading(true)
+    }
+    const stop = () => {
+      setLoading(false)
+      if (loadStarted.current !== null) {
+        setLoadMs(Date.now() - loadStarted.current)
+        loadStarted.current = null
+      }
+    }
 
     /** L'invité accepte `loadURL` à partir d'ici, pas avant. */
     const attached = () => {
@@ -355,6 +382,8 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
       if (detail.errorCode === -3) return
       setFailure(detail.errorDescription || t('navigateur.loading_failed'))
       setLoading(false)
+      setLoadMs(null)
+      loadStarted.current = null
     }
 
     const logged = (event: Event) => {
@@ -526,6 +555,13 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
       return new URL(url).pathname
     } catch {
       return null
+    }
+  })()
+  const host = (() => {
+    try {
+      return new URL(url).host
+    } catch {
+      return url
     }
   })()
 
@@ -754,6 +790,15 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
         onClose={() => setPicked(null)}
       />
       </div>
+
+      <StatusBar
+        dot={failure ? 'err' : 'ok'}
+        left={[
+          failure ? `${host} — ${failure}` : t('statusbar.responds', { host }),
+          ...(!failure && loadMs !== null ? [t('statusbar.loaded_in', { ms: loadMs })] : []),
+        ]}
+        right={[t('statusbar.selector_shortcut')]}
+      />
     </div>
   )
 }

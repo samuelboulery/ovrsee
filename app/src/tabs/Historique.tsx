@@ -1,9 +1,11 @@
 import { useState, type ReactNode } from 'react'
 
 import {
+  commitsDeLaFrise,
   frDate,
   humanAge,
   planFiles,
+  plansOuverts,
   planRejected,
   planWhy,
   type GitCommit,
@@ -18,6 +20,8 @@ import { ActivityPanel } from '../ActivityPanel'
 import { Illisibles } from '../Illisibles'
 import { t } from '../i18n'
 import { s } from '../style'
+import { StatusBar } from '../StatusBar'
+import { ViewBar } from '../ViewBar'
 import { COULEUR_PRIORITE } from './Tableau'
 
 /** `2026-08-08T12:00:00+02:00` → `2026-08-08`. Les plans, eux, datent déjà du jour. */
@@ -42,6 +46,7 @@ type Vue = 'tickets' | 'commits'
  * ici ? », donc c'est elle qui ouvre par défaut.
  */
 export function Historique({
+  projet,
   plans,
   timeline,
   ticketTimeline,
@@ -49,6 +54,8 @@ export function Historique({
   illisibles = [],
   onOuvrirTicket,
 }: {
+  /** Nom affiché du projet, pour le fil d'Ariane de la barre de vue. */
+  projet: string
   plans: Plan[]
   timeline: TimelineEntry[]
   ticketTimeline: TicketTimelineEntry[]
@@ -59,37 +66,47 @@ export function Historique({
   const [vue, setVue] = useState<Vue>('tickets')
   const byFile = new Map(plans.map(plan => [plan.file, plan]))
   const isEmpty = vue === 'tickets' ? ticketTimeline.length === 0 : timeline.length === 0
+  const commits = commitsDeLaFrise(timeline)
+  const dernierCommit = commits.reduce<string | null>(
+    (recent, c) => (recent === null || c.date > recent ? c.date : recent),
+    null,
+  )
 
   return (
-    <div style={s('flex: 1; display: flex; min-width: 0; min-height: 0;')}>
-      <div style={s('flex: 1; min-width: 0; padding: 20px 22px; overflow: auto;')}>
-        <div style={s('display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px;')}>
-          <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
-            {t('historique.title')}
-          </h2>
-          <div style={s('flex: 1;')} />
-          <ViewSwitch vue={vue} onChange={setVue} />
-        </div>
-        <div style={s('font-size: 12px; color: var(--color-neutral-600); margin-bottom: 20px;')}>
-          {t('historique.subtitle')}
-        </div>
+    <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
+      <ViewBar
+        projet={projet}
+        vue={t('historique.title')}
+        meta={`${plans.length} plans · ${commits.length} commits`}
+      >
+        <ViewSwitch vue={vue} onChange={setVue} />
+      </ViewBar>
+      <div style={s('flex: 1; display: flex; min-width: 0; min-height: 0;')}>
+        <div style={s('flex: 1; min-width: 0; padding: 20px 22px; overflow: auto;')}>
+          <Illisibles entries={illisibles} quoi="plan" />
 
-        <Illisibles entries={illisibles} quoi="plan" />
-
-        {isEmpty ? (
-          <div style={s('padding: 40px 0; display: flex; align-items: center; justify-content: center;')}>
-            <div style={s('font-size: 12px; color: var(--color-neutral-600); text-align: center; max-width: 46ch; line-height: 1.6;')}>
-              {t('apercu.project_timeline_empty')}
+          {isEmpty ? (
+            <div style={s('padding: 40px 0; display: flex; align-items: center; justify-content: center;')}>
+              <div style={s('font-size: 12px; color: var(--color-neutral-600); text-align: center; max-width: 46ch; line-height: 1.6;')}>
+                {t('apercu.project_timeline_empty')}
+              </div>
             </div>
-          </div>
-        ) : vue === 'tickets' ? (
-          <TicketFrise entries={ticketTimeline} byFile={byFile} onOuvrirTicket={onOuvrirTicket} />
-        ) : (
-          <CommitFrise entries={timeline} byFile={byFile} />
-        )}
+          ) : vue === 'tickets' ? (
+            <TicketFrise entries={ticketTimeline} byFile={byFile} onOuvrirTicket={onOuvrirTicket} />
+          ) : (
+            <CommitFrise entries={timeline} byFile={byFile} />
+          )}
+        </div>
+
+        <ActivityPanel timeline={timeline} ticketTimeline={ticketTimeline} scans={scans} />
       </div>
 
-      <ActivityPanel timeline={timeline} ticketTimeline={ticketTimeline} scans={scans} />
+      <StatusBar
+        left={[
+          t('statusbar.plans_summary', { total: plans.length, open: plansOuverts(plans).length }),
+          ...(dernierCommit ? [t('statusbar.last_commit', { age: humanAge(dernierCommit) })] : []),
+        ]}
+      />
     </div>
   )
 }

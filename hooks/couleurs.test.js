@@ -53,6 +53,8 @@ const FICHIERS_PORTES = new Set([
   'Donnees.tsx',
   'ActivityPanel.tsx',
   'Tableau.tsx',
+  'ViewBar.tsx',
+  'StatusBar.tsx',
 ])
 
 const racine = join(dirname(fileURLToPath(import.meta.url)), '..')

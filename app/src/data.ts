@@ -939,6 +939,14 @@ export const colonneFinale = (board: Colonne[]): string | null =>
   liste(board).length > 1 ? (liste(board).at(-1)?.id ?? null) : null
 
 /**
+ * Nom affiché du projet — `package.json` s'il en déclare un, sinon le nom du
+ * dossier. Même dérivation que celle d'`Apercu.tsx`, extraite ici pour que la
+ * barre de vue (`ViewBar`) l'utilise sans dupliquer la logique.
+ */
+export const projectDisplayName = (snapshot: Pick<Snapshot, 'root' | 'packageJson'>): string =>
+  snapshot.packageJson?.name ?? snapshot.root.split('/').filter(Boolean).at(-1) ?? snapshot.root
+
+/**
  * Ce qui reste à faire.
  *
  * Compte les tickets à faire, avec une logique spéciale pour les epics :

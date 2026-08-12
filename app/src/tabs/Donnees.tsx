@@ -4,6 +4,8 @@ import { Database } from '@phosphor-icons/react'
 import { frDate, tablesFrom, type GraphifyGraph, type Integration, type SchemaTable, type Snapshot } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
+import { StatusBar } from '../StatusBar'
+import { ViewBar } from '../ViewBar'
 import type { IntegrationsBridge } from '../useTerminal'
 
 /**
@@ -191,6 +193,7 @@ function confStyle(conf: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS' | 'LIVE'): strin
 }
 
 export function Donnees({
+  projet,
   graph,
   source,
   sourceRequested,
@@ -201,6 +204,8 @@ export function Donnees({
   root,
   integrations = [],
 }: {
+  /** Nom affiché du projet, pour le fil d'Ariane de la barre de vue. */
+  projet: string
   graph: GraphifyGraph | null
   source: Source
   sourceRequested?: string
@@ -261,11 +266,8 @@ export function Donnees({
   }
 
   return (
-    <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
-      <div style={s('display: flex; align-items: baseline; gap: 10px;')}>
-        <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
-          {t('donnees.title')}
-        </h2>
+    <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
+      <ViewBar projet={projet} vue={t('donnees.title')}>
         {provenance && (
           <span
             className="tag"
@@ -279,7 +281,7 @@ export function Donnees({
           <button
             type="button"
             className="btn btn-secondary"
-            style={s('font-size: 11.5px; padding: 3px 9px; margin-left: auto;')}
+            style={s('font-size: 11.5px; padding: 3px 9px;')}
             disabled={!ovrsee || liveBusy}
             title={ovrsee ? undefined : t('deploiements.electron_only')}
             onClick={verifierSchema}
@@ -287,80 +289,83 @@ export function Donnees({
             {liveBusy ? t('donnees.live_checking') : t('donnees.live_check')}
           </button>
         )}
+      </ViewBar>
+      <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
+        {sourceMissing && <SourceAlert sourceRequested={sourceRequested} config={config} />}
+
+        {liveErreur && (
+          <div
+            style={s(
+              'margin-bottom: 16px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
+            )}
+          >
+            {liveErreur}
+          </div>
+        )}
+
+        {tables.length === 0 ? (
+          <div>
+            <EtatVide titre={rien.titre} detail={rien.detail} source={source} />
+            {coffreIgnore && <CoffreIgnore />}
+          </div>
+        ) : (
+          <div>
+            <div style={s('font-size: 12px; color: var(--color-neutral-600); margin-bottom: 18px;')}>
+              {provenance?.intro}
+            </div>
+            {coffreIgnore && <CoffreIgnore />}
+            <table className="table" style={s('width: 100%; font-size: 12.5px;')}>
+              <thead>
+                <tr>
+                  <th>Table</th>
+                  <th>{t('donnees.col_header')}</th>
+                  <th>{t('donnees.used_header')}</th>
+                  <th>{source === 'obsidian' ? t('donnees.declared_header') : t('donnees.confidence_header')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tables.map((table) => (
+                  <tr key={table.name}>
+                    <td style={s('font-family: var(--font-mono);')}>{table.name}</td>
+                    <td style={s('color: var(--color-neutral-500);')}>{table.cols}</td>
+                    <td style={s('color: var(--color-neutral-400);')}>{table.used}</td>
+                    <td>
+                      {/* Une table confirmée en direct l'emporte sur la confiance
+                          déduite du code : la base elle-même est la vérité. */}
+                      {liveTables?.includes(table.name) ? (
+                        <span style={s(confStyle('LIVE'))}>{t('donnees.live_badge')}</span>
+                      ) : /* `declared` posé — même à null — signe une ligne du coffre.
+                          Elle n'a pas de confiance à afficher : elle a une date, ou
+                          l'aveu qu'elle n'en a pas. */
+                      table.declared === undefined ? (
+                        <span style={s(confStyle(table.conf))}>{table.conf}</span>
+                      ) : table.declared ? (
+                        <span style={s('color: var(--color-neutral-400);')}>{frDate(table.declared)}</span>
+                      ) : (
+                        <span style={s(NON_DATE)}>{t('donnees.no_date')}</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {liveOnly.length > 0 && (
+              <div
+                style={s(
+                  'margin-top: 16px; font-size: 11.5px; color: var(--color-neutral-500); padding-left: 10px; border-left: 1px solid var(--color-neutral-700);',
+                )}
+              >
+                {t('donnees.live_only', { tables: liveOnly.join(', ') })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {liveSchema && liveSchema.length > 0 && <LiveSchema tables={liveSchema} />}
       </div>
 
-      {sourceMissing && <SourceAlert sourceRequested={sourceRequested} config={config} />}
-
-      {liveErreur && (
-        <div
-          style={s(
-            'margin-bottom: 16px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
-          )}
-        >
-          {liveErreur}
-        </div>
-      )}
-
-      {tables.length === 0 ? (
-        <div>
-          <EtatVide titre={rien.titre} detail={rien.detail} source={source} />
-          {coffreIgnore && <CoffreIgnore />}
-        </div>
-      ) : (
-        <div>
-          <div style={s('font-size: 12px; color: var(--color-neutral-600); margin-bottom: 18px;')}>
-            {provenance?.intro}
-          </div>
-          {coffreIgnore && <CoffreIgnore />}
-          <table className="table" style={s('width: 100%; font-size: 12.5px;')}>
-            <thead>
-              <tr>
-                <th>Table</th>
-                <th>{t('donnees.col_header')}</th>
-                <th>{t('donnees.used_header')}</th>
-                <th>{source === 'obsidian' ? t('donnees.declared_header') : t('donnees.confidence_header')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tables.map((table) => (
-                <tr key={table.name}>
-                  <td style={s('font-family: var(--font-mono);')}>{table.name}</td>
-                  <td style={s('color: var(--color-neutral-500);')}>{table.cols}</td>
-                  <td style={s('color: var(--color-neutral-400);')}>{table.used}</td>
-                  <td>
-                    {/* Une table confirmée en direct l'emporte sur la confiance
-                        déduite du code : la base elle-même est la vérité. */}
-                    {liveTables?.includes(table.name) ? (
-                      <span style={s(confStyle('LIVE'))}>{t('donnees.live_badge')}</span>
-                    ) : /* `declared` posé — même à null — signe une ligne du coffre.
-                        Elle n'a pas de confiance à afficher : elle a une date, ou
-                        l'aveu qu'elle n'en a pas. */
-                    table.declared === undefined ? (
-                      <span style={s(confStyle(table.conf))}>{table.conf}</span>
-                    ) : table.declared ? (
-                      <span style={s('color: var(--color-neutral-400);')}>{frDate(table.declared)}</span>
-                    ) : (
-                      <span style={s(NON_DATE)}>{t('donnees.no_date')}</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {liveOnly.length > 0 && (
-            <div
-              style={s(
-                'margin-top: 16px; font-size: 11.5px; color: var(--color-neutral-500); padding-left: 10px; border-left: 1px solid var(--color-neutral-700);',
-              )}
-            >
-              {t('donnees.live_only', { tables: liveOnly.join(', ') })}
-            </div>
-          )}
-        </div>
-      )}
-
-      {liveSchema && liveSchema.length > 0 && <LiveSchema tables={liveSchema} />}
+      <StatusBar />
     </div>
   )
 }

@@ -21,6 +21,8 @@ import { Markdown, headings } from '../markdown'
 import { Sante } from './Sante'
 import { t } from '../i18n'
 import { s } from '../style'
+import { StatusBar } from '../StatusBar'
+import { ViewBar } from '../ViewBar'
 import type { Editeur } from '../useTerminal'
 
 /** Crochets appelés par le gestionnaire de paquets, jamais tapés à la main. */
@@ -108,6 +110,7 @@ export function Apercu({
   const deps = stackFrom(packageJson, snapshot.whys).length
   const scan = lastScan(snapshot.scans)
   const tickets = restant(snapshot.tickets, snapshot.board)
+  const planActif = plans.find(p => p.file === snapshot.activePlan) ?? null
   const plan = readme ? headings(readme) : []
 
   // Le panneau droit (Déploiements + README, maquette 2b) défile pour son
@@ -121,6 +124,7 @@ export function Apercu({
   useEffect(() => {
     setGitStatus(snapshot.gitStatus ?? EMPTY_GIT_STATUS)
   }, [root, snapshot.gitStatus])
+  const gitDirtyTotal = gitStatus.dirty.staged + gitStatus.dirty.unstaged + gitStatus.dirty.untracked
 
   // Le README est replié par défaut : c'est la réponse à « c'est quoi, ce
   // projet ? », pas quelque chose qu'on relit à chaque ouverture de l'onglet.
@@ -161,6 +165,7 @@ export function Apercu({
 
   return (
     <div style={s('flex: 1; display: flex; flex-direction: column; overflow: hidden;')}>
+      <ViewBar projet={nom} vue={t('tabs.apercu')} />
       <div style={s('flex: none; padding: 22px 24px 18px; border-bottom: 1px solid #17181d;')}>
         <Illisibles entries={snapshot.illisibles ?? []} />
 
@@ -278,6 +283,16 @@ export function Apercu({
           </div>
         </div>
       </div>
+
+      <StatusBar
+        dot={!gitStatus.branch ? undefined : gitDirtyTotal === 0 ? 'ok' : 'warn'}
+        left={[
+          gitStatus.branch ?? t('sante.no_branch'),
+          ...(scan?.commit ? [scan.commit.slice(0, 7)] : []),
+          gitDirtyTotal === 0 ? t('sante.tree_clean') : t('sante.tree_dirty', { n: gitDirtyTotal }),
+        ]}
+        right={planActif ? [t('statusbar.active_plan', { title: planActif.title })] : []}
+      />
     </div>
   )
 }

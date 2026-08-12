@@ -1,8 +1,10 @@
 import { useState } from 'react'
 
-import { stackFrom, type StackRow, type Snapshot } from '../data'
+import { projectDisplayName, stackFrom, type StackRow, type Snapshot } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
+import { StatusBar } from '../StatusBar'
+import { ViewBar } from '../ViewBar'
 
 type Filtre = 'toutes' | 'production' | 'sans_raison'
 
@@ -76,13 +78,10 @@ export function Stack({ snapshot }: { snapshot: Snapshot }) {
   })
 
   return (
-    <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
-      <div style={s('display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;')}>
-        <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
-          Stack
-        </h2>
+    <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
+      <ViewBar projet={projectDisplayName(snapshot)} vue="Stack">
         {rows.length > 0 && (
-          <div className="seg" style={s('margin-left: auto; font-size: 12px;')}>
+          <div className="seg" style={s('font-size: 12px;')}>
             {(
               [
                 ['toutes', t('stack.filter_all')],
@@ -102,41 +101,40 @@ export function Stack({ snapshot }: { snapshot: Snapshot }) {
             ))}
           </div>
         )}
-      </div>
-
-      <div style={s('font-size: 12px; color: var(--color-neutral-600); margin-bottom: 10px;')}>
-        {t('stack.why_subtitle')}
-      </div>
-
-      {rows.length > 0 && (
-        <div style={s('margin-bottom: 22px;')}>
-          <div
-            style={s(
-              'height: 4px; border-radius: 999px; background: var(--color-surface-control); overflow: hidden;',
-            )}
-          >
+      </ViewBar>
+      <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
+        {rows.length > 0 && (
+          <div style={s('margin-bottom: 22px;')}>
             <div
               style={s(
-                `height: 100%; border-radius: 999px; background: var(--color-accent); width: ${(tracees / rows.length) * 100}%;`,
+                'height: 4px; border-radius: 999px; background: var(--color-surface-control); overflow: hidden;',
               )}
-            />
+            >
+              <div
+                style={s(
+                  `height: 100%; border-radius: 999px; background: var(--color-accent); width: ${(tracees / rows.length) * 100}%;`,
+                )}
+              />
+            </div>
+            <div style={s('font-size: 11.5px; color: var(--color-neutral-500); margin-top: 6px;')}>
+              {tracees} {t('stack.of_stack_prefix')} {rows.length} {t('stack.of_stack')}
+            </div>
           </div>
-          <div style={s('font-size: 11.5px; color: var(--color-neutral-500); margin-top: 6px;')}>
-            {tracees} {t('stack.of_stack_prefix')} {rows.length} {t('stack.of_stack')}
-          </div>
-        </div>
-      )}
+        )}
 
-      {rows.length === 0 ? (
-        <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
-          {t('stack.no_dependencies')}
-        </div>
-      ) : (
-        <div style={s('display: flex; gap: 28px; flex-wrap: wrap;')}>
-          <Colonne titre={t('stack.production')} rows={filtrees.filter(row => !row.dev)} />
-          <Colonne titre={t('stack.development')} rows={filtrees.filter(row => row.dev)} />
-        </div>
-      )}
+        {rows.length === 0 ? (
+          <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
+            {t('stack.no_dependencies')}
+          </div>
+        ) : (
+          <div style={s('display: flex; gap: 28px; flex-wrap: wrap;')}>
+            <Colonne titre={t('stack.production')} rows={filtrees.filter(row => !row.dev)} />
+            <Colonne titre={t('stack.development')} rows={filtrees.filter(row => row.dev)} />
+          </div>
+        )}
+      </div>
+
+      <StatusBar />
     </div>
   )
 }

@@ -12,6 +12,7 @@ import {
   layoutGraph,
   pageName,
   plansForPage,
+  projectDisplayName,
   shotRatio,
   scanFailed,
   shotDate,
@@ -25,6 +26,8 @@ import { t } from '../i18n'
 import { s, useHover } from '../style'
 import { Divider, useResizable } from '../useResizable'
 import { usePanZoom } from '../usePanZoom'
+import { StatusBar } from '../StatusBar'
+import { ViewBar } from '../ViewBar'
 import type { Layout } from '../Terminal'
 
 /** Onglet Produit — maquette l. 85-274. */
@@ -64,6 +67,7 @@ export function Produit({
   const linkCount = pages.reduce((total, page) => total + page.links.length, 0)
   const failed = scanFailed(snapshot.scans)
   const commit = lastScan(snapshot.scans)?.commit ?? null
+  const scanDate = lastScan(snapshot.scans)?.date ?? null
 
   const side = layout === 'side'
 
@@ -80,45 +84,42 @@ export function Produit({
 
   if (pages.length === 0) {
     return (
-      <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
-        <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0 0 4px;')}>
-          {t('produit.title')}
-        </h2>
-        <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
-          {t('produit.no_pages')}{' '}
-          <span style={s('font-family: var(--font-mono);')}>node crawl/index.js</span>.
+      <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
+        <ViewBar projet={projectDisplayName(snapshot)} vue={t('produit.title')} />
+        <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
+          <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
+            {t('produit.no_pages')}{' '}
+            <span style={s('font-family: var(--font-mono);')}>node crawl/index.js</span>.
+          </div>
         </div>
+        <StatusBar />
       </div>
     )
   }
 
   return (
-    <div style={s('flex: 1; display: flex; min-width: 0; position: relative;')}>
-      <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
-        <div style={s('flex: none; padding: 20px 22px 0;')}>
-          <div style={s('display: flex; align-items: center; gap: 12px; margin-bottom: 4px;')}>
-            <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
-              {t('produit.title')}
-            </h2>
-            <span style={s('font-size: 12px; color: var(--color-neutral-500);')}>
-              {pages.length > 1 ? t('produit.pages_count_plural', { n: pages.length }) : t('produit.pages_count', { n: 1 })} · {linkCount > 1 ? t('produit.links_count_plural', { n: linkCount }) : t('produit.links_count', { n: 1 })} · {t('produit.rebuilt_at_commit')}
-              {commit && <span style={s('font-family: var(--font-mono);')}> {commit.slice(0, 7)}</span>}
-            </span>
-            <div style={s('flex: 1;')} />
-            <button
-              type="button"
-              className="btn btn-ghost"
-              disabled={currentShots.length < 2}
-              onClick={() => setCompare(true)}
-              style={s('font-size: 12px;')}
-            >
-              <GitDiff size={14} weight="regular" aria-hidden="true" />
-              {t('produit.compare_dates')}
-            </button>
-            <CrawlButton packageManager={packageManager} />
-          </div>
-
-          <Legend />
+    <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
+      <ViewBar
+        projet={projectDisplayName(snapshot)}
+        vue={t('produit.title')}
+        meta={`${pages.length > 1 ? t('produit.pages_count_plural', { n: pages.length }) : t('produit.pages_count', { n: 1 })} · ${linkCount > 1 ? t('produit.links_count_plural', { n: linkCount }) : t('produit.links_count', { n: 1 })} · ${t('produit.rebuilt_at_commit')}${commit ? ` ${commit.slice(0, 7)}` : ''}`}
+      >
+        <button
+          type="button"
+          className="btn btn-ghost"
+          disabled={currentShots.length < 2}
+          onClick={() => setCompare(true)}
+          style={s('font-size: 12px;')}
+        >
+          <GitDiff size={14} weight="regular" aria-hidden="true" />
+          {t('produit.compare_dates')}
+        </button>
+        <CrawlButton packageManager={packageManager} />
+      </ViewBar>
+      <div style={s('flex: 1; display: flex; min-width: 0; min-height: 0; position: relative;')}>
+        <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
+          <div style={s('flex: none; padding: 12px 22px 0;')}>
+            <Legend />
 
           {failed && (
             <div
@@ -228,6 +229,16 @@ export function Produit({
           onClose={() => setCompare(false)}
         />
       )}
+      </div>
+
+      <StatusBar
+        left={[
+          ...(scanDate ? [t('statusbar.graph_rebuilt', { age: humanAge(scanDate) })] : []),
+          pages.length > 1 ? t('produit.pages_count_plural', { n: pages.length }) : t('produit.pages_count', { n: 1 }),
+          linkCount > 1 ? t('produit.links_count_plural', { n: linkCount }) : t('produit.links_count', { n: 1 }),
+        ]}
+        right={[t('statusbar.canvas_hint')]}
+      />
     </div>
   )
 }

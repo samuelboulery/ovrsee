@@ -99,6 +99,7 @@ const RENDUS: Array<[string, (snap: Snapshot) => ReactElement]> = [
     'Historique',
     snap => (
       <Historique
+        projet="ovrsee"
         plans={snap.plans ?? []}
         timeline={snap.timeline ?? []}
         ticketTimeline={snap.ticketTimeline ?? []}
@@ -110,6 +111,7 @@ const RENDUS: Array<[string, (snap: Snapshot) => ReactElement]> = [
     'Tableau',
     snap => (
       <Tableau
+        projet="ovrsee"
         root={snap.root}
         board={snap.board ?? []}
         tickets={snap.tickets ?? []}
@@ -117,7 +119,7 @@ const RENDUS: Array<[string, (snap: Snapshot) => ReactElement]> = [
       />
     ),
   ],
-  ['Données', snap => <Donnees graph={snap.graph} source={snap.graphSource} vaultDeclared={false} />],
+  ['Données', snap => <Donnees projet="ovrsee" graph={snap.graph} source={snap.graphSource} vaultDeclared={false} />],
   ['Stack', snap => <Stack snapshot={snap} />],
 ]
 

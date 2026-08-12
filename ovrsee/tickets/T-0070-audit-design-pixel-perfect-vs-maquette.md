@@ -2,7 +2,7 @@
 {
   "id": "T-0070",
   "titre": "Audit design pixel-perfect vs Ovrsee App.dc.html",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

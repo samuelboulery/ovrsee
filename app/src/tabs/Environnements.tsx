@@ -33,7 +33,10 @@ export function Environnements({
             <div style={s('display: flex; align-items: center; gap: 6px;')}>
               <div style={s('font-size: 12.5px; font-weight: 500;')}>{env.nom}</div>
               {env.branche && env.branche === gitStatus.branch && (
-                <span className="tag tag-accent" style={s('font-size: 10px;')}>
+                <span
+                  className="tag"
+                  style={s('font-size: 10px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660;')}
+                >
                   {t('environnements.current_branch')}
                 </span>
               )}

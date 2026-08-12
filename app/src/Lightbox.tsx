@@ -132,7 +132,7 @@ export function Lightbox({
                 <span
                   style={s(
                     current
-                      ? 'width: 9px; height: 9px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 10px var(--color-accent); display: block;'
+                      ? 'width: 9px; height: 9px; border-radius: 50%; background: var(--color-accent); display: block;'
                       : 'width: 6px; height: 6px; border-radius: 50%; background: var(--color-neutral-700); display: block;',
                   )}
                 />

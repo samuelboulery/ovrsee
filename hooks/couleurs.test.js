@@ -31,11 +31,28 @@ const EXCEPTIONS = new Set([
   '#000', // mask-image
 ])
 
-// Fichiers portés littéralement depuis la maquette (T-0074) : leurs couleurs
-// sont un choix délibéré, pas une dérive. Étendre cette liste à mesure que le
-// chantier 2 porte les autres onglets — jamais pour contourner le garde-fou
-// ailleurs.
-const FICHIERS_PORTES = new Set(['App.tsx', 'Terminal.tsx', 'Apercu.tsx', 'Sante.tsx', 'Deploiements.tsx', 'Branches.tsx'])
+// Fichiers portés littéralement depuis la maquette (T-0074, T-0076) : leurs
+// couleurs sont un choix délibéré, pas une dérive — jamais pour contourner le
+// garde-fou ailleurs.
+const FICHIERS_PORTES = new Set([
+  'App.tsx',
+  'Terminal.tsx',
+  'Apercu.tsx',
+  'Sante.tsx',
+  'Deploiements.tsx',
+  'Branches.tsx',
+  'Illisibles.tsx',
+  'Produit.tsx',
+  'Historique.tsx',
+  'Navigateur.tsx',
+  'Onboarding.tsx',
+  'OnboardingArt.tsx',
+  'PreferencesControls.tsx',
+  'SkillsPanel.tsx',
+  'Environnements.tsx',
+  'Donnees.tsx',
+  'Tableau.tsx',
+])
 
 const racine = join(dirname(fileURLToPath(import.meta.url)), '..')
 

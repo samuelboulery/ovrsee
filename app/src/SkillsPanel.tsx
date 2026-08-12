@@ -71,8 +71,12 @@ export function SkillsList({
             >
               {skill.titre}
               <span
-                className={skill.installe ? 'tag tag-accent' : 'tag'}
-                style={s('font-size: 10px;')}
+                className="tag"
+                style={s(
+                  skill.installe
+                    ? 'font-size: 10px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660;'
+                    : 'font-size: 10px;',
+                )}
               >
                 {skill.source === 'externe'
                   ? skill.installe

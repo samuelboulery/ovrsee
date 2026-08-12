@@ -455,7 +455,7 @@ export function Onboarding({ settings, etapeInitiale = 0, onFini, onAjouterProje
                   style={s(
                     'flex: none; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 9px;' +
                       (index < etape
-                        ? ' border: 1px solid var(--color-accent-700); background: var(--color-accent-900); color: var(--color-accent-300);'
+                        ? ' border: 1px solid #2a2660; background: #14132a; color: #a49dfa;'
                         : index === etape
                           ? ' background: var(--color-accent); color: var(--color-bg);'
                           : ' border: 1px solid var(--color-divider); color: var(--color-neutral-600);'),

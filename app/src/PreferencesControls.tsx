@@ -216,7 +216,7 @@ export function ErrorBox({ children }: { children: ReactNode }) {
     <div
       role="alert"
       style={s(
-        'font-size: 11.5px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
+        'font-size: 11.5px; color: #e5677a; background: #1c0d10; border: 1px solid #3a1c22; border-radius: 6px; padding: 7px 10px;',
       )}
     >
       {children}

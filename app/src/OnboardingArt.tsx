@@ -142,14 +142,14 @@ export function SchemaBoucle() {
               width={LARGEUR}
               height={HAUTEUR}
               rx="8"
-              fill={depot ? 'var(--color-accent-900)' : 'var(--theme-bg-secondary)'}
-              stroke={depot ? 'var(--color-accent-700)' : 'var(--color-divider)'}
+              fill={depot ? '#14132a' : 'var(--theme-bg-secondary)'}
+              stroke={depot ? '#2a2660' : 'var(--color-divider)'}
             />
             <text
               x={x + LARGEUR / 2}
               y="34"
               textAnchor="middle"
-              fill={depot ? 'var(--color-accent-300)' : 'var(--color-text)'}
+              fill={depot ? '#a49dfa' : 'var(--color-text)'}
               style={s(
                 depot
                   ? 'font-size: 12.5px; font-family: var(--font-mono);'

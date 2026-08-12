@@ -277,7 +277,7 @@ function Legend() {
   )
 }
 
-const NIVEAUX_DENSITE = ['var(--color-neutral-800)', 'var(--color-accent-900)', 'var(--color-accent-700)', 'var(--color-accent-500)', 'var(--color-accent-300)']
+const NIVEAUX_DENSITE = ['#1c1d24', '#2a2660', '#4b46a3', '#6259cc', '#7d76f0']
 
 function DensityLegend() {
   return (
@@ -645,11 +645,11 @@ function PlanDetail({ plan }: { plan: Plan }) {
         {planWhy(plan)}
       </div>
       {planRejected(plan) !== null && (
-        <div style={s('display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; padding: 9px 11px; border-radius: 6px; background: var(--color-accent-900); border: 1px solid var(--color-accent-800); max-width: 62ch;')}>
-          <span style={s('font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-accent-300); flex: none; padding-top: 1px;')}>
+        <div style={s('display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; padding: 9px 11px; border-radius: 6px; background: #14132a; border: 1px solid #2a2660; max-width: 62ch;')}>
+          <span style={s('font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #8079c9; flex: none; padding-top: 1px;')}>
             {t('historique.rejected')}
           </span>
-          <span style={s('font-size: 12px; color: var(--color-accent-200); line-height: 1.5;')}>
+          <span style={s('font-size: 12px; color: #a49dfa; line-height: 1.5;')}>
             {planRejected(plan)}
           </span>
         </div>

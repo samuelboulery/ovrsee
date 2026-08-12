@@ -267,7 +267,10 @@ export function Donnees({
           {t('donnees.title')}
         </h2>
         {provenance && (
-          <span className="tag tag-accent" style={s('font-size: 10.5px;')}>
+          <span
+            className="tag"
+            style={s('font-size: 10.5px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660;')}
+          >
             {provenance.badge}
             {sourceDate && ` — ${sourceDate}`}
           </span>

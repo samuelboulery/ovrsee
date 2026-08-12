@@ -226,8 +226,12 @@ function LigneDeploiement({ d }: { d: DeploymentInfo }) {
         )}
       />
       <span
-        className={`tag ${d.environment === 'Production' ? 'tag-accent' : 'tag-neutral'}`}
-        style={s('font-size: 9.5px; padding: 1px 7px;')}
+        className={`tag ${d.environment === 'Production' ? '' : 'tag-neutral'}`}
+        style={s(
+          `font-size: 9.5px; padding: 1px 7px;${
+            d.environment === 'Production' ? ' color: #a49dfa; background: #14132a; border: 1px solid #2a2660;' : ''
+          }`,
+        )}
       >
         {d.environment}
       </span>

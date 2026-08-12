@@ -603,8 +603,8 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
                   style={s(
                     'cursor: pointer; font-family: var(--font-body); font-size: 10.5px; letter-spacing: .06em; padding: 4px 9px; border-radius: 5px; border: 1px solid ' +
                       (dock === id
-                        ? 'var(--color-accent-600); background: var(--color-accent-900); color: var(--color-accent-200);'
-                        : 'var(--color-neutral-800); background: transparent; color: var(--color-neutral-500);'),
+                        ? '#24252c; background: #24252c; color: #f2f3f5;'
+                        : '#22232a; background: transparent; color: #9096a0;'),
                   )}
                 >
                   {displayLabel}
@@ -852,8 +852,12 @@ function ElementPanel({
                 {routes.map(route => (
                   <span
                     key={route}
-                    className={route === currentRoute ? 'tag tag-accent' : 'tag tag-outline'}
-                    style={s('font-size: 11px;')}
+                    className={route === currentRoute ? 'tag' : 'tag tag-outline'}
+                    style={s(
+                      route === currentRoute
+                        ? 'font-size: 11px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660;'
+                        : 'font-size: 11px;',
+                    )}
                   >
                     {route}
                   </span>

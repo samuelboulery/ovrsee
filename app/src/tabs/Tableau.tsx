@@ -1081,7 +1081,12 @@ function Detail({
         <div>
           ovrsee/tickets/{ticket.file}
           {nonCommite && (
-            <span className="tag tag-accent" style={s('font-size: 10px; margin-left: 6px;')}>
+            <span
+              className="tag"
+              style={s(
+                'font-size: 10px; margin-left: 6px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660;',
+              )}
+            >
               {t('tableau.uncommitted')}
             </span>
           )}

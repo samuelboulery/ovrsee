@@ -123,7 +123,7 @@ export function Produit({
           {failed && (
             <div
               style={s(
-                'display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 8px 11px; border-radius: 6px; background: var(--color-accent-900); border: 1px solid var(--color-accent-800); font-size: 12px; color: var(--color-accent-200);',
+                'display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 8px 11px; border-radius: 6px; background: #1c0d10; border: 1px solid #3a1c22; font-size: 12px; color: #e5677a;',
               )}
             >
               {t('produit.last_scan_failed', { date: frDate(lastScan(snapshot.scans)?.date) })}
@@ -275,9 +275,7 @@ function Legend() {
       </span>
       <span style={s('display: flex; align-items: center; gap: 6px;')}>
         <span
-          style={s(
-            'width: 7px; height: 7px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent); display: block;',
-          )}
+          style={s('width: 7px; height: 7px; border-radius: 50%; background: var(--color-accent); display: block;')}
         />
         {t('produit.entry_point')}
       </span>
@@ -429,7 +427,7 @@ function PageCard({
         {isEntry && (
           <span
             style={s(
-              'width: 7px; height: 7px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent); display: block; flex: none;',
+              'width: 7px; height: 7px; border-radius: 50%; background: var(--color-accent); display: block; flex: none;',
             )}
           />
         )}

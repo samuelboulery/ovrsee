@@ -14,8 +14,6 @@ import {
   GroupLabel,
   IconDark,
   IconGrip,
-  IconLight,
-  IconSystem,
   Row,
   SectionTitle,
   Segmented,
@@ -155,18 +153,14 @@ export function SectionGeneral({
   return (
     <>
       <SectionTitle>{t('pref.general')}</SectionTitle>
+      {/* Clair et Système retirés : aucune maquette claire n'existe
+          (`theme.ts`, T-0075) — proposer le choix promettait un thème qui ne
+          change rien à l'affichage. */}
       <Row label={t('pref.theme')}>
-        <Segmented
-          name="pref-theme"
-          ariaLabel={t('pref.theme')}
-          value={settings.theme ?? 'auto'}
-          onChange={theme => onSettings({ ...settings, theme })}
-          options={[
-            { value: 'auto', label: t('pref.theme_system'), icon: <IconSystem /> },
-            { value: 'light', label: t('pref.theme_light'), icon: <IconLight /> },
-            { value: 'dark', label: t('pref.theme_dark'), icon: <IconDark /> },
-          ]}
-        />
+        <div style={s('display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--color-text);')}>
+          <IconDark />
+          {t('pref.theme_dark')}
+        </div>
       </Row>
       <Row label={t('pref.language')} hint={t('pref.language_note')}>
         <Segmented

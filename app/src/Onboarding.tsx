@@ -24,8 +24,6 @@ import { Logo, SchemaBoucle } from './OnboardingArt'
 import { apercuReponses, appliquerReponses, reponsesInitiales, type Reponses } from './profilage'
 import {
   IconDark,
-  IconLight,
-  IconSystem,
   Row,
   SectionTitle,
   Segmented,
@@ -35,7 +33,6 @@ import { basculerOnglet } from './PreferencesPanel'
 import { SectionProfils, profilCourant } from './PreferencesProfils'
 import { BlocGitignore } from './PreferencesProjet'
 import { s } from './style'
-import { applyTheme } from './theme'
 import { TAB_ICONS, type TabId } from './views'
 
 const NB_ECRANS = 3
@@ -313,23 +310,14 @@ function EcranReglages({
         />
       </Row>
 
+      {/* Clair et Système retirés : aucune maquette claire n'existe
+          (`theme.ts`, T-0075) — proposer le choix promettait un thème qui ne
+          change rien à l'affichage. */}
       <Row label={t('pref.theme')}>
-        <Segmented
-          name="onboard-theme"
-          ariaLabel={t('pref.theme')}
-          value={settings.theme ?? 'auto'}
-          onChange={theme => {
-            // Appliqué tout de suite : choisir un thème sans le voir changer
-            // serait un réglage à l'aveugle.
-            applyTheme(theme)
-            onSettings({ ...settings, theme })
-          }}
-          options={[
-            { value: 'auto', label: t('pref.theme_system'), icon: <IconSystem /> },
-            { value: 'light', label: t('pref.theme_light'), icon: <IconLight /> },
-            { value: 'dark', label: t('pref.theme_dark'), icon: <IconDark /> },
-          ]}
-        />
+        <div style={s('display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--color-text);')}>
+          <IconDark />
+          {t('pref.theme_dark')}
+        </div>
       </Row>
 
       <Row label={t('onboard.bootstrap_label')} hint={t('onboard.bootstrap_hint')}>

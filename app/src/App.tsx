@@ -589,12 +589,15 @@ export function App() {
                         <Navigateur snapshot={snapshot} visible={tab === 'navigateur'} />
                       </div>
 
-                      {tab === 'produit' && <Produit snapshot={snapshot} layout={layout} />}
+                      {tab === 'produit' && (
+                        <Produit snapshot={snapshot} layout={layout} packageManager={settings?.packageManager ?? 'pnpm'} />
+                      )}
                       {tab === 'historique' && (
                         <Historique
                           plans={plans}
                           timeline={snapshot.timeline ?? []}
                           ticketTimeline={snapshot.ticketTimeline ?? []}
+                          scans={snapshot.scans ?? []}
                           illisibles={snapshot.illisibles ?? []}
                           onOuvrirTicket={onOuvrirTicket}
                         />

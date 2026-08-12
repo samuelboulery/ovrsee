@@ -104,16 +104,9 @@ export function Apercu({
   const tickets = restant(snapshot.tickets, snapshot.board)
   const plan = readme ? headings(readme) : []
 
-  // La hauteur de l'en-tête sert deux fois : à poser le sommaire juste en
-  // dessous, et à décaler les ancres pour qu'un titre visé ne se retrouve pas
-  // caché derrière. Elle est mesurée plutôt que constante parce qu'un projet
-  // sans description a un en-tête plus court.
-  const entete = useRef<HTMLDivElement>(null)
-  const boite = useRef<HTMLDivElement>(null)
-  const [hauteur, setHauteur] = useState(96)
-  useEffect(() => {
-    setHauteur(entete.current?.offsetHeight ?? 96)
-  }, [root, packageJson?.description])
+  // Le panneau droit (Déploiements + README, maquette 2b) défile pour son
+  // propre compte — c'est lui que `scrollVers` amène à un titre, pas la page.
+  const panneauDroit = useRef<HTMLDivElement>(null)
 
   // L'état git est réévalué à chaque nouveau snapshot (changement de projet,
   // rechargement) mais mis à jour localement après un fetch — relire tout le
@@ -129,7 +122,7 @@ export function Apercu({
   const [ancreEnAttente, setAncreEnAttente] = useState<string | null>(null)
 
   /**
-   * Amener un titre sous l'en-tête, en ne bougeant que ce cadre.
+   * Amener un titre en haut du panneau droit, en ne bougeant que ce cadre.
    *
    * Laisser le navigateur suivre le `#` déplaçait la fenêtre entière : la barre
    * d'onglets et la latérale sortaient de l'écran, et l'application paraissait
@@ -138,10 +131,9 @@ export function Apercu({
    */
   const scrollVers = (id: string) => {
     const cible = document.getElementById(id)
-    const cadre = boite.current
+    const cadre = panneauDroit.current
     if (!cible || !cadre) return
-    cadre.scrollTop +=
-      cible.getBoundingClientRect().top - cadre.getBoundingClientRect().top - (hauteur + 14)
+    cadre.scrollTop += cible.getBoundingClientRect().top - cadre.getBoundingClientRect().top - 14
   }
 
   // Un lien du sommaire peut viser un titre caché derrière le README replié :
@@ -162,11 +154,10 @@ export function Apercu({
   }, [readmeOpen, ancreEnAttente])
 
   return (
-    <div ref={boite} style={s('flex: 1; display: flex; flex-direction: column; overflow: auto;')}>
+    <div style={s('flex: 1; display: flex; flex-direction: column; overflow: hidden;')}>
       <div
-        ref={entete}
         style={s(
-          'position: sticky; top: 0; z-index: 2; padding: 18px 22px 12px; background: var(--color-bg); border-bottom: 1px solid var(--color-divider);',
+          'flex: none; padding: 18px 22px 12px; background: var(--color-bg); border-bottom: 1px solid var(--color-divider);',
         )}
       >
         <Illisibles entries={snapshot.illisibles ?? []} />
@@ -234,20 +225,11 @@ export function Apercu({
         </div>
       </div>
 
-      <div
-        style={s(
-          `display: flex; align-items: flex-start; gap: 28px; padding: 18px 22px 32px; --md-anchor: ${hauteur + 14}px;`,
-        )}
-      >
-        <div style={s('flex: 1; min-width: 0; max-width: 820px;')}>
+      <div style={s('flex: 1; display: flex; min-height: 0;')}>
+        <div style={s('flex: 1; min-width: 0; overflow-y: auto; padding: 18px 22px 32px;')}>
           <Sante snapshot={snapshot} gitStatus={gitStatus} />
           <Branches root={root} gitStatus={gitStatus} onGitStatus={setGitStatus} />
           <Environnements config={snapshot.config} gitStatus={gitStatus} />
-          <Deploiements
-            root={root}
-            integrations={snapshot.integrations ?? []}
-            onOpenPreferences={onOpenPreferences}
-          />
 
           <div style={s('margin-top: 18px;')}>
             <Lancement packageJson={packageJson} />
@@ -257,6 +239,23 @@ export function Apercu({
             <Titre>{t('apercu.take_away')}</Titre>
             <Obsidian root={root} />
           </div>
+        </div>
+
+        {/* Panneau droit fixe, propre défilement — Déploiements puis README,
+            maquette 2b. `Deploiements` et le sommaire du README y vivent
+            ensemble : c'est la même question, « quoi de neuf, et de quoi ça
+            parle ». */}
+        <div
+          ref={panneauDroit}
+          style={s(
+            'flex: none; width: 320px; overflow-y: auto; border-left: 1px solid var(--color-divider); padding: 18px 20px 32px;',
+          )}
+        >
+          <Deploiements
+            root={root}
+            integrations={snapshot.integrations ?? []}
+            onOpenPreferences={onOpenPreferences}
+          />
 
           <div style={s('margin-top: 24px;')}>
             <div style={s('display: flex; align-items: center; justify-content: space-between; gap: 12px;')}>
@@ -277,11 +276,10 @@ export function Apercu({
                 {t('apercu.no_readme')}
               </div>
             )}
+            {plan.length >= 3 && <Sommaire plan={plan} aller={aller} />}
             {readme && readmeOpen && <Markdown text={readme} root={root} />}
           </div>
         </div>
-
-        {plan.length >= 3 && <Sommaire plan={plan} top={hauteur + 14} aller={aller} />}
       </div>
     </div>
   )
@@ -386,27 +384,21 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
 }
 
 /**
- * Le plan du README, à droite.
+ * Le plan du README, dans le panneau droit.
  *
- * Il ne paraît qu'à partir de trois titres : en dessous, une colonne entière
- * pour deux liens coûte plus de place qu'elle n'en fait gagner. Les titres de
- * quatrième niveau en sont exclus — un sommaire qui descend aussi bas cesse
- * d'être un sommaire.
+ * Il ne paraît qu'à partir de trois titres : en dessous, le sommaire coûte
+ * plus de place qu'il n'en fait gagner. Les titres de quatrième niveau en
+ * sont exclus — un sommaire qui descend aussi bas cesse d'être un sommaire.
  */
 function Sommaire({
   plan,
-  top,
   aller,
 }: {
   plan: Array<{ level: number; texte: string; id: string }>
-  top: number
   aller: (id: string) => void
 }) {
   return (
-    <nav
-      aria-label={t('apercu.summary')}
-      style={s(`position: sticky; top: ${top}px; width: 190px; flex: none;`)}
-    >
+    <nav aria-label={t('apercu.summary')} style={s('margin-top: 14px;')}>
       <Titre>{t('apercu.summary')}</Titre>
       {plan
         .filter(titre => titre.level <= 3)

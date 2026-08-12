@@ -303,8 +303,6 @@ export function SectionInterface({ settings, onSettings }: SectionProps) {
         {t('pref.tabs_desc')}
       </p>
 
-      <PreferencesPreview settings={settings} />
-
       <GroupLabel>{t('pref.tabs')}</GroupLabel>
 
       <div
@@ -615,7 +613,7 @@ export function PreferencesModal({
         aria-label={t('pref.title')}
         onClick={event => event.stopPropagation()}
         style={s(
-          'width: min(860px, 100%); height: min(600px, 100%); display: flex; overflow: hidden; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 10px; box-shadow: var(--shadow-lg);',
+          'width: min(1100px, 100%); height: min(700px, 100%); display: flex; overflow: hidden; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 10px; box-shadow: var(--shadow-lg);',
         )}
       >
         {/* La barre de navigation. Cinq entrées visibles d'un coup : elles ne
@@ -624,7 +622,7 @@ export function PreferencesModal({
         <nav
           aria-label={t('pref.title')}
           style={s(
-            'flex: none; width: 200px; display: flex; flex-direction: column; gap: 2px; padding: 16px 10px; overflow-y: auto; background: var(--theme-bg-tertiary); border-right: 1px solid var(--color-divider);',
+            'flex: none; width: 220px; display: flex; flex-direction: column; gap: 2px; padding: 16px 10px; overflow-y: auto; background: var(--theme-bg-tertiary); border-right: 1px solid var(--color-divider);',
           )}
         >
           {SECTIONS.map(item => (
@@ -671,18 +669,41 @@ export function PreferencesModal({
             </button>
           </div>
 
-          <div style={s('flex: 1; overflow-y: auto; padding: 4px 24px 24px;')}>
-            {etat === 'chargement' && (
-              <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
-                {t('pref.loading')}
+          <div style={s('flex: 1; display: flex; min-height: 0;')}>
+            <div style={s('flex: 1; min-width: 0; overflow-y: auto; padding: 4px 24px 24px;')}>
+              {etat === 'chargement' && (
+                <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
+                  {t('pref.loading')}
+                </div>
+              )}
+              {erreur && (
+                <div style={s('margin-bottom: 14px;')}>
+                  <ErrorBox>{erreur}</ErrorBox>
+                </div>
+              )}
+              {settings && corps(settings)}
+            </div>
+
+            {/* Aperçu en direct, visible quelle que soit la section ouverte —
+                maquette 2i. Un panneau fixe, pas une pièce d'une section : le
+                choix du thème dans « Général » a le même effet visible que
+                l'ordre des onglets dans « Interface ». */}
+            {settings && (
+              <div
+                style={s(
+                  'flex: none; width: 300px; overflow-y: auto; padding: 16px 18px; border-left: 1px solid var(--color-divider); background: var(--color-bg);',
+                )}
+              >
+                <div
+                  style={s(
+                    'font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;',
+                  )}
+                >
+                  {t('pref.preview')}
+                </div>
+                <PreferencesPreview settings={settings} />
               </div>
             )}
-            {erreur && (
-              <div style={s('margin-bottom: 14px;')}>
-                <ErrorBox>{erreur}</ErrorBox>
-              </div>
-            )}
-            {settings && corps(settings)}
           </div>
         </div>
       </div>

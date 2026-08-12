@@ -3,7 +3,6 @@ import { useState, type ReactNode } from 'react'
 import {
   commitsDeLaFrise,
   dailyCounts,
-  foldWeekly,
   frDate,
   humanAge,
   planEntriesDeLaFrise,
@@ -14,6 +13,7 @@ import {
   type GitCommit,
   type Illisible,
   type Plan,
+  type Scan,
   type Ticket,
   type TicketTimelineEntry,
   type TimelineEntry,
@@ -29,10 +29,13 @@ const day = (date: string): string => date.slice(0, 10)
 /** `2026-08-08T12:00:00+02:00` → `12:00`. Vide pour une date sans heure. */
 const hour = (date: string): string => (date.length > 10 ? date.slice(11, 16) : '')
 
-type Vue = 'tickets' | 'commits' | 'graphe'
+type Vue = 'tickets' | 'commits'
 
 /**
- * Chronologie du projet : deux lectures du même fil.
+ * Chronologie du projet : deux lectures du même fil, plus un panneau
+ * d'activité permanent — maquette 2e. Le panneau n'est plus une troisième
+ * vue qui remplace la frise (comme avant) : il vit à côté d'elle, tout le
+ * temps.
  *
  * La vue commits vient de git : chaque commit, et les plans qui les
  * expliquent. Elle dit ce qui a été fait. La vue tickets vient du tableau :
@@ -45,47 +48,51 @@ export function Historique({
   plans,
   timeline,
   ticketTimeline,
+  scans = [],
   illisibles = [],
   onOuvrirTicket,
 }: {
   plans: Plan[]
   timeline: TimelineEntry[]
   ticketTimeline: TicketTimelineEntry[]
+  scans?: Scan[]
   illisibles?: Illisible[]
   onOuvrirTicket: (file: string) => void
 }) {
   const [vue, setVue] = useState<Vue>('tickets')
   const byFile = new Map(plans.map(plan => [plan.file, plan]))
-  const isEmpty = vue === 'tickets' ? ticketTimeline.length === 0 : vue === 'commits' ? timeline.length === 0 : false
+  const isEmpty = vue === 'tickets' ? ticketTimeline.length === 0 : timeline.length === 0
 
   return (
-    <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
-      <div style={s('display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px;')}>
-        <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
-          {t('historique.title')}
-        </h2>
-        <div style={s('flex: 1;')} />
-        <ViewSwitch vue={vue} onChange={setVue} />
-      </div>
-      <div style={s('font-size: 12px; color: var(--color-neutral-600); margin-bottom: 20px;')}>
-        {t('historique.subtitle')}
-      </div>
-
-      <Illisibles entries={illisibles} quoi="plan" />
-
-      {isEmpty ? (
-        <div style={s('padding: 40px 0; display: flex; align-items: center; justify-content: center;')}>
-          <div style={s('font-size: 12px; color: var(--color-neutral-600); text-align: center; max-width: 46ch; line-height: 1.6;')}>
-            {t('apercu.project_timeline_empty')}
-          </div>
+    <div style={s('flex: 1; display: flex; min-width: 0; min-height: 0;')}>
+      <div style={s('flex: 1; min-width: 0; padding: 20px 22px; overflow: auto;')}>
+        <div style={s('display: flex; align-items: baseline; gap: 14px; margin-bottom: 4px;')}>
+          <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
+            {t('historique.title')}
+          </h2>
+          <div style={s('flex: 1;')} />
+          <ViewSwitch vue={vue} onChange={setVue} />
         </div>
-      ) : vue === 'tickets' ? (
-        <TicketFrise entries={ticketTimeline} byFile={byFile} onOuvrirTicket={onOuvrirTicket} />
-      ) : vue === 'commits' ? (
-        <CommitFrise entries={timeline} byFile={byFile} />
-      ) : (
-        <ActivityGraph timeline={timeline} ticketTimeline={ticketTimeline} />
-      )}
+        <div style={s('font-size: 12px; color: var(--color-neutral-600); margin-bottom: 20px;')}>
+          {t('historique.subtitle')}
+        </div>
+
+        <Illisibles entries={illisibles} quoi="plan" />
+
+        {isEmpty ? (
+          <div style={s('padding: 40px 0; display: flex; align-items: center; justify-content: center;')}>
+            <div style={s('font-size: 12px; color: var(--color-neutral-600); text-align: center; max-width: 46ch; line-height: 1.6;')}>
+              {t('apercu.project_timeline_empty')}
+            </div>
+          </div>
+        ) : vue === 'tickets' ? (
+          <TicketFrise entries={ticketTimeline} byFile={byFile} onOuvrirTicket={onOuvrirTicket} />
+        ) : (
+          <CommitFrise entries={timeline} byFile={byFile} />
+        )}
+      </div>
+
+      <ActivityPanel timeline={timeline} ticketTimeline={ticketTimeline} scans={scans} />
     </div>
   )
 }
@@ -107,7 +114,6 @@ function ViewSwitch({ vue, onChange }: { vue: Vue; onChange: (vue: Vue) => void 
     <div style={s('display: flex; gap: 4px; flex: none;')}>
       {option('tickets', t('historique.view_tickets'))}
       {option('commits', t('historique.view_commits'))}
-      {option('graphe', t('historique.view_graph'))}
     </div>
   )
 }
@@ -122,80 +128,165 @@ const COULEUR_SERIE = {
 } as const
 
 /**
- * Trois lectures du même fil que les frises, en comptage plutôt qu'en liste :
- * ce que la fréquence dit et qu'un défilement de cartes ne montre pas.
+ * Panneau d'activité — maquette 2e, colonne fixe à droite de la frise.
+ *
+ * Trois lectures du même fil, en comptage plutôt qu'en liste : ce que la
+ * fréquence dit et qu'un défilement de cartes ne montre pas. Trois bascules
+ * lui sont propres (Plans/Tickets/Commits hors plan) : elles ne touchent que
+ * ce panneau, jamais la frise à sa gauche — la maquette les qualifie de « ses
+ * propres filtres ».
  *
  * Les dates viennent des mêmes props que les frises (`timeline`,
  * `ticketTimeline`) — aucune agrégation côté serveur, aucun nouvel appel
  * réseau. `hooks/density.js` reste la seule source du calcul de seaux, comme
  * pour la densité de la barre latérale.
  */
-function ActivityGraph({ timeline, ticketTimeline }: { timeline: TimelineEntry[]; ticketTimeline: TicketTimelineEntry[] }) {
+function ActivityPanel({
+  timeline,
+  ticketTimeline,
+  scans,
+}: {
+  timeline: TimelineEntry[]
+  ticketTimeline: TicketTimelineEntry[]
+  scans: Scan[]
+}) {
   const [sousVue, setSousVue] = useState<SousVue>('empile')
+  const [avecPlans, setAvecPlans] = useState(true)
+  const [avecTickets, setAvecTickets] = useState(true)
+  const [avecCommitsHorsPlan, setAvecCommitsHorsPlan] = useState(true)
 
-  const commits = commitsDeLaFrise(timeline)
-  const plans = planEntriesDeLaFrise(timeline)
-  const tickets = ticketsDeLaFrise(ticketTimeline).map(ticket => ({ date: ticket.maj }))
+  const commitsHorsPlan = timeline.filter(e => e.kind === 'commit').map(e => e.commit)
+  const plansBruts = planEntriesDeLaFrise(timeline)
+  const ticketsBruts = ticketsDeLaFrise(ticketTimeline).map(ticket => ({ date: ticket.maj }))
 
-  const total = commits.length + plans.length + tickets.length
+  // Seules les vues agrégées (empilée, densité) lisent les trois bascules —
+  // la vue par type reste un décompte, filtrer une catégorie n'y aurait pas
+  // de sens : autant regarder son nombre.
+  const plans = avecPlans ? plansBruts : []
+  const tickets = avecTickets ? ticketsBruts : []
+  const commits = avecCommitsHorsPlan ? commitsHorsPlan : []
+
+  const total = plansBruts.length + ticketsBruts.length + commitsHorsPlan.length
 
   return (
-    <div>
-      <div style={s('display: flex; gap: 4px; margin-bottom: 16px;')}>
-        {(
-          [
-            ['empile', t('historique.graph_stacked')],
-            ['densite', t('historique.graph_density')],
-            ['type', t('historique.graph_by_type')],
-          ] as const
-        ).map(([id, label]) => (
-          <button
-            key={id}
-            type="button"
-            className={sousVue === id ? 'btn btn-primary' : 'btn btn-ghost'}
-            style={s('font-size: 11px; padding: 5px 11px;')}
-            onClick={() => setSousVue(id)}
-            aria-pressed={sousVue === id}
-          >
-            {label}
-          </button>
-        ))}
+    <div
+      style={s(
+        'width: 300px; flex: none; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); padding: 16px 14px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;',
+      )}
+    >
+      <div style={s('display: flex; align-items: center; gap: 8px;')}>
+        <div style={s('font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-600); flex: 1;')}>
+          {t('historique.view_graph')}
+        </div>
+        <div style={s('display: flex; gap: 2px; padding: 2px; border-radius: 6px; background: var(--color-surface-control); border: 1px solid var(--color-divider);')}>
+          {(
+            [
+              ['empile', t('historique.window_14d'), t('historique.graph_stacked')],
+              ['densite', t('historique.window_12w'), t('historique.graph_density')],
+              ['type', t('historique.window_type'), t('historique.graph_by_type')],
+            ] as const
+          ).map(([id, label, title]) => (
+            <button
+              key={id}
+              type="button"
+              title={title}
+              onClick={() => setSousVue(id)}
+              aria-pressed={sousVue === id}
+              style={s(
+                `font-size: 10.5px; padding: 2px 7px; border-radius: 4px; border: 0; cursor: pointer; font-family: var(--font-body); ${
+                  sousVue === id
+                    ? 'background: var(--color-surface); color: var(--color-text);'
+                    : 'background: transparent; color: var(--color-neutral-500);'
+                }`,
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {total === 0 ? (
-        <div style={s('padding: 40px 0; display: flex; align-items: center; justify-content: center;')}>
-          <div style={s('font-size: 12px; color: var(--color-neutral-600); text-align: center; max-width: 46ch; line-height: 1.6;')}>
-            {t('historique.graph_empty')}
-          </div>
+        <div style={s('font-size: 11.5px; color: var(--color-neutral-600); line-height: 1.6;')}>
+          {t('historique.graph_empty')}
         </div>
       ) : sousVue === 'empile' ? (
-        <StackedBars commits={commits} plans={plans} tickets={tickets} days={14} />
+        <>
+          <StackedBars commits={commits} plans={plans} tickets={tickets} days={14} />
+          <Legend />
+        </>
       ) : sousVue === 'densite' ? (
-        <WeeklyDensity commits={commits} plans={plans} tickets={tickets} weeks={12} />
+        <>
+          <WeeklyDensityGrid commits={commits} plans={plans} tickets={tickets} weeks={12} />
+          <DensityLegend />
+        </>
       ) : (
-        <ByTypeBars commits={commits} plans={plans} tickets={tickets} days={30} />
+        <ByTypeMeters commits={commitsDeLaFrise(timeline)} plans={plansBruts} tickets={ticketsBruts} scans={scans} days={30} />
       )}
 
-      <Legend />
+      <div style={s('height: 1px; background: var(--color-divider);')} />
+
+      <div style={s('font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-600);')}>
+        {t('historique.filter_title')}
+      </div>
+      <div style={s('display: flex; flex-direction: column; gap: 10px;')}>
+        <FilterToggle checked={avecPlans} onChange={setAvecPlans} label={t('historique.filter_plans')} />
+        <FilterToggle checked={avecTickets} onChange={setAvecTickets} label={t('historique.filter_tickets')} />
+        <FilterToggle checked={avecCommitsHorsPlan} onChange={setAvecCommitsHorsPlan} label={t('historique.filter_commits_out_of_plan')} />
+      </div>
     </div>
+  )
+}
+
+function FilterToggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
+  return (
+    <label style={s('display: flex; align-items: center; gap: 9px; cursor: pointer;')}>
+      <span
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        style={s(
+          `box-sizing: border-box; flex: none; width: 28px; height: 16px; border-radius: 999px; padding: 2px; display: flex; align-items: center; ${
+            checked ? 'background: var(--color-accent); justify-content: flex-end;' : 'background: var(--color-neutral-800); justify-content: flex-start;'
+          }`,
+        )}
+      >
+        <span style={s('width: 12px; height: 12px; border-radius: 50%; background: var(--color-bg); display: block;')} />
+      </span>
+      <span style={s(`font-size: 12.5px; color: ${checked ? 'var(--color-text)' : 'var(--color-neutral-500)'};`)}>{label}</span>
+    </label>
   )
 }
 
 function Legend() {
   return (
-    <div style={s('display: flex; gap: 16px; margin-top: 16px; font-size: 11px; color: var(--color-neutral-500);')}>
+    <div style={s('display: flex; gap: 16px; font-size: 10px; color: var(--color-neutral-500); font-family: var(--font-mono);')}>
       {(
         [
-          ['commits', t('historique.view_commits')],
           ['plans', t('historique.plan_label')],
           ['tickets', t('historique.ticket_label')],
+          ['commits', t('historique.commits_label')],
         ] as const
       ).map(([key, label]) => (
-        <div key={key} style={s('display: flex; align-items: center; gap: 6px;')}>
-          <span style={s(`width: 8px; height: 8px; border-radius: 2px; background: ${COULEUR_SERIE[key]}; display: block;`)} />
+        <div key={key} style={s('display: flex; align-items: center; gap: 5px;')}>
+          <span style={s(`width: 7px; height: 7px; border-radius: 2px; background: ${COULEUR_SERIE[key]}; display: block;`)} />
           {label}
         </div>
       ))}
+    </div>
+  )
+}
+
+const NIVEAUX_DENSITE = ['var(--color-neutral-800)', 'var(--color-accent-900)', 'var(--color-accent-700)', 'var(--color-accent-500)', 'var(--color-accent-300)']
+
+function DensityLegend() {
+  return (
+    <div style={s('display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--color-neutral-500); font-family: var(--font-mono);')}>
+      <span>{t('historique.density_less')}</span>
+      {NIVEAUX_DENSITE.map(couleur => (
+        <span key={couleur} style={s(`width: 9px; height: 9px; border-radius: 2px; background: ${couleur}; display: block;`)} />
+      ))}
+      <span>{t('historique.density_more')}</span>
     </div>
   )
 }
@@ -217,21 +308,21 @@ function StackedBars({
   const k = dailyCounts(tickets, days)
   const totals = c.map((v, i) => v + p[i] + k[i])
   const max = Math.max(1, ...totals)
-  const HEIGHT = 120
+  const HEIGHT = 88
 
   return (
-    <div style={s('display: flex; gap: 5px; align-items: flex-end; height: ' + HEIGHT + 'px;')}>
+    <div style={s('display: flex; gap: 4px; align-items: flex-end; height: ' + HEIGHT + 'px;')}>
       {totals.map((total, i) => {
         const scale = total === 0 ? 0 : (HEIGHT * (total / max)) / total
         return (
           <div
             key={i}
-            title={`${total} · ${c[i]} commit(s), ${p[i]} plan(s), ${k[i]} ticket(s)`}
+            title={`${total} · ${p[i]} plan(s), ${k[i]} ticket(s), ${c[i]} commit(s)`}
             style={s('flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: 1px;')}
           >
+            {c[i] > 0 && <div style={s(`background: ${COULEUR_SERIE.commits}; height: ${Math.max(2, c[i] * scale)}px; border-radius: 1px;`)} />}
             {k[i] > 0 && <div style={s(`background: ${COULEUR_SERIE.tickets}; height: ${Math.max(2, k[i] * scale)}px; border-radius: 1px;`)} />}
             {p[i] > 0 && <div style={s(`background: ${COULEUR_SERIE.plans}; height: ${Math.max(2, p[i] * scale)}px; border-radius: 1px;`)} />}
-            {c[i] > 0 && <div style={s(`background: ${COULEUR_SERIE.commits}; height: ${Math.max(2, c[i] * scale)}px; border-radius: 1px;`)} />}
             {total === 0 && <div style={s('background: var(--color-neutral-800); height: 3px; border-radius: 1px;')} />}
           </div>
         )
@@ -240,8 +331,16 @@ function StackedBars({
   )
 }
 
-/** Densité combinée, en semaines : la même lecture d'intensité que la barre latérale, mais sur tout le fil, pas les seuls commits. */
-function WeeklyDensity({
+/**
+ * Densité combinée, en grille — maquette 2l (planche B) : douze semaines en
+ * colonnes, sept jours en lignes, l'intensité en couleur. La grille CSS
+ * remplit ses cellules dans l'ordre du DOM en priorité ligne — on pousse donc
+ * les jours d'une même semaine consécutivement, comme `foldWeekly()` les
+ * replie déjà, plutôt que d'aligner sur le vrai lundi civil : ni l'un ni
+ * l'autre n'est plus « correct », et suivre la même convention que le pliage
+ * existant évite d'introduire une deuxième façon de découper une semaine.
+ */
+function WeeklyDensityGrid({
   commits,
   plans,
   tickets,
@@ -254,70 +353,82 @@ function WeeklyDensity({
 }) {
   const days = weeks * 7
   const combined = [...commits, ...plans, ...tickets]
-  const bars = foldWeekly(dailyCounts(combined, days))
-  const max = Math.max(1, ...bars)
-  const HEIGHT = 90
+  const daily = dailyCounts(combined, days)
+  const max = Math.max(1, ...daily)
+
+  const couleur = (value: number) => {
+    if (value === 0) return NIVEAUX_DENSITE[0]
+    const ratio = value / max
+    if (ratio > 0.75) return NIVEAUX_DENSITE[4]
+    if (ratio > 0.5) return NIVEAUX_DENSITE[3]
+    if (ratio > 0.25) return NIVEAUX_DENSITE[2]
+    return NIVEAUX_DENSITE[1]
+  }
 
   return (
-    <div style={s('display: flex; gap: 6px; align-items: flex-end; height: ' + HEIGHT + 'px;')}>
-      {bars.map((value, i) => {
-        const height = value === 0 ? 3 : Math.max(4, Math.round((value / max) * HEIGHT))
-        const color = value === 0 ? 'var(--color-neutral-800)' : value / max > 0.6 ? 'var(--color-accent-500)' : 'var(--color-accent-700)'
-        return (
-          <div
-            key={i}
-            title={`${value} activité(s)`}
-            style={s(`flex: 1; height: ${height}px; border-radius: 2px; background: ${color};`)}
-            role="img"
-            aria-label={`semaine ${i + 1} : ${value} activité(s)`}
-          />
-        )
-      })}
+    <div style={s(`display: grid; grid-template-columns: repeat(${weeks}, 1fr); grid-template-rows: repeat(7, 1fr); gap: 3px; height: 92px;`)}>
+      {Array.from({ length: 7 }, (_, row) =>
+        Array.from({ length: weeks }, (_, col) => {
+          const value = daily[col * 7 + row]
+          return (
+            <div
+              key={`${row}-${col}`}
+              title={`${value} activité(s)`}
+              role="img"
+              aria-label={`${value} activité(s)`}
+              style={s(`background: ${couleur(value)}; border-radius: 2px;`)}
+            />
+          )
+        }),
+      )}
     </div>
   )
 }
 
-/** Trois séries côte à côte plutôt qu'empilées : compare le rythme d'une nature d'activité à l'autre. */
-function ByTypeBars({
+/**
+ * Quatre lectures côte à côte, en barre proportionnelle plutôt qu'en
+ * sparkline journalière — maquette 2l (planche C) : ce que chaque nature
+ * d'activité pèse sur trente jours, pas son rythme jour par jour (déjà
+ * disponible via la vue empilée).
+ */
+function ByTypeMeters({
   commits,
   plans,
   tickets,
+  scans,
   days,
 }: {
   commits: Array<{ date: string }>
   plans: Array<{ date: string }>
   tickets: Array<{ date: string }>
+  scans: Scan[]
   days: number
 }) {
+  const since = (entries: Array<{ date: string }>) => dailyCounts(entries, days).reduce((sum, n) => sum + n, 0)
+
   const series = [
-    ['commits', dailyCounts(commits, days)],
-    ['plans', dailyCounts(plans, days)],
-    ['tickets', dailyCounts(tickets, days)],
+    { key: 'commits', label: t('historique.commits_label'), count: since(commits), couleur: COULEUR_SERIE.commits },
+    { key: 'tickets', label: t('historique.tickets_written'), count: since(tickets), couleur: COULEUR_SERIE.tickets },
+    { key: 'plans', label: t('historique.plans_captured'), count: since(plans), couleur: COULEUR_SERIE.plans },
+    { key: 'scans', label: t('historique.scans_label'), count: since(scans), couleur: 'var(--color-neutral-600)' },
   ] as const
+
+  const max = Math.max(1, ...series.map(item => item.count))
 
   return (
     <div style={s('display: flex; flex-direction: column; gap: 12px;')}>
-      {series.map(([key, values]) => {
-        const max = Math.max(1, ...values)
-        return (
-          <div key={key} style={s('display: flex; align-items: center; gap: 10px;')}>
-            <div style={s('width: 60px; flex: none; font-size: 11px; color: var(--color-neutral-500); text-align: right;')}>
-              {key === 'commits' ? t('historique.view_commits') : key === 'plans' ? t('historique.plan_label') : t('historique.ticket_label')}
-            </div>
-            <div style={s('flex: 1; display: flex; gap: 2px; align-items: flex-end; height: 30px;')}>
-              {values.map((value, i) => (
-                <div
-                  key={i}
-                  title={`${value}`}
-                  style={s(
-                    `flex: 1; height: ${value === 0 ? 2 : Math.max(3, Math.round((value / max) * 30))}px; background: ${value === 0 ? 'var(--color-neutral-800)' : COULEUR_SERIE[key]}; border-radius: 1px;`,
-                  )}
-                />
-              ))}
-            </div>
+      {series.map(item => (
+        <div key={item.key} style={s('display: flex; flex-direction: column; gap: 6px;')}>
+          <div style={s('display: flex; align-items: baseline; gap: 8px;')}>
+            <div style={s('font-size: 12px; color: var(--color-text);')}>{item.label}</div>
+            <div style={s('flex: 1;')} />
+            <div style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-neutral-500);')}>{item.count}</div>
           </div>
-        )
-      })}
+          <div style={s('height: 6px; border-radius: 3px; background: var(--color-surface-control); overflow: hidden;')}>
+            <div style={s(`width: ${(item.count / max) * 100}%; height: 100%; background: ${item.couleur};`)} />
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

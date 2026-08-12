@@ -37,6 +37,7 @@ const settings = (patch: Record<string, unknown> = {}): SettingsType =>
 
 const reponses = (patch: Partial<Reponses> = {}): Reponses => ({
   profil: 'complet',
+  vuesActives: null,
   bootstrap: true,
   ...patch,
 })
@@ -99,6 +100,19 @@ test('appliquerReponses : marque la présentation comme vue', () => {
 test('appliquerReponses : un profil inconnu retombe sur le premier de la liste', () => {
   const result = appliquerReponses(settings(), reponses({ profil: 'inexistant' }))
   assert.deepEqual(result.onglets.actifs, ORDRE)
+})
+
+test('appliquerReponses : la grille de vues (vuesActives) l’emporte sur le template', () => {
+  const result = appliquerReponses(
+    settings(),
+    reponses({ profil: 'sobre', vuesActives: ['apercu', 'stack'] }),
+  )
+  assert.deepEqual(result.onglets.actifs, ['apercu', 'stack'])
+})
+
+test('appliquerReponses : sans vuesActives, le template décide seul', () => {
+  const result = appliquerReponses(settings(), reponses({ profil: 'sobre', vuesActives: null }))
+  assert.deepEqual(result.onglets.actifs, ['apercu', 'tableau', 'historique'])
 })
 
 test('appliquerReponses : ne mute pas les préférences reçues', () => {

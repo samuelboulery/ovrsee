@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { X } from '@phosphor-icons/react'
 
 import { ticketAction, type Snapshot } from '../data'
 import { t } from '../i18n'
@@ -520,6 +521,13 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
   }, [devtools, visible, dock, pane.size, placeDevtools])
 
   const errors = logs.filter(l => l.level === 'error').length
+  const currentRoute = (() => {
+    try {
+      return new URL(url).pathname
+    } catch {
+      return null
+    }
+  })()
 
   // `<webview>` est une balise d'Electron. Dans un navigateur elle ne rend
   // rien : l'onglet affichait un grand rectangle blanc surmonté d'une barre
@@ -606,6 +614,12 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
           </div>
         )}
       </div>
+
+      {/* La colonne aperçu+DevTools+journal à gauche, le panneau de
+          l'élément sélectionné à droite — persistant, maquette 2c, plutôt
+          qu'une barre qui n'apparaissait qu'un élément choisi. */}
+      <div style={s('flex: 1; display: flex; min-height: 0; min-width: 0;')}>
+      <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
 
       {/* Aperçu et DevTools partagent cette zone : en colonne quand ils sont
           en bas, en ligne quand ils sont sur le côté. */}
@@ -719,40 +733,6 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
         </div>
       )}
 
-      {picked && (
-        <div
-          style={s(
-            'flex: none; display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-top: 1px solid var(--color-divider); background: var(--color-surface); font-size: 11.5px;',
-          )}
-        >
-          <span style={s('font-family: var(--font-mono); color: var(--color-accent); flex: none;')}>
-            {picked.selector}
-          </span>
-          <span
-            style={s(
-              'flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--color-neutral-600);',
-            )}
-          >
-            {picked.text}
-          </span>
-          <button type="button" onClick={envoyerAClaude} className="btn btn-secondary" style={s('font-size: 11px; padding: 3px 9px;')}>
-            {t('navigateur.send_to_claude')}
-          </button>
-          <button
-            type="button"
-            onClick={creerTicket}
-            disabled={ticketing}
-            className="btn btn-secondary"
-            style={s('font-size: 11px; padding: 3px 9px;')}
-          >
-            {ticketing ? t('navigateur.ticket_creating') : t('navigateur.create_ticket')}
-          </button>
-          <button type="button" onClick={() => setPicked(null)} className="btn btn-ghost" style={s('font-size: 11px; padding: 3px 8px;')}>
-            {t('navigateur.dismiss_selection')}
-          </button>
-        </div>
-      )}
-
       {notice && (
         <div
           style={s(
@@ -762,6 +742,138 @@ export function Navigateur({ snapshot, visible }: { snapshot: Snapshot; visible:
           {notice}
         </div>
       )}
+      </div>
+
+      <ElementPanel
+        picked={picked}
+        routes={snapshot.pages?.pages?.map(page => page.route) ?? []}
+        currentRoute={currentRoute}
+        onSend={envoyerAClaude}
+        onTicket={creerTicket}
+        ticketing={ticketing}
+        onClose={() => setPicked(null)}
+      />
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Panneau de l'élément sélectionné — maquette 2c, colonne fixe à droite.
+ *
+ * Remplace la barre du bas qui n'apparaissait qu'une fois un élément choisi :
+ * la maquette le pose en permanence, avec un état vide tant que rien n'est
+ * sélectionné.
+ */
+function ElementPanel({
+  picked,
+  routes,
+  currentRoute,
+  onSend,
+  onTicket,
+  ticketing,
+  onClose,
+}: {
+  picked: Picked | null
+  routes: string[]
+  currentRoute: string | null
+  onSend: () => void
+  onTicket: () => void
+  ticketing: boolean
+  onClose: () => void
+}) {
+  return (
+    <div
+      style={s(
+        'width: 340px; flex: none; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); display: flex; flex-direction: column; overflow-y: auto;',
+      )}
+    >
+      <div style={s('height: 38px; flex: none; display: flex; align-items: center; padding: 0 14px; border-bottom: 1px solid var(--color-divider);')}>
+        <div style={s('font-size: 12px; font-weight: 500; flex: 1;')}>{t('navigateur.selected_element')}</div>
+        {picked && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t('navigateur.dismiss_selection')}
+            style={s('background: transparent; border: 0; cursor: pointer; color: var(--color-neutral-600); display: flex; padding: 0;')}
+          >
+            <X size={14} weight="regular" aria-hidden="true" />
+          </button>
+        )}
+      </div>
+
+      <div style={s('padding: 14px; display: flex; flex-direction: column; gap: 14px;')}>
+        {picked ? (
+          <>
+            <PanelField label={t('navigateur.selector_label')}>
+              <div
+                style={s(
+                  'font-family: var(--font-mono); font-size: 11px; color: var(--color-accent); background: var(--color-surface-control); border: 1px solid var(--color-divider); border-radius: var(--radius-md); padding: 9px 10px; line-height: 1.6; word-break: break-all;',
+                )}
+              >
+                {picked.selector}
+              </div>
+            </PanelField>
+            <PanelField label={t('navigateur.text_label')}>
+              <div style={s('font-size: 12.5px; color: var(--color-neutral-400); line-height: 1.6;')}>{picked.text || '—'}</div>
+            </PanelField>
+            <PanelField label={t('navigateur.route_label')}>
+              <div style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-neutral-500);')}>{picked.route}</div>
+            </PanelField>
+
+            <div style={s('height: 1px; background: var(--color-divider);')} />
+
+            <div style={s('display: flex; flex-direction: column; gap: 8px;')}>
+              <button type="button" onClick={onSend} className="btn btn-primary" style={s('justify-content: center; font-size: 12px;')}>
+                {t('navigateur.paste_in_claude')}
+              </button>
+              <button
+                type="button"
+                onClick={onTicket}
+                disabled={ticketing}
+                className="btn btn-secondary"
+                style={s('justify-content: center; font-size: 12px;')}
+              >
+                {ticketing ? t('navigateur.ticket_creating') : t('navigateur.open_ticket_from_element')}
+              </button>
+            </div>
+          </>
+        ) : (
+          <div style={s('font-size: 12px; color: var(--color-neutral-600); line-height: 1.6;')}>
+            {t('navigateur.no_element_selected')}
+          </div>
+        )}
+
+        {routes.length > 0 && (
+          <>
+            <div style={s('height: 1px; background: var(--color-divider);')} />
+            <PanelField label={t('navigateur.known_routes')}>
+              <div style={s('display: flex; flex-wrap: wrap; gap: 5px;')}>
+                {routes.map(route => (
+                  <span
+                    key={route}
+                    className={route === currentRoute ? 'tag tag-accent' : 'tag tag-outline'}
+                    style={s('font-size: 11px;')}
+                  >
+                    {route}
+                  </span>
+                ))}
+              </div>
+            </PanelField>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function PanelField({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div style={s('display: flex; flex-direction: column; gap: 6px;')}>
+      <div style={s('font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-600);')}>
+        {label}
+      </div>
+      {children}
     </div>
   )
 }

@@ -17,6 +17,12 @@ import { PROFILS, appliquerProfil, profilCourant } from './PreferencesProfils'
 export type Reponses = {
   /** Le template retenu : choisi directement dans la galerie, plus jamais déduit d'une matrice. */
   profil: string
+  /**
+   * Les vues actives, quand la grille de bascules de l'écran 2 (maquette 2j)
+   * s'écarte du template choisi. `null` tant qu'on n'y a pas touché — le
+   * template décide seul.
+   */
+  vuesActives: string[] | null
   /** Proposer une commande à l'ouverture d'un projet neuf. */
   bootstrap: boolean
 }
@@ -44,7 +50,12 @@ export const BOOTSTRAP_DEFAUT = ['/project-setup']
  */
 export function appliquerReponses(settings: SettingsType, reponses: Reponses): SettingsType {
   const profil = PROFILS.find(p => p.id === reponses.profil) ?? PROFILS[0]
-  const applique = appliquerProfil(settings, profil)
+  // La grille de la maquette 2j l'emporte sur le template dès qu'on y a
+  // touché — sinon un réglage fin serait repris par le prochain rendu.
+  const applique = appliquerProfil(
+    settings,
+    reponses.vuesActives ? { ...profil, actifs: reponses.vuesActives } : profil,
+  )
 
   return {
     ...applique,
@@ -71,6 +82,7 @@ export const apercuReponses = (settings: SettingsType, reponses: Reponses): Sett
 export function reponsesInitiales(settings: SettingsType): Reponses {
   return {
     profil: profilCourant(settings) ?? PROFILS[0].id,
+    vuesActives: null,
     bootstrap: true,
   }
 }

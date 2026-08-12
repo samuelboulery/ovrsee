@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+import { Compass, GitDiff } from '@phosphor-icons/react'
 
 import {
   CARD_H,
   CARD_W,
+  composerCommande,
   frDate,
   frDateShort,
   humanAge,
@@ -26,12 +28,21 @@ import { usePanZoom } from '../usePanZoom'
 import type { Layout } from '../Terminal'
 
 /** Onglet Produit — maquette l. 85-274. */
-export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layout }) {
+export function Produit({
+  snapshot,
+  layout,
+  packageManager,
+}: {
+  snapshot: Snapshot
+  layout: Layout
+  packageManager: string
+}) {
   const pages = snapshot.pages?.pages ?? []
   const redirects = snapshot.pages?.redirects ?? {}
   const orphans = snapshot.pages?.orphanShots ?? []
   const [selected, setSelected] = useState<string | null>(null)
   const [panel, setPanel] = useState(true)
+  const [compare, setCompare] = useState(false)
 
   // Tirer vers la gauche agrandit le rail, qui est à droite.
   const rail = useResizable({
@@ -49,6 +60,7 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
   const { placed, width, height } = layoutGraph(pages)
 
   const current = pages.find(p => p.route === selected) ?? pages[0] ?? null
+  const currentShots = current ? snapshot.shots[current.slug] ?? [] : []
   const linkCount = pages.reduce((total, page) => total + page.links.length, 0)
   const failed = scanFailed(snapshot.scans)
   const commit = lastScan(snapshot.scans)?.commit ?? null
@@ -84,7 +96,7 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
     <div style={s('flex: 1; display: flex; min-width: 0; position: relative;')}>
       <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
         <div style={s('flex: none; padding: 20px 22px 0;')}>
-          <div style={s('display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;')}>
+          <div style={s('display: flex; align-items: center; gap: 12px; margin-bottom: 4px;')}>
             <h2 style={s('font-family: var(--font-heading); font-weight: 500; font-size: 19px; margin: 0;')}>
               {t('produit.title')}
             </h2>
@@ -92,6 +104,18 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
               {pages.length > 1 ? t('produit.pages_count_plural', { n: pages.length }) : t('produit.pages_count', { n: 1 })} · {linkCount > 1 ? t('produit.links_count_plural', { n: linkCount }) : t('produit.links_count', { n: 1 })} · {t('produit.rebuilt_at_commit')}
               {commit && <span style={s('font-family: var(--font-mono);')}> {commit.slice(0, 7)}</span>}
             </span>
+            <div style={s('flex: 1;')} />
+            <button
+              type="button"
+              className="btn btn-ghost"
+              disabled={currentShots.length < 2}
+              onClick={() => setCompare(true)}
+              style={s('font-size: 12px;')}
+            >
+              <GitDiff size={14} weight="regular" aria-hidden="true" />
+              {t('produit.compare_dates')}
+            </button>
+            <CrawlButton packageManager={packageManager} />
           </div>
 
           <Legend />
@@ -194,7 +218,47 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
           </button>
         </div>
       )}
+
+      {compare && current && currentShots.length > 1 && (
+        <CompareModal
+          root={snapshot.root}
+          slug={current.slug}
+          files={currentShots}
+          label={`${pageName(current, pages)} · ${current.route}`}
+          onClose={() => setCompare(false)}
+        />
+      )}
     </div>
+  )
+}
+
+/**
+ * Bouton Crawler — maquette 2d, en-tête. Copie la commande plutôt que de la
+ * coller dans le terminal : importer `pasteToClaude` chargerait `@xterm/xterm`
+ * (et son CSS) dans un onglet couvert par `render.test.tsx`, comme trouvé sur
+ * Données. Même geste que `donnees.copy_command`.
+ */
+function CrawlButton({ packageManager }: { packageManager: string }) {
+  const [copie, setCopie] = useState(false)
+
+  return (
+    <button
+      type="button"
+      className="btn btn-primary"
+      style={s('font-size: 12px;')}
+      onClick={() => {
+        navigator.clipboard
+          ?.writeText(composerCommande('ovrsee:crawl', packageManager))
+          .then(() => {
+            setCopie(true)
+            setTimeout(() => setCopie(false), 1500)
+          })
+          .catch(() => setCopie(false))
+      }}
+    >
+      <Compass size={14} weight="fill" aria-hidden="true" />
+      {copie ? t('produit.crawl_copied') : t('produit.crawl')}
+    </button>
   )
 }
 
@@ -440,7 +504,6 @@ function DetailPanel({
   // Index de la capture agrandie, ou null. Toutes les captures sont
   // atteignables depuis la visionneuse, pas seulement les cinq du rail.
   const [zoom, setZoom] = useState<number | null>(null)
-  const [compare, setCompare] = useState(false)
 
   return (
     <div
@@ -529,14 +592,6 @@ function DetailPanel({
               >
                 {t('produit.view_all_screenshots', { n: shots.length })}
               </button>
-              <button
-                type="button"
-                onClick={() => setCompare(true)}
-                className="btn btn-ghost"
-                style={s('font-size: 11px; padding: 4px 9px;')}
-              >
-                {t('produit.compare_dates')}
-              </button>
             </div>
           </>
         ) : (
@@ -584,16 +639,6 @@ function DetailPanel({
           onIndex={setZoom}
           onClose={() => setZoom(null)}
           label={`${pageName(page, pages)} · ${page.route}`}
-        />
-      )}
-
-      {compare && (
-        <CompareModal
-          root={snapshot.root}
-          slug={page.slug}
-          files={shots}
-          label={`${pageName(page, pages)} · ${page.route}`}
-          onClose={() => setCompare(false)}
         />
       )}
     </div>

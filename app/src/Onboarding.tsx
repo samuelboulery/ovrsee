@@ -16,11 +16,12 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
+import { Check } from '@phosphor-icons/react'
 
 import type { SettingsType } from './data'
-import { t } from './i18n'
+import { t, type TranslationKey } from './i18n'
 import { Logo, SchemaBoucle } from './OnboardingArt'
-import { appliquerReponses, reponsesInitiales, type Reponses } from './profilage'
+import { apercuReponses, appliquerReponses, reponsesInitiales, type Reponses } from './profilage'
 import {
   IconDark,
   IconLight,
@@ -30,12 +31,17 @@ import {
   Segmented,
   Switch,
 } from './PreferencesControls'
+import { basculerOnglet } from './PreferencesPanel'
 import { SectionProfils, profilCourant } from './PreferencesProfils'
 import { BlocGitignore } from './PreferencesProjet'
 import { s } from './style'
 import { applyTheme } from './theme'
+import { TAB_ICONS, type TabId } from './views'
 
 const NB_ECRANS = 3
+
+/** Les titres d'étape de la colonne de gauche, dans l'ordre — maquette 2j. */
+const ETAPES: TranslationKey[] = ['onboard.what_title', 'onboard.profile_step_label', 'onboard.settings_title']
 
 export type OnboardingProps = {
   settings: SettingsType
@@ -169,6 +175,78 @@ function EcranPresentation() {
 
 /* — Écran 2 : composition d'interface — */
 
+/**
+ * Les six vues de la grille — Stack n'y figure pas, la maquette 2j s'arrête
+ * à ces six-là et laisse Stack au seul choix du template.
+ */
+const VUES_GRILLE: Array<{ id: TabId; labelCle: TranslationKey; descCle: TranslationKey; verrouille?: boolean }> = [
+  { id: 'apercu', labelCle: 'tabs.apercu', descCle: 'onboard.view_always_on', verrouille: true },
+  { id: 'navigateur', labelCle: 'tabs.navigateur', descCle: 'onboard.view_desc_navigateur' },
+  { id: 'produit', labelCle: 'tabs.produit', descCle: 'onboard.view_desc_produit' },
+  { id: 'historique', labelCle: 'tabs.historique', descCle: 'onboard.view_desc_historique' },
+  { id: 'tableau', labelCle: 'tabs.tableau', descCle: 'onboard.view_desc_tableau' },
+  { id: 'donnees', labelCle: 'tabs.donnees', descCle: 'onboard.view_desc_donnees' },
+]
+
+/**
+ * La grille 2×3 de bascules par vue, sous la galerie de préréglages.
+ *
+ * Un second niveau de réglage, pas une redite : le préréglage choisit un
+ * point de départ, la grille l'affine vue par vue. Elle lit et écrit
+ * l'aperçu du choix en cours (`apercuReponses`), jamais `settings` brut —
+ * sans quoi cocher une vue avant d'avoir choisi de préréglage partirait
+ * d'un état qui ne reflète pas encore le préréglage courant.
+ */
+function GrilleVues({
+  settings,
+  reponses,
+  onReponses,
+}: {
+  settings: SettingsType
+  reponses: Reponses
+  onReponses: (r: Reponses) => void
+}) {
+  const effectif = apercuReponses(settings, reponses)
+  const actifs = new Set(effectif.onglets?.actifs ?? [])
+
+  return (
+    <div style={s('display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;')}>
+      {VUES_GRILLE.map(({ id, labelCle, descCle, verrouille }) => {
+        const Icon = TAB_ICONS[id]
+        const actif = actifs.has(id)
+        return (
+          <div
+            key={id}
+            style={s(
+              'display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 9px; border: 1px solid var(--color-divider); background: var(--color-surface-card);' +
+                (actif ? '' : ' opacity: .65;'),
+            )}
+          >
+            <Icon
+              size={16}
+              weight={actif ? 'fill' : 'regular'}
+              color={actif ? 'var(--color-accent)' : 'var(--color-neutral-600)'}
+              aria-hidden="true"
+            />
+            <div style={s('flex: 1; min-width: 0;')}>
+              <div style={s('font-size: 12.5px; font-weight: 500;')}>{t(labelCle)}</div>
+              <div style={s('font-size: 11px; color: var(--color-neutral-600); margin-top: 2px;')}>
+                {t(descCle)}
+              </div>
+            </div>
+            <Switch
+              label={t(labelCle)}
+              checked={actif}
+              disabled={verrouille}
+              onChange={() => onReponses({ ...reponses, vuesActives: basculerOnglet(effectif, id).onglets.actifs })}
+            />
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function EcranProfil({
   settings,
   reponses,
@@ -179,15 +257,24 @@ function EcranProfil({
   onReponses: (r: Reponses) => void
 }) {
   // La galerie elle-même est la question : un clic sur une carte vaut
-  // réponse, sans matrice cachée entre les deux (maquette 2j).
+  // réponse, sans matrice cachée entre les deux (maquette 2j). Choisir un
+  // autre préréglage efface les ajustements de la grille — c'est un nouveau
+  // point de départ, pas un correctif du précédent.
   return (
-    <SectionProfils
-      settings={settings}
-      courant={reponses.profil}
-      titreCle="onboard.profile_title"
-      descCle="onboard.profile_desc"
-      onSettings={next => onReponses({ ...reponses, profil: profilCourant(next) ?? reponses.profil })}
-    />
+    <>
+      <SectionProfils
+        settings={settings}
+        courant={reponses.profil}
+        titreCle="onboard.profile_title"
+        descCle="onboard.profile_desc"
+        onSettings={next =>
+          onReponses({ ...reponses, profil: profilCourant(next) ?? reponses.profil, vuesActives: null })
+        }
+      />
+      <div style={s('margin-top: 20px;')}>
+        <GrilleVues settings={settings} reponses={reponses} onReponses={onReponses} />
+      </div>
+    </>
   )
 }
 
@@ -341,97 +428,118 @@ export function Onboarding({ settings, etapeInitiale = 0, onFini, onAjouterProje
         aria-modal="true"
         aria-label={t('onboard.header')}
         style={s(
-          // Mêmes proportions que l'écran des préférences, en un peu plus haut :
-          // la galerie des templates de l'écran 2 ne tient pas en 600 px.
-          'width: min(880px, 100%); height: min(680px, 100%); display: flex; flex-direction: column; overflow: hidden; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 10px; box-shadow: var(--shadow-lg); color: var(--color-text); font-family: var(--font-body);',
+          // Mêmes proportions que l'écran des préférences côté hauteur, plus
+          // large : la colonne de gauche (étapes) et la galerie de l'écran 2
+          // (quatre cartes en ligne) ne tiennent pas dans 880px.
+          'width: min(1040px, 100%); height: min(700px, 100%); display: flex; overflow: hidden; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 10px; box-shadow: var(--shadow-lg); color: var(--color-text); font-family: var(--font-body);',
         )}
       >
-        <header
+        {/* Colonne de gauche : logo, les 3 étapes, note d'aide — maquette 2j.
+            Remplace l'ancien en-tête à puces, qui ne portait pas les titres
+            d'étape. */}
+        <div
           style={s(
-            'flex: none; display: flex; align-items: center; gap: 12px; padding: 13px 18px; background: var(--theme-bg-tertiary); border-bottom: 1px solid var(--color-divider);',
+            'width: 300px; flex: none; background: var(--color-bg); border-right: 1px solid var(--color-divider); padding: 28px 24px; display: flex; flex-direction: column; gap: 26px;',
           )}
         >
-          <Logo size={24} />
-          <div style={s('font-size: 13px;')}>{t('onboard.header')}</div>
+          <div style={s('display: flex; align-items: center; gap: 10px;')}>
+            <Logo size={26} />
+            <div style={s('font-size: 15px; font-weight: 600;')}>Ovrsee</div>
+          </div>
 
-          <div style={s('flex: 1;')} />
-
-          <div aria-hidden="true" style={s('display: flex; gap: 5px; margin-right: 6px;')}>
-            {Array.from({ length: NB_ECRANS }, (_, index) => (
-              <span
-                key={index}
-                style={s(
-                  'width: 6px; height: 6px; border-radius: 50%;' +
-                    (index === etape
-                      ? ' background: var(--color-accent);'
-                      : ' background: var(--color-divider);'),
-                )}
-              />
+          <div style={s('display: flex; flex-direction: column; gap: 14px;')}>
+            {ETAPES.map((cle, index) => (
+              <div key={cle} style={s('display: flex; align-items: center; gap: 10px;')}>
+                <span
+                  aria-hidden="true"
+                  style={s(
+                    'flex: none; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 9px;' +
+                      (index < etape
+                        ? ' border: 1px solid var(--color-accent-700); background: var(--color-accent-900); color: var(--color-accent-300);'
+                        : index === etape
+                          ? ' background: var(--color-accent); color: var(--color-bg);'
+                          : ' border: 1px solid var(--color-divider); color: var(--color-neutral-600);'),
+                  )}
+                >
+                  {index < etape ? <Check size={10} weight="bold" /> : index + 1}
+                </span>
+                <span
+                  style={s(
+                    'font-size: 12.5px;' +
+                      (index === etape ? ' font-weight: 500;' : ' color: var(--color-neutral-600);'),
+                  )}
+                >
+                  {t(cle)}
+                </span>
+              </div>
             ))}
           </div>
 
-          <button type="button" className="btn btn-ghost" onClick={terminer}>
-            {t('onboard.skip')}
-          </button>
-        </header>
-
-        <div
-          ref={corps}
-          style={s(
-            'flex: 1; overflow-y: auto; padding: 22px 24px; display: flex; flex-direction: column;',
-          )}
-        >
-          {/* `margin: auto 0` centre un écran plus court que la modale et ne
-              fait rien quand il est plus long — contrairement à
-              `justify-content: center`, qui couperait le haut de l'écran 2 au
-              lieu de le laisser défiler. */}
-          <div style={s('margin: auto 0; width: 100%;')}>
-            {etape === 0 && <EcranPresentation />}
-            {etape === 1 && (
-              <EcranProfil settings={brouillon} reponses={reponses} onReponses={repondre} />
-            )}
-            {etape === 2 && (
-              <EcranReglages
-                settings={brouillon}
-                onSettings={setBrouillon}
-                reponses={reponses}
-                onReponses={repondre}
-                onAjouterProjet={onAjouterProjet && ajouter}
-              />
-            )}
+          <div style={s('flex: 1;')} />
+          <div style={s('font-size: 12px; color: var(--color-neutral-600); line-height: 1.65; text-wrap: pretty;')}>
+            {t('onboard.sidebar_note')}
           </div>
         </div>
 
-        <footer
-          style={s(
-            'flex: none; display: flex; align-items: center; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--color-divider);',
-          )}
-        >
-          <button
-            type="button"
-            className="btn btn-ghost"
-            disabled={etape === 0}
-            onClick={() => setEtape(e => Math.max(0, e - 1))}
+        <div style={s('flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden;')}>
+          <div
+            ref={corps}
+            style={s(
+              'flex: 1; overflow-y: auto; padding: 28px 30px; display: flex; flex-direction: column;',
+            )}
           >
-            {t('onboard.prev')}
-          </button>
+            {/* `margin: auto 0` centre un écran plus court que la modale et ne
+                fait rien quand il est plus long — contrairement à
+                `justify-content: center`, qui couperait le haut de l'écran 2 au
+                lieu de le laisser défiler. */}
+            <div style={s('margin: auto 0; width: 100%;')}>
+              {etape === 0 && <EcranPresentation />}
+              {etape === 1 && (
+                <EcranProfil settings={brouillon} reponses={reponses} onReponses={repondre} />
+              )}
+              {etape === 2 && (
+                <EcranReglages
+                  settings={brouillon}
+                  onSettings={setBrouillon}
+                  reponses={reponses}
+                  onReponses={repondre}
+                  onAjouterProjet={onAjouterProjet && ajouter}
+                />
+              )}
+            </div>
+          </div>
 
-          <div style={s('flex: 1;')} />
-
-          <span style={s('font-size: 11.5px; color: var(--color-neutral-600);')}>
-            {t('onboard.step', { n: String(etape + 1), total: String(NB_ECRANS) })}
-          </span>
-
-          {etape < NB_ECRANS - 1 ? (
-            <button type="button" className="btn btn-primary" onClick={() => setEtape(e => e + 1)}>
-              {t('onboard.next')}
+          <div
+            style={s(
+              'flex: none; display: flex; align-items: center; gap: 10px; padding: 16px 30px; border-top: 1px solid var(--color-divider);',
+            )}
+          >
+            <button type="button" className="btn btn-ghost" onClick={terminer}>
+              {t('onboard.skip')}
             </button>
-          ) : (
-            <button type="button" className="btn btn-primary" onClick={terminer}>
-              {t('onboard.done')}
+
+            <div style={s('flex: 1;')} />
+
+            <button
+              type="button"
+              className="btn btn-secondary"
+              disabled={etape === 0}
+              onClick={() => setEtape(e => Math.max(0, e - 1))}
+            >
+              {t('onboard.prev')}
             </button>
-          )}
-        </footer>
+
+            {etape < NB_ECRANS - 1 ? (
+              <button type="button" className="btn btn-primary" onClick={() => setEtape(e => e + 1)}>
+                {t('onboard.next')}
+              </button>
+            ) : (
+              <button type="button" className="btn btn-primary" onClick={terminer}>
+                {t('onboard.done')}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )

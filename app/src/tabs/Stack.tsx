@@ -7,11 +7,11 @@ import { s } from '../style'
 type Filtre = 'toutes' | 'production' | 'sans_raison'
 
 /** Une dépendance : nom, version, et la raison si `WHY:` en donne une. */
-function Carte({ row }: { row: StackRow }) {
+function Carte({ row, colonneLarge }: { row: StackRow; colonneLarge: boolean }) {
   return (
     <div
       style={s(
-        'display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: start; border: 1px solid var(--color-divider); border-radius: var(--radius-md); padding: 12px 14px; background: var(--color-surface-card);',
+        `display: grid; grid-template-columns: ${colonneLarge ? 190 : 170}px 1fr; gap: 18px; align-items: start; border: 1px solid var(--color-divider); border-radius: 9px; padding: 13px 15px; background: var(--color-surface-card);`,
       )}
     >
       <div>
@@ -48,7 +48,7 @@ function Colonne({ titre, rows }: { titre: string; rows: StackRow[] }) {
       </div>
       <div style={s('display: flex; flex-direction: column; gap: 8px;')}>
         {rows.map(row => (
-          <Carte key={row.name} row={row} />
+          <Carte key={row.name} row={row} colonneLarge={!row.dev} />
         ))}
       </div>
     </div>

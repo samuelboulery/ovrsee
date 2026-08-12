@@ -120,7 +120,7 @@ export function Switch({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       style={s(
-        'width: 38px; height: 22px; flex: none; padding: 2px; border-radius: 11px; position: relative;' +
+        'width: 28px; height: 16px; flex: none; padding: 2px; border-radius: 999px; position: relative;' +
           ' transition: background .14s ease, border-color .14s ease;' +
           (disabled ? ' opacity: .45; cursor: not-allowed;' : ' cursor: pointer;') +
           (checked
@@ -130,9 +130,9 @@ export function Switch({
     >
       <span
         style={s(
-          'display: block; width: 16px; height: 16px; border-radius: 50%; transition: transform .14s ease;' +
+          'display: block; width: 12px; height: 12px; border-radius: 50%; transition: transform .14s ease;' +
             (checked
-              ? ' background: var(--color-accent); transform: translateX(16px);'
+              ? ' background: var(--color-accent); transform: translateX(12px);'
               : ' background: var(--color-neutral-500); transform: translateX(0);'),
         )}
       />

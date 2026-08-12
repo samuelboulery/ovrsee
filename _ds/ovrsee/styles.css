@@ -177,7 +177,7 @@ figcaption {
   font-size: 14px; line-height: 1.2; color: var(--color-text);
   background: transparent; border: 1px solid transparent;
   padding: var(--space-2) calc(var(--space-3) * 1.2);
-  border-radius: var(--radius-md);
+  border-radius: 6px; /* maquette 2a : boutons à 6px, pas --radius-md (8px) */
 }
 .btn svg { display: block; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
@@ -212,7 +212,7 @@ textarea.input { min-height: 90px; resize: vertical; }
   position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
 }
 .radio .dot {
-  width: 16px; height: 16px; flex: none; border-radius: 50%;
+  width: 14px; height: 14px; flex: none; border-radius: 50%;
   border: 1.5px solid var(--color-divider);
 }
 .radio:hover .dot { border-color: var(--color-accent); }
@@ -257,7 +257,7 @@ textarea.input { min-height: 90px; resize: vertical; }
 .tag {
   display: inline-flex; align-items: center; font-size: 11px;
   letter-spacing: 0.02em; padding: 3px 10px;
-  border-radius: calc(var(--radius-md) * 0.75);
+  border-radius: 4px; /* maquette 2a : badges/tags à 4px */
 }
 .tag-accent { background: var(--color-accent-800); color: var(--color-accent-100); }
 .tag-accent-2 { background: var(--color-accent-2-800); color: var(--color-accent-2-100); }

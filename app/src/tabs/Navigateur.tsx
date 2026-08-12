@@ -788,7 +788,7 @@ function ElementPanel({
         'width: 340px; flex: none; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); display: flex; flex-direction: column; overflow-y: auto;',
       )}
     >
-      <div style={s('height: 38px; flex: none; display: flex; align-items: center; padding: 0 14px; border-bottom: 1px solid var(--color-divider);')}>
+      <div style={s('height: 38px; flex: none; display: flex; align-items: center; padding: 0 12px; border-bottom: 1px solid var(--color-divider);')}>
         <div style={s('font-size: 12px; font-weight: 500; flex: 1;')}>{t('navigateur.selected_element')}</div>
         {picked && (
           <button

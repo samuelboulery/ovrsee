@@ -2,12 +2,17 @@
 {
   "id": "T-0069",
   "titre": "Galerie de préréglages (onboarding étape 2) — mise en page ne suit pas la maquette",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "basse",
-  "tags": ["ui", "onboarding"],
+  "tags": [
+    "ui",
+    "onboarding"
+  ],
   "cree": "2026-08-12",
   "maj": "2026-08-12",
-  "plan": null
+  "plan": "2026-08-12-audit-design-pixel-perfect-vs-ovrsee-app-dc-html.md",
+  "epic": "T-0070",
+  "charge": "s"
 }
 ---
 
@@ -29,7 +34,10 @@ T-0059/T-0060) et ne l'a pas revérifiée au pixel de mise en page — seul son 
 
 ## Critères d'acceptation
 
-- [ ] La galerie de préréglages est une ligne de 4 cartes compactes façon maquette,
+- [x] La galerie de préréglages est une ligne de 4 cartes compactes façon maquette,
       sélection directe sans bouton « Appliquer » séparé.
-- [ ] `pnpm typecheck` et `pnpm test` passent.
-- [ ] Comparaison visuelle contre `Ovrsee App.dc.html#2j` confirmée dans Chrome.
+- [x] `pnpm typecheck` et `pnpm test` passent.
+- [x] Comparaison visuelle contre `Ovrsee App.dc.html#2j` confirmée dans Chrome —
+      `SectionProfils` (`app/src/PreferencesProfils.tsx`, partagée avec l'onboarding)
+      refondue en ligne `flex` de 4 cartes cliquables (radio 14px, pastille 6px si
+      sélectionné, sans bouton), gap 10px, radius 10px, calé sur `#2j`.

@@ -117,7 +117,12 @@ export function profilCourant(settings: SettingsType): string | null {
   return trouve?.id ?? null
 }
 
-/** Une carte : la maquette de ce que le template donne, puis son bouton. */
+/**
+ * Une carte compacte : la maquette de ce que le template donne, un point de
+ * sélection façon radio, puis son nom et sa description. Toute la carte est
+ * cliquable — le clic applique le template, il n'y a pas de bouton séparé
+ * (maquette 2j).
+ */
 function CarteProfil({
   profil,
   settings,
@@ -130,39 +135,43 @@ function CarteProfil({
   onSettings: (settings: SettingsType) => void
 }) {
   return (
-    <div
+    <button
+      type="button"
+      aria-pressed={courant}
+      onClick={() => onSettings(appliquerProfil(settings, profil))}
       style={s(
-        'display: flex; flex-direction: column; gap: 9px; padding: 11px; border-radius: 9px;' +
+        'flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 9px; padding: 10px;' +
+          ' border-radius: 10px; text-align: left; cursor: pointer; font: inherit; color: inherit;' +
           (courant
-            ? ' border: 1px solid var(--color-accent);'
-            : ' border: 1px solid var(--color-divider);'),
+            ? ' border: 1px solid var(--color-accent-600); background: var(--color-surface-active);'
+            : ' border: 1px solid var(--color-divider); background: var(--color-surface-card);'),
       )}
     >
       {/* La maquette est la description : elle montre les onglets retenus et
           la place du terminal mieux qu'une phrase ne le dirait. */}
       <PreferencesPreview settings={appliquerProfil(settings, profil)} />
 
-      <div>
-        <div style={s('font-size: 13px; color: var(--color-text);')}>{t(profil.cle)}</div>
+      <div style={s('display: flex; align-items: center; gap: 7px;')}>
         <div
           style={s(
-            'margin-top: 3px; font-size: 11.5px; line-height: 1.45; color: var(--color-neutral-500);',
+            'box-sizing: border-box; width: 14px; height: 14px; border-radius: 50%; flex: none;' +
+              ' display: flex; align-items: center; justify-content: center;' +
+              (courant
+                ? ' border: 1.5px solid var(--color-accent);'
+                : ' border: 1.5px solid var(--color-neutral-700);'),
           )}
         >
-          {t(profil.cleDesc)}
+          {courant && (
+            <div style={s('width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent);')} />
+          )}
         </div>
+        <div style={s('font-size: 12px; font-weight: 500; color: var(--color-text);')}>{t(profil.cle)}</div>
       </div>
 
-      <button
-        type="button"
-        className={courant ? 'btn btn-ghost btn-block' : 'btn btn-primary btn-block'}
-        disabled={courant}
-        onClick={() => onSettings(appliquerProfil(settings, profil))}
-        style={s('font-size: 12px;')}
-      >
-        {courant ? t('pref.profile_current') : t('pref.profile_apply')}
-      </button>
-    </div>
+      <div style={s('font-size: 11px; line-height: 1.55; color: var(--color-neutral-500);')}>
+        {t(profil.cleDesc)}
+      </div>
+    </button>
   )
 }
 
@@ -196,7 +205,7 @@ export function SectionProfils({
         {t(descCle ?? 'pref.profiles_desc')}
       </p>
 
-      <div style={s('display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;')}>
+      <div style={s('display: flex; gap: 10px;')}>
         {PROFILS.map(profil => (
           <CarteProfil
             key={profil.id}

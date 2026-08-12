@@ -417,7 +417,7 @@ function PageCard({
 
   // Hauteur fixe : les arêtes s'ancrent sur CARD_H, une carte qui grandit avec
   // son titre les décrocherait.
-  const base = `position: absolute; left: ${x}px; top: ${y}px; width: ${CARD_W}px; height: ${CARD_H}px; overflow: hidden; box-sizing: border-box; display: flex; flex-direction: column; padding: 11px 13px; border-radius: 8px; background: var(--color-surface); border: 1px solid var(--color-neutral-800); cursor: pointer;`
+  const base = `position: absolute; left: ${x}px; top: ${y}px; width: ${CARD_W}px; height: ${CARD_H}px; overflow: hidden; box-sizing: border-box; display: flex; flex-direction: column; padding: 11px 13px; border-radius: 10px; background: var(--color-surface); border: 1px solid var(--color-neutral-800); cursor: pointer;`
 
   return (
     <div

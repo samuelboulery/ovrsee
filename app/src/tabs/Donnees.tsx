@@ -141,10 +141,10 @@ function EtatVide({ titre, detail, source }: { titre: string; detail: string; so
   return (
     <div style={s('display: flex; flex-direction: column; align-items: center; text-align: center; padding: 48px 20px; gap: 14px;')}>
       <Database size={40} weight="regular" color="var(--color-text-quaternary)" aria-hidden="true" />
-      <div style={s('font-family: var(--font-heading); font-weight: 500; font-size: 15px; color: var(--color-text);')}>
+      <div style={s('font-family: var(--font-heading); font-weight: 600; font-size: 15px; color: var(--color-text);')}>
         {titre}
       </div>
-      <div style={s('max-width: 46ch; font-size: 12px; line-height: 1.5; color: var(--color-neutral-500);')}>
+      <div style={s('max-width: 46ch; font-size: 12.5px; line-height: 1.5; color: var(--color-neutral-500);')}>
         {detail}
       </div>
       {source === null && (

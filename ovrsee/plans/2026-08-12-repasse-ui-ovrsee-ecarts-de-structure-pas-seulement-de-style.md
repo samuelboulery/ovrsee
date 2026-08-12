@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Repasse UI ovrsee — écarts de structure, pas seulement de style",
   "opened": "2026-08-12",
-  "closed": null,
+  "closed": "2026-08-12",
   "commits": [
     {
       "sha": "8364d47",
@@ -22,6 +22,11 @@
         "hooks/i18n.d.ts",
         "hooks/i18n.js"
       ]
+    },
+    {
+      "sha": "27f625b",
+      "date": "2026-08-12",
+      "files": []
     }
   ]
 }

@@ -150,7 +150,7 @@
   /* Elevation — recalculée sur la nouvelle rampe neutre. */
   --shadow-sm: 0 0 0 1px #323d48;
   --shadow-md: 0 0 0 1px #495969, 0 6px 18px rgba(0, 0, 0, 0.55);
-  --shadow-lg: 0 0 0 1px #8799ab, 0 16px 40px rgba(0, 0, 0, 0.65);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.5);
 }
 
 body {

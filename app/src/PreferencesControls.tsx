@@ -66,11 +66,7 @@ export function Row({
 /** Le titre d'une section, au-dessus de ses lignes. */
 export function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h3
-      style={s(
-        'margin: 0 0 4px; font-family: var(--font-heading); font-weight: 500; font-size: 17px; color: var(--color-text);',
-      )}
-    >
+    <h3 className="kicker" style={s('margin: 0 0 8px; font-size: 11px;')}>
       {children}
     </h3>
   )

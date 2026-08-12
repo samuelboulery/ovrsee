@@ -607,7 +607,7 @@ export function PreferencesModal({
         aria-label={t('pref.title')}
         onClick={event => event.stopPropagation()}
         style={s(
-          'width: min(1100px, 100%); height: min(700px, 100%); display: flex; overflow: hidden; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 10px; box-shadow: var(--shadow-lg);',
+          'width: min(1100px, 100%); height: min(700px, 100%); display: flex; overflow: hidden; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 14px; box-shadow: var(--shadow-lg);',
         )}
       >
         {/* La barre de navigation. Cinq entrées visibles d'un coup : elles ne
@@ -626,7 +626,7 @@ export function PreferencesModal({
               aria-current={section === item.id ? 'page' : undefined}
               onClick={() => setSection(item.id)}
               style={s(
-                'display: block; width: 100%; text-align: left; padding: 7px 10px; margin-top: 2px; border: 0; border-radius: var(--radius-sm); cursor: pointer; font-family: var(--font-body); font-size: 13px;' +
+                'display: flex; align-items: center; width: 100%; height: 31px; text-align: left; padding: 0 10px; margin-top: 2px; border: 0; border-radius: var(--radius-sm); cursor: pointer; font-family: var(--font-body); font-size: 13px;' +
                   // `--color-surface-active`, pas `--color-neutral-900` : ce
                   // dernier s'inverse en clair (T-0045) et devient la teinte
                   // la plus claire de la rampe — une surface « sélectionnée »

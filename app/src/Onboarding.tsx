@@ -419,7 +419,7 @@ export function Onboarding({ settings, etapeInitiale = 0, onFini, onAjouterProje
           // Mêmes proportions que l'écran des préférences côté hauteur, plus
           // large : la colonne de gauche (étapes) et la galerie de l'écran 2
           // (quatre cartes en ligne) ne tiennent pas dans 880px.
-          'width: min(1040px, 100%); height: min(700px, 100%); display: flex; overflow: hidden; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 10px; box-shadow: var(--shadow-lg); color: var(--color-text); font-family: var(--font-body);',
+          'width: min(1040px, 100%); height: min(700px, 100%); display: flex; overflow: hidden; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 14px; box-shadow: var(--shadow-lg); color: var(--color-text); font-family: var(--font-body);',
         )}
       >
         {/* Colonne de gauche : logo, les 3 étapes, note d'aide — maquette 2j.
@@ -443,7 +443,7 @@ export function Onboarding({ settings, etapeInitiale = 0, onFini, onAjouterProje
                   style={s(
                     'flex: none; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 9px;' +
                       (index < etape
-                        ? ' border: 1px solid #2a2660; background: #14132a; color: #a49dfa;'
+                        ? ' border: 1px solid var(--color-plan-border); background: var(--color-plan-bg); color: var(--color-plan);'
                         : index === etape
                           ? ' background: var(--color-accent); color: var(--color-bg);'
                           : ' border: 1px solid var(--color-divider); color: var(--color-neutral-600);'),

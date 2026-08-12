@@ -174,7 +174,7 @@ export function CommandPalette({
           }
         }}
         style={s(
-          'width: min(560px, 100%); max-height: 60vh; display: flex; flex-direction: column; overflow: hidden; background: var(--color-surface-card); border: 1px solid var(--color-divider); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);',
+          'width: min(560px, 100%); max-height: 60vh; display: flex; flex-direction: column; overflow: hidden; background: var(--color-surface-control); border: 1px solid var(--color-divider); border-radius: 9px; box-shadow: var(--shadow-lg);',
         )}
       >
         <div
@@ -190,7 +190,7 @@ export function CommandPalette({
             placeholder={t('palette.placeholder')}
             aria-label={t('palette.placeholder')}
             style={s(
-              'flex: 1; border: 0; outline: 0; background: transparent; color: var(--color-text); font: inherit; font-size: 14px;',
+              'flex: 1; border: 0; outline: 0; background: transparent; color: var(--color-text); font-family: var(--font-mono); font-size: 12px;',
             )}
           />
         </div>

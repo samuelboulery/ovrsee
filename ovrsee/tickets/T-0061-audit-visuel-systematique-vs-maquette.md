@@ -2,14 +2,14 @@
 {
   "id": "T-0061",
   "titre": "Audit visuel systématique de chaque écran contre la maquette",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",
     "qa"
   ],
   "cree": "2026-08-12",
-  "maj": "2026-08-11",
+  "maj": "2026-08-12",
   "plan": "2026-08-11-repasse-ui-ovrsee-coller-a-la-maquette-ovrsee-app-dc-html.md",
   "epic": "T-0058"
 }

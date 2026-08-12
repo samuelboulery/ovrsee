@@ -2,14 +2,14 @@
 {
   "id": "T-0059",
   "titre": "Police IBM Plex, pictos de rail et palette ⌘K — corrections connues",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",
     "design-system"
   ],
   "cree": "2026-08-12",
-  "maj": "2026-08-11",
+  "maj": "2026-08-12",
   "plan": "2026-08-11-repasse-ui-ovrsee-coller-a-la-maquette-ovrsee-app-dc-html.md",
   "epic": "T-0058"
 }

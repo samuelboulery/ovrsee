@@ -4,7 +4,35 @@
   "title": "Repasse UI ovrsee — coller à la maquette « Ovrsee App.dc.html »",
   "opened": "2026-08-11",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "a36966b",
+      "date": "2026-08-12",
+      "files": [
+        "_ds/ovrsee/styles.css",
+        "app/src/App.tsx",
+        "app/src/CommandPalette.tsx",
+        "app/src/Onboarding.tsx",
+        "app/src/PreferencesProfils.tsx",
+        "app/src/assets/fonts/ibm-plex-mono-400.woff2",
+        "app/src/assets/fonts/ibm-plex-sans-400.woff2",
+        "app/src/assets/fonts/ibm-plex-sans-500.woff2",
+        "app/src/assets/fonts/ibm-plex-sans-600.woff2",
+        "app/src/data.ts",
+        "app/src/onboarding.test.tsx",
+        "app/src/profilage.ts",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Donnees.tsx",
+        "app/src/tabs/Produit.tsx",
+        "app/src/tabs/Sante.tsx",
+        "app/src/tabs/Stack.tsx",
+        "app/src/views.ts",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/settings.js"
+      ]
+    }
+  ]
 }
 ---
 

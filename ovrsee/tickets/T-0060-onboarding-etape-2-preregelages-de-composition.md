@@ -2,14 +2,14 @@
 {
   "id": "T-0060",
   "titre": "Onboarding étape 2 — préréglages de composition au lieu de la question d'usage",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",
     "onboarding"
   ],
   "cree": "2026-08-12",
-  "maj": "2026-08-11",
+  "maj": "2026-08-12",
   "plan": "2026-08-11-repasse-ui-ovrsee-coller-a-la-maquette-ovrsee-app-dc-html.md",
   "epic": "T-0058"
 }

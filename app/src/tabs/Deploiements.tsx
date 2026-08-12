@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ArrowUpRight, Plus } from '@phosphor-icons/react'
 
 import {
   humanAge,
@@ -11,6 +12,13 @@ import {
 import { t, type TranslationKey } from '../i18n'
 import { s } from '../style'
 import type { IntegrationsBridge } from '../useTerminal'
+
+const DOT_ETAT: Record<IntegrationState, string> = {
+  ok: '#4cc38a',
+  error: '#e5677a',
+  building: '#9096a0',
+  unknown: '#4e5158',
+}
 
 const ETAT_STYLE: Record<IntegrationState, string> = {
   ok: 'color: #4cc38a; border: 1px solid #1c3728;',
@@ -77,42 +85,24 @@ export function Deploiements({
     if (masque) return null
 
     return (
-      <div style={s('margin-top: 18px;')} className="card">
-        <div style={s('display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;')}>
-          <div>
-            <Titre>{t('deploiements.title')}</Titre>
-            <div style={s('font-size: 12px; color: var(--color-neutral-500); max-width: 480px;')}>
-              {t('deploiements.empty_desc')}
-            </div>
+      <div>
+        <EnTete onOpenPreferences={onOpenPreferences} onMasquer={() => {
+          localStorage.setItem(CLE_MASQUE, '1')
+          setMasque(true)
+        }} />
+        <div style={s('padding: 14px 0 0;')}>
+          <div style={s('font-size: 12px; color: var(--color-neutral-500); max-width: 480px; margin-bottom: 10px;')}>
+            {t('deploiements.empty_desc')}
           </div>
           <button
             type="button"
-            className="btn btn-ghost"
-            style={s('font-size: 11px; padding: 3px 9px; flex: none;')}
-            onClick={() => {
-              localStorage.setItem(CLE_MASQUE, '1')
-              setMasque(true)
-            }}
+            onClick={() => onOpenPreferences()}
+            style={s(
+              'width: 100%; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 9px; border: 1px dashed #24252b; background: transparent; color: #62666e;',
+            )}
           >
-            {t('deploiements.hide')}
-          </button>
-        </div>
-        <div style={s('display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;')}>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            style={s('font-size: 12px; padding: 4px 9px;')}
-            onClick={() => onOpenPreferences({ provider: 'vercel' })}
-          >
-            {t('deploiements.add_deploy')}
-          </button>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            style={s('font-size: 12px; padding: 4px 9px;')}
-            onClick={() => onOpenPreferences({ provider: 'supabase' })}
-          >
-            {t('deploiements.add_db')}
+            <Plus size={14} aria-hidden="true" />
+            <span style={s('font-size: 12.5px;')}>{t('deploiements.add_integration')}</span>
           </button>
         </div>
       </div>
@@ -129,9 +119,9 @@ export function Deploiements({
   }
 
   return (
-    <div style={s('margin-top: 18px;')}>
-      <Titre>{t('deploiements.title')}</Titre>
-      <div style={s('display: flex; flex-wrap: wrap; gap: 10px;')}>
+    <div>
+      <EnTete onOpenPreferences={onOpenPreferences} />
+      <div style={s('display: flex; flex-direction: column; gap: 8px; padding: 14px 0 0;')}>
         {integrations.map(integ => {
           const status = statuses[integ.id]
           const etat = status?.state ?? 'unknown'
@@ -140,34 +130,39 @@ export function Deploiements({
           return (
             <div
               key={integ.id}
-              className="card"
-              style={s(`padding: 9px 12px; min-width: ${deployments?.length ? 320 : 190}px;`)}
+              style={s('border: 1px solid #1c1d22; border-radius: 9px; background: #0c0d10; padding: 11px 12px;')}
             >
-              <div style={s('display: flex; align-items: center; gap: 6px;')}>
-                <div style={s('font-size: 12.5px; font-weight: 500;')}>{integ.label}</div>
-                <span className="tag" style={s(`font-size: 10px; ${ETAT_STYLE[etat]}`)}>
-                  {status ? t(ETAT_LABEL[etat]) : t('deploiements.never_checked')}
-                </span>
-              </div>
-
-              <div
-                style={s(
-                  'font-family: var(--font-mono); font-size: 11px; color: var(--color-neutral-500); margin-top: 3px;',
+              <div style={s('display: flex; align-items: flex-start; gap: 10px;')}>
+                <span
+                  style={s(
+                    `width: 7px; height: 7px; border-radius: 50%; flex: none; margin-top: 4px; background: ${DOT_ETAT[etat]};`,
+                  )}
+                />
+                <div style={s('flex: 1; min-width: 0;')}>
+                  <div style={s('font-size: 12.5px; color: #f2f3f5;')}>
+                    {integ.label} · {integ.provider}
+                  </div>
+                  <div
+                    style={s(
+                      'font-family: var(--font-mono); font-size: 10.5px; color: #55585f; margin-top: 2px;',
+                    )}
+                  >
+                    {status ? t(ETAT_LABEL[etat]) : t('deploiements.never_checked')}
+                    {status?.detail ? ` · ${status.detail}` : ''}
+                  </div>
+                </div>
+                {integ.url && (
+                  <a
+                    href={integ.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    title={integ.url}
+                    style={s('flex: none; display: block; color: #62666e;')}
+                  >
+                    <ArrowUpRight size={14} aria-hidden="true" />
+                  </a>
                 )}
-              >
-                {integ.provider}
               </div>
-
-              {integ.url && (
-                <a
-                  href={integ.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={s('font-size: 11px; color: var(--color-accent); margin-top: 3px; display: block;')}
-                >
-                  {integ.url}
-                </a>
-              )}
 
               {deployments?.length ? (
                 <div style={s('margin-top: 6px;')}>
@@ -175,18 +170,13 @@ export function Deploiements({
                     <LigneDeploiement key={d.id} d={d} />
                   ))}
                 </div>
-              ) : (
-                status?.detail && (
-                  <div style={s('font-size: 11px; color: var(--color-neutral-600); margin-top: 3px;')}>
-                    {status.detail}
-                  </div>
-                )
-              )}
+              ) : null}
 
               <button
                 type="button"
-                className="btn btn-secondary"
-                style={s('font-size: 11px; padding: 3px 9px; margin-top: 7px;')}
+                style={s(
+                  'cursor: pointer; font-size: 10.5px; padding: 3px 8px; margin-top: 8px; border-radius: 5px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+                )}
                 disabled={!ovrsee || checking === integ.id}
                 title={ovrsee ? undefined : t('deploiements.electron_only')}
                 onClick={() => verifier(integ.id)}
@@ -197,6 +187,42 @@ export function Deploiements({
           )
         })}
       </div>
+    </div>
+  )
+}
+
+/** En-tête fixe — maquette : "Déploiements" + lien "Configurer", 38px, séparateur bas. */
+function EnTete({
+  onOpenPreferences,
+  onMasquer,
+}: {
+  onOpenPreferences: (opts?: { provider?: IntegrationProvider }) => void
+  onMasquer?: () => void
+}) {
+  return (
+    <div
+      style={s(
+        'height: 38px; flex: none; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #17181d;',
+      )}
+    >
+      <div style={s('font-size: 12px; font-weight: 500; color: #f2f3f5;')}>{t('deploiements.title')}</div>
+      <div style={s('flex: 1;')} />
+      {onMasquer && (
+        <button
+          type="button"
+          onClick={onMasquer}
+          style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #62666e;')}
+        >
+          {t('deploiements.hide')}
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={() => onOpenPreferences()}
+        style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #62666e;')}
+      >
+        {t('deploiements.configure')}
+      </button>
     </div>
   )
 }
@@ -261,17 +287,5 @@ function LigneDeploiement({ d }: { d: DeploymentInfo }) {
     <a href={d.url} target="_blank" rel="noreferrer" style={style} {...survolProps}>
       {contenu}
     </a>
-  )
-}
-
-function Titre({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={s(
-        'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;',
-      )}
-    >
-      {children}
-    </div>
   )
 }

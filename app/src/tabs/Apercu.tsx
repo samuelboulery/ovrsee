@@ -248,26 +248,32 @@ export function Apercu({
             onOpenPreferences={onOpenPreferences}
           />
 
-          <div style={s('margin-top: 24px;')}>
-            <div style={s('display: flex; align-items: center; justify-content: space-between; gap: 12px;')}>
-              <Titre>README.md</Titre>
-              {readme && (
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  style={s(BOUTON)}
-                  onClick={() => setReadmeOpen(open => !open)}
-                >
-                  {readmeOpen ? t('apercu.hide_readme') : t('apercu.show_readme')}
-                </button>
-              )}
-            </div>
+          <div style={s('height: 1px; background: #17181d; margin: 18px 0;')} />
+
+          <div
+            style={s(
+              'height: 38px; flex: none; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #17181d;',
+            )}
+          >
+            <div style={s('font-size: 12px; font-weight: 500; color: #f2f3f5;')}>README.md</div>
+            <div style={s('flex: 1;')} />
+            {readme && (
+              <button
+                type="button"
+                onClick={() => setReadmeOpen(open => !open)}
+                style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #62666e;')}
+              >
+                {readmeOpen ? t('apercu.hide_readme') : t('apercu.show_readme')}
+              </button>
+            )}
+          </div>
+          <div style={s('padding-top: 14px;')}>
             {!readme && (
               <div style={s('font-size: 12.5px; color: var(--color-neutral-600);')}>
                 {t('apercu.no_readme')}
               </div>
             )}
-            {plan.length >= 3 && <Sommaire plan={plan} aller={aller} />}
+            {plan.length > 0 && <Sommaire plan={plan} aller={aller} />}
             {readme && readmeOpen && <Markdown text={readme} root={root} />}
           </div>
         </div>
@@ -375,10 +381,8 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
 }
 
 /**
- * Le plan du README, dans le panneau droit.
- *
- * Il ne paraît qu'à partir de trois titres : en dessous, le sommaire coûte
- * plus de place qu'il n'en fait gagner. Les titres de quatrième niveau en
+ * Le plan du README, dans le panneau droit — maquette : « Ce qu'on y voit »,
+ * toujours visible, indentation uniforme. Les titres de quatrième niveau en
  * sont exclus — un sommaire qui descend aussi bas cesse d'être un sommaire.
  */
 function Sommaire({
@@ -389,8 +393,8 @@ function Sommaire({
   aller: (id: string) => void
 }) {
   return (
-    <nav aria-label={t('apercu.summary')} style={s('margin-top: 14px;')}>
-      <Titre>{t('apercu.summary')}</Titre>
+    <nav aria-label={t('apercu.summary')} style={s('display: flex; flex-direction: column; gap: 6px;')}>
+      <div style={s('font-size: 12.5px; color: #b6bac1;')}>{t('apercu.summary')}</div>
       {plan
         .filter(titre => titre.level <= 3)
         .map(titre => (
@@ -402,8 +406,7 @@ function Sommaire({
               aller(titre.id)
             }}
             style={s(
-              'display: block; font-size: 11.5px; line-height: 1.5; margin: 4px 0; color: var(--color-neutral-500); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; ' +
-                (titre.level > 1 ? 'padding-left: 10px;' : ''),
+              'display: block; font-size: 12.5px; color: #62666e; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-left: 12px;',
             )}
             title={titre.texte}
           >

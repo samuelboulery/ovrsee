@@ -446,6 +446,8 @@ export type TranslationKey =
   | 'deploiements.empty_desc'
   | 'deploiements.add_deploy'
   | 'deploiements.add_db'
+  | 'deploiements.add_integration'
+  | 'deploiements.configure'
   | 'deploiements.hide'
   | 'deploiements.electron_only'
   | 'deploiements.state_ok'

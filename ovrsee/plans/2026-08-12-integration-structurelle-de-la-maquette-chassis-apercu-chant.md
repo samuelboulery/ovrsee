@@ -61,6 +61,13 @@
         "hooks/i18n.js",
         "hooks/snapshot.js"
       ]
+    },
+    {
+      "sha": "b92d81e",
+      "date": "2026-08-12",
+      "files": [
+        "app/src/tabs/Branches.tsx"
+      ]
     }
   ]
 }

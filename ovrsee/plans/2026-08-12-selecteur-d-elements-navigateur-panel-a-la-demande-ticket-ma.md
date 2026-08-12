@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Sélecteur d'éléments (Navigateur) — panel à la demande + ticket manuel",
   "opened": "2026-08-12",
-  "closed": null,
+  "closed": "2026-08-12",
   "commits": [
     {
       "sha": "282c8d6",
@@ -15,6 +15,11 @@
         "hooks/i18n.d.ts",
         "hooks/i18n.js"
       ]
+    },
+    {
+      "sha": "219b461",
+      "date": "2026-08-12",
+      "files": []
     }
   ]
 }

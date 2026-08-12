@@ -386,6 +386,7 @@ export type TranslationKey =
   | 'apercu.reveal'
   | 'apercu.terminal_claude'
   | 'apercu.terminal_shell'
+  | 'apercu.more_actions'
   | 'apercu.copy_path'
   | 'apercu.copied'
   | 'apercu.summary'

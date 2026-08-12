@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { CaretDown, Code, DotsThree, FolderOpen } from '@phosphor-icons/react'
 
 import {
   EMPTY_GIT_STATUS,
@@ -112,6 +113,7 @@ export function Apercu({
   const tickets = restant(snapshot.tickets, snapshot.board)
   const planActif = plans.find(p => p.file === snapshot.activePlan) ?? null
   const plan = readme ? headings(readme) : []
+  const hasEnvironments = (snapshot.config?.environments?.length ?? 0) > 0
 
   // Le panneau droit (Déploiements + README, maquette 2b) défile pour son
   // propre compte — c'est lui que `scrollVers` amène à un titre, pas la page.
@@ -165,21 +167,19 @@ export function Apercu({
 
   return (
     <div style={s('flex: 1; display: flex; flex-direction: column; overflow: hidden;')}>
-      <ViewBar projet={nom} vue={t('tabs.apercu')} />
+      <ViewBar projet={nom} vue={t('tabs.apercu')}>
+        <Actions root={root} onTerminal={onTerminal} />
+      </ViewBar>
       <div style={s('flex: none; padding: 22px 24px 18px; border-bottom: 1px solid #17181d;')}>
         <Illisibles entries={snapshot.illisibles ?? []} />
 
         <div
           style={s(
-            'display: flex; align-items: baseline; justify-content: space-between; gap: 18px; flex-wrap: wrap;',
+            'display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;',
           )}
         >
-          <div style={s('min-width: 0; display: flex; align-items: baseline; gap: 12px;')}>
-            <h2 style={s('font-size: 21px; font-weight: 600; letter-spacing: -.015em; margin: 0;')}>{nom}</h2>
-            <div style={s('font-family: var(--font-mono); font-size: 11px; color: #55585f;')}>{root}</div>
-          </div>
-
-          <Actions root={root} onTerminal={onTerminal} />
+          <h2 style={s('font-size: 21px; font-weight: 600; letter-spacing: -.015em; margin: 0;')}>{nom}</h2>
+          <div style={s('font-family: var(--font-mono); font-size: 11px; color: #55585f;')}>{root}</div>
         </div>
 
         {packageJson?.description && (
@@ -224,8 +224,18 @@ export function Apercu({
             onReload={onReload}
             onVoirTousLesPlans={onVoirTousLesPlans}
           />
-          <Branches root={root} gitStatus={gitStatus} onGitStatus={setGitStatus} />
-          <Environnements config={snapshot.config} gitStatus={gitStatus} />
+          {hasEnvironments ? (
+            <div style={s('display: flex; gap: 18px; align-items: flex-start;')}>
+              <div style={s('flex: 1; min-width: 0;')}>
+                <Branches root={root} gitStatus={gitStatus} onGitStatus={setGitStatus} />
+              </div>
+              <div style={s('flex: 1; min-width: 0;')}>
+                <Environnements config={snapshot.config} gitStatus={gitStatus} />
+              </div>
+            </div>
+          ) : (
+            <Branches root={root} gitStatus={gitStatus} onGitStatus={setGitStatus} />
+          )}
 
           <div style={s('margin-top: 18px;')}>
             <Lancement packageJson={packageJson} />
@@ -316,6 +326,12 @@ const derniere = (snapshot: Snapshot) => snapshot.timeline?.[0]?.date ?? null
  * En navigateur, `window.ovrsee` n'existe pas et il ne reste que la copie du
  * chemin — un bouton qui ne peut rien faire vaut mieux caché qu'inerte.
  */
+/**
+ * Actions de la barre de vue — maquette 2b. Puce éditeur (lance l'éditeur
+ * courant, le caret change lequel), Finder, copier le chemin (⌘⇧C câblé
+ * pour de vrai — un indice qui ne fait rien serait un mensonge d'interface,
+ * même raison que ⇧⌘E sur Navigateur), et un menu ⋯ pour le reste.
+ */
 function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }) {
   const ovrsee = pont()
   const [copie, setCopie] = useState(false)
@@ -324,73 +340,163 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
     const garde = localStorage.getItem('ovrsee.editor')
     return EDITEURS.some(([nom]) => nom === garde) ? (garde as Editeur) : 'vscode'
   })
+  const [menuEditeur, setMenuEditeur] = useState(false)
+  const [menuPlus, setMenuPlus] = useState(false)
+  const refEditeur = useRef<HTMLDivElement>(null)
+  const refPlus = useRef<HTMLDivElement>(null)
+
+  const copier = () => {
+    navigator.clipboard
+      ?.writeText(root)
+      .then(() => {
+        setCopie(true)
+        setTimeout(() => setCopie(false), 1500)
+      })
+      .catch(() => setCopie(false))
+  }
+
+  useEffect(() => {
+    if (!menuEditeur && !menuPlus) return
+    const onClickOutside = (event: MouseEvent) => {
+      if (menuEditeur && refEditeur.current && !refEditeur.current.contains(event.target as Node)) setMenuEditeur(false)
+      if (menuPlus && refPlus.current && !refPlus.current.contains(event.target as Node)) setMenuPlus(false)
+    }
+    document.addEventListener('mousedown', onClickOutside)
+    return () => document.removeEventListener('mousedown', onClickOutside)
+  }, [menuEditeur, menuPlus])
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey && event.shiftKey && event.key.toLowerCase() === 'c') {
+        event.preventDefault()
+        copier()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [root])
+
+  if (!ovrsee) {
+    // Navigateur : ni éditeur ni Finder n'ont de sens sans pont Electron.
+    return (
+      <button type="button" className="btn btn-secondary" style={s(BOUTON)} onClick={copier}>
+        {copie ? t('apercu.copied') : t('apercu.copy_path')}
+      </button>
+    )
+  }
+
+  const nomEditeur = EDITEURS.find(([valeur]) => valeur === editeur)?.[1] ?? editeur
 
   return (
-    <div style={s('display: flex; flex-wrap: wrap; align-items: center; gap: 6px;')}>
-      {ovrsee && (
-        <>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            style={s(BOUTON)}
-            onClick={() => ovrsee.projects.edit(root, editeur)}
-          >
-            {t('apercu.open_editor')}
-          </button>
-
-          <select
-            className="input"
-            aria-label={t('apercu.editor')}
-            value={editeur}
-            onChange={event => {
-              const choisi = event.target.value as Editeur
-              setEditeur(choisi)
-              // Une préférence d'affichage, pas un réglage du projet : elle n'a
-              // rien à faire dans `ovrsee.config.json`, que git suit.
-              localStorage.setItem('ovrsee.editor', choisi)
-            }}
-            style={s('font-size: 12px; padding: 3px 6px; min-height: 0; width: auto;')}
-          >
-            {EDITEURS.map(([valeur, nom]) => (
-              <option key={valeur} value={valeur}>
-                {nom}
-              </option>
-            ))}
-          </select>
-
-          <button
-            type="button"
-            className="btn btn-secondary"
-            style={s(BOUTON)}
-            onClick={() => ovrsee.projects.reveal(root)}
-          >
-            {t('apercu.reveal')}
-          </button>
-
-          {onTerminal && (
-            <button type="button" className="btn btn-secondary" style={s(BOUTON)} onClick={onTerminal}>
-              {t('apercu.terminal_shell')}
-            </button>
+    <div style={s('display: flex; align-items: center; gap: 6px;')}>
+      <div ref={refEditeur} style={s('position: relative;')}>
+        <div
+          style={s(
+            'display: flex; align-items: center; height: 27px; border-radius: 6px; border: 1px solid #24252b; background: #101114; overflow: hidden;',
           )}
-        </>
-      )}
+        >
+          <button
+            type="button"
+            onClick={() => ovrsee.projects.edit(root, editeur)}
+            title={t('apercu.open_editor')}
+            style={s(
+              'cursor: pointer; display: flex; align-items: center; gap: 6px; height: 100%; padding: 0 8px 0 10px; border: 0; background: transparent; font-size: 12px; color: #d5d8dd;',
+            )}
+          >
+            <Code size={14} weight="regular" aria-hidden="true" color="#6ea8fe" />
+            {nomEditeur}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMenuEditeur(o => !o)}
+            aria-label={t('apercu.editor')}
+            aria-expanded={menuEditeur}
+            style={s(
+              'cursor: pointer; display: flex; align-items: center; height: 100%; padding: 0 8px; border: 0; border-left: 1px solid #24252b; background: transparent;',
+            )}
+          >
+            <CaretDown size={10} weight="bold" aria-hidden="true" color="#55585f" />
+          </button>
+        </div>
+        {menuEditeur && (
+          <div
+            style={s(
+              'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 140px; padding: 4px; border-radius: 8px; border: 1px solid #1c1d22; background: #101114; box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
+            )}
+          >
+            {EDITEURS.map(([valeur, nomOpt]) => (
+              <button
+                key={valeur}
+                type="button"
+                onClick={() => {
+                  setEditeur(valeur)
+                  // Une préférence d'affichage, pas un réglage du projet : elle
+                  // n'a rien à faire dans `ovrsee.config.json`, que git suit.
+                  localStorage.setItem('ovrsee.editor', valeur)
+                  ovrsee.projects.edit(root, valeur)
+                  setMenuEditeur(false)
+                }}
+                style={s(
+                  `cursor: pointer; text-align: left; height: 27px; padding: 0 8px; border-radius: 5px; border: 0; font-size: 12px; background: ${valeur === editeur ? '#1c1d24' : 'transparent'}; color: ${valeur === editeur ? '#f2f3f5' : '#b6bac1'};`,
+                )}
+              >
+                {nomOpt}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       <button
         type="button"
         className="btn btn-secondary"
         style={s(BOUTON)}
-        onClick={() => {
-          navigator.clipboard
-            ?.writeText(root)
-            .then(() => {
-              setCopie(true)
-              setTimeout(() => setCopie(false), 1500)
-            })
-            .catch(() => setCopie(false))
-        }}
+        onClick={() => ovrsee.projects.reveal(root)}
       >
-        {copie ? t('apercu.copied') : t('apercu.copy_path')}
+        <FolderOpen size={14} weight="regular" aria-hidden="true" color="#62666e" />
+        {t('apercu.reveal')}
       </button>
+
+      <button type="button" className="btn btn-secondary" style={s(BOUTON + ' gap: 8px;')} onClick={copier}>
+        {copie ? t('apercu.copied') : t('apercu.copy_path')}
+        <span className="kbd">⌘⇧C</span>
+      </button>
+
+      {onTerminal && (
+        <div ref={refPlus} style={s('position: relative;')}>
+          <button
+            type="button"
+            onClick={() => setMenuPlus(o => !o)}
+            aria-label={t('apercu.more_actions')}
+            aria-expanded={menuPlus}
+            style={s(
+              'cursor: pointer; width: 27px; height: 27px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #24252b; background: #101114; color: #9096a0;',
+            )}
+          >
+            <DotsThree size={16} weight="bold" aria-hidden="true" />
+          </button>
+          {menuPlus && (
+            <div
+              style={s(
+                'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 160px; padding: 4px; border-radius: 8px; border: 1px solid #1c1d22; background: #101114; box-shadow: 0 12px 28px rgba(0,0,0,.5);',
+              )}
+            >
+              <button
+                type="button"
+                onClick={() => {
+                  onTerminal()
+                  setMenuPlus(false)
+                }}
+                style={s(
+                  'cursor: pointer; width: 100%; text-align: left; height: 27px; padding: 0 8px; border-radius: 5px; border: 0; background: transparent; font-size: 12px; color: #b6bac1;',
+                )}
+              >
+                {t('apercu.terminal_shell')}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

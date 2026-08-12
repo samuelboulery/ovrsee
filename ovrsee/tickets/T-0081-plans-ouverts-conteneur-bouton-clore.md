@@ -2,7 +2,7 @@
 {
   "id": "T-0081",
   "titre": "Plans ouverts : conteneur, pastilles, badge actif, bouton Clore le plan actif",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

@@ -2,7 +2,7 @@
 {
   "id": "T-0079",
   "titre": "Densité d'activité : segmentation par type, toggles, filtre, plans rejetés",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

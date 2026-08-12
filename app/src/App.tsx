@@ -4,8 +4,6 @@ import { CaretDown, GearSix, MagnifyingGlass, TerminalWindow } from '@phosphor-i
 import { applyTheme } from './theme'
 import { t, setCurrentLanguage } from './i18n'
 import {
-  commitsDeLaFrise,
-  density,
   estAbandon,
   fetchProjects,
   fetchSettings,
@@ -20,11 +18,16 @@ import {
   restant,
   updateSettings,
   type IntegrationProvider,
+  type Plan,
   type Project,
+  type Scan,
   type SettingsType,
   type Snapshot,
   type Tableau as TableauData,
+  type TicketTimelineEntry,
+  type TimelineEntry,
 } from './data'
+import { ActivityPanel } from './ActivityPanel'
 import { CommandPalette } from './CommandPalette'
 import { Garde } from './Garde'
 import { Onboarding } from './Onboarding'
@@ -530,9 +533,10 @@ export function App() {
             onTabPick={onTabPick}
             onOpenPreferences={() => setPreferencesOuvertes(true)}
             onOpenPalette={() => setPaletteOuverte(true)}
-            density={density(commitsDeLaFrise(snapshot?.timeline ?? []), {
-              fenetre: settings?.densiteActivite.fenetre,
-            })}
+            timeline={snapshot?.timeline ?? []}
+            ticketTimeline={snapshot?.ticketTimeline ?? []}
+            scans={snapshot?.scans ?? []}
+            plans={snapshot?.plans ?? []}
           />
           {sidebarOuverte && <Divider axis="x" resizable={sidebar} />}
 
@@ -779,117 +783,6 @@ function Message({ text }: { text: string }) {
   )
 }
 
-/** Affiche l'histogramme de densité d'activité (barres verticaless). */
-function DensityHistogram({ bars, fenetre }: { bars: number[]; fenetre: string }) {
-  const max = Math.max(1, ...bars)
-
-  const cles: Record<string, string> = {
-    jour: 'density.window_day',
-    semaine: 'density.window_week',
-    mois: 'density.window_month',
-    '3mois': 'density.window_3months',
-    an: 'density.window_year',
-  }
-  const label = t((cles[fenetre] ?? 'density.window_3months') as Parameters<typeof t>[0])
-
-  return (
-    <>
-      <div style={s('display: flex; gap: 3px; align-items: flex-end; height: 34px;')}>
-        {bars.map((value, i) => {
-          const height = value === 0 ? 3 : Math.max(4, Math.round((value / max) * 34))
-          const color = value === 0 ? '#2a2b33' : value / max > 0.6 ? '#7d76f0' : '#4b46a3'
-          return (
-            <div
-              key={i}
-              title={`${value} commit(s)`}
-              style={s(`flex: 1; height: ${height}px; border-radius: 1px; background: ${color};`)}
-              role="img"
-              aria-label={`seau ${i}: ${value} commits`}
-            />
-          )
-        })}
-      </div>
-      <div
-        style={s(
-          'display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-mono); color: #4e5158; margin-top: 6px;',
-        )}
-      >
-        <span>{label}</span>
-        <span>{t('sidebar.today')}</span>
-      </div>
-    </>
-  )
-}
-
-/** Affiche une heatmap de 30 jours (grille 5×6). */
-function DensityHeatmap({ bars }: { bars: number[] }) {
-  const max = Math.max(1, ...bars)
-
-  // Les 30 jours : on suppose que bars[0] = le plus ancien, bars[29] = hier
-  // Construit la grille 5 rangées × 6 colonnes
-  const days = bars.slice(0, 30)
-
-  // Couleurs : 5 paliers, du fond neutre à l'accent plein (maquette 2l).
-  const colors = [
-    '#1c1d24', // 0 commit
-    '#2a2660', // très peu
-    '#4b46a3', // moyen
-    '#6259cc', // beaucoup
-    '#7d76f0', // beaucoup beaucoup
-  ]
-
-  const getColor = (value: number): string => {
-    if (value === 0) return colors[0]
-    if (value <= max * 0.2) return colors[1]
-    if (value <= max * 0.4) return colors[2]
-    if (value <= max * 0.6) return colors[3]
-    return colors[4]
-  }
-
-  const now = new Date()
-  const getDateLabel = (daysAgo: number): string => {
-    const d = new Date(now)
-    d.setDate(d.getDate() - (29 - daysAgo)) // 29 - daysAgo car days[0] est le plus ancien
-    const day = d.getDate()
-    const month = d.getMonth() + 1
-    return `${day}/${month}`
-  }
-
-  return (
-    <div
-      style={s(
-        'overflow-x: auto; border: 1px solid var(--color-divider); border-radius: 4px; margin-top: 8px;',
-      )}
-    >
-      <table style={s('width: 100%; border-collapse: collapse; font-size: 10px;')}>
-        <tbody>
-          {Array.from({ length: 5 }).map((_, rowIdx) => (
-            <tr key={rowIdx}>
-              {Array.from({ length: 6 }).map((_, colIdx) => {
-                const idx = rowIdx * 6 + colIdx
-                if (idx >= days.length) return <td key={colIdx} />
-                const value = days[idx]
-                const date = getDateLabel(idx)
-                return (
-                  <td
-                    key={colIdx}
-                    style={s(
-                      `width: 16px; height: 16px; border: 1px solid var(--color-divider); background: ${getColor(value)}; cursor: pointer;`,
-                    )}
-                    title={`${date}: ${value} commits`}
-                    role="img"
-                    aria-label={`${date}: ${value} commits`}
-                  />
-                )
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
 /** Largeur fixe du rail replié — juste assez pour un picto 16px centré. */
 const RAIL_COLLAPSED_WIDTH = 52
 
@@ -910,7 +803,10 @@ function Sidebar({
   onTabPick,
   onOpenPreferences,
   onOpenPalette,
-  density: bars,
+  timeline,
+  ticketTimeline,
+  scans,
+  plans,
 }: {
   collapsed: boolean
   settings: SettingsType | null
@@ -920,7 +816,10 @@ function Sidebar({
   /** La modale vit dans `App` : le menu natif l'ouvre par le même chemin. */
   onOpenPreferences: () => void
   onOpenPalette: () => void
-  density: number[]
+  timeline: TimelineEntry[]
+  ticketTimeline: TicketTimelineEntry[]
+  scans: Scan[]
+  plans: Plan[]
 }) {
   const views = activeTabsInOrder(settings)
   const [username, setUsername] = useState<string | null>(null)
@@ -1033,22 +932,8 @@ function Sidebar({
         </button>
       </div>
 
-      <div
-        style={s('padding: 10px 10px 0; border-top: 1px solid #17181d; margin-top: 10px;')}
-      >
-        <div
-          style={s(
-            'font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #4e5158; margin-bottom: 8px;',
-          )}
-        >
-          {t('sidebar.activity')}
-        </div>
-
-        {settings?.densiteActivite.fenetre === 'mois' ? (
-          <DensityHeatmap bars={bars} />
-        ) : (
-          <DensityHistogram bars={bars} fenetre={settings?.densiteActivite.fenetre ?? '3mois'} />
-        )}
+      <div style={s('padding: 10px 10px 0; border-top: 1px solid #17181d; margin-top: 10px;')}>
+        <ActivityPanel compact timeline={timeline} ticketTimeline={ticketTimeline} scans={scans} plans={plans} />
       </div>
     </aside>
   )

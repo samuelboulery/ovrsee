@@ -2,7 +2,7 @@
 {
   "id": "T-0080",
   "titre": "Icônes Phosphor sur les boutons du panneau Commandes (terminal)",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui"

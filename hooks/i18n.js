@@ -747,6 +747,7 @@ const translations = {
     'sidebar.toggle_terminal': 'Afficher ou masquer le terminal',
     'sidebar.switch_project': 'Changer de projet',
     'sidebar.open_project': 'Ouvrir un projet (⌘O)',
+    'sidebar.rejected_plans': 'Plans rejetés · ${n}',
     // Palette ⌘K
     'palette.placeholder': 'Rechercher, aller à…',
     'palette.tickets': 'Tickets',
@@ -1484,6 +1485,7 @@ const translations = {
     'sidebar.toggle_terminal': 'Show or hide the terminal',
     'sidebar.switch_project': 'Switch project',
     'sidebar.open_project': 'Open a project (⌘O)',
+    'sidebar.rejected_plans': 'Rejected plans · ${n}',
     // Command palette
     'palette.placeholder': 'Search, jump to…',
     'palette.tickets': 'Tickets',

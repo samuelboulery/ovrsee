@@ -13,6 +13,20 @@
         "hooks/i18n.d.ts",
         "hooks/i18n.js"
       ]
+    },
+    {
+      "sha": "7666c83",
+      "date": "2026-08-12",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/data.ts",
+        "server/api.js"
+      ]
+    },
+    {
+      "sha": "b79fb51",
+      "date": "2026-08-12",
+      "files": []
     }
   ]
 }

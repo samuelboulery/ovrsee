@@ -10,6 +10,7 @@ export type TranslationKey =
   | 'sidebar.toggle_terminal'
   | 'sidebar.switch_project'
   | 'sidebar.open_project'
+  | 'sidebar.rejected_plans'
   | 'palette.placeholder'
   | 'palette.tickets'
   | 'palette.commands'

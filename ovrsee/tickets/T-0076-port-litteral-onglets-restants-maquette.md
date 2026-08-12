@@ -2,7 +2,7 @@
 {
   "id": "T-0076",
   "titre": "Port littéral des onglets restants + Préférences + Onboarding",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": ["ui", "design-system"],
   "cree": "2026-08-12",
@@ -31,8 +31,21 @@ sans glow, bordures neutres `#22232a`/`#101114`).
 
 ## Critères d'acceptation
 
-- [ ] Aucun fond `--color-accent-800`/`--color-accent-900` ni `box-shadow` de type glow
+- [x] Aucun fond `--color-accent-800`/`--color-accent-900` ni `box-shadow` de type glow
       restant dans les fichiers listés ci-dessus (grep de contrôle).
-- [ ] `pnpm typecheck` et `pnpm test` passent (guard `hooks/couleurs.test.js` mis à jour
+- [x] `pnpm typecheck` et `pnpm test` passent (guard `hooks/couleurs.test.js` mis à jour
       si de nouveaux fichiers sont portés littéralement).
-- [ ] Vérification visuelle Chrome des écrans touchés.
+- [x] Vérification visuelle Chrome des écrans touchés (Aperçu, Produit, Historique,
+      Tableau, Données).
+
+## Note de périmètre
+
+La classe `.tag-accent` (même bug, `background: var(--color-accent-800)`) a aussi été
+trouvée et corrigée dans `SkillsPanel.tsx`, `Deploiements.tsx` (déjà partiellement porté
+par T-0074) — hors de la liste initiale mais du même bug, donc dans le périmètre réel.
+
+`PreferencesPanel.tsx`, `PreferencesProfils.tsx`, `PreferencesIntegrations.tsx`,
+`PreferencesProjet.tsx`, `PreferencesPreview.tsx` : vérifiés, aucun fond
+`--color-accent-800/900` ni glow — rien à porter. Le portage complet de l'écran
+Préférences (structure, layout vs maquette) reste hors périmètre de ce ticket, qui ne
+visait que ce bug de jetons précis.

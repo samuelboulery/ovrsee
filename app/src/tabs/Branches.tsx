@@ -55,7 +55,7 @@ export function Branches({
       {erreur && (
         <div
           style={s(
-            'margin-bottom: 8px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
+            'margin-bottom: 8px; font-size: 12px; color: #e5677a; background: #1c0d10; border: 1px solid #3a1c22; border-radius: 6px; padding: 7px 10px;',
           )}
         >
           {erreur}

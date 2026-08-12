@@ -5,19 +5,23 @@ import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 
 /**
- * Le garde-fou du thème clair.
+ * Le garde-fou des couleurs hors du chantier de portage littéral.
  *
- * Les couleurs de `app/src` ont été remplacées une à une par des jetons pour
- * qu'un thème puisse exister. Sans ce test, la prochaine écrite en dur repasse
- * inaperçue et le travail se défait un composant à la fois.
+ * Ce test interdisait toute couleur en dur pour qu'un thème clair puisse
+ * exister à côté du sombre — raison retirée par T-0075 (thème clair supprimé,
+ * pas de maquette claire). T-0074 a ensuite tranché : plutôt que de corriger
+ * les jetons `--color-accent-800/900` un par un (la cause du bug de contraste
+ * violet signalé sur 8 captures), le châssis et l'Aperçu portent désormais
+ * littéralement les valeurs hex de `Ovrsee App.dc.html`, comme la maquette
+ * elle-même le fait — sans variable CSS.
+ *
+ * Le garde-fou reste utile ailleurs : `app/src` a des onglets qui partagent le
+ * même bug de jetons et n'ont pas encore été portés (chantier 2). Sans lui, une
+ * couleur en dur qui n'est pas un portage délibéré y passerait inaperçue.
  *
  * Il vit dans `hooks/` et non dans `app/src` parce que `app/src` est compilé
  * sans les types Node : y lire des fichiers demanderait une dépendance de types
  * pour du code qui ne tourne que dans un navigateur.
- *
- * Les exceptions sont nommées. Une couleur qui ne dépend pas du thème — une
- * couleur de marque, le fond du webview Chromium, un masque CSS — a le droit
- * d'exister, à condition qu'on l'ait dit ici.
  */
 const EXCEPTIONS = new Set([
   '#7d76f0', // marque
@@ -26,6 +30,12 @@ const EXCEPTIONS = new Set([
   '#fff',
   '#000', // mask-image
 ])
+
+// Fichiers portés littéralement depuis la maquette (T-0074) : leurs couleurs
+// sont un choix délibéré, pas une dérive. Étendre cette liste à mesure que le
+// chantier 2 porte les autres onglets — jamais pour contourner le garde-fou
+// ailleurs.
+const FICHIERS_PORTES = new Set(['App.tsx', 'Terminal.tsx', 'Apercu.tsx', 'Sante.tsx', 'Deploiements.tsx', 'Branches.tsx'])
 
 const racine = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -37,12 +47,13 @@ const sources = dir =>
     return [chemin]
   })
 
-test('aucune couleur en dur dans app/src, hors exceptions déclarées', () => {
+test('aucune couleur en dur dans app/src, hors exceptions et fichiers portés', () => {
   const fautifs = []
 
   for (const fichier of sources(join(racine, 'app', 'src'))) {
     // `theme.ts` est le seul endroit où les couleurs s'écrivent.
     if (fichier.endsWith('theme.ts')) continue
+    if (FICHIERS_PORTES.has(fichier.split('/').pop())) continue
 
     readFileSync(fichier, 'utf8')
       .split('\n')

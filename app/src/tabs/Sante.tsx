@@ -26,7 +26,7 @@ export function Sante({ snapshot, gitStatus }: { snapshot: Snapshot; gitStatus: 
       <Titre>{t('sante.title')}</Titre>
       <div style={s('display: flex; flex-wrap: wrap; gap: 8px;')}>
         <Badge
-          accent={fichiersModifies > 0}
+          etat={fichiersModifies > 0 ? 'attention' : 'ok'}
           texte={
             git.branch === null
               ? t('sante.no_branch')
@@ -37,12 +37,12 @@ export function Sante({ snapshot, gitStatus }: { snapshot: Snapshot; gitStatus: 
         />
         {git.branch !== null && (
           <Badge
-            accent={ahead > 0}
+            etat={ahead > 0 ? 'attention' : 'ok'}
             texte={ahead > 0 ? t('sante.unpushed', { n: ahead }) : t('sante.unpushed_none')}
           />
         )}
         <Badge
-          accent={audit === null}
+          etat="neutre"
           texte={
             audit
               ? t('sante.last_audit', { age: humanAge(audit.date), skill: audit.skill })
@@ -81,7 +81,7 @@ function Titre({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={s(
-        'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;',
+        'font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #55585f; margin-bottom: 10px;',
       )}
     >
       {children}
@@ -89,12 +89,25 @@ function Titre({ children }: { children: React.ReactNode }) {
   )
 }
 
-function Badge({ texte, accent = false }: { texte: string; accent?: boolean }) {
+const ETAT_BADGE: Record<'ok' | 'attention' | 'neutre', string> = {
+  ok: 'background: #0b1610; border: 1px solid #1c3728; color: #4cc38a;',
+  attention: 'background: #1a1608; border: 1px solid #3a3117; color: #e3b341;',
+  neutre: 'background: #101114; border: 1px solid #22232a; color: #9096a0;',
+}
+const DOT_ETAT: Record<'ok' | 'attention' | 'neutre', string> = {
+  ok: '#4cc38a',
+  attention: '#e3b341',
+  neutre: '#4e5158',
+}
+
+function Badge({ texte, etat }: { texte: string; etat: 'ok' | 'attention' | 'neutre' }) {
   return (
     <span
-      className={accent ? 'tag tag-accent' : 'tag tag-neutral'}
-      style={s('font-size: 11.5px;')}
+      style={s(
+        `display: inline-flex; align-items: center; gap: 7px; height: 27px; padding: 0 10px; border-radius: 6px; font-size: 12px; ${ETAT_BADGE[etat]}`,
+      )}
     >
+      <span style={s(`width: 5px; height: 5px; border-radius: 50%; display: block; background: ${DOT_ETAT[etat]};`)} />
       {texte}
     </span>
   )

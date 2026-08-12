@@ -63,7 +63,8 @@ const EDITEURS: Array<[Editeur, string]> = [
   ['windsurf', 'Windsurf'],
 ]
 
-const BOUTON = 'font-size: 12px; padding: 4px 9px;'
+const BOUTON =
+  'height: 27px; display: flex; align-items: center; gap: 7px; padding: 0 10px; border-radius: 6px; border: 1px solid #24252b; background: #101114; font-size: 12px; color: #d5d8dd;'
 
 /**
  * Onglet Aperçu — la page d'arrivée.
@@ -155,49 +156,29 @@ export function Apercu({
 
   return (
     <div style={s('flex: 1; display: flex; flex-direction: column; overflow: hidden;')}>
-      <div
-        style={s(
-          'flex: none; padding: 18px 22px 12px; background: var(--color-bg); border-bottom: 1px solid var(--color-divider);',
-        )}
-      >
+      <div style={s('flex: none; padding: 22px 24px 18px; border-bottom: 1px solid #17181d;')}>
         <Illisibles entries={snapshot.illisibles ?? []} />
 
         <div
           style={s(
-            'display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; flex-wrap: wrap;',
+            'display: flex; align-items: baseline; justify-content: space-between; gap: 18px; flex-wrap: wrap;',
           )}
         >
-          <div style={s('min-width: 0;')}>
-            <h2
-              style={s(
-                'font-family: var(--font-heading); font-weight: 500; font-size: 22px; margin: 0 0 4px;',
-              )}
-            >
-              {nom}
-            </h2>
-            <div
-              style={s(
-                'font-family: var(--font-mono); font-size: 11px; color: var(--color-neutral-600);',
-              )}
-            >
-              {root}
-            </div>
+          <div style={s('min-width: 0; display: flex; align-items: baseline; gap: 12px;')}>
+            <h2 style={s('font-size: 21px; font-weight: 600; letter-spacing: -.015em; margin: 0;')}>{nom}</h2>
+            <div style={s('font-family: var(--font-mono); font-size: 11px; color: #55585f;')}>{root}</div>
           </div>
 
           <Actions root={root} onTerminal={onTerminal} />
         </div>
 
         {packageJson?.description && (
-          <div
-            style={s(
-              'font-size: 13px; color: var(--color-neutral-400); line-height: 1.6; margin-top: 10px; max-width: 820px; text-wrap: pretty;',
-            )}
-          >
+          <div style={s('font-size: 13px; color: #9096a0; line-height: 1.6; margin-top: 8px; max-width: 720px; text-wrap: pretty;')}>
             {packageJson.description}
           </div>
         )}
 
-        <div style={s('display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 14px;')}>
+        <div style={s('display: flex; gap: 10px; margin-top: 18px;')}>
           <Chiffre
             valeur={pages.length}
             unite={pages.length > 1 ? t('apercu.pages') : t('apercu.page')}
@@ -220,7 +201,7 @@ export function Apercu({
             valeur={scan ? frDate(scan.date) : '—'}
             unite=""
             legende={scan ? (scan.ok ? t('apercu.last_scan') : t('apercu.scan_failed')) : t('apercu.no_scan')}
-            accent={scan?.ok === false}
+            statut={scan ? (scan.ok ? 'succes' : 'echec') : undefined}
           />
         </div>
       </div>
@@ -537,45 +518,45 @@ function Titre({ children }: { children: React.ReactNode }) {
   )
 }
 
-/** Un chiffre et ce qu'il compte. Sans légende, un nombre seul ne dit rien. */
+/**
+ * Un chiffre et ce qu'il compte. Sans légende, un nombre seul ne dit rien.
+ *
+ * `accent` ne colore que la carte « plans » (maquette 2b) — un fond violet
+ * générique réutilisé pour n'importe quel état (ex. scan en échec) brouille
+ * le seul signal qu'on voulait vraiment faire ressortir.
+ */
 function Chiffre({
   valeur,
   unite,
   legende,
   accent = false,
+  statut,
 }: {
   valeur: number | string
   unite: string
   legende: string
   accent?: boolean
+  /** Couleur sémantique de la légende seule (ex. rouge pour un scan en échec). */
+  statut?: 'succes' | 'echec'
 }) {
+  const legendeColor =
+    statut === 'succes' ? '#4cc38a' : statut === 'echec' ? '#e5677a' : accent ? '#8079c9' : '#55585f'
+
   return (
     <div
       style={s(
-        accent
-          ? 'padding: 9px 13px; border-radius: var(--radius-md); background: color-mix(in srgb, var(--color-accent) 8%, transparent); border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);'
-          : 'padding: 9px 0;',
+        `flex: 1; border-radius: 9px; padding: 12px 14px; ${
+          accent ? 'border: 1px solid #2a2660; background: #0f0e1c;' : 'border: 1px solid #1c1d22; background: #0c0d10;'
+        }`,
       )}
     >
       <div
-        style={s(
-          'font-size: 24px; font-weight: 600; ' +
-            (accent ? 'color: var(--color-accent);' : 'color: var(--color-text);'),
-        )}
+        style={s(`font-size: 20px; font-weight: 600; letter-spacing: -.02em; color: ${accent ? '#a49dfa' : '#f2f3f5'};`)}
       >
         {valeur}
-        {unite && (
-          <span style={s('font-size: 12px; font-weight: 400; color: var(--color-neutral-500); margin-left: 6px;')}>
-            {unite}
-          </span>
-        )}
       </div>
-      <div
-        style={s(
-          'font-size: 11px; margin-top: 3px; ' +
-            (accent ? 'color: var(--color-accent-2);' : 'color: var(--color-neutral-600);'),
-        )}
-      >
+      {unite && <div style={s('font-size: 12px; color: #9096a0; margin-top: 3px;')}>{unite}</div>}
+      <div style={s(`font-family: var(--font-mono); font-size: 10.5px; margin-top: 2px; color: ${legendeColor};`)}>
         {legende}
       </div>
     </div>

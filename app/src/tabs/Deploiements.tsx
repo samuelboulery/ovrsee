@@ -13,8 +13,8 @@ import { s } from '../style'
 import type { IntegrationsBridge } from '../useTerminal'
 
 const ETAT_STYLE: Record<IntegrationState, string> = {
-  ok: 'color: var(--color-accent); border: 1px solid var(--color-accent-700);',
-  error: 'color: var(--color-accent); border: 1px solid var(--color-accent-700);',
+  ok: 'color: #4cc38a; border: 1px solid #1c3728;',
+  error: 'color: #e5677a; border: 1px solid #3a1c22;',
   building: 'color: var(--color-neutral-300); border: 1px solid var(--color-neutral-700);',
   unknown: 'color: var(--color-neutral-500); border: 1px dashed var(--color-neutral-700);',
 }

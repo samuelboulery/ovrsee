@@ -467,7 +467,7 @@ export function App() {
           retrait à gauche laisse la place aux pastilles du système. */}
       <header
         style={s(
-          'height: 44px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 82px; background: var(--theme-bg-tertiary); border-bottom: 1px solid var(--color-divider); -webkit-app-region: drag;',
+          'height: 38px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 82px; background: #0b0c0e; border-bottom: 1px solid #17181d; -webkit-app-region: drag;',
         )}
       >
         {/* `-webkit-app-region: no-drag` : sans cela le bouton est avalé par la
@@ -490,7 +490,7 @@ export function App() {
             titres des onglets sont des `h2` sous celui-là. */}
         <h1
           style={s(
-            'margin: 0; font-size: 12.5px; font-weight: 400; color: var(--color-neutral-400); letter-spacing: .02em;',
+            'margin: 0; font-size: 12.5px; font-weight: 400; color: #9096a0; letter-spacing: .02em;',
           )}
         >
           Ovrsee — {projects.find(p => p.path === current)?.name ?? '…'}
@@ -738,7 +738,7 @@ export function App() {
 function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
   if (!scan) {
     return (
-      <div style={s('font-size: 11.5px; color: var(--color-neutral-600);')}>
+      <div style={s('font-size: 11.5px; color: #62666e;')}>
         {t('scan.none')}
       </div>
     )
@@ -746,14 +746,14 @@ function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
   return (
     <div
       style={s(
-        'display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--color-neutral-500);',
+        'display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-family: var(--font-mono); color: #62666e;',
       )}
     >
       <span
         style={s(
           scan.ok
-            ? 'width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 8px var(--color-accent); display: block;'
-            : 'width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--color-neutral-600); display: block;',
+            ? 'width: 5px; height: 5px; border-radius: 50%; background: #4cc38a; display: block;'
+            : 'width: 5px; height: 5px; border-radius: 50%; background: #e5677a; display: block;',
         )}
       />
       {scan.ok ? t('scan.last') : t('scan.failed')} · {frDate(scan.date)} · commit {scan.commit}
@@ -791,12 +791,7 @@ function DensityHistogram({ bars, fenetre }: { bars: number[]; fenetre: string }
       <div style={s('display: flex; gap: 3px; align-items: flex-end; height: 34px;')}>
         {bars.map((value, i) => {
           const height = value === 0 ? 3 : Math.max(4, Math.round((value / max) * 34))
-          const color =
-            value === 0
-              ? 'var(--color-neutral-800)'
-              : value / max > 0.6
-                ? 'var(--color-accent-500)'
-                : 'var(--color-accent-700)'
+          const color = value === 0 ? '#2a2b33' : value / max > 0.6 ? '#7d76f0' : '#4b46a3'
           return (
             <div
               key={i}
@@ -810,7 +805,7 @@ function DensityHistogram({ bars, fenetre }: { bars: number[]; fenetre: string }
       </div>
       <div
         style={s(
-          'display: flex; justify-content: space-between; font-size: 10px; color: var(--color-neutral-600); margin-top: 6px;',
+          'display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-mono); color: #4e5158; margin-top: 6px;',
         )}
       >
         <span>{label}</span>
@@ -828,13 +823,13 @@ function DensityHeatmap({ bars }: { bars: number[] }) {
   // Construit la grille 5 rangées × 6 colonnes
   const days = bars.slice(0, 30)
 
-  // Couleurs : 5 paliers sur la rampe accent
+  // Couleurs : 5 paliers, du fond neutre à l'accent plein (maquette 2l).
   const colors = [
-    'var(--color-accent-900)', // 0 commits
-    'var(--color-accent-700)', // très peu
-    'var(--color-accent-500)', // moyen
-    'var(--color-accent-300)', // beaucoup
-    'var(--color-accent-100)', // beaucoup beaucoup
+    '#1c1d24', // 0 commit
+    '#2a2660', // très peu
+    '#4b46a3', // moyen
+    '#6259cc', // beaucoup
+    '#7d76f0', // beaucoup beaucoup
   ]
 
   const getColor = (value: number): string => {
@@ -945,7 +940,7 @@ function Sidebar({
       <aside
         aria-label={t('sidebar.projects')}
         style={s(
-          `width: ${RAIL_COLLAPSED_WIDTH}px; flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; background: var(--theme-bg-secondary); border-right: 1px solid var(--color-divider); padding: 14px 0;`,
+          `width: ${RAIL_COLLAPSED_WIDTH}px; flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; background: #0b0c0e; border-right: 1px solid #17181d; padding: 10px 0;`,
         )}
       >
         {views.map(([id, cle, path]) => (
@@ -957,7 +952,7 @@ function Sidebar({
           title={`${t('sidebar.preferences')} (⌘,)`}
           onClick={onOpenPreferences}
           style={s(
-            'width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); background: transparent; border: none; color: var(--color-text-tertiary); cursor: pointer;',
+            'width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: transparent; border: none; color: #62666e; cursor: pointer;',
           )}
         >
           <GearSix size={16} weight="regular" aria-hidden="true" />
@@ -970,20 +965,24 @@ function Sidebar({
     <aside
       aria-label={t('sidebar.projects')}
       style={s(
-        `width: ${width}px; flex: none; display: flex; flex-direction: column; background: var(--theme-bg-secondary); border-right: 1px solid var(--color-divider); padding: 14px 0;`,
+        `width: ${width}px; flex: none; display: flex; flex-direction: column; background: #0b0c0e; border-right: 1px solid #17181d; padding: 10px 0;`,
       )}
     >
-      <div style={s('padding: 0 14px 12px;')}>
+      <div style={s('padding: 0 10px 10px;')}>
         <button
           type="button"
           onClick={onOpenPalette}
           style={s(
-            'width: 100%; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: var(--radius-md); border: 1px solid var(--color-divider); background: var(--color-surface-control); color: var(--color-text-tertiary); font-size: 12.5px; cursor: pointer; text-align: left;',
+            'width: 100%; height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 9px; border-radius: 7px; border: 1px solid #1c1d22; background: #101114; color: #62666e; font-size: 12px; cursor: pointer; text-align: left;',
           )}
         >
           <MagnifyingGlass size={14} aria-hidden="true" />
           <span style={s('flex: 1;')}>{t('palette.placeholder')}</span>
-          <span style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-text-quaternary);')}>
+          <span
+            style={s(
+              "box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 17px; padding: 0 5px; border-radius: 4px; background: #17181d; font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; font-size: 10.5px; line-height: 1; color: #9096a0;",
+            )}
+          >
             ⌘K
           </span>
         </button>
@@ -991,7 +990,7 @@ function Sidebar({
 
       <div
         style={s(
-          'padding: 0 14px 10px; display: flex; align-items: center; gap: 8px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);',
+          'padding: 8px 8px 5px; display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #4e5158;',
         )}
       >
         {t('sidebar.projects')}
@@ -1000,9 +999,10 @@ function Sidebar({
           <button
             type="button"
             title="Ouvrir un projet (⌘O)"
-            className="btn btn-ghost"
             onClick={() => openProject(onProjects, onError)}
-            style={s('font-size: 14px; line-height: 1; padding: 2px 7px;')}
+            style={s(
+              'background: transparent; border: 0; cursor: pointer; color: #62666e; font-size: 14px; line-height: 1; padding: 2px 4px;',
+            )}
           >
             +
           </button>
@@ -1027,12 +1027,13 @@ function Sidebar({
 
       <div
         style={s(
-          'padding: 12px 14px 6px; display: flex; align-items: center; gap: 8px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);',
+          'padding: 8px 8px 5px 10px; display: flex; align-items: center; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #4e5158;',
         )}
       >
         {t('sidebar.views')}
+        <span>{views.length}</span>
       </div>
-      <div style={s('display: flex; flex-direction: column; gap: 1px; padding: 0 8px;')}>
+      <div style={s('display: flex; flex-direction: column; gap: 2px; padding: 0 10px;')}>
         {views.map(([id, cle, path]) => (
           <RailLink key={id} id={id} label={t(cle)} path={path} active={tab === id} onTabPick={onTabPick} />
         ))}
@@ -1044,26 +1045,26 @@ function Sidebar({
           `~/.claude/` avaient chacun leur bouton et leur modale ; ils sont
           maintenant deux sections des préférences, parce que c'est la même
           question — comment l'ovrsee est réglé. */}
-      <div style={s('padding: 0 14px 12px; display: flex; flex-direction: column; gap: 6px;')}>
+      <div style={s('padding: 10px 0 0;')}>
         <button
           type="button"
-          className="btn btn-ghost btn-block"
           onClick={onOpenPreferences}
           title="⌘,"
-          style={s('font-size: 11px;')}
+          style={s(
+            'width: 100%; height: 32px; margin: 0 10px; padding: 0 8px; display: flex; align-items: center; gap: 9px; border-radius: 6px; border: 0; background: transparent; color: #b6bac1; font-size: 12.5px; cursor: pointer; text-align: left;',
+          )}
         >
-          <GearSix size={14} weight="regular" aria-hidden="true" /> {t('sidebar.preferences')}
+          <GearSix size={15} weight="regular" aria-hidden="true" color="#62666e" />
+          {t('sidebar.preferences')}
         </button>
       </div>
 
       <div
-        style={s(
-          'padding: 12px 14px 0; border-top: 1px solid var(--color-divider); margin-top: 12px;',
-        )}
+        style={s('padding: 10px 10px 0; border-top: 1px solid #17181d; margin-top: 10px;')}
       >
         <div
           style={s(
-            'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 8px;',
+            'font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #4e5158; margin-bottom: 8px;',
           )}
         >
           {t('sidebar.activity')}
@@ -1126,17 +1127,22 @@ function RailLink({
       }}
       style={s(
         (compact
-          ? 'width: 36px; height: 36px; justify-content: center;'
-          : 'padding: 7px 8px; gap: 10px;') +
-          ' display: flex; align-items: center; text-decoration: none; border-radius: var(--radius-sm); font-size: 13px; ' +
+          ? 'width: 36px; height: 31px; justify-content: center;'
+          : 'height: 31px; padding: 0 8px; gap: 10px;') +
+          ' display: flex; align-items: center; text-decoration: none; border-radius: 6px; font-size: 12.5px; ' +
           (active
-            ? 'background: var(--color-surface-active); color: var(--color-text);'
+            ? 'background: #1c1d24; font-weight: 500; color: #f2f3f5;'
             : hover
-              ? 'background: color-mix(in srgb, var(--color-text) 7%, transparent); color: var(--color-text-secondary);'
-              : 'color: var(--color-text-tertiary);'),
+              ? 'background: color-mix(in srgb, #f2f3f5 6%, transparent); color: #b6bac1;'
+              : 'color: #b6bac1;'),
       )}
     >
-      <Icon size={16} weight={active ? 'fill' : 'regular'} aria-hidden="true" />
+      <Icon
+        size={16}
+        weight={active ? 'fill' : 'regular'}
+        aria-hidden="true"
+        color={active ? '#7d76f0' : '#62666e'}
+      />
       {!compact && label}
     </a>
   )
@@ -1212,17 +1218,26 @@ function ProjectRow({
         setConfirming(false)
       }}
       style={s(
-        'padding: 9px 14px; cursor: pointer; ' +
-          (active
-            ? 'background: color-mix(in srgb, var(--color-accent) 22%, transparent); box-shadow: inset 2px 0 0 var(--color-accent); color: var(--color-text);'
-            : 'color: var(--color-neutral-300);'),
+        'padding: 6px 8px; margin: 0 10px; border-radius: 6px; cursor: pointer; ' +
+          (active ? 'background: #1c1d24;' : ''),
       )}
     >
-      <div style={s('display: flex; align-items: baseline; gap: 8px;')}>
-        <div style={s('font-size: 13px; font-weight: 500;')} title={project.path}>
+      <div style={s('display: flex; align-items: center; gap: 9px;')}>
+        <div style={s('width: 7px; flex: none; display: flex; align-items: center; justify-content: center;')}>
+          <div
+            style={s(
+              `width: 7px; height: 7px; border-radius: 2px; background: ${active ? '#7d76f0' : '#33353c'};`,
+            )}
+          />
+        </div>
+        <div
+          style={s(
+            `flex: 1; min-width: 0; font-size: 12.5px; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; ${active ? 'font-weight: 500; color: #f2f3f5;' : 'color: #9096a0;'}`,
+          )}
+          title={project.path}
+        >
           {project.name}
         </div>
-        <div style={s('flex: 1;')} />
 
         {!confirming && (
           <div
@@ -1232,10 +1247,10 @@ function ProjectRow({
                 : "Ce dossier n'a pas encore de ovrsee/"
             }
             style={s(
-              'font-size: 10px; padding: 1px 6px; border-radius: 999px; ' +
+              'box-sizing: border-box; display: inline-flex; align-items: center; height: 17px; padding: 0 5px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px; line-height: 1; flex: none; ' +
                 (vivant.open && vivant.equipped
-                  ? 'color: var(--color-accent); border: 1px solid var(--color-accent-700);'
-                  : 'color: var(--color-neutral-600); border: 1px solid var(--color-neutral-800);'),
+                  ? 'color: #a49dfa; border: 1px solid #2f2a66; background: #14132a;'
+                  : 'color: #9096a0; background: #24252c;'),
             )}
           >
             {badge}
@@ -1265,7 +1280,7 @@ function ProjectRow({
       </div>
       <div
         title="Dernier commit rattaché à un plan"
-        style={s('font-size: 11px; color: var(--color-neutral-600); margin-top: 3px;')}
+        style={s('font-size: 10.5px; font-family: var(--font-mono); color: #4e5158; margin-top: 3px; padding-left: 16px;')}
       >
         {humanAge(vivant.last)}
       </div>

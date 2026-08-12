@@ -101,6 +101,7 @@ const RENDUS: Array<[string, (snap: Snapshot) => ReactElement]> = [
       <Historique
         projet="ovrsee"
         plans={snap.plans ?? []}
+        activePlan={snap.activePlan}
         timeline={snap.timeline ?? []}
         ticketTimeline={snap.ticketTimeline ?? []}
         onOuvrirTicket={() => {}}

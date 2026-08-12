@@ -267,7 +267,8 @@ export function Tableau({
       </ViewBar>
       <div style={s('padding: 12px 22px 12px;')}>
         {filtreEpic && (
-          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: color-mix(in srgb, var(--color-accent) 15%, transparent); border-left: 3px solid var(--color-accent); display: flex; align-items: center; gap: 10px;')}>
+          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: #101114; border: 1px solid #24252b; display: flex; align-items: center; gap: 10px;')}>
+            <span className="tag tag-accent" style={s('font-size: 10px;')}>epic</span>
             <div style={s('font-size: 12px; color: var(--color-text);')}>
               {t('tableau.children_of')} <span style={s('font-weight: 500;')}>{filtreEpic}</span>
             </div>
@@ -321,6 +322,7 @@ export function Tableau({
               }}
               onCreer={titre => creer(titre, colonne.id)}
               onOuvrir={setOuverte}
+              ouverte={ouverte}
               onRenommer={patch => renommer(colonne.id, patch)}
               onRetirer={vers => retirer(colonne.id, vers)}
               filtreEpic={filtreEpic}
@@ -388,6 +390,7 @@ function ColonneVue({
   onDeposeColonne,
   onCreer,
   onOuvrir,
+  ouverte,
   onRenommer,
   onRetirer,
   filtreEpic,
@@ -410,6 +413,8 @@ function ColonneVue({
   onDeposeColonne: (id: string, apres: boolean) => void
   onCreer: (titre: string) => void
   onOuvrir: (file: string) => void
+  /** Fichier du ticket sélectionné (panneau Detail ouvert), pour marquer sa carte. */
+  ouverte: string | null
   onRenommer: (patch: { titre?: string; wip?: number | null }) => void
   onRetirer: (vers?: string) => void
   filtreEpic: string | null
@@ -462,8 +467,10 @@ function ColonneVue({
       style={s(
         COLONNE_LARGEUR +
           COLONNE_FOND +
+          // Cible de dépôt neutre — jamais un filet coloré pour signifier un
+          // état (audit §5.1) : pointillé #383a44, fond #131418.
           (survolee
-            ? 'background: color-mix(in srgb, var(--color-accent) 22%, transparent); outline: 1px dashed var(--color-accent-600);'
+            ? 'background: #131418; outline: 1px dashed #383a44;'
             : 'background: color-mix(in srgb, var(--color-surface) 55%, transparent);') +
           liseré,
       )}
@@ -642,18 +649,31 @@ function ColonneVue({
         </div>
       ) : (
         <div style={s('display: flex; flex-direction: column; gap: 8px; overflow-y: auto;')}>
-          {tickets.map(ticket => (
-            <Carte
-              key={ticket.file}
-              ticket={ticket}
-              onOuvrir={onOuvrir}
-              filtreEpic={filtreEpic}
-              setFiltreEpic={setFiltreEpic}
-              allTickets={allTickets}
-              onModifier={(patch) => onModifier(ticket.file, patch)}
-              boardColonnes={boardColonnes}
-            />
-          ))}
+          {survolee && (
+            <div
+              style={s(
+                'font-size: 11px; color: #9096a0; text-align: center; padding: 8px; border-radius: 6px; border: 1px dashed #383a44;',
+              )}
+            >
+              {t('tableau.drop_here')}
+            </div>
+          )}
+          {tickets
+            .filter(ticket => !(ticket.epic && tickets.some(e => e.id === ticket.epic && e.type === 'epic')))
+            .map(ticket => (
+              <Carte
+                key={ticket.file}
+                ticket={ticket}
+                onOuvrir={onOuvrir}
+                ouverte={ouverte}
+                enfantsIci={ticket.type === 'epic' ? tickets.filter(c => c.epic === ticket.id) : undefined}
+                filtreEpic={filtreEpic}
+                setFiltreEpic={setFiltreEpic}
+                allTickets={allTickets}
+                onModifier={onModifier}
+                boardColonnes={boardColonnes}
+              />
+            ))}
         </div>
       )}
     </div>
@@ -739,6 +759,8 @@ export const COULEUR_PRIORITE: Record<Priorite, string> = {
 function Carte({
   ticket,
   onOuvrir,
+  ouverte,
+  enfantsIci,
   filtreEpic,
   setFiltreEpic,
   allTickets,
@@ -747,22 +769,22 @@ function Carte({
 }: {
   ticket: Ticket
   onOuvrir: (file: string) => void
+  /** Fichier du ticket dont le panneau Detail est ouvert — filet + halo, jamais un filet accent. */
+  ouverte: string | null
+  /** Enfants de cet epic présents dans cette même colonne — rendus imbriqués, sans liseré. */
+  enfantsIci?: Ticket[]
   filtreEpic: string | null
   setFiltreEpic: (epic: string | null) => void
   allTickets: Ticket[]
-  onModifier: (patch: TicketPatch) => void
+  onModifier: (file: string, patch: TicketPatch) => void
   boardColonnes: Colonne[]
 }) {
   const isEpic = ticket.type === 'epic'
+  const selectionnee = ticket.file === ouverte
   const children = isEpic ? childrenOf(allTickets, ticket.id) : []
   const finalColumn = colonneFinale(boardColonnes)
   const progress = isEpic ? epicProgress(children, finalColumn) : null
   const parentEpic = ticket.epic ? allTickets.find(t => t.id === ticket.epic) : null
-
-  // Le liseré signale l'appartenance à un epic même quand l'enfant n'est
-  // plus dans la même colonne — regrouper visuellement n'est possible que
-  // là, mais l'indicateur d'appartenance, lui, vaut partout.
-  const liseréEnfant = parentEpic ? 'box-shadow: inset 3px 0 0 var(--color-accent);' : ''
 
   return (
     <div
@@ -771,11 +793,11 @@ function Carte({
       onClick={() => onOuvrir(ticket.file)}
       style={s(
         'border: 1px solid ' +
-          (isEpic ? 'var(--color-accent-600)' : 'var(--color-neutral-800)') +
-          '; border-radius: 8px; padding: 10px 11px; background: ' +
-          (isEpic ? 'color-mix(in srgb, var(--color-accent) 10%, var(--color-surface))' : 'var(--color-surface)') +
+          (selectionnee ? '#383a44' : isEpic ? '#1c1d22' : 'var(--color-neutral-800)') +
+          '; border-radius: ' + (isEpic ? '10px' : '8px') + '; padding: 10px 11px; background: ' +
+          (selectionnee ? '#16171d' : 'var(--color-surface)') +
           '; cursor: pointer;' +
-          liseréEnfant,
+          (selectionnee ? ' box-shadow: var(--ring-selected);' : ''),
       )}
     >
       <div style={s('display: flex; align-items: center; gap: 7px;')}>
@@ -867,13 +889,31 @@ function Carte({
             style={s('font-size: 10px; padding: 3px 6px; flex: 1;')}
             onClick={(e) => {
               e.stopPropagation()
-              onModifier({ epic: null })
+              onModifier(ticket.file, { epic: null })
             }}
           >
             {t('tableau.detach')}
           </button>
         )}
       </div>
+
+      {enfantsIci && enfantsIci.length > 0 && (
+        <div style={s('display: flex; flex-direction: column; gap: 8px; margin-top: 10px; margin-left: 14px;')}>
+          {enfantsIci.map(enfant => (
+            <Carte
+              key={enfant.file}
+              ticket={enfant}
+              onOuvrir={onOuvrir}
+              ouverte={ouverte}
+              filtreEpic={filtreEpic}
+              setFiltreEpic={setFiltreEpic}
+              allTickets={allTickets}
+              onModifier={onModifier}
+              boardColonnes={boardColonnes}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -16,11 +16,12 @@ import { s } from './style'
 
 type SousVue = 'empile' | 'densite' | 'type'
 
-/** commit → accent, plan → accent-2, ticket → neutral : la seule autre paire de teintes du système. */
+/** Valeurs littérales de l'audit design (§4.4) — pas les rampes de token,
+    dont ni le mapping ni les teintes ne correspondaient à la maquette. */
 const COULEUR_SERIE = {
-  commits: 'var(--color-accent-500)',
-  plans: 'var(--color-accent-2-500)',
-  tickets: 'var(--color-neutral-400)',
+  plans: '#7d76f0',
+  tickets: '#4b46a3',
+  commits: '#2a2b33',
 } as const
 
 /**

@@ -48,6 +48,7 @@ type Vue = 'tickets' | 'commits'
 export function Historique({
   projet,
   plans,
+  activePlan,
   timeline,
   ticketTimeline,
   scans = [],
@@ -57,6 +58,8 @@ export function Historique({
   /** Nom affiché du projet, pour le fil d'Ariane de la barre de vue. */
   projet: string
   plans: Plan[]
+  /** Fichier du plan actif, ou `null` — pour distinguer le rail d'une bande active. */
+  activePlan: string | null
   timeline: TimelineEntry[]
   ticketTimeline: TicketTimelineEntry[]
   scans?: Scan[]
@@ -92,9 +95,9 @@ export function Historique({
               </div>
             </div>
           ) : vue === 'tickets' ? (
-            <TicketFrise entries={ticketTimeline} byFile={byFile} onOuvrirTicket={onOuvrirTicket} />
+            <TicketFrise entries={ticketTimeline} byFile={byFile} activePlan={activePlan} onOuvrirTicket={onOuvrirTicket} />
           ) : (
-            <CommitFrise entries={timeline} byFile={byFile} />
+            <CommitFrise entries={timeline} byFile={byFile} activePlan={activePlan} />
           )}
         </div>
 
@@ -113,26 +116,29 @@ export function Historique({
 
 function ViewSwitch({ vue, onChange }: { vue: Vue; onChange: (vue: Vue) => void }) {
   const option = (id: Vue, label: string) => (
-    <button
-      type="button"
-      className={vue === id ? 'btn btn-primary' : 'btn btn-ghost'}
-      style={s('font-size: 11px; padding: 5px 11px;')}
-      onClick={() => onChange(id)}
-      aria-pressed={vue === id}
-    >
+    <label key={id} className="seg-opt">
+      <input type="radio" name="historique-vue" checked={vue === id} onChange={() => onChange(id)} />
       {label}
-    </button>
+    </label>
   )
 
   return (
-    <div style={s('display: flex; gap: 4px; flex: none;')}>
+    <div className="seg">
       {option('tickets', t('historique.view_tickets'))}
       {option('commits', t('historique.view_commits'))}
     </div>
   )
 }
 
-function CommitFrise({ entries, byFile }: { entries: TimelineEntry[]; byFile: Map<string, Plan> }) {
+function CommitFrise({
+  entries,
+  byFile,
+  activePlan,
+}: {
+  entries: TimelineEntry[]
+  byFile: Map<string, Plan>
+  activePlan: string | null
+}) {
   let previous: string | null = null
 
   return (
@@ -148,7 +154,7 @@ function CommitFrise({ entries, byFile }: { entries: TimelineEntry[]; byFile: Ma
             {entry.kind === 'commit' ? (
               <CommitRow commit={entry.commit} />
             ) : (
-              <PlanBand entry={entry} plan={byFile.get(entry.plan) ?? null} />
+              <PlanBand entry={entry} plan={byFile.get(entry.plan) ?? null} actif={entry.plan === activePlan} />
             )}
           </div>
         )
@@ -160,10 +166,12 @@ function CommitFrise({ entries, byFile }: { entries: TimelineEntry[]; byFile: Ma
 function TicketFrise({
   entries,
   byFile,
+  activePlan,
   onOuvrirTicket,
 }: {
   entries: TicketTimelineEntry[]
   byFile: Map<string, Plan>
+  activePlan: string | null
   onOuvrirTicket: (file: string) => void
 }) {
   let previous: string | null = null
@@ -181,7 +189,12 @@ function TicketFrise({
             {entry.kind === 'ticket' ? (
               <TicketCard ticket={entry.ticket} onOuvrir={onOuvrirTicket} />
             ) : (
-              <PlanBandTickets entry={entry} plan={byFile.get(entry.plan) ?? null} onOuvrirTicket={onOuvrirTicket} />
+              <PlanBandTickets
+                entry={entry}
+                plan={byFile.get(entry.plan) ?? null}
+                actif={entry.plan === activePlan}
+                onOuvrirTicket={onOuvrirTicket}
+              />
             )}
           </div>
         )
@@ -193,10 +206,8 @@ function TicketFrise({
 function DayHeading({ date }: { date: string }) {
   return (
     <div style={s('display: flex; align-items: center; gap: 10px; margin: 18px 0 8px;')}>
-      <div style={s('font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--color-neutral-500); flex: none;')}>
-        {frDate(date)}
-      </div>
-      <div style={s('flex: 1; height: 1px; background: var(--color-divider);')} />
+      <div className="kicker">{frDate(date)}</div>
+      <div style={s('flex: 1; height: 1px; background: #17181d;')} />
     </div>
   )
 }
@@ -211,7 +222,9 @@ function CommitRow({ commit }: { commit: GitCommit }) {
   return (
     <div style={s('display: flex; align-items: baseline; gap: 10px; padding: 4px 0;')}>
       <span style={s('width: 5px; height: 5px; border-radius: 50%; background: var(--color-neutral-600); flex: none; align-self: center;')} />
-      <span style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-accent); flex: none;')}>
+      {/* L'accent n'est pas la couleur des commits (audit §5.2) — #6ea8fe,
+          la même teinte que les shas ailleurs dans l'app (colonne Revue). */}
+      <span style={s('font-family: var(--font-mono); font-size: 11px; color: #6ea8fe; flex: none;')}>
         {commit.sha}
       </span>
       <span style={s('font-size: 12.5px; color: var(--color-neutral-300); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>
@@ -231,19 +244,24 @@ function CommitRow({ commit }: { commit: GitCommit }) {
  * Cliquable : ouvre le panneau Detail du ticket dans l'onglet Tableau.
  */
 function TicketCard({ ticket, onOuvrir }: { ticket: Ticket; onOuvrir: (file: string) => void }) {
+  // Heuristique sur l'id de colonne par défaut (board.json) : la frise n'a
+  // pas la liste des colonnes du board pour distinguer « en cours »
+  // autrement. Un board reconfiguré retombe simplement sur la variante repos.
+  const enCours = ticket.colonne === 'en-cours'
+
   return (
     <button
       type="button"
       onClick={() => onOuvrir(ticket.file)}
       style={s(
-        'display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; background: transparent; border: 0; padding: 5px 0; cursor: pointer; font-family: var(--font-body); color: inherit;',
+        `display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; cursor: pointer; font-family: var(--font-body); color: inherit; margin: 3px 0; padding: 10px 11px; border-radius: 10px; border: 1px solid ${enCours ? '#22232a' : '#1c1d22'}; background: ${enCours ? '#0e0f12' : '#0c0d10'};`,
       )}
     >
       <span
-        style={s(`width: 7px; height: 7px; border-radius: 50%; flex: none; background: ${COULEUR_PRIORITE[ticket.priorite] ?? COULEUR_PRIORITE.moyenne};`)}
+        style={s(`width: 5px; height: 5px; border-radius: 50%; flex: none; background: ${COULEUR_PRIORITE[ticket.priorite] ?? COULEUR_PRIORITE.moyenne};`)}
         title={`${t('tableau.priority_label')} ${ticket.priorite}`}
       />
-      <span style={s('font-family: var(--font-mono); font-size: 10.5px; color: var(--color-accent); flex: none;')}>
+      <span style={s('font-family: var(--font-mono); font-size: 10.5px; color: #62666e; flex: none;')}>
         {ticket.id}
       </span>
       <span style={s('font-size: 12.5px; color: var(--color-neutral-300); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>
@@ -258,7 +276,7 @@ function TicketCard({ ticket, onOuvrir }: { ticket: Ticket; onOuvrir: (file: str
       <span className="tag tag-outline" style={s('font-size: 10px; flex: none;')}>
         {ticket.colonne}
       </span>
-      <span style={s('font-size: 10.5px; color: var(--color-neutral-600); flex: none;')}>
+      <span style={s('font-family: var(--font-mono); font-size: 10.5px; color: var(--color-neutral-600); flex: none;')}>
         {humanAge(ticket.maj)}
       </span>
     </button>
@@ -275,14 +293,24 @@ function TicketCard({ ticket, onOuvrir }: { ticket: Ticket; onOuvrir: (file: str
 function PlanBand({
   entry,
   plan,
+  actif,
 }: {
   entry: Extract<TimelineEntry, { kind: 'plan' }>
   plan: Plan | null
+  actif: boolean
 }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <PlanBandShell open={open} onToggle={() => setOpen(o => !o)} title={entry.title} status={entry.status}>
+    <PlanBandShell
+      open={open}
+      onToggle={() => setOpen(o => !o)}
+      title={entry.title}
+      status={entry.status}
+      actif={actif}
+      closingSha={plan?.commits.at(-1)?.sha ?? null}
+      meta={entry.commits.length > 0 ? t('historique.commits_count', { n: entry.commits.length }) : undefined}
+    >
       {open && plan !== null && <PlanDetail plan={plan} />}
 
       {/* Le plan dont le fichier a disparu garde sa bande : la frise vient de
@@ -310,16 +338,26 @@ function PlanBand({
 function PlanBandTickets({
   entry,
   plan,
+  actif,
   onOuvrirTicket,
 }: {
   entry: Extract<TicketTimelineEntry, { kind: 'plan' }>
   plan: Plan | null
+  actif: boolean
   onOuvrirTicket: (file: string) => void
 }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <PlanBandShell open={open} onToggle={() => setOpen(o => !o)} title={entry.title} status={entry.status}>
+    <PlanBandShell
+      open={open}
+      onToggle={() => setOpen(o => !o)}
+      title={entry.title}
+      status={entry.status}
+      actif={actif}
+      closingSha={plan?.commits.at(-1)?.sha ?? null}
+      meta={entry.tickets.length > 0 ? t('historique.tickets_count', { n: entry.tickets.length }) : undefined}
+    >
       {open && plan !== null && <PlanDetail plan={plan} />}
       {open && plan === null && (
         <div style={s('margin-top: 9px; font-size: 12px; color: var(--color-neutral-600);')}>
@@ -367,24 +405,37 @@ function PlanDetail({ plan }: { plan: Plan }) {
   )
 }
 
-/** L'habillage commun aux deux bandes : liseré, en-tête pliable, statut. */
+/**
+ * L'habillage commun aux deux bandes : rail, en-tête pliable, statut.
+ *
+ * Rail et étiquette distinguent trois états — actif (teinte plan), clos
+ * (« clos par {sha} », neutre), ouvert non actif (neutre aussi) — jamais
+ * un filet accent générique (audit §5.1 : le filet coloré ne signifie un
+ * état qu'à la sélection, pas au statut d'un plan).
+ */
 function PlanBandShell({
   open,
   onToggle,
   title,
   status,
+  actif,
+  closingSha,
+  meta,
   children,
 }: {
   open: boolean
   onToggle: () => void
   title: string
   status: 'open' | 'closed'
+  actif: boolean
+  closingSha: string | null
+  meta?: string
   children: ReactNode
 }) {
   return (
     <div
       style={s(
-        'border-left: 2px solid var(--color-accent-700); padding: 8px 0 8px 12px; margin: 6px 0 6px 1px; background: linear-gradient(90deg, color-mix(in srgb, var(--color-accent) 22%, transparent) 0%, transparent 60%); border-radius: 0 6px 6px 0;',
+        `border-left: 2px solid ${actif ? '#2a2660' : '#24252c'}; padding: 8px 0 8px 14px; margin: 6px 0 6px 1px;`,
       )}
     >
       <button
@@ -394,14 +445,31 @@ function PlanBandShell({
           'display: flex; align-items: baseline; gap: 9px; width: 100%; text-align: left; background: transparent; border: 0; padding: 0; cursor: pointer; font-family: var(--font-body); color: inherit;',
         )}
       >
-        <span style={s('font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-accent); flex: none;')}>
-          {t('historique.plan_label')}
-        </span>
-        <span style={s('font-size: 14px; font-weight: 500; color: var(--color-text);')}>{title}</span>
+        <span className="kicker" style={s('font-size: 9.5px;')}>{t('historique.plan_label')}</span>
+        <span style={s('font-size: 13px; font-weight: 500; color: var(--color-text);')}>{title}</span>
         <span style={s('flex: 1;')} />
-        <span className="tag tag-outline" style={s('font-size: 10px; flex: none;')}>
-          {status === 'closed' ? t('historique.closed') : t('historique.open')}
-        </span>
+        {actif ? (
+          <span
+            style={s(
+              'font-size: 9.5px; padding: 1px 6px; border-radius: 4px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660; flex: none;',
+            )}
+          >
+            {t('sante.active_badge')}
+          </span>
+        ) : status === 'closed' && closingSha ? (
+          <span className="tag tag-neutral" style={s('font-size: 10px; flex: none;')}>
+            {t('historique.closed_by', { sha: closingSha })}
+          </span>
+        ) : (
+          <span className="tag tag-neutral" style={s('font-size: 10px; flex: none;')}>
+            {status === 'closed' ? t('historique.closed') : t('historique.open')}
+          </span>
+        )}
+        {meta && (
+          <span style={s('font-family: var(--font-mono); font-size: 10.5px; color: var(--color-neutral-600); flex: none;')}>
+            {meta}
+          </span>
+        )}
         <span style={s('font-size: 10.5px; color: var(--color-neutral-600); flex: none;')}>{open ? '▾' : '▸'}</span>
       </button>
 

@@ -33,39 +33,71 @@
 }
 
 :root {
-  /* Surfaces — cinq niveaux, du fond applicatif au contrôle actif. */
+  /* Surfaces — huit niveaux, du fond applicatif au contrôle actif.
+     Valeurs de la maquette `Ovrsee App.dc.html#2a` (audit design du
+     2026-08-12) — littérales, pas dérivées par color-mix. */
   --color-bg: #08090a; /* fond application */
-  --color-surface: #0b0c0e; /* rails et panneaux */
+  --color-surface: #0b0c0e; /* rails */
+  --color-surface-panel: #0a0b0d; /* panneaux latéraux et dock */
   --color-surface-card: #0c0d10; /* cartes */
   --color-surface-control: #101114; /* contrôles */
+  --color-surface-hover: #131418; /* survol de ligne */
   --color-surface-active: #1c1d24; /* état actif/élevé — jamais un filet
      de couleur : une surface élevée, un texte plus clair, et le picto qui
      passe en plein (maquette 2a). */
+  --color-surface-elevated: #16171d;
+  --color-surface-segment: #24252c; /* pastille active d'un segmenté */
 
-  /* Accent — retenu plus froid, plus saturé que l'ancien Nocturne (#9184d9
-     → #7d76f0), rampe recalculée à la même teinte. */
-  --color-text: #f2f3f5; /* hiérarchie de texte — primaire (titres, valeurs) */
-  --color-text-secondary: color-mix(in srgb, var(--color-text) 78%, transparent); /* corps de carte */
-  --color-text-tertiary: color-mix(in srgb, var(--color-text) 60%, transparent); /* légendes */
-  --color-text-quaternary: color-mix(in srgb, var(--color-text) 45%, transparent); /* métadonnées */
-  --color-text-discrete: color-mix(in srgb, var(--color-text) 32%, transparent); /* libellés de section */
+  /* Hiérarchie de texte — sept niveaux, rampe froide de la maquette. Valeurs
+     littérales : un color-mix sur #f2f3f5 donne des gris neutres plus clairs
+     que ceux de la maquette. */
+  --color-text: #f2f3f5; /* titres, valeurs */
+  --color-text-secondary: #b6bac1; /* corps de carte */
+  --color-text-tertiary: #9096a0; /* légendes */
+  --color-text-quaternary: #62666e; /* métadonnées */
+  --color-text-discrete: #55585f; /* libellés de section (mono, capitales) */
+  --color-text-faint: #4e5158; /* compteurs, hints */
+  --color-text-ghost: #3f424a; /* pictos inertes, puces éteintes */
+
+  /* Filets — quatre rôles, quatre jetons (au lieu d'un --color-divider
+     unique qui écrasait la hiérarchie de la maquette). --color-divider
+     reste défini comme alias par défaut pour les usages pas encore migrés
+     vers un rôle précis (chantiers Lot 3-7) — pointe sur le rôle carte. */
+  --color-border-chrome: #17181d; /* séparateurs de châssis, lignes de liste */
+  --color-border-card: #1c1d22; /* contour de carte */
+  --color-border-control: #24252b; /* contour de contrôle */
+  --color-border-selected: #383a44; /* contour sélectionné */
+  --color-divider: var(--color-border-card);
+
   --color-accent: #7d76f0;
   --color-accent-2: #8682cf;
-  --color-divider: color-mix(in srgb, #f2f3f5 16%, transparent);
+
+  /* Statuts — teinte / filet / fond, valeurs de la maquette. */
+  --color-ok: #4cc38a; --color-ok-border: #1c3728; --color-ok-bg: #0b1610;
+  --color-warn: #e3b341; --color-warn-border: #3a3117; --color-warn-bg: #1a1608;
+  --color-err: #e5677a; --color-err-border: #3d1c22; --color-err-bg: #170b0e;
+  --color-info: #6ea8fe; /* sha de commit, colonne « revue » */
+  --color-plan: #a49dfa; --color-plan-border: #2f2a66; --color-plan-bg: #14132a;
+
+  --ring-selected: 0 0 0 4px rgba(255, 255, 255, 0.045); /* halo de sélection */
 
   /* Tonal ramps — même teinte que l'accent et le neutre de base, 9 paliers
-     de luminosité générés une fois (voir T-0045). Le clair (theme.ts,
+     de luminosité générés une fois (voir T-0045). Rampe neutre recolorée en
+     froid (audit du 2026-08-12) pour cesser de rendre bleutée partout où
+     elle est encore utilisée (29 fichiers, migration progressive au fil des
+     chantiers Lot 3-7) — mêmes rôles que la hiérarchie de texte/filets
+     ci-dessus, en 9 paliers plutôt que 7+4. Le clair (theme.ts,
      nocturneClair) réutilise les mêmes 9 couleurs par ramp, indices
      inversés — pas une nouvelle teinte par thème. */
-  --color-neutral-100: #f3f5f7;
-  --color-neutral-200: #e1e6ea;
-  --color-neutral-300: #c9d1d9;
-  --color-neutral-400: #abb8c4;
-  --color-neutral-500: #8799ab;
-  --color-neutral-600: #63788d;
-  --color-neutral-700: #495969;
-  --color-neutral-800: #323d48;
-  --color-neutral-900: #1d242a;
+  --color-neutral-100: #f2f3f5;
+  --color-neutral-200: #dcdee2;
+  --color-neutral-300: #b6bac1;
+  --color-neutral-400: #9096a0;
+  --color-neutral-500: #74787f;
+  --color-neutral-600: #62666e;
+  --color-neutral-700: #55585f;
+  --color-neutral-800: #3f424a;
+  --color-neutral-900: #24252b;
 
   --color-accent-100: #eeedfd;
   --color-accent-200: #d8d6fa;
@@ -126,7 +158,6 @@ body {
   color: var(--color-text);
   font-family: var(--font-body);
 }
-h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); }
 
 .lighten{mix-blend-mode:lighten;background-color:transparent}
 
@@ -137,16 +168,19 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-headi
 
 *, *::before, *::after { box-sizing: border-box; }
 body { margin: 0; font-size: 15px; line-height: 1.55; font-weight: 400; }
+/* Échelle unique (audit 2026-08-12, §5.3) : h1 = titre de page, h2 = titre de
+   section, h3 = titre de bloc, h4 = ligne de corps. Un seul niveau par rôle —
+   ne pas ajouter de graisse/taille hors cette échelle. */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
-  line-height: 1.12; letter-spacing: -0.015em; margin: 0 0 var(--space-2);
+  font-family: var(--font-heading);
+  line-height: 1.2; letter-spacing: -0.01em; margin: 0 0 var(--space-2);
 }
-h1 { font-size: 42px; }
-h2 { font-size: 32px; }
-h3 { font-size: 25px; }
-h4 { font-size: 20px; }
-h5 { font-size: 16px; }
-h6 { font-size: 13px; }
+h1 { font-size: 21px; font-weight: 600; }
+h2 { font-size: 15px; font-weight: 500; }
+h3 { font-size: 13px; font-weight: 500; }
+h4 { font-size: 12.5px; font-weight: 400; }
+h5 { font-size: 16px; font-weight: 600; }
+h6 { font-size: 13px; font-weight: 600; }
 h6 { letter-spacing: 0.08em; text-transform: uppercase; }
 p { margin: 0 0 var(--space-3); }
 a { color: var(--color-accent); text-underline-offset: 3px; }
@@ -173,24 +207,27 @@ figcaption {
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   cursor: pointer; text-decoration: none;
-  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
-  font-size: 14px; line-height: 1.2; color: var(--color-text);
+  font-family: var(--font-body); font-weight: 500;
+  font-size: 12px; line-height: 1; color: var(--color-text);
   background: transparent; border: 1px solid transparent;
-  padding: var(--space-2) calc(var(--space-3) * 1.2);
-  border-radius: 6px; /* maquette 2a : boutons à 6px, pas --radius-md (8px) */
+  height: 27px; padding: 0 11px;
+  border-radius: 6px;
 }
 .btn svg { display: block; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { color: var(--color-accent); border-color: var(--color-accent); }
-.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
-.btn-primary:active { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
-.btn-secondary { border-color: var(--color-divider); }
-.btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
-.btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
-.btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
-.btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
-.btn-ghost:active { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
-.btn-icon { width: 36px; height: 36px; padding: 0; }
+/* Primaire = fond plein, jamais un filet/texte accent — l'accent ne sert pas
+   de couleur de libellé (audit §5, règle d'or n°2). */
+.btn-primary { background: #7d76f0; color: #0a0a12; }
+.btn-primary:hover { background: color-mix(in srgb, #7d76f0 90%, white); }
+.btn-primary:active { background: color-mix(in srgb, #7d76f0 85%, black); }
+.btn-secondary { background: var(--color-surface-control); border-color: var(--color-border-control); color: #d5d8dd; }
+.btn-secondary:hover { background: var(--color-surface-hover); }
+.btn-secondary:active { background: var(--color-surface-active); }
+/* Fantôme = texte tertiaire neutre, jamais violet. */
+.btn-ghost { color: var(--color-text-tertiary); padding-inline: var(--space-2); }
+.btn-ghost:hover { background: var(--color-surface-hover); }
+.btn-ghost:active { background: var(--color-surface-active); }
+.btn-icon { width: 27px; height: 27px; padding: 0; }
 .btn-block { width: 100%; margin-top: var(--space-2); }
 
 /* — forms — */
@@ -199,21 +236,21 @@ figcaption {
   color: color-mix(in srgb, var(--color-text) 70%, transparent);
 }
 .input {
-  width: 100%; min-height: 36px; padding: 6px 10px; font: inherit;
-  font-size: 14px; color: var(--color-text); caret-color: var(--color-accent);
+  width: 100%; height: 27px; padding: 0 10px; font: inherit;
+  font-size: 12px; color: var(--color-text); caret-color: var(--color-accent);
   background: var(--color-surface-control);
-  border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-control); border-radius: 6px;
 }
-.input:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+.input:hover { border-color: var(--color-border-selected); }
 .input:focus-visible { border-color: var(--color-accent); outline-offset: 0; }
-textarea.input { min-height: 90px; resize: vertical; }
-.radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+textarea.input { height: auto; min-height: 90px; padding-top: 6px; padding-bottom: 6px; resize: vertical; }
+.radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; }
 .radio input, .seg-opt input {
   position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
 }
 .radio .dot {
   width: 14px; height: 14px; flex: none; border-radius: 50%;
-  border: 1.5px solid var(--color-divider);
+  border: 1.5px solid var(--color-border-control);
 }
 .radio:hover .dot { border-color: var(--color-accent); }
 .radio input:checked + .dot {
@@ -221,33 +258,71 @@ textarea.input { min-height: 90px; resize: vertical; }
   box-shadow: inset 0 0 0 4px var(--color-bg);
 }
 .radio input:focus-visible + .dot { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+/* Segmenté — pastille active sur fond élevé, jamais un anneau accent
+   (audit §2.2 : le conteneur n'a plus de filets internes entre options). */
 .seg {
-  display: inline-flex; overflow: hidden;
-  border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 2px; background: var(--color-surface-control);
+  border: 1px solid var(--color-border-card); border-radius: 7px;
 }
 .seg-opt {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 7px 12px; font-size: 13px; cursor: pointer;
+  padding: 5px 10px; font-size: 12px; line-height: 1; cursor: pointer;
+  border-radius: 5px; color: var(--color-text-tertiary);
 }
-.seg-opt + .seg-opt { border-left: 1px solid var(--color-divider); }
-.seg-opt:has(input:checked) { color: var(--color-accent); box-shadow: inset 0 0 0 1px var(--color-accent); }
-.seg-opt:not(:has(input:checked)):hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+.seg-opt:has(input:checked) { background: var(--color-surface-segment); color: var(--color-text); }
+.seg-opt:not(:has(input:checked)):hover { background: var(--color-surface-hover); }
 .seg-opt:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+
+/* — switch — */
+.switch {
+  position: relative; display: inline-flex; align-items: center; flex: none;
+  width: 28px; height: 16px; border-radius: 999px; cursor: pointer;
+  background: var(--color-surface-segment); transition: background 0.15s ease;
+}
+.switch input {
+  position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
+}
+.switch .thumb {
+  position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--color-text-quaternary);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.switch:has(input:checked) { background: var(--color-accent); }
+.switch:has(input:checked) .thumb { transform: translateX(12px); background: #0a0a12; }
+.switch:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+/* — touche clavier — police système, jamais mono (audit §5.4). */
+.kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 17px; min-width: 17px; padding: 0 5px; border-radius: 4px;
+  background: var(--color-border-chrome); color: var(--color-text-tertiary);
+  font-size: 10.5px; line-height: 1; font-weight: 400;
+  font-family: -apple-system, 'SF Pro Text', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* — libellé de section — mono, capitales, jamais la police de corps
+   (audit §2.3). Distinct de .card-kicker, qui reste en accent. */
+.kicker {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--color-text-discrete);
+}
 
 /* — cards — */
 .card {
   display: flex; flex-direction: column; gap: var(--space-2);
-  padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface-card);
+  padding: 11px 13px; border-radius: 9px;
+  background: var(--color-surface-card); border: 1px solid var(--color-border-card);
 }
 .card-kicker { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-accent); }
 .card-title {
-  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
-  font-size: 17px; line-height: 1.2;
+  font-family: var(--font-body); font-weight: 500;
+  font-size: 13px; line-height: 1.3;
 }
-.card-body { margin: 0; font-size: 13px; opacity: 0.8; flex: 1; }
+.card-body { margin: 0; font-size: 12.5px; color: var(--color-text-secondary); flex: 1; }
 .card-meta {
-  display: flex; align-items: center; gap: 6px; font-size: 11px;
-  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 11px; color: var(--color-text-quaternary);
 }
 .elev-sm { box-shadow: var(--shadow-sm); }
 .elev-md { box-shadow: var(--shadow-md); }
@@ -255,14 +330,19 @@ textarea.input { min-height: 90px; resize: vertical; }
 
 /* — tags — */
 .tag {
-  display: inline-flex; align-items: center; font-size: 11px;
-  letter-spacing: 0.02em; padding: 3px 10px;
-  border-radius: 4px; /* maquette 2a : badges/tags à 4px */
+  display: inline-flex; align-items: center; font-size: 10.5px;
+  letter-spacing: 0.02em; padding: 1px 6px;
+  border-radius: 4px;
 }
-.tag-accent { background: var(--color-accent-800); color: var(--color-accent-100); }
+/* « accent » = teinte plan (audit §2.2), jamais un fond accent plein sur du
+   texte clair — c'était le bug de fond des chantiers précédents. */
+.tag-accent { background: var(--color-plan-bg); color: var(--color-plan); border: 1px solid var(--color-plan-border); }
 .tag-accent-2 { background: var(--color-accent-2-800); color: var(--color-accent-2-100); }
-.tag-neutral { background: var(--color-neutral-800); color: var(--color-neutral-100); }
+.tag-neutral { background: transparent; color: var(--color-text-tertiary); border: 1px solid var(--color-border-control); }
 .tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
+.tag-ok { background: var(--color-ok-bg); color: var(--color-ok); border: 1px solid var(--color-ok-border); }
+.tag-warn { background: var(--color-warn-bg); color: var(--color-warn); border: 1px solid var(--color-warn-border); }
+.tag-err { background: var(--color-err-bg); color: var(--color-err); border: 1px solid var(--color-err-border); }
 
 /* — navigation — */
 .nav {

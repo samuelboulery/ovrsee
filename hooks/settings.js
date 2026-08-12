@@ -45,8 +45,8 @@ export const DEFAULT_SETTINGS = {
   terminal: {
     visible: true,
     disposition: 'bottom',
-    // Coupé pour de bon quand l'accueil détecte un usage sans terminal — pas
-    // seulement replié. Voir `app/src/profilage.ts:terminalPourUsage()`.
+    // Coupé pour de bon quand le profil choisi à l'accueil n'a pas de
+    // terminal — pas seulement replié. Voir `app/src/PreferencesProfils.tsx`.
     disabled: false,
     hauteur: 244,
     largeur: 468,
@@ -60,9 +60,9 @@ export const DEFAULT_SETTINGS = {
   // ment. Le défaut est le bon même sur un fichier abîmé : mieux vaut une
   // présentation de trop qu'un premier lancement muet.
   onboardingVu: false,
-  // `usage` vient de l'accueil et s'y met à jour. `niveau` n'est plus posé par
-  // l'accueil (la galerie de profils remplace la question) — le champ reste
-  // pour compatibilité mais retombe toujours sur son défaut.
+  // Ni `niveau` ni `usage` ne sont plus posés par l'accueil (la galerie de
+  // profils remplace les deux questions) — le champ reste pour compatibilité
+  // mais retombe toujours sur son défaut.
   claude: { niveau: 'intermediaire', usage: 'terminal' },
   // Alignés sur l'état constaté du dépôt ovrsee lui-même au moment d'écrire
   // ce réglage : captures ignorées, plans/tickets versionnés.

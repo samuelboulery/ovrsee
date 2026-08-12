@@ -558,21 +558,32 @@ function Chiffre({
   accent?: boolean
 }) {
   return (
-    <div>
+    <div
+      style={s(
+        accent
+          ? 'padding: 9px 13px; border-radius: var(--radius-md); background: color-mix(in srgb, var(--color-accent) 8%, transparent); border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);'
+          : 'padding: 9px 0;',
+      )}
+    >
       <div
         style={s(
-          'font-size: 17px; font-weight: 500; ' +
+          'font-size: 24px; font-weight: 600; ' +
             (accent ? 'color: var(--color-accent);' : 'color: var(--color-text);'),
         )}
       >
         {valeur}
         {unite && (
-          <span style={s('font-size: 11.5px; color: var(--color-neutral-500); margin-left: 5px;')}>
+          <span style={s('font-size: 12px; font-weight: 400; color: var(--color-neutral-500); margin-left: 6px;')}>
             {unite}
           </span>
         )}
       </div>
-      <div style={s('font-size: 11px; color: var(--color-neutral-600); margin-top: 2px;')}>
+      <div
+        style={s(
+          'font-size: 11px; margin-top: 3px; ' +
+            (accent ? 'color: var(--color-accent-2);' : 'color: var(--color-neutral-600);'),
+        )}
+      >
         {legende}
       </div>
     </div>

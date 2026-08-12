@@ -1149,6 +1149,8 @@ export interface StackRow {
   version: string
   /** Le commentaire `WHY:` trouvé au-dessus de l'import, ou rien. */
   why: string | null
+  /** Déclarée dans `devDependencies`, plutôt que `dependencies`. */
+  dev: boolean
 }
 
 /**
@@ -1169,13 +1171,20 @@ export function stackFrom(
   packageJson: PackageJson | null,
   whys: Record<string, string> = {},
 ): StackRow[] {
-  const all = { ...(packageJson?.dependencies ?? {}), ...(packageJson?.devDependencies ?? {}) }
-
-  return Object.entries(all).map(([name, version]) => ({
+  const prod = Object.entries(packageJson?.dependencies ?? {}).map(([name, version]) => ({
     name,
     version,
     why: whys[name] ?? null,
+    dev: false,
   }))
+  const dev = Object.entries(packageJson?.devDependencies ?? {}).map(([name, version]) => ({
+    name,
+    version,
+    why: whys[name] ?? null,
+    dev: true,
+  }))
+
+  return [...prod, ...dev]
 }
 
 // --- Configuration Claude Code -----------------------------------------------

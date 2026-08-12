@@ -171,6 +171,8 @@ export function SectionProfils({
   settings,
   onSettings,
   courant: force,
+  titreCle,
+  descCle,
 }: {
   settings: SettingsType
   onSettings: (settings: SettingsType) => void
@@ -181,14 +183,17 @@ export function SectionProfils({
    * correspond plus exactement et que la galerie n'en montrerait aucun.
    */
   courant?: string | null
+  /** Titre/description de remplacement — l'accueil pose sa propre question. */
+  titreCle?: TranslationKey
+  descCle?: TranslationKey
 }) {
   const courant = force ?? profilCourant(settings)
 
   return (
     <>
-      <SectionTitle>{t('pref.profiles')}</SectionTitle>
+      <SectionTitle>{t(titreCle ?? 'pref.profiles')}</SectionTitle>
       <p style={s('margin: 0 0 14px; font-size: 12px; color: var(--color-neutral-500);')}>
-        {t('pref.profiles_desc')}
+        {t(descCle ?? 'pref.profiles_desc')}
       </p>
 
       <div style={s('display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;')}>

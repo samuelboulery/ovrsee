@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { GearSix, MagnifyingGlass } from '@phosphor-icons/react'
 
 import { applyTheme } from './theme'
 import { t, setCurrentLanguage } from './i18n'
@@ -522,6 +523,7 @@ export function App() {
             onProjects={applyProjects}
             onError={setError}
             onOpenPreferences={() => setPreferencesOuvertes(true)}
+            onOpenPalette={() => setPaletteOuverte(true)}
             density={density(commitsDeLaFrise(snapshot?.timeline ?? []), {
               fenetre: settings?.densiteActivite.fenetre,
             })}
@@ -710,8 +712,14 @@ export function App() {
         <CommandPalette
           settings={settings}
           tickets={snapshot?.tickets ?? []}
+          projects={projects}
+          current={current}
           onClose={() => setPaletteOuverte(false)}
           onTabPick={onTabPick}
+          onPick={path => {
+            setCurrent(path)
+            pushUrl(window.location.pathname, path)
+          }}
           onOpenPreferences={() => setPreferencesOuvertes(true)}
           onOpenTicket={onOuvrirTicket}
         />
@@ -903,6 +911,7 @@ function Sidebar({
   onProjects,
   onError,
   onOpenPreferences,
+  onOpenPalette,
   density: bars,
 }: {
   collapsed: boolean
@@ -919,6 +928,7 @@ function Sidebar({
   onError: (message: string) => void
   /** La modale vit dans `App` : le menu natif l'ouvre par le même chemin. */
   onOpenPreferences: () => void
+  onOpenPalette: () => void
   density: number[]
 }) {
   // Le sélecteur de dossier n'existe que dans l'application empaquetée. Dans un
@@ -938,6 +948,17 @@ function Sidebar({
         {views.map(([id, cle, path]) => (
           <RailLink key={id} id={id} label={t(cle)} path={path} active={tab === id} onTabPick={onTabPick} compact />
         ))}
+        <div style={s('flex: 1;')} />
+        <button
+          type="button"
+          title={`${t('sidebar.preferences')} (⌘,)`}
+          onClick={onOpenPreferences}
+          style={s(
+            'width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); background: transparent; border: none; color: var(--color-text-tertiary); cursor: pointer;',
+          )}
+        >
+          <GearSix size={16} weight="regular" aria-hidden="true" />
+        </button>
       </aside>
     )
   }
@@ -949,6 +970,22 @@ function Sidebar({
         `width: ${width}px; flex: none; display: flex; flex-direction: column; background: var(--theme-bg-secondary); border-right: 1px solid var(--color-divider); padding: 14px 0;`,
       )}
     >
+      <div style={s('padding: 0 14px 12px;')}>
+        <button
+          type="button"
+          onClick={onOpenPalette}
+          style={s(
+            'width: 100%; display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: var(--radius-md); border: 1px solid var(--color-divider); background: var(--color-surface-control); color: var(--color-text-tertiary); font-size: 12.5px; cursor: pointer; text-align: left;',
+          )}
+        >
+          <MagnifyingGlass size={14} aria-hidden="true" />
+          <span style={s('flex: 1;')}>{t('palette.placeholder')}</span>
+          <span style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-text-quaternary);')}>
+            ⌘K
+          </span>
+        </button>
+      </div>
+
       <div
         style={s(
           'padding: 0 14px 10px; display: flex; align-items: center; gap: 8px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600);',
@@ -1012,7 +1049,7 @@ function Sidebar({
           title="⌘,"
           style={s('font-size: 11px;')}
         >
-          ⚙ {t('sidebar.preferences')}
+          <GearSix size={14} weight="regular" aria-hidden="true" /> {t('sidebar.preferences')}
         </button>
       </div>
 

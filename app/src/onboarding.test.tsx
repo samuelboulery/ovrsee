@@ -3,14 +3,7 @@ import test from 'node:test'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import type { SettingsType } from './data'
-import {
-  appliquerReponses,
-  apercuReponses,
-  profilSuggere,
-  reponsesInitiales,
-  terminalPourUsage,
-  type Reponses,
-} from './profilage'
+import { appliquerReponses, apercuReponses, reponsesInitiales, type Reponses } from './profilage'
 import { Onboarding } from './Onboarding'
 import { Logo, SchemaBoucle } from './OnboardingArt'
 
@@ -43,61 +36,25 @@ const settings = (patch: Record<string, unknown> = {}): SettingsType =>
   }) as unknown as SettingsType
 
 const reponses = (patch: Partial<Reponses> = {}): Reponses => ({
-  usage: 'terminal',
   profil: 'complet',
   bootstrap: true,
   ...patch,
 })
 
-/* — profilSuggere — */
-
-test('profilSuggere : avec terminal, complet ; sans, sobre', () => {
-  assert.equal(profilSuggere('terminal'), 'complet')
-  assert.equal(profilSuggere('ide'), 'complet')
-  assert.equal(profilSuggere('desktop'), 'sobre')
-  assert.equal(profilSuggere('autre'), 'sobre')
-})
-
-/* — terminalPourUsage — */
-
-test('terminalPourUsage : l’usage décide de la place du terminal, et du disable', () => {
-  assert.deepEqual(terminalPourUsage('terminal'), { visible: true, disposition: 'side', disabled: false })
-  assert.deepEqual(terminalPourUsage('ide'), { visible: true, disposition: 'bottom', disabled: false })
-  assert.deepEqual(terminalPourUsage('desktop'), { visible: false, disabled: true })
-  assert.deepEqual(terminalPourUsage('autre'), { visible: false, disabled: true })
-})
-
-test('terminalPourUsage : sans terminal, aucune disposition n’est imposée', () => {
-  // Masqué, la disposition ne se voit nulle part : l'écraser effacerait le
-  // réglage de quelqu'un qui rouvrira le terminal plus tard.
-  assert.equal('disposition' in terminalPourUsage('desktop'), false)
-})
-
 /* — appliquerReponses — */
 
-test('appliquerReponses : le template range les onglets, l’usage place le terminal', () => {
-  const result = appliquerReponses(settings(), reponses({ usage: 'terminal', profil: 'dev' }))
+test('appliquerReponses : le template range les onglets et place le terminal', () => {
+  const result = appliquerReponses(settings(), reponses({ profil: 'dev' }))
 
   assert.deepEqual(result.onglets.actifs, ['apercu', 'tableau', 'stack', 'historique'])
   assert.equal(result.terminal.visible, true)
   assert.equal(result.terminal.disposition, 'side')
 })
 
-test('appliquerReponses : l’usage l’emporte sur la disposition du template', () => {
-  // Le template `dev` pose le terminal à droite ; en usage `ide` il descend.
-  const result = appliquerReponses(settings(), reponses({ usage: 'ide', profil: 'dev' }))
-  assert.equal(result.terminal.disposition, 'bottom')
-})
-
-test('appliquerReponses : sans terminal, il est masqué et désactivé quel que soit le template', () => {
-  const result = appliquerReponses(settings(), reponses({ usage: 'desktop', profil: 'complet' }))
+test('appliquerReponses : un template sans terminal le masque et le désactive', () => {
+  const result = appliquerReponses(settings(), reponses({ profil: 'sobre' }))
   assert.equal(result.terminal.visible, false)
   assert.equal(result.terminal.disabled, true)
-})
-
-test('appliquerReponses : avec terminal, il n’est pas désactivé', () => {
-  const result = appliquerReponses(settings(), reponses({ usage: 'terminal' }))
-  assert.equal(result.terminal.disabled, false)
 })
 
 test('appliquerReponses : `ordre` garde ses sept identifiants', () => {
@@ -111,7 +68,7 @@ test('appliquerReponses : `ordre` garde ses sept identifiants', () => {
 test('appliquerReponses : les tailles du terminal ne bougent pas', () => {
   const result = appliquerReponses(
     settings({ terminal: { visible: true, disposition: 'bottom', hauteur: 300, largeur: 500 } }),
-    reponses({ usage: 'terminal' }),
+    reponses(),
   )
   assert.equal(result.terminal.hauteur, 300)
   assert.equal(result.terminal.largeur, 500)
@@ -125,25 +82,22 @@ test('appliquerReponses : le bootstrap suit la case', () => {
   )
 })
 
-test('appliquerReponses : langue, thème et densité restent intacts', () => {
-  const avant = settings({ langue: 'en', theme: 'light' })
+test('appliquerReponses : langue, thème, densité et claude restent intacts', () => {
+  const avant = settings({ langue: 'en', theme: 'light', claude: { niveau: 'expert', usage: 'ide' } })
   const result = appliquerReponses(avant, reponses({ profil: 'sobre' }))
   assert.equal(result.langue, 'en')
   assert.equal(result.theme, 'light')
   assert.deepEqual(result.densiteActivite, avant.densiteActivite)
+  assert.deepEqual(result.claude, { niveau: 'expert', usage: 'ide' })
 })
 
-test('appliquerReponses : marque la présentation comme vue et garde l’usage', () => {
-  const result = appliquerReponses(settings(), reponses({ usage: 'desktop' }))
+test('appliquerReponses : marque la présentation comme vue', () => {
+  const result = appliquerReponses(settings(), reponses())
   assert.equal(result.onboardingVu, true)
-  assert.deepEqual(result.claude, { niveau: 'intermediaire', usage: 'desktop' })
 })
 
-test('appliquerReponses : un profil inconnu retombe sur la suggestion', () => {
-  const result = appliquerReponses(
-    settings(),
-    reponses({ usage: 'terminal', profil: 'inexistant' }),
-  )
+test('appliquerReponses : un profil inconnu retombe sur le premier de la liste', () => {
+  const result = appliquerReponses(settings(), reponses({ profil: 'inexistant' }))
   assert.deepEqual(result.onglets.actifs, ORDRE)
 })
 
@@ -162,28 +116,14 @@ test('apercuReponses : montre le résultat sans clore la présentation', () => {
 
 test('reponsesInitiales : reprend le profil courant s’il en matche un', () => {
   // Onglets et terminal du fixture `settings()` matchent le template `complet`.
-  const result = reponsesInitiales(settings({ claude: { niveau: 'expert', usage: 'ide' } }))
-  assert.equal(result.usage, 'ide')
+  const result = reponsesInitiales(settings())
   assert.equal(result.profil, 'complet')
   assert.equal(result.bootstrap, true)
 })
 
-test('reponsesInitiales : sans profil courant reconnu, retombe sur la suggestion par usage', () => {
-  const result = reponsesInitiales(
-    settings({
-      claude: { niveau: 'expert', usage: 'desktop' },
-      onglets: { actifs: ['apercu'], ordre: [...ORDRE] },
-    }),
-  )
-  assert.equal(result.usage, 'desktop')
-  assert.equal(result.profil, 'sobre')
-})
-
-test('reponsesInitiales : un usage absent ou abîmé donne terminal', () => {
-  for (const claude of [undefined, null, { niveau: 'gourou', usage: 'fax' }]) {
-    const result = reponsesInitiales(settings({ claude }))
-    assert.equal(result.usage, 'terminal')
-  }
+test('reponsesInitiales : sans profil courant reconnu, retombe sur le premier de la liste', () => {
+  const result = reponsesInitiales(settings({ onglets: { actifs: ['apercu'], ordre: [...ORDRE] } }))
+  assert.equal(result.profil, 'complet')
 })
 
 /* — rendu — */

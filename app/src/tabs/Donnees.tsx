@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Database } from '@phosphor-icons/react'
 
 import { frDate, tablesFrom, type GraphifyGraph, type Integration, type SchemaTable, type Snapshot } from '../data'
 import { t } from '../i18n'
@@ -127,6 +128,55 @@ function CoffreIgnore() {
   )
 }
 
+/** La commande qui produit une source de graphe, identique à celle de la palette ⌘K. */
+const COMMANDE_GRAPHIFY = '/graphify . --obsidian --obsidian-dir ovrsee/obsidian/graphe'
+
+/**
+ * L'état vide, avec pictogramme — aucune ligne à montrer n'est pas une
+ * absence de mise en page (maquette 2g).
+ */
+function EtatVide({ titre, detail, source }: { titre: string; detail: string; source: Source }) {
+  const [copie, setCopie] = useState(false)
+
+  return (
+    <div style={s('display: flex; flex-direction: column; align-items: center; text-align: center; padding: 48px 20px; gap: 14px;')}>
+      <Database size={40} weight="regular" color="var(--color-text-quaternary)" aria-hidden="true" />
+      <div style={s('font-family: var(--font-heading); font-weight: 500; font-size: 15px; color: var(--color-text);')}>
+        {titre}
+      </div>
+      <div style={s('max-width: 46ch; font-size: 12px; line-height: 1.5; color: var(--color-neutral-500);')}>
+        {detail}
+      </div>
+      {source === null && (
+        <div style={s('display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 6px;')}>
+          <code
+            style={s(
+              'font-family: var(--font-mono); font-size: 11.5px; color: var(--color-accent-500); background: var(--color-surface-control); border: 1px solid var(--color-divider); border-radius: var(--radius-md); padding: 8px 12px;',
+            )}
+          >
+            {COMMANDE_GRAPHIFY}
+          </code>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => {
+              navigator.clipboard
+                ?.writeText(COMMANDE_GRAPHIFY)
+                .then(() => {
+                  setCopie(true)
+                  setTimeout(() => setCopie(false), 1500)
+                })
+                .catch(() => setCopie(false))
+            }}
+          >
+            {copie ? t('apercu.copied') : t('donnees.copy_command')}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function confStyle(conf: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS' | 'LIVE'): string {
   const styles = {
     EXTRACTED: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-accent); border: 1px solid var(--color-accent-700);',
@@ -250,10 +300,7 @@ export function Donnees({
 
       {tables.length === 0 ? (
         <div>
-          <div style={s('font-size: 12px; color: var(--color-neutral-600); margin-bottom: 18px;')}>
-            {rien.titre}
-          </div>
-          <div style={s('font-size: 11px;')}>{rien.detail}</div>
+          <EtatVide titre={rien.titre} detail={rien.detail} source={source} />
           {coffreIgnore && <CoffreIgnore />}
         </div>
       ) : (

@@ -13,43 +13,12 @@
 import type { SettingsType } from './data'
 import { PROFILS, appliquerProfil, profilCourant } from './PreferencesProfils'
 
-export type Usage = 'terminal' | 'ide' | 'desktop' | 'autre'
-
-export const USAGES: Usage[] = ['terminal', 'ide', 'desktop', 'autre']
-
 /** Ce que la présentation retient d'une personne. */
 export type Reponses = {
-  usage: Usage
   /** Le template retenu : choisi directement dans la galerie, plus jamais déduit d'une matrice. */
   profil: string
   /** Proposer une commande à l'ouverture d'un projet neuf. */
   bootstrap: boolean
-}
-
-/**
- * Le template suggéré par défaut, avant que la galerie ne devienne le vrai
- * choix : sans terminal, les onglets qui supposent une session ouverte n'ont
- * plus de raison d'occuper la barre.
- */
-export function profilSuggere(usage: Usage): string {
-  const avecTerminal = usage === 'terminal' || usage === 'ide'
-  return avecTerminal ? 'complet' : 'sobre'
-}
-
-/**
- * La place du terminal, dictée par la façon dont Claude Code est lancé.
- *
- * Appliquée *après* le template : un template range les onglets, mais c'est
- * l'usage réel qui sait si une session tourne à côté et où elle doit tenir.
- * Sans terminal (Claude Desktop, autre), `disabled` coupe aussi la pastille de
- * réouverture — pas seulement `visible`, qui ne fait que replier le panneau.
- */
-export function terminalPourUsage(
-  usage: Usage,
-): { visible: boolean; disposition?: string; disabled: boolean } {
-  if (usage === 'terminal') return { visible: true, disposition: 'side', disabled: false }
-  if (usage === 'ide') return { visible: true, disposition: 'bottom', disabled: false }
-  return { visible: false, disabled: true }
 }
 
 /**
@@ -63,27 +32,23 @@ export const BOOTSTRAP_DEFAUT = ['/project-setup']
 /**
  * Les préférences telles qu'elles seront après la présentation.
  *
- * Fonction totale : un profil inconnu retombe sur la suggestion plutôt que de
- * ne rien appliquer, parce qu'un écran passé à la va-vite doit quand même
- * laisser des réglages cohérents derrière lui.
+ * Fonction totale : un profil inconnu retombe sur le premier de la liste
+ * (« Complet ») plutôt que de ne rien appliquer, parce qu'un écran passé à la
+ * va-vite doit quand même laisser des réglages cohérents derrière lui.
  *
- * Ce qui n'est *pas* touché : la langue, le thème et la densité. Ils ont leur
- * propre écran et se règlent séparément — les écraser ici ferait qu'un
- * changement de profil déferait un choix de thème.
+ * Ce qui n'est *pas* touché : la langue, le thème, la densité et `claude`
+ * (niveau/usage — l'accueil ne pose plus cette question, voir
+ * `hooks/settings.js:DEFAULT_SETTINGS`). Ils ont leur propre écran ou leur
+ * propre défaut, et les écraser ici ferait qu'un changement de profil
+ * déferait un réglage sans rapport.
  */
 export function appliquerReponses(settings: SettingsType, reponses: Reponses): SettingsType {
-  const id = PROFILS.some(p => p.id === reponses.profil)
-    ? reponses.profil
-    : profilSuggere(reponses.usage)
-  const profil = PROFILS.find(p => p.id === id) ?? PROFILS[0]
-
+  const profil = PROFILS.find(p => p.id === reponses.profil) ?? PROFILS[0]
   const applique = appliquerProfil(settings, profil)
 
   return {
     ...applique,
-    terminal: { ...applique.terminal, ...terminalPourUsage(reponses.usage) },
     bootstrap: reponses.bootstrap ? BOOTSTRAP_DEFAUT : [],
-    claude: { niveau: settings.claude?.niveau ?? 'intermediaire', usage: reponses.usage },
     onboardingVu: true,
   }
 }
@@ -104,12 +69,8 @@ export const apercuReponses = (settings: SettingsType, reponses: Reponses): Sett
  * cas d'un « Revoir la présentation » : on ne redemande pas ce qu'on sait.
  */
 export function reponsesInitiales(settings: SettingsType): Reponses {
-  const usage = (USAGES as string[]).includes(settings.claude?.usage ?? '')
-    ? (settings.claude?.usage as Usage)
-    : 'terminal'
   return {
-    usage,
-    profil: profilCourant(settings) ?? profilSuggere(usage),
+    profil: profilCourant(settings) ?? PROFILS[0].id,
     bootstrap: true,
   }
 }

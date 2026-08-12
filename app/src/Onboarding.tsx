@@ -20,15 +20,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { SettingsType } from './data'
 import { t } from './i18n'
 import { Logo, SchemaBoucle } from './OnboardingArt'
-import {
-  USAGES,
-  apercuReponses,
-  appliquerReponses,
-  profilSuggere,
-  reponsesInitiales,
-  type Reponses,
-  type Usage,
-} from './profilage'
+import { appliquerReponses, reponsesInitiales, type Reponses } from './profilage'
 import {
   IconDark,
   IconLight,
@@ -38,7 +30,6 @@ import {
   Segmented,
   Switch,
 } from './PreferencesControls'
-import { PreferencesPreview, ongletsVisibles } from './PreferencesPreview'
 import { SectionProfils, profilCourant } from './PreferencesProfils'
 import { BlocGitignore } from './PreferencesProjet'
 import { s } from './style'
@@ -57,40 +48,6 @@ export type OnboardingProps = {
    * sur la commande en ligne, comme le fait `Welcome`.
    */
   onAjouterProjet?: () => void
-}
-
-/** Une réponse à choisir : un titre, une phrase, et l'état sélectionné. */
-function Carte({
-  titre,
-  detail,
-  choisi,
-  onChoisir,
-}: {
-  titre: string
-  detail: string
-  choisi: boolean
-  onChoisir: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onChoisir}
-      aria-pressed={choisi}
-      style={s(
-        // Fond tertiaire, pas secondaire : la modale est déjà secondaire, et
-        // une carte de la même teinte ne tient que par sa bordure.
-        'display: block; width: 100%; text-align: left; padding: 10px 12px; border-radius: 9px; cursor: pointer; background: var(--theme-bg-tertiary);' +
-          (choisi
-            ? ' border: 1px solid var(--color-accent);'
-            : ' border: 1px solid var(--color-divider);'),
-      )}
-    >
-      <div style={s('font-size: 13px; color: var(--color-text);')}>{titre}</div>
-      <div style={s('margin-top: 2px; font-size: 11.5px; line-height: 1.4; color: var(--color-neutral-500);')}>
-        {detail}
-      </div>
-    </button>
-  )
 }
 
 /* — Écran 1 : ce qu'est l'ovrsee — */
@@ -210,28 +167,7 @@ function EcranPresentation() {
   )
 }
 
-/* — Écran 2 : vous et Claude Code — */
-
-/**
- * La phrase qui dit ce que le choix vient de changer.
- *
- * Sans elle, les deux questions seraient un sondage : on répond, il ne se passe
- * rien de visible, et rien ne dit que c'était utile.
- */
-function Consequence({ apercu }: { apercu: SettingsType }) {
-  const onglets = ongletsVisibles(apercu).length
-  const place = !apercu.terminal?.visible
-    ? t('onboard.effect_terminal_hidden')
-    : apercu.terminal.disposition === 'side'
-      ? t('onboard.effect_terminal_side')
-      : t('onboard.effect_terminal_bottom')
-
-  return (
-    <p style={s('margin: 10px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--color-neutral-500);')}>
-      {t('onboard.effect', { onglets: String(onglets), terminal: place })}
-    </p>
-  )
-}
+/* — Écran 2 : composition d'interface — */
 
 function EcranProfil({
   settings,
@@ -242,61 +178,16 @@ function EcranProfil({
   reponses: Reponses
   onReponses: (r: Reponses) => void
 }) {
-  const apercu = apercuReponses(settings, reponses)
-
+  // La galerie elle-même est la question : un clic sur une carte vaut
+  // réponse, sans matrice cachée entre les deux (maquette 2j).
   return (
-    <>
-      <SectionTitle>{t('onboard.you_title')}</SectionTitle>
-      <p style={s('margin: 0 0 16px; font-size: 12.5px; line-height: 1.5; color: var(--color-neutral-500); max-width: 62ch;')}>
-        {t('onboard.you_desc')}
-      </p>
-
-      <div style={s('display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: start;')}>
-        <div>
-          <div style={s('font-size: 12px; color: var(--color-text); margin-bottom: 8px;')}>
-            {t('onboard.usage_question')}
-          </div>
-          <div style={s('display: flex; flex-direction: column; gap: 7px;')}>
-            {USAGES.map(usage => (
-              <Carte
-                key={usage}
-                titre={t(`onboard.usage_${usage}`)}
-                detail={t(`onboard.usage_${usage}_desc`)}
-                choisi={reponses.usage === usage}
-                onChoisir={() =>
-                  // Réponse changée : la suggestion repart de zéro. Garder le
-                  // template précédent ferait mentir la question qu'on vient
-                  // de poser.
-                  onReponses({
-                    ...reponses,
-                    usage: usage as Usage,
-                    profil: profilSuggere(usage as Usage),
-                  })
-                }
-              />
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <PreferencesPreview settings={apercu} />
-          <Consequence apercu={apercu} />
-        </div>
-      </div>
-
-      <div style={s('margin-top: 22px;')}>
-        <div style={s('font-size: 12px; color: var(--color-text); margin-bottom: 8px;')}>
-          {t('onboard.profile_question')}
-        </div>
-        {/* La galerie elle-même est la question : un clic sur une carte vaut
-            réponse, sans matrice cachée entre les deux. */}
-        <SectionProfils
-          settings={apercu}
-          courant={reponses.profil}
-          onSettings={next => onReponses({ ...reponses, profil: profilCourant(next) ?? reponses.profil })}
-        />
-      </div>
-    </>
+    <SectionProfils
+      settings={settings}
+      courant={reponses.profil}
+      titreCle="onboard.profile_title"
+      descCle="onboard.profile_desc"
+      onSettings={next => onReponses({ ...reponses, profil: profilCourant(next) ?? reponses.profil })}
+    />
   )
 }
 

@@ -53,7 +53,7 @@ export function Sante({ snapshot, gitStatus }: { snapshot: Snapshot; gitStatus: 
 
       <div style={s('margin-top: 10px;')}>
         <div style={s('font-size: 11px; color: var(--color-neutral-600); margin-bottom: 6px;')}>
-          {ouverts.length > 0 ? t('sante.open_plans') : t('sante.no_open_plans')}
+          {ouverts.length > 0 ? `${t('sante.open_plans')} · ${ouverts.length}` : t('sante.no_open_plans')}
         </div>
         {ouverts.length > 0 && (
           <div style={s('display: flex; flex-direction: column; gap: 3px;')}>

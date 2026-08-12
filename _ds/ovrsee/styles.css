@@ -3,6 +3,35 @@
    `Ovrsee App.dc.html` (T-0045). Ce fichier est la source de vérité du
    système ; retoucher ici, jamais dans les composants. */
 
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../app/src/assets/fonts/ibm-plex-sans-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../app/src/assets/fonts/ibm-plex-sans-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../../app/src/assets/fonts/ibm-plex-sans-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../app/src/assets/fonts/ibm-plex-mono-400.woff2') format('woff2');
+}
+
 :root {
   /* Surfaces — cinq niveaux, du fond applicatif au contrôle actif. */
   --color-bg: #08090a; /* fond application */
@@ -65,10 +94,9 @@
   --color-section-glow: #353b80;
   --color-section-ghost: #4c5397;
 
-  /* Typographie — IBM Plex Sans/Mono. Pas de fichiers auto-hébergés pour
-     l'instant (l'app doit rester utilisable hors-ligne une fois packagée) :
-     on retombe sur la pile système tant que T-0045 n'a pas embarqué les
-     woff2 — voir le plan lié. */
+  /* Typographie — IBM Plex Sans/Mono, auto-hébergées (woff2, sous-jeu latin)
+     sous `app/src/assets/fonts/` : l'app reste utilisable hors-ligne une fois
+     packagée, pas de dépendance à un CDN au runtime. */
   --font-heading: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-heading-weight: 600; /* maquette 2a : 21/600 pour les titres de page */
   --font-body: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;

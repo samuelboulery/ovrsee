@@ -7,10 +7,10 @@ import {
   Browser,
   ClockCounterClockwise,
   Database,
-  Graph,
-  House,
   Kanban,
+  SquaresFour,
   Stack as StackIcon,
+  TreeStructure,
 } from '@phosphor-icons/react'
 
 import type { SettingsType } from './data'
@@ -43,10 +43,10 @@ export const TABS = [
 export type TabId = (typeof TABS)[number][0]
 
 /** Un picto Phosphor par vue, pour le rail — maquette 2a : contour au repos, plein à l'état actif. */
-export const TAB_ICONS: Record<TabId, typeof House> = {
-  apercu: House,
+export const TAB_ICONS: Record<TabId, typeof Browser> = {
+  apercu: SquaresFour,
   navigateur: Browser,
-  produit: Graph,
+  produit: TreeStructure,
   historique: ClockCounterClockwise,
   tableau: Kanban,
   donnees: Database,

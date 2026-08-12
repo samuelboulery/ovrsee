@@ -9,16 +9,17 @@
  * plein texte dans les plans ou les commits, pas de registre extensible.
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Gear, MagnifyingGlass, Terminal as TerminalIcon, Ticket as TicketIcon } from '@phosphor-icons/react'
+import { FolderOpen, Gear, MagnifyingGlass, Terminal as TerminalIcon, Ticket as TicketIcon } from '@phosphor-icons/react'
 
 import { TAB_ICONS, activeTabsInOrder, type TabId } from './views'
-import { deliveredActions, type SettingsType, type Ticket } from './data'
+import { deliveredActions, type Project, type SettingsType, type Ticket } from './data'
 import { pasteToClaude } from './useTerminal'
 import { t } from './i18n'
 import { s } from './style'
 
 type Item =
-  | { kind: 'view'; key: string; id: TabId; label: string; path: string }
+  | { kind: 'project'; key: string; label: string; path: string; badge: number | null }
+  | { kind: 'view'; key: string; id: TabId; label: string; path: string; shortcut: number | null }
   | { kind: 'preferences'; key: string; label: string }
   | { kind: 'ticket'; key: string; label: string; sub: string; file: string }
   | { kind: 'command'; key: string; label: string; text: string }
@@ -26,15 +27,21 @@ type Item =
 export function CommandPalette({
   settings,
   tickets,
+  projects,
+  current,
   onClose,
   onTabPick,
+  onPick,
   onOpenPreferences,
   onOpenTicket,
 }: {
   settings: SettingsType | null
   tickets: Ticket[]
+  projects: Project[]
+  current: string | null
   onClose: () => void
   onTabPick: (id: TabId, path: string) => void
+  onPick: (path: string) => void
   onOpenPreferences: () => void
   onOpenTicket: (file: string) => void
 }) {
@@ -59,9 +66,33 @@ export function CommandPalette({
     const q = normalise(query.trim())
     const match = (label: string) => q === '' || normalise(label).includes(q)
 
-    const views: Item[] = activeTabsInOrder(settings)
+    const activeViews = activeTabsInOrder(settings)
+    const projectItems: Item[] = projects
+      .filter(project => match(project.name))
+      .map(
+        project =>
+          ({
+            kind: 'project',
+            key: `project:${project.path}`,
+            label: project.name,
+            path: project.path,
+            badge: project.path === current ? tickets.length : null,
+          }) as const,
+      )
+
+    const views: Item[] = activeViews
       .filter(([, cle]) => match(t(cle)))
-      .map(([id, cle, path]) => ({ kind: 'view', key: `view:${id}`, id, label: t(cle), path }) as const)
+      .map(
+        ([id, cle, path]) =>
+          ({
+            kind: 'view',
+            key: `view:${id}`,
+            id,
+            label: t(cle),
+            path,
+            shortcut: activeViews.findIndex(([viewId]) => viewId === id) + 1,
+          }) as const,
+      )
 
     const preferences: Item[] = match(t('sidebar.preferences'))
       ? [{ kind: 'preferences', key: 'preferences', label: t('sidebar.preferences') } as const]
@@ -85,11 +116,12 @@ export function CommandPalette({
       : []
 
     return [
+      { title: t('sidebar.projects'), items: projectItems },
       { title: t('sidebar.views'), items: [...views, ...preferences] },
       { title: t('palette.tickets'), items: ticketItems },
       { title: t('palette.commands'), items: commands },
     ].filter(group => group.items.length > 0)
-  }, [query, settings, tickets])
+  }, [query, settings, tickets, projects, current])
 
   const flat = useMemo(() => groups.flatMap(group => group.items), [groups])
 
@@ -100,7 +132,8 @@ export function CommandPalette({
   }, [flat.length])
 
   const activate = (item: Item) => {
-    if (item.kind === 'view') onTabPick(item.id, item.path)
+    if (item.kind === 'project') onPick(item.path)
+    else if (item.kind === 'view') onTabPick(item.id, item.path)
     else if (item.kind === 'preferences') onOpenPreferences()
     else if (item.kind === 'ticket') onOpenTicket(item.file)
     else if (item.kind === 'command') {
@@ -193,6 +226,30 @@ export function CommandPalette({
 
         <div
           style={s(
+            'flex: none; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-top: 1px solid var(--color-divider);',
+          )}
+        >
+          <FolderOpen size={14} weight="regular" aria-hidden="true" color="var(--color-text-quaternary)" />
+          <span style={s('flex: 1; font-size: 12px; color: var(--color-text-tertiary);')}>
+            {projects.find(project => project.path === current)?.name ?? t('sidebar.projects')}
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              onOpenPreferences()
+              onClose()
+            }}
+            title={t('sidebar.preferences')}
+            style={s(
+              'display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--color-text-quaternary); cursor: pointer;',
+            )}
+          >
+            <Gear size={14} weight="regular" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div
+          style={s(
             'flex: none; display: flex; gap: 14px; padding: 8px 14px; border-top: 1px solid var(--color-divider); font-size: 11px; color: var(--color-text-quaternary);',
           )}
         >
@@ -217,7 +274,15 @@ function PaletteRow({
   onPick: () => void
 }) {
   const Icon =
-    item.kind === 'view' ? TAB_ICONS[item.id] : item.kind === 'preferences' ? Gear : item.kind === 'ticket' ? TicketIcon : TerminalIcon
+    item.kind === 'project'
+      ? FolderOpen
+      : item.kind === 'view'
+        ? TAB_ICONS[item.id]
+        : item.kind === 'preferences'
+          ? Gear
+          : item.kind === 'ticket'
+            ? TicketIcon
+            : TerminalIcon
 
   return (
     <button
@@ -236,6 +301,19 @@ function PaletteRow({
       {item.kind === 'ticket' && (
         <span style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-text-quaternary);')}>
           {item.sub}
+        </span>
+      )}
+      {item.kind === 'project' && item.badge !== null && (
+        <span
+          className="tag tag-neutral"
+          style={s('font-family: var(--font-mono);')}
+        >
+          {item.badge}
+        </span>
+      )}
+      {item.kind === 'view' && item.shortcut !== null && item.shortcut > 0 && item.shortcut <= 9 && (
+        <span style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-text-quaternary);')}>
+          ⌘{item.shortcut}
         </span>
       )}
     </button>

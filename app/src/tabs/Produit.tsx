@@ -51,6 +51,7 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
   const current = pages.find(p => p.route === selected) ?? pages[0] ?? null
   const linkCount = pages.reduce((total, page) => total + page.links.length, 0)
   const failed = scanFailed(snapshot.scans)
+  const commit = lastScan(snapshot.scans)?.commit ?? null
 
   const side = layout === 'side'
 
@@ -88,7 +89,8 @@ export function Produit({ snapshot, layout }: { snapshot: Snapshot; layout: Layo
               {t('produit.title')}
             </h2>
             <span style={s('font-size: 12px; color: var(--color-neutral-500);')}>
-              {pages.length} {pages.length > 1 ? t('produit.pages_count_plural', { n: pages.length }) : t('produit.pages_count', { n: 1 })} · {linkCount} {linkCount > 1 ? t('produit.links_count_plural', { n: linkCount }) : t('produit.links_count', { n: 1 })} · {t('produit.rebuilt_at_commit')}
+              {pages.length > 1 ? t('produit.pages_count_plural', { n: pages.length }) : t('produit.pages_count', { n: 1 })} · {linkCount > 1 ? t('produit.links_count_plural', { n: linkCount }) : t('produit.links_count', { n: 1 })} · {t('produit.rebuilt_at_commit')}
+              {commit && <span style={s('font-family: var(--font-mono);')}> {commit.slice(0, 7)}</span>}
             </span>
           </div>
 

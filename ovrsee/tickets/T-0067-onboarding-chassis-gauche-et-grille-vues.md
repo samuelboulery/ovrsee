@@ -2,7 +2,7 @@
 {
   "id": "T-0067",
   "titre": "Onboarding — châssis de gauche absent, grille de bascules par vue manquante à l'étape 2",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

@@ -2,7 +2,7 @@
 {
   "id": "T-0068",
   "titre": "Produit — Comparer deux dates et Crawler déplacés vers l'en-tête",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "basse",
   "tags": [
     "ui",

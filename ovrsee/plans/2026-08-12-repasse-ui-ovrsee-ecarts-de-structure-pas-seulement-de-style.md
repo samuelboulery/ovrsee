@@ -4,7 +4,26 @@
   "title": "Repasse UI ovrsee — écarts de structure, pas seulement de style",
   "opened": "2026-08-12",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "8364d47",
+      "date": "2026-08-12",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Onboarding.tsx",
+        "app/src/PreferencesPanel.tsx",
+        "app/src/onboarding.test.tsx",
+        "app/src/profilage.ts",
+        "app/src/render.test.tsx",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/Produit.tsx",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js"
+      ]
+    }
+  ]
 }
 ---
 

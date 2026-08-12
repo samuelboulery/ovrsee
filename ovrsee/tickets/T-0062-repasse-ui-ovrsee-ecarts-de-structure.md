@@ -2,7 +2,7 @@
 {
   "id": "T-0062",
   "titre": "Repasse UI ovrsee — écarts de structure, pas seulement de style",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

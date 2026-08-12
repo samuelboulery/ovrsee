@@ -2,7 +2,7 @@
 {
   "id": "T-0063",
   "titre": "Panneau droit persistant — Déploiements et README dans Aperçu",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

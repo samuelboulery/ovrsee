@@ -2,7 +2,7 @@
 {
   "id": "T-0064",
   "titre": "Panneau droit persistant — élément sélectionné dans Navigateur",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

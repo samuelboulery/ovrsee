@@ -2,7 +2,7 @@
 {
   "id": "T-0066",
   "titre": "Préférences — colonne d'aperçu en direct absente",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

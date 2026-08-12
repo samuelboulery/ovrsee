@@ -2,7 +2,7 @@
 {
   "id": "T-0065",
   "titre": "Panneau droit persistant — graphe d'activité dans Historique, densité en grille, série Scans",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

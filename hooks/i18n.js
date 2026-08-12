@@ -744,6 +744,9 @@ const translations = {
     'sidebar.projects': 'Projets',
     'sidebar.views': 'Vues',
     'sidebar.toggle': 'Réduire ou déployer la barre latérale',
+    'sidebar.toggle_terminal': 'Afficher ou masquer le terminal',
+    'sidebar.switch_project': 'Changer de projet',
+    'sidebar.open_project': 'Ouvrir un projet (⌘O)',
     // Palette ⌘K
     'palette.placeholder': 'Rechercher, aller à…',
     'palette.tickets': 'Tickets',
@@ -1478,6 +1481,9 @@ const translations = {
     'sidebar.projects': 'Projects',
     'sidebar.views': 'Views',
     'sidebar.toggle': 'Collapse or expand the sidebar',
+    'sidebar.toggle_terminal': 'Show or hide the terminal',
+    'sidebar.switch_project': 'Switch project',
+    'sidebar.open_project': 'Open a project (⌘O)',
     // Command palette
     'palette.placeholder': 'Search, jump to…',
     'palette.tickets': 'Tickets',

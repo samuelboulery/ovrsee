@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { GearSix, MagnifyingGlass } from '@phosphor-icons/react'
+import { useEffect, useRef, useState } from 'react'
+import { CaretDown, GearSix, MagnifyingGlass, TerminalWindow } from '@phosphor-icons/react'
 
 import { applyTheme } from './theme'
 import { t, setCurrentLanguage } from './i18n'
@@ -486,17 +486,31 @@ export function App() {
           {sidebarOuverte ? '⇤' : '⇥'}
         </button>
 
-        {/* Le seul `h1` de l'écran : la fenêtre porte le nom du projet, et les
-            titres des onglets sont des `h2` sous celui-là. */}
-        <h1
-          style={s(
-            'margin: 0; font-size: 12.5px; font-weight: 400; color: #9096a0; letter-spacing: .02em;',
-          )}
-        >
-          Ovrsee — {projects.find(p => p.path === current)?.name ?? '…'}
-        </h1>
+        <ProjectSwitcher
+          projects={projects}
+          current={current}
+          snapshot={snapshot}
+          onPick={path => {
+            setCurrent(path)
+            pushUrl(window.location.pathname, path)
+          }}
+          onProjects={applyProjects}
+          onError={setError}
+        />
         <div style={s('flex: 1;')} />
         <ScanBadge scan={scan} />
+        <button
+          type="button"
+          title={t('sidebar.toggle_terminal')}
+          aria-label={t('sidebar.toggle_terminal')}
+          aria-pressed={terminal}
+          onClick={() => setTerminal(ouvert => !ouvert)}
+          style={s(
+            'width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 5px; border: 0; background: transparent; cursor: pointer; -webkit-app-region: no-drag;',
+          )}
+        >
+          <TerminalWindow size={14} weight="fill" aria-hidden="true" color="#b6bac1" />
+        </button>
       </header>
 
       <div style={s('flex: 1; display: flex; flex-direction: column; min-height: 0;')}>
@@ -509,19 +523,10 @@ export function App() {
               largeur d'icônes ne se règle pas à la souris. */}
           <Sidebar
             collapsed={!sidebarOuverte}
-            projects={projects}
-            current={current}
-            snapshot={snapshot}
             settings={settings}
             width={sidebar.size}
             tab={tab}
             onTabPick={onTabPick}
-            onPick={path => {
-              setCurrent(path)
-              pushUrl(window.location.pathname, path)
-            }}
-            onProjects={applyProjects}
-            onError={setError}
             onOpenPreferences={() => setPreferencesOuvertes(true)}
             onOpenPalette={() => setPaletteOuverte(true)}
             density={density(commitsDeLaFrise(snapshot?.timeline ?? []), {
@@ -898,41 +903,24 @@ const RAIL_COLLAPSED_WIDTH = 52
  */
 function Sidebar({
   collapsed,
-  projects,
-  current,
-  snapshot,
   settings,
   width,
   tab,
   onTabPick,
-  onPick,
-  onProjects,
-  onError,
   onOpenPreferences,
   onOpenPalette,
   density: bars,
 }: {
   collapsed: boolean
-  projects: Project[]
-  current: string | null
-  /** L'instantané du projet affiché, pour que sa pastille suive le tableau. */
-  snapshot: Snapshot | null
   settings: SettingsType | null
   width: number
   tab: TabId
   onTabPick: (id: TabId, path: string) => void
-  onPick: (path: string) => void
-  onProjects: (list: Project[], select?: string | null) => void
-  onError: (message: string) => void
   /** La modale vit dans `App` : le menu natif l'ouvre par le même chemin. */
   onOpenPreferences: () => void
   onOpenPalette: () => void
   density: number[]
 }) {
-  // Le sélecteur de dossier n'existe que dans l'application empaquetée. Dans un
-  // navigateur, le bouton est absent plutôt que présent et inerte — même
-  // franchise que pour le terminal.
-  const picker = window.ovrsee?.projects
   const views = activeTabsInOrder(settings)
 
   if (collapsed) {
@@ -990,43 +978,6 @@ function Sidebar({
 
       <div
         style={s(
-          'padding: 8px 8px 5px; display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #4e5158;',
-        )}
-      >
-        {t('sidebar.projects')}
-        <div style={s('flex: 1;')} />
-        {picker && (
-          <button
-            type="button"
-            title="Ouvrir un projet (⌘O)"
-            onClick={() => openProject(onProjects, onError)}
-            style={s(
-              'background: transparent; border: 0; cursor: pointer; color: #62666e; font-size: 14px; line-height: 1; padding: 2px 4px;',
-            )}
-          >
-            +
-          </button>
-        )}
-      </div>
-      <div style={s('display: flex; flex-direction: column;')}>
-        {projects.map(project => (
-          <ProjectRow
-            key={project.path}
-            project={project}
-            active={project.path === current}
-            snapshot={project.path === current ? snapshot : null}
-            onPick={onPick}
-            onRemove={() => {
-              projectAction('remove', project.path)
-                .then(result => onProjects(result.projects))
-                .catch(err => onError(String(err.message ?? err)))
-            }}
-          />
-        ))}
-      </div>
-
-      <div
-        style={s(
           'padding: 8px 8px 5px 10px; display: flex; align-items: center; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #4e5158;',
         )}
       >
@@ -1077,6 +1028,114 @@ function Sidebar({
         )}
       </div>
     </aside>
+  )
+}
+
+/**
+ * Bascule de projet — bouton badge dans la barre de titre, menu déroulant en
+ * dessous. Remplace l'ancienne section « PROJETS » de la sidebar, qui
+ * occupait une colonne entière pour une bascule qu'on ne fait pas souvent.
+ *
+ * Réutilise `ProjectRow` tel quel (pastille, badge de tickets restants,
+ * suppression avec confirmation en deux temps) — seul son conteneur change,
+ * d'une liste fixe de sidebar à un popover ancré au bouton.
+ */
+function ProjectSwitcher({
+  projects,
+  current,
+  snapshot,
+  onPick,
+  onProjects,
+  onError,
+}: {
+  projects: Project[]
+  current: string | null
+  /** L'instantané du projet affiché, pour que sa pastille suive le tableau sans re-fetch. */
+  snapshot: Snapshot | null
+  onPick: (path: string) => void
+  onProjects: (list: Project[], select?: string | null) => void
+  onError: (message: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const active = projects.find(p => p.path === current) ?? null
+  const picker = window.ovrsee?.projects
+
+  useEffect(() => {
+    if (!open) return
+    const onClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false)
+    }
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onClickOutside)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onClickOutside)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  return (
+    <div ref={ref} style={s('position: relative; -webkit-app-region: no-drag;')}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        aria-label={t('sidebar.switch_project')}
+        style={s(
+          'display: flex; align-items: center; gap: 8px; height: 24px; padding: 0 8px; margin: 0 -8px; border-radius: 6px; border: 0; background: transparent; cursor: pointer;',
+        )}
+      >
+        <span style={s('width: 5px; height: 5px; border-radius: 2px; background: #7d76f0; flex: none;')} />
+        <span style={s('font-size: 12px; font-weight: 500; color: #f2f3f5; white-space: nowrap;')}>
+          Ovrsee — {active?.name ?? '…'}
+        </span>
+        <CaretDown size={10} weight="bold" aria-hidden="true" color="#55585f" />
+      </button>
+
+      {open && (
+        <div
+          style={s(
+            'position: absolute; top: 30px; left: -8px; width: 260px; z-index: 20; padding: 6px; border-radius: 9px; border: 1px solid #1c1d22; background: #101114; box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
+          )}
+        >
+          {projects.map(project => (
+            <ProjectRow
+              key={project.path}
+              project={project}
+              active={project.path === current}
+              snapshot={project.path === current ? snapshot : null}
+              onPick={path => {
+                onPick(path)
+                setOpen(false)
+              }}
+              onRemove={() => {
+                projectAction('remove', project.path)
+                  .then(result => onProjects(result.projects))
+                  .catch(err => onError(String(err.message ?? err)))
+              }}
+            />
+          ))}
+          {picker && (
+            <button
+              type="button"
+              title={t('sidebar.open_project')}
+              onClick={() => {
+                setOpen(false)
+                openProject(onProjects, onError)
+              }}
+              style={s(
+                'margin-top: 4px; padding-top: 6px; border-top: 1px solid #17181d; display: flex; align-items: center; gap: 8px; height: 28px; padding-left: 8px; border-radius: 6px; border: 0; background: transparent; color: #62666e; font-size: 12.5px; cursor: pointer; text-align: left;',
+              )}
+            >
+              +&nbsp;&nbsp;{t('sidebar.open_project')}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
 

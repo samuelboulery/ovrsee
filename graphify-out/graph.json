@@ -9258,8 +9258,8 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Apercu.tsx",
       "source_location": "L494",
       "weight": 1.0,
-      "_src": "apercu_s",
-      "_tgt": "i18n_t",
+      "_src": "i18n_t",
+      "_tgt": "apercu_s",
       "source": "i18n_t",
       "target": "apercu_s"
     },

@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Fondations + Châssis — aligner ovrsee sur l'audit design (Lots 1-2)",
   "opened": "2026-08-12",
-  "closed": null,
+  "closed": "2026-08-12",
   "commits": [
     {
       "sha": "2d9baf2",
@@ -51,6 +51,11 @@
     },
     {
       "sha": "88419a7",
+      "date": "2026-08-12",
+      "files": []
+    },
+    {
+      "sha": "0862496",
       "date": "2026-08-12",
       "files": []
     }

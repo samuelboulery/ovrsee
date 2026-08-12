@@ -587,6 +587,24 @@ export const estAbandon = (err: unknown): boolean =>
 
 export const fetchProjects = () => json<Project[]>('/api/projects')
 
+/** Nom d'utilisateur système — pas un secret, lecture seule. */
+export const fetchUsername = () => json<{ username: string | null }>('/api/username')
+
+/**
+ * Clore le plan actif, depuis l'UI — même geste que `pnpm ovrsee:close`.
+ * Rend les fichiers de plan effectivement clos (vide si aucun n'avait de commit).
+ */
+export async function closeActivePlans(path: string): Promise<{ closed: string[] }> {
+  const response = await fetch('/api/plans/close-active', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
+    body: JSON.stringify({ path }),
+  })
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result
+}
+
 export type ProjectAction = 'add' | 'remove' | 'touch' | 'init' | 'export-obsidian'
 
 /**

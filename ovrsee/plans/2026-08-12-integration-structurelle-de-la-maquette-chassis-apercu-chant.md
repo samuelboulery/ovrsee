@@ -4,7 +4,17 @@
   "title": "Intégration structurelle de la maquette — châssis + Aperçu (chantier 3)",
   "opened": "2026-08-12",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "78b9c2b",
+      "date": "2026-08-12",
+      "files": [
+        "app/src/App.tsx",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js"
+      ]
+    }
+  ]
 }
 ---
 

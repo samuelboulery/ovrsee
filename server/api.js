@@ -15,17 +15,19 @@
 import { createReadStream, existsSync, lstatSync, readFileSync } from 'node:fs'
 import { isAbsolute, join } from 'node:path'
 import { execFileSync } from 'node:child_process'
+import { userInfo } from 'node:os'
 
 import { readConfigClaude } from '../hooks/config-claude.js'
 import { install } from '../hooks/install.js'
 import { exportVault } from '../hooks/obsidian.js'
-import { registerProject, touchProject, unregisterProject } from '../hooks/plans.js'
+import { closeOpenPlans, registerProject, touchProject, unregisterProject } from '../hooks/plans.js'
 import { readSettings, writeSettings, validateSettings, mergeSettings } from '../hooks/settings.js'
 import { installSkills, readSkills } from '../hooks/skills.js'
 import { projects, snapshot, shotPath, mediaPath, tableau, readJson } from '../hooks/snapshot.js'
 import { gitStatus } from '../hooks/git-status.js'
 import {
   addColumn,
+  avancerTicketsClos,
   createTicket,
   deleteTicket,
   reorderColumn,
@@ -432,6 +434,35 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
       const root = asked()
       const media = root ? mediaPath(root, url.searchParams.get('file') ?? '') : null
       return media ?? { status: 404, json: { error: 'média introuvable' } }
+    }
+
+    // Nom d'utilisateur système — pas un secret, contrairement aux jetons
+    // d'intégration (voir CLAUDE.md) : passer par `/api/*` convient ici.
+    case '/api/username': {
+      if (method !== 'GET') return { status: 405, json: { error: 'méthode non permise' } }
+      try {
+        return { json: { username: userInfo().username } }
+      } catch {
+        return { json: { username: null } }
+      }
+    }
+
+    // Clore le plan actif — même geste que `pnpm ovrsee:close` en CLI, juste
+    // déclenché depuis l'UI. `closeOpenPlans` refuse silencieusement de clore
+    // un plan sans commit ; `avancerTicketsClos` fait suivre les tickets liés,
+    // comme le CLI le fait déjà (hooks/ovrsee-cli.js).
+    case '/api/plans/close-active': {
+      if (method !== 'POST') return { status: 405, json: { error: 'méthode non permise' } }
+      if (headers['x-ovrsee'] !== '1') {
+        return { status: 403, json: { error: 'en-tête X-Ovrsee manquant' } }
+      }
+      const root = projects().find(p => p.path === body?.path)?.path ?? null
+      if (!root) return { status: 404, json: { error: 'projet inconnu' } }
+
+      const ovrseeDir = join(root, 'ovrsee')
+      const closed = closeOpenPlans(ovrseeDir, () => {})
+      if (closed.length > 0) avancerTicketsClos(ovrseeDir)
+      return { json: { closed } }
     }
 
     default:

@@ -11,6 +11,7 @@ import {
   fetchSettings,
   fetchSnapshot,
   fetchTableau,
+  fetchUsername,
   frDate,
   humanAge,
   isUnequipped,
@@ -922,6 +923,13 @@ function Sidebar({
   density: number[]
 }) {
   const views = activeTabsInOrder(settings)
+  const [username, setUsername] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchUsername()
+      .then(r => setUsername(r.username))
+      .catch(() => {})
+  }, [])
 
   if (collapsed) {
     return (
@@ -995,18 +1003,33 @@ function Sidebar({
       {/* Une seule porte vers la configuration. Les skills et la lecture de
           `~/.claude/` avaient chacun leur bouton et leur modale ; ils sont
           maintenant deux sections des préférences, parce que c'est la même
-          question — comment l'ovrsee est réglé. */}
-      <div style={s('padding: 10px 0 0;')}>
+          question — comment l'ovrsee est réglé. Le nom d'utilisateur système
+          (lecture seule, jamais un secret) donne à ce bouton la même
+          affordance « c'est vous, ici » que la maquette. */}
+      <div style={s('padding: 10px 10px 0; border-top: 1px solid #17181d;')}>
         <button
           type="button"
           onClick={onOpenPreferences}
-          title="⌘,"
+          title={`${t('sidebar.preferences')} (⌘,)`}
           style={s(
-            'width: 100%; height: 32px; margin: 0 10px; padding: 0 8px; display: flex; align-items: center; gap: 9px; border-radius: 6px; border: 0; background: transparent; color: #b6bac1; font-size: 12.5px; cursor: pointer; text-align: left;',
+            'width: 100%; height: 32px; display: flex; align-items: center; gap: 9px; padding: 0 8px; border-radius: 6px; border: 0; background: transparent; cursor: pointer; text-align: left;',
           )}
         >
+          <span
+            style={s(
+              'width: 20px; height: 20px; flex: none; border-radius: 5px; background: #1e1f25; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #9096a0;',
+            )}
+          >
+            {username ? username[0].toUpperCase() : '?'}
+          </span>
+          <span
+            style={s(
+              'flex: 1; font-size: 12.5px; color: #b6bac1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
+            )}
+          >
+            {username ?? '…'}
+          </span>
           <GearSix size={15} weight="regular" aria-hidden="true" color="#62666e" />
-          {t('sidebar.preferences')}
         </button>
       </div>
 

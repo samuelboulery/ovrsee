@@ -2,7 +2,7 @@
 {
   "id": "T-0077",
   "titre": "Sélecteur de projet en menu déroulant + suppression PROJETS sidebar",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

@@ -162,13 +162,24 @@ test('README.en.md existe', () => {
   )
 })
 
-test('les dossiers ovrsee/pages/shots/ existent pour tous les onglets', () => {
+// Ce test regardait autrefois `ovrsee/pages/shots/` sur le disque. Les captures
+// ne sont plus suivies par git (`.gitignore`, et `data.ts` conseille de les
+// ignorer dans les projets observés) : un clone frais n'en a aucune, et
+// l'assertion échouait en CI sans que rien ne soit cassé.
+//
+// L'invariant qui compte survit au clone : `pages.json`, lui, est versionné, et
+// c'est lui que l'interface lit pour savoir quelle capture montrer.
+test('pages.json déclare une capture pour chaque onglet', () => {
   const tabs = ['accueil', 'navigateur', 'produit', 'historique', 'tableau', 'donnees', 'stack']
+  const pages = JSON.parse(readFileSync(join(root, 'ovrsee', 'pages', 'pages.json'), 'utf8'))
+  const couverts = new Set(
+    pages.pages.map(p => p.shot?.split('/')[1]).filter(Boolean)
+  )
+
   for (const tab of tabs) {
-    const dir = join(root, 'ovrsee', 'pages', 'shots', tab)
     assert(
-      existsSync(dir),
-      `Dossier de captures pour l'onglet '${tab}' n'existe pas`
+      couverts.has(tab),
+      `Aucune capture déclarée pour l'onglet '${tab}' dans pages.json`
     )
   }
 })

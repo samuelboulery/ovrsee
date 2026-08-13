@@ -12,7 +12,7 @@
 
   ![version](https://img.shields.io/badge/version-1.0.0--beta-6c5ce7?style=flat-square)
   ![stack](https://img.shields.io/badge/stack-Electron%20%2B%20React%20%2B%20TypeScript-2d3436?style=flat-square)
-  ![deps prod](https://img.shields.io/badge/d%C3%A9pendances%20prod-3-00b894?style=flat-square)
+  ![deps prod](https://img.shields.io/badge/d%C3%A9pendances%20prod-4-00b894?style=flat-square)
 </div>
 
 Une vue en lecture seule sur un projet développé en vibecoding : ce qui a été fait,
@@ -212,8 +212,11 @@ celui d'un autre projet produirait des captures datées d'aujourd'hui montrant l
 
 ## Téléchargement
 
-> Dépôt **privé** — l'onglet [Releases](https://github.com/samuelboulery/ovrsee/releases)
-> n'est visible qu'aux collaborateurs invités sur le repo GitHub.
+Les binaires se prennent sur l'onglet
+[Releases](https://github.com/samuelboulery/ovrsee/releases). Ils ne sont **ni signés
+ni notariés** : macOS refuse le premier lancement — clic droit sur l'application,
+puis *Ouvrir* — et Windows affiche un avertissement SmartScreen, qu'on passe par
+*Informations complémentaires* puis *Exécuter quand même*.
 
 | Plateforme | Format |
 |---|---|
@@ -230,7 +233,7 @@ pnpm package:win    # installeur NSIS dans release/ (x64, depuis Windows uniquem
 
 ## Dépendances
 
-Sobriété délibérée : **3 dépendances de production**, le reste est du Node et du React nus.
+Sobriété délibérée : **4 dépendances de production**, le reste est du Node et du React nus.
 
 **Production**
 

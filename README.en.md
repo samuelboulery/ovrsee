@@ -12,7 +12,7 @@
 
   ![version](https://img.shields.io/badge/version-1.0.0--beta-6c5ce7?style=flat-square)
   ![stack](https://img.shields.io/badge/stack-Electron%20%2B%20React%20%2B%20TypeScript-2d3436?style=flat-square)
-  ![prod deps](https://img.shields.io/badge/prod%20deps-3-00b894?style=flat-square)
+  ![prod deps](https://img.shields.io/badge/prod%20deps-4-00b894?style=flat-square)
 </div>
 
 A read-only view of a vibecoded project: what was built, why, what remains open,
@@ -207,8 +207,10 @@ crawling the wrong app would produce backdated screenshots of the wrong project.
 
 ## Download
 
-> This is a **private** repository — the [Releases](https://github.com/samuelboulery/ovrsee/releases)
-> tab is only visible to collaborators invited on the GitHub repo.
+Binaries live on the [Releases](https://github.com/samuelboulery/ovrsee/releases)
+tab. They are **neither signed nor notarised**: macOS refuses the first launch —
+right-click the app, then *Open* — and Windows shows a SmartScreen warning, which
+you get past with *More info* then *Run anyway*.
 
 | Platform | Format |
 |---|---|
@@ -225,7 +227,7 @@ pnpm package:win    # NSIS installer in release/ (x64, from Windows only)
 
 ## Dependencies
 
-Deliberately minimal: **3 production dependencies**, everything else is plain Node and React.
+Deliberately minimal: **4 production dependencies**, everything else is plain Node and React.
 
 **Production**
 

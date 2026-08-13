@@ -19,6 +19,10 @@ on:
 
 # Les noms de jobs sont les contextes cités par le ruleset de `main` : les
 # renommer casserait la règle en silence, et les PR passeraient sans contrôle.
+#
+# Rien par défaut, et chaque job redemande le strict nécessaire. `contents: read`
+# n'est pas décoratif : sans lui `actions/checkout` n'a pas de jeton pour cloner
+# et `git` sort en 128. Le premier run de cette CI l'a découvert.
 permissions: {}
 
 concurrency:
@@ -29,7 +33,8 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    permissions: {}
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
@@ -56,7 +61,8 @@ jobs:
   test-mac:
     runs-on: macos-latest
     timeout-minutes: 15
-    permissions: {}
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
@@ -76,7 +82,8 @@ jobs:
   test-win:
     runs-on: windows-latest
     timeout-minutes: 15
-    permissions: {}
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:

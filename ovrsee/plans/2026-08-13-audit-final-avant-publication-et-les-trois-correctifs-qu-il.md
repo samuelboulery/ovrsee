@@ -33,6 +33,14 @@
         "hooks/tickets.js",
         "skills/ovrsee-tickets/SKILL.md"
       ]
+    },
+    {
+      "sha": "e664787",
+      "date": "2026-08-14",
+      "files": [
+        "hooks/tickets.js",
+        "hooks/tickets.test.js"
+      ]
     }
   ]
 }

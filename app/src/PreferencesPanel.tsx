@@ -19,7 +19,7 @@ import {
   Segmented,
   Switch,
 } from './PreferencesControls'
-import { PreferencesPreview, TAB_KEYS } from './PreferencesPreview'
+import { TAB_KEYS } from './PreferencesPreview'
 import { SectionProfils } from './PreferencesProfils'
 import { SectionProjet } from './PreferencesProjet'
 import { s } from './style'
@@ -47,13 +47,12 @@ import { TAB_ICONS, type TabId } from './views'
  * et Claude Code dans `ClaudeConfigPanel.tsx`.
  */
 
-export type SectionId = 'profils' | 'general' | 'interface' | 'claude' | 'projet'
+export type SectionId = 'general' | 'interface' | 'claude' | 'projet'
 
 /** Les sections, dans l'ordre de la barre latérale. */
 const SECTIONS: Array<{ id: SectionId; cle: TranslationKey }> = [
-  { id: 'profils', cle: 'pref.profiles' },
-  { id: 'general', cle: 'pref.general' },
   { id: 'interface', cle: 'pref.interface' },
+  { id: 'general', cle: 'pref.general' },
   { id: 'claude', cle: 'pref.claude' },
   { id: 'projet', cle: 'pref.project' },
 ]
@@ -495,7 +494,7 @@ export function PreferencesModal({
   initialProvider?: IntegrationProvider
 }) {
   const [settings, setSettings] = useState<SettingsType | null>(null)
-  const [section, setSection] = useState<SectionId>(initialSection ?? 'profils')
+  const [section, setSection] = useState<SectionId>(initialSection ?? 'interface')
   const [etat, setEtat] = useState<'vide' | 'chargement' | 'ecriture' | 'ecrit'>('chargement')
   const [erreur, setErreur] = useState<string | null>(null)
 
@@ -584,10 +583,17 @@ export function PreferencesModal({
 
   const corps = (courantes: SettingsType) => {
     const props = { settings: courantes, onSettings: applique }
-    if (section === 'profils') return <SectionProfils {...props} />
     if (section === 'general')
       return <SectionGeneral {...props} onRevoirPresentation={onRevoirPresentation} />
-    if (section === 'interface') return <SectionInterface {...props} />
+    if (section === 'interface')
+      return (
+        <>
+          <SectionProfils {...props} />
+          <div style={s('margin-top: 32px;')}>
+            <SectionInterface {...props} />
+          </div>
+        </>
+      )
     if (section === 'claude') return <SectionClaude />
     return (
       <SectionProjet {...props} root={root} integrations={integrations} initialProvider={initialProvider} />
@@ -610,7 +616,7 @@ export function PreferencesModal({
           'width: min(1100px, 100%); height: min(700px, 100%); display: flex; overflow: hidden; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 14px; box-shadow: var(--shadow-lg);',
         )}
       >
-        {/* La barre de navigation. Cinq entrées visibles d'un coup : elles ne
+        {/* La barre de navigation. Quatre entrées visibles d'un coup : elles ne
             se regroupent plus, un intitulé de groupe par entrée n'aiderait
             personne. */}
         <nav
@@ -677,27 +683,6 @@ export function PreferencesModal({
               )}
               {settings && corps(settings)}
             </div>
-
-            {/* Aperçu en direct, visible quelle que soit la section ouverte —
-                maquette 2i. Un panneau fixe, pas une pièce d'une section : le
-                choix du thème dans « Général » a le même effet visible que
-                l'ordre des onglets dans « Interface ». */}
-            {settings && (
-              <div
-                style={s(
-                  'flex: none; width: 300px; overflow-y: auto; padding: 16px 18px; border-left: 1px solid var(--color-divider); background: var(--color-bg);',
-                )}
-              >
-                <div
-                  style={s(
-                    'font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;',
-                  )}
-                >
-                  {t('pref.preview')}
-                </div>
-                <PreferencesPreview settings={settings} />
-              </div>
-            )}
           </div>
         </div>
       </div>

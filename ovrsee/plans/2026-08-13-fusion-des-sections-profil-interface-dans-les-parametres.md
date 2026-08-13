@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Fusion des sections Profil + Interface dans les Paramètres",
   "opened": "2026-08-13",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": [
     {
       "sha": "6609d27",
@@ -14,6 +14,11 @@
     },
     {
       "sha": "aadea61",
+      "date": "2026-08-13",
+      "files": []
+    },
+    {
+      "sha": "dce1138",
       "date": "2026-08-13",
       "files": []
     }

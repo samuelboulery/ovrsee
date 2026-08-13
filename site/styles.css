@@ -171,8 +171,8 @@ a:focus-visible {
 
   /* Toutes les grilles se replient sur une colonne. */
   [style*="grid-template-columns: repeat(3, 1fr)"],
-  [style*="grid-template-columns: 1fr 1fr"],
-  [style*="grid-template-columns: 1fr 460px"] {
+  [style*="grid-template-columns: 1fr 460px"],
+  [style*="grid-template-columns: 1fr 1fr"]:not([style*="width: 340px"]) {
     grid-template-columns: 1fr !important;
   }
 
@@ -183,18 +183,40 @@ a:focus-visible {
   }
 
   /* Navigation : les trois ancres disparaissent, le sélecteur de langue et le
-     bouton GitHub restent — ce sont les deux seules actions de la barre. */
-  a[href="#demo"],
-  a[href="#comment"],
-  a[href="#donnees"] {
+     bouton GitHub restent — ce sont les deux seules actions de la barre.
+
+     Le sélecteur est ancré à la barre collante, et ce n'est pas du zèle : le
+     bouton « Explorer l'interface » du hero pointe vers la même ancre `#demo`,
+     et une règle non ancrée le faisait disparaître avec les autres. */
+  [style*="position: sticky"] a[href="#demo"],
+  [style*="position: sticky"] a[href="#comment"],
+  [style*="position: sticky"] a[href="#donnees"] {
     display: none !important;
   }
 
+  /* Les deux gouttières de 28 px de la barre suffisaient à la faire déborder
+     de 5 px une fois les ancres retirées. */
+  [style*="position: sticky"] [style*="max-width: 1180px"] {
+    gap: 10px !important;
+  }
+
   /* Le bandeau de statistiques du pied de page était figé à 340 px : c'est lui,
-     et lui seul, qui faisait déborder toute la page sous 768 px. */
+     et lui seul, qui faisait déborder toute la page sous 768 px.
+
+     L'élargir ne suffisait pas : il partage une rangée flex avec le bloc de
+     texte, qui l'écrasait en colonne verticale aux libellés tronqués. La
+     rangée s'empile d'abord ; le bandeau prend alors toute la largeur, et
+     garde ses deux colonnes. */
+  [style*="padding: 54px 48px"][style*="gap: 48px"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 32px 22px !important;
+    gap: 28px !important;
+  }
+
   [style*="width: 340px"] {
     width: 100% !important;
-    flex: 1 1 auto !important;
+    flex: none !important;
   }
 
   /* La fenêtre de démo est réduite par `mesurer()`, avec un plancher : en

@@ -177,9 +177,9 @@
  "tickets du tableau": "board tickets",
  "état du tableau": "board state",
  "export, réécrasable": "export, overwritable",
- "Electron + React + TypeScript, trois dépendances de production, aucun framework de test. Builds macOS arm64 et Windows x64 publiés à chaque tag.": "Electron + React + TypeScript, three production dependencies, no test framework. macOS arm64 and Windows x64 builds published on every tag.",
  "stdio · lecture": "stdio · read",
  "readme": "readme",
  "Gestion de projet pour Claude Code : plans approuvés, commits qui les réalisent, tickets à faire — versionnés dans le dépôt.": "Project management for Claude Code: approved plans, the commits that carry them out, tickets left to do — versioned in the repository.",
- "binaires non signés — macOS et Windows avertissent au premier lancement": "unsigned binaries — macOS and Windows warn on first launch"
+ "binaires non signés — macOS et Windows avertissent au premier lancement": "unsigned binaries — macOS and Windows warn on first launch",
+ "Electron + React + TypeScript, quatre dépendances de production, aucun framework de test. Builds macOS arm64 et Windows x64 publiés à chaque tag.": "Electron + React + TypeScript, four production dependencies, no test framework. macOS arm64 and Windows x64 builds published on every tag."
 }

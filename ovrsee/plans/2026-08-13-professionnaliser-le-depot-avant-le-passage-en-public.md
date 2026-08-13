@@ -93,6 +93,16 @@
       "sha": "a1d5ded",
       "date": "2026-08-13",
       "files": []
+    },
+    {
+      "sha": "101fed4",
+      "date": "2026-08-13",
+      "files": [
+        "site/app.js",
+        "site/dict.json",
+        "site/index.html",
+        "site/styles.css"
+      ]
     }
   ]
 }

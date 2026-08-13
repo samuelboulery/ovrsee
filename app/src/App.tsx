@@ -5,7 +5,6 @@ import {
   GearSix,
   MagnifyingGlass,
   SidebarSimple,
-  TerminalWindow,
 } from '@phosphor-icons/react'
 
 import { applyTheme } from './theme'
@@ -549,25 +548,6 @@ export function App() {
         />
         <div style={s('flex: 1;')} />
         <ScanBadge scan={scan} />
-        <button
-          type="button"
-          title={t('sidebar.toggle_terminal')}
-          aria-label={t('sidebar.toggle_terminal')}
-          aria-pressed={terminal}
-          onClick={() => setTerminal(ouvert => !ouvert)}
-          style={s(
-            terminal
-              ? 'width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 0; background: #1c1d24; cursor: pointer; -webkit-app-region: no-drag;'
-              : 'width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 0; background: transparent; cursor: pointer; -webkit-app-region: no-drag;',
-          )}
-        >
-          <TerminalWindow
-            size={14}
-            weight={terminal ? 'fill' : 'regular'}
-            aria-hidden="true"
-            color={terminal ? '#b6bac1' : '#62666e'}
-          />
-        </button>
       </header>
 
       <div style={s('flex: 1; display: flex; flex-direction: column; min-height: 0;')}>

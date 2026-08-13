@@ -2,7 +2,7 @@
 {
   "id": "T-0116",
   "titre": "Largeur des tickets enfants d'un epic — plus d'espace à gauche qu'à droite",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": ["ui"],
   "cree": "2026-08-13",
@@ -19,4 +19,4 @@ retrouve donc décalée vers la droite, avec plus d'espace à gauche qu'à droit
 
 ## Critères d'acceptation
 
-- [ ] Les cartes enfants d'un epic ont un espace symétrique gauche/droite dans le tableau.
+- [x] Les cartes enfants d'un epic ont un espace symétrique gauche/droite dans le tableau.

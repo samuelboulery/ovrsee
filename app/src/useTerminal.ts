@@ -153,8 +153,10 @@ const claudeSlot = (project: string): Session => ({
  * Ouvre les sessions du panneau et les relie chacune à un xterm.
  *
  * Une session `claude` par projet, ouverte d'office ; autant de shells nus que
- * demandé, pour un serveur de dev ou des logs. Changer de projet ferme tout et
- * rouvre une session Claude dans le bon dossier.
+ * demandé, pour un serveur de dev ou des logs. Changer de projet change
+ * d'onglets dans le panneau — les sessions du projet quitté continuent de
+ * tourner, montées hors écran (même motif qu'entre sessions d'un même projet,
+ * voir `Terminal.tsx`), et réapparaissent telles quelles au retour.
  */
 export function useTerminals(projectPath: string | null) {
   const [sessions, setSessions] = useState<Session[]>([])
@@ -163,6 +165,16 @@ export function useTerminals(projectPath: string | null) {
 
   const panes = useRef(new Map<string, Pane>())
   const counter = useRef(0)
+  // Sessions et onglet actif de chaque projet déjà visité, pour les retrouver
+  // sans les rouvrir. `panes` sert déjà de collection inter-projets : les clés
+  // portent le chemin du projet, donc aucune collision entre deux projets.
+  const sessionsByProject = useRef(new Map<string, Session[]>())
+  const activeByProject = useRef(new Map<string, string | null>())
+  // Lu par `attach()` pour ne pointer `claudeSessionId` que si le projet de la
+  // session qui vient de s'ouvrir est toujours celui affiché — sans ça, changer
+  // de projet pendant l'ouverture ferait écrire `injectToClaude` dans la
+  // mauvaise session.
+  const activeProjectRef = useRef(projectPath)
   // Une fonction de référence par session, gardée telle quelle d'un rendu à
   // l'autre : React appelle une référence changeante avec `null` puis avec
   // l'élément, ce qui détruirait et rouvrirait la session à chaque rendu.
@@ -216,18 +228,34 @@ export function useTerminals(projectPath: string | null) {
     )
   }, [])
 
-  // Changer de projet repart d'une seule session Claude. Les clés portent le
-  // chemin : les anciens hôtes se démontent, donc se ferment, tout seuls.
+  // Changer de projet affiche ses sessions au lieu d'en ouvrir de nouvelles :
+  // la première visite amorce une session Claude, les visites suivantes
+  // retrouvent ce qui tournait déjà, `active` compris.
   useEffect(() => {
+    activeProjectRef.current = projectPath
+
     if (!projectPath) {
       setSessions([])
       setActive(null)
+      claudeSessionId = null
       return
     }
-    const first = claudeSlot(projectPath)
-    counter.current = 0
-    setSessions([first])
-    setActive(first.key)
+
+    if (!sessionsByProject.current.has(projectPath)) {
+      const first = claudeSlot(projectPath)
+      sessionsByProject.current.set(projectPath, [first])
+      activeByProject.current.set(projectPath, first.key)
+    }
+
+    const projectSessions = sessionsByProject.current.get(projectPath) ?? []
+    setSessions(projectSessions)
+
+    const wasActive = activeByProject.current.get(projectPath)
+    setActive(
+      wasActive && projectSessions.some(s => s.key === wasActive) ? wasActive : claudeSlot(projectPath).key,
+    )
+
+    claudeSessionId = panes.current.get(claudeSlot(projectPath).key)?.id ?? null
     setErrors({})
   }, [projectPath])
 
@@ -310,7 +338,10 @@ export function useTerminals(projectPath: string | null) {
           return
         }
         pane.id = result.id
-        if (session.kind === 'claude') claudeSessionId = result.id
+        // Ne pointer `claudeSessionId` que si le projet de cette session est
+        // toujours celui affiché : sinon un changement de projet pendant
+        // l'ouverture ferait écrire `injectToClaude` dans une session cachée.
+        if (session.kind === 'claude' && activeProjectRef.current === projectPath) claudeSessionId = result.id
         bridge.resize(result.id, xterm.cols, xterm.rows)
       })
     }
@@ -328,7 +359,11 @@ export function useTerminals(projectPath: string | null) {
       kind: 'shell',
       label: `shell ${n}`,
     }
-    setSessions(before => [...before, session])
+    const before = sessionsByProject.current.get(projectPath) ?? []
+    const after = [...before, session]
+    sessionsByProject.current.set(projectPath, after)
+    setSessions(after)
+    activeByProject.current.set(projectPath, session.key)
     setActive(session.key)
   }, [projectPath])
 
@@ -336,11 +371,15 @@ export function useTerminals(projectPath: string | null) {
   const closeShell = useCallback(
     (key: string) => {
       if (!projectPath || key === claudeSlot(projectPath).key) return
-      setSessions(before => before.filter(s => s.key !== key))
+      const remaining = (sessionsByProject.current.get(projectPath) ?? []).filter(s => s.key !== key)
+      sessionsByProject.current.set(projectPath, remaining)
+      setSessions(remaining)
       // Retour sur la session Claude : elle existe toujours, elle ne se ferme
       // pas. Choisir « la dernière restante » demanderait de lire la liste
       // depuis un setter, ce qui la lirait périmée.
-      setActive(now => (now === key ? claudeSlot(projectPath).key : now))
+      const claudeKey = claudeSlot(projectPath).key
+      if (activeByProject.current.get(projectPath) === key) activeByProject.current.set(projectPath, claudeKey)
+      setActive(now => (now === key ? claudeKey : now))
       setErrors(({ [key]: _closed, ...rest }) => rest)
     },
     [projectPath],
@@ -359,10 +398,27 @@ export function useTerminals(projectPath: string | null) {
     pane?.xterm.focus()
   }, [projectPath])
 
+  /** Change l'onglet actif du projet courant, et s'en souvient pour le retour. */
+  const handleSetActive = useCallback(
+    (key: string | null) => {
+      setActive(key)
+      if (!projectPath || !key) return
+      activeByProject.current.set(projectPath, key)
+      if (key.endsWith('#claude')) claudeSessionId = panes.current.get(key)?.id ?? null
+    },
+    [projectPath],
+  )
+
+  // Toutes les sessions de tous les projets visités : `Terminal.tsx` les monte
+  // toutes pour ne jamais démonter un onglet caché, seule `sessions`
+  // (ci-dessus, celles du projet courant) alimente la barre de pastilles.
+  const allSessions = Array.from(sessionsByProject.current.values()).flat()
+
   return {
     sessions,
+    allSessions,
     active,
-    setActive,
+    setActive: handleSetActive,
     attach,
     openShell,
     closeShell,

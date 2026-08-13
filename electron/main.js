@@ -272,7 +272,7 @@ app.whenReady().then(() => {
   // Le menu se construit une fois, dans la langue des préférences : le
   // reconstruire à chaud coûte plus qu'il ne rapporte, et l'écran des
   // préférences prévient que le changement prend effet au prochain lancement.
-  Menu.setApplicationMenu(buildMenu(readSettings().langue))
+  Menu.setApplicationMenu(buildMenu(readSettings().langue, createWindow))
 
   protocol.handle(SCHEME, async request => {
     const url = new URL(request.url)

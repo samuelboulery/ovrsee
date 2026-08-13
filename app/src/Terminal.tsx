@@ -94,6 +94,7 @@ export function Terminal({
   const [notice, setNotice] = useState<string | null>(null)
   const {
     sessions,
+    allSessions,
     active,
     setActive,
     attach,
@@ -290,12 +291,13 @@ export function Terminal({
         {available && (
           // Session réelle : xterm occupe la zone, `claude` tourne derrière.
           //
-          // Les sessions sont empilées et toutes montées, l'inactive rendue
-          // transparente. Pas `display: none` : un conteneur de largeur nulle
-          // fait calculer à FitAddon une grille fausse, et `claude` se
-          // réafficherait de travers au retour sur l'onglet.
+          // Les sessions sont empilées et toutes montées — celles du projet
+          // affiché comme celles des autres projets déjà visités — l'inactive
+          // rendue transparente. Pas `display: none` : un conteneur de largeur
+          // nulle fait calculer à FitAddon une grille fausse, et `claude` se
+          // réafficherait de travers au retour sur l'onglet ou sur le projet.
           <div style={s('flex: 1; min-width: 0; min-height: 0; position: relative;')}>
-            {sessions.map(session => (
+            {allSessions.map(session => (
               <div
                 key={session.key}
                 ref={attach(session)}

@@ -47,9 +47,12 @@ const TAB_IDS = ['apercu', 'navigateur', 'produit', 'historique', 'tableau', 'do
  * @param {'fr' | 'en'} [lang] langue lue des préférences par le processus
  *   principal. Le défaut français garde le comportement d'avant l'i18n pour
  *   tout appelant qui l'ignorerait.
+ * @param {() => Electron.BrowserWindow} createWindow ouvre une nouvelle
+ *   fenêtre. Passé en paramètre plutôt qu'importé de `main.js` : `main.js`
+ *   importe déjà `buildMenu` d'ici, et l'import réciproque bouclerait.
  * @returns {Electron.Menu}
  */
-export function buildMenu(lang = 'fr') {
+export function buildMenu(lang = 'fr', createWindow) {
   const m = (key, params) => t(key, lang, params)
   const mac = process.platform === 'darwin'
 
@@ -86,6 +89,10 @@ export function buildMenu(lang = 'fr') {
       label: m('menu.file'),
       submenu: [
         { label: m('menu.open_project'), accelerator: 'CmdOrCtrl+O', click: send('project:open') },
+        // Action directe sur le processus principal, pas `send()` : ouvrir une
+        // fenêtre n'est pas un geste que le rendu sait déjà faire, contrairement
+        // aux autres items de ce menu.
+        { label: m('menu.new_window'), accelerator: 'CmdOrCtrl+N', click: () => createWindow() },
         // ⌘R relit `ovrsee/` ; recharger la *page* est en ⇧⌘R, sous Affichage.
         // Un rechargement de page perdrait l'onglet Navigateur et la session du
         // terminal — ce n'est pas ce qu'on veut du raccourci le plus proche.

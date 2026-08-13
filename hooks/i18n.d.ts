@@ -61,6 +61,7 @@ export type TranslationKey =
   | 'menu.quit'
   | 'menu.file'
   | 'menu.open_project'
+  | 'menu.new_window'
   | 'menu.reload_project'
   | 'menu.reveal'
   | 'menu.close_window'

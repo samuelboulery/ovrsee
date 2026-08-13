@@ -64,7 +64,9 @@ function loginShell() {
  *   dessinés par Claude sortent en charabia.
  */
 function sessionEnv() {
-  const { ELECTRON_RUN_AS_NODE, NODE_OPTIONS, ...rest } = process.env
+  // Ces deux-là ne sont pas lues : elles sont nommées pour être EXCLUES de
+  // `rest`. Le tiret bas dit au linter que c'est délibéré.
+  const { ELECTRON_RUN_AS_NODE: _run, NODE_OPTIONS: _opts, ...rest } = process.env
   const env = Object.fromEntries(
     Object.entries(rest).filter(([key]) => !key.startsWith('CLAUDE')),
   )
@@ -171,5 +173,9 @@ export function closeSession(id) {
 
 /** Ne jamais laisser une session orpheline derrière la fenêtre. */
 export function closeAll() {
+  // La copie est délibérée : `closeSession` retire l'entrée de `sessions`, et
+  // itérer l'itérateur vivant d'une Map qu'on vide sous ses pieds est le genre
+  // de chose qui marche jusqu'au jour où la fermeture en cascade une autre.
+  // oxlint-disable-next-line unicorn/no-useless-spread
   for (const id of [...sessions.keys()]) closeSession(id)
 }

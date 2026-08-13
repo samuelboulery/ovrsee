@@ -1,0 +1,94 @@
+name: ci
+
+# Avant ce workflow, rien ne testait le dépôt entre deux tags. Cinq tests de
+# portabilité cassaient sous Windows depuis des semaines — séparateurs `\`, bit
+# d'exécution absent, EPERM au lieu d'EISDIR — et c'est le premier
+# `git push --tags` qui les a découverts, en faisant échouer la release.
+on:
+  pull_request:
+    paths-ignore:
+      - 'site/**'
+      - '*.md'
+      - 'ovrsee/**'
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'site/**'
+      - '*.md'
+      - 'ovrsee/**'
+
+# Les noms de jobs sont les contextes cités par le ruleset de `main` : les
+# renommer casserait la règle en silence, et les PR passeraient sans contrôle.
+permissions: {}
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions: {}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm lint
+
+      - run: pnpm typecheck
+
+      - run: pnpm build:ui
+
+  # Deux runners, deux sémantiques de chemins et de permissions. Ubuntu
+  # n'apporterait pas de troisième environnement utile : personne ne fait
+  # tourner l'application dessus.
+  test-mac:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    permissions: {}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm test
+
+  test-win:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    permissions: {}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm test

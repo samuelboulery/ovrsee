@@ -2,7 +2,7 @@
 {
   "id": "T-0125",
   "titre": "CI sur chaque PR, avec un job Windows",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "m",
   "epic": "T-0123",

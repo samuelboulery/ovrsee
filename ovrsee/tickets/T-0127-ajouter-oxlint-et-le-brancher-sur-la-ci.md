@@ -2,7 +2,7 @@
 {
   "id": "T-0127",
   "titre": "Ajouter oxlint et le brancher sur la CI",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "s",
   "epic": "T-0123",

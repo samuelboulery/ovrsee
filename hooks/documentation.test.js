@@ -33,33 +33,15 @@ function extractPnpmScripts(text) {
     .filter((v, i, a) => a.indexOf(v) === i) // déduplique
 }
 
-/**
- * Extrait les chemins cités dans le texte.
- * Cherche les patterns comme `ovrsee/`, `app/`, `hooks/`, etc.
- * @param {string} text
- * @returns {string[]} liste des chemins trouvés
- */
-function extractPaths(text) {
-  const patterns = [
-    /(?:^|[\s`(])([a-z_][a-z0-9_/-]*\/[a-z0-9_/-]+(?:\.(?:js|ts|tsx|json|md))?)/gim,
-  ]
-
-  const paths = new Set()
-  for (const pattern of patterns) {
-    const matches = text.matchAll(pattern) || []
-    for (const match of matches) {
-      let path = match[1].trim()
-      // Enlève les marqueurs de fin possibles
-      if (path.endsWith('.') || path.endsWith(',') || path.endsWith(')') || path.endsWith('`')) {
-        path = path.slice(0, -1)
-      }
-      if (path && !path.includes('http')) {
-        paths.add(path)
-      }
-    }
-  }
-  return Array.from(paths)
-}
+// Un `extractPaths` vivait ici, censé relever tous les chemins cités dans un
+// README pour vérifier qu'ils existent. Les deux tests plus bas l'appelaient et
+// jetaient son résultat — parce qu'il ne marchait pas : son alternance
+// `js|ts|tsx|json` faisait correspondre `js` en premier, donc `ovrsee/board.json`
+// devenait `ovrsee/board.js`, et la prose produisait des chemins inventés comme
+// `plans/tickets/pages`. Le câbler aurait fait échouer les tests sur du bruit.
+//
+// Ce qui reste vérifie une liste courte et écrite à la main. C'est moins
+// ambitieux, mais c'est vrai.
 
 test('les commandes pnpm citées dans README.md existent', () => {
   const scripts = extractPnpmScripts(readmeFr)
@@ -131,8 +113,7 @@ test('README.md mentionne le dossier mcp/', () => {
   )
 })
 
-test('les chemins cités dans README.md existent', () => {
-  const paths = extractPaths(readmeFr)
+test('les dossiers cités dans README.md existent', () => {
   const required = ['ovrsee/', 'hooks/', 'crawl/', 'app/', 'electron/']
 
   for (const path of required) {
@@ -143,8 +124,7 @@ test('les chemins cités dans README.md existent', () => {
   }
 })
 
-test('les chemins cités dans README.en.md existent', () => {
-  const paths = extractPaths(readmeEn)
+test('les dossiers cités dans README.en.md existent', () => {
   const required = ['ovrsee/', 'hooks/', 'crawl/', 'app/', 'electron/']
 
   for (const path of required) {

@@ -2,7 +2,7 @@
 {
   "id": "T-0128",
   "titre": "Aligner le discours de l'app, des READMEs et de la landing",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "l",
   "epic": "T-0123",

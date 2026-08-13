@@ -4,7 +4,29 @@
   "title": "Professionnaliser le dépôt avant le passage en public",
   "opened": "2026-08-13",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "f7b5ae8",
+      "date": "2026-08-13",
+      "files": [
+        ".github/CODEOWNERS",
+        ".github/ISSUE_TEMPLATE/bug_report.yml",
+        ".github/ISSUE_TEMPLATE/config.yml",
+        ".github/ISSUE_TEMPLATE/feature_request.yml",
+        ".github/dependabot.yml",
+        ".github/pull_request_template.md",
+        ".npmrc",
+        "CHANGELOG.md",
+        "CODE_OF_CONDUCT.md",
+        "CONTRIBUTING.md",
+        "LICENSE",
+        "README.en.md",
+        "README.md",
+        "SECURITY.md",
+        "package.json"
+      ]
+    }
+  ]
 }
 ---
 

@@ -2,7 +2,7 @@
 {
   "id": "T-0124",
   "titre": "Poser les fichiers attendus d'un dépôt public",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "m",
   "epic": "T-0123",

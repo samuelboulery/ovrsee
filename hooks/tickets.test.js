@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, symlinkSync, existsSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, writeFileSync, readdirSync, symlinkSync, existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -557,8 +557,8 @@ test('updateTicket peut retirer le type epic', () => {
 test("childrenOf retourne les enfants d'un epic triés", () => {
   const ovrseeDir = fixture()
   const epic = createTicket(ovrseeDir, { titre: 'Epic', type: 'epic' })
-  const enfant1 = createTicket(ovrseeDir, { titre: 'Enfant 1', epic: epic.meta.id, priorite: 'moyenne' })
-  const enfant2 = createTicket(ovrseeDir, { titre: 'Enfant 2', epic: epic.meta.id, priorite: 'haute' })
+  createTicket(ovrseeDir, { titre: 'Enfant 1', epic: epic.meta.id, priorite: 'moyenne' })
+  createTicket(ovrseeDir, { titre: 'Enfant 2', epic: epic.meta.id, priorite: 'haute' })
   createTicket(ovrseeDir, { titre: 'Autre' })
 
   const tickets = readTickets(ovrseeDir)
@@ -580,8 +580,8 @@ test('childrenOf retourne une liste vide si epic inexistant', () => {
 test("orphanChildren détecte les enfants pointant un epic inexistant", () => {
   const ovrseeDir = fixture()
   const epic = createTicket(ovrseeDir, { titre: 'Epic', type: 'epic' })
-  const enfantVrai = createTicket(ovrseeDir, { titre: 'Enfant vrai', epic: epic.meta.id })
-  const enfantOrphelin = createTicket(ovrseeDir, { titre: 'Orphelin', epic: 'T-999' })
+  createTicket(ovrseeDir, { titre: 'Enfant vrai', epic: epic.meta.id })
+  createTicket(ovrseeDir, { titre: 'Orphelin', epic: 'T-999' })
   createTicket(ovrseeDir, { titre: 'Ordinaire' })
 
   const tickets = readTickets(ovrseeDir)

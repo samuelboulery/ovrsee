@@ -648,7 +648,7 @@ export function Navigateur({
         {/* Le choix ne se pose que quand ils sont ouverts. */}
         {devtools && (
           <div style={s('display: flex; gap: 2px;')}>
-            {DOCKS.map(([id, label]) => {
+            {DOCKS.map(([id]) => {
               const displayLabel = id === 'bottom' ? t('pref.terminal_bottom') : t('pref.terminal_side')
               return (
                 <button

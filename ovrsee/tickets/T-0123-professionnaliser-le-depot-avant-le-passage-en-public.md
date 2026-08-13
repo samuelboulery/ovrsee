@@ -2,11 +2,14 @@
 {
   "id": "T-0123",
   "titre": "Professionnaliser le dépôt avant le passage en public",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "type": "epic",
   "charge": "xl",
-  "tags": ["infra", "release"],
+  "tags": [
+    "infra",
+    "release"
+  ],
   "cree": "2026-08-13",
   "maj": "2026-08-13",
   "plan": "2026-08-13-professionnaliser-le-depot-avant-le-passage-en-public.md"

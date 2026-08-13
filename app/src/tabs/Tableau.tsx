@@ -371,7 +371,6 @@ export function Tableau({
               ouverte={ouverte}
               onRenommer={patch => renommer(colonne.id, patch)}
               onRetirer={vers => retirer(colonne.id, vers)}
-              filtreEpic={filtreEpic}
               setFiltreEpic={setFiltreEpic}
               allTickets={tickets}
               onModifier={modifier}
@@ -440,7 +439,6 @@ function ColonneVue({
   ouverte,
   onRenommer,
   onRetirer,
-  filtreEpic,
   setFiltreEpic,
   allTickets,
   onModifier,
@@ -465,7 +463,6 @@ function ColonneVue({
   ouverte: string | null
   onRenommer: (patch: { titre?: string; wip?: number | null }) => void
   onRetirer: (vers?: string) => void
-  filtreEpic: string | null
   setFiltreEpic: (epic: string | null) => void
   allTickets: Ticket[]
   onModifier: (file: string, patch: TicketPatch) => void
@@ -727,7 +724,6 @@ function ColonneVue({
                 onOuvrir={onOuvrir}
                 ouverte={ouverte}
                 enfantsIci={ticket.type === 'epic' ? tickets.filter(c => c.epic === ticket.id) : undefined}
-                filtreEpic={filtreEpic}
                 setFiltreEpic={setFiltreEpic}
                 allTickets={allTickets}
                 onModifier={onModifier}
@@ -821,7 +817,6 @@ function Carte({
   onOuvrir,
   ouverte,
   enfantsIci,
-  filtreEpic,
   setFiltreEpic,
   allTickets,
   onModifier,
@@ -833,7 +828,6 @@ function Carte({
   ouverte: string | null
   /** Enfants de cet epic présents dans cette même colonne — rendus imbriqués, sans liseré. */
   enfantsIci?: Ticket[]
-  filtreEpic: string | null
   setFiltreEpic: (epic: string | null) => void
   allTickets: Ticket[]
   onModifier: (file: string, patch: TicketPatch) => void
@@ -965,7 +959,6 @@ function Carte({
               ticket={enfant}
               onOuvrir={onOuvrir}
               ouverte={ouverte}
-              filtreEpic={filtreEpic}
               setFiltreEpic={setFiltreEpic}
               allTickets={allTickets}
               onModifier={onModifier}

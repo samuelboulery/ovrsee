@@ -6,17 +6,25 @@ on:
       - 'v*'
   workflow_dispatch:
 
-permissions:
-  contents: write
+# Pas de permissions au niveau du workflow : seul le job qui crée la release en
+# a besoin. Déclarées ici, elles seraient accordées aussi aux jobs de build, qui
+# n'écrivent rien — sauf electron-builder, qui reçoit le jeton par `env`.
+permissions: {}
+
+# Pas de `concurrency` avec annulation ici, contrairement à la CI : annuler un
+# build à mi-envoi laisse une release à moitié remplie. C'est arrivé.
 
 jobs:
   # `electron-builder --publish` crée la release brouillon à la volée, au
-  # premier envoi d'asset — et ses envois sont parallèles. Deux d'entre eux
-  # ont déjà trouvé « pas de release » au même instant et en ont créé une
-  # chacun, les assets répartis entre les deux. La créer ici, une fois, avant
-  # que le moindre runner ne démarre, supprime la course.
+  # premier envoi d'asset — et ses envois sont parallèles. Deux d'entre eux ont
+  # déjà trouvé « pas de release » au même instant et en ont créé une chacun,
+  # les assets répartis entre les deux. La créer ici, une fois, avant que le
+  # moindre runner ne démarre, supprime la course.
   draft:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
     steps:
       # Pas de checkout : `gh` travaille sur `$GITHUB_REPOSITORY`, et
       # `--generate-notes` se calcule côté serveur.
@@ -44,12 +52,17 @@ jobs:
           - os: windows-latest
             target: --win
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
           cache: pnpm

@@ -110,7 +110,7 @@ export function density(commits, { fenetre, now = new Date() } = {}) {
   const fenetreNorm = fenetre ?? '3mois'
   const granulariteNorm = granulariteForFenetre(fenetreNorm)
   const bucketCnt = bucketCount(fenetreNorm)
-  const buckets = new Array(bucketCnt).fill(0)
+  const buckets = Array.from({ length: bucketCnt }, () => 0)
 
   for (const commit of Array.isArray(commits) ? commits : []) {
     const at = Date.parse(commit.date)
@@ -142,7 +142,7 @@ const DAY_MS = 24 * 60 * 60 * 1000
  * @returns {number[]}
  */
 export function dailyCounts(entries, days, now = new Date()) {
-  const buckets = new Array(days).fill(0)
+  const buckets = Array.from({ length: days }, () => 0)
   const nowDays = Math.floor(now.getTime() / DAY_MS)
 
   for (const entry of Array.isArray(entries) ? entries : []) {

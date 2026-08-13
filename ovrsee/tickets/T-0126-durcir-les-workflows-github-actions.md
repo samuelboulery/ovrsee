@@ -2,7 +2,7 @@
 {
   "id": "T-0126",
   "titre": "Durcir les workflows GitHub Actions",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "s",
   "epic": "T-0123",

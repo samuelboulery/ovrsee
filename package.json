@@ -17,14 +17,14 @@
     "url": "https://github.com/samuelboulery/ovrsee/issues"
   },
   "homepage": "https://github.com/samuelboulery/ovrsee#readme",
-  "description": "Vue en lecture seule sur un projet vibecodé : plans capturés, pages crawlées, historique daté.",
+  "description": "Gestion de projet pour Claude Code : plans approuvés, commits qui les réalisent, tickets à faire — versionnés dans le dépôt.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.json && vite build",
     "test": "node --test hooks/*.test.js crawl/*.test.js server/*.test.js mcp/*.test.js && node scripts/test-ui.js",
     "test:ui": "node scripts/test-ui.js",
     "typecheck": "tsc -p tsconfig.json",
-    "lint": "oxlint hooks crawl server mcp electron app/src",
+    "lint": "oxlint hooks crawl server mcp electron app/src site",
     "ovrsee:install": "node hooks/install.js",
     "ovrsee:status": "node hooks/ovrsee-cli.js status",
     "ovrsee:close": "node hooks/ovrsee-cli.js close",

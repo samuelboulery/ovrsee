@@ -2,7 +2,7 @@
 {
   "id": "T-0130",
   "titre": "Porter la landing en statique dans site/",
-  "colonne": "fait",
+  "colonne": "en-cours",
   "priorite": "moyenne",
   "charge": "xl",
   "epic": "T-0123",

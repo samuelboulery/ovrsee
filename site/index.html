@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ovrsee, piloter un projet vibecodé</title>
+<meta name="description" content="Gestion de projet pour Claude Code : les plans approuvés, les commits qui les réalisent, les tickets à faire — versionnés dans votre dépôt.">
+<meta property="og:title" content="Ovrsee">
+<meta property="og:description" content="Vibecoder vite, sans perdre le fil du projet.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none"><symbol id="i-arrow-up-right" viewBox="0 0 256 256"><path d="M200,64V168a8,8,0,0,1-16,0V83.31L69.66,197.66a8,8,0,0,1-11.32-11.32L172.69,72H88a8,8,0,0,1,0-16H192A8,8,0,0,1,200,64Z"/></symbol><symbol id="i-arrows-out-simple" viewBox="0 0 256 256"><path d="M216,48V96a8,8,0,0,1-16,0V67.31l-50.34,50.35a8,8,0,0,1-11.32-11.32L188.69,56H160a8,8,0,0,1,0-16h48A8,8,0,0,1,216,48ZM106.34,138.34,56,188.69V160a8,8,0,0,0-16,0v48a8,8,0,0,0,8,8H96a8,8,0,0,0,0-16H67.31l50.35-50.34a8,8,0,0,0-11.32-11.32Z"/></symbol><symbol id="i-browser" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V88H40V56Zm0,144H40V104H216v96Z"/></symbol><symbol id="i-check" viewBox="0 0 256 256"><path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"/></symbol><symbol id="i-clock-counter-clockwise" viewBox="0 0 256 256"><path d="M136,80v43.47l36.12,21.67a8,8,0,0,1-8.24,13.72l-40-24A8,8,0,0,1,120,128V80a8,8,0,0,1,16,0Zm-8-48A95.44,95.44,0,0,0,60.08,60.15C52.81,67.51,46.35,74.59,40,82V64a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H72a8,8,0,0,0,0-16H49c7.15-8.42,14.27-16.35,22.39-24.57a80,80,0,1,1,1.66,114.75,8,8,0,1,0-11,11.64A96,96,0,1,0,128,32Z"/></symbol><symbol id="i-code" viewBox="0 0 256 256"><path d="M69.12,94.15,28.5,128l40.62,33.85a8,8,0,1,1-10.24,12.29l-48-40a8,8,0,0,1,0-12.29l48-40a8,8,0,0,1,10.24,12.3Zm176,27.7-48-40a8,8,0,1,0-10.24,12.3L227.5,128l-40.62,33.85a8,8,0,1,0,10.24,12.29l48-40a8,8,0,0,0,0-12.29ZM162.73,32.48a8,8,0,0,0-10.25,4.79l-64,176a8,8,0,0,0,4.79,10.26A8.14,8.14,0,0,0,96,224a8,8,0,0,0,7.52-5.27l64-176A8,8,0,0,0,162.73,32.48Z"/></symbol><symbol id="i-cursor-click" viewBox="0 0 256 256"><path d="M88,24V16a8,8,0,0,1,16,0v8a8,8,0,0,1-16,0ZM16,104h8a8,8,0,0,0,0-16H16a8,8,0,0,0,0,16ZM124.42,39.16a8,8,0,0,0,10.74-3.58l8-16a8,8,0,0,0-14.31-7.16l-8,16A8,8,0,0,0,124.42,39.16Zm-96,81.69-16,8a8,8,0,0,0,7.16,14.31l16-8a8,8,0,1,0-7.16-14.31ZM219.31,184a16,16,0,0,1,0,22.63l-12.68,12.68a16,16,0,0,1-22.63,0L132.7,168,115,214.09c0,.1-.08.21-.13.32a15.83,15.83,0,0,1-14.6,9.59l-.79,0a15.83,15.83,0,0,1-14.41-11L32.8,52.92A16,16,0,0,1,52.92,32.8L213,85.07a16,16,0,0,1,1.41,29.8l-.32.13L168,132.69ZM208,195.31,156.69,144h0a16,16,0,0,1,4.93-26l.32-.14,45.95-17.64L48,48l52.2,159.86,17.65-46c0-.11.08-.22.13-.33a16,16,0,0,1,11.69-9.34,16.72,16.72,0,0,1,3-.28,16,16,0,0,1,11.3,4.69L195.31,208Z"/></symbol><symbol id="i-database" viewBox="0 0 256 256"><path d="M128,24C74.17,24,32,48.6,32,80v96c0,31.4,42.17,56,96,56s96-24.6,96-56V80C224,48.6,181.83,24,128,24Zm80,104c0,9.62-7.88,19.43-21.61,26.92C170.93,163.35,150.19,168,128,168s-42.93-4.65-58.39-13.08C55.88,147.43,48,137.62,48,128V111.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64ZM69.61,53.08C85.07,44.65,105.81,40,128,40s42.93,4.65,58.39,13.08C200.12,60.57,208,70.38,208,80s-7.88,19.43-21.61,26.92C170.93,115.35,150.19,120,128,120s-42.93-4.65-58.39-13.08C55.88,99.43,48,89.62,48,80S55.88,60.57,69.61,53.08ZM186.39,202.92C170.93,211.35,150.19,216,128,216s-42.93-4.65-58.39-13.08C55.88,195.43,48,185.62,48,176V159.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64V176C208,185.62,200.12,195.43,186.39,202.92Z"/></symbol><symbol id="i-dots-six-vertical" viewBox="0 0 256 256"><path d="M104,60A12,12,0,1,1,92,48,12,12,0,0,1,104,60Zm60,12a12,12,0,1,0-12-12A12,12,0,0,0,164,72ZM92,116a12,12,0,1,0,12,12A12,12,0,0,0,92,116Zm72,0a12,12,0,1,0,12,12A12,12,0,0,0,164,116ZM92,184a12,12,0,1,0,12,12A12,12,0,0,0,92,184Zm72,0a12,12,0,1,0,12,12A12,12,0,0,0,164,184Z"/></symbol><symbol id="i-download-simple" viewBox="0 0 256 256"><path d="M224,144v64a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V144a8,8,0,0,1,16,0v56H208V144a8,8,0,0,1,16,0Zm-101.66,5.66a8,8,0,0,0,11.32,0l40-40a8,8,0,0,0-11.32-11.32L136,124.69V32a8,8,0,0,0-16,0v92.69L93.66,98.34a8,8,0,0,0-11.32,11.32Z"/></symbol><symbol id="i-folder-open" viewBox="0 0 256 256"><path d="M245,110.64A16,16,0,0,0,232,104H216V88a16,16,0,0,0-16-16H130.67L102.94,51.2a16.14,16.14,0,0,0-9.6-3.2H40A16,16,0,0,0,24,64V208h0a8,8,0,0,0,8,8H211.1a8,8,0,0,0,7.59-5.47l28.49-85.47A16.05,16.05,0,0,0,245,110.64ZM93.34,64,123.2,86.4A8,8,0,0,0,128,88h72v16H69.77a16,16,0,0,0-15.18,10.94L40,158.7V64Zm112,136H43.1l26.67-80H232Z"/></symbol><symbol id="i-gear-six" viewBox="0 0 256 256"><path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm109.94-52.79a8,8,0,0,0-3.89-5.4l-29.83-17-.12-33.62a8,8,0,0,0-2.83-6.08,111.91,111.91,0,0,0-36.72-20.67,8,8,0,0,0-6.46.59L128,41.85,97.88,25a8,8,0,0,0-6.47-.6A112.1,112.1,0,0,0,54.73,45.15a8,8,0,0,0-2.83,6.07l-.15,33.65-29.83,17a8,8,0,0,0-3.89,5.4,106.47,106.47,0,0,0,0,41.56,8,8,0,0,0,3.89,5.4l29.83,17,.12,33.62a8,8,0,0,0,2.83,6.08,111.91,111.91,0,0,0,36.72,20.67,8,8,0,0,0,6.46-.59L128,214.15,158.12,231a7.91,7.91,0,0,0,3.9,1,8.09,8.09,0,0,0,2.57-.42,112.1,112.1,0,0,0,36.68-20.73,8,8,0,0,0,2.83-6.07l.15-33.65,29.83-17a8,8,0,0,0,3.89-5.4A106.47,106.47,0,0,0,237.94,107.21Zm-15,34.91-28.57,16.25a8,8,0,0,0-3,3c-.58,1-1.19,2.06-1.81,3.06a7.94,7.94,0,0,0-1.22,4.21l-.15,32.25a95.89,95.89,0,0,1-25.37,14.3L134,199.13a8,8,0,0,0-3.91-1h-.19c-1.21,0-2.43,0-3.64,0a8.08,8.08,0,0,0-4.1,1l-28.84,16.1A96,96,0,0,1,67.88,201l-.11-32.2a8,8,0,0,0-1.22-4.22c-.62-1-1.23-2-1.8-3.06a8.09,8.09,0,0,0-3-3.06l-28.6-16.29a90.49,90.49,0,0,1,0-28.26L61.67,97.63a8,8,0,0,0,3-3c.58-1,1.19-2.06,1.81-3.06a7.94,7.94,0,0,0,1.22-4.21l.15-32.25a95.89,95.89,0,0,1,25.37-14.3L122,56.87a8,8,0,0,0,4.1,1c1.21,0,2.43,0,3.64,0a8.08,8.08,0,0,0,4.1-1l28.84-16.1A96,96,0,0,1,188.12,55l.11,32.2a8,8,0,0,0,1.22,4.22c.62,1,1.23,2,1.8,3.06a8.09,8.09,0,0,0,3,3.06l28.6,16.29A90.49,90.49,0,0,1,222.9,142.12Z"/></symbol><symbol id="i-git-branch" viewBox="0 0 256 256"><path d="M232,64a32,32,0,1,0-40,31v17a8,8,0,0,1-8,8H96a23.84,23.84,0,0,0-8,1.38V95a32,32,0,1,0-16,0v66a32,32,0,1,0,16,0V144a8,8,0,0,1,8-8h88a24,24,0,0,0,24-24V95A32.06,32.06,0,0,0,232,64ZM64,64A16,16,0,1,1,80,80,16,16,0,0,1,64,64ZM96,192a16,16,0,1,1-16-16A16,16,0,0,1,96,192ZM200,80a16,16,0,1,1,16-16A16,16,0,0,1,200,80Z"/></symbol><symbol id="i-git-diff" viewBox="0 0 256 256"><path d="M112,152a8,8,0,0,0-8,8v28.69L66.34,151A8,8,0,0,1,64,145.37V95a32,32,0,1,0-16,0v50.38a23.85,23.85,0,0,0,7,17L92.69,200H64a8,8,0,0,0,0,16h48a8,8,0,0,0,8-8V160A8,8,0,0,0,112,152ZM40,64A16,16,0,1,1,56,80,16,16,0,0,1,40,64Zm168,97V110.63a23.85,23.85,0,0,0-7-17L163.31,56H192a8,8,0,0,0,0-16H144a8,8,0,0,0-8,8V96a8,8,0,0,0,16,0V67.31L189.66,105a8,8,0,0,1,2.34,5.66V161a32,32,0,1,0,16,0Zm-8,47a16,16,0,1,1,16-16A16,16,0,0,1,200,208Z"/></symbol><symbol id="i-kanban" viewBox="0 0 256 256"><path d="M216,48H40a8,8,0,0,0-8,8V208a16,16,0,0,0,16,16H88a16,16,0,0,0,16-16V160h48v16a16,16,0,0,0,16,16h40a16,16,0,0,0,16-16V56A8,8,0,0,0,216,48ZM88,208H48V128H88Zm0-96H48V64H88Zm64,32H104V64h48Zm56,32H168V128h40Zm0-64H168V64h40Z"/></symbol><symbol id="i-magnifying-glass" viewBox="0 0 256 256"><path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"/></symbol><symbol id="i-minus" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128Z"/></symbol><symbol id="i-plus" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"/></symbol><symbol id="i-sidebar-simple" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM40,56H80V200H40ZM216,200H96V56H216V200Z"/></symbol><symbol id="i-squares-four" viewBox="0 0 256 256"><path d="M104,40H56A16,16,0,0,0,40,56v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,104,40Zm0,64H56V56h48v48Zm96-64H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm0,64H152V56h48v48Zm-96,32H56a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,104,136Zm0,64H56V152h48v48Zm96-64H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,200,136Zm0,64H152V152h48v48Z"/></symbol><symbol id="i-tree-structure" viewBox="0 0 256 256"><path d="M160,112h48a16,16,0,0,0,16-16V48a16,16,0,0,0-16-16H160a16,16,0,0,0-16,16V64H128a24,24,0,0,0-24,24v32H72v-8A16,16,0,0,0,56,96H24A16,16,0,0,0,8,112v32a16,16,0,0,0,16,16H56a16,16,0,0,0,16-16v-8h32v32a24,24,0,0,0,24,24h16v16a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V160a16,16,0,0,0-16-16H160a16,16,0,0,0-16,16v16H128a8,8,0,0,1-8-8V88a8,8,0,0,1,8-8h16V96A16,16,0,0,0,160,112ZM56,144H24V112H56v32Zm104,16h48v48H160Zm0-112h48V96H160Z"/></symbol><symbol id="i-stack" viewBox="0 0 256 256"><path d="M230.91,172A8,8,0,0,1,228,182.91l-96,56a8,8,0,0,1-8.06,0l-96-56A8,8,0,0,1,36,169.09l92,53.65,92-53.65A8,8,0,0,1,230.91,172ZM220,121.09l-92,53.65L36,121.09A8,8,0,0,0,28,134.91l96,56a8,8,0,0,0,8.06,0l96-56A8,8,0,1,0,220,121.09ZM24,80a8,8,0,0,1,4-6.91l96-56a8,8,0,0,1,8.06,0l96,56a8,8,0,0,1,0,13.82l-96,56a8,8,0,0,1-8.06,0l-96-56A8,8,0,0,1,24,80Zm23.88,0L128,126.74,208.12,80,128,33.26Z"/></symbol><symbol id="i-compass" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216ZM172.42,72.84l-64,32a8.05,8.05,0,0,0-3.58,3.58l-32,64A8,8,0,0,0,80,184a8.1,8.1,0,0,0,3.58-.84l64-32a8.05,8.05,0,0,0,3.58-3.58l32-64a8,8,0,0,0-10.74-10.74ZM138,138,97.89,158.11,118,118l40.15-20.07Z"/></symbol><symbol id="i-caret-down" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z"/></symbol><symbol id="i-dots-three" viewBox="0 0 256 256"><path d="M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128Zm56-12a12,12,0,1,0,12,12A12,12,0,0,0,196,116ZM60,116a12,12,0,1,0,12,12A12,12,0,0,0,60,116Z"/></symbol><symbol id="i-github-logo" viewBox="0 0 256 256"><path d="M208.31,75.68A59.78,59.78,0,0,0,202.93,28,8,8,0,0,0,196,24a59.75,59.75,0,0,0-48,24H124A59.75,59.75,0,0,0,76,24a8,8,0,0,0-6.93,4,59.78,59.78,0,0,0-5.38,47.68A58.14,58.14,0,0,0,56,104v8a56.06,56.06,0,0,0,48.44,55.47A39.8,39.8,0,0,0,96,192v8H72a24,24,0,0,1-24-24A40,40,0,0,0,8,136a8,8,0,0,0,0,16,24,24,0,0,1,24,24,40,40,0,0,0,40,40H96v16a8,8,0,0,0,16,0V192a24,24,0,0,1,48,0v40a8,8,0,0,0,16,0V192a39.8,39.8,0,0,0-8.44-24.53A56.06,56.06,0,0,0,216,112v-8A58.14,58.14,0,0,0,208.31,75.68ZM200,112a40,40,0,0,1-40,40H112a40,40,0,0,1-40-40v-8a41.74,41.74,0,0,1,6.9-22.48A8,8,0,0,0,80,73.83a43.81,43.81,0,0,1,.79-33.58,43.88,43.88,0,0,1,32.32,20.06A8,8,0,0,0,119.82,64h32.35a8,8,0,0,0,6.74-3.69,43.87,43.87,0,0,1,32.32-20.06A43.81,43.81,0,0,1,192,73.83a8.09,8.09,0,0,0,1,7.65A41.72,41.72,0,0,1,200,104Z"/></symbol><symbol id="i-lightning" viewBox="0 0 256 256"><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17ZM109.37,214l10.47-52.38a8,8,0,0,0-5-9.06L62,132.71l84.62-90.66L136.16,94.43a8,8,0,0,0,5,9.06l52.8,19.8Z"/></symbol><symbol id="i-caret-down-fill" viewBox="0 0 256 256"><path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,48,88H208a8,8,0,0,1,5.66,13.66Z"/></symbol><symbol id="i-compass-fill" viewBox="0 0 256 256"><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm51.58,57.79-32,64a4.08,4.08,0,0,1-1.79,1.79l-64,32a4,4,0,0,1-5.37-5.37l32-64a4.08,4.08,0,0,1,1.79-1.79l64-32A4,4,0,0,1,179.58,81.79Z"/></symbol><symbol id="i-dots-three-fill" viewBox="0 0 256 256"><path d="M224,80H32A16,16,0,0,0,16,96v64a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V96A16,16,0,0,0,224,80ZM60,140a12,12,0,1,1,12-12A12,12,0,0,1,60,140Zm68,0a12,12,0,1,1,12-12A12,12,0,0,1,128,140Zm68,0a12,12,0,1,1,12-12A12,12,0,0,1,196,140Z"/></symbol><symbol id="i-github-logo-fill" viewBox="0 0 256 256"><path d="M216,104v8a56.06,56.06,0,0,1-48.44,55.47A39.8,39.8,0,0,1,176,192v40a8,8,0,0,1-8,8H104a8,8,0,0,1-8-8V216H72a40,40,0,0,1-40-40A24,24,0,0,0,8,152a8,8,0,0,1,0-16,40,40,0,0,1,40,40,24,24,0,0,0,24,24H96v-8a39.8,39.8,0,0,1,8.44-24.53A56.06,56.06,0,0,1,56,112v-8a58.14,58.14,0,0,1,7.69-28.32A59.78,59.78,0,0,1,69.07,28,8,8,0,0,1,76,24a59.75,59.75,0,0,1,48,24h24a59.75,59.75,0,0,1,48-24,8,8,0,0,1,6.93,4,59.74,59.74,0,0,1,5.37,47.68A58,58,0,0,1,216,104Z"/></symbol><symbol id="i-lightning-fill" viewBox="0 0 256 256"><path d="M213.85,125.46l-112,120a8,8,0,0,1-13.69-7l14.66-73.33L45.19,143.49a8,8,0,0,1-3-13l112-120a8,8,0,0,1,13.69,7L153.18,90.9l57.63,21.61a8,8,0,0,1,3,12.95Z"/></symbol><symbol id="i-browser-fill" viewBox="0 0 256 256"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V88H40V56Z"/></symbol><symbol id="i-clock-counter-clockwise-fill" viewBox="0 0 256 256"><path d="M224,128A96,96,0,0,1,62.11,197.82a8,8,0,1,1,11-11.64A80,80,0,1,0,71.43,71.43C67.9,75,64.58,78.51,61.35,82L77.66,98.34A8,8,0,0,1,72,112H32a8,8,0,0,1-8-8V64a8,8,0,0,1,13.66-5.66L50,70.7c3.22-3.49,6.54-7,10.06-10.55A96,96,0,0,1,224,128ZM128,72a8,8,0,0,0-8,8v48a8,8,0,0,0,3.88,6.86l40,24a8,8,0,1,0,8.24-13.72L136,123.47V80A8,8,0,0,0,128,72Z"/></symbol><symbol id="i-database-fill" viewBox="0 0 256 256"><path d="M128,24C74.17,24,32,48.6,32,80v96c0,31.4,42.17,56,96,56s96-24.6,96-56V80C224,48.6,181.83,24,128,24Zm80,104c0,9.62-7.88,19.43-21.61,26.92C170.93,163.35,150.19,168,128,168s-42.93-4.65-58.39-13.08C55.88,147.43,48,137.62,48,128V111.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64Zm-21.61,74.92C170.93,211.35,150.19,216,128,216s-42.93-4.65-58.39-13.08C55.88,195.43,48,185.62,48,176V159.36c17.06,15,46.23,24.64,80,24.64s62.94-9.68,80-24.64V176C208,185.62,200.12,195.43,186.39,202.92Z"/></symbol><symbol id="i-kanban-fill" viewBox="0 0 256 256"><path d="M160,56v96a8,8,0,0,1-8,8H112a8,8,0,0,1-8-8V56a8,8,0,0,1,8-8h40A8,8,0,0,1,160,56Zm64-8H184a8,8,0,0,0-8,8v52a4,4,0,0,0,4,4h48a4,4,0,0,0,4-4V56A8,8,0,0,0,224,48Zm4,80H180a4,4,0,0,0-4,4v44a16,16,0,0,0,16,16h24a16,16,0,0,0,16-16V132A4,4,0,0,0,228,128ZM80,48H40a8,8,0,0,0-8,8v52a4,4,0,0,0,4,4H84a4,4,0,0,0,4-4V56A8,8,0,0,0,80,48Zm4,80H36a4,4,0,0,0-4,4v76a16,16,0,0,0,16,16H72a16,16,0,0,0,16-16V132A4,4,0,0,0,84,128Z"/></symbol><symbol id="i-squares-four-fill" viewBox="0 0 256 256"><path d="M120,56v48a16,16,0,0,1-16,16H56a16,16,0,0,1-16-16V56A16,16,0,0,1,56,40h48A16,16,0,0,1,120,56Zm80-16H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V56A16,16,0,0,0,200,40Zm-96,96H56a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,104,136Zm96,0H152a16,16,0,0,0-16,16v48a16,16,0,0,0,16,16h48a16,16,0,0,0,16-16V152A16,16,0,0,0,200,136Z"/></symbol><symbol id="i-stack-fill" viewBox="0 0 256 256"><path d="M220,169.09l-92,53.65L36,169.09A8,8,0,0,0,28,182.91l96,56a8,8,0,0,0,8.06,0l96-56A8,8,0,1,0,220,169.09Z"/><path d="M220,121.09l-92,53.65L36,121.09A8,8,0,0,0,28,134.91l96,56a8,8,0,0,0,8.06,0l96-56A8,8,0,1,0,220,121.09Z"/><path d="M28,86.91l96,56a8,8,0,0,0,8.06,0l96-56a8,8,0,0,0,0-13.82l-96-56a8,8,0,0,0-8.06,0l-96,56a8,8,0,0,0,0,13.82Z"/></symbol><symbol id="i-tree-structure-fill" viewBox="0 0 256 256"><path d="M144,96V80H128a8,8,0,0,0-8,8v80a8,8,0,0,0,8,8h16V160a16,16,0,0,1,16-16h48a16,16,0,0,1,16,16v48a16,16,0,0,1-16,16H160a16,16,0,0,1-16-16V192H128a24,24,0,0,1-24-24V136H72v8a16,16,0,0,1-16,16H24A16,16,0,0,1,8,144V112A16,16,0,0,1,24,96H56a16,16,0,0,1,16,16v8h32V88a24,24,0,0,1,24-24h16V48a16,16,0,0,1,16-16h48a16,16,0,0,1,16,16V96a16,16,0,0,1-16,16H160A16,16,0,0,1,144,96Z"/></symbol></svg>
+<div style="min-height: 100vh; background: #08090a; display: flex; flex-direction: column; align-items: center; overflow-x: hidden;">
+
+  <div style="position: sticky; top: 0; z-index: 20; width: 100%; height: 56px; display: flex; justify-content: center; background: rgba(8,9,10,.82); backdrop-filter: blur(14px);">
+    <div style="position: absolute; left: 0; right: 0; top: 100%; height: 44px; pointer-events: none; background: linear-gradient(rgba(8,9,10,.82), rgba(8,9,10,.55) 38%, rgba(8,9,10,0)); mask-image: linear-gradient(#000, transparent); -webkit-mask-image: linear-gradient(#000, transparent);"></div>
+    <div style="width: 100%; max-width: 1180px; padding: 0 28px; display: flex; align-items: center; gap: 28px;">
+      <a href="#top" style="display: flex; align-items: center; gap: 10px;">
+        <div style="display: grid; grid-template-columns: repeat(7, 3.5px); grid-template-rows: repeat(5, 3.5px); gap: 1.5px;">
+          <div></div><div></div><div style="background: #737983;"></div><div style="background: #737983;"></div><div style="background: #737983;"></div><div></div><div></div>
+          <div></div><div style="background: #8b919b;"></div><div></div><div></div><div></div><div style="background: #8b919b;"></div><div></div>
+          <div style="background: #8b919b;"></div><div></div><div style="background: #7d76f0; animation: ovrsee-iris 3.2s ease-in-out infinite;"></div><div style="background: #7d76f0; animation: ovrsee-iris 3.2s ease-in-out .12s infinite;"></div><div style="background: #7d76f0; animation: ovrsee-iris 3.2s ease-in-out .24s infinite;"></div><div></div><div style="background: #8b919b;"></div>
+          <div></div><div style="background: #8b919b;"></div><div></div><div></div><div></div><div style="background: #8b919b;"></div><div></div>
+          <div></div><div></div><div style="background: #737983;"></div><div style="background: #737983;"></div><div style="background: #737983;"></div><div></div><div></div>
+        </div>
+        <span style="font-size: 13.5px; font-weight: 600; letter-spacing: -.01em; color: #f2f3f5;">Ovrsee</span>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #737983; border: 1px solid #363841; border-radius: 4px; padding: 1px 5px;" data-version>v1.0.0-beta</span>
+      </a>
+      <div style="flex: 1;"></div>
+      <div style="display: flex; align-items: center; gap: 22px;">
+        <a href="#demo" style="font-size: 12.5px; color: #a2a8b2;" style-hover="color: #f2f3f5;">Démo</a>
+        <a href="#comment" style="font-size: 12.5px; color: #a2a8b2;" style-hover="color: #f2f3f5;">Comment ça marche</a>
+        <a href="#donnees" style="font-size: 12.5px; color: #a2a8b2;" style-hover="color: #f2f3f5;">Données</a>
+        <div style="display: flex; align-items: center; gap: 2px; padding: 2px; border-radius: 6px; background: #131519; border: 1px solid #2b2d35;">
+          <span onClick="{{ pickFr }}" style="{{ frStyle }}">FR</span>
+          <span onClick="{{ pickEn }}" style="{{ enStyle }}">EN</span>
+        </div>
+        <a href="https://github.com/samuelboulery/ovrsee" target="_blank" style="display: flex; align-items: center; gap: 7px; height: 28px; padding: 0 12px; border-radius: 6px; background: #7d76f0; color: #0a0a12; font-size: 12px; font-weight: 500;" style-hover="background: #8b85f4; color: #0a0a12;">
+          <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px;" aria-hidden="true"><use href="#i-github-logo-fill"/></svg>GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="top" style="position: relative; width: 100%; display: flex; justify-content: center; padding: 96px 28px 36px; overflow: hidden;">
+    <div style="position: absolute; z-index: 0; inset: 0; pointer-events: none; background-image: linear-gradient(#101216 1px, transparent 1px), linear-gradient(90deg, #101216 1px, transparent 1px); background-size: 22px 22px, 22px 22px; mask-image: linear-gradient(#000 30%, rgba(0,0,0,.45) 70%, transparent); -webkit-mask-image: linear-gradient(#000 30%, rgba(0,0,0,.45) 70%, transparent);">
+    </div>
+
+    <div style="position: relative; width: 100%; max-width: 1180px; display: flex; flex-direction: column; gap: 34px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983;">Gestion de projet pour Claude Code</span>
+      </div>
+      <h1 style="margin: 0; max-width: 900px; font-size: 68px; line-height: 1.02; font-weight: 600; letter-spacing: -.035em; text-wrap: pretty;">Vibecoder vite,<br><span style="color: #7f858f;">sans perdre le fil du projet.</span></h1>
+      <p style="margin: 0; max-width: 660px; font-size: 15.5px; line-height: 1.65; color: #b6bac1; text-wrap: pretty;">Ovrsee tient le suivi de ce que vous construisez avec Claude&nbsp;Code : les décisions que vous avez approuvées, les commits qui les réalisent, les tickets à faire, l'architecture du site et son évolution. De quoi savoir où vous en êtes quand on code au rythme de l'agent, et quoi faire ensuite.</p>
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <a href="https://github.com/samuelboulery/ovrsee" target="_blank" style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border-radius: 8px; background: #7d76f0; color: #0a0a12; font-size: 13.5px; font-weight: 500;" style-hover="background: #8b85f4; color: #0a0a12;">
+          <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 17px;" aria-hidden="true"><use href="#i-github-logo-fill"/></svg>Aller au dépôt
+        </a>
+        <a href="#demo" style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 8px; background: #191b22; border: 1px solid #363841; color: #d5d8dd; font-size: 13.5px;" style-hover="background: #1f212a; color: #f2f3f5;">
+          <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 17px; color: #a2a8b2;" aria-hidden="true"><use href="#i-cursor-click"/></svg>Explorer l'interface
+        </a>
+        <div style="display: flex; align-items: center; gap: 10px; margin-left: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b7078;">
+          <span>macOS arm64</span><span style="color: #363841;">·</span><span>Windows x64</span><span style="color: #363841;">·</span><span>4 dépendances de prod</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="demo" style="width: 100%; display: flex; justify-content: center; padding: 40px 28px 0;">
+    <div style="width: 100%; max-width: 1180px; display: flex; flex-direction: column; gap: 14px;">
+
+      <div  data-stage-wrap style="{{ stageWrapStyle }}">
+      <div style="{{ stageStyle }}">
+
+        <div style="height: 38px; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 14px; background: #0b0c0e; border-bottom: 1px solid #22242b;">
+          <div style="display: flex; gap: 8px; margin-right: 16px;">
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: #2a2d38;"></div>
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: #2a2d38;"></div>
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: #2a2d38;"></div>
+          </div>
+          <div style="width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px;"><svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px; color: #7f858f;" aria-hidden="true"><use href="#i-sidebar-simple"/></svg></div>
+          <div style="display: flex; align-items: center; gap: 8px; height: 24px; padding: 0 9px; border-radius: 6px; border: 1px solid #2b2d35; background: #191b22;">
+            <span style="width: 5px; height: 5px; border-radius: 2px; background: #7d76f0;"></span>
+            <span style="font-size: 12px; font-weight: 500; color: #f2f3f5;">ovrsee</span>
+            <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 10px; color: #737983;" aria-hidden="true"><use href="#i-caret-down-fill"/></svg>
+          </div>
+          <div style="flex: 1;"></div>
+          <div style="display: flex; align-items: center; gap: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7f858f;">
+            <span style="width: 5px; height: 5px; border-radius: 50%; background: #4cc38a; display: block;"></span>
+            dernier scan · 11 août 2026 · 0ca659f
+          </div>
+        </div>
+
+        <div style="display: flex; height: 782px;">
+
+          <div style="width: 236px; flex: none; display: flex; flex-direction: column; background: #0d0e12; border-right: 1px solid #22242b; padding: 10px 0;">
+            <div style="padding: 0 10px 10px;">
+              <div style="width: 100%; height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 9px; border-radius: 6px; border: 1px solid #2b2d35; background: #191b22; color: #7f858f; font-size: 12px;">
+                <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px;" aria-hidden="true"><use href="#i-magnifying-glass"/></svg>
+                <span style="flex: 1;">Rechercher, aller à…</span>
+                <span style="display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 17px; padding: 0 5px; border-radius: 4px; background: #22242b; font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; font-size: 10.5px; line-height: 1; color: #a2a8b2;">⌘K</span>
+              </div>
+            </div>
+            <div style="padding: 8px 8px 5px 10px; display: flex; align-items: center; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #6b7078;">
+              <span>Vues</span><span>7</span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px; padding: 0 10px;">
+              <div data-for="views" data-as="v" onClick="{{ v.pick }}" style="{{ v.rowStyle }}">
+                  <svg data-icon="{{ v.icon }}" style="width:1em;height:1em;fill:currentColor;flex:none;{{ v.iconStyle }}" aria-hidden="true"><use href=""/></svg>
+                  <span style="{{ v.labelStyle }}">{{ v.label }}</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b7078; flex: none;">{{ v.key }}</span>
+                  <span style="{{ v.badgeStyle }}">{{ v.count }}</span>
+                </div>
+              <div style="height: 31px; padding: 0 8px; display: flex; align-items: center; gap: 10px; border-radius: 6px; color: #6b7078; font-size: 12.5px;">
+                <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 15px; color: #585d66;" aria-hidden="true"><use href="#i-dots-six-vertical"/></svg>Réordonner, masquer…
+              </div>
+            </div>
+            <div style="flex: 1;"></div>
+            <div style="padding: 10px 10px 0; border-top: 1px solid #22242b;">
+              <div style="width: 100%; height: 32px; display: flex; align-items: center; gap: 9px; padding: 0 8px; border-radius: 6px;">
+                <span style="width: 20px; height: 20px; flex: none; border-radius: 6px; background: #363841; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #a2a8b2;">S</span>
+                <span style="flex: 1; font-size: 12.5px; color: #b6bac1;">samuel</span>
+                <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 15px; color: #7f858f;" aria-hidden="true"><use href="#i-gear-six"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+
+            <div style="height: 46px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 1px solid #22242b;">
+              <span style="font-size: 12.5px; color: #7f858f; white-space: nowrap;">ovrsee</span>
+              <span style="font-size: 12.5px; color: #585d66;">/</span>
+              <span style="font-size: 12.5px; font-weight: 500; color: #f2f3f5; white-space: nowrap;">{{ viewTitle }}</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6b7078; white-space: nowrap;">{{ viewMeta }}</span>
+              <div style="flex: 1;"></div>
+
+              <div data-if="isApercu" style="display: flex; align-items: center; gap: 6px;">
+                  <div style="display: flex; align-items: center; height: 27px; border-radius: 6px; border: 1px solid #363841; background: #191b22; overflow: hidden;">
+                    <div style="display: flex; align-items: center; gap: 6px; height: 100%; padding: 0 8px 0 10px; font-size: 12px; color: #b6bac1;">
+                      <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px; color: #6ea8fe;" aria-hidden="true"><use href="#i-code"/></svg>VS Code
+                    </div>
+                    <div style="display: flex; align-items: center; height: 100%; padding: 0 8px; border-left: 1px solid #363841;"><svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 10px; color: #737983;" aria-hidden="true"><use href="#i-caret-down-fill"/></svg></div>
+                  </div>
+                  <div style="display: inline-flex; align-items: center; gap: 6px; height: 27px; padding: 0 11px; border-radius: 6px; background: #191b22; border: 1px solid #363841; color: #d5d8dd; font-size: 12px; font-weight: 500;">
+                    <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px; color: #7f858f;" aria-hidden="true"><use href="#i-folder-open"/></svg>Révéler dans le Finder
+                  </div>
+                  <div style="display: inline-flex; align-items: center; gap: 8px; height: 27px; padding: 0 11px; border-radius: 6px; background: #191b22; border: 1px solid #363841; color: #d5d8dd; font-size: 12px; font-weight: 500;">
+                    Copier le chemin
+                    <span style="display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 17px; padding: 0 5px; border-radius: 4px; background: #22242b; font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; font-size: 10.5px; line-height: 1; color: #a2a8b2;">⌘⇧C</span>
+                  </div>
+                  <div style="width: 27px; height: 27px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #363841; background: #191b22; color: #a2a8b2;"><svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 16px;" aria-hidden="true"><use href="#i-dots-three-fill"/></svg></div>
+                </div>
+
+              <div data-if="isProduit" style="display: flex; align-items: center; gap: 6px;">
+                  <div style="display: inline-flex; align-items: center; gap: 6px; height: 27px; padding: 0 8px; border-radius: 6px; color: #a2a8b2; font-size: 12px; font-weight: 500;">
+                    <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px;" aria-hidden="true"><use href="#i-git-diff"/></svg>Comparer deux dates
+                  </div>
+                  <div style="display: inline-flex; align-items: center; gap: 6px; height: 27px; padding: 0 11px; border-radius: 6px; background: #7d76f0; color: #0a0a12; font-size: 12px; font-weight: 500;">
+                    <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px;" aria-hidden="true"><use href="#i-compass-fill"/></svg>Crawler
+                  </div>
+                </div>
+
+              <div data-if="isHistorique" style="display: inline-flex; align-items: center; gap: 2px; padding: 2px; background: #191b22; border: 1px solid #2b2d35; border-radius: 7px;">
+                  <span style="display: inline-flex; align-items: center; padding: 5px 10px; font-size: 12px; line-height: 1; border-radius: 5px; background: #33363f; color: #f2f3f5;">Par tickets</span>
+                  <span style="display: inline-flex; align-items: center; padding: 5px 10px; font-size: 12px; line-height: 1; border-radius: 5px; color: #a2a8b2;">Par commits</span>
+                </div>
+
+              <div data-if="isTableau" style="display: inline-flex; align-items: center; height: 27px; padding: 5px 11px; border-radius: 6px; font-size: 11.5px; font-weight: 500; color: #a2a8b2;">Éditer les colonnes</div>
+            </div>
+
+            <div style="flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;">
+
+              <div data-if="isApercu" style="flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;">
+                  <div style="flex: none; padding: 22px 24px 18px; border-bottom: 1px solid #22242b;">
+                    <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;">
+                      <h2 style="font-size: 21px; font-weight: 600; letter-spacing: -.015em; margin: 0; color: #f2f3f5;">ovrsee</h2>
+                      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #737983;">~/Code/ovrsee</div>
+                    </div>
+                    <div style="font-size: 13px; color: #a2a8b2; line-height: 1.6; margin-top: 8px; max-width: 720px;">Gestion de projet pour Claude Code : plans approuvés, commits qui les réalisent, tickets à faire — versionnés dans le dépôt.</div>
+                    <div style="display: flex; gap: 10px; margin-top: 18px;">
+                      <div style="flex: 1; border-radius: 8px; padding: 12px 14px; border: 1px solid #2b2d35; background: #131519;">
+                        <div style="font-size: 20px; font-weight: 600; letter-spacing: -.02em; color: #f2f3f5;">7</div>
+                        <div style="font-size: 12px; color: #a2a8b2; margin-top: 3px;">pages</div>
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; margin-top: 2px; color: #737983;">cartographiées</div>
+                      </div>
+                      <div style="flex: 1; border-radius: 8px; padding: 12px 14px; border: 1px solid #2f2a66; background: #14132a;">
+                        <div style="font-size: 20px; font-weight: 600; letter-spacing: -.02em; color: #a49dfa;">43</div>
+                        <div style="font-size: 12px; color: #a2a8b2; margin-top: 3px;">plans</div>
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; margin-top: 2px; color: #8682cf;">dont 9 ouverts</div>
+                      </div>
+                      <div style="flex: 1; border-radius: 8px; padding: 12px 14px; border: 1px solid #2b2d35; background: #131519;">
+                        <div style="font-size: 20px; font-weight: 600; letter-spacing: -.02em; color: #f2f3f5;">12</div>
+                        <div style="font-size: 12px; color: #a2a8b2; margin-top: 3px;">tickets</div>
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; margin-top: 2px; color: #737983;">à faire</div>
+                      </div>
+                      <div style="flex: 1; border-radius: 8px; padding: 12px 14px; border: 1px solid #2b2d35; background: #131519;">
+                        <div style="font-size: 20px; font-weight: 600; letter-spacing: -.02em; color: #f2f3f5;">3</div>
+                        <div style="font-size: 12px; color: #a2a8b2; margin-top: 3px;">dépendances</div>
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; margin-top: 2px; color: #737983;">déclarées</div>
+                      </div>
+                      <div style="flex: 1; border-radius: 8px; padding: 12px 14px; border: 1px solid #2b2d35; background: #131519;">
+                        <div style="font-size: 20px; font-weight: 600; letter-spacing: -.02em; color: #f2f3f5;">il y a 3 h</div>
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; margin-top: 2px; color: #737983;">dernière activité</div>
+                      </div>
+                      <div style="flex: 1; border-radius: 8px; padding: 12px 14px; border: 1px solid #2b2d35; background: #131519;">
+                        <div style="font-size: 20px; font-weight: 600; letter-spacing: -.02em; color: #f2f3f5;">11 août 2026</div>
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; margin-top: 2px; color: #4cc38a;">dernier scan</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="flex: 1; display: flex; min-height: 0;">
+                    <div style="flex: 1; min-width: 0; overflow-y: auto; padding: 18px 22px 32px;">
+                      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983; margin-bottom: 10px;">Santé</div>
+                      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <span style="display: inline-flex; align-items: center; gap: 7px; height: 27px; padding: 0 10px; border-radius: 6px; font-size: 12px; background: #1a1608; border: 1px solid #3a3117; color: #e3b341;"><span style="width: 5px; height: 5px; border-radius: 50%; display: block; background: #e3b341;"></span>3 fichiers modifiés</span>
+                        <span style="display: inline-flex; align-items: center; gap: 7px; height: 27px; padding: 0 10px; border-radius: 6px; font-size: 12px; background: #0b1610; border: 1px solid #1c3728; color: #4cc38a;"><span style="width: 5px; height: 5px; border-radius: 50%; display: block; background: #4cc38a;"></span>tout est poussé</span>
+                        <span style="display: inline-flex; align-items: center; gap: 7px; height: 27px; padding: 0 10px; border-radius: 6px; font-size: 12px; background: #191b22; border: 1px solid #363841; color: #a2a8b2;"><span style="width: 5px; height: 5px; border-radius: 50%; display: block; background: #6b7078;"></span>dernier audit il y a 2 j (ovrsee)</span>
+                      </div>
+
+                      <div style="margin-top: 10px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                          <div style="font-size: 11px; color: #7f858f; flex: 1;">plans ouverts · 9</div>
+                          <div style="font-size: 10.5px; padding: 3px 8px; border-radius: 6px; border: 1px solid #363841; background: #191b22; color: #b6bac1;">Clore le plan actif</div>
+                          <div style="font-size: 10.5px; padding: 3px 8px; border-radius: 6px; border: 1px solid #363841; background: #191b22; color: #b6bac1;">Tout voir</div>
+                        </div>
+                        <div style="border: 1px solid #2b2d35; border-radius: 8px; background: #131519; overflow: hidden;">
+                          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid #22242b;">
+                            <span style="width: 5px; height: 5px; border-radius: 50%; flex: none; background: #7d76f0;"></span>
+                            <span style="flex: 1; font-size: 11.5px; color: #b6bac1;">Barre de vue et barre d'état sur les six onglets</span>
+                            <span style="flex: none; font-size: 9.5px; padding: 1px 6px; border-radius: 4px; color: #a49dfa; background: #14132a; border: 1px solid #2f2a66;">actif</span>
+                            <span style="flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7f858f;">il y a 6 h</span>
+                          </div>
+                          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid #22242b;">
+                            <span style="width: 5px; height: 5px; border-radius: 50%; flex: none; background: #585d66;"></span>
+                            <span style="flex: 1; font-size: 11.5px; color: #b6bac1;">Rampe de gris froide et quatre jetons de filet</span>
+                            <span style="flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7f858f;">il y a 1 j</span>
+                          </div>
+                          <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px;">
+                            <span style="width: 5px; height: 5px; border-radius: 50%; flex: none; background: #585d66;"></span>
+                            <span style="flex: 1; font-size: 11.5px; color: #b6bac1;">Export du coffre Obsidian : wikilinks entre plans et tickets</span>
+                            <span style="flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7f858f;">il y a 3 j</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style="margin-top: 18px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                          <div style="font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #7f858f; margin-bottom: 10px;">Branches</div>
+                          <div style="font-size: 11.5px; padding: 3px 9px; border-radius: 6px; background: #191b22; border: 1px solid #363841; color: #d5d8dd; font-weight: 500;">Rafraîchir</div>
+                        </div>
+                        <div style="font-size: 11px; color: #7f858f; margin-bottom: 8px;">dernier fetch il y a 3 h</div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                          <div style="display: flex; align-items: center; gap: 12px; height: 28px; padding: 0 12px; border-radius: 4px; border: 1px solid #2b2d35; background: #191b22;">
+                            <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px; color: #b6bac1;" aria-hidden="true"><use href="#i-git-branch"/></svg>
+                            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #b6bac1; flex: none; font-weight: 600;">main</span>
+                            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #7f858f; flex: none;">origin/main</span>
+                            <div style="flex: 1;"></div>
+                            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; flex: none; color: #4cc38a;">à jour</span>
+                          </div>
+                          <div style="display: flex; align-items: center; gap: 12px; height: 28px; padding: 0 12px; border-radius: 4px; border: 1px solid #2b2d35; background: #191b22;">
+                            <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px; color: #b6bac1;" aria-hidden="true"><use href="#i-git-branch"/></svg>
+                            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #b6bac1; flex: none;">chantier/statusbar</span>
+                            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #7f858f; flex: none;">pas de remote suivie</span>
+                            <div style="flex: 1;"></div>
+                            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; flex: none; color: #a2a8b2;">2 en avance</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style="margin-top: 18px;">
+                        <div style="font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #7f858f; margin-bottom: 10px;">Comment on le lance</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid #2b2d35; color: #a2a8b2;">pnpm dev</span>
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid #2b2d35; color: #a2a8b2;">pnpm electron</span>
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid #2b2d35; color: #a2a8b2;">pnpm ovrsee:crawl</span>
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid #2b2d35; color: #a2a8b2;">pnpm test</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style="flex: none; width: 320px; overflow-y: auto; border-left: 1px solid #2b2d35; padding: 18px 20px 32px;">
+                      <div style="height: 38px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #22242b;">
+                        <div style="font-size: 12px; font-weight: 500; color: #f2f3f5;">Déploiements</div>
+                        <div style="flex: 1;"></div>
+                        <div style="font-size: 11.5px; color: #7f858f;">Configurer</div>
+                      </div>
+                      <div style="display: flex; flex-direction: column; gap: 8px; padding: 14px 0 0;">
+                        <div style="border: 1px solid #2b2d35; border-radius: 8px; background: #131519; padding: 11px 12px;">
+                          <div style="display: flex; align-items: flex-start; gap: 10px;">
+                            <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; margin-top: 4px; background: #4cc38a;"></span>
+                            <div style="flex: 1; min-width: 0;">
+                              <div style="font-size: 12.5px; color: #f2f3f5;">ovrsee · vercel</div>
+                              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #737983; margin-top: 2px;">en ligne · 2 déploiements</div>
+                            </div>
+                            <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px; color: #7f858f; flex: none;" aria-hidden="true"><use href="#i-arrow-up-right"/></svg>
+                          </div>
+                          <div style="margin-top: 6px;">
+                            <div style="display: flex; align-items: center; gap: 6px; padding: 4px 6px; margin: 0 -6px; border-top: 1px solid #2b2d35; border-radius: 4px;">
+                              <span style="width: 6px; height: 6px; border-radius: 50%; flex: none; background: #4cc38a;"></span>
+                              <span style="display: inline-flex; align-items: center; font-size: 9.5px; padding: 1px 7px; border-radius: 4px; color: #a49dfa; background: #14132a; border: 1px solid #2f2a66;">Production</span>
+                              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #8b919b;">0ca659f</span>
+                              <span style="font-size: 10.5px; color: #8b919b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">main</span>
+                              <span style="margin-left: auto; font-size: 10.5px; color: #7f858f; flex: none;">il y a 3 h</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px; padding: 4px 6px; margin: 0 -6px; border-top: 1px solid #2b2d35; border-radius: 4px;">
+                              <span style="width: 6px; height: 6px; border-radius: 50%; flex: none; background: #a2a8b2;"></span>
+                              <span style="display: inline-flex; align-items: center; font-size: 9.5px; padding: 1px 7px; border-radius: 4px; background: transparent; color: #a2a8b2; border: 1px solid #363841;">Preview</span>
+                              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #8b919b;">3f21a8e</span>
+                              <span style="font-size: 10.5px; color: #8b919b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">chantier/statusbar</span>
+                              <span style="margin-left: auto; font-size: 10.5px; color: #7f858f; flex: none;">il y a 1 j</span>
+                            </div>
+                          </div>
+                          <div style="display: inline-flex; font-size: 10.5px; padding: 3px 8px; margin-top: 8px; border-radius: 6px; border: 1px solid #363841; background: #191b22; color: #b6bac1;">Vérifier</div>
+                        </div>
+                      </div>
+                      <div style="height: 1px; background: #22242b; margin: 18px 0;"></div>
+                      <div style="height: 38px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #22242b;">
+                        <div style="font-size: 12px; font-weight: 500; color: #f2f3f5;">README.md</div>
+                        <div style="flex: 1;"></div>
+                        <div style="font-size: 11.5px; color: #7f858f;">Afficher</div>
+                      </div>
+                      <div style="padding-top: 14px; display: flex; flex-direction: column; gap: 6px;">
+                        <div style="font-size: 12.5px; color: #b6bac1;">Ce qu'on y voit</div>
+                        <div style="font-size: 12.5px; color: #7f858f; padding-left: 12px;">En images</div>
+                        <div style="font-size: 12.5px; color: #7f858f; padding-left: 12px;">Premier lancement</div>
+                        <div style="font-size: 12.5px; color: #7f858f; padding-left: 12px;">Mise en route : trois commandes</div>
+                        <div style="font-size: 12.5px; color: #7f858f; padding-left: 12px;">Skills Claude Code</div>
+                        <div style="font-size: 12.5px; color: #7f858f; padding-left: 12px;">Serveur MCP</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              <div data-if="isHistorique" style="flex: 1; display: flex; min-width: 0; min-height: 0;">
+                  <div style="flex: 1; min-width: 0; padding: 20px 22px; overflow: auto;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin: 0 0 8px;">
+                      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #737983;">11 août 2026</div>
+                      <div style="flex: 1; height: 1px; background: #22242b;"></div>
+                    </div>
+
+                    <div style="border-left: 2px solid #2f2a66; padding: 8px 0 8px 14px; margin: 6px 0 6px 1px;">
+                      <div style="display: flex; align-items: baseline; gap: 9px;">
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983;">Plan</span>
+                        <span style="font-size: 13px; font-weight: 500; color: #f2f3f5;">Barre de vue et barre d'état sur les six onglets</span>
+                        <span style="flex: 1;"></span>
+                        <span style="font-size: 9.5px; padding: 1px 6px; border-radius: 4px; color: #a49dfa; background: #14132a; border: 1px solid #2f2a66; flex: none;">actif</span>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7f858f; flex: none;">3 tickets</span>
+                        <span style="font-size: 10.5px; color: #7f858f; flex: none;">▸</span>
+                      </div>
+                      <div style="margin-top: 6px;">
+                        <div style="display: flex; align-items: center; gap: 9px; width: 100%; margin: 3px 0; padding: 10px 11px; border-radius: 8px; border: 1px solid #363841; background: #0d0e12;">
+                          <span style="width: 5px; height: 5px; border-radius: 50%; flex: none; background: #e5677a;"></span>
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7f858f; flex: none;">T-0118</span>
+                          <span style="font-size: 12.5px; color: #c2c6cd;">Créer ViewBar et la câbler sur les six vues</span>
+                          <span style="flex: 1;"></span>
+                          <span style="display: inline-flex; align-items: center; font-size: 10px; padding: 1px 6px; border-radius: 4px; background: transparent; color: #a2a8b2; border: 1px solid #363841; flex: none;">châssis</span>
+                          <span style="display: inline-flex; align-items: center; font-size: 10px; padding: 1px 6px; border-radius: 4px; border: 1px solid #7d76f0; color: #7d76f0; flex: none;">en-cours</span>
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7f858f; flex: none;">il y a 4 h</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 9px; width: 100%; margin: 3px 0; padding: 10px 11px; border-radius: 8px; border: 1px solid #2b2d35; background: #131519;">
+                          <span style="width: 5px; height: 5px; border-radius: 50%; flex: none; background: #e3b341;"></span>
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7f858f; flex: none;">T-0111</span>
+                          <span style="font-size: 12.5px; color: #c2c6cd;">Barre d'état : deux faits par vue, ⌘K en dernier</span>
+                          <span style="flex: 1;"></span>
+                          <span style="display: inline-flex; align-items: center; font-size: 10px; padding: 1px 6px; border-radius: 4px; border: 1px solid #7d76f0; color: #7d76f0; flex: none;">fait</span>
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7f858f; flex: none;">il y a 6 h</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style="border-left: 2px solid #33363f; padding: 8px 0 8px 14px; margin: 6px 0 6px 1px;">
+                      <div style="display: flex; align-items: baseline; gap: 9px;">
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983;">Plan</span>
+                        <span style="font-size: 13px; font-weight: 500; color: #f2f3f5;">Rampe de gris froide et quatre jetons de filet</span>
+                        <span style="flex: 1;"></span>
+                        <span style="display: inline-flex; align-items: center; font-size: 10px; padding: 1px 6px; border-radius: 4px; color: #a2a8b2; border: 1px solid #363841; flex: none;">clos par 3f21a8e</span>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7f858f; flex: none;">5 commits</span>
+                        <span style="font-size: 10.5px; color: #7f858f; flex: none;">▸</span>
+                      </div>
+                      <div style="margin-top: 6px;">
+                        <div style="display: flex; align-items: baseline; gap: 10px; padding: 4px 0;">
+                          <span style="width: 5px; height: 5px; border-radius: 50%; background: #7f858f; flex: none; align-self: center;"></span>
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6ea8fe; flex: none;">3f21a8e</span>
+                          <span style="font-size: 12.5px; color: #c2c6cd;">ds : jetons de filet, .kicker, switch 28×16</span>
+                          <span style="flex: 1;"></span>
+                          <span style="font-size: 10.5px; color: #7f858f; flex: none;">11:31</span>
+                        </div>
+                        <div style="display: flex; align-items: baseline; gap: 10px; padding: 4px 0;">
+                          <span style="width: 5px; height: 5px; border-radius: 50%; background: #7f858f; flex: none; align-self: center;"></span>
+                          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6ea8fe;">a04c1de</span>
+                          <span style="font-size: 12.5px; color: #c2c6cd;">ds : migrer les usages de --color-neutral-*</span>
+                          <span style="flex: 1;"></span>
+                          <span style="font-size: 10.5px; color: #7f858f; flex: none;">10:04</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style="display: flex; align-items: baseline; gap: 10px; padding: 4px 0; margin-top: 10px;">
+                      <span style="width: 5px; height: 5px; border-radius: 50%; background: #7f858f; flex: none; align-self: center;"></span>
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #6ea8fe; flex: none;">b71c204</span>
+                      <span style="font-size: 12.5px; color: #c2c6cd;">fix : bit d'exécution de spawn-helper au postinstall</span>
+                      <span style="flex: 1;"></span>
+                      <span style="font-size: 10.5px; color: #7f858f; flex: none;">09:12</span>
+                    </div>
+                  </div>
+
+                  <div style="width: 300px; flex: none; border-left: 1px solid #2b2d35; background: #0d0e12; padding: 16px 14px; display: flex; flex-direction: column; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <div style="font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #7f858f; flex: 1;">Activité</div>
+                      <div style="display: flex; gap: 2px; padding: 2px; border-radius: 6px; background: #191b22; border: 1px solid #2b2d35;">
+                        <span style="font-size: 10.5px; padding: 2px 7px; border-radius: 4px; background: #2a2d38; color: #f2f3f5;">14 j</span>
+                        <span style="font-size: 10.5px; padding: 2px 7px; border-radius: 4px; color: #8b919b;">12 s</span>
+                        <span style="font-size: 10.5px; padding: 2px 7px; border-radius: 4px; color: #8b919b;">type</span>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 4px; align-items: flex-end; height: 88px;">
+                      <div data-for="bars" data-as="b" style="flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; gap: 1px;">
+                          <div style="{{ b.commits }}"></div>
+                          <div style="{{ b.tickets }}"></div>
+                          <div style="{{ b.plans }}"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 16px; font-size: 10px; color: #8b919b; font-family: 'IBM Plex Mono', monospace;">
+                      <div style="display: flex; align-items: center; gap: 5px;"><span style="width: 7px; height: 7px; border-radius: 2px; background: #7d76f0; display: block;"></span>Plan</div>
+                      <div style="display: flex; align-items: center; gap: 5px;"><span style="width: 7px; height: 7px; border-radius: 2px; background: #4c46b4; display: block;"></span>Ticket</div>
+                      <div style="display: flex; align-items: center; gap: 5px;"><span style="width: 7px; height: 7px; border-radius: 2px; background: #3a3c47; display: block;"></span>Commits</div>
+                    </div>
+                    <div style="height: 1px; background: #2b2d35;"></div>
+                    <div style="font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #7f858f;">Filtrer</div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                      <div style="display: flex; align-items: center; gap: 9px;">
+                        <span style="flex: none; width: 28px; height: 16px; border-radius: 999px; padding: 2px; display: flex; align-items: center; justify-content: flex-end; background: #7d76f0;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #08090a; display: block;"></span></span>
+                        <span style="font-size: 12.5px; color: #f2f3f5;">Plans</span>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 9px;">
+                        <span style="flex: none; width: 28px; height: 16px; border-radius: 999px; padding: 2px; display: flex; align-items: center; justify-content: flex-end; background: #7d76f0;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #08090a; display: block;"></span></span>
+                        <span style="font-size: 12.5px; color: #f2f3f5;">Tickets</span>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 9px;">
+                        <span style="flex: none; width: 28px; height: 16px; border-radius: 999px; padding: 2px; display: flex; align-items: center; justify-content: flex-start; background: #585d66;"><span style="width: 12px; height: 12px; border-radius: 50%; background: #08090a; display: block;"></span></span>
+                        <span style="font-size: 12.5px; color: #8b919b;">Commits hors plan</span>
+                      </div>
+                    </div>
+                    <div style="height: 1px; background: #2b2d35;"></div>
+                    <div>
+                      <div style="font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #7f858f; margin-bottom: 8px;">Plans rejetés · 4</div>
+                      <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <div style="font-size: 11.5px; color: #a2a8b2;">Thème clair dérivé du sombre</div>
+                        <div style="font-size: 11.5px; color: #a2a8b2;">Barre d'onglets horizontale</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              <div data-if="isTableau" style="flex: 1; display: flex; flex-direction: column; min-height: 0;">
+                  <div style="padding: 12px 22px 12px;">
+                    <div style="font-size: 12px; color: #7f858f;">Un fichier par ticket dans ovrsee/tickets/, colonnes réglées dans ovrsee/board.json. Écrit ici comme depuis le terminal.</div>
+                  </div>
+                  <div style="flex: 1; display: flex; gap: 12px; padding: 0 22px 20px; overflow-x: auto; align-items: stretch;">
+
+                    <div style="width: 268px; min-width: 268px; display: flex; flex-direction: column; gap: 8px; border-radius: 8px; padding: 10px; background: #0d0e12;">
+                      <div style="display: flex; align-items: center; gap: 6px; padding: 0 2px;">
+                        <div style="font-size: 12.5px; font-weight: 500; color: #f2f3f5;">Prêt</div>
+                        <div style="font-size: 11px; color: #7f858f;">18</div>
+                        <div style="flex: 1;"></div>
+                        <div style="font-size: 14px; line-height: 1; color: #a2a8b2;">+</div>
+                      </div>
+                      <div style="border: 1px solid #2b2d35; border-radius: 8px; padding: 10px 11px; background: #131519;">
+                        <div style="display: flex; align-items: center; gap: 7px;">
+                          <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: #e3b341;"></span>
+                          <span style="font-size: 9px; color: #8b919b; text-transform: uppercase; letter-spacing: .02em; flex: none;">M</span>
+                          <span style="display: inline-flex; align-items: center; font-size: 9px; padding: 2px 6px; border-radius: 4px; border: 1px solid #7d76f0; color: #7d76f0;">epic</span>
+                          <div style="font-size: 10px; color: #7f858f;">T-0125</div>
+                          <div style="flex: 1;"></div>
+                          <div style="font-size: 10px; color: #7f858f;">il y a 2 j</div>
+                        </div>
+                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">Refonte du châssis de l'application</div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 11px;">
+                          <div style="flex: 1; height: 4px; border-radius: 2px; background: #585d66; overflow: hidden;"><div style="height: 100%; background: #857ef1; width: 40%;"></div></div>
+                          <span style="color: #7f858f;">2/5</span>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;">
+                          <span style="display: inline-flex; align-items: center; font-size: 10px; padding: 1px 6px; border-radius: 4px; color: #a2a8b2; border: 1px solid #363841;">châssis</span>
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-top: 8px;">
+                          <div style="font-size: 10px; padding: 3px 6px; flex: 1; text-align: center; border-radius: 6px; color: #a2a8b2;">Voir les 3 enfants</div>
+                        </div>
+                      </div>
+                      <div style="border: 1px solid #2b2d35; border-radius: 8px; padding: 10px 11px; background: #131519;">
+                        <div style="display: flex; align-items: center; gap: 7px;">
+                          <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: #585d66;"></span>
+                          <div style="font-size: 10px; color: #7f858f;">T-0131</div>
+                          <div style="flex: 1;"></div>
+                          <div style="font-size: 10px; color: #7f858f;">il y a 5 h</div>
+                        </div>
+                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">Régénérer docs/screenshots/</div>
+                      </div>
+                    </div>
+
+                    <div style="width: 268px; min-width: 268px; display: flex; flex-direction: column; gap: 8px; border-radius: 8px; padding: 10px; background: #0d0e12;">
+                      <div style="display: flex; align-items: center; gap: 6px; padding: 0 2px;">
+                        <div style="font-size: 12.5px; font-weight: 500; color: #f2f3f5;">En cours</div>
+                        <div style="font-size: 11px; color: #7f858f;">3</div>
+                        <div style="flex: 1;"></div>
+                        <div style="font-size: 10.5px; color: #7d76f0;">⚠ 3/2</div>
+                        <div style="font-size: 14px; line-height: 1; color: #a2a8b2;">+</div>
+                      </div>
+                      <div style="border: 1px solid #2b2d35; border-radius: 8px; padding: 10px 11px; background: #131519;">
+                        <div style="display: flex; align-items: center; gap: 7px;">
+                          <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: #e5677a;"></span>
+                          <span style="font-size: 9px; color: #8b919b; text-transform: uppercase; letter-spacing: .02em; flex: none;">L</span>
+                          <div style="font-size: 10px; color: #7f858f;">T-0118</div>
+                          <div style="flex: 1;"></div>
+                          <div style="font-size: 10px; color: #7f858f;">il y a 4 h</div>
+                        </div>
+                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">Créer ViewBar et la câbler sur les six vues</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;">
+                          <span style="display: inline-flex; align-items: center; font-size: 10px; padding: 1px 6px; border-radius: 4px; color: #a2a8b2; border: 1px solid #363841;">châssis</span>
+                          <span style="display: inline-flex; align-items: center; font-size: 10px; padding: 1px 6px; border-radius: 4px; border: 1px solid #7d76f0; color: #7d76f0;">plan</span>
+                          <span style="display: inline-flex; align-items: center; font-size: 10px; padding: 1px 6px; border-radius: 4px; border: 1px solid #7d76f0; color: #7d76f0;">enfant de T-0125</span>
+                        </div>
+                      </div>
+                      <div style="border: 1px solid #2b2d35; border-radius: 8px; padding: 10px 11px; background: #131519;">
+                        <div style="display: flex; align-items: center; gap: 7px;">
+                          <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: #e3b341;"></span>
+                          <div style="font-size: 10px; color: #7f858f;">T-0119</div>
+                          <div style="flex: 1;"></div>
+                          <div style="font-size: 10px; color: #7f858f;">il y a 1 j</div>
+                        </div>
+                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">Puce de projet dans la barre de titre</div>
+                      </div>
+                    </div>
+
+                    <div style="width: 268px; min-width: 268px; display: flex; flex-direction: column; gap: 8px; border-radius: 8px; padding: 10px; background: #0d0e12;">
+                      <div style="display: flex; align-items: center; gap: 6px; padding: 0 2px;">
+                        <div style="font-size: 12.5px; font-weight: 500; color: #f2f3f5;">Revue</div>
+                        <div style="font-size: 11px; color: #7f858f;">5</div>
+                        <div style="flex: 1;"></div>
+                        <div style="font-size: 14px; line-height: 1; color: #a2a8b2;">+</div>
+                      </div>
+                      <div style="border: 1px solid #2b2d35; border-radius: 8px; padding: 10px 11px; background: #131519;">
+                        <div style="display: flex; align-items: center; gap: 7px;">
+                          <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: #e3b341;"></span>
+                          <div style="font-size: 10px; color: #7f858f;">T-0112</div>
+                          <div style="flex: 1;"></div>
+                          <div style="font-size: 10px; color: #7f858f;">il y a 3 j</div>
+                        </div>
+                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">Serveur MCP : écriture limitée aux tickets</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;">
+                          <span style="display: inline-flex; align-items: center; font-size: 10px; padding: 1px 6px; border-radius: 4px; color: #a2a8b2; border: 1px solid #363841;">mcp</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style="width: 268px; min-width: 268px; display: flex; flex-direction: column; gap: 8px; border-radius: 8px; padding: 10px; background: #0d0e12;">
+                      <div style="display: flex; align-items: center; gap: 6px; padding: 0 2px;">
+                        <div style="font-size: 12.5px; font-weight: 500; color: #f2f3f5;">Fait</div>
+                        <div style="font-size: 11px; color: #7f858f;">17</div>
+                        <div style="flex: 1;"></div>
+                        <div style="font-size: 14px; line-height: 1; color: #a2a8b2;">+</div>
+                      </div>
+                      <div style="border: 1px solid #2b2d35; border-radius: 8px; padding: 10px 11px; background: #131519;">
+                        <div style="display: flex; align-items: center; gap: 7px;">
+                          <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: #585d66;"></span>
+                          <div style="font-size: 10px; color: #7f858f;">T-0111</div>
+                          <div style="flex: 1;"></div>
+                          <div style="font-size: 10px; color: #7f858f;">il y a 6 h</div>
+                        </div>
+                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">Barre d'état : deux faits par vue, ⌘K en dernier</div>
+                      </div>
+                      <div style="border: 1px solid #2b2d35; border-radius: 8px; padding: 10px 11px; background: #131519;">
+                        <div style="display: flex; align-items: center; gap: 7px;">
+                          <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: #585d66;"></span>
+                          <div style="font-size: 10px; color: #7f858f;">T-0108</div>
+                          <div style="flex: 1;"></div>
+                          <div style="font-size: 10px; color: #7f858f;">il y a 2 j</div>
+                        </div>
+                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">Hook post-commit : rattacher au plan actif</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              <div data-if="isProduit" style="flex: 1; display: flex; min-width: 0; min-height: 0;">
+                  <div style="flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;">
+                    <div style="flex: none; padding: 12px 22px 0;">
+                      <div style="display: flex; gap: 16px; margin: 8px 0 16px; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #7f858f;">
+                        <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 20px; height: 1px; background: #7d76f0; display: block;"></span>mène à</span>
+                        <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 7px; height: 7px; border-radius: 50%; background: #7d76f0; display: block;"></span>entrée de l'app</span>
+                      </div>
+                    </div>
+                    <div style="flex: 1; position: relative; overflow: hidden; min-height: 0; background: #08090a radial-gradient(#2b2d35 1px, transparent 1px) 0 0 / 22px 22px;">
+                      <div style="position: absolute; left: 50%; top: 0; width: 780px; height: 500px; margin-left: -390px;">
+                        <svg viewBox="0 0 780 500" style="position: absolute; inset: 0; width: 780px; height: 500px;">
+                          <path d="M390 232 L390 254 L170 254 L170 276" stroke="#7d76f0" stroke-width="1" fill="none" opacity=".55"></path>
+                          <path d="M390 232 L390 254 L610 254 L610 276" stroke="#7d76f0" stroke-width="1" fill="none" opacity=".55"></path>
+                        </svg>
+                        <div style="position: absolute; left: 280px; top: 22px; width: 220px; height: 210px; overflow: hidden; display: flex; flex-direction: column; padding: 11px 13px; border-radius: 8px; background: #131519; border: 1px solid #2b2d35;">
+                          <div style="display: flex; align-items: center; gap: 7px;">
+                            <span style="width: 7px; height: 7px; border-radius: 50%; background: #7d76f0; display: block; flex: none;"></span>
+                            <span style="font-size: 13.5px; font-weight: 500; color: #f2f3f5;">Aperçu</span>
+                          </div>
+                          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #737983; margin-top: 3px;">/</div>
+                          <div style="width: 100%; aspect-ratio: 16/10; border-radius: 6px; border: 1px solid #2b2d35; margin-top: 9px; background-image: repeating-linear-gradient(135deg, #191b22 0 10px, #131519 10px 20px);"></div>
+                          <div style="flex: 1;"></div>
+                          <div style="display: flex; gap: 8px; margin-top: 9px; font-size: 10px; color: #7f858f;"><span>6 plans</span><span style="flex: 1;"></span><span>11 août</span></div>
+                        </div>
+                        <div style="position: absolute; left: 60px; top: 276px; width: 220px; height: 210px; overflow: hidden; display: flex; flex-direction: column; padding: 11px 13px; border-radius: 8px; background: #131519; border: 1px solid #2b2d35;">
+                          <div style="font-size: 13.5px; font-weight: 500; color: #f2f3f5;">Historique</div>
+                          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #737983; margin-top: 3px;">/historique</div>
+                          <div style="width: 100%; aspect-ratio: 16/10; border-radius: 6px; border: 1px solid #2b2d35; margin-top: 9px; background-image: repeating-linear-gradient(135deg, #191b22 0 10px, #131519 10px 20px);"></div>
+                          <div style="flex: 1;"></div>
+                          <div style="display: flex; gap: 8px; margin-top: 9px; font-size: 10px; color: #7f858f;"><span>11 plans</span><span style="flex: 1;"></span><span>11 août</span></div>
+                        </div>
+                        <div style="position: absolute; left: 500px; top: 276px; width: 220px; height: 210px; overflow: hidden; display: flex; flex-direction: column; padding: 11px 13px; border-radius: 8px; background: #24262f; border: 1px solid #4d5060; box-shadow: 0 0 0 4px rgba(255,255,255,.075);">
+                          <div style="font-size: 13.5px; font-weight: 500; color: #f2f3f5;">Tableau</div>
+                          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #737983; margin-top: 3px;">/tableau</div>
+                          <div style="width: 100%; aspect-ratio: 16/10; border-radius: 6px; border: 1px dashed #363841; margin-top: 9px; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #7f858f;">capture en échec</div>
+                          <div style="flex: 1;"></div>
+                          <div style="display: flex; gap: 8px; margin-top: 9px; font-size: 10px; color: #7f858f;"><span>9 plans</span><span style="flex: 1;"></span><span>09 août</span></div>
+                        </div>
+                      </div>
+                      <div style="position: absolute; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 3px; padding: 3px; border-radius: 8px; border: 1px solid #2b2d35; background: #0d0e12;">
+                        <div style="width: 24px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: #b6bac1;"><svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 13px;" aria-hidden="true"><use href="#i-minus"/></svg></div>
+                        <div style="min-width: 40px; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #b6bac1;">92 %</div>
+                        <div style="width: 24px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: #b6bac1;"><svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 13px;" aria-hidden="true"><use href="#i-plus"/></svg></div>
+                        <div style="width: 1px; height: 14px; background: #2b2d35;"></div>
+                        <div style="width: 24px; height: 22px; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: #b6bac1;"><svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 13px;" aria-hidden="true"><use href="#i-arrows-out-simple"/></svg></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="width: 320px; flex: none; border-left: 1px solid #2b2d35; background: #0d0e12; padding: 20px; overflow: hidden;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <div style="font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #7f858f;">Détail de la page</div>
+                      <div style="flex: 1;"></div>
+                      <div style="font-size: 11px; padding: 3px 9px; color: #a2a8b2;">Fermer</div>
+                    </div>
+                    <div style="font-size: 17px; margin-top: 8px; color: #f2f3f5;">Tableau</div>
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7d76f0; margin-top: 3px;">/tableau</div>
+                    <div style="font-size: 12px; color: #a2a8b2; margin-top: 9px; line-height: 1.5;">Un fichier par ticket dans ovrsee/tickets/, colonnes réglées dans ovrsee/board.json. Les epics affichent leur avancement.</div>
+                    <div style="display: inline-flex; align-items: center; justify-content: center; width: 100%; height: 27px; margin-top: 10px; border-radius: 6px; background: #191b22; border: 1px solid #363841; color: #d5d8dd; font-size: 11px; font-weight: 500;">Ouvrir dans le Navigateur</div>
+                    <div style="height: 1px; background: #22242b; margin: 18px 0;"></div>
+                    <div style="font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #7f858f; margin-bottom: 10px;">Captures précédentes</div>
+                    <div style="display: flex; gap: 6px;">
+                      <div style="width: 62px; height: 40px; border-radius: 6px; border: 1px solid #2b2d35; background-image: repeating-linear-gradient(135deg, #191b22 0 6px, #131519 6px 12px);"></div>
+                      <div style="width: 62px; height: 40px; border-radius: 6px; border: 1px solid #2b2d35; background-image: repeating-linear-gradient(135deg, #191b22 0 6px, #131519 6px 12px);"></div>
+                      <div style="width: 62px; height: 40px; border-radius: 6px; border: 1px solid #2b2d35; background-image: repeating-linear-gradient(135deg, #191b22 0 6px, #131519 6px 12px);"></div>
+                      <div style="width: 62px; height: 40px; border-radius: 6px; border: 1px solid #2b2d35; background-image: repeating-linear-gradient(135deg, #191b22 0 6px, #131519 6px 12px);"></div>
+                    </div>
+                  </div>
+                </div>
+
+            </div>
+
+            <div style="height: 32px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-top: 1px solid #22242b; background: #0b0c0e;">
+              <span style="font-size: 11px; color: #7f858f;">Terminal · claude</span>
+              <span style="font-size: 10.5px; color: #7f858f;">réduit — la session tourne toujours</span>
+            </div>
+
+            <div style="height: 26px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px; border-top: 1px solid #22242b; background: #0b0c0e; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #737983;">
+              <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
+                <span data-if="isApercu" style="width: 5px; height: 5px; border-radius: 50%; background: #e3b341; flex: none;"></span>
+                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ statusLeft }}</span>
+              </div>
+              <div style="flex: 1;"></div>
+              <div style="display: flex; align-items: center; gap: 8px; flex: none;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #737983;">{{ statusRight }}</span>
+                <span style="color: #585d66;">|</span>
+                <span style="font-family: -apple-system, 'SF Pro Text', ui-sans-serif, system-ui, sans-serif; font-size: 10.5px; color: #a2a8b2;">⌘K</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; padding: 0 4px;">
+        <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 13px; color: #6b7078;" aria-hidden="true"><use href="#i-cursor-click"/></svg>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b7078;">démo interactive, rendue avec le code de l'app : cliquez une vue dans la colonne de gauche</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="width: 100%; display: flex; justify-content: center; padding: 116px 28px;">
+    <div data-reveal="1" style="width: 100%; max-width: 1180px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #22242b; border: 1px solid #22242b; border-radius: 12px; overflow: hidden;">
+      <div style="background: #08090a; padding: 26px 24px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983;">Principe 01</span>
+        <span style="font-size: 17px; font-weight: 500; letter-spacing: -.01em;">Un plan, ses commits, ses tickets.</span>
+        <span style="font-size: 13px; line-height: 1.6; color: #a2a8b2;">Chaque décision approuvée dans Claude Code devient une ligne de projet : ce qui a été décidé, ce qui l'a exécuté, ce qui reste ouvert.</span>
+      </div>
+      <div style="background: #08090a; padding: 26px 24px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983;">Principe 02</span>
+        <span style="font-size: 17px; font-weight: 500; letter-spacing: -.01em;">Le projet vit dans le dépôt.</span>
+        <span style="font-size: 13px; line-height: 1.6; color: #a2a8b2;">Backlog, historique et captures sous <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #b6bac1;">&lt;repo&gt;/ovrsee/</span>, versionnés par git. Pas d'outil à tenir à jour en parallèle du code.</span>
+      </div>
+      <div style="background: #08090a; padding: 26px 24px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983;">Principe 03</span>
+        <span style="font-size: 17px; font-weight: 500; letter-spacing: -.01em;">Claude Code y lit et y écrit.</span>
+        <span style="font-size: 13px; line-height: 1.6; color: #a2a8b2;">Serveur MCP et deux skills : l'agent connaît votre backlog, ouvre et déplace les tickets. Vous restez maître du plan.</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="comment" style="width: 100%; display: flex; justify-content: center; padding: 0 28px 116px;">
+    <div data-reveal="1" style="width: 100%; max-width: 1180px; display: flex; flex-direction: column; gap: 36px;">
+      <div style="display: flex; align-items: flex-end; gap: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983;">Comment ça marche</span>
+          <h2 style="margin: 0; font-size: 38px; font-weight: 600; letter-spacing: -.028em; max-width: 620px; line-height: 1.1;">Trois commandes, et le projet se tient à jour tout seul.</h2>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+        <div style="border-radius: 12px; border: 1px solid #2b2d35; background: #131519; padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 9px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b7078;">01</span>
+            <span style="font-size: 13px; font-weight: 500;">Installer, une fois par projet</span>
+          </div>
+          <div style="border-radius: 8px; background: #191b22; border: 1px solid #363841; padding: 11px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #d5d8dd; overflow-x: auto;"><span style="color: #737983;">$ </span>pnpm ovrsee:install ./mon-projet</div>
+          <span style="font-size: 12.5px; line-height: 1.6; color: #a2a8b2;">Pose les hooks Claude Code et le hook post-commit. Rien d'autre à configurer.</span>
+        </div>
+        <div style="border-radius: 12px; border: 1px solid #2b2d35; background: #131519; padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 9px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b7078;">02</span>
+            <span style="font-size: 13px; font-weight: 500;">Cartographier l'application</span>
+          </div>
+          <div style="border-radius: 8px; background: #191b22; border: 1px solid #363841; padding: 11px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #d5d8dd; overflow-x: auto;"><span style="color: #737983;">$ </span>pnpm ovrsee:crawl ./mon-projet</div>
+          <span style="font-size: 12.5px; line-height: 1.6; color: #a2a8b2;">Playwright parcourt vos routes et photographie chaque écran, daté et rattaché au commit.</span>
+        </div>
+        <div style="border-radius: 12px; border: 1px solid #2b2d35; background: #131519; padding: 20px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 9px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b7078;">03</span>
+            <span style="font-size: 13px; font-weight: 500;">Lire</span>
+          </div>
+          <div style="border-radius: 8px; background: #191b22; border: 1px solid #363841; padding: 11px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #d5d8dd; overflow-x: auto;"><span style="color: #737983;">$ </span>pnpm electron</div>
+          <span style="font-size: 12.5px; line-height: 1.6; color: #a2a8b2;">L'application avec son terminal intégré, ou <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #b6bac1;">pnpm dev</span> dans un navigateur, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #b6bac1;">ovrsee:brief</span> en texte.</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-radius: 10px; background: #14132a; border: 1px solid #2f2a66;">
+        <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 15px; color: #a49dfa;" aria-hidden="true"><use href="#i-lightning-fill"/></svg>
+        <span style="font-size: 13px; color: #b6bac1; line-height: 1.55;">Ensuite, c'est automatique : chaque plan approuvé dans Claude Code est capturé dans <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #d5d8dd;">ovrsee/plans/</span>, et le hook post-commit rattache chaque commit au plan actif.</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="width: 100%; display: flex; justify-content: center; padding: 0 28px 116px;">
+    <div data-reveal="1" style="width: 100%; max-width: 1180px; display: flex; flex-direction: column; gap: 28px;">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983;">Sept vues</span>
+        <h2 style="margin: 0; font-size: 38px; font-weight: 600; letter-spacing: -.028em; max-width: 700px; line-height: 1.1;">Savoir où vous en êtes, sans ouvrir un seul fichier.</h2>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+        <div style="border-radius: 12px; border: 1px solid #2b2d35; background: #131519; padding: 20px; display: flex; flex-direction: column; gap: 10px;" style-hover="border-color: #363841; background: #191b22;">
+          <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 17px; color: #7d76f0;" aria-hidden="true"><use href="#i-squares-four"/></svg>
+          <span style="font-size: 13.5px; font-weight: 500;">Aperçu</span>
+          <span style="font-size: 12.5px; line-height: 1.6; color: #a2a8b2;">Où en est le projet, en un écran : plans ouverts, tickets à faire, santé du dépôt, branches, déploiements.</span>
+        </div>
+        <div style="border-radius: 12px; border: 1px solid #2b2d35; background: #131519; padding: 20px; display: flex; flex-direction: column; gap: 10px;" style-hover="border-color: #363841; background: #191b22;">
+          <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 17px; color: #7d76f0;" aria-hidden="true"><use href="#i-browser"/></svg>
+          <span style="font-size: 13.5px; font-weight: 500;">Navigateur</span>
+          <span style="font-size: 12.5px; line-height: 1.6; color: #a2a8b2;">Votre app, ses DevTools et un sélecteur d'élément dans la fenêtre. Le sélecteur se colle directement dans Claude.</span>
+        </div>
+        <div style="border-radius: 12px; border: 1px solid #2b2d35; background: #131519; padding: 20px; display: flex; flex-direction: column; gap: 10px;" style-hover="border-color: #363841; background: #191b22;">
+          <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 17px; color: #7d76f0;" aria-hidden="true"><use href="#i-tree-structure"/></svg>
+          <span style="font-size: 13.5px; font-weight: 500;">Produit</span>
+          <span style="font-size: 12.5px; line-height: 1.6; color: #a2a8b2;">Le graphe des pages crawlées, miniatures à l'appui. Deux dates se comparent : ce qui a changé se voit.</span>
+        </div>
+        <div style="border-radius: 12px; border: 1px solid #2b2d35; background: #131519; padding: 20px; display: flex; flex-direction: column; gap: 10px;" style-hover="border-color: #363841; background: #191b22;">
+          <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 17px; color: #7d76f0;" aria-hidden="true"><use href="#i-clock-counter-clockwise"/></svg>
+          <span style="font-size: 13.5px; font-weight: 500;">Historique</span>
+          <span style="font-size: 12.5px; line-height: 1.6; color: #a2a8b2;">Ce qui a avancé, semaine après semaine : chaque commit sous le plan qui l'explique, l'activité en un histogramme.</span>
+        </div>
+        <div style="border-radius: 12px; border: 1px solid #2b2d35; background: #131519; padding: 20px; display: flex; flex-direction: column; gap: 10px;" style-hover="border-color: #363841; background: #191b22;">
+          <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 17px; color: #7d76f0;" aria-hidden="true"><use href="#i-kanban"/></svg>
+          <span style="font-size: 13.5px; font-weight: 500;">Tableau</span>
+          <span style="font-size: 12.5px; line-height: 1.6; color: #a2a8b2;">Le backlog, en kanban : epics et avancement, limites de WIP, un fichier markdown par ticket que Claude sait écrire.</span>
+        </div>
+        <div style="border-radius: 12px; border: 1px solid #2b2d35; background: #131519; padding: 20px; display: flex; flex-direction: column; gap: 10px;" style-hover="border-color: #363841; background: #191b22;">
+          <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 17px; color: #7d76f0;" aria-hidden="true"><use href="#i-database"/></svg>
+          <span style="font-size: 13.5px; font-weight: 500;">Données &amp; Stack</span>
+          <span style="font-size: 12.5px; line-height: 1.6; color: #a2a8b2;">Tables, colonnes et qui s'en sert ; dépendances avec la raison écrite en commentaire <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #b6bac1;">WHY:</span> au-dessus de l'import.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width: 100%; display: flex; justify-content: center; padding: 0 28px 116px;">
+    <div data-reveal="1" style="width: 100%; max-width: 1180px; display: flex; flex-direction: column; gap: 28px;">
+      <div style="display: flex; align-items: flex-end; gap: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983;">Avec Claude Code</span>
+          <h2 style="margin: 0; font-size: 38px; font-weight: 600; letter-spacing: -.028em; max-width: 640px; line-height: 1.1;">Claude reste dans la boucle, vous gardez la main.</h2>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column;">
+        <div style="display: grid; grid-template-columns: 44px 260px 1fr; gap: 24px; align-items: start; padding: 22px 0; border-top: 1px solid #22242b;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #585d66; padding-top: 3px;">01</span>
+          <span style="font-size: 15px; font-weight: 500; letter-spacing: -.01em;">Terminal intégré</span>
+          <div style="display: flex; flex-direction: column; gap: 6px; max-width: 620px;">
+            <span style="font-size: 13px; line-height: 1.65; color: #b6bac1;">Un vrai pty : shell de connexion, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #d5d8dd;">claude</span> lancé dedans, plusieurs sessions, dock en bas, sur le côté ou plein écran. Les commandes du projet (crawl, graphe, export Obsidian) sont à un clic.</span>
+            <span style="font-size: 12px; line-height: 1.55; color: #7f858f;">Réservé à l'application, et par IPC : l'exposer sur une socket locale l'ouvrirait à tout processus du même compte.</span>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 44px 260px 1fr; gap: 24px; align-items: start; padding: 22px 0; border-top: 1px solid #22242b;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #585d66; padding-top: 3px;">02</span>
+          <span style="font-size: 15px; font-weight: 500; letter-spacing: -.01em;">Deux skills livrées</span>
+          <div style="display: flex; flex-direction: column; gap: 6px; max-width: 620px;">
+            <span style="font-size: 13px; line-height: 1.65; color: #b6bac1;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #d5d8dd;">ovrsee</span> apprend à lire <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #d5d8dd;">ovrsee/</span> : plans, pages, scans, captures et leurs pièges de lecture. <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #d5d8dd;">ovrsee-tickets</span> apprend à écrire les tickets du tableau, format et gestes compris.</span>
+            <span style="font-size: 12px; line-height: 1.55; color: #7f858f;">Installables depuis l'écran d'initialisation, ou avec <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #d5d8dd;">--skills</span>.</span>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 44px 260px 1fr; gap: 24px; align-items: start; padding: 22px 0; border-top: 1px solid #22242b;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #585d66; padding-top: 3px;">03</span>
+          <span style="font-size: 15px; font-weight: 500; letter-spacing: -.01em;">Serveur MCP</span>
+          <div style="display: flex; flex-direction: column; gap: 6px; max-width: 620px;">
+            <span style="font-size: 13px; line-height: 1.65; color: #b6bac1;">stdio, JSON-RPC 2.0, même interface que <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #d5d8dd;">/api/*</span> : Claude lit tout <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #d5d8dd;">ovrsee/</span>, n'écrit que les tickets et <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #d5d8dd;">board.json</span>, n'exécute aucun code.</span>
+            <span style="font-size: 12px; line-height: 1.55; color: #7f858f;">Seuls les projets du registre sont lisibles : un chemin absent est refusé, même s’il existe sur le disque.</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 10px; padding: 20px 0 0; border-top: 1px solid #22242b;">
+          <span style="font-size: 12.5px; line-height: 1.6; color: #7f858f; max-width: 940px;">L'onglet Données lit le graphe de code produit par <a href="https://github.com/Graphify-Labs/graphify" target="_blank" style="color: #a2a8b2; border-bottom: 1px solid #363841;" style-hover="color: #f2f3f5; border-bottom-color: #7d76f0;">Graphify</a> : parsing AST local, chaque relation étiquetée. Ovrsee ne recalcule rien : il détecte l'outil et affiche sa commande.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="donnees" style="width: 100%; display: flex; justify-content: center; padding: 0 28px 116px;">
+    <div data-reveal="1" style="width: 100%; max-width: 1180px; display: grid; grid-template-columns: 1fr 460px; gap: 40px; align-items: center;">
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983;">Le projet, en fichiers</span>
+        <h2 style="margin: 0; font-size: 38px; font-weight: 600; letter-spacing: -.028em; line-height: 1.1;">Votre backlog vit dans votre dépôt.</h2>
+        <p style="margin: 0; font-size: 14.5px; line-height: 1.65; color: #b6bac1; max-width: 500px;">Tout le suivi du projet tient dans un dossier de votre dépôt : il suit les branches, se relit dans un éditeur, s'exporte en coffre Obsidian avec ses wikilinks. Pas de format propriétaire, aucun outil à synchroniser.</p>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 9px;"><svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px; color: #4cc38a;" aria-hidden="true"><use href="#i-check"/></svg><span style="font-size: 13px; color: #b6bac1;">Le suivi suit les branches : un plan part avec la branche qui le porte</span></div>
+          <div style="display: flex; align-items: center; gap: 9px;"><svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px; color: #4cc38a;" aria-hidden="true"><use href="#i-check"/></svg><span style="font-size: 13px; color: #b6bac1;">Chaque capture est datée et rattachée au commit qui l'a produite</span></div>
+          <div style="display: flex; align-items: center; gap: 9px;"><svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px; color: #4cc38a;" aria-hidden="true"><use href="#i-check"/></svg><span style="font-size: 13px; color: #b6bac1;">Export Obsidian avec frontmatter requêtable en Dataview</span></div>
+          <div style="display: flex; align-items: center; gap: 9px;"><svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px; color: #4cc38a;" aria-hidden="true"><use href="#i-check"/></svg><span style="font-size: 13px; color: #b6bac1;">Aucune exécution de code côté MCP, aucune socket ouverte</span></div>
+        </div>
+      </div>
+      <div style="border-radius: 12px; border: 1px solid #2b2d35; background: #131519; overflow: hidden;">
+        <div style="height: 34px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-bottom: 1px solid #22242b;">
+          <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 13px; color: #7f858f;" aria-hidden="true"><use href="#i-folder-open"/></svg>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #a2a8b2;">&lt;repo&gt;/ovrsee/</span>
+        </div>
+        <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 9px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">
+          <div style="display: flex; gap: 10px;"><span style="color: #d5d8dd; width: 200px;">plans/&lt;date&gt;-&lt;slug&gt;.md</span><span style="color: #737983;">1 plan approuvé</span></div>
+          <div style="display: flex; gap: 10px;"><span style="color: #d5d8dd; width: 200px;">pages/pages.json</span><span style="color: #737983;">pages, liens, résumés</span></div>
+          <div style="display: flex; gap: 10px;"><span style="color: #d5d8dd; width: 200px;">pages/scans.jsonl</span><span style="color: #737983;">1 ligne par scan</span></div>
+          <div style="display: flex; gap: 10px;"><span style="color: #d5d8dd; width: 200px;">pages/shots/&lt;onglet&gt;/</span><span style="color: #737983;">captures datées</span></div>
+          <div style="display: flex; gap: 10px;"><span style="color: #d5d8dd; width: 200px;">tickets/*.md</span><span style="color: #737983;">tickets du tableau</span></div>
+          <div style="display: flex; gap: 10px;"><span style="color: #d5d8dd; width: 200px;">board.json</span><span style="color: #737983;">état du tableau</span></div>
+          <div style="height: 1px; background: #22242b; margin: 4px 0;"></div>
+          <div style="display: flex; gap: 10px;"><span style="color: #7f858f; width: 200px;">obsidian/</span><span style="color: #737983;">export, réécrasable</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="width: 100%; display: flex; justify-content: center; padding: 0 28px 116px;">
+    <div data-reveal="1" style="width: 100%; max-width: 1180px; border-radius: 16px; border: 1px solid #2b2d35; background: #0b0c0e; padding: 54px 48px; display: flex; align-items: center; gap: 48px; background-image: radial-gradient(#16171c 1px, transparent 1px); background-size: 22px 22px;">
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+        <h2 style="margin: 0; font-size: 34px; font-weight: 600; letter-spacing: -.026em; line-height: 1.12; max-width: 480px;">Le code est sur GitHub.</h2>
+        <p style="margin: 0; font-size: 14px; line-height: 1.65; color: #a2a8b2; max-width: 480px;">Electron + React + TypeScript, trois dépendances de production, aucun framework de test. Builds macOS arm64 et Windows x64 publiés à chaque tag.</p>
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 6px; flex-wrap: wrap;">
+          <a href="https://github.com/samuelboulery/ovrsee" target="_blank" style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 18px; border-radius: 8px; background: #7d76f0; color: #0a0a12; font-size: 13.5px; font-weight: 500;" style-hover="background: #8b85f4; color: #0a0a12;">
+            <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 17px;" aria-hidden="true"><use href="#i-github-logo-fill"/></svg>samuelboulery/ovrsee
+          </a>
+          <a href="https://github.com/samuelboulery/ovrsee/releases" target="_blank" style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 8px; background: #191b22; border: 1px solid #363841; color: #d5d8dd; font-size: 13.5px;" style-hover="background: #1f212a; color: #f2f3f5;">
+            <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 16px; color: #a2a8b2;" aria-hidden="true"><use href="#i-download-simple"/></svg>Releases
+          </a>
+        </div>
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b7078;">dépôt privé, l'accès aux releases demande une invitation</span>
+      </div>
+      <div style="width: 340px; flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #22242b; border: 1px solid #22242b; border-radius: 10px; overflow: hidden;">
+        <div style="background: #131519; padding: 16px; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 19px; font-weight: 600;">v1.0.0</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #737983;">beta</span></div>
+        <div style="background: #131519; padding: 16px; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 19px; font-weight: 600;">3</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #737983;">deps prod</span></div>
+        <div style="background: #131519; padding: 16px; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 19px; font-weight: 600;">7</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #737983;">onglets</span></div>
+        <div style="background: #131519; padding: 16px; display: flex; flex-direction: column; gap: 4px;"><span style="font-size: 19px; font-weight: 600;">MCP</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #737983;">stdio · lecture</span></div>
+      </div>
+    </div>
+  </div>
+
+  
+
+  <div style="width: 100%; display: flex; justify-content: center; border-top: 1px solid #22242b; padding: 26px 28px 40px;">
+    <div style="width: 100%; max-width: 1180px; display: flex; align-items: center; gap: 20px;">
+      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b7078;">Ovrsee · Samuel Boulery · 2026</span>
+      <span style="flex: 1;"></span>
+      <a href="https://github.com/samuelboulery/ovrsee" target="_blank" style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b7078;" style-hover="color: #a2a8b2;">github</a>
+      <a href="https://github.com/samuelboulery/ovrsee#readme" target="_blank" style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #6b7078;" style-hover="color: #a2a8b2;">readme</a>
+    </div>
+  </div>
+
+</div>
+
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#7d76f0&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#7d76f0&quot;,&quot;#4cc38a&quot;,&quot;#6ea8fe&quot;,&quot;#e3b341&quot;]},&quot;repoUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;https://github.com/samuelboulery/ovrsee&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { view: 'apercu', scale: 1180 / 1400, lang: 'fr' };
+
+  // Traduction posée sur le DOM, pas dans le template : le français reste le
+  // texte source (il s'affiche dès le premier octet et reste éditable), et
+  // l'anglais est appliqué nœud de texte par nœud de texte après le rendu.
+  static DICT = {
+    'Gestion de projet pour Claude Code': 'Project management for Claude Code',
+    'Vibecoder vite,': 'Vibecode fast,',
+    'sans perdre le fil du projet.': 'without losing track of the project.',
+    "Ovrsee tient le suivi de ce que vous construisez avec Claude\u00a0Code : les décisions que vous avez approuvées, les commits qui les réalisent, les tickets à faire, l'architecture du site et son évolution. De quoi savoir où vous en êtes quand on code au rythme de l'agent, et quoi faire ensuite.":
+      "Ovrsee keeps track of what you build with Claude\u00a0Code: the plans you approved, the commits that carry them out, the tickets left to do, the site architecture and how it changes. Enough to know where you stand when you code at the agent's pace, and what to do next.",
+    'Aller au dépôt': 'Go to the repository',
+    "Explorer l'interface": 'Explore the interface',
+    '4 dépendances de prod': '3 production dependencies',
+    "démo interactive, rendue avec le code de l'app : cliquez une vue dans la colonne de gauche":
+      'interactive demo, rendered from the app code: click a view in the left column',
+    'Principe 01': 'Principle 01',
+    'Principe 02': 'Principle 02',
+    'Principe 03': 'Principle 03',
+    'Un plan, ses commits, ses tickets.': 'A plan, its commits, its tickets.',
+    'Chaque décision approuvée dans Claude Code devient une ligne de projet : ce qui a été décidé, ce qui l\u2019a exécuté, ce qui reste ouvert.':
+      'Every plan approved in Claude Code becomes a line of the project: what was decided, what carried it out, what is still open.',
+    "Chaque décision approuvée dans Claude Code devient une ligne de projet : ce qui a été décidé, ce qui l'a exécuté, ce qui reste ouvert.":
+      'Every plan approved in Claude Code becomes a line of the project: what was decided, what carried it out, what is still open.',
+    'Le projet vit dans le dépôt.': 'The project lives in the repository.',
+    'Claude Code y lit et y écrit.': 'Claude Code reads it, and writes to it.',
+    "Serveur MCP et deux skills : l'agent connaît votre backlog, ouvre et déplace les tickets. Vous restez maître du plan.":
+      'An MCP server and two skills: the agent knows your backlog, opens and moves tickets. You stay in charge of the plan.',
+    'Comment ça marche': 'How it works',
+    'Trois commandes, et le projet se tient à jour tout seul.': 'Three commands, then the project keeps itself up to date.',
+    'Installer, une fois par projet': 'Install once per project',
+    "Pose les hooks Claude Code et le hook post-commit. Rien d'autre à configurer.":
+      'Sets up the Claude Code hooks and the post-commit hook. Nothing else to configure.',
+    "Cartographier l'application": 'Map the application',
+    'Playwright parcourt vos routes et photographie chaque écran, daté et rattaché au commit.':
+      'Playwright walks your routes and photographs every screen, dated and tied to the commit.',
+    'Lire': 'Read',
+    'Sept vues': 'Seven views',
+    'Savoir où vous en êtes, sans ouvrir un seul fichier.': 'Know where you stand without opening a single file.',
+    'Aperçu': 'Overview',
+    'Navigateur': 'Browser',
+    'Produit': 'Product',
+    'Historique': 'History',
+    'Tableau': 'Board',
+    'Données': 'Data',
+    'Stack': 'Stack',
+    'Vues': 'Views',
+    'Rechercher, aller à…': 'Search, jump to…',
+    'Réordonner, masquer…': 'Reorder, hide…',
+    'Avec Claude Code': 'With Claude Code',
+    'Claude reste dans la boucle, vous gardez la main.': 'Claude stays in the loop, you keep control.',
+    'Terminal intégré': 'Built-in terminal',
+    'Deux skills livrées': 'Two skills included',
+    'Serveur MCP': 'MCP server',
+    'Le projet, en fichiers': 'The project, as files',
+    'Votre backlog vit dans votre dépôt.': 'Your backlog lives in your repository.',
+    'Le code est sur GitHub.': 'The code is on GitHub.',
+    'Releases': 'Releases',
+    "dépôt privé, l'accès aux releases demande une invitation": 'private repository, release access needs an invitation',
+    'deps prod': 'prod deps',
+    'onglets': 'tabs',
+    'Démo': 'Demo',
+    'github': 'github',
+    'Révéler dans le Finder': 'Reveal in Finder',
+    'Copier le chemin': 'Copy path',
+    'Comparer deux dates': 'Compare two dates',
+    'Crawler': 'Crawl',
+    'Par tickets': 'By tickets',
+    'Par commits': 'By commits',
+    'Éditer les colonnes': 'Edit columns',
+    'dernier scan · 11 août 2026 · 0ca659f': 'last scan · Aug 11 2026 · 0ca659f',
+    'Gestion de projet pour Claude Code : plans approuvés, commits qui les réalisent, tickets à faire — versionnés dans le dépôt.': 'A read-only view of a vibecoded project: captured plans, crawled pages, dated history.',
+    'cartographiées': 'mapped',
+    'dont 9 ouverts': 'of which 9 open',
+    'déclarées': 'declared',
+    'il y a 3 h': '3 h ago',
+    'dernière activité': 'last activity',
+    'dernier scan': 'last scan',
+    '11 août 2026': 'Aug 11 2026',
+    'Santé': 'Health',
+    '3 fichiers modifiés': '3 modified files',
+    'tout est poussé': 'everything is pushed',
+    'dernier audit il y a 2 j (ovrsee)': 'last audit 2 d ago (ovrsee)',
+    'plans ouverts · 9': 'open plans · 9',
+    'Clore le plan actif': 'Close active plan',
+    'Tout voir': 'See all',
+    'Barre de vue et barre d\'état sur les six onglets': 'View bar and status bar on all six tabs',
+    'actif': 'active',
+    'il y a 6 h': '6 h ago',
+    'Rampe de gris froide et quatre jetons de filet': 'Cold grey ramp and four border tokens',
+    'il y a 1 j': '1 d ago',
+    'Export du coffre Obsidian : wikilinks entre plans et tickets': 'Obsidian vault export: wikilinks between plans and tickets',
+    'il y a 3 j': '3 d ago',
+    'Rafraîchir': 'Refresh',
+    'dernier fetch il y a 3 h': 'last fetch 3 h ago',
+    'pas de remote suivie': 'no upstream',
+    '2 en avance': '2 ahead',
+    'à jour': 'up to date',
+    'Comment on le lance': 'How to run it',
+    'Déploiements': 'Deployments',
+    'Configurer': 'Configure',
+    'en ligne · 2 déploiements': 'online · 2 deployments',
+    'Vérifier': 'Check',
+    'Afficher': 'Show',
+    'Ce qu\'on y voit': 'What you see in it',
+    'En images': 'In pictures',
+    'Premier lancement': 'First launch',
+    'Mise en route : trois commandes': 'Getting started: three commands',
+    'Skills Claude Code': 'Claude Code skills',
+    'Créer ViewBar et la câbler sur les six vues': 'Create ViewBar and wire it into all six views',
+    'châssis': 'chrome',
+    'en-cours': 'in-progress',
+    'il y a 4 h': '4 h ago',
+    'Barre d\'état : deux faits par vue, ⌘K en dernier': 'Status bar: two facts per view, ⌘K last',
+    'fait': 'done',
+    'clos par 3f21a8e': 'closed by 3f21a8e',
+    'ds : jetons de filet, .kicker, switch 28×16': 'ds: border tokens, .kicker, 28×16 switch',
+    'ds : migrer les usages de --color-neutral-*': 'ds: migrate --color-neutral-* usages',
+    'fix : bit d\'exécution de spawn-helper au postinstall': 'fix: spawn-helper exec bit on postinstall',
+    'Activité': 'Activity',
+    '14 j': '14 d',
+    '12 s': '12 w',
+    'Filtrer': 'Filter',
+    'Commits hors plan': 'Commits outside a plan',
+    'Plans rejetés · 4': 'Rejected plans · 4',
+    'Thème clair dérivé du sombre': 'Light theme derived from dark',
+    'Barre d\'onglets horizontale': 'Horizontal tab bar',
+    'Un fichier par ticket dans ovrsee/tickets/, colonnes réglées dans ovrsee/board.json. Écrit ici comme depuis le terminal.': 'One file per ticket in ovrsee/tickets/, columns set in ovrsee/board.json. Written here as from terminal.',
+    'Prêt': 'Ready',
+    'il y a 2 j': '2 d ago',
+    'Refonte du châssis de l\'application': 'Rework of the app chrome',
+    'Voir les 3 enfants': 'View 3 children',
+    'Régénérer docs/screenshots/': 'Regenerate docs/screenshots/',
+    'En cours': 'In progress',
+    'enfant de T-0125': 'child of T-0125',
+    'il y a 5 h': '5 h ago',
+    'Puce de projet dans la barre de titre': 'Project chip in the title bar',
+    'Revue': 'Review',
+    'Serveur MCP : écriture limitée aux tickets': 'MCP server: writes limited to tickets',
+    'Fait': 'Done',
+    'Hook post-commit : rattacher au plan actif': 'Post-commit hook: attach to the active plan',
+    'mène à': 'leads to',
+    'entrée de l\'app': 'app entry',
+    '11 août': 'Aug 11',
+    '09 août': 'Aug 09',
+    'capture en échec': 'scan failed',
+    'Détail de la page': 'Page detail',
+    'Fermer': 'Close',
+    'Un fichier par ticket dans ovrsee/tickets/, colonnes réglées dans ovrsee/board.json. Les epics affichent leur avancement.': 'One file per ticket in ovrsee/tickets/, columns set in ovrsee/board.json. Epics show their progress.',
+    'Ouvrir dans le Navigateur': 'Open in Browser',
+    'Captures précédentes': 'Previous screenshots',
+    'réduit — la session tourne toujours': 'minimised — the session is still running',
+    'Backlog, historique et captures sous': 'Backlog, history and screenshots under',
+    ', versionnés par git. Pas d\'outil à tenir à jour en parallèle du code.': ', versioned by git. No tool to keep in sync with the code.',
+    'L\'application avec son terminal intégré, ou': 'The app with its built-in terminal, or',
+    'dans un navigateur,': 'in a browser,',
+    'en texte.': 'as text.',
+    'Ensuite, c\'est automatique : chaque plan approuvé dans Claude Code est capturé dans': 'From then on it is automatic: every plan approved in Claude Code is captured in',
+    ', et le hook post-commit rattache chaque commit au plan actif.': ', and the post-commit hook attaches each commit to the active plan.',
+    'Où en est le projet, en un écran : plans ouverts, tickets à faire, santé du dépôt, branches, déploiements.': 'Where the project stands, in one screen: open plans, tickets to do, repo health, branches, deployments.',
+    'Votre app, ses DevTools et un sélecteur d\'élément dans la fenêtre. Le sélecteur se colle directement dans Claude.': 'Your app, its DevTools and an element picker inside the window. The selector pastes straight into Claude.',
+    'Le graphe des pages crawlées, miniatures à l\'appui. Deux dates se comparent : ce qui a changé se voit.': 'The graph of crawled pages, screenshots included. Compare two dates: what changed shows.',
+    'Ce qui a avancé, semaine après semaine : chaque commit sous le plan qui l\'explique, l\'activité en un histogramme.': 'What moved, week after week: every commit under the plan that explains it, activity as a histogram.',
+    'Le backlog, en kanban : epics et avancement, limites de WIP, un fichier markdown par ticket que Claude sait écrire.': 'The backlog as a kanban: epics and progress, WIP limits, one markdown file per ticket that Claude can write.',
+    'Données & Stack': 'Data & Stack',
+    'Tables, colonnes et qui s\'en sert ; dépendances avec la raison écrite en commentaire': 'Tables, columns and who uses them; dependencies with the reason written as a comment',
+    'au-dessus de l\'import.': 'above the import.',
+    'Un vrai pty : shell de connexion,': 'A real pty: login shell,',
+    'lancé dedans, plusieurs sessions, dock en bas, sur le côté ou plein écran. Les commandes du projet (crawl, graphe, export Obsidian) sont à un clic.': 'running inside it, several sessions, dock at the bottom, on the side or full screen. The project commands (crawl, graph, Obsidian export) are one click away.',
+    'Réservé à l\'application, et par IPC : l\'exposer sur une socket locale l\'ouvrirait à tout processus du même compte.': 'App-only, and over IPC: exposing it on a local socket would open it to every process on the same account.',
+    'apprend à lire': 'learns to read',
+    ': plans, pages, scans, captures et leurs pièges de lecture.': ': plans, pages, scans, screenshots and their reading traps.',
+    'apprend à écrire les tickets du tableau, format et gestes compris.': 'learns to write board tickets, format and gestures included.',
+    'Installables depuis l\'écran d\'initialisation, ou avec': 'Installable from the setup screen, or with',
+    'stdio, JSON-RPC 2.0, même interface que': 'stdio, JSON-RPC 2.0, same interface as',
+    ': Claude lit tout': ': Claude reads all of',
+    ', n\'écrit que les tickets et': ', writes only the tickets and',
+    ', n\'exécute aucun code.': ', runs no code.',
+    'Seuls les projets du registre sont lisibles : un chemin absent est refusé, même s’il existe sur le disque.': 'Only projects in the registry are readable: a path that is not there is refused, even if it exists on disk.',
+    'L\'onglet Données lit le graphe de code produit par': 'The Data tab reads the code graph produced by',
+    ': parsing AST local, chaque relation étiquetée. Ovrsee ne recalcule rien : il détecte l\'outil et affiche sa commande.': ': local AST parsing, every edge labelled. Ovrsee recomputes nothing: it detects the tool and shows its command.',
+    'Tout le suivi du projet tient dans un dossier de votre dépôt : il suit les branches, se relit dans un éditeur, s\'exporte en coffre Obsidian avec ses wikilinks. Pas de format propriétaire, aucun outil à synchroniser.': 'All the project tracking fits in one folder of your repository: it follows branches, reads back in any editor, exports to an Obsidian vault with its wikilinks. No proprietary format, no tool to sync.',
+    'Le suivi suit les branches : un plan part avec la branche qui le porte': 'Tracking follows branches: a plan travels with the branch that carries it',
+    'Chaque capture est datée et rattachée au commit qui l\'a produite': 'Every screenshot is dated and tied to the commit that produced it',
+    'Export Obsidian avec frontmatter requêtable en Dataview': 'Obsidian export with Dataview-queryable frontmatter',
+    'Aucune exécution de code côté MCP, aucune socket ouverte': 'No code execution on the MCP side, no open socket',
+    '1 plan approuvé': '1 approved plan',
+    'pages, liens, résumés': 'pages, links, summaries',
+    '1 ligne par scan': '1 line per scan',
+    'captures datées': 'dated screenshots',
+    'tickets du tableau': 'board tickets',
+    'état du tableau': 'board state',
+    'export, réécrasable': 'export, overwritable',
+    'Electron + React + TypeScript, trois dépendances de production, aucun framework de test. Builds macOS arm64 et Windows x64 publiés à chaque tag.': 'Electron + React + TypeScript, three production dependencies, no test framework. macOS arm64 and Windows x64 builds published on every tag.',
+    'stdio · lecture': 'stdio · read',
+    'readme': 'readme'
+  };
+
+  basculerLangue = lang => { if (lang !== this.state.lang) this.setState({ lang }); };
+
+  traduire = () => {
+    const D = Component.DICT;
+    const table = {};
+    if (this.state.lang === 'en') for (const k in D) table[k] = D[k];
+    else for (const k in D) table[D[k]] = k;
+    const marcheur = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const noeuds = [];
+    while (marcheur.nextNode()) noeuds.push(marcheur.currentNode);
+    for (const n of noeuds) {
+      const brut = n.nodeValue;
+      const texte = brut.trim();
+      if (!texte) continue;
+      const cible = table[texte];
+      if (cible && cible !== texte) n.nodeValue = brut.replace(texte, cible);
+    }
+    document.documentElement.lang = this.state.lang;
+  };
+
+  // La fenêtre de démo est dessinée à sa taille réelle (1400×820, comme l'app)
+  // puis réduite pour tenir dans la colonne — le facteur suit la largeur
+  // mesurée, sinon un écran de 13" en coupe le quart droit.
+  mesurer = () => {
+    const el = this.stageEl;
+    if (!el) return;
+    const scale = Math.min(1, el.clientWidth / 1400);
+    if (Math.abs(scale - this.state.scale) > 0.001) this.setState({ scale });
+  };
+
+  attacherStage = el => {
+    if (!el || el === this.stageEl) return;
+    this.stageEl = el;
+    if (typeof ResizeObserver !== 'undefined') {
+      this.ro?.disconnect();
+      this.ro = new ResizeObserver(this.mesurer);
+      this.ro.observe(el);
+    }
+    this.mesurer();
+  };
+
+  componentDidMount() {
+    this.mesurer();
+    window.addEventListener('resize', this.mesurer);
+    this.reveler();
+    this.traduire();
+  }
+
+  // React réécrit les nœuds de texte à chaque rendu : la traduction se
+  // réapplique après.
+  componentDidUpdate() {
+    this.traduire();
+  }
+
+  // Révélation au défilement, posée en JS : sans script la page reste
+  // entièrement visible — rien n'est masqué en dur dans le template.
+  reveler = () => {
+    if (typeof IntersectionObserver === 'undefined') return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cibles = Array.from(document.querySelectorAll('[data-reveal]'));
+    for (const el of cibles) {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(16px)';
+      el.style.transition = 'opacity .6s cubic-bezier(.2,.7,.2,1), transform .6s cubic-bezier(.2,.7,.2,1)';
+    }
+    this.io = new IntersectionObserver(entrees => {
+      for (const e of entrees) {
+        if (!e.isIntersecting) continue;
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'none';
+        this.io.unobserve(e.target);
+      }
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+    cibles.forEach(el => this.io.observe(el));
+  };
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.mesurer);
+    this.ro?.disconnect();
+    this.io?.disconnect();
+  }
+
+  renderVals() {
+    const accent = this.props.accent ?? '#7d76f0';
+    const repoUrl = this.props.repoUrl ?? 'https://github.com/samuelboulery/ovrsee';
+    const v = this.state.view;
+
+    // Registre des 7 vues, dans l'ordre de `app/src/views.ts` (pictos Phosphor identiques).
+    const defs = [
+      { id: 'apercu', label: 'Aperçu', icon: 'squares-four', key: '1' },
+      { id: 'navigateur', label: 'Navigateur', icon: 'browser', key: '2' },
+      { id: 'produit', label: 'Produit', icon: 'tree-structure', key: '3' },
+      { id: 'historique', label: 'Historique', icon: 'clock-counter-clockwise', key: '4' },
+      { id: 'tableau', label: 'Tableau', icon: 'kanban', key: '5', count: 12 },
+      { id: 'donnees', label: 'Données', icon: 'database', key: '6' },
+      { id: 'stack', label: 'Stack', icon: 'stack', key: '7' }
+    ];
+    const demoable = { apercu: 1, produit: 1, historique: 1, tableau: 1 };
+
+    const views = defs.map(d => {
+      const active = d.id === v;
+      return {
+        label: d.label,
+        key: d.key,
+        count: d.count ?? '',
+        pick: () => { if (demoable[d.id]) this.setState({ view: d.id }); },
+        icon: (active ? 'ph-fill ph-' : 'ph ph-') + d.icon,
+        iconStyle: 'font-size: 16px; flex: none; color: ' + (active ? accent : '#7f858f') + ';',
+        labelStyle: 'flex: 1; font-size: 12.5px; color: ' + (active ? '#f2f3f5' : '#b6bac1') + '; font-weight: ' + (active ? 500 : 400) + '; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
+        badgeStyle: d.count
+          ? 'display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 17px; padding: 0 5px; border-radius: 4px; background: #33363f; font-family: \'IBM Plex Mono\', monospace; font-size: 10px; color: #a2a8b2; flex: none;'
+          : 'display: none;',
+        rowStyle: 'height: 31px; padding: 0 8px; gap: 10px; border-radius: 6px; display: flex; align-items: center; font-size: 12.5px; cursor: ' + (demoable[d.id] ? 'pointer' : 'default') + '; ' + (active ? 'background: #2a2d38;' : '')
+      };
+    });
+
+    // Fils d'Ariane, métas et barres d'état : mêmes chaînes que `i18n.js`.
+    const meta = {
+      apercu: { title: 'Aperçu', meta: '', left: 'main · 0ca659f · 3 fichiers modifiés', right: 'plan actif : Barre de vue et barre d\'état sur les six onglets' },
+      produit: { title: 'Graphe de navigation', meta: '7 pages · 42 liens · reconstruit au commit 0ca659f', left: 'graphe reconstruit il y a 3 h · 7 pages · 42 liens', right: 'glisser · ⌥ molette pour zoomer' },
+      historique: { title: 'Chronologie du projet', meta: '43 plans · 128 commits', left: '43 plans · 9 ouverts · dernier commit il y a 3 h', right: '' },
+      tableau: { title: 'Tableau', meta: '43 tickets · ovrsee/tickets/', left: '', right: '' }
+    };
+    const metaEn = {
+      apercu: { title: 'Overview', meta: '', left: 'main · 0ca659f · 3 modified files', right: 'active plan: View bar and status bar on all six tabs' },
+      produit: { title: 'Navigation graph', meta: '7 pages · 42 links · rebuilt at commit 0ca659f', left: 'graph rebuilt 3 h ago · 7 pages · 42 links', right: 'drag · ⌥ scroll to zoom' },
+      historique: { title: 'Project timeline', meta: '43 plans · 128 commits', left: '43 plans · 9 open · last commit 3 h ago', right: '' },
+      tableau: { title: 'Board', meta: '43 tickets · ovrsee/tickets/', left: '', right: '' }
+    };
+    const table = this.state.lang === 'en' ? metaEn : meta;
+    const m = table[v] || table.apercu;
+    const ongletStyle = actif =>
+      'padding: 3px 7px; border-radius: 4px; font-family: \'IBM Plex Mono\', monospace; font-size: 10.5px; cursor: pointer; ' +
+      (actif ? 'background: #2a2d38; color: #f2f3f5;' : 'color: #7f858f;');
+
+    // Barres empilées de `ActivityPanel` — commits, tickets, plans (bas vers haut).
+    const heights = [[5, 6, 8], [7, 9, 14], [10, 4, 6], [6, 12, 20], [9, 8, 11], [6, 3, 4], [4, 2, 0], [8, 10, 16], [7, 14, 24], [11, 7, 9], [5, 9, 13], [8, 5, 7], [6, 11, 18], [9, 13, 22]];
+    const bars = heights.map(h => ({
+      commits: 'background: #3a3c47; height: ' + h[0] + 'px; border-radius: 1px;',
+      tickets: 'background: #4c46b4; height: ' + h[1] + 'px; border-radius: 1px;',
+      plans: 'background: ' + accent + '; height: ' + Math.max(2, h[2]) + 'px; border-radius: 1px;'
+    }));
+
+    const scale = this.state.scale;
+
+    return {
+      views, bars, repoUrl,
+      stageRef: this.attacherStage,
+      pickFr: () => this.basculerLangue('fr'),
+      pickEn: () => this.basculerLangue('en'),
+      frStyle: ongletStyle(this.state.lang === 'fr'),
+      enStyle: ongletStyle(this.state.lang === 'en'),
+      stageWrapStyle: 'width: 100%; overflow: hidden; height: ' + Math.round(820 * scale) + 'px;',
+      stageStyle: 'width: 1400px; height: 820px; flex: none; transform: scale(' + scale + '); transform-origin: top left; border-radius: 14px; border: 1px solid #2b2d35; background: #08090a; overflow: hidden; box-shadow: 0 40px 120px rgba(0,0,0,.7);',
+      releasesUrl: repoUrl + '/releases',
+      readmeUrl: repoUrl + '#readme',
+      viewTitle: m.title,
+      viewMeta: m.meta,
+      statusLeft: m.left,
+      statusRight: m.right,
+      isApercu: v === 'apercu',
+      isProduit: v === 'produit',
+      isHistorique: v === 'historique',
+      isTableau: v === 'tableau'
+    };
+  }
+}
+</script>
+</body>
+</html>
+<script src="app.js"></script>
+</body>
+</html>

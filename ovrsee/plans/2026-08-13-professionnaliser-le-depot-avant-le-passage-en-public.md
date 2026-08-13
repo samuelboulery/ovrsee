@@ -60,6 +60,18 @@
         "README.en.md",
         "README.md"
       ]
+    },
+    {
+      "sha": "8b6ea6b",
+      "date": "2026-08-13",
+      "files": [
+        "CLAUDE.md",
+        "README.en.md",
+        "README.md",
+        "app/src/Onboarding.tsx",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js"
+      ]
     }
   ]
 }

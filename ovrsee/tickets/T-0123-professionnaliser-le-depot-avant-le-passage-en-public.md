@@ -2,7 +2,7 @@
 {
   "id": "T-0123",
   "titre": "Professionnaliser le dépôt avant le passage en public",
-  "colonne": "fait",
+  "colonne": "en-cours",
   "priorite": "haute",
   "type": "epic",
   "charge": "xl",

@@ -39,26 +39,9 @@ Contexte complet : [`cadrage-ovrsee.md`](./cadrage-ovrsee.md)
 ### Aperçu — l'état du projet en un coup d'œil
 ![Onglet Aperçu](./docs/screenshots/apercu.png)
 
-Compteurs (pages, plans, tickets, dépendances), plans ouverts, statut des branches, et le
-terminal intégré avec ses commandes rapides (crawl, graphe, export Obsidian).
-
-### Historique — chaque commit et le plan qui l'explique
-![Onglet Historique](./docs/screenshots/historique.png)
-
-La chronologie du projet : un plan est clos par le commit qui l'exécute, chaque ticket lié
-apparaît avec son statut.
-
-### Produit — le graphe de navigation
-![Onglet Produit](./docs/screenshots/produit.png)
-
-La carte des pages du projet crawlé, miniatures de captures à l'appui, avec un panneau de
-détail par page et l'historique de ses captures précédentes.
-
-### Tableau — le kanban des tickets
-![Onglet Tableau](./docs/screenshots/tableau.png)
-
-Un fichier par ticket dans `ovrsee/tickets/`, colonnes réglées dans `ovrsee/board.json`.
-Écrit ici comme depuis le terminal intégré.
+Compteurs (pages, plans, tickets, dépendances), santé du dépôt, plans ouverts, statut des
+branches, commandes du projet, et le terminal intégré avec ses raccourcis (crawl, graphe,
+export Obsidian). À droite, le panneau des déploiements et le sommaire du `README.md`.
 
 ### Navigateur — parcourir l'application observée sans quitter l'ovrsee
 ![Onglet Navigateur](./docs/screenshots/navigateur.png)
@@ -66,9 +49,37 @@ Un fichier par ticket dans `ovrsee/tickets/`, colonnes réglées dans `ovrsee/bo
 Un navigateur intégré (barre d'adresse, DevTools, sélecteur d'élément) pour inspecter
 l'application observée directement depuis l'interface.
 
-**Deux autres onglets, sans capture pour l'instant :** **Données** (tables et relations,
-lues depuis Graphify ou un coffre Obsidian) et **Stack** (dépendances et choix techniques,
-alimentés par les commentaires `WHY:` de Graphify).
+### Produit — le graphe de navigation
+![Onglet Produit](./docs/screenshots/produit.png)
+
+La carte des pages du projet crawlé, miniatures de captures à l'appui, avec un panneau de
+détail par page et l'historique de ses captures précédentes. Deux dates se comparent.
+
+### Historique — chaque commit et le plan qui l'explique
+![Onglet Historique](./docs/screenshots/historique.png)
+
+La chronologie du projet : un plan est clos par le commit qui l'exécute, chaque ticket lié
+apparaît avec son statut. Filtrable par plans, tickets et commits hors plan.
+
+### Tableau — le kanban des tickets
+![Onglet Tableau](./docs/screenshots/tableau.png)
+
+Un fichier par ticket dans `ovrsee/tickets/`, colonnes réglées dans `ovrsee/board.json`.
+Écrit ici comme depuis le terminal intégré. Les epics affichent leur avancement et leurs
+tickets enfants.
+
+### Données — les tables du projet
+![Onglet Données](./docs/screenshots/donnees.png)
+
+L'introspection reconstruite à chaque commit, lue depuis Graphify ou un coffre Obsidian :
+tables, colonnes, qui s'en sert, et le niveau de confiance de l'extraction. L'ovrsee ne
+recalcule rien.
+
+### Stack — les dépendances et leur raison d'être
+![Onglet Stack](./docs/screenshots/stack.png)
+
+Production et développement séparés, chacune avec sa version et la raison écrite en
+commentaire `WHY:` au-dessus de son import. Ce qui n'en a pas est signalé.
 
 ## Premier lancement
 

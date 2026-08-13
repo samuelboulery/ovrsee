@@ -38,26 +38,9 @@ Full context (French): [`cadrage-ovrsee.md`](./cadrage-ovrsee.md)
 ### Overview — project state at a glance
 ![Overview tab](./docs/screenshots/apercu.png)
 
-Counters (pages, plans, tickets, dependencies), open plans, branch status, and the
-integrated terminal with quick commands (crawl, graph, Obsidian export).
-
-### History — every commit and the plan behind it
-![History tab](./docs/screenshots/historique.png)
-
-The project timeline: a plan is closed by the commit that executes it, each linked
-ticket shows up with its status.
-
-### Product — the navigation graph
-![Product tab](./docs/screenshots/produit.png)
-
-A map of the crawled project's pages, with screenshot thumbnails, a detail panel
-per page, and its capture history.
-
-### Board — ticket kanban
-![Board tab](./docs/screenshots/tableau.png)
-
-One file per ticket in `ovrsee/tickets/`, columns set in `ovrsee/board.json`.
-Written here just like from the integrated terminal.
+Counters (pages, plans, tickets, dependencies), repo health, open plans, branch status,
+project commands, and the integrated terminal with its shortcuts (crawl, graph, Obsidian
+export). On the right, the deployments panel and the `README.md` outline.
 
 ### Navigator — browse the observed app without leaving Ovrsee
 ![Navigator tab](./docs/screenshots/navigateur.png)
@@ -65,9 +48,36 @@ Written here just like from the integrated terminal.
 An embedded browser (address bar, DevTools, element picker) to inspect the
 observed application directly from the interface.
 
-**Two more tabs, no screenshot yet:** **Data** (tables and relations, read from
-Graphify or an Obsidian vault) and **Stack** (dependencies and technical choices,
-sourced from Graphify's `WHY:` comments).
+### Product — the navigation graph
+![Product tab](./docs/screenshots/produit.png)
+
+A map of the crawled project's pages, with screenshot thumbnails, a detail panel
+per page, and its capture history. Two dates can be compared.
+
+### History — every commit and the plan behind it
+![History tab](./docs/screenshots/historique.png)
+
+The project timeline: a plan is closed by the commit that executes it, each linked
+ticket shows up with its status. Filterable by plans, tickets, and off-plan commits.
+
+### Board — ticket kanban
+![Board tab](./docs/screenshots/tableau.png)
+
+One file per ticket in `ovrsee/tickets/`, columns set in `ovrsee/board.json`.
+Written here just like from the integrated terminal. Epics show their progress and
+their child tickets.
+
+### Data — the project's tables
+![Data tab](./docs/screenshots/donnees.png)
+
+Introspection rebuilt on every commit, read from Graphify or an Obsidian vault: tables,
+columns, who uses them, and how confident the extraction is. Ovrsee recomputes nothing.
+
+### Stack — dependencies and why they are there
+![Stack tab](./docs/screenshots/stack.png)
+
+Production and development split apart, each with its version and the reason written as a
+`WHY:` comment above its import. Anything missing one is flagged.
 
 ## First launch
 

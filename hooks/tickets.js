@@ -36,6 +36,17 @@ export const DEFAULT_COLUMNS = [
 ]
 
 /** De la plus urgente à la moins urgente. L'ordre du tableau est l'ordre du tri. */
+/**
+ * La colonne qui marque le travail commencé.
+ *
+ * Trois hooks s'en servent pour distinguer un ticket en vol d'un ticket que
+ * personne n'a ouvert — `ovrsee-tool-edit` l'y met, `ovrsee-tool-stop` le
+ * pousse plus loin, `ovrsee-post-commit` refuse de clore en deçà. Elle était
+ * écrite en dur dans chacun, dont deux constantes locales identiques : trois
+ * définitions d'une même chaîne finissent par diverger.
+ */
+export const EN_COURS = 'en-cours'
+
 export const PRIORITES = ['haute', 'moyenne', 'basse']
 
 const DEFAULT_PRIORITE = 'moyenne'

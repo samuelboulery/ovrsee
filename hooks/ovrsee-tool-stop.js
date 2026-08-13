@@ -23,7 +23,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { readBoard, readTickets, moveTicket } from './tickets.js'
+import { EN_COURS, moveTicket, readBoard, readTickets } from './tickets.js'
 import { isSafePlanFileName } from './plans.js'
 
 function readStdin() {
@@ -72,7 +72,6 @@ export function aDuCodeNonCommite(root) {
   }
 }
 
-const EN_COURS = 'en-cours'
 const REVUE = 'revue'
 
 /**

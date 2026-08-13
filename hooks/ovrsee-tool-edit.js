@@ -21,7 +21,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { readBoard, readTickets, moveTicket } from './tickets.js'
+import { EN_COURS, moveTicket, readBoard, readTickets } from './tickets.js'
 import { isSafePlanFileName } from './plans.js'
 
 function readStdin() {
@@ -69,18 +69,23 @@ export function estUneEditionSource(root, filePath) {
   return !DERIVED.some(prefix => rel.startsWith(prefix))
 }
 
-const EN_COURS = 'en-cours'
 const REVUE = 'revue'
 
 /**
- * Avance vers « en cours » les tickets liés à ce plan : ceux pas encore
- * commencés (colonne avant `en-cours`), et ceux qu'on avait mis en `revue` —
- * une édition qui reprend après une relecture demandée redevient du travail
- * en cours, pas une relecture en attente.
+ * Avance vers « en cours » les tickets liés à ce plan qui étaient **prêts** —
+ * la colonne juste avant `en-cours` — et ceux qu'on avait mis en `revue` : une
+ * édition qui reprend après une relecture demandée redevient du travail en
+ * cours, pas une relecture en attente.
+ *
+ * Ne remonte jamais un ticket de plus loin en arrière. Un ticket en backlog ou
+ * « à spécifier » est du travail qu'on a décidé de ne pas faire maintenant, et
+ * éditer un fichier ne revient pas sur cette décision. Ce hook prenait
+ * autrefois tous les tickets du plan : le commit suivant les soldait alors
+ * tous, et un plan qui produit neuf tickets vidait le tableau d'un coup.
  *
  * Ne touche jamais un ticket déjà en `en-cours` ni un ticket en colonne
- * finale ou au-delà — l'avancée manuelle reste toujours plus vraie que cette
- * règle automatique. Silencieuse si le board n'a pas de colonne `en-cours`.
+ * finale — l'avancée manuelle reste toujours plus vraie que cette règle
+ * automatique. Silencieuse si le board n'a pas de colonne `en-cours`.
  */
 export function avancerTicketsEnCours(ovrseeDir, planFile) {
   const colonnes = readBoard(ovrseeDir)
@@ -93,6 +98,8 @@ export function avancerTicketsEnCours(ovrseeDir, planFile) {
     const rang = rangDe.get(ticket.meta.colonne) ?? 0
     if (rang === iCible) continue // déjà en cours
     if (rang > iCible && ticket.meta.colonne !== REVUE) continue // déjà plus loin
+    // Le rang exact, et non « avant la cible » : seul le ticket prêt démarre.
+    if (rang < iCible - 1) continue
 
     try {
       moveTicket(ovrseeDir, ticket.file, EN_COURS)

@@ -9,7 +9,7 @@
     "perf"
   ],
   "cree": "2026-08-13",
-  "maj": "2026-08-13",
+  "maj": "2026-08-14",
   "plan": "2026-08-13-audit-final-avant-publication-et-les-trois-correctifs-qu-il.md"
 }
 ---

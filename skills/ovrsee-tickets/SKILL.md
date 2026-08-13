@@ -101,10 +101,18 @@ depuis l'interface et un déplacement écrit ici se marchent dessus.
 **Suivre le travail — c'est automatique.** Trois hooks font ce mouvement sans
 intervention : la première édition sous un plan actif passe le ticket en
 « en cours » (`ovrsee-tool-edit.js`), une fin de tour avec du code non commité
-le passe en « revue » (`ovrsee-tool-stop.js`), un commit le passe en colonne
-finale (`ovrsee-post-commit.js`). N'utiliser `moveTicket`/`updateTicket` à la
-main que pour corriger un déplacement, ou pour un ticket sans `plan` renseigné
-— ces hooks ne suivent que les tickets liés au plan actif.
+le passe en « revue » (`ovrsee-tool-stop.js`), un commit passe en colonne finale
+**les tickets qui étaient en vol** — en cours ou en revue — et eux seuls
+(`ovrsee-post-commit.js`).
+
+Un ticket resté en `backlog`, `à spécifier` ou `prêt` ne bouge pas : un commit
+clôt ce qu'on a fait, pas ce qu'on a prévu. Sans cette distinction, un plan qui
+produit neuf tickets les soldait tous les neuf au premier commit, et le tableau
+se vidait tout seul.
+
+N'utiliser `moveTicket`/`updateTicket` à la main que pour corriger un
+déplacement, ou pour un ticket sans `plan` renseigné — ces hooks ne suivent que
+les tickets liés au plan actif.
 
 **Le ticket actif hors-plan (`ovrsee/.active-ticket`).** Sans plan actif,
 `ovrsee-tool-edit-gate.js` exige quand même un ticket avant la première édition

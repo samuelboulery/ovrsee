@@ -16,7 +16,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { attachCommitToPlan, isSafePlanFileName } from './plans.js'
-import { avancerTicketsClos, colonneFinale, readBoard, readTickets, moveTicket } from './tickets.js'
+import { avancerTicketsClos, colonneFinale, EN_COURS, readBoard, readTickets, moveTicket } from './tickets.js'
 import { readSettings, mergeSettings } from './settings.js'
 import { syncGitignore } from './gitignore-sync.js'
 import { readJson } from './snapshot.js'
@@ -103,14 +103,37 @@ function attachCommit(ovrseeDir, root, sources) {
  * `null`) : un board reconfiguré sans colonne terminale ne doit jamais faire
  * échouer un commit.
  */
-export function avancerTicketsDuPlan(ovrseeDir, planFile) {
+export function avancerTicketsDuPlan(ovrseeDir, planFile, message = '') {
   const colonnes = readBoard(ovrseeDir)
   const finale = colonneFinale(colonnes)
   if (!finale) return
 
-  for (const ticket of readTickets(ovrseeDir, colonnes)) {
-    if (ticket.meta.plan !== planFile || ticket.meta.colonne === finale) continue
+  // Sans colonne `en-cours`, rien ne distingue un ticket en vol d'un ticket
+  // jamais commencé. Ne rien fermer est alors le défaut sûr : un tableau qui
+  // garde un ticket de trop se corrige d'un geste, un tableau vidé tout seul
+  // ne se remarque pas.
+  const iEnCours = colonnes.findIndex(c => c.id === EN_COURS)
+  if (iEnCours === -1) return
 
+  const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
+  const liesAuPlan = readTickets(ovrseeDir, colonnes).filter(t => t.meta.plan === planFile)
+
+  // « En vol » : le travail a commencé. Un commit clôt ce qu'on a fait, pas ce
+  // qu'on a prévu — un ticket resté en backlog ou en prêt n'est jamais soldé.
+  const enVol = liesAuPlan.filter(
+    t => t.meta.colonne !== finale && (rangDe.get(t.meta.colonne) ?? -1) >= iEnCours,
+  )
+
+  const cites = new Set(message.match(/T-\d{4}/g) ?? [])
+
+  // L'attribution, dans l'ordre de fiabilité. Citer le ticket dans le message
+  // tranche — c'est la convention déjà suivie par ce dépôt. À défaut, on ne
+  // devine que si le plan n'a qu'un seul ticket en vol : au-delà, rien ne dit
+  // lequel ce commit fait avancer, et fermer les autres est une perte
+  // silencieuse.
+  const aFermer = cites.size > 0 ? enVol.filter(t => cites.has(t.meta.id)) : enVol.length === 1 ? enVol : []
+
+  for (const ticket of aFermer) {
     try {
       moveTicket(ovrseeDir, ticket.file, finale)
     } catch {
@@ -154,7 +177,16 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       const file = attachCommit(ovrseeDir, root, sources)
       if (file) {
         process.stdout.write(`[ovrsee] commit rattaché à ${file}\n`)
-        avancerTicketsDuPlan(ovrseeDir, file)
+        // Le message porte l'attribution : « (T-0124) » dit de quel ticket ce
+        // commit parle. Une lecture git en échec rend une chaîne vide, et on
+        // retombe alors sur la règle du ticket unique.
+        let message = ''
+        try {
+          message = git(['log', '-1', '--format=%B'], root)
+        } catch {
+          // Sans message, on n'attribue rien de plus qu'avant.
+        }
+        avancerTicketsDuPlan(ovrseeDir, file, message)
       }
       // Filet à chaque commit : rattrape un ticket resté en retard, quelle
       // que soit la raison (CLI qui aurait oublié d'avancer, dérive passée).

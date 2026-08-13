@@ -92,3 +92,122 @@ test('avancerTicketsDuPlan ne fait rien sur un board à une seule colonne', () =
   assert.doesNotThrow(() => avancerTicketsDuPlan(ovrseeDir, '2026-08-10-x.md'))
   assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'todo')
 })
+
+// Le défaut que ces trois tests fixent : la fonction fermait TOUT ticket du
+// plan qui n'était pas déjà en finale, y compris ceux que personne n'avait
+// commencés. Sur un plan qui produit neuf tickets, le premier commit les
+// soldait tous les neuf — le tableau se vidait tout seul, et l'utilisateur qui
+// ne le remarquait pas perdait son reste-à-faire.
+//
+// Le commentaire de la fonction annonçait pourtant déjà la bonne règle : un
+// commit clôt ce qui était en vol, « qu'il vienne de revue ou soit resté en
+// cours ». Il manquait la vérification.
+
+test('avancerTicketsDuPlan ne touche pas un ticket du plan resté en backlog', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'backlog', plan: '2026-08-10-x.md' })
+
+  avancerTicketsDuPlan(ovrseeDir, '2026-08-10-x.md')
+
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'backlog')
+})
+
+test('avancerTicketsDuPlan ne touche pas un ticket du plan resté en prêt', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'pret', plan: '2026-08-10-x.md' })
+
+  avancerTicketsDuPlan(ovrseeDir, '2026-08-10-x.md')
+
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'pret')
+})
+
+test('un commit ne clôt que le ticket en vol, pas les autres du même plan', () => {
+  const ovrseeDir = fixture()
+  const plan = '2026-08-10-x.md'
+  const enVol = createTicket(ovrseeDir, { titre: 'En vol', colonne: 'en-cours', plan })
+  const prochain = createTicket(ovrseeDir, { titre: 'Prochain', colonne: 'pret', plan })
+  const plusTard = createTicket(ovrseeDir, { titre: 'Plus tard', colonne: 'backlog', plan })
+
+  avancerTicketsDuPlan(ovrseeDir, plan)
+
+  const colonne = f => readTickets(ovrseeDir).find(t => t.file === f).meta.colonne
+  assert.equal(colonne(enVol.file), 'fait')
+  assert.equal(colonne(prochain.file), 'pret')
+  assert.equal(colonne(plusTard.file), 'backlog')
+})
+
+test('sans colonne « en cours », le hook ne ferme rien plutôt que tout', () => {
+  const ovrseeDir = fixture()
+  writeFileSync(
+    join(ovrseeDir, 'board.json'),
+    JSON.stringify({ colonnes: [{ id: 'todo', titre: 'À faire' }, { id: 'done', titre: 'Fini' }] }),
+    'utf8',
+  )
+  const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'todo', plan: '2026-08-10-x.md' })
+
+  avancerTicketsDuPlan(ovrseeDir, '2026-08-10-x.md')
+
+  // Un board sans `en-cours` ne permet pas de distinguer un ticket en vol d'un
+  // ticket jamais commencé. Ne rien fermer est le défaut sûr.
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'todo')
+})
+
+// --- attribution ------------------------------------------------------------
+//
+// Fermer « tout ce qui est en vol » ne suffisait pas : `ovrsee-tool-edit` met
+// en vol TOUS les tickets du plan dès la première édition, donc le premier
+// commit les soldait encore tous. Le maillon manquant était l'attribution — à
+// quel ticket ce commit correspond-il ?
+//
+// Le dépôt donne déjà la réponse : ses messages citent le ticket, « (T-0124) ».
+// Quand la citation est là, elle tranche. Sinon on ne devine que si le plan n'a
+// qu'un seul ticket ouvert ; au-delà, on ne touche à rien.
+
+test('un commit qui cite un ticket ne ferme que celui-là', () => {
+  const ovrseeDir = fixture()
+  const plan = '2026-08-10-x.md'
+  const cite = createTicket(ovrseeDir, { titre: 'Cité', colonne: 'en-cours', plan })
+  const autre = createTicket(ovrseeDir, { titre: 'Autre', colonne: 'en-cours', plan })
+
+  avancerTicketsDuPlan(ovrseeDir, plan, `feat: quelque chose (${cite.meta.id})`)
+
+  const colonne = f => readTickets(ovrseeDir).find(t => t.file === f).meta.colonne
+  assert.equal(colonne(cite.file), 'fait')
+  assert.equal(colonne(autre.file), 'en-cours')
+})
+
+test('sans citation, un plan à plusieurs tickets ouverts ne ferme rien', () => {
+  const ovrseeDir = fixture()
+  const plan = '2026-08-10-x.md'
+  const a = createTicket(ovrseeDir, { titre: 'A', colonne: 'en-cours', plan })
+  const b = createTicket(ovrseeDir, { titre: 'B', colonne: 'en-cours', plan })
+
+  avancerTicketsDuPlan(ovrseeDir, plan, 'fix: sans citation')
+
+  const colonne = f => readTickets(ovrseeDir).find(t => t.file === f).meta.colonne
+  assert.equal(colonne(a.file), 'en-cours')
+  assert.equal(colonne(b.file), 'en-cours')
+})
+
+test('sans citation, un plan à un seul ticket ouvert le ferme', () => {
+  const ovrseeDir = fixture()
+  const plan = '2026-08-10-x.md'
+  const seul = createTicket(ovrseeDir, { titre: 'Seul', colonne: 'en-cours', plan })
+  createTicket(ovrseeDir, { titre: 'Déjà fait', colonne: 'fait', plan })
+
+  avancerTicketsDuPlan(ovrseeDir, plan, 'fix: sans citation')
+
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === seul.file).meta.colonne, 'fait')
+})
+
+test('une citation ne ressuscite pas un ticket jamais commencé', () => {
+  const ovrseeDir = fixture()
+  const plan = '2026-08-10-x.md'
+  const dormant = createTicket(ovrseeDir, { titre: 'Dormant', colonne: 'backlog', plan })
+
+  avancerTicketsDuPlan(ovrseeDir, plan, `chore: rien à voir (${dormant.meta.id})`)
+
+  // Citer un ticket dit « c'est de lui qu'il s'agit », pas « il est fini » : un
+  // ticket jamais mis en vol reste où il est.
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === dormant.file).meta.colonne, 'backlog')
+})

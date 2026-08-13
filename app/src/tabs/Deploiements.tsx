@@ -16,8 +16,8 @@ import type { IntegrationsBridge } from '../useTerminal'
 const DOT_ETAT: Record<IntegrationState, string> = {
   ok: '#4cc38a',
   error: '#e5677a',
-  building: '#9096a0',
-  unknown: '#4e5158',
+  building: '#a2a8b2',
+  unknown: '#6b7078',
 }
 
 const ETAT_STYLE: Record<IntegrationState, string> = {
@@ -98,7 +98,7 @@ export function Deploiements({
             type="button"
             onClick={() => onOpenPreferences()}
             style={s(
-              'width: 100%; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 9px; border: 1px dashed #24252b; background: transparent; color: #62666e;',
+              'width: 100%; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 9px; border: 1px dashed #363841; background: transparent; color: #7f858f;',
             )}
           >
             <Plus size={14} aria-hidden="true" />
@@ -130,7 +130,7 @@ export function Deploiements({
           return (
             <div
               key={integ.id}
-              style={s('border: 1px solid #1c1d22; border-radius: 9px; background: #0c0d10; padding: 11px 12px;')}
+              style={s('border: 1px solid #2b2d35; border-radius: 9px; background: #101216; padding: 11px 12px;')}
             >
               <div style={s('display: flex; align-items: flex-start; gap: 10px;')}>
                 <span
@@ -144,7 +144,7 @@ export function Deploiements({
                   </div>
                   <div
                     style={s(
-                      'font-family: var(--font-mono); font-size: 10.5px; color: #55585f; margin-top: 2px;',
+                      'font-family: var(--font-mono); font-size: 10.5px; color: #737983; margin-top: 2px;',
                     )}
                   >
                     {status ? t(ETAT_LABEL[etat]) : t('deploiements.never_checked')}
@@ -157,7 +157,7 @@ export function Deploiements({
                     target="_blank"
                     rel="noreferrer"
                     title={integ.url}
-                    style={s('flex: none; display: block; color: #62666e;')}
+                    style={s('flex: none; display: block; color: #7f858f;')}
                   >
                     <ArrowUpRight size={14} aria-hidden="true" />
                   </a>
@@ -175,7 +175,7 @@ export function Deploiements({
               <button
                 type="button"
                 style={s(
-                  'cursor: pointer; font-size: 10.5px; padding: 3px 8px; margin-top: 8px; border-radius: 5px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+                  'cursor: pointer; font-size: 10.5px; padding: 3px 8px; margin-top: 8px; border-radius: 5px; border: 1px solid #22232a; background: #171920; color: #d5d8dd;',
                 )}
                 disabled={!ovrsee || checking === integ.id}
                 title={ovrsee ? undefined : t('deploiements.electron_only')}
@@ -202,7 +202,7 @@ function EnTete({
   return (
     <div
       style={s(
-        'height: 38px; flex: none; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #17181d;',
+        'height: 38px; flex: none; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #22242b;',
       )}
     >
       <div style={s('font-size: 12px; font-weight: 500; color: #f2f3f5;')}>{t('deploiements.title')}</div>
@@ -211,7 +211,7 @@ function EnTete({
         <button
           type="button"
           onClick={onMasquer}
-          style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #62666e;')}
+          style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #7f858f;')}
         >
           {t('deploiements.hide')}
         </button>
@@ -219,7 +219,7 @@ function EnTete({
       <button
         type="button"
         onClick={() => onOpenPreferences()}
-        style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #62666e;')}
+        style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #7f858f;')}
       >
         {t('deploiements.configure')}
       </button>

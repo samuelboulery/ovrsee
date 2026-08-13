@@ -91,7 +91,7 @@ export function Produit({
         <div style={s('flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px 22px; overflow: auto;')}>
           <div
             style={s(
-              'display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding: 48px 20px; max-width: 46ch; border: 1px dashed #24252b; border-radius: 9px;',
+              'display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding: 48px 20px; max-width: 46ch; border: 1px dashed #363841; border-radius: 9px;',
             )}
           >
             <div style={s('font-size: 12.5px; color: var(--color-neutral-500); line-height: 1.5;')}>
@@ -328,7 +328,7 @@ function Controls({
   return (
     <div
       style={s(
-        'position: absolute; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 3px; padding: 3px; border-radius: 8px; border: 1px solid #1e1f25; background: #0e0f12; z-index: 4;',
+        'position: absolute; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 3px; padding: 3px; border-radius: 8px; border: 1px solid #2b2d35; background: #0e0f12; z-index: 4;',
       )}
     >
       <button type="button" title={t('produit.zoom_out')} onClick={() => onZoom(1 / 1.2)} style={s(button)}>
@@ -347,7 +347,7 @@ function Controls({
       <button type="button" title={t('produit.zoom_in')} onClick={() => onZoom(1.2)} style={s(button)}>
         <Plus size={13} aria-hidden="true" />
       </button>
-      <div style={s('width: 1px; height: 14px; background: #1e1f25;')} />
+      <div style={s('width: 1px; height: 14px; background: #2b2d35;')} />
       <button type="button" title={t('produit.fit_window')} onClick={onFit} style={s(button)}>
         <ArrowsOutSimple size={13} aria-hidden="true" />
       </button>
@@ -406,10 +406,10 @@ function Edges({ placed, width, height }: { placed: Placed[]; width: number; hei
     >
       <defs>
         <marker id="na" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#24252c" />
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f313b" />
         </marker>
       </defs>
-      <g fill="none" stroke="#24252c" strokeWidth="1.25" markerEnd="url(#na)">
+      <g fill="none" stroke="#2f313b" strokeWidth="1.25" markerEnd="url(#na)">
         {forward.map((d, i) => (
           <path key={i} d={d} />
         ))}
@@ -446,9 +446,9 @@ function PageCard({
   // survol et la sélection restent dans la même gamme neutre que le reste
   // de l'app, la sélection se distinguant par un halo, pas une couleur.
   const etat = isSelected
-    ? 'background: #16171d; border: 1px solid #383a44; box-shadow: var(--ring-selected);'
+    ? 'background: #202229; border: 1px solid #4d5060; box-shadow: var(--ring-selected);'
     : hover.on
-      ? 'background: var(--color-surface); border: 1px solid #383a44;'
+      ? 'background: var(--color-surface); border: 1px solid #4d5060;'
       : 'background: var(--color-surface); border: 1px solid var(--color-neutral-800);'
 
   return (
@@ -470,7 +470,7 @@ function PageCard({
           {pageName(page, pages)}
         </span>
       </div>
-      <div style={s('font-family: var(--font-mono); font-size: 10.5px; color: #55585f; margin-top: 3px;')}>
+      <div style={s('font-family: var(--font-mono); font-size: 10.5px; color: #737983; margin-top: 3px;')}>
         {page.route}
       </div>
 

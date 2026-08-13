@@ -297,7 +297,7 @@ export function Tableau({
       </ViewBar>
       <div style={s('padding: 12px 22px 12px;')}>
         {enAttente && (
-          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: #101114; border: 1px solid #24252b; display: flex; align-items: center; gap: 10px;')}>
+          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: #171920; border: 1px solid #363841; display: flex; align-items: center; gap: 10px;')}>
             <div style={s('font-size: 12px; color: var(--color-text);')}>
               {t('tableau.element_context_banner')}
             </div>
@@ -313,7 +313,7 @@ export function Tableau({
           </div>
         )}
         {filtreEpic && (
-          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: #101114; border: 1px solid #24252b; display: flex; align-items: center; gap: 10px;')}>
+          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: #171920; border: 1px solid #363841; display: flex; align-items: center; gap: 10px;')}>
             <span className="tag tag-accent" style={s('font-size: 10px;')}>epic</span>
             <div style={s('font-size: 12px; color: var(--color-text);')}>
               {t('tableau.children_of')} <span style={s('font-weight: 500;')}>{filtreEpic}</span>
@@ -524,9 +524,9 @@ function ColonneVue({
         COLONNE_LARGEUR +
           COLONNE_FOND +
           // Cible de dépôt neutre — jamais un filet coloré pour signifier un
-          // état (audit §5.1) : pointillé #383a44, fond #131418.
+          // état (audit §5.1) : pointillé #4d5060, fond #1b1d24.
           (survolee
-            ? 'background: #131418; outline: 1px dashed #383a44;'
+            ? 'background: #1b1d24; outline: 1px dashed #4d5060;'
             : 'background: color-mix(in srgb, var(--color-surface) 55%, transparent);') +
           liseré,
       )}
@@ -709,7 +709,7 @@ function ColonneVue({
           {survolee && (
             <div
               style={s(
-                'font-size: 11px; color: #9096a0; text-align: center; padding: 8px; border-radius: 6px; border: 1px dashed #383a44;',
+                'font-size: 11px; color: #a2a8b2; text-align: center; padding: 8px; border-radius: 6px; border: 1px dashed #4d5060;',
               )}
             >
               {t('tableau.drop_here')}
@@ -850,9 +850,9 @@ function Carte({
       onClick={() => onOuvrir(ticket.file)}
       style={s(
         'border: 1px solid ' +
-          (selectionnee ? '#383a44' : isEpic ? '#1c1d22' : 'var(--color-neutral-800)') +
+          (selectionnee ? '#4d5060' : isEpic ? '#2b2d35' : 'var(--color-neutral-800)') +
           '; border-radius: ' + (isEpic ? '10px' : '8px') + '; padding: 10px 11px; background: ' +
-          (selectionnee ? '#16171d' : 'var(--color-surface)') +
+          (selectionnee ? '#202229' : 'var(--color-surface)') +
           '; cursor: pointer;' +
           (selectionnee ? ' box-shadow: var(--ring-selected);' : ''),
       )}

@@ -42,7 +42,7 @@ export function StatusBar({
   const contenu = (
     <div
       style={s(
-        'height: 26px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px; border-top: 1px solid #17181d; background: #0b0c0e; font-family: var(--font-mono); font-size: 10.5px; color: #55585f;',
+        'height: 26px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px; border-top: 1px solid #22242b; background: #0b0c0e; font-family: var(--font-mono); font-size: 10.5px; color: #737983;',
       )}
     >
       {left.length > 0 && (
@@ -60,12 +60,12 @@ export function StatusBar({
           const derniere = index === droite.length - 1
           return (
             <span key={index} style={s('display: flex; align-items: center; gap: 8px;')}>
-              {index > 0 && <span style={s('color: #3f424a;')}>|</span>}
+              {index > 0 && <span style={s('color: #585d66;')}>|</span>}
               <span
                 style={s(
                   derniere
-                    ? "font-family: -apple-system, 'SF Pro Text', ui-sans-serif, system-ui, sans-serif; font-size: 10.5px; color: #9096a0;"
-                    : 'font-family: var(--font-mono); font-size: 10.5px; color: #55585f;',
+                    ? "font-family: -apple-system, 'SF Pro Text', ui-sans-serif, system-ui, sans-serif; font-size: 10.5px; color: #a2a8b2;"
+                    : 'font-family: var(--font-mono); font-size: 10.5px; color: #737983;',
                 )}
               >
                 {segment}

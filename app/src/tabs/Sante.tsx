@@ -91,7 +91,7 @@ export function Sante({
               disabled={clotureEnCours}
               onClick={clorePlanActif}
               style={s(
-                'cursor: pointer; font-size: 10.5px; padding: 3px 8px; border-radius: 5px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+                'cursor: pointer; font-size: 10.5px; padding: 3px 8px; border-radius: 5px; border: 1px solid #22232a; background: #171920; color: #d5d8dd;',
               )}
             >
               {clotureEnCours ? t('sante.closing_plan') : t('sante.close_active_plan')}
@@ -102,7 +102,7 @@ export function Sante({
               type="button"
               onClick={onVoirTousLesPlans}
               style={s(
-                'cursor: pointer; font-size: 10.5px; padding: 3px 8px; border-radius: 5px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+                'cursor: pointer; font-size: 10.5px; padding: 3px 8px; border-radius: 5px; border: 1px solid #22232a; background: #171920; color: #d5d8dd;',
               )}
             >
               {t('sante.see_all_plans')}
@@ -115,7 +115,7 @@ export function Sante({
         )}
 
         {ouverts.length > 0 && (
-          <div style={s('border: 1px solid #1c1d22; border-radius: 8px; background: #0c0d10; overflow: hidden;')}>
+          <div style={s('border: 1px solid #2b2d35; border-radius: 8px; background: #101216; overflow: hidden;')}>
             {ouverts.map((plan, index) => {
               const actif = plan.file === snapshot.activePlan
               return (
@@ -123,12 +123,12 @@ export function Sante({
                   key={plan.file}
                   style={s(
                     'display: flex; align-items: center; gap: 8px; padding: 8px 10px; ' +
-                      (index < ouverts.length - 1 ? 'border-bottom: 1px solid #17181d;' : ''),
+                      (index < ouverts.length - 1 ? 'border-bottom: 1px solid #22242b;' : ''),
                   )}
                 >
                   <span
                     style={s(
-                      `width: 5px; height: 5px; border-radius: 50%; flex: none; background: ${actif ? '#7d76f0' : '#33353c'};`,
+                      `width: 5px; height: 5px; border-radius: 50%; flex: none; background: ${actif ? '#7d76f0' : '#45474f'};`,
                     )}
                   />
                   <span
@@ -147,7 +147,7 @@ export function Sante({
                       {t('sante.active_badge')}
                     </span>
                   )}
-                  <span style={s('flex: none; font-family: var(--font-mono); font-size: 10.5px; color: #62666e;')}>
+                  <span style={s('flex: none; font-family: var(--font-mono); font-size: 10.5px; color: #7f858f;')}>
                     {humanAge(plan.opened)}
                   </span>
                 </div>
@@ -164,7 +164,7 @@ function Titre({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={s(
-        'font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #55585f; margin-bottom: 10px;',
+        'font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983; margin-bottom: 10px;',
       )}
     >
       {children}
@@ -175,12 +175,12 @@ function Titre({ children }: { children: React.ReactNode }) {
 const ETAT_BADGE: Record<'ok' | 'attention' | 'neutre', string> = {
   ok: 'background: #0b1610; border: 1px solid #1c3728; color: #4cc38a;',
   attention: 'background: #1a1608; border: 1px solid #3a3117; color: #e3b341;',
-  neutre: 'background: #101114; border: 1px solid #22232a; color: #9096a0;',
+  neutre: 'background: #171920; border: 1px solid #22232a; color: #a2a8b2;',
 }
 const DOT_ETAT: Record<'ok' | 'attention' | 'neutre', string> = {
   ok: '#4cc38a',
   attention: '#e3b341',
-  neutre: '#4e5158',
+  neutre: '#6b7078',
 }
 
 function Badge({ texte, etat }: { texte: string; etat: 'ok' | 'attention' | 'neutre' }) {

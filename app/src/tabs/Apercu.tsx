@@ -67,7 +67,7 @@ const EDITEURS: Array<[Editeur, string]> = [
 ]
 
 const BOUTON =
-  'height: 27px; display: flex; align-items: center; gap: 7px; padding: 0 10px; border-radius: 6px; border: 1px solid #24252b; background: #101114; font-size: 12px; color: #d5d8dd;'
+  'height: 27px; display: flex; align-items: center; gap: 7px; padding: 0 10px; border-radius: 6px; border: 1px solid #363841; background: #171920; font-size: 12px; color: #d5d8dd;'
 
 /**
  * Onglet Aperçu — la page d'arrivée.
@@ -170,7 +170,7 @@ export function Apercu({
       <ViewBar projet={nom} vue={t('tabs.apercu')}>
         <Actions root={root} onTerminal={onTerminal} />
       </ViewBar>
-      <div style={s('flex: none; padding: 22px 24px 18px; border-bottom: 1px solid #17181d;')}>
+      <div style={s('flex: none; padding: 22px 24px 18px; border-bottom: 1px solid #22242b;')}>
         <Illisibles entries={snapshot.illisibles ?? []} />
 
         <div
@@ -179,11 +179,11 @@ export function Apercu({
           )}
         >
           <h2 style={s('font-size: 21px; font-weight: 600; letter-spacing: -.015em; margin: 0;')}>{nom}</h2>
-          <div style={s('font-family: var(--font-mono); font-size: 11px; color: #55585f;')}>{root}</div>
+          <div style={s('font-family: var(--font-mono); font-size: 11px; color: #737983;')}>{root}</div>
         </div>
 
         {packageJson?.description && (
-          <div style={s('font-size: 13px; color: #9096a0; line-height: 1.6; margin-top: 8px; max-width: 720px; text-wrap: pretty;')}>
+          <div style={s('font-size: 13px; color: #a2a8b2; line-height: 1.6; margin-top: 8px; max-width: 720px; text-wrap: pretty;')}>
             {packageJson.description}
           </div>
         )}
@@ -263,11 +263,11 @@ export function Apercu({
             onOpenPreferences={onOpenPreferences}
           />
 
-          <div style={s('height: 1px; background: #17181d; margin: 18px 0;')} />
+          <div style={s('height: 1px; background: #22242b; margin: 18px 0;')} />
 
           <div
             style={s(
-              'height: 38px; flex: none; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #17181d;',
+              'height: 38px; flex: none; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #22242b;',
             )}
           >
             <div style={s('font-size: 12px; font-weight: 500; color: #f2f3f5;')}>README.md</div>
@@ -276,7 +276,7 @@ export function Apercu({
               <button
                 type="button"
                 onClick={() => setReadmeOpen(open => !open)}
-                style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #62666e;')}
+                style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #7f858f;')}
               >
                 {readmeOpen ? t('apercu.hide_readme') : t('apercu.show_readme')}
               </button>
@@ -394,7 +394,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
       <div ref={refEditeur} style={s('position: relative;')}>
         <div
           style={s(
-            'display: flex; align-items: center; height: 27px; border-radius: 6px; border: 1px solid #24252b; background: #101114; overflow: hidden;',
+            'display: flex; align-items: center; height: 27px; border-radius: 6px; border: 1px solid #363841; background: #171920; overflow: hidden;',
           )}
         >
           <button
@@ -414,16 +414,16 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
             aria-label={t('apercu.editor')}
             aria-expanded={menuEditeur}
             style={s(
-              'cursor: pointer; display: flex; align-items: center; height: 100%; padding: 0 8px; border: 0; border-left: 1px solid #24252b; background: transparent;',
+              'cursor: pointer; display: flex; align-items: center; height: 100%; padding: 0 8px; border: 0; border-left: 1px solid #363841; background: transparent;',
             )}
           >
-            <CaretDown size={10} weight="bold" aria-hidden="true" color="#55585f" />
+            <CaretDown size={10} weight="bold" aria-hidden="true" color="#737983" />
           </button>
         </div>
         {menuEditeur && (
           <div
             style={s(
-              'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 140px; padding: 4px; border-radius: 8px; border: 1px solid #1c1d22; background: #101114; box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
+              'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 140px; padding: 4px; border-radius: 8px; border: 1px solid #2b2d35; background: #171920; box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
             )}
           >
             {EDITEURS.map(([valeur, nomOpt]) => (
@@ -439,7 +439,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
                   setMenuEditeur(false)
                 }}
                 style={s(
-                  `cursor: pointer; text-align: left; height: 27px; padding: 0 8px; border-radius: 5px; border: 0; font-size: 12px; background: ${valeur === editeur ? '#1c1d24' : 'transparent'}; color: ${valeur === editeur ? '#f2f3f5' : '#b6bac1'};`,
+                  `cursor: pointer; text-align: left; height: 27px; padding: 0 8px; border-radius: 5px; border: 0; font-size: 12px; background: ${valeur === editeur ? '#262832' : 'transparent'}; color: ${valeur === editeur ? '#f2f3f5' : '#b6bac1'};`,
                 )}
               >
                 {nomOpt}
@@ -455,7 +455,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
         style={s(BOUTON)}
         onClick={() => ovrsee.projects.reveal(root)}
       >
-        <FolderOpen size={14} weight="regular" aria-hidden="true" color="#62666e" />
+        <FolderOpen size={14} weight="regular" aria-hidden="true" color="#7f858f" />
         {t('apercu.reveal')}
       </button>
 
@@ -472,7 +472,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
             aria-label={t('apercu.more_actions')}
             aria-expanded={menuPlus}
             style={s(
-              'cursor: pointer; width: 27px; height: 27px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #24252b; background: #101114; color: #9096a0;',
+              'cursor: pointer; width: 27px; height: 27px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #363841; background: #171920; color: #a2a8b2;',
             )}
           >
             <DotsThree size={16} weight="bold" aria-hidden="true" />
@@ -480,7 +480,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
           {menuPlus && (
             <div
               style={s(
-                'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 160px; padding: 4px; border-radius: 8px; border: 1px solid #1c1d22; background: #101114; box-shadow: 0 12px 28px rgba(0,0,0,.5);',
+                'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 160px; padding: 4px; border-radius: 8px; border: 1px solid #2b2d35; background: #171920; box-shadow: 0 12px 28px rgba(0,0,0,.5);',
               )}
             >
               <button
@@ -529,7 +529,7 @@ function Sommaire({
               aller(titre.id)
             }}
             style={s(
-              'display: block; font-size: 12.5px; color: #62666e; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-left: 12px;',
+              'display: block; font-size: 12.5px; color: #7f858f; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-left: 12px;',
             )}
             title={titre.texte}
           >
@@ -676,13 +676,13 @@ function Chiffre({
   statut?: 'succes' | 'echec'
 }) {
   const legendeColor =
-    statut === 'succes' ? '#4cc38a' : statut === 'echec' ? '#e5677a' : accent ? '#8079c9' : '#55585f'
+    statut === 'succes' ? '#4cc38a' : statut === 'echec' ? '#e5677a' : accent ? '#8079c9' : '#737983'
 
   return (
     <div
       style={s(
         `flex: 1; border-radius: 9px; padding: 12px 14px; ${
-          accent ? 'border: 1px solid #2a2660; background: #0f0e1c;' : 'border: 1px solid #1c1d22; background: #0c0d10;'
+          accent ? 'border: 1px solid #2a2660; background: #0f0e1c;' : 'border: 1px solid #2b2d35; background: #101216;'
         }`,
       )}
     >
@@ -691,7 +691,7 @@ function Chiffre({
       >
         {valeur}
       </div>
-      {unite && <div style={s('font-size: 12px; color: #9096a0; margin-top: 3px;')}>{unite}</div>}
+      {unite && <div style={s('font-size: 12px; color: #a2a8b2; margin-top: 3px;')}>{unite}</div>}
       <div style={s(`font-family: var(--font-mono); font-size: 10.5px; margin-top: 2px; color: ${legendeColor};`)}>
         {legende}
       </div>

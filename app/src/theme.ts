@@ -20,9 +20,9 @@ export const darkTheme = {
   bgPrimary: '#0b0c0e',
   // Fonds secondaires (sidebars détails, modales) — niveau "contrôles",
   // plus clair, pour lire comme élevé au-dessus du panneau.
-  bgSecondary: '#101114',
+  bgSecondary: '#171920',
   // Fonds alternatifs — niveau "actif/élevé".
-  bgTertiary: '#1c1d24',
+  bgTertiary: '#262832',
   bgQuaternary: '#0b0c0e',
   bgError: '#08090a', // Erreurs terminal
   bgAlerte: '#3a3a1a', // Encadré d'avertissement (source de graphe introuvable)

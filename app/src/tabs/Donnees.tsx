@@ -141,7 +141,7 @@ function EtatVide({ titre, detail, source }: { titre: string; detail: string; so
   const [copie, setCopie] = useState(false)
 
   return (
-    <div style={s('display: flex; flex-direction: column; align-items: center; text-align: center; padding: 48px 20px; gap: 14px; border: 1px dashed #24252b; border-radius: 9px;')}>
+    <div style={s('display: flex; flex-direction: column; align-items: center; text-align: center; padding: 48px 20px; gap: 14px; border: 1px dashed #363841; border-radius: 9px;')}>
       <Database size={40} weight="regular" color="var(--color-text-quaternary)" aria-hidden="true" />
       <div style={s('font-family: var(--font-heading); font-weight: 500; font-size: 15px; color: var(--color-text);')}>
         {titre}
@@ -419,7 +419,7 @@ function LiveSchema({ tables }: { tables: SchemaTable[] }) {
                       )}
                       {column.fk && (
                         <span style={s('font-size: 11px; color: var(--color-neutral-500); font-family: var(--font-mono);')}>
-                          <span style={s('font-size: 10px; color: #55585f;')}>n → 1</span> {column.fk}
+                          <span style={s('font-size: 10px; color: #737983;')}>n → 1</span> {column.fk}
                         </span>
                       )}
                     </td>

@@ -70,7 +70,7 @@ export function Branches({
             <div
               key={branche.name}
               style={s(
-                'display: flex; align-items: center; gap: 12px; height: 28px; padding: 0 12px; border-radius: 4px; border: 1px solid #1c1d22; background: #101114;',
+                'display: flex; align-items: center; gap: 12px; height: 28px; padding: 0 12px; border-radius: 4px; border: 1px solid #2b2d35; background: #171920;',
               )}
             >
               <GitBranch size={14} weight="regular" aria-hidden="true" color="#b6bac1" />
@@ -83,7 +83,7 @@ export function Branches({
               </span>
               <span
                 style={s(
-                  'font-family: var(--font-mono); font-size: 11.5px; color: #62666e; flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
+                  'font-family: var(--font-mono); font-size: 11.5px; color: #7f858f; flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
                 )}
               >
                 {branche.upstream ?? t('branches.no_upstream')}
@@ -91,7 +91,7 @@ export function Branches({
               <div style={s('flex: 1;')} />
               <span
                 style={s(
-                  `font-family: var(--font-mono); font-size: 11.5px; flex: none; color: ${upToDate ? '#4cc38a' : '#9096a0'};`,
+                  `font-family: var(--font-mono); font-size: 11.5px; flex: none; color: ${upToDate ? '#4cc38a' : '#a2a8b2'};`,
                 )}
               >
                 {upToDate

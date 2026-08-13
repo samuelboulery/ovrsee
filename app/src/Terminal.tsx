@@ -48,9 +48,9 @@ const panelStyle = (layout: Layout, size: number): string => {
     return 'flex: 1; background: #0b0c0e; display: flex; flex-direction: column; min-height: 0; min-width: 0;'
   }
   if (layout === 'side') {
-    return `width: ${size}px; flex: none; border-left: 1px solid #17181d; background: #0b0c0e; display: flex; flex-direction: column; min-height: 0;`
+    return `width: ${size}px; flex: none; border-left: 1px solid #22242b; background: #0b0c0e; display: flex; flex-direction: column; min-height: 0;`
   }
-  return `height: ${size}px; flex: none; border-top: 1px solid #17181d; background: #0b0c0e; display: flex; flex-direction: column; min-height: 0;`
+  return `height: ${size}px; flex: none; border-top: 1px solid #22242b; background: #0b0c0e; display: flex; flex-direction: column; min-height: 0;`
 }
 
 /**
@@ -224,7 +224,7 @@ export function Terminal({
       <div style={s(panelStyle(layout, sizing.size))}>
       <div
         style={s(
-          'height: 36px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid #17181d;',
+          'height: 36px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid #22242b;',
         )}
       >
         <span
@@ -232,7 +232,7 @@ export function Terminal({
           style={s(
             available && !error
               ? 'width: 6px; height: 6px; border-radius: 50%; background: #7d76f0; display: block; flex: none;'
-              : 'width: 6px; height: 6px; border-radius: 50%; border: 1px solid #55585f; display: block; flex: none;',
+              : 'width: 6px; height: 6px; border-radius: 50%; border: 1px solid #737983; display: block; flex: none;',
           )}
         />
 
@@ -244,12 +244,12 @@ export function Terminal({
               key={session.key}
               style={s(
                 'display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 8px 0 10px; border-radius: 6px; ' +
-                  (active === session.key ? 'background: #1c1d24;' : 'background: transparent;'),
+                  (active === session.key ? 'background: #262832;' : 'background: transparent;'),
               )}
             >
               <span
                 style={s(
-                  `width: 5px; height: 5px; border-radius: 50%; flex: none; background: ${active === session.key ? '#7d76f0' : '#3f424a'};`,
+                  `width: 5px; height: 5px; border-radius: 50%; flex: none; background: ${active === session.key ? '#7d76f0' : '#585d66'};`,
                 )}
               />
               <button
@@ -257,7 +257,7 @@ export function Terminal({
                 onClick={() => setActive(session.key)}
                 style={s(
                   'cursor: pointer; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .02em; padding: 0; border: 0; background: transparent; color: ' +
-                    (active === session.key ? '#f2f3f5;' : '#9096a0;'),
+                    (active === session.key ? '#f2f3f5;' : '#a2a8b2;'),
                 )}
               >
                 {session.label}
@@ -269,7 +269,7 @@ export function Terminal({
                   aria-label={t('terminal.close_session_aria', { label: session.label })}
                   onClick={() => closeShell(session.key)}
                   style={s(
-                    'cursor: pointer; border: 0; background: transparent; color: #62666e; font-size: 12px; line-height: 1; padding: 0;',
+                    'cursor: pointer; border: 0; background: transparent; color: #7f858f; font-size: 12px; line-height: 1; padding: 0;',
                   )}
                 >
                   ×
@@ -287,7 +287,7 @@ export function Terminal({
               'cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; padding: 0; border-radius: 6px; border: 0; background: transparent;',
             )}
           >
-            <Plus size={13} weight="regular" aria-hidden="true" color="#55585f" />
+            <Plus size={13} weight="regular" aria-hidden="true" color="#737983" />
           </button>
         </div>
 
@@ -309,7 +309,7 @@ export function Terminal({
         <button
           type="button"
           onClick={onToggle}
-          style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #62666e;')}
+          style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #7f858f;')}
         >
           {t('terminal.reduce')}
         </button>
@@ -367,8 +367,8 @@ export function Terminal({
               {line.text || ' '}
             </div>
           ))}
-          <div style={s('display: flex; align-items: center; gap: 7px; color: #62666e;')}>
-            <span style={s('color: #4e5158;')}>›</span>
+          <div style={s('display: flex; align-items: center; gap: 7px; color: #7f858f;')}>
+            <span style={s('color: #6b7078;')}>›</span>
             <span>{t('terminal.no_terminal_browser')}</span>
           </div>
         </div>
@@ -376,8 +376,8 @@ export function Terminal({
         <div
           style={s(
             layout === 'side'
-              ? 'flex: none; border-top: 1px solid #17181d; padding: 12px 14px;'
-              : 'width: 268px; flex: none; border-left: 1px solid #17181d; padding: 12px 14px;',
+              ? 'flex: none; border-top: 1px solid #22242b; padding: 12px 14px;'
+              : 'width: 268px; flex: none; border-left: 1px solid #22242b; padding: 12px 14px;',
           )}
         >
           {/* La session s'ouvre pour tout projet du registre — c'est ce qui
@@ -398,7 +398,7 @@ export function Terminal({
           {/* Section : Commandes pour Claude */}
           <div
             style={s(
-              'font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #55585f;',
+              'font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983;',
             )}
           >
             {t('terminal.commands_section')}
@@ -412,7 +412,7 @@ export function Terminal({
                   type="button"
                   onClick={() => activate(action.label, action.text)}
                   style={s(
-                    'cursor: pointer; display: flex; align-items: center; gap: 8px; height: 28px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+                    'cursor: pointer; display: flex; align-items: center; gap: 8px; height: 28px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px solid #22232a; background: #171920; color: #d5d8dd;',
                   )}
                   title={action.text}
                 >
@@ -445,7 +445,7 @@ export function Terminal({
             <>
               <div
                 style={s(
-                  'font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #55585f; margin-top: 18px;',
+                  'font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983; margin-top: 18px;',
                 )}
               >
                 {t('terminal.context_section')}
@@ -457,7 +457,7 @@ export function Terminal({
                     type="button"
                     onClick={() => activate(action.label, action.text)}
                     style={s(
-                      'cursor: pointer; display: flex; align-items: center; height: 28px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+                      'cursor: pointer; display: flex; align-items: center; height: 28px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px solid #22232a; background: #171920; color: #d5d8dd;',
                     )}
                     title={action.text}
                   >
@@ -471,22 +471,22 @@ export function Terminal({
           {/* Hors des deux sections : ce bouton n'écrit rien dans le terminal,
               il fait relire `ovrsee/` à l'interface. Le ranger avec les
               commandes laissait croire qu'il lançait quelque chose. */}
-          <div style={s('margin-top: 18px; padding-top: 14px; border-top: 1px solid #17181d;')}>
+          <div style={s('margin-top: 18px; padding-top: 14px; border-top: 1px solid #22242b;')}>
             <button
               type="button"
               onClick={onReload}
               style={s(
-                'cursor: pointer; display: flex; align-items: center; width: 100%; height: 28px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px solid #22232a; background: #101114; color: #d5d8dd;',
+                'cursor: pointer; display: flex; align-items: center; width: 100%; height: 28px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px solid #22232a; background: #171920; color: #d5d8dd;',
               )}
             >
               {t('terminal.refresh_ovrsee')}
             </button>
-            <div style={s('font-size: 11px; color: #62666e; margin-top: 6px; line-height: 1.5;')}>
+            <div style={s('font-size: 11px; color: #7f858f; margin-top: 6px; line-height: 1.5;')}>
               {t('terminal.reload_hint')}
             </div>
           </div>
 
-          <div style={s('font-size: 11px; color: #62666e; margin-top: 13px; line-height: 1.5;')}>
+          <div style={s('font-size: 11px; color: #7f858f; margin-top: 13px; line-height: 1.5;')}>
             {notice ??
               (error
                 ? error

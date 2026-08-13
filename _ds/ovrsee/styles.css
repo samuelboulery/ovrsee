@@ -39,34 +39,34 @@
   --color-bg: #08090a; /* fond application */
   --color-surface: #0b0c0e; /* rails */
   --color-surface-panel: #0a0b0d; /* panneaux latéraux et dock */
-  --color-surface-card: #0c0d10; /* cartes */
-  --color-surface-control: #101114; /* contrôles */
-  --color-surface-hover: #131418; /* survol de ligne */
-  --color-surface-active: #1c1d24; /* état actif/élevé — jamais un filet
+  --color-surface-card: #101216; /* cartes */
+  --color-surface-control: #171920; /* contrôles */
+  --color-surface-hover: #1b1d24; /* survol de ligne */
+  --color-surface-active: #262832; /* état actif/élevé — jamais un filet
      de couleur : une surface élevée, un texte plus clair, et le picto qui
      passe en plein (maquette 2a). */
-  --color-surface-elevated: #16171d;
-  --color-surface-segment: #24252c; /* pastille active d'un segmenté */
+  --color-surface-elevated: #202229;
+  --color-surface-segment: #2f313b; /* pastille active d'un segmenté */
 
   /* Hiérarchie de texte — sept niveaux, rampe froide de la maquette. Valeurs
      littérales : un color-mix sur #f2f3f5 donne des gris neutres plus clairs
      que ceux de la maquette. */
   --color-text: #f2f3f5; /* titres, valeurs */
   --color-text-secondary: #b6bac1; /* corps de carte */
-  --color-text-tertiary: #9096a0; /* légendes */
-  --color-text-quaternary: #62666e; /* métadonnées */
-  --color-text-discrete: #55585f; /* libellés de section (mono, capitales) */
-  --color-text-faint: #4e5158; /* compteurs, hints */
-  --color-text-ghost: #3f424a; /* pictos inertes, puces éteintes */
+  --color-text-tertiary: #a2a8b2; /* légendes */
+  --color-text-quaternary: #7f858f; /* métadonnées */
+  --color-text-discrete: #737983; /* libellés de section (mono, capitales) */
+  --color-text-faint: #6b7078; /* compteurs, hints */
+  --color-text-ghost: #585d66; /* pictos inertes, puces éteintes */
 
   /* Filets — quatre rôles, quatre jetons (au lieu d'un --color-divider
      unique qui écrasait la hiérarchie de la maquette). --color-divider
      reste défini comme alias par défaut pour les usages pas encore migrés
      vers un rôle précis (chantiers Lot 3-7) — pointe sur le rôle carte. */
-  --color-border-chrome: #17181d; /* séparateurs de châssis, lignes de liste */
-  --color-border-card: #1c1d22; /* contour de carte */
-  --color-border-control: #24252b; /* contour de contrôle */
-  --color-border-selected: #383a44; /* contour sélectionné */
+  --color-border-chrome: #22242b; /* séparateurs de châssis, lignes de liste */
+  --color-border-card: #2b2d35; /* contour de carte */
+  --color-border-control: #363841; /* contour de contrôle */
+  --color-border-selected: #4d5060; /* contour sélectionné */
   --color-divider: var(--color-border-card);
 
   --color-accent: #7d76f0;
@@ -79,7 +79,7 @@
   --color-info: #6ea8fe; /* sha de commit, colonne « revue » */
   --color-plan: #a49dfa; --color-plan-border: #2f2a66; --color-plan-bg: #14132a;
 
-  --ring-selected: 0 0 0 4px rgba(255, 255, 255, 0.045); /* halo de sélection */
+  --ring-selected: 0 0 0 4px rgba(255, 255, 255, 0.075); /* halo de sélection */
 
   /* Tonal ramps — même teinte que l'accent et le neutre de base, 9 paliers
      de luminosité générés une fois (voir T-0045). Rampe neutre recolorée en
@@ -91,13 +91,13 @@
      inversés — pas une nouvelle teinte par thème. */
   --color-neutral-100: #f2f3f5;
   --color-neutral-200: #dcdee2;
-  --color-neutral-300: #b6bac1;
-  --color-neutral-400: #9096a0;
-  --color-neutral-500: #74787f;
-  --color-neutral-600: #62666e;
-  --color-neutral-700: #55585f;
-  --color-neutral-800: #3f424a;
-  --color-neutral-900: #24252b;
+  --color-neutral-300: #c2c6cd;
+  --color-neutral-400: #a2a8b2;
+  --color-neutral-500: #8b919b;
+  --color-neutral-600: #7f858f;
+  --color-neutral-700: #737983;
+  --color-neutral-800: #585d66;
+  --color-neutral-900: #363841;
 
   --color-accent-100: #eeedfd;
   --color-accent-200: #d8d6fa;

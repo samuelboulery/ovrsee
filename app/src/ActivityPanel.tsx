@@ -24,7 +24,7 @@ const plur = (n: number, mot: string) => `${n} ${mot}${n > 1 ? 's' : ''}`
 const COULEUR_SERIE = {
   plans: '#7d76f0',
   tickets: '#4b46a3',
-  commits: '#2a2b33',
+  commits: '#3a3c47',
 } as const
 
 /**
@@ -231,7 +231,7 @@ function Legend() {
   )
 }
 
-const NIVEAUX_DENSITE = ['#1c1d24', '#2a2660', '#4b46a3', '#6259cc', '#7d76f0']
+const NIVEAUX_DENSITE = ['#262832', '#2a2660', '#4b46a3', '#6259cc', '#7d76f0']
 
 function DensityLegend() {
   return (

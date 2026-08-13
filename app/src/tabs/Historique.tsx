@@ -92,7 +92,7 @@ export function Historique({
             <div style={s('padding: 40px 0; display: flex; align-items: center; justify-content: center;')}>
               <div
                 style={s(
-                  'padding: 48px 20px; max-width: 46ch; text-align: center; border: 1px dashed #24252b; border-radius: 9px; font-size: 12.5px; color: var(--color-neutral-500); line-height: 1.6;',
+                  'padding: 48px 20px; max-width: 46ch; text-align: center; border: 1px dashed #363841; border-radius: 9px; font-size: 12.5px; color: var(--color-neutral-500); line-height: 1.6;',
                 )}
               >
                 {t('apercu.project_timeline_empty')}
@@ -211,7 +211,7 @@ function DayHeading({ date }: { date: string }) {
   return (
     <div style={s('display: flex; align-items: center; gap: 10px; margin: 18px 0 8px;')}>
       <div className="kicker">{frDate(date)}</div>
-      <div style={s('flex: 1; height: 1px; background: #17181d;')} />
+      <div style={s('flex: 1; height: 1px; background: #22242b;')} />
     </div>
   )
 }
@@ -258,14 +258,14 @@ function TicketCard({ ticket, onOuvrir }: { ticket: Ticket; onOuvrir: (file: str
       type="button"
       onClick={() => onOuvrir(ticket.file)}
       style={s(
-        `display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; cursor: pointer; font-family: var(--font-body); color: inherit; margin: 3px 0; padding: 10px 11px; border-radius: 10px; border: 1px solid ${enCours ? '#22232a' : '#1c1d22'}; background: ${enCours ? '#0e0f12' : '#0c0d10'};`,
+        `display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; cursor: pointer; font-family: var(--font-body); color: inherit; margin: 3px 0; padding: 10px 11px; border-radius: 10px; border: 1px solid ${enCours ? '#22232a' : '#2b2d35'}; background: ${enCours ? '#0e0f12' : '#101216'};`,
       )}
     >
       <span
         style={s(`width: 5px; height: 5px; border-radius: 50%; flex: none; background: ${COULEUR_PRIORITE[ticket.priorite] ?? COULEUR_PRIORITE.moyenne};`)}
         title={`${t('tableau.priority_label')} ${ticket.priorite}`}
       />
-      <span style={s('font-family: var(--font-mono); font-size: 10.5px; color: #62666e; flex: none;')}>
+      <span style={s('font-family: var(--font-mono); font-size: 10.5px; color: #7f858f; flex: none;')}>
         {ticket.id}
       </span>
       <span style={s('font-size: 12.5px; color: var(--color-neutral-300); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>
@@ -439,7 +439,7 @@ function PlanBandShell({
   return (
     <div
       style={s(
-        `border-left: 2px solid ${actif ? '#2a2660' : '#24252c'}; padding: 8px 0 8px 14px; margin: 6px 0 6px 1px;`,
+        `border-left: 2px solid ${actif ? '#2a2660' : '#2f313b'}; padding: 8px 0 8px 14px; margin: 6px 0 6px 1px;`,
       )}
     >
       <button

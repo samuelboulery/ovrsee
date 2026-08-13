@@ -628,7 +628,7 @@ export function Navigateur({
           style={s(
             'display: flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; cursor: pointer; ' +
               (picking
-                ? 'background: #24252c; border: 1px solid #383a44; color: #f2f3f5;'
+                ? 'background: #2f313b; border: 1px solid #4d5060; color: #f2f3f5;'
                 : 'background: transparent; border: 1px solid var(--color-border-control); color: var(--color-neutral-500);'),
           )}
           title={picking ? t('navigateur.pick_element') : t('navigateur.pick_element_inactive')}
@@ -659,8 +659,8 @@ export function Navigateur({
                   style={s(
                     'cursor: pointer; font-family: var(--font-body); font-size: 10.5px; letter-spacing: .06em; padding: 4px 9px; border-radius: 5px; border: 1px solid ' +
                       (dock === id
-                        ? '#24252c; background: #24252c; color: #f2f3f5;'
-                        : '#22232a; background: transparent; color: #9096a0;'),
+                        ? '#2f313b; background: #2f313b; color: #f2f3f5;'
+                        : '#22232a; background: transparent; color: #a2a8b2;'),
                   )}
                 >
                   {displayLabel}
@@ -698,7 +698,7 @@ export function Navigateur({
         {!url && (
           <div
             style={s(
-              'position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: #4e5158;',
+              'position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: #6b7078;',
             )}
           >
             {t('navigateur.no_url')}
@@ -801,7 +801,7 @@ export function Navigateur({
                   <span aria-hidden="true">{log.level === 'error' ? '✕' : '▲'}</span>{' '}
                   <span style={s('color: var(--color-neutral-500);')}>{log.message}</span>
                   {log.source && (
-                    <span style={s('color: #4e5158;')}> · {log.source}</span>
+                    <span style={s('color: #6b7078;')}> · {log.source}</span>
                   )}
                 </div>
               ))}

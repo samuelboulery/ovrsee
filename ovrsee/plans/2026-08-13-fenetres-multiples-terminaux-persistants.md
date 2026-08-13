@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Fenêtres multiples + terminaux persistants",
   "opened": "2026-08-13",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": [
     {
       "sha": "cfee865",
@@ -19,6 +19,11 @@
     },
     {
       "sha": "1079a02",
+      "date": "2026-08-13",
+      "files": []
+    },
+    {
+      "sha": "a9b8960",
       "date": "2026-08-13",
       "files": []
     }

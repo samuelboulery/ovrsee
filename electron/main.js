@@ -460,6 +460,20 @@ app.whenReady().then(() => {
     return true
   })
 
+  // Ramener au premier plan la fenêtre qui le demande — le clic sur une
+  // notification de session (`app/src/attention.ts`).
+  //
+  // Aucun argument : la fenêtre visée est celle qui a émis l'appel, jamais une
+  // fenêtre désignée par le rendu. `show()` avant `focus()` parce qu'une
+  // fenêtre réduite refuse le focus tant qu'elle n'est pas rétablie.
+  ipcMain.handle('app:focus', event => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    if (!window) return
+    if (window.isMinimized()) window.restore()
+    window.show()
+    window.focus()
+  })
+
   // Choisir un dossier. Le seul geste qui ne peut pas passer par `/api` : une
   // page web n'a pas le droit de connaître un chemin du disque tant que
   // l'utilisateur ne l'a pas désigné lui-même. Aucun argument venu du rendu —

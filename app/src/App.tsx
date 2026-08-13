@@ -706,6 +706,7 @@ export function App() {
                   terminalWidth={terminalWidth}
                   onTerminalHeightChange={setTerminalHeight}
                   onTerminalWidthChange={setTerminalWidth}
+                  onProjet={setCurrent}
                 />
               )}
             </div>

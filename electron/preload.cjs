@@ -80,6 +80,16 @@ contextBridge.exposeInMainWorld('ovrsee', {
     },
   },
 
+  app: {
+    /**
+     * Ramène la fenêtre au premier plan.
+     *
+     * Sans argument, et c'est ce qui la rend sûre : le processus principal vise
+     * la fenêtre émettrice, le rendu n'en désigne aucune.
+     */
+    focus: () => ipcRenderer.invoke('app:focus'),
+  },
+
   preview: {
     /**
      * Ouvre les DevTools de l'aperçu dans la fenêtre, et les place.

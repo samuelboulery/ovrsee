@@ -1,4 +1,4 @@
-import { useState, type ComponentType } from 'react'
+import { useRef, useState, type ComponentType } from 'react'
 import { Compass, GitFork, NotePencil, Plus, type IconProps } from '@phosphor-icons/react'
 
 import { briefLines, buildActions, type Snapshot, type SettingsType } from './data'
@@ -76,6 +76,7 @@ export function Terminal({
   terminalWidth,
   onTerminalHeightChange,
   onTerminalWidthChange,
+  onProjet,
 }: {
   layout: Layout
   onLayout: (layout: Layout) => void
@@ -90,8 +91,18 @@ export function Terminal({
   terminalWidth: number
   onTerminalHeightChange: (height: number) => void
   onTerminalWidthChange: (width: number) => void
+  /** Affiche un projet — au clic sur une notification venue d'un autre. */
+  onProjet: (path: string) => void
 }) {
   const [notice, setNotice] = useState<string | null>(null)
+
+  // Déclaré avant `useTerminals` pour lui être passé, mais il lit `active` et
+  // `cibler` qui en sortent : d'où la référence, tenue à jour à chaque rendu.
+  const etat = useRef<{ active: string | null; cibler: (key: string) => void }>({
+    active: null,
+    cibler: () => {},
+  })
+
   const {
     sessions,
     allSessions,
@@ -102,9 +113,32 @@ export function Terminal({
     closeShell,
     errors,
     focusClaude,
+    cibler,
     claudeKey,
     available,
-  } = useTerminals(snapshot?.root ?? null)
+  } = useTerminals(snapshot?.root ?? null, (sessionKey, kind) => {
+    // Rien à signaler si la session est sous les yeux : la notification
+    // doublonnerait ce que l'utilisateur est déjà en train de regarder.
+    if (sessionKey === etat.current.active && document.hasFocus()) return
+    if (typeof Notification === 'undefined') return
+
+    const titre = t(kind === 'question' ? 'terminal.notify_question' : 'terminal.notify_stop')
+    const projet = sessionKey.slice(0, Math.max(0, sessionKey.lastIndexOf('#')))
+    // Le nom du dossier plutôt que celui du registre : la notification peut
+    // venir d'un projet qui n'est pas l'affiché, dont le snapshot n'est pas là.
+    const nom = projet.split('/').filter(Boolean).pop() ?? projet
+
+    // `tag` : une session qui signale deux fois remplace sa notification au
+    // lieu d'en empiler une seconde.
+    const notification = new Notification(titre, { body: nom, tag: sessionKey })
+    notification.onclick = () => {
+      window.ovrsee?.app.focus()
+      etat.current.cibler(sessionKey)
+      if (projet) onProjet(projet)
+    }
+  })
+
+  etat.current = { active, cibler }
 
   const error = active ? (errors[active] ?? null) : null
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { Integration, IntegrationProvider, IntegrationStatus, SchemaTable } from './data'
+import { extractAttention, type AttentionKind } from './attention'
 import { getTerminalTheme } from './theme'
 // WHY: xterm est le terminal de VS Code, pas une imitation. Un rendu maison
 // devrait réimplémenter les séquences ANSI, le défilement et la sélection —
@@ -72,6 +73,11 @@ declare global {
       }
       /** Commandes du menu natif — voir `electron/menu.js`. */
       menu: { on: (handler: (command: string) => void) => () => void }
+      /**
+       * Ramène la fenêtre au premier plan. La seule chose qu'un clic sur une
+       * notification ne peut pas faire depuis le rendu.
+       */
+      app: { focus: () => Promise<void> }
       /** Onglet Navigateur — voir `electron/preload.cjs`. */
       preview: {
         devtools: (
@@ -150,6 +156,13 @@ const claudeSlot = (project: string): Session => ({
 })
 
 /**
+ * Prévenu quand une session réclame l'attention — voir `attention.ts`.
+ * Ce hook se contente de repérer le signal dans le flux ; s'il faut notifier,
+ * et où le clic renvoie, se décide dans `Terminal.tsx`.
+ */
+export type OnAttention = (sessionKey: string, kind: AttentionKind) => void
+
+/**
  * Ouvre les sessions du panneau et les relie chacune à un xterm.
  *
  * Une session `claude` par projet, ouverte d'office ; autant de shells nus que
@@ -158,7 +171,7 @@ const claudeSlot = (project: string): Session => ({
  * tourner, montées hors écran (même motif qu'entre sessions d'un même projet,
  * voir `Terminal.tsx`), et réapparaissent telles quelles au retour.
  */
-export function useTerminals(projectPath: string | null) {
+export function useTerminals(projectPath: string | null, onAttention?: OnAttention) {
   const [sessions, setSessions] = useState<Session[]>([])
   const [active, setActive] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -175,6 +188,10 @@ export function useTerminals(projectPath: string | null) {
   // de projet pendant l'ouverture ferait écrire `injectToClaude` dans la
   // mauvaise session.
   const activeProjectRef = useRef(projectPath)
+  // L'abonnement au flux ne se refait jamais ; sans cette référence il
+  // capturerait la callback du premier rendu et notifierait avec un état périmé.
+  const attentionRef = useRef(onAttention)
+  attentionRef.current = onAttention
   // Une fonction de référence par session, gardée telle quelle d'un rendu à
   // l'autre : React appelle une référence changeante avec `null` puis avec
   // l'élément, ce qui détruirait et rouvrirait la session à chaque rendu.
@@ -207,17 +224,29 @@ export function useTerminals(projectPath: string | null) {
 
   // Un seul abonnement pour toutes les sessions : `listen` porte déjà
   // l'identifiant, et deux abonnements écriraient deux fois le même octet.
+  // L'effet n'a pas de dépendances — la callback passe donc par une référence,
+  // même motif que `activeProjectRef` plus bas.
   useEffect(() => {
     const bridge = terminalBridge()
     if (!bridge) return
 
+    // Fin de séquence en attente, par pty : le signal peut arriver coupé
+    // entre deux lectures.
+    const carries = new Map<string, string>()
+
     return bridge.listen(
       (id, data) => {
-        for (const pane of panes.current.values()) {
-          if (pane.id === id) pane.xterm.write(data)
+        const scan = extractAttention(carries.get(id) ?? '', data)
+        carries.set(id, scan.carry)
+
+        for (const [key, pane] of panes.current) {
+          if (pane.id !== id) continue
+          pane.xterm.write(scan.clean)
+          for (const kind of scan.events) attentionRef.current?.(key, kind)
         }
       },
       (id, code) => {
+        carries.delete(id)
         for (const [key, pane] of panes.current) {
           if (pane.id !== id) continue
           pane.xterm.writeln(`\r\n\x1b[38;5;140m— session terminée (code ${code}) —\x1b[0m`)
@@ -409,6 +438,27 @@ export function useTerminals(projectPath: string | null) {
     [projectPath],
   )
 
+  /**
+   * Désigne l'onglet à afficher, y compris dans un projet qui n'est pas
+   * l'affiché — c'est le cas au clic sur une notification venue d'ailleurs.
+   *
+   * Passer par `setActive` ne suffirait pas : il inscrit le choix sous le
+   * projet **courant**, et l'appelant ne peut pas attendre que le changement
+   * de projet ait eu lieu, un état React ne s'applique pas dans le même tour.
+   * On écrit donc directement la mémoire du projet visé ; l'effet de
+   * changement de projet la relit et se posera sur le bon onglet.
+   */
+  const cibler = useCallback(
+    (key: string) => {
+      const separateur = key.lastIndexOf('#')
+      if (separateur < 1) return
+      const project = key.slice(0, separateur)
+      activeByProject.current.set(project, key)
+      if (project === projectPath) setActive(key)
+    },
+    [projectPath],
+  )
+
   // Toutes les sessions de tous les projets visités : `Terminal.tsx` les monte
   // toutes pour ne jamais démonter un onglet caché, seule `sessions`
   // (ci-dessus, celles du projet courant) alimente la barre de pastilles.
@@ -424,6 +474,7 @@ export function useTerminals(projectPath: string | null) {
     closeShell,
     errors,
     focusClaude,
+    cibler,
     claudeKey: projectPath ? claudeSlot(projectPath).key : null,
     available: Boolean(terminalBridge()),
   }

@@ -154,6 +154,19 @@ function installClaudeHooks(done) {
     added.push('PostToolUse/ExitPlanMode — capture des plans approuvés')
   }
 
+  // Stop et Notification : le signal de session lu par le panneau terminal.
+  // Deux événements, un seul script — il ne fait qu'émettre une séquence, et
+  // la séparer en deux fichiers dupliquerait la table des types de
+  // notification pour rien.
+  for (const event of ['Stop', 'Notification']) {
+    const entries = (hooks[event] ??= [])
+    if (entries.some(e => isOvrsee(e, 'ovrsee-notify'))) continue
+    entries.push({
+      hooks: [{ type: 'command', command: commandFor('ovrsee-notify.js'), timeout: 5 }],
+    })
+    added.push(`${event} — signal de session vers le panneau terminal`)
+  }
+
   if (added.length === 0) {
     done.push('Hooks Claude Code : déjà installés.')
     return

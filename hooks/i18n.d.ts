@@ -725,6 +725,8 @@ export type TranslationKey =
   | 'terminal.close_session'
   | 'terminal.close_session_aria'
   | 'terminal.open_shell'
+  | 'terminal.notify_stop'
+  | 'terminal.notify_question'
   | 'terminal.reduce'
   | 'terminal.no_terminal_browser'
   | 'terminal.commands_section'

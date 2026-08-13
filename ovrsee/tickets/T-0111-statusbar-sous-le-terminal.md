@@ -2,7 +2,7 @@
 {
   "id": "T-0111",
   "titre": "Placer la barre d'état sous le panneau de terminal",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": ["ui", "layout"],
   "cree": "2026-08-13",

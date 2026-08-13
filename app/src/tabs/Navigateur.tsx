@@ -837,6 +837,7 @@ export function Navigateur({
       )}
       </div>
 
+      {visible && (
       <StatusBar
         dot={failure ? 'err' : 'ok'}
         left={[
@@ -845,6 +846,7 @@ export function Navigateur({
         ]}
         right={[t('statusbar.selector_shortcut')]}
       />
+      )}
     </div>
   )
 }

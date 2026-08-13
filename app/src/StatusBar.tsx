@@ -1,3 +1,6 @@
+import { createContext, useContext } from 'react'
+import { createPortal } from 'react-dom'
+
 import { s } from './style'
 
 const COULEUR_DOT: Record<'ok' | 'warn' | 'err', string> = {
@@ -5,6 +8,15 @@ const COULEUR_DOT: Record<'ok' | 'warn' | 'err', string> = {
   warn: '#e3b341',
   err: '#e5677a',
 }
+
+/**
+ * Emplacement réel de la barre — un pied de page unique, sous le terminal.
+ * Chaque onglet continue de rendre `<StatusBar>` chez lui (maquette : présente
+ * partout) ; le contenu part en portail vers ce nœud pour ne pas dépendre de
+ * l'ordre DOM entre l'onglet et le panneau de terminal. Sans Provider (tests
+ * SSR de `render.test.tsx`), la barre reste inline.
+ */
+export const StatusBarSlotContext = createContext<HTMLDivElement | null>(null)
 
 /**
  * Barre d'état — maquette `Ovrsee App.dc.html#2a`, 26px, présente sur chaque
@@ -25,8 +37,9 @@ export function StatusBar({
   right?: string[]
 }) {
   const droite = [...right, '⌘K']
+  const slot = useContext(StatusBarSlotContext)
 
-  return (
+  const contenu = (
     <div
       style={s(
         'height: 26px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px; border-top: 1px solid #17181d; background: #0b0c0e; font-family: var(--font-mono); font-size: 10.5px; color: #55585f;',
@@ -63,4 +76,6 @@ export function StatusBar({
       </div>
     </div>
   )
+
+  return slot ? createPortal(contenu, slot) : contenu
 }

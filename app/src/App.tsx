@@ -39,6 +39,7 @@ import { PreferencesModal, type SectionId } from './PreferencesPanel'
 import { Welcome } from './Welcome'
 import { EquipmentPanel } from './EquipmentPanel'
 import { s } from './style'
+import { StatusBarSlotContext } from './StatusBar'
 import { Apercu } from './tabs/Apercu'
 import { Navigateur } from './tabs/Navigateur'
 import { Produit } from './tabs/Produit'
@@ -168,6 +169,9 @@ export function App() {
   const [focusRoute, setFocusRoute] = useState<string | null>(() => routeFromUrl())
   const [layout, setLayout] = useState<Layout>('bottom')
   const [terminal, setTerminal] = useState(true)
+  // Pied de page réel de `StatusBar` (T-0111) : sous le terminal, pas coincée
+  // entre le contenu de l'onglet et lui — voir StatusBarSlotContext.
+  const [statusBarSlot, setStatusBarSlot] = useState<HTMLDivElement | null>(null)
   const [terminalHeight, setTerminalHeight] = useState(244)
   const [terminalWidth, setTerminalWidth] = useState(468)
 
@@ -501,6 +505,7 @@ export function App() {
     // existe maintenant : redessiner son chrome à l'intérieur ferait deux
     // barres de titre l'une dans l'autre. L'interface occupe donc toute la
     // fenêtre, et macOS fournit le chrome.
+    <StatusBarSlotContext.Provider value={statusBarSlot}>
     <div
       style={s(
         'height: 100vh; overflow: hidden; display: flex; flex-direction: column; background: var(--color-bg); font-family: var(--font-body); color: var(--color-text);',
@@ -746,6 +751,10 @@ export function App() {
                 </span>
               </div>
             )}
+
+            {/* Cible du portail de `StatusBar` (T-0111) : toujours après le
+                terminal, quel que soit l'onglet actif ou l'état du panneau. */}
+            <div ref={setStatusBarSlot} style={s('flex: none;')} />
           </div>
         </div>
       </div>
@@ -804,6 +813,7 @@ export function App() {
         />
       )}
     </div>
+    </StatusBarSlotContext.Provider>
   )
 }
 

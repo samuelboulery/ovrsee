@@ -673,9 +673,17 @@ export function avancerTicketsClos(ovrseeDir) {
   const plansFermes = new Set(readPlans(ovrseeDir).filter(p => p.meta.status === 'closed').map(p => p.file))
   if (plansFermes.size === 0) return []
 
+  // Même règle qu'au commit : on ne solde que ce qui était en vol. Un ticket
+  // jamais commencé n'est pas « fait », et clore le plan ne le rend pas vrai —
+  // il reste visible, et rattachable à un autre plan.
+  const iEnCours = colonnes.findIndex(c => c.id === EN_COURS)
+  if (iEnCours === -1) return []
+  const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
+
   const avances = []
   for (const ticket of readTickets(ovrseeDir, colonnes)) {
     if (!plansFermes.has(ticket.meta.plan) || ticket.meta.colonne === finale) continue
+    if ((rangDe.get(ticket.meta.colonne) ?? -1) < iEnCours) continue
 
     try {
       moveTicket(ovrseeDir, ticket.file, finale)

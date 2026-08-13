@@ -20,6 +20,19 @@
       "sha": "1df162f",
       "date": "2026-08-13",
       "files": []
+    },
+    {
+      "sha": "9e1dd05",
+      "date": "2026-08-14",
+      "files": [
+        "hooks/ovrsee-post-commit.js",
+        "hooks/ovrsee-post-commit.test.js",
+        "hooks/ovrsee-tool-edit.js",
+        "hooks/ovrsee-tool-edit.test.js",
+        "hooks/ovrsee-tool-stop.js",
+        "hooks/tickets.js",
+        "skills/ovrsee-tickets/SKILL.md"
+      ]
     }
   ]
 }

@@ -626,6 +626,22 @@ test('avancerTicketsClos rattrape un plan fermé de longue date, pas seulement l
   assert.deepEqual(avancerTicketsClos(ovrseeDir), [file])
 })
 
+// Troisième instance du même défaut : clore un plan soldait tous ses tickets,
+// y compris ceux que personne n'avait commencés. Un ticket jamais démarré n'est
+// pas « fait » — l'écrire est un mensonge dans le tableau, et le tableau est la
+// seule chose que ce projet demande de saisir à la main.
+//
+// Un plan clos laisse donc ses tickets non commencés là où ils sont : visibles,
+// et rattachables à un autre plan.
+test('avancerTicketsClos ne solde pas un ticket jamais commencé', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'Jamais commencé', colonne: 'pret', plan: '2026-08-10-x.md' })
+  ecrirePlanBrut(ovrseeDir, '2026-08-10-x.md', { status: 'closed', title: 'X', opened: '2026-08-10', closed: '2026-08-10', commits: [] })
+
+  assert.deepEqual(avancerTicketsClos(ovrseeDir), [])
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === file).meta.colonne, 'pret')
+})
+
 test('avancerTicketsClos ignore les tickets d’un plan encore ouvert', () => {
   const ovrseeDir = fixture()
   const { file } = createTicket(ovrseeDir, { titre: 'X', colonne: 'backlog', plan: '2026-08-10-x.md' })

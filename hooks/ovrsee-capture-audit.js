@@ -3,7 +3,7 @@
  * Trois hooks en un fichier, branchés sur `hook_event_name` :
  *
  * - UserPromptSubmit : un skill d'audit invoqué en commande slash (ex.
- *   `/ponytail:ponytail-audit`) ne passe jamais par l'outil `Skill` — le
+ *   `/ponytail-audit`, forme courte) ne passe jamais par l'outil `Skill` — le
  *   harness le charge avant même le tour du modèle, donc PostToolUse ne voit
  *   rien. On détecte la commande dans le prompt brut et on pose un marqueur.
  * - PostToolUse (matcher `Skill`) : cas où l'audit est réellement invoqué via
@@ -15,7 +15,7 @@
  * Contrat (identique à ovrsee-capture-plan.js) : JSON sur stdin, exit 0
  * TOUJOURS. Un hook qui bloquerait l'outil casserait la revue elle-même.
  *
- *   stdin  UserPromptSubmit {"hook_event_name":"UserPromptSubmit","prompt":"/ponytail:ponytail-audit","cwd":"/chemin"}
+ *   stdin  UserPromptSubmit {"hook_event_name":"UserPromptSubmit","prompt":"/ponytail-audit","cwd":"/chemin"}
  *          PostToolUse      {"hook_event_name":"PostToolUse","tool_name":"Skill","tool_input":{"skill":"code-review:code-review"},"cwd":"/chemin"}
  *          Stop             {"hook_event_name":"Stop","cwd":"/chemin"}
  *   effets <repo>/ovrsee/.pending-audit (créé par UserPromptSubmit, consommé par Stop)
@@ -26,7 +26,8 @@
 
 import { execFileSync } from 'node:child_process'
 import { appendFileSync, existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 /**
  * Noms exacts tels qu'invoqués par l'outil Skill : `plugin:skill` pour les
@@ -37,15 +38,29 @@ import { join } from 'node:path'
 const AUDIT_SKILLS = new Set(['code-review:code-review', 'security-review', 'ponytail:ponytail-audit', 'ponytail:ponytail-review'])
 
 /**
- * Un skill invoqué en commande slash s'écrit `/<nom-du-skill>` — vérifié sur
- * cette session : `/ponytail:ponytail-audit` déclenche le skill
- * `ponytail:ponytail-audit`, un-à-un. Args éventuels après un espace ignorés.
+ * Un skill invoqué en commande slash s'écrit sous sa forme courte
+ * (`/code-review`, `/ponytail-audit`) — c'est la forme documentée par les
+ * skills eux-mêmes et utilisée ailleurs dans ce dépôt (ex. CLAUDE.md :
+ * `commit-commands:commit-push-pr` → `/commit-push-pr`). L'outil `Skill`
+ * appelé par un agent transmet lui la forme qualifiée `plugin:skill`
+ * (`tool_input.skill`). Cette table accepte les deux et retourne toujours
+ * l'id canonique qui sert à écrire dans `audits.jsonl`.
  */
-function skillFromSlashCommand(prompt) {
+const AUDIT_SKILL_ALIASES = new Map([
+  ['code-review', 'code-review:code-review'],
+  ['code-review:code-review', 'code-review:code-review'],
+  ['security-review', 'security-review'],
+  ['ponytail-audit', 'ponytail:ponytail-audit'],
+  ['ponytail:ponytail-audit', 'ponytail:ponytail-audit'],
+  ['ponytail-review', 'ponytail:ponytail-review'],
+  ['ponytail:ponytail-review', 'ponytail:ponytail-review'],
+])
+
+export function skillFromSlashCommand(prompt) {
   const trimmed = prompt.trim()
   if (!trimmed.startsWith('/')) return null
   const name = trimmed.slice(1).split(/\s+/, 1)[0]
-  return AUDIT_SKILLS.has(name) ? name : null
+  return AUDIT_SKILL_ALIASES.get(name) ?? null
 }
 
 function readStdin() {
@@ -78,7 +93,7 @@ function repoRoot(cwd) {
  * équipé. Un échec d'écriture ne doit jamais faire échouer le hook — c'est
  * le nudge qui compte, pas la trace.
  */
-function logAudit(root, skill) {
+export function logAudit(root, skill) {
   const ovrseeDir = join(root, 'ovrsee')
   if (!existsSync(ovrseeDir)) return false
   try {
@@ -180,10 +195,19 @@ function main() {
   nudge('PostToolUse', skill)
 }
 
-try {
-  main()
-} catch (err) {
-  // Dernier filet : on signale, on ne bloque jamais.
-  process.stderr.write(`[ovrsee] capture audit ignorée : ${err?.message ?? err}\n`)
+/**
+ * Le corps ne tourne que si le fichier est lancé comme hook.
+ *
+ * Sans cette garde, l'importer pour éprouver `skillFromSlashCommand` ou
+ * `logAudit` lirait stdin et appellerait `process.exit(0)` à chaque
+ * `pnpm test`.
+ */
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try {
+    main()
+  } catch (err) {
+    // Dernier filet : on signale, on ne bloque jamais.
+    process.stderr.write(`[ovrsee] capture audit ignorée : ${err?.message ?? err}\n`)
+  }
+  process.exit(0)
 }
-process.exit(0)

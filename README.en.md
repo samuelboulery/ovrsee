@@ -10,7 +10,7 @@
 
   **A read-only view of what you vibecoded.**
 
-  ![version](https://img.shields.io/badge/version-0.9.0--beta-6c5ce7?style=flat-square)
+  ![version](https://img.shields.io/badge/version-1.0.0--beta-6c5ce7?style=flat-square)
   ![stack](https://img.shields.io/badge/stack-Electron%20%2B%20React%20%2B%20TypeScript-2d3436?style=flat-square)
   ![prod deps](https://img.shields.io/badge/prod%20deps-3-00b894?style=flat-square)
 </div>

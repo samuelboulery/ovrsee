@@ -95,3 +95,136 @@ a:focus-visible {
     scroll-behavior: auto;
   }
 }
+
+/* ------------------------------------------------------------- survols -- */
+
+/* La maquette portait ses états de survol dans un attribut `style-hover`, que
+   `support.js` appliquait à l'exécution. Le runtime parti, ces 17 attributs ne
+   faisaient plus rien : les voici en CSS, un sélecteur par déclaration
+   distincte. `!important` est obligatoire — la règle doit battre le `style`
+   inline de l'élément. */
+
+[style-hover="color: #f2f3f5;"]:hover {
+  color: #f2f3f5 !important;
+}
+
+[style-hover="color: #a2a8b2;"]:hover {
+  color: #a2a8b2 !important;
+}
+
+[style-hover="background: #8b85f4; color: #0a0a12;"]:hover {
+  background: #8b85f4 !important;
+  color: #0a0a12 !important;
+}
+
+[style-hover="background: #1f212a; color: #f2f3f5;"]:hover {
+  background: #1f212a !important;
+  color: #f2f3f5 !important;
+}
+
+[style-hover="border-color: #363841; background: #191b22;"]:hover {
+  border-color: #363841 !important;
+  background: #191b22 !important;
+}
+
+[style-hover="color: #f2f3f5; border-bottom-color: #7d76f0;"]:hover {
+  color: #f2f3f5 !important;
+  border-bottom-color: #7d76f0 !important;
+}
+
+[style-hover] {
+  transition: color .15s, background-color .15s, border-color .15s;
+}
+
+/* ---------------------------------------------------------- adaptatif -- */
+
+/* La maquette est dessinée pour un écran large et porte toute sa mise en page
+   en attributs `style` : pas une media query, pas une largeur relative. En
+   dessous de 900 px le titre débordait horizontalement et la navigation
+   sortait de l'écran.
+   
+   Les règles ci-dessous ciblent les déclarations inline elles-mêmes, par
+   sélecteur d'attribut. C'est la seule façon de reprendre la main sans
+   réécrire 130 ko de HTML — et `!important` n'est pas un raccourci ici, c'est
+   la seule spécificité qui batte un `style` inline. */
+
+@media (max-width: 900px) {
+  /* Marges des conteneurs : 28 px mangent trop d'un écran de téléphone. */
+  [style*="padding: 0 28px"] {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  /* Le titre débordait : 68 px ne tiennent pas sur 390 px de large. */
+  [style*="font-size: 68px"] {
+    font-size: 40px !important;
+    line-height: 1.06 !important;
+  }
+
+  [style*="font-size: 38px"] {
+    font-size: 27px !important;
+  }
+
+  [style*="font-size: 34px"] {
+    font-size: 25px !important;
+  }
+
+  /* Toutes les grilles se replient sur une colonne. */
+  [style*="grid-template-columns: repeat(3, 1fr)"],
+  [style*="grid-template-columns: 1fr 1fr"],
+  [style*="grid-template-columns: 1fr 460px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Les blocs numérotés « 01 / titre / texte » : le numéro passe au-dessus. */
+  [style*="grid-template-columns: 44px 260px 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Navigation : les trois ancres disparaissent, le sélecteur de langue et le
+     bouton GitHub restent — ce sont les deux seules actions de la barre. */
+  a[href="#demo"],
+  a[href="#comment"],
+  a[href="#donnees"] {
+    display: none !important;
+  }
+
+  /* Le bandeau de statistiques du pied de page était figé à 340 px : c'est lui,
+     et lui seul, qui faisait déborder toute la page sous 768 px. */
+  [style*="width: 340px"] {
+    width: 100% !important;
+    flex: 1 1 auto !important;
+  }
+
+  /* La fenêtre de démo est réduite par `mesurer()`, avec un plancher : en
+     dessous, le texte de l'interface devient illisible et la démo ne
+     démontre plus rien. Elle défile donc latéralement, dans son cadre. */
+  [data-stage-wrap] {
+    overflow-x: auto !important;
+    overscroll-behavior-x: contain;
+  }
+}
+
+@media (max-width: 480px) {
+  /* La barre de navigation exige 406 px pour tenir sur une ligne : le logo et
+     son badge de version en font 175, le groupe de droite 167, le reste étant
+     marges et gouttière. Au-dessous, c'est le badge qui saute — il répète une
+     information que la page donne déjà, et il libère 78 px. */
+  [data-version] {
+    display: none !important;
+  }
+
+  [style*="padding: 0 28px"] {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  [style*="font-size: 68px"] {
+    font-size: 32px !important;
+  }
+
+  [style*="font-size: 38px"] {
+    font-size: 23px !important;
+  }
+}

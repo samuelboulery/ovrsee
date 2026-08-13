@@ -44,7 +44,6 @@
  "Votre backlog vit dans votre dépôt.": "Your backlog lives in your repository.",
  "Le code est sur GitHub.": "The code is on GitHub.",
  "Releases": "Releases",
- "dépôt privé, l'accès aux releases demande une invitation": "private repository, release access needs an invitation",
  "deps prod": "prod deps",
  "onglets": "tabs",
  "Démo": "Demo",
@@ -181,5 +180,6 @@
  "Electron + React + TypeScript, trois dépendances de production, aucun framework de test. Builds macOS arm64 et Windows x64 publiés à chaque tag.": "Electron + React + TypeScript, three production dependencies, no test framework. macOS arm64 and Windows x64 builds published on every tag.",
  "stdio · lecture": "stdio · read",
  "readme": "readme",
- "Gestion de projet pour Claude Code : plans approuvés, commits qui les réalisent, tickets à faire — versionnés dans le dépôt.": "Project management for Claude Code: approved plans, the commits that carry them out, tickets left to do — versioned in the repository."
+ "Gestion de projet pour Claude Code : plans approuvés, commits qui les réalisent, tickets à faire — versionnés dans le dépôt.": "Project management for Claude Code: approved plans, the commits that carry them out, tickets left to do — versioned in the repository.",
+ "binaires non signés — macOS et Windows avertissent au premier lancement": "unsigned binaries — macOS and Windows warn on first launch"
 }

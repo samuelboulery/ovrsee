@@ -252,10 +252,15 @@ function rendre(patch) {
 // La fenêtre de démo est dessinée à sa taille réelle (1400×820, comme l'app)
 // puis réduite pour tenir dans la colonne — sinon un écran de 13" en coupe le
 // quart droit.
+// Plancher : en dessous de 0.42 le texte de l'interface devient illisible et
+// la démo ne démontre plus rien. Le cadre défile alors latéralement — la
+// feuille de style pose `overflow-x: auto` sous 900 px pour ça.
+const ÉCHELLE_MINI = 0.42
+
 function mesurer() {
   const el = document.querySelector('[data-stage-wrap]')
   if (!el) return
-  const scale = Math.min(1, el.clientWidth / 1400)
+  const scale = Math.max(ÉCHELLE_MINI, Math.min(1, el.clientWidth / 1400))
   if (Math.abs(scale - état.scale) > 0.001) rendre({ scale })
 }
 

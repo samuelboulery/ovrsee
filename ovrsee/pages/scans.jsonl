@@ -108,3 +108,15 @@
 {"date":"2026-08-13","commit":"ac14cdf","ok":false,"error":"http://localhost:5180 répond déjà — un autre serveur occupe le port. Arrêtez-le, ou donnez un baseUrl libre dans ovrsee.config.json."}
 {"date":"2026-08-13","commit":"6609d27","ok":false,"error":"http://localhost:5180 répond déjà — un autre serveur occupe le port. Arrêtez-le, ou donnez un baseUrl libre dans ovrsee.config.json."}
 {"date":"2026-08-13","commit":"cfee865","ok":false,"error":"http://localhost:5180 répond déjà — un autre serveur occupe le port. Arrêtez-le, ou donnez un baseUrl libre dans ovrsee.config.json."}
+{"date":"2026-08-13","commit":"cc68b5d","ok":false,"error":"http://localhost:5180 répond déjà — un autre serveur occupe le port. Arrêtez-le, ou donnez un baseUrl libre dans ovrsee.config.json."}
+{"date":"2026-08-13","commit":"cc68b5d","ok":true,"pages":7}
+{"date":"2026-08-13","commit":"cc68b5d","ok":true,"pages":7}
+{"date":"2026-08-13","commit":"b7b2a55","ok":true,"pages":7}
+{"date":"2026-08-13","commit":"f386ce6","ok":true,"pages":7}
+{"date":"2026-08-13","commit":"8be5857","ok":true,"pages":7}
+{"date":"2026-08-13","commit":"51cd6aa","ok":true,"pages":7}
+{"date":"2026-08-13","commit":"707bd93","ok":true,"pages":7}
+{"date":"2026-08-13","commit":"5dacb19","ok":true,"pages":7}
+{"date":"2026-08-13","commit":"09bf3b1","ok":true,"pages":7}
+{"date":"2026-08-13","commit":"b8b7d6e","ok":true,"pages":7}
+{"date":"2026-08-13","commit":"6527486","ok":true,"pages":7}

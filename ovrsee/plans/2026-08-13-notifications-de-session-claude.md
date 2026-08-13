@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Notifications de session Claude",
   "opened": "2026-08-13",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": [
     {
       "sha": "09bf3b1",
@@ -22,6 +22,11 @@
         "hooks/notify.test.js",
         "hooks/ovrsee-notify.js"
       ]
+    },
+    {
+      "sha": "fe8f929",
+      "date": "2026-08-13",
+      "files": []
     }
   ]
 }

@@ -2,7 +2,7 @@
 {
   "id": "T-0122",
   "titre": "Éclaircir la trame du canevas et les colonnes du kanban",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui"

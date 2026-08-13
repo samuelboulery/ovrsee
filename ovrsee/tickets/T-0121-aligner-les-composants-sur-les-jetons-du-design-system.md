@@ -2,7 +2,7 @@
 {
   "id": "T-0121",
   "titre": "Aligner les composants sur les jetons du design system",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

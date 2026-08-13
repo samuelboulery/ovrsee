@@ -4,7 +4,46 @@
   "title": "Homogénéiser fonds et filets, éclaircir trame et colonnes kanban",
   "opened": "2026-08-13",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "6527486",
+      "date": "2026-08-13",
+      "files": [
+        "_ds/ovrsee/styles.css",
+        "app/src/ActivityPanel.tsx",
+        "app/src/App.tsx",
+        "app/src/CommandPalette.tsx",
+        "app/src/EquipmentPanel.tsx",
+        "app/src/Illisibles.tsx",
+        "app/src/Lightbox.tsx",
+        "app/src/Onboarding.tsx",
+        "app/src/OnboardingArt.tsx",
+        "app/src/PreferencesIntegrations.tsx",
+        "app/src/PreferencesPanel.tsx",
+        "app/src/PreferencesPreview.tsx",
+        "app/src/PreferencesProfils.tsx",
+        "app/src/PreferencesProjet.tsx",
+        "app/src/SkillsPanel.tsx",
+        "app/src/StatusBar.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/ViewBar.tsx",
+        "app/src/Welcome.tsx",
+        "app/src/markdown.tsx",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Branches.tsx",
+        "app/src/tabs/Deploiements.tsx",
+        "app/src/tabs/Donnees.tsx",
+        "app/src/tabs/Environnements.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/Produit.tsx",
+        "app/src/tabs/Sante.tsx",
+        "app/src/tabs/Stack.tsx",
+        "app/src/tabs/Tableau.tsx",
+        "app/src/theme.ts"
+      ]
+    }
+  ]
 }
 ---
 

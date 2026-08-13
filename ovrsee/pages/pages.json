@@ -1,13 +1,13 @@
 {
-  "date": "2026-08-12",
-  "commit": "a36966b",
+  "date": "2026-08-13",
+  "commit": "6527486",
   "pages": [
     {
       "route": "/",
       "slug": "accueil",
       "title": "Ovrsee",
       "sample": "/",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nPréférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawle",
+      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\nCrawler le projet\nGraphe complet\nGraphe → coffre Obsidian\n↻ Recharger",
       "links": [
         "/navigateur",
         "/produit",
@@ -16,8 +16,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/accueil/2026-08-12-a36966b.png",
-      "shotDate": "2026-08-12",
+      "shot": "shots/accueil/2026-08-13-6527486.png",
+      "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -28,7 +28,7 @@
       "slug": "navigateur",
       "title": "Ovrsee",
       "sample": "/navigateur",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nPréférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawle",
+      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\nCrawler le projet\nGraphe complet\nGraphe → coffre Obsidian\n↻ Recharger",
       "links": [
         "/",
         "/produit",
@@ -37,8 +37,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/navigateur/2026-08-12-a36966b.png",
-      "shotDate": "2026-08-12",
+      "shot": "shots/navigateur/2026-08-13-6527486.png",
+      "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -49,7 +49,7 @@
       "slug": "produit",
       "title": "Ovrsee",
       "sample": "/produit",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nPréférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawle",
+      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\nCrawler le projet\nGraphe complet\nGraphe → coffre Obsidian\n↻ Recharger",
       "links": [
         "/",
         "/navigateur",
@@ -58,8 +58,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/produit/2026-08-12-a36966b.png",
-      "shotDate": "2026-08-12",
+      "shot": "shots/produit/2026-08-13-6527486.png",
+      "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -70,7 +70,7 @@
       "slug": "historique",
       "title": "Ovrsee",
       "sample": "/historique",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nPréférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawle",
+      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\nCrawler le projet\nGraphe complet\nGraphe → coffre Obsidian\n↻ Recharger",
       "links": [
         "/",
         "/navigateur",
@@ -79,8 +79,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/historique/2026-08-12-a36966b.png",
-      "shotDate": "2026-08-12",
+      "shot": "shots/historique/2026-08-13-6527486.png",
+      "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -91,7 +91,7 @@
       "slug": "tableau",
       "title": "Ovrsee",
       "sample": "/tableau",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nPréférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawle",
+      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\nCrawler le projet\nGraphe complet\nGraphe → coffre Obsidian\n↻ Recharger",
       "links": [
         "/",
         "/navigateur",
@@ -100,8 +100,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/tableau/2026-08-12-a36966b.png",
-      "shotDate": "2026-08-12",
+      "shot": "shots/tableau/2026-08-13-6527486.png",
+      "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -112,7 +112,7 @@
       "slug": "donnees",
       "title": "Ovrsee",
       "sample": "/donnees",
-      "excerpt": "⇤\nOvrsee — ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nPROJETS\novrsee\n—\njamais\nmiette\n—\njamais\nVUES\nAperçu\nNavigateur\nProduit\nHistorique\nTableau\nDonnées\nStack\nPréférences\nDENSITÉ D'ACTIVITÉ\n7 jours\naujourd'hui\nLecture de ovrsee/…\n+\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\n⟳ Crawle",
+      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\nCrawler le projet\nGraphe complet\nGraphe → coffre Obsidian\n↻ Recharger",
       "links": [
         "/",
         "/navigateur",
@@ -121,8 +121,8 @@
         "/tableau",
         "/stack"
       ],
-      "shot": "shots/donnees/2026-08-12-a36966b.png",
-      "shotDate": "2026-08-12",
+      "shot": "shots/donnees/2026-08-13-6527486.png",
+      "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -133,7 +133,7 @@
       "slug": "stack",
       "title": "Ovrsee",
       "sample": "/stack",
-      "excerpt": "⇤\nOvrsee — …\nno scan recorded\nSearch, jump to…\n⌘K\nPROJECTS\nVIEWS\nOverview\nNavigator\nProduct\nHistory\nBoard\nData\nStack\nPreferences\nACTIVITY DENSITY\n13 weeks\ntoday\nOvrsee\n\nOvrsee is a read-only view of a vibe-coded project.\n\nIt captures approved plans, crawled pages, dated commit history, and project tickets, versioned inovrsee/as you go.\n\nOvrsee cannot execute code — it only reads and writes the ovr",
+      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…\nDISPOSITION\nBas\nCôté\nPlein\nRéduire\nlecture de ovrsee/…\n›\nterminal disponible dans l'application, pas dans le navigateur\nCOMMANDES (TERMINAL SEULEMENT)\nCrawler le projet\nGraphe complet\nGraphe → coffre Obsidian\n↻ Recharger",
       "links": [
         "/",
         "/navigateur",
@@ -142,8 +142,8 @@
         "/tableau",
         "/donnees"
       ],
-      "shot": "shots/stack/2026-08-12-a36966b.png",
-      "shotDate": "2026-08-12",
+      "shot": "shots/stack/2026-08-13-6527486.png",
+      "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
         "height": 800

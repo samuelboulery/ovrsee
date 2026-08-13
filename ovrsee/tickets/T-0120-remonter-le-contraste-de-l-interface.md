@@ -2,7 +2,7 @@
 {
   "id": "T-0120",
   "titre": "Remonter le contraste de l'interface",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

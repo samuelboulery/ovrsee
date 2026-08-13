@@ -1,10 +1,33 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Remonter le contraste de l'interface",
   "opened": "2026-08-13",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-13",
+  "commits": [
+    {
+      "sha": "b8b7d6e",
+      "date": "2026-08-13",
+      "files": [
+        "_ds/ovrsee/styles.css",
+        "app/src/ActivityPanel.tsx",
+        "app/src/App.tsx",
+        "app/src/StatusBar.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/ViewBar.tsx",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Branches.tsx",
+        "app/src/tabs/Deploiements.tsx",
+        "app/src/tabs/Donnees.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/Produit.tsx",
+        "app/src/tabs/Sante.tsx",
+        "app/src/tabs/Tableau.tsx",
+        "app/src/theme.ts"
+      ]
+    }
+  ]
 }
 ---
 

@@ -2,7 +2,7 @@
 {
   "id": "T-0136",
   "titre": "Alléger les captures du crawl",
-  "colonne": "en-cours",
+  "colonne": "backlog",
   "priorite": "basse",
   "charge": "m",
   "tags": [

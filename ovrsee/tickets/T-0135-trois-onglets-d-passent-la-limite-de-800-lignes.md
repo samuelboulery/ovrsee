@@ -2,7 +2,7 @@
 {
   "id": "T-0135",
   "titre": "Trois onglets dépassent la limite de 800 lignes",
-  "colonne": "en-cours",
+  "colonne": "backlog",
   "priorite": "basse",
   "charge": "l",
   "tags": [

@@ -2,7 +2,7 @@
 {
   "id": "T-0134",
   "titre": "Charger graph.json à la demande",
-  "colonne": "en-cours",
+  "colonne": "backlog",
   "priorite": "moyenne",
   "charge": "m",
   "tags": [

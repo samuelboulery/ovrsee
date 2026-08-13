@@ -4,7 +4,19 @@
   "title": "Audit final avant publication — et les trois correctifs qu'il justifie",
   "opened": "2026-08-13",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "54911c7",
+      "date": "2026-08-13",
+      "files": [
+        "SECURITY.md",
+        "app/src/markdown.tsx",
+        "app/src/tabs/Produit.tsx",
+        "hooks/integrationProviders.js",
+        "hooks/integrationProviders.test.js"
+      ]
+    }
+  ]
 }
 ---
 

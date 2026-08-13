@@ -2,10 +2,13 @@
 {
   "id": "T-0132",
   "titre": "Appliquer les trois correctifs sûrs de l'audit",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "s",
-  "tags": ["securite", "audit"],
+  "tags": [
+    "securite",
+    "audit"
+  ],
   "cree": "2026-08-13",
   "maj": "2026-08-13",
   "plan": "2026-08-13-audit-final-avant-publication-et-les-trois-correctifs-qu-il.md"

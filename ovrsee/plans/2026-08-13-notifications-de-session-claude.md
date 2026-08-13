@@ -4,7 +4,26 @@
   "title": "Notifications de session Claude",
   "opened": "2026-08-13",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "09bf3b1",
+      "date": "2026-08-13",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/attention.test.ts",
+        "app/src/attention.ts",
+        "app/src/useTerminal.ts",
+        "electron/main.js",
+        "electron/preload.cjs",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/install.js",
+        "hooks/notify.test.js",
+        "hooks/ovrsee-notify.js"
+      ]
+    }
+  ]
 }
 ---
 

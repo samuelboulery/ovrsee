@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Audit visuel exhaustif ovrsee vs `Ovrsee App.dc.html` (round 2, sans correction)",
   "opened": "2026-08-12",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": []
 }
 ---

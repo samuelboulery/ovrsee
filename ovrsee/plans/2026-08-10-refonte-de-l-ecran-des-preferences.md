@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Refonte de l'écran des préférences",
   "opened": "2026-08-10",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": []
 }
 ---

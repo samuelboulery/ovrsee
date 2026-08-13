@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Préférences : cinq sections, et des templates d'interface",
   "opened": "2026-08-10",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": []
 }
 ---

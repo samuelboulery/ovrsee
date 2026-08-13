@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Rendre le serveur MCP de Cockpit réellement fonctionnel dans Claude Code",
   "opened": "2026-08-10",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": []
 }
 ---

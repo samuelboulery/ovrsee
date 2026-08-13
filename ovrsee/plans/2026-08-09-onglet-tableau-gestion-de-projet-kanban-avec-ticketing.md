@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Onglet Tableau — gestion de projet kanban avec ticketing",
   "opened": "2026-08-09",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": []
 }
 ---

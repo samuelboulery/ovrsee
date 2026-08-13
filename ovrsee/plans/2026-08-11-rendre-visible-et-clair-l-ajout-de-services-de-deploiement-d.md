@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Rendre visible et clair l'ajout de services de déploiement/DB sur l'Aperçu",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": []
 }
 ---

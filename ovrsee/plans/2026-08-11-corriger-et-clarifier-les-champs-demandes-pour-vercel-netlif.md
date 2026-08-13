@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Corriger et clarifier les champs demandés pour Vercel/Netlify/Supabase",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": []
 }
 ---

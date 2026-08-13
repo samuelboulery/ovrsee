@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Ajouter un installeur Windows",
   "opened": "2026-08-11",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": []
 }
 ---

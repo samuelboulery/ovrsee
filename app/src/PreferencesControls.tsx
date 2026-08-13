@@ -126,7 +126,7 @@ export function Switch({
     >
       <span
         style={s(
-          'display: block; width: 12px; height: 12px; border-radius: 50%; transition: transform .14s ease;' +
+          'display: block; width: 10px; height: 10px; border-radius: 50%; transition: transform .14s ease;' +
             (checked
               ? ' background: var(--color-accent); transform: translateX(12px);'
               : ' background: var(--color-neutral-500); transform: translateX(0);'),

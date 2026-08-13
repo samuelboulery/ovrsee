@@ -2,14 +2,14 @@
 {
   "id": "T-0071",
   "titre": "Vérifier visuellement le panneau droit Navigateur (Electron)",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",
     "navigateur"
   ],
   "cree": "2026-08-12",
-  "maj": "2026-08-12",
+  "maj": "2026-08-13",
   "plan": null,
   "epic": "T-0070",
   "charge": "s"
@@ -26,9 +26,9 @@ disponible à l'époque.
 
 ## Critères d'acceptation
 
-- [ ] `pnpm electron` lancé, onglet Navigateur ouvert, panneau droit (détail
+- [x] `pnpm electron` lancé, onglet Navigateur ouvert, panneau droit (détail
       d'élément sélectionné) comparé visuellement à `Ovrsee App.dc.html#2c`.
-- [ ] Écarts trouvés listés et corrigés (ou, si aucun écart, le constat noté dans le
+- [x] Écarts trouvés listés et corrigés (ou, si aucun écart, le constat noté dans le
       commit qui ferme ce ticket).
 
 ## Note

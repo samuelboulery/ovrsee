@@ -13,7 +13,7 @@ function Carte({ row, colonneLarge }: { row: StackRow; colonneLarge: boolean }) 
   return (
     <div
       style={s(
-        `display: grid; grid-template-columns: ${colonneLarge ? 190 : 170}px 1fr; gap: 18px; align-items: start; border: 1px solid var(--color-divider); border-radius: 9px; padding: 13px 15px; background: var(--color-surface-card);`,
+        `display: grid; grid-template-columns: ${colonneLarge ? 190 : 170}px 1fr; gap: 18px; align-items: start; border: 1px solid var(--color-divider); border-radius: 8px; padding: 13px 15px; background: var(--color-surface-card);`,
       )}
     >
       <div>

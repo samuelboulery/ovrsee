@@ -63,11 +63,11 @@ function SourceAlert({
     return (
       <div
         style={s(
-          'background: var(--theme-bg-alerte); border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
+          'background: var(--color-warn-bg); border: 1px solid var(--color-warn-border); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warn);',
         )}
       >
         <div style={s('font-weight: 500; margin-bottom: 6px;')}>{t('donnees.graphify_missing_title')}</div>
-        <div style={s('color: var(--color-warning-300);')}>
+        <div style={s('color: var(--color-warn);')}>
           {t('donnees.graphify_missing')}
         </div>
       </div>
@@ -79,11 +79,11 @@ function SourceAlert({
       return (
         <div
           style={s(
-            'background: var(--theme-bg-alerte); border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
+            'background: var(--color-warn-bg); border: 1px solid var(--color-warn-border); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warn);',
           )}
         >
           <div style={s('font-weight: 500; margin-bottom: 6px;')}>{t('donnees.obsidian_unconfigured_title')}</div>
-          <div style={s('color: var(--color-warning-300);')}>
+          <div style={s('color: var(--color-warn);')}>
             {t('donnees.obsidian_unconfigured')}
           </div>
         </div>
@@ -93,11 +93,11 @@ function SourceAlert({
     return (
       <div
         style={s(
-          'background: var(--theme-bg-alerte); border: 1px solid var(--color-warning-600); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warning-200);',
+          'background: var(--color-warn-bg); border: 1px solid var(--color-warn-border); border-radius: 6px; padding: 10px 12px; margin-bottom: 16px; font-size: 12px; color: var(--color-warn);',
         )}
       >
         <div style={s('font-weight: 500; margin-bottom: 6px;')}>{t('donnees.obsidian_unreadable_title')}</div>
-        <div style={s('color: var(--color-warning-300);')}>
+        <div style={s('color: var(--color-warn);')}>
           {t('donnees.obsidian_unreadable')} <code>{config.obsidianVault}</code>
         </div>
       </div>
@@ -109,7 +109,7 @@ function SourceAlert({
 
 /** Une table sans date le dit. C'est une information, pas un trou d'affichage. */
 const NON_DATE =
-  'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-400); border: 1px dashed var(--color-neutral-600);'
+  'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-400); border: 1px dashed var(--color-border-control);'
 
 /**
  * Un `obsidianVault` déclaré que Graphify supplante.
@@ -122,7 +122,7 @@ function CoffreIgnore() {
   return (
     <div
       style={s(
-        'font-size: 11px; color: var(--color-neutral-500); margin-bottom: 18px; padding-left: 10px; border-left: 1px solid var(--color-neutral-700);',
+        'font-size: 11px; color: var(--color-neutral-500); margin-bottom: 18px; padding-left: 10px; border-left: 1px solid var(--color-border-control);',
       )}
     >
       {t('donnees.vault_ignored')}
@@ -141,7 +141,7 @@ function EtatVide({ titre, detail, source }: { titre: string; detail: string; so
   const [copie, setCopie] = useState(false)
 
   return (
-    <div style={s('display: flex; flex-direction: column; align-items: center; text-align: center; padding: 48px 20px; gap: 14px; border: 1px dashed #363841; border-radius: 9px;')}>
+    <div style={s('display: flex; flex-direction: column; align-items: center; text-align: center; padding: 48px 20px; gap: 14px; border: 1px dashed var(--color-border-control); border-radius: 8px;')}>
       <Database size={40} weight="regular" color="var(--color-text-quaternary)" aria-hidden="true" />
       <div style={s('font-family: var(--font-heading); font-weight: 500; font-size: 15px; color: var(--color-text);')}>
         {titre}
@@ -182,8 +182,8 @@ function EtatVide({ titre, detail, source }: { titre: string; detail: string; so
 function confStyle(conf: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS' | 'LIVE'): string {
   const styles = {
     EXTRACTED: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-accent); border: 1px solid var(--color-accent-700);',
-    INFERRED: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-300); border: 1px solid var(--color-neutral-700);',
-    AMBIGUOUS: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-400); border: 1px dashed var(--color-neutral-600);',
+    INFERRED: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-300); border: 1px solid var(--color-border-control);',
+    AMBIGUOUS: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-400); border: 1px dashed var(--color-border-control);',
     // Vérifiée en direct sur la base elle-même, pas déduite du code : le
     // second accent du design system (`--color-accent-2-*`) la distingue des
     // trois confiances ci-dessus, qui restent des lectures de Graphify.
@@ -271,7 +271,7 @@ export function Donnees({
         {provenance && (
           <span
             className="tag"
-            style={s('font-size: 10.5px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660;')}
+            style={s('font-size: 10.5px; color: var(--color-plan); background: var(--color-plan-bg); border: 1px solid var(--color-plan-border);')}
           >
             {provenance.badge}
             {sourceDate && ` — ${sourceDate}`}
@@ -353,7 +353,7 @@ export function Donnees({
             {liveOnly.length > 0 && (
               <div
                 style={s(
-                  'margin-top: 16px; font-size: 11.5px; color: var(--color-neutral-500); padding-left: 10px; border-left: 1px solid var(--color-neutral-700);',
+                  'margin-top: 16px; font-size: 11.5px; color: var(--color-neutral-500); padding-left: 10px; border-left: 1px solid var(--color-border-control);',
                 )}
               >
                 {t('donnees.live_only', { tables: liveOnly.join(', ') })}
@@ -389,7 +389,7 @@ function LiveSchema({ tables }: { tables: SchemaTable[] }) {
           <div key={table.name} style={s('border: 1px solid var(--color-border-card); border-radius: 6px; overflow: hidden;')}>
             <div
               style={s(
-                'font-family: var(--font-mono); font-weight: 500; font-size: 12.5px; padding: 7px 11px; background: var(--color-surface); border-bottom: 1px solid var(--color-border-card);',
+                'font-family: var(--font-mono); font-weight: 500; font-size: 12.5px; padding: 7px 11px; background: var(--color-surface-control); border-bottom: 1px solid var(--color-border-card);',
               )}
             >
               {table.name}
@@ -419,7 +419,7 @@ function LiveSchema({ tables }: { tables: SchemaTable[] }) {
                       )}
                       {column.fk && (
                         <span style={s('font-size: 11px; color: var(--color-neutral-500); font-family: var(--font-mono);')}>
-                          <span style={s('font-size: 10px; color: #737983;')}>n → 1</span> {column.fk}
+                          <span style={s('font-size: 10px; color: var(--color-text-discrete);')}>n → 1</span> {column.fk}
                         </span>
                       )}
                     </td>

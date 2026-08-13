@@ -59,7 +59,7 @@ export function Logo({ size = 64 }: { size?: number }) {
       role="img"
       aria-label={t('onboard.logo_alt')}
     >
-      <rect width="1024" height="1024" rx="228" fill="var(--theme-bg-tertiary)" />
+      <rect width="1024" height="1024" rx="228" fill="var(--color-surface-card)" />
       <rect
         x="6"
         y="6"
@@ -142,14 +142,14 @@ export function SchemaBoucle() {
               width={LARGEUR}
               height={HAUTEUR}
               rx="8"
-              fill={depot ? '#14132a' : 'var(--theme-bg-secondary)'}
-              stroke={depot ? '#2a2660' : 'var(--color-divider)'}
+              fill={depot ? 'var(--color-plan-bg)' : 'var(--color-surface-panel)'}
+              stroke={depot ? 'var(--color-plan-border)' : 'var(--color-divider)'}
             />
             <text
               x={x + LARGEUR / 2}
               y="34"
               textAnchor="middle"
-              fill={depot ? '#a49dfa' : 'var(--color-text)'}
+              fill={depot ? 'var(--color-plan)' : 'var(--color-text)'}
               style={s(
                 depot
                   ? 'font-size: 12.5px; font-family: var(--font-mono);'

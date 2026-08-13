@@ -141,7 +141,7 @@ function CarteProfil({
       onClick={() => onSettings(appliquerProfil(settings, profil))}
       style={s(
         'flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 9px; padding: 10px;' +
-          ' border-radius: 10px; text-align: left; cursor: pointer; font: inherit; color: inherit;' +
+          ' border-radius: 8px; text-align: left; cursor: pointer; font: inherit; color: inherit;' +
           (courant
             ? ' border: 1px solid var(--color-accent-600); background: var(--color-surface-active);'
             : ' border: 1px solid var(--color-divider); background: var(--color-surface-card);'),
@@ -158,7 +158,7 @@ function CarteProfil({
               ' display: flex; align-items: center; justify-content: center;' +
               (courant
                 ? ' border: 1.5px solid var(--color-accent);'
-                : ' border: 1.5px solid var(--color-neutral-700);'),
+                : ' border: 1.5px solid var(--color-border-control);'),
           )}
         >
           {courant && (

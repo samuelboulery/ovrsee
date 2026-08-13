@@ -91,7 +91,7 @@ export function Produit({
         <div style={s('flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px 22px; overflow: auto;')}>
           <div
             style={s(
-              'display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding: 48px 20px; max-width: 46ch; border: 1px dashed #363841; border-radius: 9px;',
+              'display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding: 48px 20px; max-width: 46ch; border: 1px dashed var(--color-border-control); border-radius: 8px;',
             )}
           >
             <div style={s('font-size: 12.5px; color: var(--color-neutral-500); line-height: 1.5;')}>
@@ -132,7 +132,7 @@ export function Produit({
           {failed && (
             <div
               style={s(
-                'display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 8px 11px; border-radius: 6px; background: #1c0d10; border: 1px solid #3a1c22; font-size: 12px; color: #e5677a;',
+                'display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 8px 11px; border-radius: 6px; background: var(--color-err-bg); border: 1px solid var(--color-err-border); font-size: 12px; color: var(--color-err);',
               )}
             >
               {t('produit.last_scan_failed', { date: frDate(lastScan(snapshot.scans)?.date) })}
@@ -154,7 +154,7 @@ export function Produit({
           style={s(
             // `user-select: none` : sans lui, glisser le canevas surligne les
             // titres des cartes au passage.
-            `flex: 1; position: relative; overflow: hidden; min-height: 0; touch-action: none; user-select: none; padding-right: ${side && panel ? rail.size : 0}px; background: #08090a radial-gradient(#16171c 1px, transparent 1px) 0 0 / 22px 22px; ` +
+            `flex: 1; position: relative; overflow: hidden; min-height: 0; touch-action: none; user-select: none; padding-right: ${side && panel ? rail.size : 0}px; background: var(--color-bg) radial-gradient(var(--color-border-card) 1px, transparent 1px) 0 0 / 22px 22px; ` +
               (canvas.panning ? 'cursor: grabbing;' : 'cursor: grab;'),
           )}
         >
@@ -214,15 +214,15 @@ export function Produit({
         <div
           style={s(
             side
-              ? 'position: absolute; top: 0; right: 0; bottom: 0; width: 42px; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); display: flex; justify-content: center; padding-top: 16px; z-index: 5;'
-              : 'width: 42px; flex: none; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); display: flex; justify-content: center; padding-top: 16px;',
+              ? 'position: absolute; top: 0; right: 0; bottom: 0; width: 42px; border-left: 1px solid var(--color-divider); background: var(--color-surface-panel); display: flex; justify-content: center; padding-top: 16px; z-index: 5;'
+              : 'width: 42px; flex: none; border-left: 1px solid var(--color-divider); background: var(--color-surface-panel); display: flex; justify-content: center; padding-top: 16px;',
           )}
         >
           <button
             type="button"
             onClick={() => setPanel(true)}
             style={s(
-              'background: transparent; border: 1px solid var(--color-neutral-800); border-radius: 6px; color: var(--color-neutral-400); cursor: pointer; font-family: var(--font-body); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; padding: 12px 5px; writing-mode: vertical-rl;',
+              'background: transparent; border: 1px solid var(--color-border-card); border-radius: 6px; color: var(--color-neutral-400); cursor: pointer; font-family: var(--font-body); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; padding: 12px 5px; writing-mode: vertical-rl;',
             )}
           >
             {t('produit.page_detail')}
@@ -323,12 +323,12 @@ function Controls({
   onFit: () => void
 }) {
   const button =
-    'cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 22px; border-radius: 5px; border: none; background: transparent; color: #b6bac1;'
+    'cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 22px; border-radius: 6px; border: none; background: transparent; color: var(--color-text-secondary);'
 
   return (
     <div
       style={s(
-        'position: absolute; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 3px; padding: 3px; border-radius: 8px; border: 1px solid #2b2d35; background: #0e0f12; z-index: 4;',
+        'position: absolute; left: 14px; bottom: 14px; display: flex; align-items: center; gap: 3px; padding: 3px; border-radius: 8px; border: 1px solid var(--color-border-card); background: var(--color-surface-panel); z-index: 4;',
       )}
     >
       <button type="button" title={t('produit.zoom_out')} onClick={() => onZoom(1 / 1.2)} style={s(button)}>
@@ -339,7 +339,7 @@ function Controls({
         title={t('produit.zoom_100')}
         onClick={onReset}
         style={s(
-          'cursor: pointer; min-width: 40px; border: none; background: transparent; font-family: var(--font-mono); font-size: 11px; color: #b6bac1; font-variant-numeric: tabular-nums;',
+          'cursor: pointer; min-width: 40px; border: none; background: transparent; font-family: var(--font-mono); font-size: 11px; color: var(--color-text-secondary); font-variant-numeric: tabular-nums;',
         )}
       >
         {Math.round(zoom * 100)} %
@@ -347,7 +347,7 @@ function Controls({
       <button type="button" title={t('produit.zoom_in')} onClick={() => onZoom(1.2)} style={s(button)}>
         <Plus size={13} aria-hidden="true" />
       </button>
-      <div style={s('width: 1px; height: 14px; background: #2b2d35;')} />
+      <div style={s('width: 1px; height: 14px; background: var(--color-border-card);')} />
       <button type="button" title={t('produit.fit_window')} onClick={onFit} style={s(button)}>
         <ArrowsOutSimple size={13} aria-hidden="true" />
       </button>
@@ -404,12 +404,15 @@ function Edges({ placed, width, height }: { placed: Placed[]; width: number; hei
       height={height}
       style={s('position: absolute; inset: 0; overflow: visible;')}
     >
+      {/* Les flèches gardent leur valeur littérale : `fill`/`stroke` sont des
+          attributs de présentation SVG, où `var(--…)` n'est pas fiable d'un
+          moteur à l'autre. Valeur de `--color-border-selected`. */}
       <defs>
         <marker id="na" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f313b" />
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4d5060" />
         </marker>
       </defs>
-      <g fill="none" stroke="#2f313b" strokeWidth="1.25" markerEnd="url(#na)">
+      <g fill="none" stroke="#4d5060" strokeWidth="1.25" markerEnd="url(#na)">
         {forward.map((d, i) => (
           <path key={i} d={d} />
         ))}
@@ -441,15 +444,15 @@ function PageCard({
 
   // Hauteur fixe : les arêtes s'ancrent sur CARD_H, une carte qui grandit avec
   // son titre les décrocherait.
-  const base = `position: absolute; left: ${x}px; top: ${y}px; width: ${CARD_W}px; height: ${CARD_H}px; overflow: hidden; box-sizing: border-box; display: flex; flex-direction: column; padding: 11px 13px; border-radius: 10px; cursor: pointer;`
+  const base = `position: absolute; left: ${x}px; top: ${y}px; width: ${CARD_W}px; height: ${CARD_H}px; overflow: hidden; box-sizing: border-box; display: flex; flex-direction: column; padding: 11px 13px; border-radius: 8px; cursor: pointer;`
   // Jamais de filet accent pour signifier un état (règle d'or §5.1) — le
   // survol et la sélection restent dans la même gamme neutre que le reste
   // de l'app, la sélection se distinguant par un halo, pas une couleur.
   const etat = isSelected
-    ? 'background: #202229; border: 1px solid #4d5060; box-shadow: var(--ring-selected);'
+    ? 'background: var(--color-surface-elevated); border: 1px solid var(--color-border-selected); box-shadow: var(--ring-selected);'
     : hover.on
-      ? 'background: var(--color-surface); border: 1px solid #4d5060;'
-      : 'background: var(--color-surface); border: 1px solid var(--color-neutral-800);'
+      ? 'background: var(--color-surface-card); border: 1px solid var(--color-border-selected);'
+      : 'background: var(--color-surface-card); border: 1px solid var(--color-border-card);'
 
   return (
     <div {...hover.props} onClick={onPick} style={s(base + etat)}>
@@ -470,7 +473,7 @@ function PageCard({
           {pageName(page, pages)}
         </span>
       </div>
-      <div style={s('font-family: var(--font-mono); font-size: 10.5px; color: #737983; margin-top: 3px;')}>
+      <div style={s('font-family: var(--font-mono); font-size: 10.5px; color: var(--color-text-discrete); margin-top: 3px;')}>
         {page.route}
       </div>
 
@@ -482,13 +485,13 @@ function PageCard({
           src={shotUrl(snapshot.root, page.shot)}
           alt=""
           style={s(
-            `width: 100%; aspect-ratio: ${shotRatio(page)}; object-fit: cover; object-position: top; border-radius: 5px; border: 1px solid var(--color-neutral-800); margin-top: 9px; display: block;`,
+            `width: 100%; aspect-ratio: ${shotRatio(page)}; object-fit: cover; object-position: top; border-radius: 6px; border: 1px solid var(--color-border-card); margin-top: 9px; display: block;`,
           )}
         />
       ) : (
         <div
           style={s(
-            `width: 100%; aspect-ratio: ${shotRatio(page)}; border-radius: 5px; border: 1px dashed var(--color-neutral-700); margin-top: 9px; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-600);`,
+            `width: 100%; aspect-ratio: ${shotRatio(page)}; border-radius: 6px; border: 1px dashed var(--color-border-control); margin-top: 9px; display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-600);`,
           )}
         >
           {t('produit.scan_failed')}
@@ -539,8 +542,8 @@ function DetailPanel({
     <div
       style={s(
         side
-          ? `position: absolute; top: 0; right: 0; bottom: 0; width: ${width}px; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); padding: 20px; overflow: auto; box-shadow: -22px 0 44px rgba(0,0,0,0.55); z-index: 5;`
-          : `width: ${width}px; flex: none; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); padding: 20px; overflow: auto;`,
+          ? `position: absolute; top: 0; right: 0; bottom: 0; width: ${width}px; border-left: 1px solid var(--color-divider); background: var(--color-surface-panel); padding: 20px; overflow: auto; box-shadow: -22px 0 44px rgba(0,0,0,0.55); z-index: 5;`
+          : `width: ${width}px; flex: none; border-left: 1px solid var(--color-divider); background: var(--color-surface-panel); padding: 20px; overflow: auto;`,
       )}
     >
       <div style={s('display: flex; align-items: center; gap: 8px;')}>
@@ -579,13 +582,13 @@ function DetailPanel({
           title={t('produit.zoom')}
           onClick={() => setZoom(0)}
           style={s(
-            `margin-top: 14px; border-radius: 8px; border: 1px solid var(--color-neutral-800); width: 100%; aspect-ratio: ${shotRatio(page)}; object-fit: cover; object-position: top; display: block; cursor: zoom-in;`,
+            `margin-top: 14px; border-radius: 8px; border: 1px solid var(--color-border-card); width: 100%; aspect-ratio: ${shotRatio(page)}; object-fit: cover; object-position: top; display: block; cursor: zoom-in;`,
           )}
         />
       ) : (
         <div
           style={s(
-            `margin-top: 14px; border-radius: 8px; border: 1px dashed var(--color-neutral-700); width: 100%; aspect-ratio: ${shotRatio(page)}; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--color-neutral-500);`,
+            `margin-top: 14px; border-radius: 8px; border: 1px dashed var(--color-border-control); width: 100%; aspect-ratio: ${shotRatio(page)}; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--color-neutral-500);`,
           )}
         >
           {t('produit.no_screenshot')}
@@ -613,7 +616,7 @@ function DetailPanel({
                     title={t('produit.zoom')}
                     onClick={() => setZoom(i + 1)}
                     style={s(
-                      'height: 44px; width: 100%; object-fit: cover; object-position: top; border-radius: 5px; border: 1px solid var(--color-neutral-800); display: block; cursor: zoom-in;',
+                      'height: 44px; width: 100%; object-fit: cover; object-position: top; border-radius: 6px; border: 1px solid var(--color-border-card); display: block; cursor: zoom-in;',
                     )}
                   />
                   <div style={s('font-size: 9.5px; color: var(--color-neutral-600); margin-top: 4px;')}>
@@ -770,7 +773,7 @@ function CompareSide({
           src={shotUrl(root, `shots/${slug}/${file}`)}
           alt={`${label} — ${frDate(shotDate(file))}`}
           style={s(
-            'flex: 1; min-height: 0; width: 100%; object-fit: contain; border-radius: 8px; border: 1px solid var(--color-neutral-800); background: var(--theme-bg-lightbox);',
+            'flex: 1; min-height: 0; width: 100%; object-fit: contain; border-radius: 8px; border: 1px solid var(--color-border-card); background: var(--theme-bg-lightbox);',
           )}
         />
       ) : (
@@ -831,7 +834,7 @@ function Footnotes({
   ].filter(Boolean)
 
   return (
-    <div style={s('flex: none; border-top: 1px solid var(--color-divider); background: var(--theme-bg-secondary);')}>
+    <div style={s('flex: none; border-top: 1px solid var(--color-divider); background: var(--color-surface-panel);')}>
       <button
         type="button"
         onClick={() => setOpen(o => !o)}

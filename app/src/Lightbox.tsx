@@ -94,7 +94,7 @@ export function Lightbox({
           src={shotUrl(root, `shots/${slug}/${file}`)}
           alt={`${label} — ${frDate(shotDate(file))}`}
           style={s(
-            'max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; border: 1px solid var(--color-neutral-800); box-shadow: 0 24px 60px rgba(0,0,0,.6); background: var(--theme-bg-lightbox);',
+            'max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; border: 1px solid var(--color-border-card); box-shadow: 0 24px 60px rgba(0,0,0,.6); background: var(--theme-bg-lightbox);',
           )}
         />
         <Arrow label="›" title={t('a11y.newer_shot')} disabled={at <= 0} onClick={() => step(1)} />
@@ -163,7 +163,7 @@ function Arrow({
       disabled={disabled}
       onClick={onClick}
       style={s(
-        'flex: none; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--color-neutral-800); background: rgba(19,20,31,.8); font-size: 19px; line-height: 1; ' +
+        'flex: none; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--color-border-card); background: rgba(19,20,31,.8); font-size: 19px; line-height: 1; ' +
           (disabled
             ? 'color: rgba(233,233,237,.4); cursor: default;'
             : 'color: rgba(233,233,237,.92); cursor: pointer;'),

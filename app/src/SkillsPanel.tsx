@@ -74,7 +74,7 @@ export function SkillsList({
                 className="tag"
                 style={s(
                   skill.installe
-                    ? 'font-size: 10px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660;'
+                    ? 'font-size: 10px; color: var(--color-plan); background: var(--color-plan-bg); border: 1px solid var(--color-plan-border);'
                     : 'font-size: 10px;',
                 )}
               >

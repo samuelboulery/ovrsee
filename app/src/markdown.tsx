@@ -66,7 +66,7 @@ const inlinePattern = () =>
 // exactement `--color-bg` en thème clair (T-0045, rampe inversée) — un code
 // « surligné » qui se fond dans le fond de la page.
 const CODE_STYLE =
-  'font-family: var(--font-mono); font-size: .92em; background: var(--color-surface-control); border: 1px solid var(--color-neutral-800); border-radius: 4px; padding: 1px 5px;'
+  'font-family: var(--font-mono); font-size: .92em; background: var(--color-surface-control); border: 1px solid var(--color-border-card); border-radius: 4px; padding: 1px 5px;'
 
 /**
  * Une image ou une vidéo du dépôt, ou rien.
@@ -212,7 +212,7 @@ const HEADING_STYLES = [
 ]
 
 const CELL =
-  'padding: 7px 11px; border-bottom: 1px solid var(--color-neutral-800); text-align: left; vertical-align: top;'
+  'padding: 7px 11px; border-bottom: 1px solid var(--color-border-card); text-align: left; vertical-align: top;'
 
 /**
  * Un bloc de code : sa barre, sa coloration, son bouton copier.
@@ -227,12 +227,12 @@ function Bloc({ code, language }: { code: string; language: string }) {
   return (
     <div
       style={s(
-        'margin: 12px 0; border: 1px solid var(--color-neutral-800); border-radius: 8px; background: var(--color-surface-control); overflow: hidden;',
+        'margin: 12px 0; border: 1px solid var(--color-border-card); border-radius: 8px; background: var(--color-surface-control); overflow: hidden;',
       )}
     >
       <div
         style={s(
-          'display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 5px 10px; border-bottom: 1px solid var(--color-neutral-800);',
+          'display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 5px 10px; border-bottom: 1px solid var(--color-border-card);',
         )}
       >
         <span style={s('font-size: 10px; color: var(--color-neutral-600);')}>{language}</span>
@@ -387,7 +387,7 @@ export function Markdown({ text, root }: { text: string; root?: string }): React
         <details
           key={key()}
           style={s(
-            'margin: 12px 0; padding: 8px 12px; border: 1px solid var(--color-neutral-800); border-radius: 8px;',
+            'margin: 12px 0; padding: 8px 12px; border: 1px solid var(--color-border-card); border-radius: 8px;',
           )}
         >
           <summary style={s('cursor: pointer; font-size: 12.5px; color: var(--color-neutral-300);')}>
@@ -447,7 +447,7 @@ export function Markdown({ text, root }: { text: string; root?: string }): React
         <div key={key()} style={s('margin: 12px 0; overflow-x: auto;')}>
           <table
             style={s(
-              'border-collapse: collapse; width: 100%; font-size: 12.5px; border: 1px solid var(--color-neutral-800); border-radius: 8px;',
+              'border-collapse: collapse; width: 100%; font-size: 12.5px; border: 1px solid var(--color-border-card); border-radius: 8px;',
             )}
           >
             <thead>
@@ -456,7 +456,7 @@ export function Markdown({ text, root }: { text: string; root?: string }): React
                   <th
                     key={c}
                     style={s(
-                      `${CELL} font-weight: 500; color: var(--color-neutral-400); background: var(--color-surface);`,
+                      `${CELL} font-weight: 500; color: var(--color-neutral-400); background: var(--color-surface-control);`,
                     )}
                   >
                     {inline(cell, `${key()}-h${c}`, root)}

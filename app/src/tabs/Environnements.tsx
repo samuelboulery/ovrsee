@@ -35,7 +35,7 @@ export function Environnements({
               {env.branche && env.branche === gitStatus.branch && (
                 <span
                   className="tag"
-                  style={s('font-size: 10px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660;')}
+                  style={s('font-size: 10px; color: var(--color-plan); background: var(--color-plan-bg); border: 1px solid var(--color-plan-border);')}
                 >
                   {t('environnements.current_branch')}
                 </span>

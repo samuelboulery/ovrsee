@@ -14,17 +14,17 @@ import { s } from '../style'
 import type { IntegrationsBridge } from '../useTerminal'
 
 const DOT_ETAT: Record<IntegrationState, string> = {
-  ok: '#4cc38a',
-  error: '#e5677a',
-  building: '#a2a8b2',
-  unknown: '#6b7078',
+  ok: 'var(--color-ok)',
+  error: 'var(--color-err)',
+  building: 'var(--color-text-tertiary)',
+  unknown: 'var(--color-text-faint)',
 }
 
 const ETAT_STYLE: Record<IntegrationState, string> = {
-  ok: 'color: #4cc38a; border: 1px solid #1c3728;',
-  error: 'color: #e5677a; border: 1px solid #3a1c22;',
-  building: 'color: var(--color-neutral-300); border: 1px solid var(--color-neutral-700);',
-  unknown: 'color: var(--color-neutral-500); border: 1px dashed var(--color-neutral-700);',
+  ok: 'color: var(--color-ok); border: 1px solid var(--color-ok-border);',
+  error: 'color: var(--color-err); border: 1px solid var(--color-err-border);',
+  building: 'color: var(--color-neutral-300); border: 1px solid var(--color-border-control);',
+  unknown: 'color: var(--color-neutral-500); border: 1px dashed var(--color-border-control);',
 }
 
 const ETAT_LABEL: Record<IntegrationState, TranslationKey> = {
@@ -98,7 +98,7 @@ export function Deploiements({
             type="button"
             onClick={() => onOpenPreferences()}
             style={s(
-              'width: 100%; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 9px; border: 1px dashed #363841; background: transparent; color: #7f858f;',
+              'width: 100%; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 8px; border: 1px dashed var(--color-border-control); background: transparent; color: var(--color-text-quaternary);',
             )}
           >
             <Plus size={14} aria-hidden="true" />
@@ -130,7 +130,7 @@ export function Deploiements({
           return (
             <div
               key={integ.id}
-              style={s('border: 1px solid #2b2d35; border-radius: 9px; background: #101216; padding: 11px 12px;')}
+              style={s('border: 1px solid var(--color-border-card); border-radius: 8px; background: var(--color-surface-card); padding: 11px 12px;')}
             >
               <div style={s('display: flex; align-items: flex-start; gap: 10px;')}>
                 <span
@@ -139,12 +139,12 @@ export function Deploiements({
                   )}
                 />
                 <div style={s('flex: 1; min-width: 0;')}>
-                  <div style={s('font-size: 12.5px; color: #f2f3f5;')}>
+                  <div style={s('font-size: 12.5px; color: var(--color-text);')}>
                     {integ.label} · {integ.provider}
                   </div>
                   <div
                     style={s(
-                      'font-family: var(--font-mono); font-size: 10.5px; color: #737983; margin-top: 2px;',
+                      'font-family: var(--font-mono); font-size: 10.5px; color: var(--color-text-discrete); margin-top: 2px;',
                     )}
                   >
                     {status ? t(ETAT_LABEL[etat]) : t('deploiements.never_checked')}
@@ -157,7 +157,7 @@ export function Deploiements({
                     target="_blank"
                     rel="noreferrer"
                     title={integ.url}
-                    style={s('flex: none; display: block; color: #7f858f;')}
+                    style={s('flex: none; display: block; color: var(--color-text-quaternary);')}
                   >
                     <ArrowUpRight size={14} aria-hidden="true" />
                   </a>
@@ -175,7 +175,7 @@ export function Deploiements({
               <button
                 type="button"
                 style={s(
-                  'cursor: pointer; font-size: 10.5px; padding: 3px 8px; margin-top: 8px; border-radius: 5px; border: 1px solid #22232a; background: #171920; color: #d5d8dd;',
+                  'cursor: pointer; font-size: 10.5px; padding: 3px 8px; margin-top: 8px; border-radius: 6px; border: 1px solid var(--color-border-control); background: var(--color-surface-control); color: var(--color-text-secondary);',
                 )}
                 disabled={!ovrsee || checking === integ.id}
                 title={ovrsee ? undefined : t('deploiements.electron_only')}
@@ -202,16 +202,16 @@ function EnTete({
   return (
     <div
       style={s(
-        'height: 38px; flex: none; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #22242b;',
+        'height: 38px; flex: none; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--color-border-chrome);',
       )}
     >
-      <div style={s('font-size: 12px; font-weight: 500; color: #f2f3f5;')}>{t('deploiements.title')}</div>
+      <div style={s('font-size: 12px; font-weight: 500; color: var(--color-text);')}>{t('deploiements.title')}</div>
       <div style={s('flex: 1;')} />
       {onMasquer && (
         <button
           type="button"
           onClick={onMasquer}
-          style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #7f858f;')}
+          style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: var(--color-text-quaternary);')}
         >
           {t('deploiements.hide')}
         </button>
@@ -219,7 +219,7 @@ function EnTete({
       <button
         type="button"
         onClick={() => onOpenPreferences()}
-        style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #7f858f;')}
+        style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: var(--color-text-quaternary);')}
       >
         {t('deploiements.configure')}
       </button>
@@ -241,7 +241,7 @@ const LIGNE_STYLE =
  */
 function LigneDeploiement({ d }: { d: DeploymentInfo }) {
   const [survol, setSurvol] = useState(false)
-  const style = s(LIGNE_STYLE + (d.url && survol ? ' background: var(--theme-bg-tertiary);' : ''))
+  const style = s(LIGNE_STYLE + (d.url && survol ? ' background: var(--color-surface-hover);' : ''))
   const survolProps = d.url ? { onMouseEnter: () => setSurvol(true), onMouseLeave: () => setSurvol(false) } : {}
 
   const contenu = (
@@ -255,7 +255,7 @@ function LigneDeploiement({ d }: { d: DeploymentInfo }) {
         className={`tag ${d.environment === 'Production' ? '' : 'tag-neutral'}`}
         style={s(
           `font-size: 9.5px; padding: 1px 7px;${
-            d.environment === 'Production' ? ' color: #a49dfa; background: #14132a; border: 1px solid #2a2660;' : ''
+            d.environment === 'Production' ? ' color: var(--color-plan); background: var(--color-plan-bg); border: 1px solid var(--color-plan-border);' : ''
           }`,
         )}
       >

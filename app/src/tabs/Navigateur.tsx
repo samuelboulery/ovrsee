@@ -118,7 +118,7 @@ function pickElement(): Promise<Picked | null> {
   return new Promise(resolve => {
     const overlay = document.createElement('div')
     overlay.style.cssText =
-      'position:fixed;z-index:2147483647;pointer-events:none;border:2px solid #7d76f0;' +
+      'position:fixed;z-index:2147483647;pointer-events:none;border:2px solid var(--color-accent);' +
       'background:rgba(125,118,240,.18);border-radius:2px;transition:all .05s;'
     document.body.appendChild(overlay)
 
@@ -628,7 +628,7 @@ export function Navigateur({
           style={s(
             'display: flex; align-items: center; gap: 6px; font-size: 11.5px; padding: 5px 10px; border-radius: 6px; cursor: pointer; ' +
               (picking
-                ? 'background: #2f313b; border: 1px solid #4d5060; color: #f2f3f5;'
+                ? 'background: var(--color-surface-segment); border: 1px solid var(--color-border-selected); color: var(--color-text);'
                 : 'background: transparent; border: 1px solid var(--color-border-control); color: var(--color-neutral-500);'),
           )}
           title={picking ? t('navigateur.pick_element') : t('navigateur.pick_element_inactive')}
@@ -657,10 +657,10 @@ export function Navigateur({
                   onClick={() => moveDock(id)}
                   title={t('navigateur.dock_position', { position: displayLabel.toLowerCase() })}
                   style={s(
-                    'cursor: pointer; font-family: var(--font-body); font-size: 10.5px; letter-spacing: .06em; padding: 4px 9px; border-radius: 5px; border: 1px solid ' +
+                    'cursor: pointer; font-family: var(--font-body); font-size: 10.5px; letter-spacing: .06em; padding: 4px 9px; border-radius: 6px; border: 1px solid ' +
                       (dock === id
-                        ? '#2f313b; background: #2f313b; color: #f2f3f5;'
-                        : '#22232a; background: transparent; color: #a2a8b2;'),
+                        ? 'var(--color-surface-segment); background: var(--color-surface-segment); color: var(--color-text);'
+                        : 'var(--color-border-control); background: transparent; color: var(--color-text-tertiary);'),
                   )}
                 >
                   {displayLabel}
@@ -691,14 +691,14 @@ export function Navigateur({
           `flex: 1; position: relative; min-height: 0; min-width: 0; background: ${
             url
               ? '#ffffff'
-              : 'repeating-linear-gradient(135deg, #101116 0 10px, #0b0c10 10px 20px)'
+              : 'repeating-linear-gradient(135deg, var(--color-surface-card) 0 10px, var(--color-surface-panel) 10px 20px)'
           };`,
         )}
       >
         {!url && (
           <div
             style={s(
-              'position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: #6b7078;',
+              'position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: var(--color-text-faint);',
             )}
           >
             {t('navigateur.no_url')}
@@ -751,7 +751,7 @@ export function Navigateur({
       {logs.length > 0 && (
         <div
           style={s(
-            'flex: none; border-top: 1px solid var(--color-divider); background: var(--color-surface); font-size: 11.5px;',
+            'flex: none; border-top: 1px solid var(--color-divider); background: var(--color-surface-panel); font-size: 11.5px;',
           )}
         >
           <div style={s('display: flex; align-items: center; gap: 10px; padding: 6px 12px;')}>
@@ -801,7 +801,7 @@ export function Navigateur({
                   <span aria-hidden="true">{log.level === 'error' ? '✕' : '▲'}</span>{' '}
                   <span style={s('color: var(--color-neutral-500);')}>{log.message}</span>
                   {log.source && (
-                    <span style={s('color: #6b7078;')}> · {log.source}</span>
+                    <span style={s('color: var(--color-text-faint);')}> · {log.source}</span>
                   )}
                 </div>
               ))}
@@ -877,7 +877,7 @@ function ElementPanel({
   return (
     <div
       style={s(
-        `width: ${width}px; flex: none; border-left: 1px solid var(--color-divider); background: var(--color-surface); display: flex; flex-direction: column; overflow-y: auto;`,
+        `width: ${width}px; flex: none; border-left: 1px solid var(--color-divider); background: var(--color-surface-panel); display: flex; flex-direction: column; overflow-y: auto;`,
       )}
     >
       <div style={s('height: 38px; flex: none; display: flex; align-items: center; padding: 0 12px; border-bottom: 1px solid var(--color-divider);')}>
@@ -931,7 +931,7 @@ function ElementPanel({
                     className={route === currentRoute ? 'tag' : 'tag tag-outline'}
                     style={s(
                       route === currentRoute
-                        ? 'font-size: 11px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660;'
+                        ? 'font-size: 11px; color: var(--color-plan); background: var(--color-plan-bg); border: 1px solid var(--color-plan-border);'
                         : 'font-size: 11px;',
                     )}
                   >
@@ -966,7 +966,7 @@ function NavButton({ label, title, onClick }: { label: string; title: string; on
       aria-label={title}
       onClick={onClick}
       style={s(
-        'cursor: pointer; border: 1px solid var(--color-neutral-800); background: transparent; color: var(--color-neutral-500); border-radius: 6px; width: 26px; height: 26px; font-size: 12px; line-height: 1; flex: none;',
+        'cursor: pointer; border: 1px solid var(--color-border-card); background: transparent; color: var(--color-neutral-500); border-radius: 6px; width: 26px; height: 26px; font-size: 12px; line-height: 1; flex: none;',
       )}
     >
       {label}

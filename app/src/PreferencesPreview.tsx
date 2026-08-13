@@ -88,7 +88,7 @@ export function PreferencesPreview({ settings }: { settings: SettingsType }) {
   const barreTerminal = (
     <div
       style={s(
-        'display: flex; gap: 5px; padding: 6px 7px; background: var(--theme-bg-primary); font-size: 8px; color: var(--color-neutral-500);' +
+        'display: flex; gap: 5px; padding: 6px 7px; background: var(--color-surface); font-size: 8px; color: var(--color-neutral-500);' +
           formeTerminal,
       )}
     >
@@ -107,7 +107,7 @@ export function PreferencesPreview({ settings }: { settings: SettingsType }) {
       {/* Bande de titre — les trois pastilles du système, en 5 px. */}
       <div
         style={s(
-          'flex: none; height: 16px; display: flex; align-items: center; gap: 4px; padding: 0 7px; background: var(--theme-bg-tertiary); border-bottom: 1px solid var(--color-divider);',
+          'flex: none; height: 16px; display: flex; align-items: center; gap: 4px; padding: 0 7px; background: var(--color-surface); border-bottom: 1px solid var(--color-divider);',
         )}
       >
         {[0, 1, 2].map(i => (
@@ -127,7 +127,7 @@ export function PreferencesPreview({ settings }: { settings: SettingsType }) {
             rail (`App.tsx`, maquette 2a). */}
         <div
           style={s(
-            'flex: none; width: 42px; display: flex; flex-direction: column; gap: 5px; padding: 7px 5px; background: var(--theme-bg-secondary); border-right: 1px solid var(--color-divider); overflow: hidden;',
+            'flex: none; width: 42px; display: flex; flex-direction: column; gap: 5px; padding: 7px 5px; background: var(--color-surface-panel); border-right: 1px solid var(--color-divider); overflow: hidden;',
           )}
         >
           <Ligne width={26} />

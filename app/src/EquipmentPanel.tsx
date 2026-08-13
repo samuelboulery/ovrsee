@@ -45,7 +45,7 @@ async function envoyerAuTerminal(
 }
 
 const CARTE =
-  'width: 100%; padding: 14px; background: var(--theme-bg-secondary); border-radius: 6px; text-align: left;'
+  'width: 100%; padding: 14px; background: var(--color-surface-card); border-radius: 6px; text-align: left;'
 const TITRE_CARTE =
   'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;'
 

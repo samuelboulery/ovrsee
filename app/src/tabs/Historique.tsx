@@ -92,7 +92,7 @@ export function Historique({
             <div style={s('padding: 40px 0; display: flex; align-items: center; justify-content: center;')}>
               <div
                 style={s(
-                  'padding: 48px 20px; max-width: 46ch; text-align: center; border: 1px dashed #363841; border-radius: 9px; font-size: 12.5px; color: var(--color-neutral-500); line-height: 1.6;',
+                  'padding: 48px 20px; max-width: 46ch; text-align: center; border: 1px dashed var(--color-border-control); border-radius: 8px; font-size: 12.5px; color: var(--color-neutral-500); line-height: 1.6;',
                 )}
               >
                 {t('apercu.project_timeline_empty')}
@@ -211,7 +211,7 @@ function DayHeading({ date }: { date: string }) {
   return (
     <div style={s('display: flex; align-items: center; gap: 10px; margin: 18px 0 8px;')}>
       <div className="kicker">{frDate(date)}</div>
-      <div style={s('flex: 1; height: 1px; background: #22242b;')} />
+      <div style={s('flex: 1; height: 1px; background: var(--color-border-chrome);')} />
     </div>
   )
 }
@@ -226,9 +226,9 @@ function CommitRow({ commit }: { commit: GitCommit }) {
   return (
     <div style={s('display: flex; align-items: baseline; gap: 10px; padding: 4px 0;')}>
       <span style={s('width: 5px; height: 5px; border-radius: 50%; background: var(--color-neutral-600); flex: none; align-self: center;')} />
-      {/* L'accent n'est pas la couleur des commits (audit §5.2) — #6ea8fe,
+      {/* L'accent n'est pas la couleur des commits (audit §5.2) — var(--color-info),
           la même teinte que les shas ailleurs dans l'app (colonne Revue). */}
-      <span style={s('font-family: var(--font-mono); font-size: 11px; color: #6ea8fe; flex: none;')}>
+      <span style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-info); flex: none;')}>
         {commit.sha}
       </span>
       <span style={s('font-size: 12.5px; color: var(--color-neutral-300); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>
@@ -258,14 +258,14 @@ function TicketCard({ ticket, onOuvrir }: { ticket: Ticket; onOuvrir: (file: str
       type="button"
       onClick={() => onOuvrir(ticket.file)}
       style={s(
-        `display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; cursor: pointer; font-family: var(--font-body); color: inherit; margin: 3px 0; padding: 10px 11px; border-radius: 10px; border: 1px solid ${enCours ? '#22232a' : '#2b2d35'}; background: ${enCours ? '#0e0f12' : '#101216'};`,
+        `display: flex; align-items: center; gap: 9px; width: 100%; text-align: left; cursor: pointer; font-family: var(--font-body); color: inherit; margin: 3px 0; padding: 10px 11px; border-radius: 8px; border: 1px solid ${enCours ? 'var(--color-border-control)' : 'var(--color-border-card)'}; background: ${enCours ? 'var(--color-surface-panel)' : 'var(--color-surface-card)'};`,
       )}
     >
       <span
         style={s(`width: 5px; height: 5px; border-radius: 50%; flex: none; background: ${COULEUR_PRIORITE[ticket.priorite] ?? COULEUR_PRIORITE.moyenne};`)}
         title={`${t('tableau.priority_label')} ${ticket.priorite}`}
       />
-      <span style={s('font-family: var(--font-mono); font-size: 10.5px; color: #7f858f; flex: none;')}>
+      <span style={s('font-family: var(--font-mono); font-size: 10.5px; color: var(--color-text-quaternary); flex: none;')}>
         {ticket.id}
       </span>
       <span style={s('font-size: 12.5px; color: var(--color-neutral-300); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>
@@ -386,11 +386,11 @@ function PlanDetail({ plan }: { plan: Plan }) {
         {planWhy(plan)}
       </div>
       {planRejected(plan) !== null && (
-        <div style={s('display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; padding: 9px 11px; border-radius: 6px; background: #14132a; border: 1px solid #2a2660; max-width: 62ch;')}>
-          <span style={s('font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #8079c9; flex: none; padding-top: 1px;')}>
+        <div style={s('display: flex; align-items: flex-start; gap: 8px; margin-top: 10px; padding: 9px 11px; border-radius: 6px; background: var(--color-plan-bg); border: 1px solid var(--color-plan-border); max-width: 62ch;')}>
+          <span style={s('font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-accent-2); flex: none; padding-top: 1px;')}>
             {t('historique.rejected')}
           </span>
-          <span style={s('font-size: 12px; color: #a49dfa; line-height: 1.5;')}>
+          <span style={s('font-size: 12px; color: var(--color-plan); line-height: 1.5;')}>
             {planRejected(plan)}
           </span>
         </div>
@@ -399,7 +399,7 @@ function PlanDetail({ plan }: { plan: Plan }) {
         {planFiles(plan).map(file => (
           <span
             key={file}
-            style={s('font-family: var(--font-mono); font-size: 10.5px; color: var(--color-neutral-500); border: 1px solid var(--color-neutral-800); border-radius: 4px; padding: 3px 7px;')}
+            style={s('font-family: var(--font-mono); font-size: 10.5px; color: var(--color-neutral-500); border: 1px solid var(--color-border-card); border-radius: 4px; padding: 3px 7px;')}
           >
             {file}
           </span>
@@ -439,7 +439,7 @@ function PlanBandShell({
   return (
     <div
       style={s(
-        `border-left: 2px solid ${actif ? '#2a2660' : '#2f313b'}; padding: 8px 0 8px 14px; margin: 6px 0 6px 1px;`,
+        `border-left: 2px solid ${actif ? 'var(--color-plan-border)' : 'var(--color-surface-segment)'}; padding: 8px 0 8px 14px; margin: 6px 0 6px 1px;`,
       )}
     >
       <button
@@ -455,7 +455,7 @@ function PlanBandShell({
         {actif ? (
           <span
             style={s(
-              'font-size: 9.5px; padding: 1px 6px; border-radius: 4px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660; flex: none;',
+              'font-size: 9.5px; padding: 1px 6px; border-radius: 4px; color: var(--color-plan); background: var(--color-plan-bg); border: 1px solid var(--color-plan-border); flex: none;',
             )}
           >
             {t('sante.active_badge')}

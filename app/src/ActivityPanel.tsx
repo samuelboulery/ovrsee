@@ -22,8 +22,8 @@ type SousVue = 'empile' | 'densite' | 'type'
 const plur = (n: number, mot: string) => `${n} ${mot}${n > 1 ? 's' : ''}`
 
 const COULEUR_SERIE = {
-  plans: '#7d76f0',
-  tickets: '#4b46a3',
+  plans: 'var(--color-accent)',
+  tickets: 'var(--color-accent-2-700)',
   commits: '#3a3c47',
 } as const
 
@@ -69,7 +69,7 @@ export function ActivityPanel({
   return (
     <div
       style={s(
-        'width: 300px; flex: none; border-left: 1px solid var(--color-divider); background: var(--theme-bg-secondary); padding: 16px 14px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;',
+        'width: 300px; flex: none; border-left: 1px solid var(--color-divider); background: var(--color-surface-panel); padding: 16px 14px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;',
       )}
     >
       <div style={s('display: flex; align-items: center; gap: 8px;')}>
@@ -101,7 +101,7 @@ export function ActivityPanel({
               style={s(
                 `font-size: 10.5px; padding: 2px 7px; border-radius: 4px; border: 0; cursor: pointer; font-family: var(--font-body); ${
                   sousVue === id
-                    ? 'background: var(--color-surface); color: var(--color-text);'
+                    ? 'background: var(--color-surface-active); color: var(--color-text);'
                     : 'background: transparent; color: var(--color-neutral-500);'
                 }`,
               )}
@@ -231,7 +231,7 @@ function Legend() {
   )
 }
 
-const NIVEAUX_DENSITE = ['#262832', '#2a2660', '#4b46a3', '#6259cc', '#7d76f0']
+const NIVEAUX_DENSITE = ['var(--color-surface-active)', 'var(--color-plan-border)', 'var(--color-accent-2-700)', 'var(--color-accent-2-600)', 'var(--color-accent)']
 
 function DensityLegend() {
   return (
@@ -381,7 +381,7 @@ function ByTypeMeters({
             <div style={s('flex: 1;')} />
             <div style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-neutral-500);')}>{item.count}</div>
           </div>
-          <div style={s('height: 6px; border-radius: 3px; background: var(--color-surface-control); overflow: hidden;')}>
+          <div style={s('height: 6px; border-radius: 4px; background: var(--color-surface-control); overflow: hidden;')}>
             <div style={s(`width: ${(item.count / max) * 100}%; height: 100%; background: ${item.couleur};`)} />
           </div>
         </div>

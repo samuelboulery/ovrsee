@@ -18,15 +18,11 @@ export const darkTheme = {
   // Fonds principaux (statusbar, panneaux terminal) — niveau "rails et
   // panneaux" du système Ovrsee (T-0045).
   bgPrimary: '#0b0c0e',
-  // Fonds secondaires (sidebars détails, modales) — niveau "contrôles",
-  // plus clair, pour lire comme élevé au-dessus du panneau.
-  bgSecondary: '#171920',
-  // Fonds alternatifs — niveau "actif/élevé".
-  bgTertiary: '#262832',
-  bgQuaternary: '#0b0c0e',
-  bgError: '#08090a', // Erreurs terminal
-  bgAlerte: '#3a3a1a', // Encadré d'avertissement (source de graphe introuvable)
   bgLightbox: '#08090a', // Fond lightbox
+  // `bgSecondary`, `bgTertiary`, `bgQuaternary`, `bgError` et `bgAlerte` ont
+  // disparu (T-0121) : ils doublaient `--color-surface-*` et `--color-warn-bg`
+  // du design system, et les composants divergeaient selon celui des deux
+  // qu'ils citaient. Les surfaces se prennent dans `_ds/ovrsee/styles.css`.
   // xterm
   xtermBg: '#0b0c0e',
   xtermFg: '#e1e6ea',
@@ -111,11 +107,6 @@ function getCSSVariables(): string {
    */
   const themeTokens = (palette: typeof darkTheme) => ({
     '--theme-bg-primary': palette.bgPrimary,
-    '--theme-bg-secondary': palette.bgSecondary,
-    '--theme-bg-tertiary': palette.bgTertiary,
-    '--theme-bg-quaternary': palette.bgQuaternary,
-    '--theme-bg-error': palette.bgError,
-    '--theme-bg-alerte': palette.bgAlerte,
     '--theme-bg-lightbox': palette.bgLightbox,
     '--theme-xterm-bg': palette.xtermBg,
     '--theme-xterm-fg': palette.xtermFg,

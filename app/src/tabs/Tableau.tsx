@@ -297,7 +297,7 @@ export function Tableau({
       </ViewBar>
       <div style={s('padding: 12px 22px 12px;')}>
         {enAttente && (
-          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: #171920; border: 1px solid #363841; display: flex; align-items: center; gap: 10px;')}>
+          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: var(--color-surface-card); border: 1px solid var(--color-border-control); display: flex; align-items: center; gap: 10px;')}>
             <div style={s('font-size: 12px; color: var(--color-text);')}>
               {t('tableau.element_context_banner')}
             </div>
@@ -313,7 +313,7 @@ export function Tableau({
           </div>
         )}
         {filtreEpic && (
-          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: #171920; border: 1px solid #363841; display: flex; align-items: center; gap: 10px;')}>
+          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: var(--color-surface-card); border: 1px solid var(--color-border-control); display: flex; align-items: center; gap: 10px;')}>
             <span className="tag tag-accent" style={s('font-size: 10px;')}>epic</span>
             <div style={s('font-size: 12px; color: var(--color-text);')}>
               {t('tableau.children_of')} <span style={s('font-weight: 500;')}>{filtreEpic}</span>
@@ -415,12 +415,12 @@ export function Tableau({
 }
 
 const PANNEAU =
-  'width: 340px; min-width: 340px; border-left: 1px solid var(--color-neutral-800); padding: 0 18px 20px; overflow-y: auto; background: var(--color-bg);'
+  'width: 340px; min-width: 340px; border-left: 1px solid var(--color-border-card); padding: 0 18px 20px; overflow-y: auto; background: var(--color-surface-panel);'
 
 const COLONNE_LARGEUR = 'width: 268px; min-width: 268px;'
 
 const COLONNE_FOND =
-  'display: flex; flex-direction: column; gap: 8px; border-radius: 10px; padding: 10px; max-height: 100%; '
+  'display: flex; flex-direction: column; gap: 8px; border-radius: 8px; padding: 10px; max-height: 100%; '
 
 function ColonneVue({
   colonne,
@@ -524,10 +524,13 @@ function ColonneVue({
         COLONNE_LARGEUR +
           COLONNE_FOND +
           // Cible de dépôt neutre — jamais un filet coloré pour signifier un
-          // état (audit §5.1) : pointillé #4d5060, fond #1b1d24.
+          // état (audit §5.1) : pointillé var(--color-border-selected), fond var(--color-surface-hover).
           (survolee
-            ? 'background: #1b1d24; outline: 1px dashed #4d5060;'
-            : 'background: color-mix(in srgb, var(--color-surface) 55%, transparent);') +
+            ? 'background: var(--color-surface-hover); outline: 1px dashed var(--color-border-selected);'
+            : // Une colonne est un panneau : elle porte des cartes, donc elle se
+              // pose au-dessus du fond. L'ancien color-mix la rendait plus
+              // sombre que le fond qu'elle recouvrait.
+              'background: var(--color-surface-panel);') +
           liseré,
       )}
     >
@@ -566,7 +569,7 @@ function ColonneVue({
                 event.currentTarget.blur()
               }
             }}
-            style={s('flex: 1; min-width: 0; font-size: 12.5px; font-weight: 500; font-family: inherit; color: var(--color-text); background: transparent; border: 1px solid var(--color-neutral-800); border-radius: 5px; padding: 3px 6px;')}
+            style={s('flex: 1; min-width: 0; font-size: 12.5px; font-weight: 500; font-family: inherit; color: var(--color-text); background: transparent; border: 1px solid var(--color-border-card); border-radius: 6px; padding: 3px 6px;')}
           />
         ) : (
           <>
@@ -603,7 +606,7 @@ function ColonneVue({
                 }
                 if (wip !== (colonne.wip ?? null)) onRenommer({ wip })
               }}
-              style={s('width: 46px; font-size: 11px; font-family: inherit; color: var(--color-text); background: transparent; border: 1px solid var(--color-neutral-800); border-radius: 5px; padding: 3px 4px;')}
+              style={s('width: 46px; font-size: 11px; font-family: inherit; color: var(--color-text); background: transparent; border: 1px solid var(--color-border-card); border-radius: 6px; padding: 3px 4px;')}
             />
             <button
               type="button"
@@ -662,7 +665,7 @@ function ColonneVue({
       {/* La confirmation prend la place des cartes plutôt que de flotter : ce
           qu'on s'apprête à vider est exactement ce qu'elle recouvre. */}
       {confirme ? (
-        <div style={s('border: 1px solid var(--color-accent-700); border-radius: 8px; padding: 10px; background: var(--color-surface);')}>
+        <div style={s('border: 1px solid var(--color-accent-700); border-radius: 8px; padding: 10px; background: var(--color-surface-card);')}>
           <div style={s('font-size: 11px; color: var(--color-neutral-400); line-height: 1.5;')}>
             {tickets.length > 0
               ? t(tickets.length > 1 ? 'tableau.tickets_to_relocate_plural' : 'tableau.tickets_to_relocate', { n: tickets.length })
@@ -709,7 +712,7 @@ function ColonneVue({
           {survolee && (
             <div
               style={s(
-                'font-size: 11px; color: #a2a8b2; text-align: center; padding: 8px; border-radius: 6px; border: 1px dashed #4d5060;',
+                'font-size: 11px; color: var(--color-text-tertiary); text-align: center; padding: 8px; border-radius: 6px; border: 1px dashed var(--color-border-selected);',
               )}
             >
               {t('tableau.drop_here')}
@@ -771,7 +774,7 @@ function TuileAjout({
       }}
       style={s(
         COLONNE_LARGEUR +
-          'display: flex; flex-direction: column; justify-content: flex-start; border-radius: 10px; padding: 10px; border: 1px dashed ' +
+          'display: flex; flex-direction: column; justify-content: flex-start; border-radius: 8px; padding: 10px; border: 1px dashed ' +
           (vise ? 'var(--color-accent);' : 'var(--color-neutral-800);'),
       )}
     >
@@ -850,9 +853,9 @@ function Carte({
       onClick={() => onOuvrir(ticket.file)}
       style={s(
         'border: 1px solid ' +
-          (selectionnee ? '#4d5060' : isEpic ? '#2b2d35' : 'var(--color-neutral-800)') +
-          '; border-radius: ' + (isEpic ? '10px' : '8px') + '; padding: 10px 11px; background: ' +
-          (selectionnee ? '#202229' : 'var(--color-surface)') +
+          (selectionnee ? 'var(--color-border-selected)' : 'var(--color-border-card)') +
+          '; border-radius: 8px; padding: 10px 11px; background: ' +
+          (selectionnee ? 'var(--color-surface-elevated)' : 'var(--color-surface-card)') +
           '; cursor: pointer;' +
           (selectionnee ? ' box-shadow: var(--ring-selected);' : ''),
       )}
@@ -1183,7 +1186,7 @@ function Detail({
             <span
               className="tag"
               style={s(
-                'font-size: 10px; margin-left: 6px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660;',
+                'font-size: 10px; margin-left: 6px; color: var(--color-plan); background: var(--color-plan-bg); border: 1px solid var(--color-plan-border);',
               )}
             >
               {t('tableau.uncommitted')}

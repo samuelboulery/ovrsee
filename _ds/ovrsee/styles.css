@@ -38,15 +38,17 @@
      2026-08-12) — littérales, pas dérivées par color-mix. */
   --color-bg: #08090a; /* fond application */
   --color-surface: #0b0c0e; /* rails */
-  --color-surface-panel: #0a0b0d; /* panneaux latéraux et dock */
-  --color-surface-card: #101216; /* cartes */
-  --color-surface-control: #171920; /* contrôles */
-  --color-surface-hover: #1b1d24; /* survol de ligne */
-  --color-surface-active: #262832; /* état actif/élevé — jamais un filet
+  --color-surface-panel: #0d0e12; /* panneaux, sidebars, dock, colonnes kanban —
+     au-dessus du fond applicatif, sous les cartes qu'il porte. Il était plus
+     sombre que les rails, d'où des colonnes de kanban quasi noires. */
+  --color-surface-card: #131519; /* cartes */
+  --color-surface-control: #191b22; /* contrôles */
+  --color-surface-hover: #1f212a; /* survol de ligne */
+  --color-surface-active: #2a2d38; /* état actif/élevé — jamais un filet
      de couleur : une surface élevée, un texte plus clair, et le picto qui
      passe en plein (maquette 2a). */
-  --color-surface-elevated: #202229;
-  --color-surface-segment: #2f313b; /* pastille active d'un segmenté */
+  --color-surface-elevated: #24262f;
+  --color-surface-segment: #33363f; /* pastille active d'un segmenté */
 
   /* Hiérarchie de texte — sept niveaux, rampe froide de la maquette. Valeurs
      littérales : un color-mix sur #f2f3f5 donne des gris neutres plus clairs

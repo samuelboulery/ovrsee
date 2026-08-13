@@ -174,7 +174,7 @@ export function CommandPalette({
           }
         }}
         style={s(
-          'width: min(560px, 100%); max-height: 60vh; display: flex; flex-direction: column; overflow: hidden; background: var(--color-surface-control); border: 1px solid var(--color-divider); border-radius: 9px; box-shadow: var(--shadow-lg);',
+          'width: min(560px, 100%); max-height: 60vh; display: flex; flex-direction: column; overflow: hidden; background: var(--color-surface-control); border: 1px solid var(--color-divider); border-radius: 8px; box-shadow: var(--shadow-lg);',
         )}
       >
         <div

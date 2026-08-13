@@ -26,14 +26,14 @@ export function ViewBar({
   return (
     <div
       style={s(
-        'height: 46px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 1px solid #22242b;',
+        'height: 46px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 1px solid var(--color-border-chrome);',
       )}
     >
-      <span style={s('font-size: 12.5px; color: #7f858f; white-space: nowrap;')}>{projet}</span>
-      <span style={s('font-size: 12.5px; color: #45474f;')}>/</span>
-      <span style={s('font-size: 12.5px; font-weight: 500; color: #f2f3f5; white-space: nowrap;')}>{vue}</span>
+      <span style={s('font-size: 12.5px; color: var(--color-text-quaternary); white-space: nowrap;')}>{projet}</span>
+      <span style={s('font-size: 12.5px; color: var(--color-text-ghost);')}>/</span>
+      <span style={s('font-size: 12.5px; font-weight: 500; color: var(--color-text); white-space: nowrap;')}>{vue}</span>
       {meta && (
-        <span style={s('font-family: var(--font-mono); font-size: 11px; color: #6b7078; white-space: nowrap;')}>
+        <span style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-text-faint); white-space: nowrap;')}>
           {meta}
         </span>
       )}

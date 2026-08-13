@@ -91,7 +91,7 @@ export function Sante({
               disabled={clotureEnCours}
               onClick={clorePlanActif}
               style={s(
-                'cursor: pointer; font-size: 10.5px; padding: 3px 8px; border-radius: 5px; border: 1px solid #22232a; background: #171920; color: #d5d8dd;',
+                'cursor: pointer; font-size: 10.5px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--color-border-control); background: var(--color-surface-control); color: var(--color-text-secondary);',
               )}
             >
               {clotureEnCours ? t('sante.closing_plan') : t('sante.close_active_plan')}
@@ -102,7 +102,7 @@ export function Sante({
               type="button"
               onClick={onVoirTousLesPlans}
               style={s(
-                'cursor: pointer; font-size: 10.5px; padding: 3px 8px; border-radius: 5px; border: 1px solid #22232a; background: #171920; color: #d5d8dd;',
+                'cursor: pointer; font-size: 10.5px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--color-border-control); background: var(--color-surface-control); color: var(--color-text-secondary);',
               )}
             >
               {t('sante.see_all_plans')}
@@ -111,11 +111,11 @@ export function Sante({
         </div>
 
         {erreurCloture && (
-          <div style={s('font-size: 11px; color: #e5677a; margin-bottom: 8px;')}>{erreurCloture}</div>
+          <div style={s('font-size: 11px; color: var(--color-err); margin-bottom: 8px;')}>{erreurCloture}</div>
         )}
 
         {ouverts.length > 0 && (
-          <div style={s('border: 1px solid #2b2d35; border-radius: 8px; background: #101216; overflow: hidden;')}>
+          <div style={s('border: 1px solid var(--color-border-card); border-radius: 8px; background: var(--color-surface-card); overflow: hidden;')}>
             {ouverts.map((plan, index) => {
               const actif = plan.file === snapshot.activePlan
               return (
@@ -123,17 +123,17 @@ export function Sante({
                   key={plan.file}
                   style={s(
                     'display: flex; align-items: center; gap: 8px; padding: 8px 10px; ' +
-                      (index < ouverts.length - 1 ? 'border-bottom: 1px solid #22242b;' : ''),
+                      (index < ouverts.length - 1 ? 'border-bottom: 1px solid var(--color-border-chrome);' : ''),
                   )}
                 >
                   <span
                     style={s(
-                      `width: 5px; height: 5px; border-radius: 50%; flex: none; background: ${actif ? '#7d76f0' : '#45474f'};`,
+                      `width: 5px; height: 5px; border-radius: 50%; flex: none; background: ${actif ? 'var(--color-accent)' : 'var(--color-text-ghost)'};`,
                     )}
                   />
                   <span
                     style={s(
-                      'flex: 1; font-size: 11.5px; color: #d5d8dd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
+                      'flex: 1; font-size: 11.5px; color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
                     )}
                   >
                     {plan.title}
@@ -141,13 +141,13 @@ export function Sante({
                   {actif && (
                     <span
                       style={s(
-                        'flex: none; font-size: 9.5px; padding: 1px 6px; border-radius: 4px; color: #a49dfa; background: #14132a; border: 1px solid #2a2660;',
+                        'flex: none; font-size: 9.5px; padding: 1px 6px; border-radius: 4px; color: var(--color-plan); background: var(--color-plan-bg); border: 1px solid var(--color-plan-border);',
                       )}
                     >
                       {t('sante.active_badge')}
                     </span>
                   )}
-                  <span style={s('flex: none; font-family: var(--font-mono); font-size: 10.5px; color: #7f858f;')}>
+                  <span style={s('flex: none; font-family: var(--font-mono); font-size: 10.5px; color: var(--color-text-quaternary);')}>
                     {humanAge(plan.opened)}
                   </span>
                 </div>
@@ -164,7 +164,7 @@ function Titre({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={s(
-        'font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #737983; margin-bottom: 10px;',
+        'font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-discrete); margin-bottom: 10px;',
       )}
     >
       {children}
@@ -173,14 +173,14 @@ function Titre({ children }: { children: React.ReactNode }) {
 }
 
 const ETAT_BADGE: Record<'ok' | 'attention' | 'neutre', string> = {
-  ok: 'background: #0b1610; border: 1px solid #1c3728; color: #4cc38a;',
-  attention: 'background: #1a1608; border: 1px solid #3a3117; color: #e3b341;',
-  neutre: 'background: #171920; border: 1px solid #22232a; color: #a2a8b2;',
+  ok: 'background: var(--color-ok-bg); border: 1px solid var(--color-ok-border); color: var(--color-ok);',
+  attention: 'background: var(--color-warn-bg); border: 1px solid var(--color-warn-border); color: var(--color-warn);',
+  neutre: 'background: var(--color-surface-control); border: 1px solid var(--color-border-control); color: var(--color-text-tertiary);',
 }
 const DOT_ETAT: Record<'ok' | 'attention' | 'neutre', string> = {
-  ok: '#4cc38a',
-  attention: '#e3b341',
-  neutre: '#6b7078',
+  ok: 'var(--color-ok)',
+  attention: 'var(--color-warn)',
+  neutre: 'var(--color-text-faint)',
 }
 
 function Badge({ texte, etat }: { texte: string; etat: 'ok' | 'attention' | 'neutre' }) {

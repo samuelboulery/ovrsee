@@ -63,7 +63,7 @@ export function Welcome({ onAjouterProjet }: { onAjouterProjet?: () => void }) {
         </p>
         <code
           style={s(
-            'display: block; padding: 12px; background: var(--theme-bg-secondary); border-radius: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--color-accent-500); word-break: break-all;',
+            'display: block; padding: 12px; background: var(--color-surface-card); border-radius: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--color-accent-500); word-break: break-all;',
           )}
         >
           {t('welcome.install_command')}

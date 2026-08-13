@@ -20,10 +20,10 @@ export function Illisibles({ entries, quoi }: { entries: Illisible[]; quoi?: str
     <div
       role="status"
       style={s(
-        'flex: none; margin-bottom: 14px; padding: 9px 12px; border-radius: 6px; border: 1px solid #3a3117; background: #1a1608;',
+        'flex: none; margin-bottom: 14px; padding: 9px 12px; border-radius: 6px; border: 1px solid var(--color-warn-border); background: var(--color-warn-bg);',
       )}
     >
-      <div style={s('font-size: 11.5px; color: #e3b341; margin-bottom: 4px;')}>
+      <div style={s('font-size: 11.5px; color: var(--color-warn); margin-bottom: 4px;')}>
         {listés.length === 1
           ? '1 fichier de ovrsee/ existe mais ne se lit pas.'
           : `${listés.length} fichiers de ovrsee/ existent mais ne se lisent pas.`}
@@ -31,7 +31,7 @@ export function Illisibles({ entries, quoi }: { entries: Illisible[]; quoi?: str
       {listés.map(entry => (
         <div
           key={entry.file}
-          style={s('font-family: var(--font-mono); font-size: 11px; color: #e3b341;')}
+          style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-warn);')}
         >
           ovrsee/{entry.file}
           {entry.lignes

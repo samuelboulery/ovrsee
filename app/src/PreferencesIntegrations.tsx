@@ -254,7 +254,7 @@ export function BlocIntegrations({
           <div
             key={integ.id}
             style={s(
-              'display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 6px; background: var(--theme-bg-tertiary);',
+              'display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 6px; background: var(--color-surface-control);',
             )}
           >
             <div style={s('flex: 1; min-width: 0;')}>

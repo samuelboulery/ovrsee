@@ -243,7 +243,7 @@ function CarteDisposition({
       <span
         aria-hidden="true"
         style={s(
-          'position: relative; display: block; width: 62px; height: 40px; border-radius: 4px; overflow: hidden; background: var(--theme-bg-quaternary);',
+          'position: relative; display: block; width: 62px; height: 40px; border-radius: 4px; overflow: hidden; background: var(--color-surface-card);',
         )}
       >
         <span
@@ -613,7 +613,7 @@ export function PreferencesModal({
         aria-label={t('pref.title')}
         onClick={event => event.stopPropagation()}
         style={s(
-          'width: min(1100px, 100%); height: min(700px, 100%); display: flex; overflow: hidden; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 14px; box-shadow: var(--shadow-lg);',
+          'width: min(1100px, 100%); height: min(700px, 100%); display: flex; overflow: hidden; background: var(--color-surface-panel); border: 1px solid var(--color-divider); border-radius: 12px; box-shadow: var(--shadow-lg);',
         )}
       >
         {/* La barre de navigation. Quatre entrées visibles d'un coup : elles ne
@@ -622,7 +622,7 @@ export function PreferencesModal({
         <nav
           aria-label={t('pref.title')}
           style={s(
-            'flex: none; width: 220px; display: flex; flex-direction: column; gap: 2px; padding: 16px 10px; overflow-y: auto; background: var(--theme-bg-tertiary); border-right: 1px solid var(--color-divider);',
+            'flex: none; width: 220px; display: flex; flex-direction: column; gap: 2px; padding: 16px 10px; overflow-y: auto; background: var(--color-surface); border-right: 1px solid var(--color-divider);',
           )}
         >
           {SECTIONS.map(item => (

@@ -515,7 +515,7 @@ export function App() {
           retrait à gauche laisse la place aux pastilles du système. */}
       <header
         style={s(
-          'height: 38px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 82px; background: #0b0c0e; border-bottom: 1px solid #22242b; -webkit-app-region: drag;',
+          'height: 38px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px 0 82px; background: var(--color-surface); border-bottom: 1px solid var(--color-border-chrome); -webkit-app-region: drag;',
         )}
       >
         {/* `-webkit-app-region: no-drag` : sans cela le bouton est avalé par la
@@ -528,8 +528,8 @@ export function App() {
           onClick={() => setSidebarOuverte(ouverte => !ouverte)}
           style={s(
             sidebarOuverte
-              ? 'width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 0; background: transparent; color: #7f858f; cursor: pointer; -webkit-app-region: no-drag;'
-              : 'width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 0; background: #262832; color: #b6bac1; cursor: pointer; -webkit-app-region: no-drag;',
+              ? 'width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 0; background: transparent; color: var(--color-text-quaternary); cursor: pointer; -webkit-app-region: no-drag;'
+              : 'width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 0; background: var(--color-surface-active); color: var(--color-text-secondary); cursor: pointer; -webkit-app-region: no-drag;',
           )}
         >
           <SidebarSimple size={14} weight="regular" aria-hidden="true" />
@@ -717,17 +717,17 @@ export function App() {
             {!terminal && !settings?.terminal?.disabled && (
               <div
                 style={s(
-                  'height: 32px; flex: none; border-top: 1px solid #22242b; background: #0b0c0e; display: flex; align-items: center; gap: 10px; padding: 0 14px;',
+                  'height: 32px; flex: none; border-top: 1px solid var(--color-border-chrome); background: var(--color-surface); display: flex; align-items: center; gap: 10px; padding: 0 14px;',
                 )}
               >
                 <button
                   type="button"
                   onClick={() => setTerminal(true)}
-                  style={s('cursor: pointer; border: 0; background: transparent; font-size: 11px; color: #7f858f;')}
+                  style={s('cursor: pointer; border: 0; background: transparent; font-size: 11px; color: var(--color-text-quaternary);')}
                 >
                   Terminal · claude
                 </button>
-                <span style={s('font-size: 10.5px; color: #7f858f;')}>
+                <span style={s('font-size: 10.5px; color: var(--color-text-quaternary);')}>
                   réduit — la session tourne toujours
                 </span>
               </div>
@@ -805,7 +805,7 @@ export function App() {
 function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
   if (!scan) {
     return (
-      <div style={s('font-size: 11.5px; color: #7f858f;')}>
+      <div style={s('font-size: 11.5px; color: var(--color-text-quaternary);')}>
         {t('scan.none')}
       </div>
     )
@@ -813,14 +813,14 @@ function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
   return (
     <div
       style={s(
-        'display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-family: var(--font-mono); color: #7f858f;',
+        'display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-family: var(--font-mono); color: var(--color-text-quaternary);',
       )}
     >
       <span
         style={s(
           scan.ok
-            ? 'width: 5px; height: 5px; border-radius: 50%; background: #4cc38a; display: block;'
-            : 'width: 5px; height: 5px; border-radius: 50%; background: #e5677a; display: block;',
+            ? 'width: 5px; height: 5px; border-radius: 50%; background: var(--color-ok); display: block;'
+            : 'width: 5px; height: 5px; border-radius: 50%; background: var(--color-err); display: block;',
         )}
       />
       {scan.ok ? t('scan.last') : t('scan.failed')} · {frDate(scan.date)} · {scan.commit}
@@ -891,7 +891,7 @@ function Sidebar({
       <aside
         aria-label={t('sidebar.projects')}
         style={s(
-          `width: ${RAIL_COLLAPSED_WIDTH}px; flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; background: #0b0c0e; border-right: 1px solid #22242b; padding: 10px 0;`,
+          `width: ${RAIL_COLLAPSED_WIDTH}px; flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; background: var(--color-surface); border-right: 1px solid var(--color-border-chrome); padding: 10px 0;`,
         )}
       >
         <div style={s('padding-bottom: 8px;')}>
@@ -906,7 +906,7 @@ function Sidebar({
           title={`${t('sidebar.preferences')} (⌘,)`}
           onClick={onOpenPreferences}
           style={s(
-            'width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: transparent; border: none; color: #7f858f; cursor: pointer;',
+            'width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: transparent; border: none; color: var(--color-text-quaternary); cursor: pointer;',
           )}
         >
           <GearSix size={16} weight="regular" aria-hidden="true" />
@@ -919,7 +919,7 @@ function Sidebar({
     <aside
       aria-label={t('sidebar.projects')}
       style={s(
-        `width: ${width}px; flex: none; display: flex; flex-direction: column; background: #0b0c0e; border-right: 1px solid #22242b; padding: 10px 0;`,
+        `width: ${width}px; flex: none; display: flex; flex-direction: column; background: var(--color-surface-panel); border-right: 1px solid var(--color-border-chrome); padding: 10px 0;`,
       )}
     >
       <div style={s('padding: 0 10px 10px;')}>
@@ -927,14 +927,14 @@ function Sidebar({
           type="button"
           onClick={onOpenPalette}
           style={s(
-            'width: 100%; height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 9px; border-radius: 7px; border: 1px solid #2b2d35; background: #171920; color: #7f858f; font-size: 12px; cursor: pointer; text-align: left;',
+            'width: 100%; height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 9px; border-radius: 6px; border: 1px solid var(--color-border-card); background: var(--color-surface-control); color: var(--color-text-quaternary); font-size: 12px; cursor: pointer; text-align: left;',
           )}
         >
           <MagnifyingGlass size={14} aria-hidden="true" />
           <span style={s('flex: 1;')}>{t('palette.placeholder')}</span>
           <span
             style={s(
-              "box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 17px; padding: 0 5px; border-radius: 4px; background: #22242b; font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; font-size: 10.5px; line-height: 1; color: #a2a8b2;",
+              "box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 17px; padding: 0 5px; border-radius: 4px; background: var(--color-border-chrome); font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; font-size: 10.5px; line-height: 1; color: var(--color-text-tertiary);",
             )}
           >
             ⌘K
@@ -944,7 +944,7 @@ function Sidebar({
 
       <div
         style={s(
-          'padding: 8px 8px 5px 10px; display: flex; align-items: center; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #6b7078;',
+          'padding: 8px 8px 5px 10px; display: flex; align-items: center; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-faint);',
         )}
       >
         {t('sidebar.views')}
@@ -968,10 +968,10 @@ function Sidebar({
           onClick={onOpenPreferencesInterface}
           title={t('sidebar.reorder_views')}
           style={s(
-            'height: 31px; padding: 0 8px; display: flex; align-items: center; gap: 10px; border-radius: 6px; border: 0; background: transparent; cursor: pointer; text-align: left; color: #6b7078; font-size: 12.5px;',
+            'height: 31px; padding: 0 8px; display: flex; align-items: center; gap: 10px; border-radius: 6px; border: 0; background: transparent; cursor: pointer; text-align: left; color: var(--color-text-faint); font-size: 12.5px;',
           )}
         >
-          <DotsSixVertical size={15} aria-hidden="true" color="#585d66" />
+          <DotsSixVertical size={15} aria-hidden="true" color="var(--color-text-ghost)" />
           {t('sidebar.reorder_views')}
         </button>
       </div>
@@ -984,7 +984,7 @@ function Sidebar({
           question — comment l'ovrsee est réglé. Le nom d'utilisateur système
           (lecture seule, jamais un secret) donne à ce bouton la même
           affordance « c'est vous, ici » que la maquette. */}
-      <div style={s('padding: 10px 10px 0; border-top: 1px solid #22242b;')}>
+      <div style={s('padding: 10px 10px 0; border-top: 1px solid var(--color-border-chrome);')}>
         <button
           type="button"
           onClick={onOpenPreferences}
@@ -995,19 +995,19 @@ function Sidebar({
         >
           <span
             style={s(
-              'width: 20px; height: 20px; flex: none; border-radius: 5px; background: #242630; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #a2a8b2;',
+              'width: 20px; height: 20px; flex: none; border-radius: 6px; background: var(--color-border-control); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--color-text-tertiary);',
             )}
           >
             {username ? username[0].toUpperCase() : '?'}
           </span>
           <span
             style={s(
-              'flex: 1; font-size: 12.5px; color: #b6bac1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
+              'flex: 1; font-size: 12.5px; color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
             )}
           >
             {username ?? '…'}
           </span>
-          <GearSix size={15} weight="regular" aria-hidden="true" color="#7f858f" />
+          <GearSix size={15} weight="regular" aria-hidden="true" color="var(--color-text-quaternary)" />
         </button>
       </div>
     </aside>
@@ -1068,20 +1068,20 @@ function ProjectSwitcher({
         aria-expanded={open}
         aria-label={t('sidebar.switch_project')}
         style={s(
-          'display: flex; align-items: center; gap: 8px; height: 24px; padding: 0 9px; border-radius: 6px; border: 1px solid #2b2d35; background: #171920; cursor: pointer;',
+          'display: flex; align-items: center; gap: 8px; height: 24px; padding: 0 9px; border-radius: 6px; border: 1px solid var(--color-border-card); background: var(--color-surface-control); cursor: pointer;',
         )}
       >
-        <span style={s('width: 5px; height: 5px; border-radius: 2px; background: #7d76f0; flex: none;')} />
-        <span style={s('font-size: 12px; font-weight: 500; color: #f2f3f5; white-space: nowrap;')}>
+        <span style={s('width: 5px; height: 5px; border-radius: 2px; background: var(--color-accent); flex: none;')} />
+        <span style={s('font-size: 12px; font-weight: 500; color: var(--color-text); white-space: nowrap;')}>
           {active?.name ?? '…'}
         </span>
-        <CaretDown size={10} weight="bold" aria-hidden="true" color="#737983" />
+        <CaretDown size={10} weight="bold" aria-hidden="true" color="var(--color-text-discrete)" />
       </button>
 
       {open && (
         <div
           style={s(
-            'position: absolute; top: 30px; left: 0; width: 260px; z-index: 20; padding: 6px; border-radius: 9px; border: 1px solid #2b2d35; background: #171920; box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
+            'position: absolute; top: 30px; left: 0; width: 260px; z-index: 20; padding: 6px; border-radius: 8px; border: 1px solid var(--color-border-card); background: var(--color-surface-elevated); box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
           )}
         >
           {projects.map(project => (
@@ -1110,7 +1110,7 @@ function ProjectSwitcher({
                 openProject(onProjects, onError)
               }}
               style={s(
-                'margin-top: 4px; padding-top: 6px; border-top: 1px solid #22242b; display: flex; align-items: center; gap: 8px; height: 28px; padding-left: 8px; border-radius: 6px; border: 0; background: transparent; color: #7f858f; font-size: 12.5px; cursor: pointer; text-align: left;',
+                'margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--color-border-chrome); display: flex; align-items: center; gap: 8px; height: 28px; padding-left: 8px; border-radius: 6px; border: 0; background: transparent; color: var(--color-text-quaternary); font-size: 12.5px; cursor: pointer; text-align: left;',
               )}
             >
               +&nbsp;&nbsp;{t('sidebar.open_project')}
@@ -1179,30 +1179,30 @@ function RailLink({
           : 'height: 31px; padding: 0 8px; gap: 10px; border-radius: 6px;') +
           ' display: flex; align-items: center; text-decoration: none; font-size: 12.5px; ' +
           (active
-            ? 'background: #262832; font-weight: 500; color: #f2f3f5;'
+            ? 'background: var(--color-surface-active); font-weight: 500; color: var(--color-text);'
             : hover
-              ? 'background: #1b1d24; color: #b6bac1;'
-              : 'color: #b6bac1;'),
+              ? 'background: var(--color-surface-hover); color: var(--color-text-secondary);'
+              : 'color: var(--color-text-secondary);'),
       )}
     >
       <Icon
         size={compact ? 17 : 16}
         weight={active ? 'fill' : 'regular'}
         aria-hidden="true"
-        color={active ? '#7d76f0' : '#7f858f'}
+        color={active ? 'var(--color-accent)' : 'var(--color-text-quaternary)'}
       />
       {!compact && (
         <>
           <span style={s('flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>{label}</span>
           {typeof shortcut === 'number' && shortcut > 0 && shortcut <= 9 && (
-            <span style={s('font-family: var(--font-mono); font-size: 10px; color: #6b7078; flex: none;')}>
+            <span style={s('font-family: var(--font-mono); font-size: 10px; color: var(--color-text-faint); flex: none;')}>
               {shortcut}
             </span>
           )}
           {typeof count === 'number' && count > 0 && (
             <span
               style={s(
-                'display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 17px; padding: 0 5px; border-radius: 4px; background: #2f313b; font-family: var(--font-mono); font-size: 10px; color: #a2a8b2; flex: none;',
+                'display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 17px; padding: 0 5px; border-radius: 4px; background: var(--color-surface-segment); font-family: var(--font-mono); font-size: 10px; color: var(--color-text-tertiary); flex: none;',
               )}
             >
               {count}
@@ -1285,20 +1285,20 @@ function ProjectRow({
       }}
       style={s(
         'padding: 6px 8px; margin: 0 10px; border-radius: 6px; cursor: pointer; ' +
-          (active ? 'background: #262832;' : ''),
+          (active ? 'background: var(--color-surface-active);' : ''),
       )}
     >
       <div style={s('display: flex; align-items: center; gap: 9px;')}>
         <div style={s('width: 7px; flex: none; display: flex; align-items: center; justify-content: center;')}>
           <div
             style={s(
-              `width: 7px; height: 7px; border-radius: 2px; background: ${active ? '#7d76f0' : '#45474f'};`,
+              `width: 7px; height: 7px; border-radius: 2px; background: ${active ? 'var(--color-accent)' : 'var(--color-text-ghost)'};`,
             )}
           />
         </div>
         <div
           style={s(
-            `flex: 1; min-width: 0; font-size: 12.5px; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; ${active ? 'font-weight: 500; color: #f2f3f5;' : 'color: #a2a8b2;'}`,
+            `flex: 1; min-width: 0; font-size: 12.5px; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; ${active ? 'font-weight: 500; color: var(--color-text);' : 'color: var(--color-text-tertiary);'}`,
           )}
           title={project.path}
         >
@@ -1315,8 +1315,8 @@ function ProjectRow({
             style={s(
               'box-sizing: border-box; display: inline-flex; align-items: center; height: 17px; padding: 0 5px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px; line-height: 1; flex: none; ' +
                 (vivant.open && vivant.equipped
-                  ? 'color: #a49dfa; border: 1px solid #2f2a66; background: #14132a;'
-                  : 'color: #a2a8b2; background: #2f313b;'),
+                  ? 'color: var(--color-plan); border: 1px solid var(--color-plan-border); background: var(--color-plan-bg);'
+                  : 'color: var(--color-text-tertiary); background: var(--color-surface-segment);'),
             )}
           >
             {badge}
@@ -1346,7 +1346,7 @@ function ProjectRow({
       </div>
       <div
         title="Dernier commit rattaché à un plan"
-        style={s('font-size: 10.5px; font-family: var(--font-mono); color: #6b7078; margin-top: 3px; padding-left: 16px;')}
+        style={s('font-size: 10.5px; font-family: var(--font-mono); color: var(--color-text-faint); margin-top: 3px; padding-left: 16px;')}
       >
         {humanAge(vivant.last)}
       </div>

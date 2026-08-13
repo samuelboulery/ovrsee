@@ -100,7 +100,7 @@ function EcranPresentation() {
 
       <div
         style={s(
-          'padding: 26px 20px 18px; border-radius: var(--radius-lg); background: var(--theme-bg-tertiary); border: 1px solid var(--color-divider);',
+          'padding: 26px 20px 18px; border-radius: var(--radius-lg); background: var(--color-surface-card); border: 1px solid var(--color-divider);',
         )}
       >
         <SchemaBoucle />
@@ -154,7 +154,7 @@ function EcranPresentation() {
           <span
             key={cle}
             style={s(
-              'padding: 2px 8px; border-radius: var(--radius-sm); background: var(--theme-bg-tertiary); font-family: var(--font-mono); font-size: 11.5px; color: var(--color-neutral-400);',
+              'padding: 2px 8px; border-radius: var(--radius-sm); background: var(--color-surface-control); font-family: var(--font-mono); font-size: 11.5px; color: var(--color-neutral-400);',
             )}
           >
             {t(cle)}
@@ -215,7 +215,7 @@ function GrilleVues({
           <div
             key={id}
             style={s(
-              'display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 9px; border: 1px solid var(--color-divider); background: var(--color-surface-card);' +
+              'display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 8px; border: 1px solid var(--color-divider); background: var(--color-surface-card);' +
                 (actif ? '' : ' opacity: .65;'),
             )}
           >
@@ -345,7 +345,7 @@ function EcranReglages({
           // commande plutôt qu'un bouton qui ne ferait rien.
           <code
             style={s(
-              'display: block; padding: 12px; background: var(--theme-bg-tertiary); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11.5px; color: var(--color-accent-500); word-break: break-all;',
+              'display: block; padding: 12px; background: var(--color-surface-card); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11.5px; color: var(--color-accent-500); word-break: break-all;',
             )}
           >
             {t('welcome.install_command')}
@@ -419,7 +419,7 @@ export function Onboarding({ settings, etapeInitiale = 0, onFini, onAjouterProje
           // Mêmes proportions que l'écran des préférences côté hauteur, plus
           // large : la colonne de gauche (étapes) et la galerie de l'écran 2
           // (quatre cartes en ligne) ne tiennent pas dans 880px.
-          'width: min(1040px, 100%); height: min(700px, 100%); display: flex; overflow: hidden; background: var(--theme-bg-secondary); border: 1px solid var(--color-divider); border-radius: 14px; box-shadow: var(--shadow-lg); color: var(--color-text); font-family: var(--font-body);',
+          'width: min(1040px, 100%); height: min(700px, 100%); display: flex; overflow: hidden; background: var(--color-surface-panel); border: 1px solid var(--color-divider); border-radius: 12px; box-shadow: var(--shadow-lg); color: var(--color-text); font-family: var(--font-body);',
         )}
       >
         {/* Colonne de gauche : logo, les 3 étapes, note d'aide — maquette 2j.

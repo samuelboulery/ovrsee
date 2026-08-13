@@ -67,7 +67,7 @@ const EDITEURS: Array<[Editeur, string]> = [
 ]
 
 const BOUTON =
-  'height: 27px; display: flex; align-items: center; gap: 7px; padding: 0 10px; border-radius: 6px; border: 1px solid #363841; background: #171920; font-size: 12px; color: #d5d8dd;'
+  'height: 27px; display: flex; align-items: center; gap: 7px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--color-border-control); background: var(--color-surface-control); font-size: 12px; color: var(--color-text-secondary);'
 
 /**
  * Onglet Aperçu — la page d'arrivée.
@@ -170,7 +170,7 @@ export function Apercu({
       <ViewBar projet={nom} vue={t('tabs.apercu')}>
         <Actions root={root} onTerminal={onTerminal} />
       </ViewBar>
-      <div style={s('flex: none; padding: 22px 24px 18px; border-bottom: 1px solid #22242b;')}>
+      <div style={s('flex: none; padding: 22px 24px 18px; border-bottom: 1px solid var(--color-border-chrome);')}>
         <Illisibles entries={snapshot.illisibles ?? []} />
 
         <div
@@ -179,11 +179,11 @@ export function Apercu({
           )}
         >
           <h2 style={s('font-size: 21px; font-weight: 600; letter-spacing: -.015em; margin: 0;')}>{nom}</h2>
-          <div style={s('font-family: var(--font-mono); font-size: 11px; color: #737983;')}>{root}</div>
+          <div style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-text-discrete);')}>{root}</div>
         </div>
 
         {packageJson?.description && (
-          <div style={s('font-size: 13px; color: #a2a8b2; line-height: 1.6; margin-top: 8px; max-width: 720px; text-wrap: pretty;')}>
+          <div style={s('font-size: 13px; color: var(--color-text-tertiary); line-height: 1.6; margin-top: 8px; max-width: 720px; text-wrap: pretty;')}>
             {packageJson.description}
           </div>
         )}
@@ -263,20 +263,20 @@ export function Apercu({
             onOpenPreferences={onOpenPreferences}
           />
 
-          <div style={s('height: 1px; background: #22242b; margin: 18px 0;')} />
+          <div style={s('height: 1px; background: var(--color-border-chrome); margin: 18px 0;')} />
 
           <div
             style={s(
-              'height: 38px; flex: none; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #22242b;',
+              'height: 38px; flex: none; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--color-border-chrome);',
             )}
           >
-            <div style={s('font-size: 12px; font-weight: 500; color: #f2f3f5;')}>README.md</div>
+            <div style={s('font-size: 12px; font-weight: 500; color: var(--color-text);')}>README.md</div>
             <div style={s('flex: 1;')} />
             {readme && (
               <button
                 type="button"
                 onClick={() => setReadmeOpen(open => !open)}
-                style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: #7f858f;')}
+                style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: var(--color-text-quaternary);')}
               >
                 {readmeOpen ? t('apercu.hide_readme') : t('apercu.show_readme')}
               </button>
@@ -394,7 +394,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
       <div ref={refEditeur} style={s('position: relative;')}>
         <div
           style={s(
-            'display: flex; align-items: center; height: 27px; border-radius: 6px; border: 1px solid #363841; background: #171920; overflow: hidden;',
+            'display: flex; align-items: center; height: 27px; border-radius: 6px; border: 1px solid var(--color-border-control); background: var(--color-surface-control); overflow: hidden;',
           )}
         >
           <button
@@ -402,10 +402,10 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
             onClick={() => ovrsee.projects.edit(root, editeur)}
             title={t('apercu.open_editor')}
             style={s(
-              'cursor: pointer; display: flex; align-items: center; gap: 6px; height: 100%; padding: 0 8px 0 10px; border: 0; background: transparent; font-size: 12px; color: #d5d8dd;',
+              'cursor: pointer; display: flex; align-items: center; gap: 6px; height: 100%; padding: 0 8px 0 10px; border: 0; background: transparent; font-size: 12px; color: var(--color-text-secondary);',
             )}
           >
-            <Code size={14} weight="regular" aria-hidden="true" color="#6ea8fe" />
+            <Code size={14} weight="regular" aria-hidden="true" color="var(--color-info)" />
             {nomEditeur}
           </button>
           <button
@@ -414,16 +414,16 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
             aria-label={t('apercu.editor')}
             aria-expanded={menuEditeur}
             style={s(
-              'cursor: pointer; display: flex; align-items: center; height: 100%; padding: 0 8px; border: 0; border-left: 1px solid #363841; background: transparent;',
+              'cursor: pointer; display: flex; align-items: center; height: 100%; padding: 0 8px; border: 0; border-left: 1px solid var(--color-border-control); background: transparent;',
             )}
           >
-            <CaretDown size={10} weight="bold" aria-hidden="true" color="#737983" />
+            <CaretDown size={10} weight="bold" aria-hidden="true" color="var(--color-text-discrete)" />
           </button>
         </div>
         {menuEditeur && (
           <div
             style={s(
-              'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 140px; padding: 4px; border-radius: 8px; border: 1px solid #2b2d35; background: #171920; box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
+              'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 140px; padding: 4px; border-radius: 8px; border: 1px solid var(--color-border-card); background: var(--color-surface-elevated); box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
             )}
           >
             {EDITEURS.map(([valeur, nomOpt]) => (
@@ -439,7 +439,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
                   setMenuEditeur(false)
                 }}
                 style={s(
-                  `cursor: pointer; text-align: left; height: 27px; padding: 0 8px; border-radius: 5px; border: 0; font-size: 12px; background: ${valeur === editeur ? '#262832' : 'transparent'}; color: ${valeur === editeur ? '#f2f3f5' : '#b6bac1'};`,
+                  `cursor: pointer; text-align: left; height: 27px; padding: 0 8px; border-radius: 6px; border: 0; font-size: 12px; background: ${valeur === editeur ? 'var(--color-surface-active)' : 'transparent'}; color: ${valeur === editeur ? 'var(--color-text)' : 'var(--color-text-secondary)'};`,
                 )}
               >
                 {nomOpt}
@@ -455,7 +455,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
         style={s(BOUTON)}
         onClick={() => ovrsee.projects.reveal(root)}
       >
-        <FolderOpen size={14} weight="regular" aria-hidden="true" color="#7f858f" />
+        <FolderOpen size={14} weight="regular" aria-hidden="true" color="var(--color-text-quaternary)" />
         {t('apercu.reveal')}
       </button>
 
@@ -472,7 +472,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
             aria-label={t('apercu.more_actions')}
             aria-expanded={menuPlus}
             style={s(
-              'cursor: pointer; width: 27px; height: 27px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #363841; background: #171920; color: #a2a8b2;',
+              'cursor: pointer; width: 27px; height: 27px; display: flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid var(--color-border-control); background: var(--color-surface-control); color: var(--color-text-tertiary);',
             )}
           >
             <DotsThree size={16} weight="bold" aria-hidden="true" />
@@ -480,7 +480,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
           {menuPlus && (
             <div
               style={s(
-                'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 160px; padding: 4px; border-radius: 8px; border: 1px solid #2b2d35; background: #171920; box-shadow: 0 12px 28px rgba(0,0,0,.5);',
+                'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 160px; padding: 4px; border-radius: 8px; border: 1px solid var(--color-border-card); background: var(--color-surface-elevated); box-shadow: 0 12px 28px rgba(0,0,0,.5);',
               )}
             >
               <button
@@ -490,7 +490,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
                   setMenuPlus(false)
                 }}
                 style={s(
-                  'cursor: pointer; width: 100%; text-align: left; height: 27px; padding: 0 8px; border-radius: 5px; border: 0; background: transparent; font-size: 12px; color: #b6bac1;',
+                  'cursor: pointer; width: 100%; text-align: left; height: 27px; padding: 0 8px; border-radius: 6px; border: 0; background: transparent; font-size: 12px; color: var(--color-text-secondary);',
                 )}
               >
                 {t('apercu.terminal_shell')}
@@ -517,7 +517,7 @@ function Sommaire({
 }) {
   return (
     <nav aria-label={t('apercu.summary')} style={s('display: flex; flex-direction: column; gap: 6px;')}>
-      <div style={s('font-size: 12.5px; color: #b6bac1;')}>{t('apercu.summary')}</div>
+      <div style={s('font-size: 12.5px; color: var(--color-text-secondary);')}>{t('apercu.summary')}</div>
       {plan
         .filter(titre => titre.level <= 3)
         .map(titre => (
@@ -529,7 +529,7 @@ function Sommaire({
               aller(titre.id)
             }}
             style={s(
-              'display: block; font-size: 12.5px; color: #7f858f; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-left: 12px;',
+              'display: block; font-size: 12.5px; color: var(--color-text-quaternary); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-left: 12px;',
             )}
             title={titre.texte}
           >
@@ -573,7 +573,7 @@ function Lancement({ packageJson }: { packageJson: Snapshot['packageJson'] }) {
             key={script}
             title={packageJson?.scripts?.[script]}
             style={s(
-              'font-family: var(--font-mono); font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--color-neutral-800); color: var(--color-neutral-400); user-select: all;',
+              'font-family: var(--font-mono); font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--color-border-card); color: var(--color-neutral-400); user-select: all;',
             )}
           >
             pnpm {script}
@@ -676,22 +676,22 @@ function Chiffre({
   statut?: 'succes' | 'echec'
 }) {
   const legendeColor =
-    statut === 'succes' ? '#4cc38a' : statut === 'echec' ? '#e5677a' : accent ? '#8079c9' : '#737983'
+    statut === 'succes' ? 'var(--color-ok)' : statut === 'echec' ? 'var(--color-err)' : accent ? 'var(--color-accent-2)' : 'var(--color-text-discrete)'
 
   return (
     <div
       style={s(
-        `flex: 1; border-radius: 9px; padding: 12px 14px; ${
-          accent ? 'border: 1px solid #2a2660; background: #0f0e1c;' : 'border: 1px solid #2b2d35; background: #101216;'
+        `flex: 1; border-radius: 8px; padding: 12px 14px; ${
+          accent ? 'border: 1px solid var(--color-plan-border); background: var(--color-plan-bg);' : 'border: 1px solid var(--color-border-card); background: var(--color-surface-card);'
         }`,
       )}
     >
       <div
-        style={s(`font-size: 20px; font-weight: 600; letter-spacing: -.02em; color: ${accent ? '#a49dfa' : '#f2f3f5'};`)}
+        style={s(`font-size: 20px; font-weight: 600; letter-spacing: -.02em; color: ${accent ? 'var(--color-plan)' : 'var(--color-text)'};`)}
       >
         {valeur}
       </div>
-      {unite && <div style={s('font-size: 12px; color: #a2a8b2; margin-top: 3px;')}>{unite}</div>}
+      {unite && <div style={s('font-size: 12px; color: var(--color-text-tertiary); margin-top: 3px;')}>{unite}</div>}
       <div style={s(`font-family: var(--font-mono); font-size: 10.5px; margin-top: 2px; color: ${legendeColor};`)}>
         {legende}
       </div>

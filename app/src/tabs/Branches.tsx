@@ -56,7 +56,7 @@ export function Branches({
       {erreur && (
         <div
           style={s(
-            'margin-bottom: 8px; font-size: 12px; color: #e5677a; background: #1c0d10; border: 1px solid #3a1c22; border-radius: 6px; padding: 7px 10px;',
+            'margin-bottom: 8px; font-size: 12px; color: var(--color-err); background: var(--color-err-bg); border: 1px solid var(--color-err-border); border-radius: 6px; padding: 7px 10px;',
           )}
         >
           {erreur}
@@ -70,20 +70,20 @@ export function Branches({
             <div
               key={branche.name}
               style={s(
-                'display: flex; align-items: center; gap: 12px; height: 28px; padding: 0 12px; border-radius: 4px; border: 1px solid #2b2d35; background: #171920;',
+                'display: flex; align-items: center; gap: 12px; height: 28px; padding: 0 12px; border-radius: 4px; border: 1px solid var(--color-border-card); background: var(--color-surface-control);',
               )}
             >
-              <GitBranch size={14} weight="regular" aria-hidden="true" color="#b6bac1" />
+              <GitBranch size={14} weight="regular" aria-hidden="true" color="var(--color-text-secondary)" />
               <span
                 style={s(
-                  `font-family: var(--font-mono); font-size: 12px; color: #d5d8dd; flex: none; font-weight: ${branche.name === gitStatus.branch ? '600' : '400'};`,
+                  `font-family: var(--font-mono); font-size: 12px; color: var(--color-text-secondary); flex: none; font-weight: ${branche.name === gitStatus.branch ? '600' : '400'};`,
                 )}
               >
                 {branche.name}
               </span>
               <span
                 style={s(
-                  'font-family: var(--font-mono); font-size: 11.5px; color: #7f858f; flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
+                  'font-family: var(--font-mono); font-size: 11.5px; color: var(--color-text-quaternary); flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;',
                 )}
               >
                 {branche.upstream ?? t('branches.no_upstream')}
@@ -91,7 +91,7 @@ export function Branches({
               <div style={s('flex: 1;')} />
               <span
                 style={s(
-                  `font-family: var(--font-mono); font-size: 11.5px; flex: none; color: ${upToDate ? '#4cc38a' : '#a2a8b2'};`,
+                  `font-family: var(--font-mono); font-size: 11.5px; flex: none; color: ${upToDate ? 'var(--color-ok)' : 'var(--color-text-tertiary)'};`,
                 )}
               >
                 {upToDate

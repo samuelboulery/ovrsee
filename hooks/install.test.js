@@ -36,7 +36,9 @@ test("le bloc ovrsee s'installe complètement dans un post-commit vide", () => {
   assert.match(done.join('\n'), /bloc ovrsee installé/)
 })
 
-test('le fichier post-commit créé est exécutable', () => {
+// Windows n'a pas de bit d'exécution : `chmod` y est un no-op et le mode reste
+// 0o600. Le hook y est lancé par git bash, qui ne le regarde pas.
+test('le fichier post-commit créé est exécutable', { skip: process.platform === 'win32' }, () => {
   const root = tempRepo()
   const hookPath = join(root, '.git', 'hooks', 'post-commit')
   const done = []

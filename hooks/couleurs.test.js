@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { readFileSync, readdirSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 
@@ -73,7 +73,10 @@ test('aucune couleur en dur dans app/src, hors exceptions et fichiers portés', 
   for (const fichier of sources(join(racine, 'app', 'src'))) {
     // `theme.ts` est le seul endroit où les couleurs s'écrivent.
     if (fichier.endsWith('theme.ts')) continue
-    if (FICHIERS_PORTES.has(fichier.split('/').pop())) continue
+    // `basename` et non `split('/')` : sous Windows `join` rend des `\`, et le
+    // découpage ne trouvait alors aucun fichier porté — tout le lot passait
+    // pour fautif.
+    if (FICHIERS_PORTES.has(basename(fichier))) continue
 
     readFileSync(fichier, 'utf8')
       .split('\n')

@@ -10,8 +10,33 @@ permissions:
   contents: write
 
 jobs:
+  # `electron-builder --publish` crée la release brouillon à la volée, au
+  # premier envoi d'asset — et ses envois sont parallèles. Deux d'entre eux
+  # ont déjà trouvé « pas de release » au même instant et en ont créé une
+  # chacun, les assets répartis entre les deux. La créer ici, une fois, avant
+  # que le moindre runner ne démarre, supprime la course.
+  draft:
+    runs-on: ubuntu-latest
+    steps:
+      # Pas de checkout : `gh` travaille sur `$GITHUB_REPOSITORY`, et
+      # `--generate-notes` se calcule côté serveur.
+      - name: Créer la release brouillon si elle n'existe pas
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          # `workflow_dispatch` part d'une branche, pas d'un tag : rien à créer.
+          case "$GITHUB_REF" in refs/tags/*) ;; *) echo 'pas un tag'; exit 0 ;; esac
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 && exit 0
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --draft --title "${TAG#v}" --generate-notes
+
   build:
+    needs: draft
     strategy:
+      # Sans ça, l'échec du job windows annule le job mac en cours d'envoi et
+      # laisse une release à moitié remplie.
+      fail-fast: false
       matrix:
         include:
           - os: macos-latest

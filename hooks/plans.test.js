@@ -295,7 +295,9 @@ test('writeFileNoFollow nettoie le fichier temporaire quand renameSync échoue',
 
   assert.throws(
     () => writeFileNoFollow(path, 'contenu'),
-    /EISDIR|is a directory/,
+    // Windows rend EPERM là où POSIX rend EISDIR : c'est le même refus de
+    // renommer par-dessus un répertoire.
+    /EISDIR|is a directory|EPERM/,
   )
 
   // Vérifie qu'aucun fichier .tmp-* n'est laissé derrière

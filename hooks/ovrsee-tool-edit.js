@@ -18,7 +18,7 @@
 
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
-import { isAbsolute, join, relative, resolve } from 'node:path'
+import { isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { readBoard, readTickets, moveTicket } from './tickets.js'
@@ -61,7 +61,10 @@ const DERIVED = ['ovrsee/', 'graphify-out/']
 export function estUneEditionSource(root, filePath) {
   if (typeof filePath !== 'string' || !filePath) return false
   const abs = isAbsolute(filePath) ? filePath : resolve(root, filePath)
-  const rel = relative(root, abs)
+  // `relative` rend des `\` sous Windows ; `DERIVED` est écrit en `/`.
+  // Sans cette normalisation le hook y voyait toute écriture d'`ovrsee/`
+  // comme une édition de source, et chaque ticket se déplaçait lui-même.
+  const rel = relative(root, abs).split(sep).join('/')
   if (rel.startsWith('..')) return false // hors du dépôt : rien à faire ici
   return !DERIVED.some(prefix => rel.startsWith(prefix))
 }

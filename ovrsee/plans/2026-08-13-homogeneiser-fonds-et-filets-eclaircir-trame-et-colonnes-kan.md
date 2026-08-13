@@ -47,6 +47,15 @@
       "sha": "487c939",
       "date": "2026-08-13",
       "files": []
+    },
+    {
+      "sha": "fe31081",
+      "date": "2026-08-13",
+      "files": [
+        "README.en.md",
+        "README.md",
+        "package.json"
+      ]
     }
   ]
 }

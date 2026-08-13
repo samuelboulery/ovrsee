@@ -72,6 +72,22 @@
         "hooks/i18n.d.ts",
         "hooks/i18n.js"
       ]
+    },
+    {
+      "sha": "5acbf22",
+      "date": "2026-08-13",
+      "files": [
+        ".github/workflows/site.yml",
+        "package.json",
+        "site/app.js",
+        "site/dict.json",
+        "site/fonts/IBMPlexMono-400.woff2",
+        "site/fonts/IBMPlexMono-500.woff2",
+        "site/fonts/IBMPlexSans.woff2",
+        "site/fonts/OFL.txt",
+        "site/index.html",
+        "site/styles.css"
+      ]
     }
   ]
 }

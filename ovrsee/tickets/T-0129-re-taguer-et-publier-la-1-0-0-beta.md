@@ -2,7 +2,7 @@
 {
   "id": "T-0129",
   "titre": "Re-taguer et publier la 1.0.0-beta",
-  "colonne": "en-cours",
+  "colonne": "pret",
   "priorite": "haute",
   "charge": "s",
   "epic": "T-0123",

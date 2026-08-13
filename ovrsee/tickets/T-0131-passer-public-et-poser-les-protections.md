@@ -2,7 +2,7 @@
 {
   "id": "T-0131",
   "titre": "Passer public et poser les protections",
-  "colonne": "en-cours",
+  "colonne": "pret",
   "priorite": "haute",
   "charge": "m",
   "epic": "T-0123",

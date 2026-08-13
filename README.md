@@ -255,7 +255,7 @@ Sobriété délibérée : **3 dépendances de production**, le reste est du Node
 | `@types/react` | ^19.2.18 |
 | `@types/react-dom` | ^19.2.4 |
 
-Gestionnaire de paquets : `pnpm@10.12.1`, épinglé dans `package.json` et fait respecter par Corepack.
+Gestionnaire de paquets : `pnpm@10.34.5`, épinglé dans `package.json` et fait respecter par Corepack.
 
 ## Pièges connus
 

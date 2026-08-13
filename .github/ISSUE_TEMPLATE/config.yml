@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Faille de sécurité
+    url: https://github.com/samuelboulery/ovrsee/security/advisories/new
+    about: Ne l'ouvrez pas en issue publique — le signalement reste privé jusqu'au correctif.
+  - name: Question ou usage
+    url: https://github.com/samuelboulery/ovrsee/blob/main/README.md
+    about: Le mode d'emploi répond à la plupart des questions.

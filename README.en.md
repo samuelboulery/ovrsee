@@ -250,7 +250,7 @@ Deliberately minimal: **3 production dependencies**, everything else is plain No
 | `@types/react` | ^19.2.18 |
 | `@types/react-dom` | ^19.2.4 |
 
-Package manager: `pnpm@10.12.1`, pinned in `package.json` and enforced by Corepack.
+Package manager: `pnpm@10.34.5`, pinned in `package.json` and enforced by Corepack.
 
 ## Known Traps
 

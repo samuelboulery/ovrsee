@@ -1,0 +1,39 @@
+version: 2
+updates:
+  # Les actions sont épinglées à un SHA dans les workflows : sans Dependabot
+  # elles ne bougeraient plus jamais, y compris pour un correctif de sécurité.
+  # C'est lui qui rend l'épinglage tenable.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "chore"
+    open-pull-requests-limit: 3
+
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "chore"
+    open-pull-requests-limit: 5
+    groups:
+      # React, ses types et le plugin Vite montent ensemble ou pas du tout :
+      # séparés, ils produisent des PR qui ne compilent pas isolément.
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+          - "@vitejs/plugin-react"
+    ignore:
+      # node-pty est un binaire natif déballé de l'asar, et son bit d'exécution
+      # est rattrapé au postinstall. Une montée se vérifie en empaquetant sur
+      # les deux plateformes, jamais en fusionnant une PR automatique.
+      - dependency-name: "node-pty"
+      # Une majeure d'Electron change la version de Node embarquée et les
+      # règles du processus de rendu. Même raison.
+      - dependency-name: "electron"
+        update-types: ["version-update:semver-major"]

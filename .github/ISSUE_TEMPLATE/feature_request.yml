@@ -1,0 +1,37 @@
+name: Proposer une évolution
+description: Une idée pour Ovrsee.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Une règle décide de la plupart des propositions, autant la connaître
+        avant d'écrire :
+
+        > **L'ovrsee lit ; il n'exécute que le terminal qu'on lui demande.**
+
+        Une proposition qui fait écrire l'application ailleurs que dans
+        `ovrsee/tickets/` et `ovrsee/board.json`, ou qui lui fait exécuter du
+        code du projet observé, contredit le cadrage et sera refusée. Le détail
+        est dans [`cadrage-ovrsee.md`](https://github.com/samuelboulery/ovrsee/blob/main/cadrage-ovrsee.md).
+
+  - type: textarea
+    id: probleme
+    attributes:
+      label: Le problème
+      description: Ce qui ne va pas aujourd'hui, sans encore parler de solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposition
+    attributes:
+      label: Ce que vous proposez
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Ce que vous avez écarté
+      description: Facultatif, mais c'est souvent la partie la plus utile.

@@ -2,9 +2,21 @@
   "name": "ovrsee",
   "version": "1.0.0-beta",
   "private": true,
+  "license": "MIT",
   "author": "Samuel Boulery",
   "type": "module",
-  "packageManager": "pnpm@10.12.1",
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samuelboulery/ovrsee.git"
+  },
+  "bugs": {
+    "url": "https://github.com/samuelboulery/ovrsee/issues"
+  },
+  "homepage": "https://github.com/samuelboulery/ovrsee#readme",
   "description": "Vue en lecture seule sur un projet vibecodé : plans capturés, pages crawlées, historique daté.",
   "scripts": {
     "dev": "vite",

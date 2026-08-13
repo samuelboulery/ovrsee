@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Homogénéiser fonds et filets, éclaircir trame et colonnes kanban",
   "opened": "2026-08-13",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": [
     {
       "sha": "6527486",
@@ -99,6 +99,11 @@
       "files": [
         "hooks/documentation.test.js"
       ]
+    },
+    {
+      "sha": "34d6df4",
+      "date": "2026-08-13",
+      "files": []
     }
   ]
 }

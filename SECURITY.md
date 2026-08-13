@@ -34,6 +34,13 @@ Concrètement :
   arbitrage explicite du cadrage, pas un oubli.
 - **Le crawl ne démarre pas si `baseUrl` répond déjà.** Rien dans une réponse
   HTTP ne distingue son propre serveur de celui d'un autre projet.
+- **Le crawl est la seule exception à ce qui précède, et elle est voulue.**
+  `pnpm ovrsee:crawl` lance la commande `dev` écrite dans le `ovrsee.config.json`
+  du projet observé — il faut bien démarrer l'application pour la photographier.
+  C'est du code venant du dépôt observé, exécuté sur votre machine, au même titre
+  qu'un `pnpm dev` ou qu'un script d'installation npm. **N'inscrivez au registre
+  que des dépôts auxquels vous confieriez déjà un `pnpm dev`.** Le reste de
+  l'application n'exécute jamais rien du projet observé.
 
 ## Secrets
 

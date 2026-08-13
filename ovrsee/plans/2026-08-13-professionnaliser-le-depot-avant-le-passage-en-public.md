@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Professionnaliser le dépôt avant le passage en public",
   "opened": "2026-08-13",
-  "closed": null,
+  "closed": "2026-08-13",
   "commits": [
     {
       "sha": "f7b5ae8",
@@ -110,6 +110,13 @@
       "files": [
         "site/dict.json",
         "site/index.html",
+        "site/styles.css"
+      ]
+    },
+    {
+      "sha": "248b822",
+      "date": "2026-08-13",
+      "files": [
         "site/styles.css"
       ]
     }

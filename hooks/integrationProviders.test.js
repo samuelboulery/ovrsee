@@ -25,6 +25,25 @@ test('parseVercelProject : mauvais hôte → null', () => {
   assert.equal(parseVercelProject('https://example.com/mon-equipe/mon-projet'), null)
 })
 
+// Le contrôle d'hôte se faisait par `hostname.endsWith('vercel.com')`, et
+// 'evilvercel.com'.endsWith('vercel.com') est vrai : un domaine sosie passait.
+// Sans conséquence directe — l'URL d'API sortante est en dur — mais le contrôle
+// était faux, et un contrôle faux finit toujours par être invoqué ailleurs.
+test('parseVercelProject : domaine sosie → null', () => {
+  assert.equal(parseVercelProject('https://evilvercel.com/equipe/projet'), null)
+  assert.equal(parseVercelProject('https://vercel.com.attaquant.net/equipe/projet'), null)
+})
+
+// Les sous-domaines légitimes doivent continuer de passer : Netlify sert son
+// tableau de bord sur `app.netlify.com`.
+test('parseNetlifySite : sous-domaine légitime accepté', () => {
+  assert.equal(parseNetlifySite('https://app.netlify.com/sites/mon-site/overview'), 'mon-site')
+})
+
+test('parseNetlifySite : domaine sosie → null', () => {
+  assert.equal(parseNetlifySite('https://faux-netlify.com/sites/mon-site/overview'), null)
+})
+
 test('parseVercelProject : chemin incomplet → null', () => {
   assert.equal(parseVercelProject('https://vercel.com/mon-equipe'), null)
 })

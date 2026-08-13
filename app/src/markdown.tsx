@@ -120,6 +120,10 @@ function media(src: string, alt: string, key: string, root?: string): ReactNode 
       key={key}
       src={url}
       alt={alt}
+      // Un README illustré en aligne facilement une dizaine, presque toutes
+      // sous la ligne de flottaison.
+      loading="lazy"
+      decoding="async"
       style={s(
         'display: inline-block; max-width: 100%; height: auto; margin: 4px 0; border-radius: 8px;',
       )}

@@ -39,7 +39,10 @@ function pathnameParts(url, host) {
   } catch {
     return null
   }
-  if (!parsed.hostname.endsWith(host)) return null
+  // La frontière de point n'est pas du zèle : `endsWith('vercel.com')` seul
+  // acceptait `evilvercel.com`. Il faut donc l'hôte exact, ou un vrai
+  // sous-domaine — Netlify sert son tableau de bord sur `app.netlify.com`.
+  if (parsed.hostname !== host && !parsed.hostname.endsWith('.' + host)) return null
   return parsed.pathname.split('/').filter(Boolean)
 }
 

@@ -484,6 +484,12 @@ function PageCard({
         <img
           src={shotUrl(snapshot.root, page.shot)}
           alt=""
+          // Le canevas rend toutes les pages d'un coup, la plupart hors écran :
+          // sans ça, ouvrir l'onglet demandait cinquante captures de 100 ko à la
+          // fois. Les captures visibles, elles, ne portent pas l'attribut — il
+          // retarderait ce qu'on est venu regarder.
+          loading="lazy"
+          decoding="async"
           style={s(
             `width: 100%; aspect-ratio: ${shotRatio(page)}; object-fit: cover; object-position: top; border-radius: 6px; border: 1px solid var(--color-border-card); margin-top: 9px; display: block;`,
           )}

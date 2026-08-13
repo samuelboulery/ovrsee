@@ -955,7 +955,7 @@ function Carte({
       </div>
 
       {enfantsIci && enfantsIci.length > 0 && (
-        <div style={s('display: flex; flex-direction: column; gap: 8px; margin-top: 10px; margin-left: 14px;')}>
+        <div style={s('display: flex; flex-direction: column; gap: 8px; margin-top: 10px; margin-left: 14px; margin-right: 14px;')}>
           {enfantsIci.map(enfant => (
             <Carte
               key={enfant.file}

@@ -13,6 +13,13 @@ dist/
 graphify-out/cache/
 graphify-out/graph.html
 
+# Sous-produits de graphify au même titre que le cache : marqueur d'interpréteur,
+# relevé de coût et manifeste d'exécution. Rien ne les lit ici, et ils
+# apparaissaient en non-suivis à chaque `git status`.
+graphify-out/.graphify_python
+graphify-out/cost.json
+graphify-out/manifest.json
+
 # GRAPH_REPORT.md l'est aussi, pour une raison de plus : il change à CHAQUE
 # reconstruction, même à code identique. Son en-tête compte les mots du corpus,
 # et ce compte grimpe tout seul — 771 k, 778 k, 801 k, 831 k sur quatre commits

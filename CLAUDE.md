@@ -84,10 +84,14 @@ page : pour ça, il faut lancer l'app.
   `ovrsee/board.json` se saisissent — via le skill `ovrsee-tickets`. Les plans, les
   pages, les scans et les captures s'écrivent tout seuls ; les corriger à la main
   produit un état que le prochain commit écrasera.
-- **`support.js`** (69 ko) et **`Ovrsee-A-Nocturne.dc.html`** sont du code tiers
-  embarqué pour la maquette. Hors périmètre : ne pas relire, ne pas corriger, ne pas
-  compter dans les métriques du projet.
-- **`_ds/`** est une bibliothèque de design systems. Seul `nocturne-*` est chargé.
+- **`legacy/Ovrsee-A-Nocturne.dc.html`** est la maquette : du code tiers embarqué,
+  hors périmètre — ne pas relire, ne pas corriger, ne pas compter dans les métriques.
+  Elle reste là parce qu'elle est la référence des valeurs portées littéralement,
+  celles que la liste `FICHIERS_PORTES` de `hooks/couleurs.test.js` autorise.
+- **`_ds/`** tient deux design systems, et le nom trompe : c'est
+  **`_ds/ovrsee/styles.css`** que l'application charge (`app/src/main.tsx`), pas
+  `nocturne-*` — celui-ci ne sert plus qu'à la maquette. Les systèmes `industry-*`
+  et `modernist-*` que ce dossier portait ont été retirés : rien ne les chargeait.
 - **`graphify-out/graph.json`** est versionné volontairement (l'onglet Données le lit,
   et lui seul — Stack lit `package.json` et les `WHY:`) ; `graphify-out/cache/` et
   `graph.html` sont ignorés.

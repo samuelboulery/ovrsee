@@ -56,6 +56,17 @@
         "README.md",
         "package.json"
       ]
+    },
+    {
+      "sha": "85208e5",
+      "date": "2026-08-13",
+      "files": [
+        ".github/workflows/release.yml",
+        "hooks/couleurs.test.js",
+        "hooks/install.test.js",
+        "hooks/ovrsee-tool-edit.js",
+        "hooks/plans.test.js"
+      ]
     }
   ]
 }

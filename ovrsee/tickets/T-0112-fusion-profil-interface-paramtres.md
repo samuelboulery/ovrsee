@@ -2,7 +2,7 @@
 {
   "id": "T-0112",
   "titre": "Fusion des sections Profil et Interface dans les Paramètres",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

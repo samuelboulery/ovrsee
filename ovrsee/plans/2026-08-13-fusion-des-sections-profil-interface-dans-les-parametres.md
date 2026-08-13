@@ -4,7 +4,15 @@
   "title": "Fusion des sections Profil + Interface dans les Paramètres",
   "opened": "2026-08-13",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "6609d27",
+      "date": "2026-08-13",
+      "files": [
+        "app/src/PreferencesPanel.tsx"
+      ]
+    }
+  ]
 }
 ---
 

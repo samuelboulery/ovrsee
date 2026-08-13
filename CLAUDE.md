@@ -143,8 +143,10 @@ page : pour ça, il faut lancer l'app.
 - Langue : français pour les commentaires, la documentation et les messages
   d'interface ; anglais pour les identifiants et le code.
 - Commits : Conventional Commits en français (`feat:`, `fix:`, `docs:`, `chore:`).
-- `pnpm` exclusivement. Demander avant d'ajouter une dépendance — le projet en a trois
-  en production (`@xterm/xterm`, `@xterm/addon-fit`, `node-pty`) et cette sobriété est
+- `pnpm` exclusivement. Demander avant d'ajouter une dépendance — le projet en a quatre
+  en production (`@phosphor-icons/react`, `@xterm/xterm`, `@xterm/addon-fit`,
+  `node-pty` — cette liste en oubliait une, et les badges des READMEs annonçaient
+  trois pendant ce temps) et cette sobriété est
   un choix.
 - Les styles sont en CSS-in-JS via l'utilitaire `s()` de `app/src/style.ts`, sur les
   jetons du design system Nocturne. Pas de fichier `.css` dans `app/src`.

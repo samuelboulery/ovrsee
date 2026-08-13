@@ -51,6 +51,15 @@
       "sha": "99e653a",
       "date": "2026-08-13",
       "files": []
+    },
+    {
+      "sha": "c86d6c5",
+      "date": "2026-08-13",
+      "files": [
+        ".github/workflows/ci.yml",
+        "README.en.md",
+        "README.md"
+      ]
     }
   ]
 }

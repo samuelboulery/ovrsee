@@ -8,20 +8,33 @@
 
   # Ovrsee
 
-  **A read-only view of what you vibecoded.**
+  **Vibecode fast, without losing track of the project.**
 
   ![version](https://img.shields.io/badge/version-1.0.0--beta-6c5ce7?style=flat-square)
   ![stack](https://img.shields.io/badge/stack-Electron%20%2B%20React%20%2B%20TypeScript-2d3436?style=flat-square)
   ![prod deps](https://img.shields.io/badge/prod%20deps-4-00b894?style=flat-square)
 </div>
 
-A read-only view of a vibecoded project: what was built, why, what remains open,
-and what the app looked like at each commit.
+Project management for Claude Code. Ovrsee keeps track of what you build: the plans you
+approved, the commits that carry them out, the tickets left to do, the app architecture
+and how it changes. Enough to know where you stand when you code at the agent's pace,
+and what to do next.
 
 > **Ovrsee reads; it only runs a terminal if you ask.** The truth lives in `<repo>/ovrsee/`,
 > in markdown and images, versioned by git. The app is just a view — if it disappears, nothing is lost.
 
 Full context (French): [`cadrage-ovrsee.md`](./cadrage-ovrsee.md)
+
+## Three principles
+
+**A plan, its commits, its tickets.** Every plan approved in Claude Code becomes a line of
+the project: what was decided, what carried it out, what is still open.
+
+**The project lives in the repository.** Backlog, history and screenshots under
+`<repo>/ovrsee/`, versioned by git. No tool to keep up to date alongside the code.
+
+**Claude Code reads it, and writes to it.** An MCP server and two skills: the agent knows
+your backlog, opens and moves tickets. It runs no code — you stay in charge of the plan.
 
 ## What it does
 

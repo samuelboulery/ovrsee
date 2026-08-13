@@ -8,21 +8,34 @@
 
   # Ovrsee
 
-  **Vue en lecture seule sur ce que vous avez vibecodé.**
+  **Vibecoder vite, sans perdre le fil du projet.**
 
   ![version](https://img.shields.io/badge/version-1.0.0--beta-6c5ce7?style=flat-square)
   ![stack](https://img.shields.io/badge/stack-Electron%20%2B%20React%20%2B%20TypeScript-2d3436?style=flat-square)
   ![deps prod](https://img.shields.io/badge/d%C3%A9pendances%20prod-4-00b894?style=flat-square)
 </div>
 
-Une vue en lecture seule sur un projet développé en vibecoding : ce qui a été fait,
-pourquoi, ce qui reste ouvert, et à quoi l'application ressemblait à chaque commit.
+Gestion de projet pour Claude Code. Ovrsee tient le suivi de ce que vous construisez :
+les décisions que vous avez approuvées, les commits qui les réalisent, les tickets à
+faire, l'architecture de l'app et son évolution. De quoi savoir où vous en êtes quand
+on code au rythme de l'agent, et quoi faire ensuite.
 
 > **L'ovrsee lit ; il n'exécute que le terminal qu'on lui demande.** La vérité vit dans `<repo>/ovrsee/`, en
 > markdown et en images, versionnée par git. L'application n'est qu'une vue : si elle
 > disparaît, rien n'est perdu.
 
 Contexte complet : [`cadrage-ovrsee.md`](./cadrage-ovrsee.md)
+
+## Trois principes
+
+**Un plan, ses commits, ses tickets.** Chaque décision approuvée dans Claude Code devient
+une ligne de projet : ce qui a été décidé, ce qui l'a exécuté, ce qui reste ouvert.
+
+**Le projet vit dans le dépôt.** Backlog, historique et captures sous `<repo>/ovrsee/`,
+versionnés par git. Pas d'outil à tenir à jour en parallèle du code.
+
+**Claude Code y lit et y écrit.** Serveur MCP et deux skills : l'agent connaît votre
+backlog, ouvre et déplace les tickets. Il n'exécute aucun code — vous restez maître du plan.
 
 ## Ce qu'on y voit
 

@@ -57,9 +57,9 @@ export type OnboardingProps = {
 
 /** Les trois affirmations, chacune en deux temps : ce qu'on retient, puis pourquoi. */
 const AFFIRMATIONS = [
-  { tete: 'onboard.what_truth_lead', suite: 'onboard.what_truth_rest' },
-  { tete: 'onboard.what_view_lead', suite: 'onboard.what_view_rest' },
-  { tete: 'onboard.what_reads_lead', suite: 'onboard.what_reads_rest' },
+  { tete: 'onboard.what_plan_lead', suite: 'onboard.what_plan_rest' },
+  { tete: 'onboard.what_repo_lead', suite: 'onboard.what_repo_rest' },
+  { tete: 'onboard.what_claude_lead', suite: 'onboard.what_claude_rest' },
 ] as const
 
 /**

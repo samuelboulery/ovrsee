@@ -2,7 +2,7 @@
 {
   "id": "T-0114",
   "titre": "Terminal — persistance des sessions entre projets",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "terminal",

@@ -2,7 +2,7 @@
 {
   "id": "T-0113",
   "titre": "Electron — fenêtres multiples",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "electron",

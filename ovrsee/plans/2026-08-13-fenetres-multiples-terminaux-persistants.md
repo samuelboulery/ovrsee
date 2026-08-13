@@ -4,7 +4,20 @@
   "title": "Fenêtres multiples + terminaux persistants",
   "opened": "2026-08-13",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "cfee865",
+      "date": "2026-08-13",
+      "files": [
+        "app/src/Terminal.tsx",
+        "app/src/useTerminal.ts",
+        "electron/main.js",
+        "electron/menu.js",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js"
+      ]
+    }
+  ]
 }
 ---
 

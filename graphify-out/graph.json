@@ -712,7 +712,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L104",
       "id": "app_openproject",
-      "community": 5,
+      "community": 0,
       "norm_label": "openproject()"
     },
     {
@@ -847,7 +847,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesProfils.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_preferencesprofils_tsx",
-      "community": 9,
+      "community": 10,
       "norm_label": "preferencesprofils.tsx"
     },
     {
@@ -856,7 +856,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesProfils.tsx",
       "source_location": "L84",
       "id": "preferencesprofils_appliquerprofil",
-      "community": 9,
+      "community": 10,
       "norm_label": "appliquerprofil()"
     },
     {
@@ -865,7 +865,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesProfils.tsx",
       "source_location": "L104",
       "id": "preferencesprofils_profilcourant",
-      "community": 9,
+      "community": 10,
       "norm_label": "profilcourant()"
     },
     {
@@ -874,7 +874,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesProfils.tsx",
       "source_location": "L142",
       "id": "preferencesprofils_s",
-      "community": 9,
+      "community": 10,
       "norm_label": "s()"
     },
     {
@@ -1369,7 +1369,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Garde.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_garde_tsx",
-      "community": 8,
+      "community": 7,
       "norm_label": "garde.tsx"
     },
     {
@@ -1378,7 +1378,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Garde.tsx",
       "source_location": "L24",
       "id": "garde_messagede",
-      "community": 8,
+      "community": 7,
       "norm_label": "messagede()"
     },
     {
@@ -1387,7 +1387,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Garde.tsx",
       "source_location": "L39",
       "id": "garde_garde",
-      "community": 8,
+      "community": 7,
       "norm_label": "garde"
     },
     {
@@ -1396,7 +1396,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Garde.tsx",
       "source_location": "L42",
       "id": "garde_garde_getderivedstatefromerror",
-      "community": 8,
+      "community": 7,
       "norm_label": ".getderivedstatefromerror()"
     },
     {
@@ -1405,7 +1405,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Garde.tsx",
       "source_location": "L46",
       "id": "garde_garde_componentdidcatch",
-      "community": 8,
+      "community": 7,
       "norm_label": ".componentdidcatch()"
     },
     {
@@ -1414,7 +1414,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Garde.tsx",
       "source_location": "L52",
       "id": "garde_garde_render",
-      "community": 8,
+      "community": 7,
       "norm_label": ".render()"
     },
     {
@@ -1603,7 +1603,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/profilage.ts",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_profilage_ts",
-      "community": 9,
+      "community": 10,
       "norm_label": "profilage.ts"
     },
     {
@@ -1612,7 +1612,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/profilage.ts",
       "source_location": "L51",
       "id": "profilage_appliquerreponses",
-      "community": 9,
+      "community": 10,
       "norm_label": "appliquerreponses()"
     },
     {
@@ -1621,7 +1621,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/profilage.ts",
       "source_location": "L73",
       "id": "profilage_apercureponses",
-      "community": 9,
+      "community": 10,
       "norm_label": "apercureponses()"
     },
     {
@@ -1630,7 +1630,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/profilage.ts",
       "source_location": "L82",
       "id": "profilage_reponsesinitiales",
-      "community": 9,
+      "community": 10,
       "norm_label": "reponsesinitiales()"
     },
     {
@@ -1675,7 +1675,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_onboarding_tsx",
-      "community": 9,
+      "community": 10,
       "norm_label": "onboarding.tsx"
     },
     {
@@ -1684,7 +1684,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L94",
       "id": "onboarding_s",
-      "community": 9,
+      "community": 10,
       "norm_label": "s()"
     },
     {
@@ -1693,7 +1693,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L371",
       "id": "onboarding_repondre",
-      "community": 9,
+      "community": 10,
       "norm_label": "repondre()"
     },
     {
@@ -1702,7 +1702,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L376",
       "id": "onboarding_finaliser",
-      "community": 9,
+      "community": 10,
       "norm_label": "finaliser()"
     },
     {
@@ -1711,7 +1711,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L379",
       "id": "onboarding_terminer",
-      "community": 9,
+      "community": 10,
       "norm_label": "terminer()"
     },
     {
@@ -1720,7 +1720,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L381",
       "id": "onboarding_ajouter",
-      "community": 9,
+      "community": 10,
       "norm_label": "ajouter()"
     },
     {
@@ -1729,7 +1729,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L399",
       "id": "onboarding_onkey",
-      "community": 9,
+      "community": 10,
       "norm_label": "onkey()"
     },
     {
@@ -2035,7 +2035,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_tabs_tableau_tsx",
-      "community": 10,
+      "community": 11,
       "norm_label": "tableau.tsx"
     },
     {
@@ -2044,7 +2044,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L39",
       "id": "tableau_estcolonne",
-      "community": 10,
+      "community": 11,
       "norm_label": "estcolonne()"
     },
     {
@@ -2053,7 +2053,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L56",
       "id": "tableau_groupepics",
-      "community": 10,
+      "community": 11,
       "norm_label": "groupepics()"
     },
     {
@@ -2062,7 +2062,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L147",
       "id": "tableau_ecrire",
-      "community": 10,
+      "community": 11,
       "norm_label": "ecrire()"
     },
     {
@@ -2071,7 +2071,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L160",
       "id": "tableau_deplacer",
-      "community": 10,
+      "community": 11,
       "norm_label": "deplacer()"
     },
     {
@@ -2080,7 +2080,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L171",
       "id": "tableau_creer",
-      "community": 10,
+      "community": 11,
       "norm_label": "creer()"
     },
     {
@@ -2089,7 +2089,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L202",
       "id": "tableau_fusionnerpatch",
-      "community": 10,
+      "community": 11,
       "norm_label": "fusionnerpatch()"
     },
     {
@@ -2098,7 +2098,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L210",
       "id": "tableau_modifier",
-      "community": 10,
+      "community": 11,
       "norm_label": "modifier()"
     },
     {
@@ -2107,7 +2107,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L217",
       "id": "tableau_supprimer",
-      "community": 10,
+      "community": 11,
       "norm_label": "supprimer()"
     },
     {
@@ -2116,7 +2116,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L222",
       "id": "tableau_renommer",
-      "community": 10,
+      "community": 11,
       "norm_label": "renommer()"
     },
     {
@@ -2125,7 +2125,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L240",
       "id": "tableau_retirer",
-      "community": 10,
+      "community": 11,
       "norm_label": "retirer()"
     },
     {
@@ -2134,7 +2134,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L250",
       "id": "tableau_ajouter",
-      "community": 10,
+      "community": 11,
       "norm_label": "ajouter()"
     },
     {
@@ -2143,7 +2143,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L264",
       "id": "tableau_reordonner",
-      "community": 10,
+      "community": 11,
       "norm_label": "reordonner()"
     },
     {
@@ -2152,7 +2152,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L491",
       "id": "tableau_cote",
-      "community": 10,
+      "community": 11,
       "norm_label": "cote()"
     },
     {
@@ -2161,7 +2161,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L523",
       "id": "tableau_s",
-      "community": 10,
+      "community": 11,
       "norm_label": "s()"
     },
     {
@@ -2206,7 +2206,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L102",
       "id": "navigateur_normalize",
-      "community": 4,
+      "community": 1,
       "norm_label": "normalize()"
     },
     {
@@ -2395,7 +2395,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Apercu.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_tabs_apercu_tsx",
-      "community": 0,
+      "community": 24,
       "norm_label": "apercu.tsx"
     },
     {
@@ -2404,7 +2404,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Apercu.tsx",
       "source_location": "L56",
       "id": "apercu_pont",
-      "community": 0,
+      "community": 24,
       "norm_label": "pont()"
     },
     {
@@ -2413,7 +2413,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Apercu.tsx",
       "source_location": "L144",
       "id": "apercu_scrollvers",
-      "community": 0,
+      "community": 24,
       "norm_label": "scrollvers()"
     },
     {
@@ -2422,7 +2422,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Apercu.tsx",
       "source_location": "L153",
       "id": "apercu_aller",
-      "community": 0,
+      "community": 24,
       "norm_label": "aller()"
     },
     {
@@ -2431,7 +2431,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Apercu.tsx",
       "source_location": "L362",
       "id": "apercu_onclickoutside",
-      "community": 0,
+      "community": 24,
       "norm_label": "onclickoutside()"
     },
     {
@@ -2440,7 +2440,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Apercu.tsx",
       "source_location": "L371",
       "id": "apercu_onkey",
-      "community": 0,
+      "community": 24,
       "norm_label": "onkey()"
     },
     {
@@ -2449,7 +2449,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Apercu.tsx",
       "source_location": "L441",
       "id": "apercu_s",
-      "community": 0,
+      "community": 24,
       "norm_label": "s()"
     },
     {
@@ -2498,597 +2498,12 @@
       "norm_label": "s()"
     },
     {
-      "label": "support.js",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1",
-      "id": "users_sam_code_ovrsee_legacy_support_js",
-      "community": 1,
-      "norm_label": "support.js"
-    },
-    {
-      "label": "getReact()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L9",
-      "id": "support_getreact",
-      "community": 1,
-      "norm_label": "getreact()"
-    },
-    {
-      "label": "getReactDOM()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L14",
-      "id": "support_getreactdom",
-      "community": 1,
-      "norm_label": "getreactdom()"
-    },
-    {
-      "label": "parseDcDocument()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L24",
-      "id": "support_parsedcdocument",
-      "community": 1,
-      "norm_label": "parsedcdocument()"
-    },
-    {
-      "label": "parseDcText()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L38",
-      "id": "support_parsedctext",
-      "community": 1,
-      "norm_label": "parsedctext()"
-    },
-    {
-      "label": "parseDataProps()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L56",
-      "id": "support_parsedataprops",
-      "community": 1,
-      "norm_label": "parsedataprops()"
-    },
-    {
-      "label": "dcNameFromPath()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L75",
-      "id": "support_dcnamefrompath",
-      "community": 1,
-      "norm_label": "dcnamefrompath()"
-    },
-    {
-      "label": "rootNameForDocument()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L133",
-      "id": "support_rootnamefordocument",
-      "community": 1,
-      "norm_label": "rootnamefordocument()"
-    },
-    {
-      "label": "safeDecode()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L143",
-      "id": "support_safedecode",
-      "community": 1,
-      "norm_label": "safedecode()"
-    },
-    {
-      "label": "boot()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L150",
-      "id": "support_boot",
-      "community": 1,
-      "norm_label": "boot()"
-    },
-    {
-      "label": "resolve()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L205",
-      "id": "support_resolve",
-      "community": 1,
-      "norm_label": "resolve()"
-    },
-    {
-      "label": "parensWrapWhole()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L237",
-      "id": "support_parenswrapwhole",
-      "community": 1,
-      "norm_label": "parenswrapwhole()"
-    },
-    {
-      "label": "findTopLevelEquality()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L248",
-      "id": "support_findtoplevelequality",
-      "community": 1,
-      "norm_label": "findtoplevelequality()"
-    },
-    {
-      "label": "resolvePath()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L263",
-      "id": "support_resolvepath",
-      "community": 1,
-      "norm_label": "resolvepath()"
-    },
-    {
-      "label": "encodeCamelAttrs()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L366",
-      "id": "support_encodecamelattrs",
-      "community": 1,
-      "norm_label": "encodecamelattrs()"
-    },
-    {
-      "label": "encodeCase()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L372",
-      "id": "support_encodecase",
-      "community": 1,
-      "norm_label": "encodecase()"
-    },
-    {
-      "label": "kebabToCamel()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L388",
-      "id": "support_kebabtocamel",
-      "community": 1,
-      "norm_label": "kebabtocamel()"
-    },
-    {
-      "label": "cssToObj()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L391",
-      "id": "support_csstoobj",
-      "community": 1,
-      "norm_label": "csstoobj()"
-    },
-    {
-      "label": "compileAttr()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L401",
-      "id": "support_compileattr",
-      "community": 1,
-      "norm_label": "compileattr()"
-    },
-    {
-      "label": "collectProps()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L415",
-      "id": "support_collectprops",
-      "community": 1,
-      "norm_label": "collectprops()"
-    },
-    {
-      "label": "hostPositionStyle()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L457",
-      "id": "support_hostpositionstyle",
-      "community": 1,
-      "norm_label": "hostpositionstyle()"
-    },
-    {
-      "label": "compileTemplate()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L467",
-      "id": "support_compiletemplate",
-      "community": 1,
-      "norm_label": "compiletemplate()"
-    },
-    {
-      "label": "walkChildren()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L483",
-      "id": "support_walkchildren",
-      "community": 1,
-      "norm_label": "walkchildren()"
-    },
-    {
-      "label": "isDeckMountTag()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L489",
-      "id": "support_isdeckmounttag",
-      "community": 1,
-      "norm_label": "isdeckmounttag()"
-    },
-    {
-      "label": "walkDeckChildren()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L493",
-      "id": "support_walkdeckchildren",
-      "community": 1,
-      "norm_label": "walkdeckchildren()"
-    },
-    {
-      "label": "renderDeckKids()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L543",
-      "id": "support_renderdeckkids",
-      "community": 1,
-      "norm_label": "renderdeckkids()"
-    },
-    {
-      "label": "walk()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L550",
-      "id": "support_walk",
-      "community": 1,
-      "norm_label": "walk()"
-    },
-    {
-      "label": "warnUnresolved()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L563",
-      "id": "support_warnunresolved",
-      "community": 1,
-      "norm_label": "warnunresolved()"
-    },
-    {
-      "label": "walkText()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L569",
-      "id": "support_walktext",
-      "community": 1,
-      "norm_label": "walktext()"
-    },
-    {
-      "label": "walkFor()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L611",
-      "id": "support_walkfor",
-      "community": 1,
-      "norm_label": "walkfor()"
-    },
-    {
-      "label": "walkIf()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L646",
-      "id": "support_walkif",
-      "community": 1,
-      "norm_label": "walkif()"
-    },
-    {
-      "label": "walkComponent()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L661",
-      "id": "support_walkcomponent",
-      "community": 1,
-      "norm_label": "walkcomponent()"
-    },
-    {
-      "label": "walkXImport()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L690",
-      "id": "support_walkximport",
-      "community": 1,
-      "norm_label": "walkximport()"
-    },
-    {
-      "label": "contentKey()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L771",
-      "id": "support_contentkey",
-      "community": 1,
-      "norm_label": "contentkey()"
-    },
-    {
-      "label": "walkElement()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L787",
-      "id": "support_walkelement",
-      "community": 1,
-      "norm_label": "walkelement()"
-    },
-    {
-      "label": "constructor()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L818",
-      "id": "support_constructor",
-      "community": 1,
-      "norm_label": "constructor()"
-    },
-    {
-      "label": "setState()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L825",
-      "id": "support_setstate",
-      "community": 1,
-      "norm_label": "setstate()"
-    },
-    {
-      "label": "forceUpdate()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L828",
-      "id": "support_forceupdate",
-      "community": 1,
-      "norm_label": "forceupdate()"
-    },
-    {
-      "label": "componentDidMount()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L831",
-      "id": "support_componentdidmount",
-      "community": 1,
-      "norm_label": "componentdidmount()"
-    },
-    {
-      "label": "componentDidUpdate()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L833",
-      "id": "support_componentdidupdate",
-      "community": 1,
-      "norm_label": "componentdidupdate()"
-    },
-    {
-      "label": "componentWillUnmount()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L835",
-      "id": "support_componentwillunmount",
-      "community": 1,
-      "norm_label": "componentwillunmount()"
-    },
-    {
-      "label": "renderVals()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L838",
-      "id": "support_rendervals",
-      "community": 1,
-      "norm_label": "rendervals()"
-    },
-    {
-      "label": "evalDcLogic()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L842",
-      "id": "support_evaldclogic",
-      "community": 1,
-      "norm_label": "evaldclogic()"
-    },
-    {
-      "label": "shallowEqual()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L854",
-      "id": "support_shallowequal",
-      "community": 1,
-      "norm_label": "shallowequal()"
-    },
-    {
-      "label": "Placeholder()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L862",
-      "id": "support_placeholder",
-      "community": 1,
-      "norm_label": "placeholder()"
-    },
-    {
-      "label": "hintToMin()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L883",
-      "id": "support_hinttomin",
-      "community": 1,
-      "norm_label": "hinttomin()"
-    },
-    {
-      "label": "createComponentFactory()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L888",
-      "id": "support_createcomponentfactory",
-      "community": 1,
-      "norm_label": "createcomponentfactory()"
-    },
-    {
-      "label": "bundledBlob()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1136",
-      "id": "support_bundledblob",
-      "community": 1,
-      "norm_label": "bundledblob()"
-    },
-    {
-      "label": "cdnScriptFor()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1149",
-      "id": "support_cdnscriptfor",
-      "community": 1,
-      "norm_label": "cdnscriptfor()"
-    },
-    {
-      "label": "isRenderableType()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1157",
-      "id": "support_isrenderabletype",
-      "community": 1,
-      "norm_label": "isrenderabletype()"
-    },
-    {
-      "label": "resolveDottedPath()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1161",
-      "id": "support_resolvedottedpath",
-      "community": 1,
-      "norm_label": "resolvedottedpath()"
-    },
-    {
-      "label": "createExternalModules()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1171",
-      "id": "support_createexternalmodules",
-      "community": 1,
-      "norm_label": "createexternalmodules()"
-    },
-    {
-      "label": "isElementClass()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1348",
-      "id": "support_iselementclass",
-      "community": 1,
-      "norm_label": "iselementclass()"
-    },
-    {
-      "label": "createHelmetManager()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1366",
-      "id": "support_createhelmetmanager",
-      "community": 1,
-      "norm_label": "createhelmetmanager()"
-    },
-    {
-      "label": "scanUnquotedUrl()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1498",
-      "id": "support_scanunquotedurl",
-      "community": 1,
-      "norm_label": "scanunquotedurl()"
-    },
-    {
-      "label": "stripComments()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1511",
-      "id": "support_stripcomments",
-      "community": 1,
-      "norm_label": "stripcomments()"
-    },
-    {
-      "label": "importantify()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1542",
-      "id": "support_importantify",
-      "community": 1,
-      "norm_label": "importantify()"
-    },
-    {
-      "label": "createPseudoSheet()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1567",
-      "id": "support_createpseudosheet",
-      "community": 1,
-      "norm_label": "createpseudosheet()"
-    },
-    {
-      "label": "createRegistry()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1592",
-      "id": "support_createregistry",
-      "community": 1,
-      "norm_label": "createregistry()"
-    },
-    {
-      "label": "createRuntime()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1623",
-      "id": "support_createruntime",
-      "community": 1,
-      "norm_label": "createruntime()"
-    },
-    {
-      "label": "createStreamTracker()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1792",
-      "id": "support_createstreamtracker",
-      "community": 1,
-      "norm_label": "createstreamtracker()"
-    },
-    {
-      "label": "hideRawTemplate()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1818",
-      "id": "support_hiderawtemplate",
-      "community": 1,
-      "norm_label": "hiderawtemplate()"
-    },
-    {
-      "label": "loadScript()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1823",
-      "id": "support_loadscript",
-      "community": 1,
-      "norm_label": "loadscript()"
-    },
-    {
-      "label": "loadReactUmd()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1838",
-      "id": "support_loadreactumd",
-      "community": 1,
-      "norm_label": "loadreactumd()"
-    },
-    {
-      "label": "init()",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1848",
-      "id": "support_init",
-      "community": 1,
-      "norm_label": "init()"
-    },
-    {
       "label": "api.test.js",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_server_api_test_js",
-      "community": 11,
+      "community": 9,
       "norm_label": "api.test.js"
     },
     {
@@ -3097,7 +2512,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L12",
       "id": "api_test_url",
-      "community": 11,
+      "community": 9,
       "norm_label": "url()"
     },
     {
@@ -3106,7 +2521,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L21",
       "id": "api_test_projectwithshot",
-      "community": 11,
+      "community": 9,
       "norm_label": "projectwithshot()"
     },
     {
@@ -3115,7 +2530,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L159",
       "id": "api_test_withregistry",
-      "community": 11,
+      "community": 9,
       "norm_label": "withregistry()"
     },
     {
@@ -3124,7 +2539,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L163",
       "id": "api_test_post",
-      "community": 11,
+      "community": 9,
       "norm_label": "post()"
     },
     {
@@ -3133,7 +2548,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L233",
       "id": "api_test_postticket",
-      "community": 11,
+      "community": 9,
       "norm_label": "postticket()"
     },
     {
@@ -3142,7 +2557,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L237",
       "id": "api_test_projetenregistre",
-      "community": 11,
+      "community": 9,
       "norm_label": "projetenregistre()"
     },
     {
@@ -3151,7 +2566,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L324",
       "id": "api_test_postskills",
-      "community": 11,
+      "community": 9,
       "norm_label": "postskills()"
     },
     {
@@ -3160,7 +2575,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L518",
       "id": "api_test_configclaudeurl",
-      "community": 11,
+      "community": 9,
       "norm_label": "configclaudeurl()"
     },
     {
@@ -3169,7 +2584,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L649",
       "id": "api_test_initavecconfig",
-      "community": 11,
+      "community": 9,
       "norm_label": "initavecconfig()"
     },
     {
@@ -3178,7 +2593,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_server_api_js",
-      "community": 4,
+      "community": 1,
       "norm_label": "api.js"
     },
     {
@@ -3187,7 +2602,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L50",
       "id": "api_usabledirectory",
-      "community": 23,
+      "community": 1,
       "norm_label": "usabledirectory()"
     },
     {
@@ -3196,7 +2611,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L72",
       "id": "api_detectdefaults",
-      "community": 4,
+      "community": 1,
       "norm_label": "detectdefaults()"
     },
     {
@@ -3205,7 +2620,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L89",
       "id": "api_getfolderstate",
-      "community": 4,
+      "community": 1,
       "norm_label": "getfolderstate()"
     },
     {
@@ -3214,7 +2629,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L148",
       "id": "api_validatecrawlconfig",
-      "community": 5,
+      "community": 1,
       "norm_label": "validatecrawlconfig()"
     },
     {
@@ -3223,7 +2638,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L172",
       "id": "api_projectaction",
-      "community": 5,
+      "community": 1,
       "norm_label": "projectaction()"
     },
     {
@@ -3241,7 +2656,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L329",
       "id": "api_resolve",
-      "community": 4,
+      "community": 1,
       "norm_label": "resolve()"
     },
     {
@@ -3250,7 +2665,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L474",
       "id": "api_parsebody",
-      "community": 4,
+      "community": 1,
       "norm_label": "parsebody()"
     },
     {
@@ -3259,7 +2674,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L483",
       "id": "api_readbody",
-      "community": 4,
+      "community": 1,
       "norm_label": "readbody()"
     },
     {
@@ -3268,7 +2683,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L491",
       "id": "api_nodemiddleware",
-      "community": 4,
+      "community": 1,
       "norm_label": "nodemiddleware()"
     },
     {
@@ -3277,7 +2692,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L512",
       "id": "api_fetchhandler",
-      "community": 4,
+      "community": 1,
       "norm_label": "fetchhandler()"
     },
     {
@@ -3286,7 +2701,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_mcp_dispatch_js",
-      "community": 23,
+      "community": 1,
       "norm_label": "dispatch.js"
     },
     {
@@ -3295,7 +2710,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L37",
       "id": "dispatch_appel",
-      "community": 23,
+      "community": 1,
       "norm_label": "appel()"
     },
     {
@@ -3304,7 +2719,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L61",
       "id": "dispatch_refus",
-      "community": 23,
+      "community": 1,
       "norm_label": "refus()"
     },
     {
@@ -3313,7 +2728,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L78",
       "id": "dispatch_projet",
-      "community": 23,
+      "community": 1,
       "norm_label": "projet()"
     },
     {
@@ -3322,7 +2737,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L87",
       "id": "dispatch_derniers",
-      "community": 23,
+      "community": 1,
       "norm_label": "derniers()"
     },
     {
@@ -3331,7 +2746,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L183",
       "id": "dispatch_ecriture",
-      "community": 23,
+      "community": 1,
       "norm_label": "ecriture()"
     },
     {
@@ -3340,7 +2755,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L195",
       "id": "dispatch_dispatch",
-      "community": 23,
+      "community": 1,
       "norm_label": "dispatch()"
     },
     {
@@ -3349,7 +2764,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/server.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_mcp_server_js",
-      "community": 6,
+      "community": 4,
       "norm_label": "server.js"
     },
     {
@@ -3358,7 +2773,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/server.js",
       "source_location": "L155",
       "id": "server_sendresult",
-      "community": 6,
+      "community": 4,
       "norm_label": "sendresult()"
     },
     {
@@ -3367,7 +2782,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/server.js",
       "source_location": "L166",
       "id": "server_senderror",
-      "community": 6,
+      "community": 4,
       "norm_label": "senderror()"
     },
     {
@@ -3376,7 +2791,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/server.js",
       "source_location": "L177",
       "id": "server_toolresult",
-      "community": 6,
+      "community": 4,
       "norm_label": "toolresult()"
     },
     {
@@ -3385,7 +2800,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_mcp_mcp_test_js",
-      "community": 5,
+      "community": 9,
       "norm_label": "mcp.test.js"
     },
     {
@@ -3394,7 +2809,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L17",
       "id": "mcp_test_withregistry",
-      "community": 5,
+      "community": 9,
       "norm_label": "withregistry()"
     },
     {
@@ -3403,7 +2818,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L22",
       "id": "mcp_test_registerproject",
-      "community": 5,
+      "community": 9,
       "norm_label": "registerproject()"
     },
     {
@@ -3412,7 +2827,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L29",
       "id": "mcp_test_projectdir",
-      "community": 5,
+      "community": 9,
       "norm_label": "projectdir()"
     },
     {
@@ -3421,7 +2836,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L311",
       "id": "mcp_test_parlefil",
-      "community": 5,
+      "community": 9,
       "norm_label": "parlefil()"
     },
     {
@@ -3430,7 +2845,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L320",
       "id": "mcp_test_demande",
-      "community": 5,
+      "community": 9,
       "norm_label": "demande()"
     },
     {
@@ -3439,7 +2854,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/auth.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_crawl_auth_js",
-      "community": 6,
+      "community": 4,
       "norm_label": "auth.js"
     },
     {
@@ -3448,7 +2863,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/auth.js",
       "source_location": "L37",
       "id": "auth_assertignored",
-      "community": 6,
+      "community": 4,
       "norm_label": "assertignored()"
     },
     {
@@ -3457,7 +2872,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/auth.js",
       "source_location": "L50",
       "id": "auth_main",
-      "community": 6,
+      "community": 4,
       "norm_label": "main()"
     },
     {
@@ -3466,7 +2881,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_crawl_index_js",
-      "community": 6,
+      "community": 4,
       "norm_label": "index.js"
     },
     {
@@ -3475,7 +2890,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L48",
       "id": "index_log",
-      "community": 6,
+      "community": 4,
       "norm_label": "log()"
     },
     {
@@ -3484,7 +2899,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L50",
       "id": "index_loadconfig",
-      "community": 6,
+      "community": 4,
       "norm_label": "loadconfig()"
     },
     {
@@ -3493,7 +2908,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L72",
       "id": "index_usestoragestate",
-      "community": 6,
+      "community": 4,
       "norm_label": "usestoragestate()"
     },
     {
@@ -3502,7 +2917,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L85",
       "id": "index_shortsha",
-      "community": 6,
+      "community": 4,
       "norm_label": "shortsha()"
     },
     {
@@ -3511,7 +2926,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L98",
       "id": "index_recordscan",
-      "community": 6,
+      "community": 4,
       "norm_label": "recordscan()"
     },
     {
@@ -3520,7 +2935,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L105",
       "id": "index_sleep",
-      "community": 6,
+      "community": 4,
       "norm_label": "sleep()"
     },
     {
@@ -3529,7 +2944,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L107",
       "id": "index_waitforserver",
-      "community": 6,
+      "community": 4,
       "norm_label": "waitforserver()"
     },
     {
@@ -3538,7 +2953,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L129",
       "id": "index_assertportfree",
-      "community": 6,
+      "community": 4,
       "norm_label": "assertportfree()"
     },
     {
@@ -3547,7 +2962,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L141",
       "id": "index_startapp",
-      "community": 6,
+      "community": 4,
       "norm_label": "startapp()"
     },
     {
@@ -3556,7 +2971,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L158",
       "id": "index_stopapp",
-      "community": 6,
+      "community": 4,
       "norm_label": "stopapp()"
     },
     {
@@ -3565,7 +2980,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L174",
       "id": "index_pathof",
-      "community": 6,
+      "community": 4,
       "norm_label": "pathof()"
     },
     {
@@ -3574,7 +2989,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L179",
       "id": "index_isignored",
-      "community": 6,
+      "community": 4,
       "norm_label": "isignored()"
     },
     {
@@ -3583,7 +2998,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L186",
       "id": "index_visitall",
-      "community": 6,
+      "community": 4,
       "norm_label": "visitall()"
     },
     {
@@ -3592,7 +3007,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L258",
       "id": "index_retainable",
-      "community": 6,
+      "community": 4,
       "norm_label": "retainable()"
     },
     {
@@ -3601,7 +3016,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L293",
       "id": "index_orphanshots",
-      "community": 6,
+      "community": 4,
       "norm_label": "orphanshots()"
     },
     {
@@ -3610,7 +3025,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L301",
       "id": "index_pruneshots",
-      "community": 6,
+      "community": 4,
       "norm_label": "pruneshots()"
     },
     {
@@ -3619,7 +3034,7 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
       "source_location": "L311",
       "id": "index_run",
-      "community": 6,
+      "community": 4,
       "norm_label": "run()"
     },
     {
@@ -3646,7 +3061,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_crawl_routes_js",
-      "community": 6,
+      "community": 4,
       "norm_label": "routes.js"
     },
     {
@@ -3655,7 +3070,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.js",
       "source_location": "L19",
       "id": "routes_isdynamicsegment",
-      "community": 6,
+      "community": 4,
       "norm_label": "isdynamicsegment()"
     },
     {
@@ -3664,7 +3079,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.js",
       "source_location": "L23",
       "id": "routes_segmentsof",
-      "community": 6,
+      "community": 4,
       "norm_label": "segmentsof()"
     },
     {
@@ -3673,7 +3088,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.js",
       "source_location": "L49",
       "id": "routes_normalizeroutes",
-      "community": 6,
+      "community": 4,
       "norm_label": "normalizeroutes()"
     },
     {
@@ -3682,7 +3097,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.js",
       "source_location": "L95",
       "id": "routes_pageslug",
-      "community": 6,
+      "community": 4,
       "norm_label": "pageslug()"
     },
     {
@@ -3691,7 +3106,7 @@
       "source_file": "/Users/sam/code/cockpit/crawl/routes.js",
       "source_location": "L104",
       "id": "routes_sameorigin",
-      "community": 6,
+      "community": 4,
       "norm_label": "sameorigin()"
     },
     {
@@ -4141,7 +3556,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_tool_edit_js",
-      "community": 3,
+      "community": 8,
       "norm_label": "ovrsee-tool-edit.js"
     },
     {
@@ -4150,7 +3565,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit.js",
       "source_location": "L27",
       "id": "ovrsee_tool_edit_readstdin",
-      "community": 3,
+      "community": 8,
       "norm_label": "readstdin()"
     },
     {
@@ -4159,7 +3574,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit.js",
       "source_location": "L40",
       "id": "ovrsee_tool_edit_reporoot",
-      "community": 3,
+      "community": 8,
       "norm_label": "reporoot()"
     },
     {
@@ -4168,7 +3583,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit.js",
       "source_location": "L61",
       "id": "ovrsee_tool_edit_estuneeditionsource",
-      "community": 3,
+      "community": 8,
       "norm_label": "estuneeditionsource()"
     },
     {
@@ -4186,7 +3601,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit.js",
       "source_location": "L105",
       "id": "ovrsee_tool_edit_main",
-      "community": 3,
+      "community": 8,
       "norm_label": "main()"
     },
     {
@@ -4555,7 +3970,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_tool_stop_js",
-      "community": 3,
+      "community": 8,
       "norm_label": "ovrsee-tool-stop.js"
     },
     {
@@ -4564,7 +3979,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.js",
       "source_location": "L29",
       "id": "ovrsee_tool_stop_readstdin",
-      "community": 3,
+      "community": 8,
       "norm_label": "readstdin()"
     },
     {
@@ -4573,7 +3988,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.js",
       "source_location": "L42",
       "id": "ovrsee_tool_stop_reporoot",
-      "community": 3,
+      "community": 8,
       "norm_label": "reporoot()"
     },
     {
@@ -4582,7 +3997,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.js",
       "source_location": "L62",
       "id": "ovrsee_tool_stop_aducodenoncommite",
-      "community": 3,
+      "community": 8,
       "norm_label": "aducodenoncommite()"
     },
     {
@@ -4600,7 +4015,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.js",
       "source_location": "L101",
       "id": "ovrsee_tool_stop_main",
-      "community": 3,
+      "community": 8,
       "norm_label": "main()"
     },
     {
@@ -4609,7 +4024,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/skills.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_skills_js",
-      "community": 7,
+      "community": 6,
       "norm_label": "skills.js"
     },
     {
@@ -4618,7 +4033,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/skills.js",
       "source_location": "L39",
       "id": "skills_skillsdir",
-      "community": 7,
+      "community": 6,
       "norm_label": "skillsdir()"
     },
     {
@@ -4627,7 +4042,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/skills.js",
       "source_location": "L65",
       "id": "skills_entree",
-      "community": 7,
+      "community": 6,
       "norm_label": "entree()"
     },
     {
@@ -4636,7 +4051,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/skills.js",
       "source_location": "L76",
       "id": "skills_bundledpath",
-      "community": 7,
+      "community": 6,
       "norm_label": "bundledpath()"
     },
     {
@@ -4645,7 +4060,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/skills.js",
       "source_location": "L83",
       "id": "skills_installedpath",
-      "community": 7,
+      "community": 6,
       "norm_label": "installedpath()"
     },
     {
@@ -4654,7 +4069,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/skills.js",
       "source_location": "L85",
       "id": "skills_lire",
-      "community": 7,
+      "community": 6,
       "norm_label": "lire()"
     },
     {
@@ -4663,7 +4078,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/skills.js",
       "source_location": "L104",
       "id": "skills_readskills",
-      "community": 7,
+      "community": 6,
       "norm_label": "readskills()"
     },
     {
@@ -4672,7 +4087,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/skills.js",
       "source_location": "L132",
       "id": "skills_installskills",
-      "community": 7,
+      "community": 6,
       "norm_label": "installskills()"
     },
     {
@@ -4681,7 +4096,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/whys.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_whys_js",
-      "community": 4,
+      "community": 1,
       "norm_label": "whys.js"
     },
     {
@@ -4690,7 +4105,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/whys.js",
       "source_location": "L76",
       "id": "whys_packageof",
-      "community": 4,
+      "community": 1,
       "norm_label": "packageof()"
     },
     {
@@ -4699,7 +4114,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/whys.js",
       "source_location": "L95",
       "id": "whys_whysinsource",
-      "community": 4,
+      "community": 1,
       "norm_label": "whysinsource()"
     },
     {
@@ -4708,7 +4123,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/whys.js",
       "source_location": "L135",
       "id": "whys_readwhys",
-      "community": 4,
+      "community": 1,
       "norm_label": "readwhys()"
     },
     {
@@ -4744,7 +4159,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_timeline_js",
-      "community": 4,
+      "community": 1,
       "norm_label": "timeline.js"
     },
     {
@@ -4753,7 +4168,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.js",
       "source_location": "L43",
       "id": "timeline_timeline",
-      "community": 4,
+      "community": 1,
       "norm_label": "timeline()"
     },
     {
@@ -4762,7 +4177,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.js",
       "source_location": "L125",
       "id": "timeline_tickettimeline",
-      "community": 4,
+      "community": 1,
       "norm_label": "tickettimeline()"
     },
     {
@@ -5014,7 +4429,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_obsidian_js",
-      "community": 7,
+      "community": 6,
       "norm_label": "obsidian.js"
     },
     {
@@ -5023,7 +4438,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L46",
       "id": "obsidian_scalar",
-      "community": 7,
+      "community": 6,
       "norm_label": "scalar()"
     },
     {
@@ -5032,7 +4447,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L53",
       "id": "obsidian_frontmatter",
-      "community": 7,
+      "community": 6,
       "norm_label": "frontmatter()"
     },
     {
@@ -5041,7 +4456,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L73",
       "id": "obsidian_notename",
-      "community": 7,
+      "community": 6,
       "norm_label": "notename()"
     },
     {
@@ -5050,7 +4465,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L75",
       "id": "obsidian_link",
-      "community": 7,
+      "community": 6,
       "norm_label": "link()"
     },
     {
@@ -5059,7 +4474,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L77",
       "id": "obsidian_puces",
-      "community": 7,
+      "community": 6,
       "norm_label": "puces()"
     },
     {
@@ -5068,7 +4483,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L87",
       "id": "obsidian_pagename",
-      "community": 7,
+      "community": 6,
       "norm_label": "pagename()"
     },
     {
@@ -5077,7 +4492,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L111",
       "id": "obsidian_exportvault",
-      "community": 7,
+      "community": 6,
       "norm_label": "exportvault()"
     },
     {
@@ -5086,7 +4501,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L133",
       "id": "obsidian_ecrireplans",
-      "community": 7,
+      "community": 6,
       "norm_label": "ecrireplans()"
     },
     {
@@ -5095,7 +4510,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L165",
       "id": "obsidian_ecriretickets",
-      "community": 7,
+      "community": 6,
       "norm_label": "ecriretickets()"
     },
     {
@@ -5104,7 +4519,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L203",
       "id": "obsidian_ecrirepages",
-      "community": 7,
+      "community": 6,
       "norm_label": "ecrirepages()"
     },
     {
@@ -5113,7 +4528,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.js",
       "source_location": "L266",
       "id": "obsidian_ecrireindex",
-      "community": 7,
+      "community": 6,
       "norm_label": "ecrireindex()"
     },
     {
@@ -5167,7 +4582,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_install_js",
-      "community": 7,
+      "community": 6,
       "norm_label": "install.js"
     },
     {
@@ -5176,7 +4591,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L56",
       "id": "install_shq",
-      "community": 7,
+      "community": 6,
       "norm_label": "shq()"
     },
     {
@@ -5185,7 +4600,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L67",
       "id": "install_commandfor",
-      "community": 7,
+      "community": 6,
       "norm_label": "commandfor()"
     },
     {
@@ -5194,7 +4609,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L77",
       "id": "install_installpostcommit",
-      "community": 7,
+      "community": 6,
       "norm_label": "installpostcommit()"
     },
     {
@@ -5203,7 +4618,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L112",
       "id": "install_isovrsee",
-      "community": 7,
+      "community": 6,
       "norm_label": "isovrsee()"
     },
     {
@@ -5212,7 +4627,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L114",
       "id": "install_installclaudehooks",
-      "community": 7,
+      "community": 6,
       "norm_label": "installclaudehooks()"
     },
     {
@@ -5221,7 +4636,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L208",
       "id": "install_writeovrseeconfig",
-      "community": 7,
+      "community": 6,
       "norm_label": "writeovrseeconfig()"
     },
     {
@@ -5230,7 +4645,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L246",
       "id": "install_install",
-      "community": 7,
+      "community": 6,
       "norm_label": "install()"
     },
     {
@@ -5257,7 +4672,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_snapshot_js",
-      "community": 4,
+      "community": 1,
       "norm_label": "snapshot.js"
     },
     {
@@ -5266,7 +4681,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L24",
       "id": "snapshot_readjson",
-      "community": 4,
+      "community": 1,
       "norm_label": "readjson()"
     },
     {
@@ -5275,7 +4690,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L43",
       "id": "snapshot_readtext",
-      "community": 4,
+      "community": 1,
       "norm_label": "readtext()"
     },
     {
@@ -5284,7 +4699,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L69",
       "id": "snapshot_projects",
-      "community": 5,
+      "community": 1,
       "norm_label": "projects()"
     },
     {
@@ -5293,7 +4708,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L87",
       "id": "snapshot_shotsbypage",
-      "community": 4,
+      "community": 1,
       "norm_label": "shotsbypage()"
     },
     {
@@ -5302,7 +4717,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L114",
       "id": "snapshot_scans",
-      "community": 4,
+      "community": 1,
       "norm_label": "scans()"
     },
     {
@@ -5311,7 +4726,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L143",
       "id": "snapshot_audits",
-      "community": 4,
+      "community": 1,
       "norm_label": "audits()"
     },
     {
@@ -5320,7 +4735,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L179",
       "id": "snapshot_commits",
-      "community": 4,
+      "community": 1,
       "norm_label": "commits()"
     },
     {
@@ -5329,7 +4744,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L204",
       "id": "snapshot_tableau",
-      "community": 4,
+      "community": 1,
       "norm_label": "tableau()"
     },
     {
@@ -5338,7 +4753,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L230",
       "id": "snapshot_vaultpath",
-      "community": 4,
+      "community": 1,
       "norm_label": "vaultpath()"
     },
     {
@@ -5347,7 +4762,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L242",
       "id": "snapshot_filedate",
-      "community": 4,
+      "community": 1,
       "norm_label": "filedate()"
     },
     {
@@ -5356,7 +4771,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L277",
       "id": "snapshot_readgraph",
-      "community": 4,
+      "community": 1,
       "norm_label": "readgraph()"
     },
     {
@@ -5365,7 +4780,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L350",
       "id": "snapshot_getvaultdate",
-      "community": 4,
+      "community": 1,
       "norm_label": "getvaultdate()"
     },
     {
@@ -5374,7 +4789,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L381",
       "id": "snapshot_snapshot",
-      "community": 4,
+      "community": 1,
       "norm_label": "snapshot()"
     },
     {
@@ -5383,7 +4798,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L457",
       "id": "snapshot_shotpath",
-      "community": 4,
+      "community": 1,
       "norm_label": "shotpath()"
     },
     {
@@ -5392,7 +4807,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L472",
       "id": "snapshot_inside",
-      "community": 4,
+      "community": 1,
       "norm_label": "inside()"
     },
     {
@@ -5401,7 +4816,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L501",
       "id": "snapshot_mediapath",
-      "community": 4,
+      "community": 1,
       "norm_label": "mediapath()"
     },
     {
@@ -5419,7 +4834,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_integrations_js",
-      "community": 4,
+      "community": 1,
       "norm_label": "integrations.js"
     },
     {
@@ -5428,7 +4843,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L26",
       "id": "integrations_integrationspath",
-      "community": 4,
+      "community": 1,
       "norm_label": "integrationspath()"
     },
     {
@@ -5437,7 +4852,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L35",
       "id": "integrations_readall",
-      "community": 4,
+      "community": 1,
       "norm_label": "readall()"
     },
     {
@@ -5446,7 +4861,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L53",
       "id": "integrations_isvalidintegration",
-      "community": 4,
+      "community": 1,
       "norm_label": "isvalidintegration()"
     },
     {
@@ -5455,7 +4870,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L70",
       "id": "integrations_validateintegrationlist",
-      "community": 4,
+      "community": 1,
       "norm_label": "validateintegrationlist()"
     },
     {
@@ -5464,7 +4879,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L81",
       "id": "integrations_readintegrations",
-      "community": 4,
+      "community": 1,
       "norm_label": "readintegrations()"
     },
     {
@@ -5473,7 +4888,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrations.js",
       "source_location": "L94",
       "id": "integrations_writeintegrations",
-      "community": 4,
+      "community": 1,
       "norm_label": "writeintegrations()"
     },
     {
@@ -5482,7 +4897,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-notify.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_notify_js",
-      "community": 11,
+      "community": 1,
       "norm_label": "ovrsee-notify.js"
     },
     {
@@ -5491,7 +4906,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-notify.js",
       "source_location": "L53",
       "id": "ovrsee_notify_sequence",
-      "community": 11,
+      "community": 1,
       "norm_label": "sequence()"
     },
     {
@@ -5500,7 +4915,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-notify.js",
       "source_location": "L62",
       "id": "ovrsee_notify_genrepour",
-      "community": 11,
+      "community": 1,
       "norm_label": "genrepour()"
     },
     {
@@ -5509,7 +4924,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-notify.js",
       "source_location": "L91",
       "id": "ovrsee_notify_projetequipe",
-      "community": 11,
+      "community": 1,
       "norm_label": "projetequipe()"
     },
     {
@@ -5518,7 +4933,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-notify.js",
       "source_location": "L101",
       "id": "ovrsee_notify_main",
-      "community": 11,
+      "community": 1,
       "norm_label": "main()"
     },
     {
@@ -5527,7 +4942,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_post_commit_js",
-      "community": 29,
+      "community": 8,
       "norm_label": "ovrsee-post-commit.js"
     },
     {
@@ -5536,7 +4951,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L26",
       "id": "ovrsee_post_commit_git",
-      "community": 29,
+      "community": 8,
       "norm_label": "git()"
     },
     {
@@ -5545,7 +4960,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L37",
       "id": "ovrsee_post_commit_changedfiles",
-      "community": 29,
+      "community": 8,
       "norm_label": "changedfiles()"
     },
     {
@@ -5554,7 +4969,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L63",
       "id": "ovrsee_post_commit_crawlutile",
-      "community": 29,
+      "community": 8,
       "norm_label": "crawlutile()"
     },
     {
@@ -5563,7 +4978,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L65",
       "id": "ovrsee_post_commit_attachcommit",
-      "community": 29,
+      "community": 8,
       "norm_label": "attachcommit()"
     },
     {
@@ -5581,7 +4996,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L126",
       "id": "ovrsee_post_commit_spawncrawl",
-      "community": 29,
+      "community": 8,
       "norm_label": "spawncrawl()"
     },
     {
@@ -5590,7 +5005,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_git_status_js",
-      "community": 5,
+      "community": 29,
       "norm_label": "git-status.js"
     },
     {
@@ -5599,7 +5014,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L16",
       "id": "git_status_git",
-      "community": 5,
+      "community": 29,
       "norm_label": "git()"
     },
     {
@@ -5608,7 +5023,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L29",
       "id": "git_status_dirty",
-      "community": 5,
+      "community": 29,
       "norm_label": "dirty()"
     },
     {
@@ -5617,7 +5032,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L52",
       "id": "git_status_branches",
-      "community": 5,
+      "community": 29,
       "norm_label": "branches()"
     },
     {
@@ -5626,7 +5041,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L70",
       "id": "git_status_lastfetch",
-      "community": 5,
+      "community": 29,
       "norm_label": "lastfetch()"
     },
     {
@@ -5635,7 +5050,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L82",
       "id": "git_status_gitstatus",
-      "community": 5,
+      "community": 29,
       "norm_label": "gitstatus()"
     },
     {
@@ -5806,7 +5221,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_integrationproviders_js",
-      "community": 8,
+      "community": 7,
       "norm_label": "integrationproviders.js"
     },
     {
@@ -5815,7 +5230,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L20",
       "id": "integrationproviders_unknown",
-      "community": 8,
+      "community": 7,
       "norm_label": "unknown()"
     },
     {
@@ -5824,7 +5239,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L26",
       "id": "integrationproviders_error",
-      "community": 8,
+      "community": 7,
       "norm_label": "error()"
     },
     {
@@ -5833,7 +5248,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L35",
       "id": "integrationproviders_pathnameparts",
-      "community": 8,
+      "community": 7,
       "norm_label": "pathnameparts()"
     },
     {
@@ -5842,7 +5257,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L47",
       "id": "integrationproviders_parsevercelproject",
-      "community": 8,
+      "community": 7,
       "norm_label": "parsevercelproject()"
     },
     {
@@ -5851,7 +5266,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L53",
       "id": "integrationproviders_parsenetlifysite",
-      "community": 8,
+      "community": 7,
       "norm_label": "parsenetlifysite()"
     },
     {
@@ -5860,7 +5275,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L59",
       "id": "integrationproviders_parsesupabaseref",
-      "community": 8,
+      "community": 7,
       "norm_label": "parsesupabaseref()"
     },
     {
@@ -5869,7 +5284,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L66",
       "id": "integrationproviders_mapvercelstate",
-      "community": 8,
+      "community": 7,
       "norm_label": "mapvercelstate()"
     },
     {
@@ -5878,7 +5293,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L74",
       "id": "integrationproviders_vercelenvironment",
-      "community": 8,
+      "community": 7,
       "norm_label": "vercelenvironment()"
     },
     {
@@ -5887,7 +5302,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L88",
       "id": "integrationproviders_vercelgitinfo",
-      "community": 8,
+      "community": 7,
       "norm_label": "vercelgitinfo()"
     },
     {
@@ -5896,7 +5311,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L95",
       "id": "integrationproviders_toverceldeployment",
-      "community": 8,
+      "community": 7,
       "norm_label": "toverceldeployment()"
     },
     {
@@ -5905,7 +5320,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L109",
       "id": "integrationproviders_mapnetlifystate",
-      "community": 8,
+      "community": 7,
       "norm_label": "mapnetlifystate()"
     },
     {
@@ -5914,7 +5329,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L119",
       "id": "integrationproviders_netlifyenvironment",
-      "community": 8,
+      "community": 7,
       "norm_label": "netlifyenvironment()"
     },
     {
@@ -5923,7 +5338,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L127",
       "id": "integrationproviders_tonetlifydeployment",
-      "community": 8,
+      "community": 7,
       "norm_label": "tonetlifydeployment()"
     },
     {
@@ -5932,7 +5347,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L139",
       "id": "integrationproviders_mapsupabasestate",
-      "community": 8,
+      "community": 7,
       "norm_label": "mapsupabasestate()"
     },
     {
@@ -5941,7 +5356,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L152",
       "id": "integrationproviders_checkvercel",
-      "community": 8,
+      "community": 7,
       "norm_label": "checkvercel()"
     },
     {
@@ -5950,7 +5365,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L185",
       "id": "integrationproviders_checknetlify",
-      "community": 8,
+      "community": 7,
       "norm_label": "checknetlify()"
     },
     {
@@ -5959,7 +5374,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L218",
       "id": "integrationproviders_checksupabase",
-      "community": 8,
+      "community": 7,
       "norm_label": "checksupabase()"
     },
     {
@@ -5968,7 +5383,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.js",
       "source_location": "L257",
       "id": "integrationproviders_fetchsupabaseschema",
-      "community": 8,
+      "community": 7,
       "norm_label": "fetchsupabaseschema()"
     },
     {
@@ -6013,7 +5428,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_integrationproviders_test_js",
-      "community": 8,
+      "community": 7,
       "norm_label": "integrationproviders.test.js"
     },
     {
@@ -6022,7 +5437,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.test.js",
       "source_location": "L14",
       "id": "integrationproviders_test_jsonresponse",
-      "community": 8,
+      "community": 7,
       "norm_label": "jsonresponse()"
     },
     {
@@ -6031,7 +5446,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/integrationProviders.test.js",
       "source_location": "L60",
       "id": "integrationproviders_test_fetchimpl",
-      "community": 8,
+      "community": 7,
       "norm_label": "fetchimpl()"
     },
     {
@@ -6211,7 +5626,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L200",
       "id": "plans_writefilenofollow",
-      "community": 7,
+      "community": 6,
       "norm_label": "writefilenofollow()"
     },
     {
@@ -6310,7 +5725,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L443",
       "id": "plans_issafeplanfilename",
-      "community": 3,
+      "community": 8,
       "norm_label": "issafeplanfilename()"
     },
     {
@@ -6382,7 +5797,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_settings_js",
-      "community": 4,
+      "community": 1,
       "norm_label": "settings.js"
     },
     {
@@ -6391,7 +5806,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L86",
       "id": "settings_settingspath",
-      "community": 4,
+      "community": 1,
       "norm_label": "settingspath()"
     },
     {
@@ -6400,7 +5815,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L96",
       "id": "settings_readsettings",
-      "community": 4,
+      "community": 1,
       "norm_label": "readsettings()"
     },
     {
@@ -6409,7 +5824,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L110",
       "id": "settings_validerenum",
-      "community": 4,
+      "community": 1,
       "norm_label": "validerenum()"
     },
     {
@@ -6418,7 +5833,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L115",
       "id": "settings_valideronglets",
-      "community": 4,
+      "community": 1,
       "norm_label": "valideronglets()"
     },
     {
@@ -6427,7 +5842,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L132",
       "id": "settings_validerterminal",
-      "community": 4,
+      "community": 1,
       "norm_label": "validerterminal()"
     },
     {
@@ -6436,7 +5851,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L150",
       "id": "settings_validatesettings",
-      "community": 4,
+      "community": 1,
       "norm_label": "validatesettings()"
     },
     {
@@ -6445,7 +5860,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L226",
       "id": "settings_writesettings",
-      "community": 4,
+      "community": 1,
       "norm_label": "writesettings()"
     },
     {
@@ -6454,7 +5869,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L244",
       "id": "settings_mergesettings",
-      "community": 4,
+      "community": 1,
       "norm_label": "mergesettings()"
     },
     {
@@ -6526,7 +5941,7 @@
       "source_file": "/Users/sam/code/ovrsee/scripts/make-icon.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_scripts_make_icon_js",
-      "community": 6,
+      "community": 4,
       "norm_label": "make-icon.js"
     },
     {
@@ -6535,7 +5950,7 @@
       "source_file": "/Users/sam/code/ovrsee/scripts/make-icon.js",
       "source_location": "L107",
       "id": "make_icon_packico",
-      "community": 6,
+      "community": 4,
       "norm_label": "packico()"
     },
     {
@@ -6544,7 +5959,7 @@
       "source_file": "/Users/sam/code/ovrsee/scripts/make-icon.js",
       "source_location": "L135",
       "id": "make_icon_render",
-      "community": 6,
+      "community": 4,
       "norm_label": "render()"
     },
     {
@@ -6598,7 +6013,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_electron_main_js",
-      "community": 4,
+      "community": 1,
       "norm_label": "main.js"
     },
     {
@@ -6607,7 +6022,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L88",
       "id": "main_serveui",
-      "community": 4,
+      "community": 1,
       "norm_label": "serveui()"
     },
     {
@@ -6616,7 +6031,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L143",
       "id": "main_closedevtools",
-      "community": 4,
+      "community": 1,
       "norm_label": "closedevtools()"
     },
     {
@@ -6625,7 +6040,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L153",
       "id": "main_createwindow",
-      "community": 4,
+      "community": 1,
       "norm_label": "createwindow()"
     },
     {
@@ -6634,7 +6049,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L318",
       "id": "main_redact",
-      "community": 4,
+      "community": 1,
       "norm_label": "redact()"
     },
     {
@@ -6643,7 +6058,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L357",
       "id": "main_inconnu",
-      "community": 4,
+      "community": 1,
       "norm_label": "inconnu()"
     },
     {
@@ -6679,7 +6094,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_electron_pty_js",
-      "community": 24,
+      "community": 23,
       "norm_label": "pty.js"
     },
     {
@@ -6688,7 +6103,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L44",
       "id": "pty_loginshell",
-      "community": 24,
+      "community": 23,
       "norm_label": "loginshell()"
     },
     {
@@ -6697,7 +6112,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L66",
       "id": "pty_sessionenv",
-      "community": 24,
+      "community": 23,
       "norm_label": "sessionenv()"
     },
     {
@@ -6706,7 +6121,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L97",
       "id": "pty_opensession",
-      "community": 24,
+      "community": 23,
       "norm_label": "opensession()"
     },
     {
@@ -6715,7 +6130,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L148",
       "id": "pty_writeto",
-      "community": 24,
+      "community": 23,
       "norm_label": "writeto()"
     },
     {
@@ -6724,7 +6139,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L153",
       "id": "pty_resize",
-      "community": 24,
+      "community": 23,
       "norm_label": "resize()"
     },
     {
@@ -6733,7 +6148,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L161",
       "id": "pty_closesession",
-      "community": 24,
+      "community": 23,
       "norm_label": "closesession()"
     },
     {
@@ -6742,26 +6157,8 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L173",
       "id": "pty_closeall",
-      "community": 24,
+      "community": 23,
       "norm_label": "closeall()"
-    },
-    {
-      "label": "_ds_bundle.js",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/_ds/industry-cf80b711-4721-49c0-a0d7-0ac6ade6e741/_ds_bundle.js",
-      "source_location": "L1",
-      "id": "users_sam_code_cockpit_ds_industry_cf80b711_4721_49c0_a0d7_0ac6ade6e741_ds_bundle_js",
-      "community": 101,
-      "norm_label": "_ds_bundle.js"
-    },
-    {
-      "label": "_ds_bundle.js",
-      "file_type": "code",
-      "source_file": "/Users/sam/code/cockpit/_ds/modernist-478d93d8-0281-4ad3-8ef7-47b321465972/_ds_bundle.js",
-      "source_location": "L1",
-      "id": "users_sam_code_cockpit_ds_modernist_478d93d8_0281_4ad3_8ef7_47b321465972_ds_bundle_js",
-      "community": 102,
-      "norm_label": "_ds_bundle.js"
     },
     {
       "label": "_ds_bundle.js",
@@ -6769,7 +6166,7 @@
       "source_file": "/Users/sam/code/cockpit/_ds/nocturne-16d90168-f621-47c2-b3bb-29511cfd6dd0/_ds_bundle.js",
       "source_location": "L1",
       "id": "users_sam_code_cockpit_ds_nocturne_16d90168_f621_47c2_b3bb_29511cfd6dd0_ds_bundle_js",
-      "community": 103,
+      "community": 101,
       "norm_label": "_ds_bundle.js"
     },
     {
@@ -6784,7 +6181,7 @@
       "label": "Ovrsee Technical Reference",
       "file_type": "document",
       "source_file": "CLAUDE.md",
-      "community": 104,
+      "community": 102,
       "norm_label": "ovrsee technical reference",
       "id": "claude_md_ovrsee"
     },
@@ -6792,7 +6189,7 @@
       "label": "Ovrsee Scope & Problem Statement",
       "file_type": "document",
       "source_file": "cadrage-ovrsee.md",
-      "community": 105,
+      "community": 103,
       "norm_label": "ovrsee scope & problem statement",
       "id": "cadrage_ovrsee"
     },
@@ -6840,7 +6237,7 @@
       "label": "Kanban Board Tickets",
       "file_type": "data_type",
       "source_file": "README.en.md",
-      "community": 80,
+      "community": 77,
       "norm_label": "kanban board tickets",
       "id": "concept_tickets"
     },
@@ -6848,7 +6245,7 @@
       "label": "Automatic Capture Hooks",
       "file_type": "mechanism",
       "source_file": "CLAUDE.md",
-      "community": 77,
+      "community": 78,
       "norm_label": "automatic capture hooks",
       "id": "concept_hooks"
     },
@@ -6896,7 +6293,7 @@
       "label": "Hooks Layer - Plan Capture",
       "file_type": "architectural_layer",
       "source_file": "CLAUDE.md",
-      "community": 77,
+      "community": 78,
       "norm_label": "hooks layer - plan capture",
       "id": "claude_layers_hooks"
     },
@@ -6912,7 +6309,7 @@
       "label": "Server Layer - API Routes",
       "file_type": "architectural_layer",
       "source_file": "CLAUDE.md",
-      "community": 78,
+      "community": 79,
       "norm_label": "server layer - api routes",
       "id": "claude_layers_server"
     },
@@ -6920,7 +6317,7 @@
       "label": "MCP Layer - Protocol Server",
       "file_type": "architectural_layer",
       "source_file": "CLAUDE.md",
-      "community": 78,
+      "community": 79,
       "norm_label": "mcp layer - protocol server",
       "id": "claude_layers_mcp"
     },
@@ -6936,7 +6333,7 @@
       "label": "Electron Layer - Desktop Shell",
       "file_type": "architectural_layer",
       "source_file": "CLAUDE.md",
-      "community": 79,
+      "community": 80,
       "norm_label": "electron layer - desktop shell",
       "id": "claude_layers_electron"
     },
@@ -6960,7 +6357,7 @@
       "label": "Ovrsee-Tickets Skill - Ticket Management",
       "file_type": "skill",
       "source_file": "skills/ovrsee-tickets/SKILL.md",
-      "community": 80,
+      "community": 77,
       "norm_label": "ovrsee-tickets skill - ticket management",
       "id": "skill_ovrsee_tickets"
     },
@@ -7008,7 +6405,7 @@
       "label": "Electron Framework",
       "file_type": "technology",
       "source_file": "README.en.md",
-      "community": 79,
+      "community": 80,
       "norm_label": "electron framework",
       "id": "stack_electron"
     },
@@ -11900,1470 +11297,6 @@
       "_tgt": "branches_s",
       "source": "users_sam_code_ovrsee_app_src_tabs_branches_tsx",
       "target": "branches_s",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L9",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_getreact",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_getreact",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L14",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_getreactdom",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_getreactdom",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L24",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_parsedcdocument",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_parsedcdocument",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L38",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_parsedctext",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_parsedctext",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L56",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_parsedataprops",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_parsedataprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L75",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_dcnamefrompath",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_dcnamefrompath",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L133",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_rootnamefordocument",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_rootnamefordocument",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L143",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_safedecode",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_safedecode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L150",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_boot",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_boot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L205",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_resolve",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_resolve",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L237",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_parenswrapwhole",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_parenswrapwhole",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L248",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_findtoplevelequality",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_findtoplevelequality",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L263",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_resolvepath",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_resolvepath",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L366",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_encodecamelattrs",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_encodecamelattrs",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L372",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_encodecase",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_encodecase",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L388",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_kebabtocamel",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_kebabtocamel",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L391",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_csstoobj",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_csstoobj",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L401",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_compileattr",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_compileattr",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L415",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_collectprops",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_collectprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L457",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_hostpositionstyle",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_hostpositionstyle",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L467",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_compiletemplate",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_compiletemplate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L483",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_walkchildren",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_walkchildren",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L489",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_isdeckmounttag",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_isdeckmounttag",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L493",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_walkdeckchildren",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_walkdeckchildren",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L543",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_renderdeckkids",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_renderdeckkids",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L550",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_walk",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_walk",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L563",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_warnunresolved",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_warnunresolved",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L569",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_walktext",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_walktext",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L611",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_walkfor",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_walkfor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L646",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_walkif",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_walkif",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L661",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_walkcomponent",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_walkcomponent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L690",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_walkximport",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L771",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_contentkey",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_contentkey",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L787",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_walkelement",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L818",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_constructor",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_constructor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L825",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_setstate",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_setstate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L828",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_forceupdate",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_forceupdate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L831",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_componentdidmount",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_componentdidmount",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L833",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_componentdidupdate",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_componentdidupdate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L835",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_componentwillunmount",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_componentwillunmount",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L838",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_rendervals",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_rendervals",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L842",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_evaldclogic",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_evaldclogic",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L854",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_shallowequal",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_shallowequal",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L862",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_placeholder",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_placeholder",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L883",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_hinttomin",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_hinttomin",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L888",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_createcomponentfactory",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_createcomponentfactory",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1136",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_bundledblob",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_bundledblob",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1149",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_cdnscriptfor",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_cdnscriptfor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1157",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_isrenderabletype",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_isrenderabletype",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1161",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_resolvedottedpath",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_resolvedottedpath",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1171",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_createexternalmodules",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_createexternalmodules",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1348",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_iselementclass",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_iselementclass",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1366",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_createhelmetmanager",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_createhelmetmanager",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1498",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_scanunquotedurl",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_scanunquotedurl",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1511",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_stripcomments",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_stripcomments",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1542",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_importantify",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_importantify",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1567",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_createpseudosheet",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_createpseudosheet",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1592",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_createregistry",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_createregistry",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1623",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_createruntime",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_createruntime",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1792",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_createstreamtracker",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_createstreamtracker",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1818",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_hiderawtemplate",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_hiderawtemplate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1823",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_loadscript",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_loadscript",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1838",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_loadreactumd",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_loadreactumd",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1848",
-      "weight": 1.0,
-      "_src": "users_sam_code_ovrsee_legacy_support_js",
-      "_tgt": "support_init",
-      "source": "users_sam_code_ovrsee_legacy_support_js",
-      "target": "support_init",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L153",
-      "weight": 1.0,
-      "_src": "support_boot",
-      "_tgt": "support_getreact",
-      "source": "support_getreact",
-      "target": "support_boot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L850",
-      "weight": 1.0,
-      "_src": "support_evaldclogic",
-      "_tgt": "support_getreact",
-      "source": "support_getreact",
-      "target": "support_evaldclogic",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L889",
-      "weight": 1.0,
-      "_src": "support_createcomponentfactory",
-      "_tgt": "support_getreact",
-      "source": "support_getreact",
-      "target": "support_createcomponentfactory",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L195",
-      "weight": 1.0,
-      "_src": "support_boot",
-      "_tgt": "support_getreactdom",
-      "source": "support_getreactdom",
-      "target": "support_boot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L28",
-      "weight": 1.0,
-      "_src": "support_parsedcdocument",
-      "_tgt": "support_parsedataprops",
-      "source": "support_parsedcdocument",
-      "target": "support_parsedataprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L151",
-      "weight": 1.0,
-      "_src": "support_boot",
-      "_tgt": "support_parsedcdocument",
-      "source": "support_parsedcdocument",
-      "target": "support_boot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L46",
-      "weight": 1.0,
-      "_src": "support_parsedctext",
-      "_tgt": "support_parsedataprops",
-      "source": "support_parsedctext",
-      "target": "support_parsedataprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L141",
-      "weight": 1.0,
-      "_src": "support_rootnamefordocument",
-      "_tgt": "support_dcnamefrompath",
-      "source": "support_dcnamefrompath",
-      "target": "support_rootnamefordocument",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L135",
-      "weight": 1.0,
-      "_src": "support_rootnamefordocument",
-      "_tgt": "support_safedecode",
-      "source": "support_rootnamefordocument",
-      "target": "support_safedecode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L154",
-      "weight": 1.0,
-      "_src": "support_boot",
-      "_tgt": "support_rootnamefordocument",
-      "source": "support_rootnamefordocument",
-      "target": "support_boot",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L197",
-      "weight": 1.0,
-      "_src": "support_boot",
-      "_tgt": "make_icon_render",
-      "source": "support_boot",
-      "target": "make_icon_render"
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L208",
-      "weight": 1.0,
-      "_src": "support_resolve",
-      "_tgt": "support_parenswrapwhole",
-      "source": "support_resolve",
-      "target": "support_parenswrapwhole",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L211",
-      "weight": 1.0,
-      "_src": "support_resolve",
-      "_tgt": "support_findtoplevelequality",
-      "source": "support_resolve",
-      "target": "support_findtoplevelequality",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L286",
-      "weight": 1.0,
-      "_src": "support_resolvepath",
-      "_tgt": "support_resolve",
-      "source": "support_resolve",
-      "target": "support_resolvepath",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1840",
-      "weight": 1.0,
-      "_src": "support_loadreactumd",
-      "_tgt": "support_resolve",
-      "source": "support_resolve",
-      "target": "support_loadreactumd",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L379",
-      "weight": 1.0,
-      "_src": "support_encodecase",
-      "_tgt": "support_encodecamelattrs",
-      "source": "support_encodecamelattrs",
-      "target": "support_encodecase",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L470",
-      "weight": 1.0,
-      "_src": "support_compiletemplate",
-      "_tgt": "support_encodecase",
-      "source": "support_encodecase",
-      "target": "support_compiletemplate",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L397",
-      "weight": 1.0,
-      "_src": "support_csstoobj",
-      "_tgt": "support_kebabtocamel",
-      "source": "support_kebabtocamel",
-      "target": "support_csstoobj",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L423",
-      "weight": 1.0,
-      "_src": "support_collectprops",
-      "_tgt": "support_kebabtocamel",
-      "source": "support_kebabtocamel",
-      "target": "support_collectprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L458",
-      "weight": 1.0,
-      "_src": "support_hostpositionstyle",
-      "_tgt": "support_csstoobj",
-      "source": "support_csstoobj",
-      "target": "support_hostpositionstyle",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L441",
-      "weight": 1.0,
-      "_src": "support_collectprops",
-      "_tgt": "support_compileattr",
-      "source": "support_compileattr",
-      "target": "support_collectprops",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L612",
-      "weight": 1.0,
-      "_src": "support_walkfor",
-      "_tgt": "support_compileattr",
-      "source": "support_compileattr",
-      "target": "support_walkfor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L647",
-      "weight": 1.0,
-      "_src": "support_walkif",
-      "_tgt": "support_compileattr",
-      "source": "support_compileattr",
-      "target": "support_walkif",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L668",
-      "weight": 1.0,
-      "_src": "support_walkcomponent",
-      "_tgt": "support_compileattr",
-      "source": "support_compileattr",
-      "target": "support_walkcomponent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L691",
-      "weight": 1.0,
-      "_src": "support_walkximport",
-      "_tgt": "support_compileattr",
-      "source": "support_compileattr",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L669",
-      "weight": 1.0,
-      "_src": "support_walkcomponent",
-      "_tgt": "support_collectprops",
-      "source": "support_collectprops",
-      "target": "support_walkcomponent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L706",
-      "weight": 1.0,
-      "_src": "support_walkximport",
-      "_tgt": "support_collectprops",
-      "source": "support_collectprops",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L792",
-      "weight": 1.0,
-      "_src": "support_walkelement",
-      "_tgt": "support_collectprops",
-      "source": "support_collectprops",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L478",
-      "weight": 1.0,
-      "_src": "support_compiletemplate",
-      "_tgt": "support_walkchildren",
-      "source": "support_compiletemplate",
-      "target": "support_walkchildren",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L615",
-      "weight": 1.0,
-      "_src": "support_walkfor",
-      "_tgt": "support_walkchildren",
-      "source": "support_walkchildren",
-      "target": "support_walkfor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L650",
-      "weight": 1.0,
-      "_src": "support_walkif",
-      "_tgt": "support_walkchildren",
-      "source": "support_walkchildren",
-      "target": "support_walkif",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L670",
-      "weight": 1.0,
-      "_src": "support_walkcomponent",
-      "_tgt": "support_walkchildren",
-      "source": "support_walkchildren",
-      "target": "support_walkcomponent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L709",
-      "weight": 1.0,
-      "_src": "support_walkximport",
-      "_tgt": "support_walkchildren",
-      "source": "support_walkchildren",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L794",
-      "weight": 1.0,
-      "_src": "support_walkelement",
-      "_tgt": "support_walkchildren",
-      "source": "support_walkchildren",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L708",
-      "weight": 1.0,
-      "_src": "support_walkximport",
-      "_tgt": "support_isdeckmounttag",
-      "source": "support_isdeckmounttag",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L793",
-      "weight": 1.0,
-      "_src": "support_walkelement",
-      "_tgt": "support_isdeckmounttag",
-      "source": "support_isdeckmounttag",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L708",
-      "weight": 1.0,
-      "_src": "support_walkximport",
-      "_tgt": "support_walkdeckchildren",
-      "source": "support_walkdeckchildren",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L793",
-      "weight": 1.0,
-      "_src": "support_walkelement",
-      "_tgt": "support_walkdeckchildren",
-      "source": "support_walkdeckchildren",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L551",
-      "weight": 1.0,
-      "_src": "support_walk",
-      "_tgt": "support_walktext",
-      "source": "support_walk",
-      "target": "support_walktext",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L555",
-      "weight": 1.0,
-      "_src": "support_walk",
-      "_tgt": "support_walkfor",
-      "source": "support_walk",
-      "target": "support_walkfor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L556",
-      "weight": 1.0,
-      "_src": "support_walk",
-      "_tgt": "support_walkif",
-      "source": "support_walk",
-      "target": "support_walkif",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L557",
-      "weight": 1.0,
-      "_src": "support_walk",
-      "_tgt": "support_walkximport",
-      "source": "support_walk",
-      "target": "support_walkximport",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L559",
-      "weight": 1.0,
-      "_src": "support_walk",
-      "_tgt": "support_walkcomponent",
-      "source": "support_walk",
-      "target": "support_walkcomponent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L560",
-      "weight": 1.0,
-      "_src": "support_walk",
-      "_tgt": "support_walkelement",
-      "source": "support_walk",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L791",
-      "weight": 1.0,
-      "_src": "support_walkelement",
-      "_tgt": "support_contentkey",
-      "source": "support_contentkey",
-      "target": "support_walkelement",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1631",
-      "weight": 1.0,
-      "_src": "support_createruntime",
-      "_tgt": "support_createcomponentfactory",
-      "source": "support_createcomponentfactory",
-      "target": "support_createruntime",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1841",
-      "weight": 1.0,
-      "_src": "support_loadreactumd",
-      "_tgt": "support_cdnscriptfor",
-      "source": "support_cdnscriptfor",
-      "target": "support_loadreactumd",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1158",
-      "weight": 1.0,
-      "_src": "support_isrenderabletype",
-      "_tgt": "support_iselementclass",
-      "source": "support_isrenderabletype",
-      "target": "support_iselementclass",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1630",
-      "weight": 1.0,
-      "_src": "support_createruntime",
-      "_tgt": "support_createexternalmodules",
-      "source": "support_createexternalmodules",
-      "target": "support_createruntime",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1626",
-      "weight": 1.0,
-      "_src": "support_createruntime",
-      "_tgt": "support_createhelmetmanager",
-      "source": "support_createhelmetmanager",
-      "target": "support_createruntime",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1532",
-      "weight": 1.0,
-      "_src": "support_stripcomments",
-      "_tgt": "support_scanunquotedurl",
-      "source": "support_scanunquotedurl",
-      "target": "support_stripcomments",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1560",
-      "weight": 1.0,
-      "_src": "support_importantify",
-      "_tgt": "support_scanunquotedurl",
-      "source": "support_scanunquotedurl",
-      "target": "support_importantify",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1543",
-      "weight": 1.0,
-      "_src": "support_importantify",
-      "_tgt": "support_stripcomments",
-      "source": "support_stripcomments",
-      "target": "support_importantify",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1625",
-      "weight": 1.0,
-      "_src": "support_createruntime",
-      "_tgt": "support_createpseudosheet",
-      "source": "support_createpseudosheet",
-      "target": "support_createruntime",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1624",
-      "weight": 1.0,
-      "_src": "support_createruntime",
-      "_tgt": "support_createregistry",
-      "source": "support_createregistry",
-      "target": "support_createruntime",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1849",
-      "weight": 1.0,
-      "_src": "support_init",
-      "_tgt": "support_createruntime",
-      "source": "support_createruntime",
-      "target": "support_init",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1870",
-      "weight": 1.0,
-      "_src": "support_init",
-      "_tgt": "support_createstreamtracker",
-      "source": "support_createstreamtracker",
-      "target": "support_init",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "confidence": "EXTRACTED",
-      "source_file": "/Users/sam/code/ovrsee/legacy/support.js",
-      "source_location": "L1844",
-      "weight": 1.0,
-      "_src": "support_loadreactumd",
-      "_tgt": "support_loadscript",
-      "source": "support_loadscript",
-      "target": "support_loadreactumd",
       "confidence_score": 1.0
     },
     {

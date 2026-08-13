@@ -67,6 +67,26 @@
         "hooks/ovrsee-tool-edit.js",
         "hooks/plans.test.js"
       ]
+    },
+    {
+      "sha": "cf71166",
+      "date": "2026-08-13",
+      "files": [
+        ".gitignore",
+        "CLAUDE.md",
+        "_ds/industry-cf80b711-4721-49c0-a0d7-0ac6ade6e741/_adherence.oxlintrc.json",
+        "_ds/industry-cf80b711-4721-49c0-a0d7-0ac6ade6e741/_ds_bundle.js",
+        "_ds/industry-cf80b711-4721-49c0-a0d7-0ac6ade6e741/_ds_manifest.json",
+        "_ds/industry-cf80b711-4721-49c0-a0d7-0ac6ade6e741/readme.md",
+        "_ds/industry-cf80b711-4721-49c0-a0d7-0ac6ade6e741/styles.css",
+        "_ds/modernist-478d93d8-0281-4ad3-8ef7-47b321465972/_adherence.oxlintrc.json",
+        "_ds/modernist-478d93d8-0281-4ad3-8ef7-47b321465972/_ds_bundle.js",
+        "_ds/modernist-478d93d8-0281-4ad3-8ef7-47b321465972/_ds_manifest.json",
+        "_ds/modernist-478d93d8-0281-4ad3-8ef7-47b321465972/readme.md",
+        "_ds/modernist-478d93d8-0281-4ad3-8ef7-47b321465972/styles.css",
+        "legacy/AUDIT-2026-08-09.md",
+        "legacy/support.js"
+      ]
     }
   ]
 }

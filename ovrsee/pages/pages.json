@@ -1,6 +1,6 @@
 {
   "date": "2026-08-13",
-  "commit": "85208e5",
+  "commit": "cf71166",
   "pages": [
     {
       "route": "/",
@@ -16,7 +16,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/accueil/2026-08-13-85208e5.png",
+      "shot": "shots/accueil/2026-08-13-cf71166.png",
       "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
@@ -37,7 +37,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/navigateur/2026-08-13-85208e5.png",
+      "shot": "shots/navigateur/2026-08-13-cf71166.png",
       "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
@@ -58,7 +58,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/produit/2026-08-13-85208e5.png",
+      "shot": "shots/produit/2026-08-13-cf71166.png",
       "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
@@ -79,7 +79,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/historique/2026-08-13-85208e5.png",
+      "shot": "shots/historique/2026-08-13-cf71166.png",
       "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
@@ -100,7 +100,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/tableau/2026-08-13-85208e5.png",
+      "shot": "shots/tableau/2026-08-13-cf71166.png",
       "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
@@ -121,7 +121,7 @@
         "/tableau",
         "/stack"
       ],
-      "shot": "shots/donnees/2026-08-13-85208e5.png",
+      "shot": "shots/donnees/2026-08-13-cf71166.png",
       "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,
@@ -142,7 +142,7 @@
         "/tableau",
         "/donnees"
       ],
-      "shot": "shots/stack/2026-08-13-85208e5.png",
+      "shot": "shots/stack/2026-08-13-cf71166.png",
       "shotDate": "2026-08-13",
       "shotSize": {
         "width": 1280,

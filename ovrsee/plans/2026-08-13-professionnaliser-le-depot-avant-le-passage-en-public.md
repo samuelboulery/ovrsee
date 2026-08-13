@@ -103,6 +103,15 @@
         "site/index.html",
         "site/styles.css"
       ]
+    },
+    {
+      "sha": "d5365b5",
+      "date": "2026-08-13",
+      "files": [
+        "site/dict.json",
+        "site/index.html",
+        "site/styles.css"
+      ]
     }
   ]
 }

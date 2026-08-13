@@ -149,8 +149,17 @@ a:focus-visible {
    la seule spécificité qui batte un `style` inline. */
 
 @media (max-width: 900px) {
-  /* Marges des conteneurs : 28 px mangent trop d'un écran de téléphone. */
-  [style*="padding: 0 28px"] {
+  /* Marges des conteneurs : 28 px mangent trop d'un écran de téléphone.
+
+     Six déclarations distinctes portent ce 28 px horizontal, avec des valeurs
+     verticales toutes différentes — d'où l'énumération, et l'usage de
+     `padding-left/right` pour ne pas écraser le haut et le bas. Ne viser que
+     `padding: 0 28px` en laissait quatre de côté, dont celle du hero. */
+  [style*="padding: 0 28px"],
+  [style*="padding: 96px 28px"],
+  [style*="padding: 40px 28px"],
+  [style*="padding: 26px 28px"],
+  [style*="padding: 116px 28px"] {
     padding-left: 18px !important;
     padding-right: 18px !important;
   }
@@ -228,6 +237,24 @@ a:focus-visible {
   }
 }
 
+/* Boutons d'action pleine largeur sur téléphone.
+
+   Les quatre boutons de la page — « Aller au dépôt », « Explorer l'interface »,
+   le lien du dépôt et « Releases » — font tous 40 px de haut ; celui de la
+   barre de navigation en fait 28 et reste donc à sa taille.
+
+   Leurs deux rangées sont déjà en `flex-wrap: wrap` : un enfant à 100 % passe
+   seul sur sa ligne, sans qu'il faille toucher au conteneur. La cible de clic
+   passe ainsi de 160 px à toute la largeur, ce qui compte plus au pouce qu'à
+   la souris. */
+
+@media (max-width: 600px) {
+  a[style*="height: 40px"] {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
 @media (max-width: 480px) {
   /* La barre de navigation exige 406 px pour tenir sur une ligne : le logo et
      son badge de version en font 175, le groupe de droite 167, le reste étant
@@ -237,7 +264,11 @@ a:focus-visible {
     display: none !important;
   }
 
-  [style*="padding: 0 28px"] {
+  [style*="padding: 0 28px"],
+  [style*="padding: 96px 28px"],
+  [style*="padding: 40px 28px"],
+  [style*="padding: 26px 28px"],
+  [style*="padding: 116px 28px"] {
     padding-left: 14px !important;
     padding-right: 14px !important;
   }

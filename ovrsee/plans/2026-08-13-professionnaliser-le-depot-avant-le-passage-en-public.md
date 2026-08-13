@@ -25,6 +25,27 @@
         "SECURITY.md",
         "package.json"
       ]
+    },
+    {
+      "sha": "107fc6d",
+      "date": "2026-08-13",
+      "files": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml",
+        ".oxlintrc.json",
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/Tableau.tsx",
+        "electron/pty.js",
+        "hooks/density.js",
+        "hooks/documentation.test.js",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/settings.test.js",
+        "hooks/skills.js",
+        "hooks/tickets.test.js",
+        "package.json",
+        "pnpm-lock.yaml"
+      ]
     }
   ]
 }

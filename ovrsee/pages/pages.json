@@ -1,6 +1,6 @@
 {
-  "date": "2026-08-13",
-  "commit": "e664787",
+  "date": "2026-08-14",
+  "commit": "57120c7",
   "pages": [
     {
       "route": "/",
@@ -16,8 +16,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/accueil/2026-08-13-e664787.png",
-      "shotDate": "2026-08-13",
+      "shot": "shots/accueil/2026-08-14-57120c7.png",
+      "shotDate": "2026-08-14",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -37,8 +37,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/navigateur/2026-08-13-e664787.png",
-      "shotDate": "2026-08-13",
+      "shot": "shots/navigateur/2026-08-14-57120c7.png",
+      "shotDate": "2026-08-14",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -58,8 +58,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/produit/2026-08-13-e664787.png",
-      "shotDate": "2026-08-13",
+      "shot": "shots/produit/2026-08-14-57120c7.png",
+      "shotDate": "2026-08-14",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -79,8 +79,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/historique/2026-08-13-e664787.png",
-      "shotDate": "2026-08-13",
+      "shot": "shots/historique/2026-08-14-57120c7.png",
+      "shotDate": "2026-08-14",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -100,8 +100,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/tableau/2026-08-13-e664787.png",
-      "shotDate": "2026-08-13",
+      "shot": "shots/tableau/2026-08-14-57120c7.png",
+      "shotDate": "2026-08-14",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -121,8 +121,8 @@
         "/tableau",
         "/stack"
       ],
-      "shot": "shots/donnees/2026-08-13-e664787.png",
-      "shotDate": "2026-08-13",
+      "shot": "shots/donnees/2026-08-14-57120c7.png",
+      "shotDate": "2026-08-14",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -142,8 +142,8 @@
         "/tableau",
         "/donnees"
       ],
-      "shot": "shots/stack/2026-08-13-e664787.png",
-      "shotDate": "2026-08-13",
+      "shot": "shots/stack/2026-08-14-57120c7.png",
+      "shotDate": "2026-08-14",
       "shotSize": {
         "width": 1280,
         "height": 800

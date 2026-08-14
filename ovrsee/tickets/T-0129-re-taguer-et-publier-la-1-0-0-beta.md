@@ -2,7 +2,7 @@
 {
   "id": "T-0129",
   "titre": "Re-taguer et publier la 1.0.0-beta",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "s",
   "epic": "T-0123",
@@ -10,7 +10,7 @@
     "release"
   ],
   "cree": "2026-08-13",
-  "maj": "2026-08-13",
+  "maj": "2026-08-14",
   "plan": "2026-08-13-professionnaliser-le-depot-avant-le-passage-en-public.md"
 }
 ---

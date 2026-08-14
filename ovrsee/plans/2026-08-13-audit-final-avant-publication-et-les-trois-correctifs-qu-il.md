@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Audit final avant publication — et les trois correctifs qu'il justifie",
   "opened": "2026-08-13",
-  "closed": null,
+  "closed": "2026-08-14",
   "commits": [
     {
       "sha": "54911c7",
@@ -61,6 +61,13 @@
       "sha": "6a4a00c",
       "date": "2026-08-14",
       "files": []
+    },
+    {
+      "sha": "a8d70fe",
+      "date": "2026-08-14",
+      "files": [
+        ".github/workflows/ci.yml"
+      ]
     }
   ]
 }

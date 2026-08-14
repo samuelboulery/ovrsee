@@ -2,7 +2,7 @@
 {
   "id": "T-0131",
   "titre": "Passer public et poser les protections",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "m",
   "epic": "T-0123",
@@ -11,7 +11,7 @@
     "securite"
   ],
   "cree": "2026-08-13",
-  "maj": "2026-08-13",
+  "maj": "2026-08-14",
   "plan": "2026-08-13-professionnaliser-le-depot-avant-le-passage-en-public.md"
 }
 ---

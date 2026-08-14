@@ -4,18 +4,19 @@ name: ci
 # portabilité cassaient sous Windows depuis des semaines — séparateurs `\`, bit
 # d'exécution absent, EPERM au lieu d'EISDIR — et c'est le premier
 # `git push --tags` qui les a découverts, en faisant échouer la release.
+# Sans filtre de chemins, et ce n'est pas un oubli. `paths-ignore` et les
+# « status checks requis » du ruleset ne se combinent pas : une PR qui ne touche
+# qu'un chemin ignoré ne déclenche aucun run, les trois contextes attendus ne
+# remontent jamais, et la PR devient infusionnable pour toujours. Constaté sur
+# la PR #7, qui ne changeait qu'un ticket.
+#
+# Faire tourner la CI sur une PR de documentation coûte deux minutes de runner,
+# gratuites sur un dépôt public. C'est moins cher qu'un second workflow miroir
+# dont le seul rôle serait de déclarer verts des contextes qu'il n'a pas testés.
 on:
   pull_request:
-    paths-ignore:
-      - 'site/**'
-      - '*.md'
-      - 'ovrsee/**'
   push:
     branches: [main]
-    paths-ignore:
-      - 'site/**'
-      - '*.md'
-      - 'ovrsee/**'
 
 # Les noms de jobs sont les contextes cités par le ruleset de `main` : les
 # renommer casserait la règle en silence, et les PR passeraient sans contrôle.

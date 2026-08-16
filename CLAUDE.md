@@ -59,10 +59,18 @@ Ne pas introduire vitest / jest pour ajouter un test — écrire dans le style e
 `app/src` n'y échappe pas : `scripts/test-ui.js` le compile dans un dossier jetable
 (`app/.test-build`, marqué CommonJS) et lance le même `node --test` dessus.
 
-Il n'y a pas de CI, et les tests d'`app/src` ne sont que de deux sortes : les fonctions
-pures de `data.ts`, et un rendu des onglets sur instantanés dégradés qui vérifie
-seulement qu'aucun ne lève. Rien ne couvre une interaction, un état ou une mise en
-page — pour ça, il faut lancer l'app.
+`ci.yml` tourne sur chaque PR et chaque push vers `main` : `lint`, `typecheck` et
+`build:ui` sur ubuntu, puis `pnpm test` sur **macOS et Windows** — cinq tests de
+portabilité cassaient sous Windows depuis des semaines avant qu'elle existe. Pas de
+`paths-ignore`, délibérément : une PR qui ne déclenche aucun run ne remonte jamais les
+contextes exigés par le ruleset de `main` et devient infusionnable. Les noms de jobs
+sont ceux que ce ruleset cite — les renommer casse la règle en silence.
+
+Ce qu'elle n'attrape pas : `hooks/`, `crawl/`, `server/` et `electron/` ne sont pas
+typés (`tsconfig.json` n'inclut qu'`app/src`), et les tests d'`app/src` ne sont que de
+deux sortes — les fonctions pures de `data.ts`, et un rendu des onglets sur instantanés
+dégradés qui vérifie seulement qu'aucun ne lève. Rien ne couvre une interaction, un état
+ou une mise en page : pour ça, il faut lancer l'app.
 
 Les commandes sont dans `package.json`. Une seule ne s'en déduit pas : `pnpm dev` sert
 l'app **sans terminal**, seul `pnpm electron` le donne.

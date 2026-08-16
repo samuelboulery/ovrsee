@@ -2,7 +2,7 @@
 {
   "id": "T-0158",
   "titre": "Pointeurs de travail par session, et verrou de dépôt",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "hooks",

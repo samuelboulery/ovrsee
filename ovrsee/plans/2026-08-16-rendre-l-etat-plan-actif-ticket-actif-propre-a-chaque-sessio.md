@@ -45,6 +45,13 @@
         "server/api.js",
         "skills/ovrsee-tickets/SKILL.md"
       ]
+    },
+    {
+      "sha": "5628b2c",
+      "date": "2026-08-16",
+      "files": [
+        ".gitignore"
+      ]
     }
   ]
 }

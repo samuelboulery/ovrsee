@@ -2,7 +2,7 @@
 {
   "id": "T-0159",
   "titre": "Chaque hook lit sa session, et ne clôt plus le plan des autres",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "hooks",

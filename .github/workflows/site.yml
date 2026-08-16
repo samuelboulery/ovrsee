@@ -1,7 +1,7 @@
 name: site
 
-# La vitrine est statique. Une seule chose se construit : `site/en/index.html`, la
-# version anglaise, dérivée de `site/index.html` et `site/dict.json` — générée ici
+# La vitrine est statique. Une seule chose se construit : `site/fr/index.html`, la
+# version française, dérivée de `site/index.html` et `site/dict.json` — générée ici
 # plutôt que commitée, pour qu'elle ne puisse pas dériver de sa source. Le script n'a
 # aucune dépendance : le `node` du runner suffit, pas d'installation.
 #
@@ -12,7 +12,7 @@ on:
     branches: [main]
     paths:
       - 'site/**'
-      - 'scripts/build-site-en.js'
+      - 'scripts/build-site-fr.js'
       - '.github/workflows/site.yml'
   workflow_dispatch:
 
@@ -40,7 +40,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - run: node scripts/build-site-en.js
+      - run: node scripts/build-site-fr.js
 
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:

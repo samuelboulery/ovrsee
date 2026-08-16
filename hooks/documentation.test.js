@@ -16,8 +16,8 @@ import test from 'node:test'
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)))
 const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
-const readmeFr = readFileSync(join(root, 'README.md'), 'utf8')
-const readmeEn = readFileSync(join(root, 'README.en.md'), 'utf8')
+const readmeFr = readFileSync(join(root, 'README.fr.md'), 'utf8')
+const readmeEn = readFileSync(join(root, 'README.md'), 'utf8')
 const claudeMd = readFileSync(join(root, 'CLAUDE.md'), 'utf8')
 
 /**
@@ -43,26 +43,26 @@ function extractPnpmScripts(text) {
 // Ce qui reste vérifie une liste courte et écrite à la main. C'est moins
 // ambitieux, mais c'est vrai.
 
-test('les commandes pnpm citées dans README.md existent', () => {
+test('les commandes pnpm citées dans README.fr.md existent', () => {
   const scripts = extractPnpmScripts(readmeFr)
+  assert(scripts.length > 0, 'Aucune commande pnpm trouvée dans README.fr.md')
+
+  for (const script of scripts) {
+    assert(
+      pkg.scripts[script],
+      `Commande 'pnpm ${script}' citée dans README.fr.md mais absente de package.json`
+    )
+  }
+})
+
+test('les commandes pnpm citées dans README.md existent', () => {
+  const scripts = extractPnpmScripts(readmeEn)
   assert(scripts.length > 0, 'Aucune commande pnpm trouvée dans README.md')
 
   for (const script of scripts) {
     assert(
       pkg.scripts[script],
       `Commande 'pnpm ${script}' citée dans README.md mais absente de package.json`
-    )
-  }
-})
-
-test('les commandes pnpm citées dans README.en.md existent', () => {
-  const scripts = extractPnpmScripts(readmeEn)
-  assert(scripts.length > 0, 'Aucune commande pnpm trouvée dans README.en.md')
-
-  for (const script of scripts) {
-    assert(
-      pkg.scripts[script],
-      `Commande 'pnpm ${script}' citée dans README.en.md mais absente de package.json`
     )
   }
 })
@@ -74,27 +74,27 @@ test('les commandes pnpm citées dans CLAUDE.md existent', () => {
   assert(implemented.length > 0, 'Aucune commande pnpm implémentée trouvée dans CLAUDE.md')
 })
 
-test('README.md mentionne les 7 onglets', () => {
+test('README.fr.md mentionne les 7 onglets', () => {
   const tabs = ['aperçu', 'navigateur', 'produit', 'historique', 'tableau', 'données', 'stack']
   for (const tab of tabs) {
     assert(
       readmeFr.toLowerCase().includes(tab.toLowerCase()),
-      `Onglet '${tab}' non mentionné dans README.md`
+      `Onglet '${tab}' non mentionné dans README.fr.md`
     )
   }
   // Vérifier que 6 n'est pas mentionné
   assert(
     !readmeFr.match(/\bsix\s+onglets\b/i),
-    'README.md mentionne "six onglets" au lieu de 7'
+    'README.fr.md mentionne "six onglets" au lieu de 7'
   )
 })
 
-test('README.en.md mentionne les 7 onglets', () => {
+test('README.md mentionne les 7 onglets', () => {
   const tabs = ['overview', 'navigator', 'product', 'history', 'board', 'data', 'stack']
   for (const tab of tabs) {
     assert(
       readmeEn.toLowerCase().includes(tab),
-      `Tab '${tab}' not mentioned in README.en.md`
+      `Tab '${tab}' not mentioned in README.md`
     )
   }
 })
@@ -106,11 +106,22 @@ test('CLAUDE.md mentionne mcp/ dans le tableau des couches', () => {
   )
 })
 
-test('README.md mentionne le dossier mcp/', () => {
+test('README.fr.md mentionne le dossier mcp/', () => {
   assert(
     readmeFr.includes('mcp/'),
-    'Dossier mcp/ non mentionné dans l\'arborescence de README.md'
+    'Dossier mcp/ non mentionné dans l\'arborescence de README.fr.md'
   )
+})
+
+test('les dossiers cités dans README.fr.md existent', () => {
+  const required = ['ovrsee/', 'hooks/', 'crawl/', 'app/', 'electron/']
+
+  for (const path of required) {
+    assert(
+      existsSync(join(root, path)),
+      `Chemin '${path}' cité dans README.fr.md n'existe pas`
+    )
+  }
 })
 
 test('les dossiers cités dans README.md existent', () => {
@@ -124,21 +135,12 @@ test('les dossiers cités dans README.md existent', () => {
   }
 })
 
-test('les dossiers cités dans README.en.md existent', () => {
-  const required = ['ovrsee/', 'hooks/', 'crawl/', 'app/', 'electron/']
-
-  for (const path of required) {
-    assert(
-      existsSync(join(root, path)),
-      `Chemin '${path}' cité dans README.en.md n'existe pas`
-    )
-  }
-})
-
-test('README.en.md existe', () => {
+// La traduction est la moitié qui disparaît : l'anglais est la langue source du
+// dépôt, `README.fr.md` est ce qu'on oublie de renommer.
+test('README.fr.md existe', () => {
   assert(
-    existsSync(join(root, 'README.en.md')),
-    'README.en.md n\'existe pas'
+    existsSync(join(root, 'README.fr.md')),
+    'README.fr.md n\'existe pas'
   )
 })
 

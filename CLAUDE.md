@@ -41,7 +41,7 @@ non-authentifié, et un secret n'y transite jamais. Voir `electron/main.js` et
 | `mcp/` | Serveur MCP stdio (JSON-RPC 2.0), même interface que `/api/*` | non — `.js` |
 | `app/src/` | Interface React, 7 onglets | oui — TS strict |
 | `electron/` | Processus principal, preload, pty | non — `.js`/`.cjs` |
-| `site/` | Vitrine publique (ovrsee.app), page unique écrite à la main | non — HTML + `.js` |
+| `site/` | Vitrine publique (ovrsee.app), page unique écrite à la main, en anglais | non — HTML + `.js` |
 
 **`server/api.js` a trois hôtes, une seule implémentation** : le middleware du dev
 server Vite (`vite.config.js`), le gestionnaire du protocole `ovrsee://` du
@@ -130,15 +130,18 @@ page : pour ça, il faut lancer l'app.
   d'un flux JSON-RPC et coupe la conversation. Les traces vont sur stderr. Et
   tester `dispatch()` ne teste pas le fil : `mcp/mcp.test.js` fait les deux depuis
   qu'un protocole non conforme est passé sous une suite verte.
-- **`site/en/` est engendré, pas écrit.** `scripts/build-site-en.js` dérive la page
-  anglaise de `site/index.html` et `site/dict.json` au déploiement (`site.yml`) ; le
-  dossier est ignoré par git. Corollaire : le texte anglais se corrige dans
-  `dict.json`, jamais dans la page. Et les chemins d'assets de `index.html` sont
-  absolus depuis la racine (`/app.js`, `/styles.css`) précisément pour que `/en/` les
-  résolve — les repasser en relatifs casse la version anglaise, en silence.
+- **`site/fr/` est engendré, pas écrit.** `scripts/build-site-fr.js` dérive la page
+  française de `site/index.html` — qui est **en anglais**, la langue source — et de
+  `site/dict.json` au déploiement (`site.yml`) ; le dossier est ignoré par git.
+  Corollaire : le texte français se corrige dans `dict.json`, jamais dans la page. Et
+  les chemins d'assets de `index.html` sont absolus depuis la racine (`/app.js`,
+  `/styles.css`) précisément pour que `/fr/` les résolve — les repasser en relatifs
+  casse la version française, en silence.
 - **La langue vient de `document.documentElement.lang`.** `traduire()` (`site/app.js`)
-  applique la table inverse quand la langue est `fr` : sur une page déjà anglaise, une
-  valeur en dur la retraduirait intégralement en français au premier rendu.
+  applique la table inverse dès que la langue n'est pas `fr` : sur une page déjà
+  française, une valeur en dur la retraduirait intégralement en anglais au premier
+  rendu. Même piège dans l'autre sens qu'avant la bascule — il n'a pas disparu, il a
+  changé de côté.
 - **Un secret collé dans un plan approuvé part dans git en clair.** La parade est en
   amont : ne pas en coller.
 - **Un plan actif éclipse un ticket actif, jamais l'inverse.** `ovrsee/.active-ticket`
@@ -150,8 +153,14 @@ page : pour ça, il faut lancer l'app.
 
 ## Conventions
 
-- Langue : français pour les commentaires, la documentation et les messages
-  d'interface ; anglais pour les identifiants et le code.
+- **Langue : l'anglais est la langue publique, le français la langue de travail.**
+  En anglais : la vitrine (`site/index.html` est la source, le français en dérive),
+  les documents d'accueil du dépôt (`README.md`, `CONTRIBUTING.md`, `SECURITY.md`,
+  `CODE_OF_CONDUCT.md`, `CHANGELOG.md`), et le repli de `t()` quand une clé manque.
+  Chacun de ces fichiers a son pendant `*.fr.md`.
+  En français : les commentaires, `CLAUDE.md`, `cadrage-ovrsee.md`, les plans et les
+  tickets d'`ovrsee/`, et les messages de commit. Anglais pour les identifiants et le
+  code, comme toujours.
 - Commits : Conventional Commits en français (`feat:`, `fix:`, `docs:`, `chore:`).
 - `pnpm` exclusivement. Demander avant d'ajouter une dépendance — le projet en a quatre
   en production (`@phosphor-icons/react`, `@xterm/xterm`, `@xterm/addon-fit`,

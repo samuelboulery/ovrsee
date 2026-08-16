@@ -85,8 +85,15 @@ const readOrNull = path => {
 /** Un chemin de fichier markdown cité dans un texte, forme POSIX ou Windows. */
 const CHEMIN_MD = /[A-Za-z]:\/[^\s"']+\.md|\/[^\s"']+\.md/g
 
-/** Ramène un chemin aux barres avant, quelle que soit la plateforme. */
-const enBarresAvant = chemin => chemin.split('\\').join('/')
+/**
+ * Ramène un chemin aux barres avant, quelle que soit la plateforme.
+ *
+ * Les séparateurs répétés sont écrasés en un seul, et c'est le point qui compte :
+ * le transcript est du JSON, où un `C:\Users\…` de Windows s'écrit `C:\\Users\\…`.
+ * Convertir sans écraser donnait `C://Users//…`, que la comparaison de préfixe
+ * rejetait — quatre tests rouges sous Windows, verts partout ailleurs.
+ */
+const enBarresAvant = chemin => chemin.replace(/[\\/]+/g, '/')
 
 /**
  * Le plan que **cette session** a écrit, d'après son propre transcript.
@@ -122,7 +129,10 @@ export function planPathFromTranscript(transcriptPath) {
   for (const [trouve] of texte.matchAll(CHEMIN_MD)) {
     if (trouve.startsWith(prefixe) && !trouve.includes('/../')) dernier = trouve
   }
-  return dernier
+
+  // Rendu dans la forme de la plateforme : c'est un chemin qu'on va lire, et
+  // les barres avant qui ont servi à le comparer ne sont qu'un intermédiaire.
+  return dernier ? resolve(dernier) : null
 }
 
 /**

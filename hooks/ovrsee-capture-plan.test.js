@@ -58,6 +58,17 @@ test('planPathFromTranscript retient la dernière citation, pas la première', (
   assert.equal(planPathFromTranscript(transcript), second)
 })
 
+test('planPathFromTranscript encaisse les séparateurs doublés du JSON', () => {
+  const dir = planDirJetable()
+  const plan = ecrirePlan(dir, 'double.md', '# Double\n')
+
+  // Le transcript est du JSON : un chemin Windows y arrive avec ses
+  // séparateurs échappés (`C:\\Users\\…`). Ici, la même forme en POSIX — c'est
+  // ce qui rendait la comparaison de préfixe fausse sous Windows.
+  const transcript = ecrireTranscript([plan.split('/').join('//')])
+  assert.equal(planPathFromTranscript(transcript), plan)
+})
+
 test('planPathFromTranscript ignore un markdown hors du dossier des plans', () => {
   planDirJetable()
 

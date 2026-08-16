@@ -843,8 +843,18 @@ function Carte({
   return (
     <div
       draggable
-      onDragStart={event => event.dataTransfer.setData(TYPE_CARTE, ticket.file)}
-      onClick={() => onOuvrir(ticket.file)}
+      // Une carte enfant est rendue *dans* la carte de son epic : sans arrêter
+      // la propagation, cliquer un enfant ouvrait l'epic (le gestionnaire du
+      // parent s'exécutait ensuite et gagnait), et le glisser déplaçait l'epic
+      // (le `setData` du parent écrasait celui de l'enfant).
+      onDragStart={event => {
+        event.stopPropagation()
+        event.dataTransfer.setData(TYPE_CARTE, ticket.file)
+      }}
+      onClick={event => {
+        event.stopPropagation()
+        onOuvrir(ticket.file)
+      }}
       style={s(
         'border: 1px solid ' +
           (selectionnee ? 'var(--color-border-selected)' : 'var(--color-border-card)') +

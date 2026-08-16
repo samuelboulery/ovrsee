@@ -14,7 +14,7 @@
 import { basename } from 'node:path'
 
 import { resolve, usableDirectory } from '../server/api.js'
-import { buildBrief, readOvrsee } from '../hooks/brief.js'
+import { buildBrief, intention, readOvrsee } from '../hooks/brief.js'
 
 /**
  * Origine factice. `resolve()` ne lit que `pathname` et `searchParams` ; en
@@ -90,6 +90,29 @@ const derniers = (liste, champ, limite) =>
     .slice(0, limite)
 
 /**
+ * Le corps d'un plan ou d'un ticket, retiré sauf demande explicite.
+ *
+ * Un plan pèse jusqu'à 26 ko, un ticket quelques milliers d'octets : dix plans
+ * renvoyés entiers, c'est une réponse d'outil de vingt mille jetons pour une
+ * question qui portait le plus souvent sur des titres et des dates. Le corps
+ * reste accessible — il faut le demander.
+ *
+ * Un plan sans son corps garde quand même de quoi se reconnaître : `intention`
+ * en donne la première phrase, celle que le brief affiche déjà.
+ *
+ * @param {Array} liste
+ * @param {boolean} full
+ * @param {'body' | 'corps'} champ nom du corps — un plan porte `body`, un ticket `corps`
+ */
+const sansCorps = (liste, full, champ) =>
+  full
+    ? liste
+    : liste.map(item => {
+        const { [champ]: body, ...reste } = item
+        return champ === 'body' ? { ...reste, intention: intention({ body }) } : reste
+      })
+
+/**
  * Un outil = une fonction du chemin et des arguments vers un résultat.
  * Toutes reçoivent un chemin déjà validé, sauf `listProjects` qui n'en prend pas.
  */
@@ -133,14 +156,26 @@ const OUTILS = {
     const snap = projet(chemin)
     return snap.isError
       ? snap
-      : { content: derniers(snap.content.tickets, 'cree', args.limit ?? 20) }
+      : {
+          content: sansCorps(
+            derniers(snap.content.tickets, 'cree', args.limit ?? 20),
+            args.full === true,
+            'corps',
+          ),
+        }
   },
 
   getPlans: (chemin, args) => {
     const snap = projet(chemin)
     return snap.isError
       ? snap
-      : { content: derniers(snap.content.plans, 'opened', args.limit ?? 10) }
+      : {
+          content: sansCorps(
+            derniers(snap.content.plans, 'opened', args.limit ?? 10),
+            args.full === true,
+            'body',
+          ),
+        }
   },
 
   getTimeline: chemin => {
@@ -148,11 +183,35 @@ const OUTILS = {
     return snap.isError ? snap : { content: snap.content.timeline }
   },
 
-  getGraph: chemin => {
+  // Le blob de graphify pèse 708 ko, soit ~177 000 jetons : un seul appel
+  // remplissait 18 % d'un contexte d'un million. La description de l'outil
+  // avertissait déjà du volume — un avertissement ne suffit pas quand la
+  // réponse est déjà dans le contexte au moment où on le lit. D'où un résumé
+  // par défaut, et le blob seulement sur `full`.
+  getGraph: (chemin, args) => {
     const snap = projet(chemin)
-    return snap.isError
-      ? snap
-      : { content: { graph: snap.content.graph, graphSource: snap.content.graphSource } }
+    if (snap.isError) return snap
+
+    const graph = snap.content.graph
+    if (args.full === true) return { content: { graph, graphSource: snap.content.graphSource } }
+
+    const nodes = Array.isArray(graph?.nodes) ? graph.nodes : []
+    const communautes = [...new Set(nodes.map(n => n?.community).filter(c => c != null))].sort()
+
+    return {
+      content: {
+        graphSource: snap.content.graphSource,
+        resume: graph
+          ? {
+              nodeCount: nodes.length,
+              linkCount: Array.isArray(graph.links) ? graph.links.length : 0,
+              hyperedgeCount: Array.isArray(graph.hyperedges) ? graph.hyperedges.length : 0,
+              communautes,
+              note: 'Résumé. Passer { full: true } pour le graphe entier (~177 000 jetons).',
+            }
+          : null,
+      },
+    }
   },
 
   createTicket: (chemin, args) => {

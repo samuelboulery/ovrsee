@@ -58,24 +58,26 @@ const TOOLS = [
   },
   {
     name: 'listTickets',
-    description: 'N derniers tickets d\'un projet',
+    description: 'N derniers tickets d\'un projet, métadonnées seules (titre, colonne, priorité, dates). Passer full:true pour le corps de chaque ticket.',
     inputSchema: {
       type: 'object',
       properties: {
         path: { type: 'string' },
         limit: { type: 'number', default: 20 },
+        full: { type: 'boolean', default: false, description: 'Inclure le corps markdown — réponse nettement plus volumineuse' },
       },
       required: ['path'],
     },
   },
   {
     name: 'getPlans',
-    description: 'N derniers plans d\'un projet',
+    description: 'N derniers plans d\'un projet, métadonnées + première phrase de l\'intention. Passer full:true pour le corps entier (~2 000 jetons par plan).',
     inputSchema: {
       type: 'object',
       properties: {
         path: { type: 'string' },
         limit: { type: 'number', default: 10 },
+        full: { type: 'boolean', default: false, description: 'Inclure le corps markdown de chaque plan' },
       },
       required: ['path'],
     },
@@ -91,10 +93,13 @@ const TOOLS = [
   },
   {
     name: 'getGraph',
-    description: 'Graphe de dépendances complet (volumineux : plusieurs centaines de ko)',
+    description: 'Résumé du graphe de dépendances : nombre de nœuds, de liens, liste des communautés. Passer full:true pour le graphe entier — plusieurs centaines de ko, ~177 000 jetons.',
     inputSchema: {
       type: 'object',
-      properties: { path: { type: 'string' } },
+      properties: {
+        path: { type: 'string' },
+        full: { type: 'boolean', default: false, description: 'Renvoie le graphe entier au lieu du résumé' },
+      },
       required: ['path'],
     },
   },

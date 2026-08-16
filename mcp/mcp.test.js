@@ -36,6 +36,16 @@ const projectDir = () => {
   return dir
 }
 
+// Un plan capturé, frontmatter JSON entre `---` comme les vrais.
+const ecrirePlan = (dir, titre, corps, opened = '2026-08-16') => {
+  mkdirSync(join(dir, 'ovrsee', 'plans'), { recursive: true })
+  const meta = { status: 'open', title: titre, opened, closed: null, commits: [] }
+  writeFileSync(
+    join(dir, 'ovrsee', 'plans', `${opened}-${titre.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.md`),
+    `---\n${JSON.stringify(meta, null, 2)}\n---\n\n# ${titre}\n\n## Contexte\n\n${corps}\n`,
+  )
+}
+
 // --- Tests listProjects ----
 
 test('listProjects retourne la liste des projets enregistrés', () => {
@@ -283,6 +293,90 @@ test('getPlans retourne les N derniers plans', () => {
   assert.ok(Array.isArray(result.content))
 })
 
+// --- Tests de projection ----
+//
+// Un plan pesait jusqu'à 26 ko et `getPlans` en rendait dix d'un coup. Ce que
+// ces tests gardent, ce n'est pas une optimisation : c'est qu'aucune réponse
+// d'outil ne puisse remplir le contexte sans qu'on l'ait demandé.
+
+test('getPlans omet le corps des plans, et en garde l\'intention', () => {
+  withRegistry()
+  const dir = projectDir()
+  registerProject(dir)
+  ecrirePlan(dir, 'Un plan', 'Ce que ce plan veut obtenir. Une deuxième phrase.')
+
+  const result = dispatch('getPlans', { path: dir })
+
+  assert.ok(!result.isError)
+  assert.equal(result.content.length, 1)
+  assert.equal(result.content[0].body, undefined)
+  // Le titre et la date restent : sans eux la projection ne servirait à rien.
+  assert.equal(result.content[0].title, 'Un plan')
+  assert.equal(result.content[0].intention, 'Ce que ce plan veut obtenir.')
+})
+
+test('getPlans rend le corps sur full:true', () => {
+  withRegistry()
+  const dir = projectDir()
+  registerProject(dir)
+  ecrirePlan(dir, 'Un plan', 'Ce que ce plan veut obtenir.')
+
+  const result = dispatch('getPlans', { path: dir, full: true })
+
+  assert.ok(!result.isError)
+  assert.match(result.content[0].body, /Ce que ce plan veut obtenir/)
+})
+
+test('listTickets omet le corps des tickets, et le rend sur full:true', () => {
+  withRegistry()
+  const dir = projectDir()
+  registerProject(dir)
+  dispatch('createTicket', { path: dir, titre: 'Ticket', corps: 'Le détail du ticket.' })
+
+  const projete = dispatch('listTickets', { path: dir })
+  assert.ok(!projete.isError)
+  assert.equal(projete.content[0].corps, undefined)
+  assert.equal(projete.content[0].titre, 'Ticket')
+
+  const entier = dispatch('listTickets', { path: dir, full: true })
+  assert.ok(!entier.isError)
+  assert.equal(typeof entier.content[0].corps, 'string')
+})
+
+test('getGraph rend un résumé par défaut, le graphe sur full:true', () => {
+  withRegistry()
+  const dir = projectDir()
+  registerProject(dir)
+  mkdirSync(join(dir, 'graphify-out'), { recursive: true })
+  writeFileSync(join(dir, 'graphify-out', 'graph.json'), JSON.stringify({
+    nodes: [{ id: 'a', community: 0 }, { id: 'b', community: 1 }, { id: 'c', community: 0 }],
+    links: [{ source: 'a', target: 'b' }],
+    hyperedges: [],
+  }) + '\n')
+
+  const resume = dispatch('getGraph', { path: dir })
+  assert.ok(!resume.isError)
+  assert.equal(resume.content.graph, undefined)
+  assert.equal(resume.content.resume.nodeCount, 3)
+  assert.equal(resume.content.resume.linkCount, 1)
+  assert.deepEqual(resume.content.resume.communautes, [0, 1])
+
+  const entier = dispatch('getGraph', { path: dir, full: true })
+  assert.ok(!entier.isError)
+  assert.equal(entier.content.graph.nodes.length, 3)
+})
+
+test('getGraph ne lève pas quand le projet n\'a pas de graphe', () => {
+  withRegistry()
+  const dir = projectDir()
+  registerProject(dir)
+
+  const result = dispatch('getGraph', { path: dir })
+
+  assert.ok(!result.isError)
+  assert.equal(result.content.resume, null)
+})
+
 // --- Tests outil inconnu ----
 
 test('dispatch retourne une erreur pour un outil inconnu', () => {
@@ -368,6 +462,25 @@ test('tools/call enveloppe le résultat dans content', () => {
   assert.ok(Array.isArray(rep.result.content))
   assert.equal(rep.result.content[0].type, 'text')
   assert.equal(JSON.parse(rep.result.content[0].text)[0].path, dir)
+})
+
+test('la projection tient par le fil, pas seulement dans dispatch()', () => {
+  withRegistry()
+  const dir = projectDir()
+  registerProject(dir)
+  ecrirePlan(dir, 'Un plan', 'Ce que ce plan veut obtenir.')
+
+  const [projete, entier] = parLeFil([
+    demande(1, 'tools/call', { name: 'getPlans', arguments: { path: dir } }),
+    demande(2, 'tools/call', { name: 'getPlans', arguments: { path: dir, full: true } }),
+  ], process.env.OVRSEE_REGISTRY)
+
+  const sans = JSON.parse(projete.result.content[0].text)
+  assert.equal(sans[0].body, undefined)
+  assert.equal(sans[0].intention, 'Ce que ce plan veut obtenir.')
+
+  const avec = JSON.parse(entier.result.content[0].text)
+  assert.match(avec[0].body, /Ce que ce plan veut obtenir/)
 })
 
 test('un refus d\'outil est un résultat isError, pas une erreur JSON-RPC', () => {

@@ -2,7 +2,7 @@
 {
   "id": "T-0139",
   "titre": "Item de barre de menu et popover des sessions",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "epic": "T-0137",
   "tags": [
@@ -10,7 +10,7 @@
     "ui"
   ],
   "cree": "2026-08-14",
-  "maj": "2026-08-14",
+  "maj": "2026-08-16",
   "plan": "2026-08-14-extension-barre-de-menu-macos-pour-les-sessions-claude-d-ovr.md"
 }
 ---

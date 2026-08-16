@@ -17858,8 +17858,8 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L223",
       "weight": 1.0,
-      "_src": "tray_vue",
-      "_tgt": "install_signalinstalle",
+      "_src": "install_signalinstalle",
+      "_tgt": "tray_vue",
       "source": "install_signalinstalle",
       "target": "tray_vue"
     },

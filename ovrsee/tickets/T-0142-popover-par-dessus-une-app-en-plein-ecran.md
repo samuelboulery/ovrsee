@@ -2,7 +2,7 @@
 {
   "id": "T-0142",
   "titre": "Popover par-dessus une app en plein écran, sans changer d'espace",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "s",
   "tags": [
@@ -11,7 +11,7 @@
     "ux"
   ],
   "cree": "2026-08-14",
-  "maj": "2026-08-14",
+  "maj": "2026-08-16",
   "plan": "2026-08-14-barre-de-menu-macos-les-trois-defauts-du-premier-jet.md"
 }
 ---

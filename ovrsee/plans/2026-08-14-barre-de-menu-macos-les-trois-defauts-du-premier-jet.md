@@ -1,10 +1,38 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Barre de menu macOS — les trois défauts du premier jet",
   "opened": "2026-08-14",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-16",
+  "commits": [
+    {
+      "sha": "ca72ca5",
+      "date": "2026-08-16",
+      "files": [
+        "CLAUDE.md",
+        "app/src/MenuBarPanel.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/attention.test.ts",
+        "app/src/attention.ts",
+        "app/src/main.tsx",
+        "app/src/menubar.test.ts",
+        "app/src/menubar.ts",
+        "app/src/node-test.d.ts",
+        "app/src/render.test.tsx",
+        "app/src/useTerminal.ts",
+        "electron/main.js",
+        "electron/preload.cjs",
+        "electron/pty.js",
+        "electron/tray.js",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/install.js",
+        "hooks/install.test.js",
+        "hooks/notify.test.js",
+        "hooks/ovrsee-notify.js"
+      ]
+    }
+  ]
 }
 ---
 

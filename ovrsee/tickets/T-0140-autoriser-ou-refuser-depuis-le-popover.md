@@ -2,7 +2,7 @@
 {
   "id": "T-0140",
   "titre": "Autoriser ou refuser une commande depuis le popover",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "epic": "T-0137",
   "tags": [
@@ -11,7 +11,7 @@
     "ux"
   ],
   "cree": "2026-08-14",
-  "maj": "2026-08-14",
+  "maj": "2026-08-16",
   "plan": "2026-08-14-extension-barre-de-menu-macos-pour-les-sessions-claude-d-ovr.md"
 }
 ---

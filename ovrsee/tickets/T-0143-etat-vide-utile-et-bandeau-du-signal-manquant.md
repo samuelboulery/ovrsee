@@ -2,7 +2,7 @@
 {
   "id": "T-0143",
   "titre": "État vide utile, et bandeau quand le signal n'est pas installé",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "m",
   "tags": [
@@ -11,7 +11,7 @@
     "ux"
   ],
   "cree": "2026-08-14",
-  "maj": "2026-08-14",
+  "maj": "2026-08-16",
   "plan": "2026-08-14-barre-de-menu-macos-les-trois-defauts-du-premier-jet.md"
 }
 ---

@@ -2,7 +2,7 @@
 {
   "id": "T-0141",
   "titre": "Lister les sessions ouvertes, pas seulement celles qui ont signalé",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "m",
   "tags": [
@@ -11,7 +11,7 @@
     "ux"
   ],
   "cree": "2026-08-14",
-  "maj": "2026-08-14",
+  "maj": "2026-08-16",
   "plan": "2026-08-14-barre-de-menu-macos-les-trois-defauts-du-premier-jet.md"
 }
 ---

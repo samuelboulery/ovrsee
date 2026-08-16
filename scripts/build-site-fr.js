@@ -1,15 +1,11 @@
 #!/usr/bin/env node
 /**
- * Génère `site/en/index.html` depuis `site/index.html` et `site/dict.json`.
+ * Génère `site/fr/index.html` depuis `site/index.html` et `site/dict.json`.
  *
- * Le français est le texte source ; l'anglais n'existait qu'au runtime, appliqué
- * nœud de texte par nœud de texte par `traduire()` (`site/app.js`). Utile pour un
- * visiteur, invisible pour un moteur : pas d'URL, donc rien à indexer.
- *
- * Ce script applique la même substitution, hors navigateur, sur le texte entre `>`
- * et `<`. Volontairement la même règle que `traduire()` — un texte qui se traduit
- * dans la page se traduit ici, et réciproquement. Le jour où l'une des deux dévie,
- * `build-site-en.test.js` le dit.
+ * L'anglais est le texte source — c'est la page servie à la racine. Le français
+ * s'obtient en appliquant le dictionnaire, exactement comme `traduire()` le fait
+ * au runtime dans `site/app.js` sur les libellés que le gabarit injecte. Même
+ * règle des deux côtés : le jour où l'une dévie, `build-site-fr.test.js` le dit.
  *
  * La page est générée à la publication, jamais commitée : une copie figée
  * dériverait de `index.html` sans que rien ne le signale.
@@ -21,41 +17,41 @@ import { fileURLToPath } from 'node:url'
 
 const SITE = join(dirname(fileURLToPath(import.meta.url)), '..', 'site')
 
-const TITRE_EN = 'Ovrsee — project management for Claude Code'
-const DESCRIPTION_EN =
-  'Project management for Claude Code: the plans you approved, the commits that carry ' +
-  'them out, the tickets left to do — versioned in your own repository.'
-const PARTAGE_EN =
-  'Vibecode fast, without losing track of the project. The plans you approved, the ' +
-  'commits that carry them out, the tickets left to do — versioned in your own repository.'
+const TITRE_FR = 'Ovrsee — gestion de projet pour Claude Code'
+const DESCRIPTION_FR =
+  'Gestion de projet pour Claude Code : les plans approuvés, les commits qui les ' +
+  'réalisent, les tickets à faire — versionnés dans votre dépôt.'
+const PARTAGE_FR =
+  'Vibecoder vite, sans perdre le fil du projet. Les plans approuvés, les commits ' +
+  'qui les réalisent, les tickets à faire — versionnés dans votre dépôt.'
 
-// Ce que le `<head>` doit dire une fois la page servie sous /en/. Le dictionnaire ne
+// Ce que le `<head>` doit dire une fois la page servie sous /fr/. Le dictionnaire ne
 // couvre que le corps : ces chaînes-là n'existent nulle part ailleurs.
-const TÊTE_EN = [
-  [/<html lang="fr">/, '<html lang="en">'],
-  [/<title>[^<]*<\/title>/, `<title>${TITRE_EN}</title>`],
-  [/(<meta name="description" content=")[^"]*(">)/, `$1${DESCRIPTION_EN}$2`],
-  [/(<link rel="canonical" href="https:\/\/ovrsee\.app\/)(">)/, '$1en/$2'],
-  [/(<meta property="og:url" content="https:\/\/ovrsee\.app\/)(">)/, '$1en/$2'],
-  [/(<meta property="og:locale" content=")fr_FR(">)/, '$1en_US$2'],
-  [/(<meta property="og:locale:alternate" content=")en_US(">)/, '$1fr_FR$2'],
-  [/(<meta property="og:title" content=")[^"]*(">)/, `$1${TITRE_EN}$2`],
-  [/(<meta name="twitter:title" content=")[^"]*(">)/, `$1${TITRE_EN}$2`],
-  [/(<meta property="og:description" content=")[^"]*(">)/, `$1${PARTAGE_EN}$2`],
-  [/(<meta name="twitter:description" content=")[^"]*(">)/, `$1${PARTAGE_EN}$2`],
+const TÊTE_FR = [
+  [/<html lang="en">/, '<html lang="fr">'],
+  [/<title>[^<]*<\/title>/, `<title>${TITRE_FR}</title>`],
+  [/(<meta name="description" content=")[^"]*(">)/, `$1${DESCRIPTION_FR}$2`],
+  [/(<link rel="canonical" href="https:\/\/ovrsee\.app\/)(">)/, '$1fr/$2'],
+  [/(<meta property="og:url" content="https:\/\/ovrsee\.app\/)(">)/, '$1fr/$2'],
+  [/(<meta property="og:locale" content=")en_US(">)/, '$1fr_FR$2'],
+  [/(<meta property="og:locale:alternate" content=")fr_FR(">)/, '$1en_US$2'],
+  [/(<meta property="og:title" content=")[^"]*(">)/, `$1${TITRE_FR}$2`],
+  [/(<meta name="twitter:title" content=")[^"]*(">)/, `$1${TITRE_FR}$2`],
+  [/(<meta property="og:description" content=")[^"]*(">)/, `$1${PARTAGE_FR}$2`],
+  [/(<meta name="twitter:description" content=")[^"]*(">)/, `$1${PARTAGE_FR}$2`],
   [
     /(<meta property="og:image:alt" content=")[^"]*(">)/,
-    '$1Ovrsee — vibecode fast, without losing track of the project.$2',
+    '$1Ovrsee — vibecoder vite, sans perdre le fil du projet.$2',
   ],
   // Dans le JSON-LD : même entité, décrite dans la langue de la page.
-  [/("description": ")[^"]*(")/, `$1${DESCRIPTION_EN}$2`],
-  [/("inLanguage": ")fr-FR(")/, '$1en$2'],
+  [/("description": ")[^"]*(")/, `$1${DESCRIPTION_FR}$2`],
+  [/("inLanguage": ")en(")/, '$1fr-FR$2'],
 ]
 
 const ENTITÉS = { '&nbsp;': '\u00a0', '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'" }
 
 /** Le navigateur lit des nœuds décodés ; le dictionnaire est écrit dans cette langue-là.
- *  Sans ça, `Claude&nbsp;Code` ne rencontre jamais la clé `Claude Code`.
+ *  Sans ça, `Claude&nbsp;Code` ne rencontre jamais la clé `Claude Code`.
  *  @param {string} s @returns {string} */
 const décoder = s => s.replace(/&(?:nbsp|amp|lt|gt|quot|#39);/g, m => ENTITÉS[m])
 
@@ -89,16 +85,16 @@ export function traduire(html, dict) {
  * @returns {string}
  */
 function réécrireTête(html) {
-  return TÊTE_EN.reduce((acc, [motif, remplacement]) => {
+  return TÊTE_FR.reduce((acc, [motif, remplacement]) => {
     if (!motif.test(acc)) throw new Error(`motif introuvable dans le <head> : ${motif}`)
     return acc.replace(motif, remplacement)
   }, html)
 }
 
 /**
- * @param {string} html source française
+ * @param {string} html source anglaise
  * @param {Record<string, string>} dict
- * @returns {string} la page anglaise
+ * @returns {string} la page française
  */
 export function construire(html, dict) {
   const tête = réécrireTête(html)
@@ -119,8 +115,8 @@ export function sources() {
 
 if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
   const { html, dict } = sources()
-  mkdirSync(join(SITE, 'en'), { recursive: true })
-  writeFileSync(join(SITE, 'en', 'index.html'), construire(html, dict))
+  mkdirSync(join(SITE, 'fr'), { recursive: true })
+  writeFileSync(join(SITE, 'fr', 'index.html'), construire(html, dict))
   // stdout reste libre : ce script tourne dans des pipelines.
-  process.stderr.write(`site/en/index.html écrit — ${Object.keys(dict).length} entrées\n`)
+  process.stderr.write(`site/fr/index.html écrit — ${Object.keys(dict).length} entrées\n`)
 }

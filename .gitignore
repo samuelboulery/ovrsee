@@ -49,10 +49,10 @@ release/
 build/icon-1024.png
 build/icon.iconset/
 
+# Version française de la vitrine : engendrée par scripts/build-site-fr.js au
+# déploiement. La commiter la ferait dériver de site/index.html en silence.
+site/fr/
+
 # Captures d'écran ovrsee : régénérées à chaque commit, purge auto côté
 # disque (30j puis 1/semaine) — inutile de les suivre dans git.
 ovrsee/pages/shots/
-
-# Version anglaise de la vitrine : engendrée par scripts/build-site-en.js au
-# déploiement. La commiter la ferait dériver de site/index.html en silence.
-site/en/

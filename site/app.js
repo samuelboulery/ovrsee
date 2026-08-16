@@ -15,21 +15,23 @@ const ACCENT = '#7d76f0'
 
 /* ------------------------------------------------------------------ état -- */
 
-// La langue vient du document, pas d'une valeur en dur : `/en/` est une page déjà
-// traduite (`scripts/build-site-en.js`), et `traduire()` y appliquerait sinon la table
-// inverse — la page anglaise repasserait en français au premier rendu.
-const état = { view: 'apercu', scale: 1, lang: document.documentElement.lang === 'en' ? 'en' : 'fr' }
+// La langue vient du document, pas d'une valeur en dur : `/fr/` est une page déjà
+// traduite (`scripts/build-site-fr.js`), et `traduire()` y appliquerait sinon la table
+// inverse — la page française repasserait en anglais au premier rendu.
+const état = { view: 'apercu', scale: 1, lang: document.documentElement.lang === 'fr' ? 'fr' : 'en' }
 
 /* --------------------------------------------------------------- données -- */
 
-// Registre des sept vues, dans l'ordre de `app/src/views.ts`, mêmes pictos.
+// Registre des sept vues, dans l'ordre de `app/src/views.ts`, mêmes pictos. Les
+// libellés sont en anglais, la langue source de la page ; `traduire()` les passe en
+// français sur `/fr/`, via les mêmes clés que le reste du texte.
 const VUES = [
-  { id: 'apercu', label: 'Aperçu', icon: 'squares-four', key: '1' },
-  { id: 'navigateur', label: 'Navigateur', icon: 'browser', key: '2' },
-  { id: 'produit', label: 'Produit', icon: 'tree-structure', key: '3' },
-  { id: 'historique', label: 'Historique', icon: 'clock-counter-clockwise', key: '4' },
-  { id: 'tableau', label: 'Tableau', icon: 'kanban', key: '5', count: 12 },
-  { id: 'donnees', label: 'Données', icon: 'database', key: '6' },
+  { id: 'apercu', label: 'Overview', icon: 'squares-four', key: '1' },
+  { id: 'navigateur', label: 'Browser', icon: 'browser', key: '2' },
+  { id: 'produit', label: 'Product', icon: 'tree-structure', key: '3' },
+  { id: 'historique', label: 'History', icon: 'clock-counter-clockwise', key: '4' },
+  { id: 'tableau', label: 'Board', icon: 'kanban', key: '5', count: 12 },
+  { id: 'donnees', label: 'Data', icon: 'database', key: '6' },
   { id: 'stack', label: 'Stack', icon: 'stack', key: '7' },
 ]
 
@@ -219,14 +221,18 @@ function lier(racine, ctx, horsClones = false) {
 
 /* ------------------------------------------------------------ traduction -- */
 
-// Posée sur le DOM et non dans le gabarit : le français est le texte source, il
-// s'affiche dès le premier octet et reste éditable ; l'anglais s'applique nœud
+// Posée sur le DOM et non dans le gabarit : l'anglais est le texte source, il
+// s'affiche dès le premier octet et reste éditable ; le français s'applique nœud
 // de texte par nœud de texte après le rendu.
+//
+// Sur `/fr/` la page est déjà française et seuls les libellés injectés par le
+// gabarit restent anglais : la table s'y applique dans le même sens, et les nœuds
+// déjà traduits n'y trouvent simplement pas de clé.
 let DICT = {}
 
 function traduire() {
   const table = {}
-  if (état.lang === 'en') for (const k in DICT) table[k] = DICT[k]
+  if (état.lang === 'fr') for (const k in DICT) table[k] = DICT[k]
   else for (const k in DICT) table[DICT[k]] = k
 
   const marcheur = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)

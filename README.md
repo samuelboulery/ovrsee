@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="./README.md"><img alt="Français" src="https://img.shields.io/badge/🇫🇷-Fran%C3%A7ais-4c3f91?style=for-the-badge"></a>
-  <a href="./README.en.md"><img alt="English" src="https://img.shields.io/badge/🇬🇧-English-3a3d4d?style=for-the-badge"></a>
+  <a href="./README.md"><img alt="English" src="https://img.shields.io/badge/🇬🇧-English-4c3f91?style=for-the-badge"></a>
+  <a href="./README.fr.md"><img alt="Français" src="https://img.shields.io/badge/🇫🇷-Fran%C3%A7ais-3a3d4d?style=for-the-badge"></a>
 </p>
 
 <div align="center">
@@ -8,193 +8,188 @@
 
   # Ovrsee
 
-  **Vibecoder vite, sans perdre le fil du projet.**
+  **Vibecode fast, without losing track of the project.**
 
   ![version](https://img.shields.io/badge/version-1.0.0--beta-6c5ce7?style=flat-square)
   ![stack](https://img.shields.io/badge/stack-Electron%20%2B%20React%20%2B%20TypeScript-2d3436?style=flat-square)
-  ![deps prod](https://img.shields.io/badge/d%C3%A9pendances%20prod-4-00b894?style=flat-square)
+  ![prod deps](https://img.shields.io/badge/prod%20deps-4-00b894?style=flat-square)
 </div>
 
-Gestion de projet pour Claude Code. Ovrsee tient le suivi de ce que vous construisez :
-les décisions que vous avez approuvées, les commits qui les réalisent, les tickets à
-faire, l'architecture de l'app et son évolution. De quoi savoir où vous en êtes quand
-on code au rythme de l'agent, et quoi faire ensuite.
+Project management for Claude Code. Ovrsee keeps track of what you build: the plans you
+approved, the commits that carry them out, the tickets left to do, the app architecture
+and how it changes. Enough to know where you stand when you code at the agent's pace,
+and what to do next.
 
-> **L'ovrsee lit ; il n'exécute que le terminal qu'on lui demande.** La vérité vit dans `<repo>/ovrsee/`, en
-> markdown et en images, versionnée par git. L'application n'est qu'une vue : si elle
-> disparaît, rien n'est perdu.
+> **Ovrsee reads; it only runs a terminal if you ask.** The truth lives in `<repo>/ovrsee/`,
+> in markdown and images, versioned by git. The app is just a view — if it disappears, nothing is lost.
 
-Contexte complet : [`cadrage-ovrsee.md`](./cadrage-ovrsee.md)
+Full context (French): [`cadrage-ovrsee.md`](./cadrage-ovrsee.md)
 
-## Trois principes
+## Three principles
 
-**Un plan, ses commits, ses tickets.** Chaque décision approuvée dans Claude Code devient
-une ligne de projet : ce qui a été décidé, ce qui l'a exécuté, ce qui reste ouvert.
+**A plan, its commits, its tickets.** Every plan approved in Claude Code becomes a line of
+the project: what was decided, what carried it out, what is still open.
 
-**Le projet vit dans le dépôt.** Backlog, historique et captures sous `<repo>/ovrsee/`,
-versionnés par git. Pas d'outil à tenir à jour en parallèle du code.
+**The project lives in the repository.** Backlog, history and screenshots under
+`<repo>/ovrsee/`, versioned by git. No tool to keep up to date alongside the code.
 
-**Claude Code y lit et y écrit.** Serveur MCP et deux skills : l'agent connaît votre
-backlog, ouvre et déplace les tickets. Il n'exécute aucun code — vous restez maître du plan.
+**Claude Code reads it, and writes to it.** An MCP server and two skills: the agent knows
+your backlog, opens and moves tickets. It runs no code — you stay in charge of the plan.
 
-## Ce qu'on y voit
+## What it does
 
-- Capture automatiquement les plans approuvés dans Claude Code — pourquoi une décision a
-  été prise, pas seulement ce qui a changé.
-- Photographie chaque écran à chaque commit : l'historique visuel de l'application, daté.
-- Cartographie les pages du projet observé et leurs dépendances.
-- Tient un tableau de tickets et une chronologie du travail, reliés aux plans qui les expliquent.
-- Tout est stocké en markdown et en images versionnés — rien ne dépend de l'application
-  elle-même pour rester lisible.
+- Automatically captures approved plans from Claude Code — why a decision was made,
+  not just what changed.
+- Photographs every screen on every commit: a dated visual history of the app.
+- Maps the observed project's pages and their dependencies.
+- Keeps a ticket board and a work timeline, linked back to the plans that explain them.
+- Everything is stored as versioned markdown and images — nothing depends on the app
+  itself to stay readable.
 
-## En images
+## Screenshots
 
-### Aperçu — l'état du projet en un coup d'œil
-![Onglet Aperçu](./docs/screenshots/apercu.png)
+### Overview — project state at a glance
+![Overview tab](./docs/screenshots/apercu.png)
 
-Compteurs (pages, plans, tickets, dépendances), santé du dépôt, plans ouverts, statut des
-branches, commandes du projet, et le terminal intégré avec ses raccourcis (crawl, graphe,
-export Obsidian). À droite, le panneau des déploiements et le sommaire du `README.md`.
+Counters (pages, plans, tickets, dependencies), repo health, open plans, branch status,
+project commands, and the integrated terminal with its shortcuts (crawl, graph, Obsidian
+export). On the right, the deployments panel and the `README.md` outline.
 
-### Navigateur — parcourir l'application observée sans quitter l'ovrsee
-![Onglet Navigateur](./docs/screenshots/navigateur.png)
+### Navigator — browse the observed app without leaving Ovrsee
+![Navigator tab](./docs/screenshots/navigateur.png)
 
-Un navigateur intégré (barre d'adresse, DevTools, sélecteur d'élément) pour inspecter
-l'application observée directement depuis l'interface.
+An embedded browser (address bar, DevTools, element picker) to inspect the
+observed application directly from the interface.
 
-### Produit — le graphe de navigation
-![Onglet Produit](./docs/screenshots/produit.png)
+### Product — the navigation graph
+![Product tab](./docs/screenshots/produit.png)
 
-La carte des pages du projet crawlé, miniatures de captures à l'appui, avec un panneau de
-détail par page et l'historique de ses captures précédentes. Deux dates se comparent.
+A map of the crawled project's pages, with screenshot thumbnails, a detail panel
+per page, and its capture history. Two dates can be compared.
 
-### Historique — chaque commit et le plan qui l'explique
-![Onglet Historique](./docs/screenshots/historique.png)
+### History — every commit and the plan behind it
+![History tab](./docs/screenshots/historique.png)
 
-La chronologie du projet : un plan est clos par le commit qui l'exécute, chaque ticket lié
-apparaît avec son statut. Filtrable par plans, tickets et commits hors plan.
+The project timeline: a plan is closed by the commit that executes it, each linked
+ticket shows up with its status. Filterable by plans, tickets, and off-plan commits.
 
-### Tableau — le kanban des tickets
-![Onglet Tableau](./docs/screenshots/tableau.png)
+### Board — ticket kanban
+![Board tab](./docs/screenshots/tableau.png)
 
-Un fichier par ticket dans `ovrsee/tickets/`, colonnes réglées dans `ovrsee/board.json`.
-Écrit ici comme depuis le terminal intégré. Les epics affichent leur avancement et leurs
-tickets enfants.
+One file per ticket in `ovrsee/tickets/`, columns set in `ovrsee/board.json`.
+Written here just like from the integrated terminal. Epics show their progress and
+their child tickets.
 
-### Données — les tables du projet
-![Onglet Données](./docs/screenshots/donnees.png)
+### Data — the project's tables
+![Data tab](./docs/screenshots/donnees.png)
 
-L'introspection reconstruite à chaque commit, lue depuis Graphify ou un coffre Obsidian :
-tables, colonnes, qui s'en sert, et le niveau de confiance de l'extraction. L'ovrsee ne
-recalcule rien.
+Introspection rebuilt on every commit, read from Graphify or an Obsidian vault: tables,
+columns, who uses them, and how confident the extraction is. Ovrsee recomputes nothing.
 
-### Stack — les dépendances et leur raison d'être
-![Onglet Stack](./docs/screenshots/stack.png)
+### Stack — dependencies and why they are there
+![Stack tab](./docs/screenshots/stack.png)
 
-Production et développement séparés, chacune avec sa version et la raison écrite en
-commentaire `WHY:` au-dessus de son import. Ce qui n'en a pas est signalé.
+Production and development split apart, each with its version and the reason written as a
+`WHY:` comment above its import. Anything missing one is flagged.
 
-## Premier lancement
+## First launch
 
-Un ovrsee fraîchement cloné, ou téléchargé, s'ouvre **vide** : aucun projet n'est
-observé tant qu'on n'en a pas désigné un. Une modale de trois écrans explique alors ce
-que fait l'application, règle l'interface d'après votre usage de Claude Code, et mène
-au choix du premier dépôt. Elle se passe d'un clic — ou de la touche Échap — et se
-rejoue depuis *Préférences → Général → Revoir la présentation*.
+A freshly cloned — or downloaded — ovrsee opens **empty**: no project is watched
+until you point at one. A three-screen modal then explains what the app does, tunes
+the interface to how you use Claude Code, and leads to picking a first repository.
+It is skippable in one click — or with Escape — and replayable from *Preferences →
+General → Replay the walkthrough*.
 
-Les réponses ne sont pas décoratives : elles choisissent les onglets affichés, la
-place du terminal et la commande proposée à l'ouverture d'un projet neuf. Tout
-reste modifiable ensuite dans les préférences.
+The answers are not decorative: they pick which tabs show, where the terminal sits,
+and which command is offered when a fresh project opens. Everything stays editable
+in Preferences afterwards.
 
-## Mise en route — trois commandes
+## Quick start
 
 ```bash
-# 1. Installer une fois par projet
-pnpm ovrsee:install /chemin/du/projet
+# Install once per project
+pnpm ovrsee:install /path/to/project
 
-# 2. Cartographier l'application (nécessite un ovrsee.config.json)
-pnpm ovrsee:crawl /chemin/du/projet
+# Map the application (requires ovrsee.config.json at project root)
+pnpm ovrsee:crawl /path/to/project
 
-# 3. Lire
-pnpm electron          # application avec terminal intégré
-pnpm dev               # ou dans un navigateur, sans terminal
-pnpm ovrsee:brief     # ou en texte, depuis le terminal
+# Read
+pnpm electron          # app with integrated terminal
+pnpm dev               # or browser, no terminal
+pnpm ovrsee:brief     # or text from CLI
 ```
 
-Quand un plan est approuvé dans Claude Code, il est capturé automatiquement dans `ovrsee/plans/`.
-Le hook post-commit rattache ensuite chaque commit au plan actif. Clore le plan quand son travail est fini :
+When a plan is approved in Claude Code, it is captured automatically in `ovrsee/plans/`.
+The post-commit hook then attaches each commit to the active plan. Close the plan when work is done:
 
 ```bash
-pnpm ovrsee:close     # retire .active-plan
+pnpm ovrsee:close     # removes .active-plan
 ```
 
-Tant qu'un plan est actif, le hook post-commit lui rattache **tout** commit — même ceux
-sans rapport. Clore n'est pas une formalité : c'est ce qui vous permet de changer de sujet
-sans encombrer l'historique.
+While a plan is active, every commit gets attached to it — even unrelated fixes.
+Closing is not optional: it lets you switch tasks without polluting the history.
 
-Le terminal intégré n'existe que dans l'application : il passe par IPC, qu'un
-navigateur n'a pas. C'est délibéré — l'exposer par une socket locale l'ouvrirait à
-tout processus tournant sous le même compte. C'est un terminal complet : le pty ouvre
-un shell de connexion et y lance `claude`.
+The **terminal is integrated in Electron only** — it runs over IPC, not a socket.
+This is intentional: a socket would be open to any process on the same user. It's
+a full terminal: the pty opens a login shell and starts `claude` in it.
 
-## Skills Claude Code
+## Claude Code Skills
 
-Deux skills disponibles — installer depuis l'écran d'initialisation, ou via `--skills` :
+Two skills, installed from the init screen or with `--skills`:
 
-| Skill | Ce qu'il apprend |
+| Skill | What it teaches |
 |---|---|
-| `ovrsee` | Lire `ovrsee/` : plans, pages, scans, captures, pièges de lecture |
-| `ovrsee-tickets` | Écrire les tickets du tableau, format et gestes compris |
+| `ovrsee` | Read `ovrsee/`: plans, pages, screenshots, pitfalls |
+| `ovrsee-tickets` | Write board tickets, format, gestures |
 
-**Graphify** (alimente l'onglet Données) est détecté mais non installé — l'ovrsee
-affiche sa commande.
+**Graphify** (feeds the Data tab) is detected but not installed — the app shows the command.
 
-## Coffre Obsidian
+## Obsidian Vault Export
 
 ```bash
-pnpm ovrsee:obsidian          # ou le bouton de l'onglet Accueil
+pnpm ovrsee:obsidian          # or the button on the Overview tab
 ```
 
-Traduit `ovrsee/` en notes Obsidian dans `ovrsee/obsidian/` : frontmatter YAML
-(requêtable en Dataview), wikilinks entre plans/tickets/pages, et les captures.
-C'est une vue — la source reste le dépôt, réexporter écrase.
+Translates `ovrsee/` into Obsidian notes under `ovrsee/obsidian/`: YAML frontmatter
+(queryable with Dataview), wikilinks between plans/tickets/pages, and the screenshots.
+It's a view — the source stays the repo, re-exporting overwrites.
 
-Graphify écrit son propre `index.md` à la racine du dossier qu'on lui donne. Réservez-lui `graphe/`,
-que l'export ne touche jamais. Exemple :
+Graphify writes its own `index.md` at the root of whatever folder you give it. Reserve
+it `graphe/`, which the export never touches:
 
 ```bash
 /graphify . --obsidian --obsidian-dir ovrsee/obsidian/graphe
 ```
 
-C'est ce que fait le bouton « ◈ Graphe → coffre Obsidian » du terminal intégré.
+That's what the "◈ Graph → Obsidian vault" button in the integrated terminal does.
 
-### Coffre comme source de l'onglet Données
+### Vault as the Data tab's source
 
-Si vous documentez dans Obsidian plutôt qu'avec Graphify, le champ `obsidianVault`
-dans `ovrsee.config.json` désigne un coffre, et l'onglet Données le lit **quand Graphify
-n'a rien produit**.
+If you document in Obsidian instead of Graphify, the `obsidianVault` field in
+`ovrsee.config.json` points at a vault, and the Data tab reads it **only when
+Graphify produced nothing**.
 
-Une note est une table quand son frontmatter porte `type: table`. `columns` en donne
-les colonnes, `maj` la date de dernière mise à jour :
+A note is a table when its frontmatter carries `type: table`. `columns` gives the
+columns, `maj` the last-updated date:
 
 ```markdown
 ---
 type: table
-titre: Commandes
+titre: Orders
 columns: [id, client_id, total]
 maj: 2026-03-12
 ---
 
-Les commandes passées.
+The orders placed.
 ```
 
-**Graphify passe devant, toujours** — son graphe vient du code, celui du coffre de ce
-que quelqu'un a tapé. Un coffre déclaré alors que `graphify-out/graph.json` existe n'est
-pas lu.
+**Graphify always takes precedence** — its graph comes from the code, the vault's
+from whatever someone typed. A declared vault is not read while `graphify-out/graph.json`
+exists.
 
-## Multi-projets et ovrsee.config.json
+## Multi-project setup and ovrsee.config.json
 
-Exemple complet :
+Full example:
 
 ```json
 {
@@ -203,62 +198,61 @@ Exemple complet :
   "entryRoutes": ["/", "/login"],
   "auth": { "storageState": ".ovrsee-auth.json" },
   "ignore": ["/auth/callback"],
-  "obsidianVault": "~/Coffres/mon-projet"
+  "obsidianVault": "~/Vaults/my-project"
 }
 ```
 
-Donnez au dev un port dédié. Le crawl refuse de démarrer si `baseUrl` répond déjà —
-rien dans une réponse HTTP ne permet de reconnaître son propre serveur, et photographier
-celui d'un autre projet produirait des captures datées d'aujourd'hui montrant la mauvaise application.
+Give dev a dedicated port. The crawler refuses to start if `baseUrl` already responds —
+there is no way to distinguish your own server from another's in an HTTP response, and
+crawling the wrong app would produce backdated screenshots of the wrong project.
 
-## Arborescence
+## Architecture Overview
 
-| Dossier | Rôle |
+| Directory | Role |
 |---|---|
-| `hooks/` | Capture des plans, clôture au commit, tickets, export Obsidian, CLI |
-| `crawl/` | Parcours Playwright de l'app, captures datées |
-| `server/` | Routes `/api/*` pour navigateur et Electron |
-| `mcp/` | Serveur MCP stdio (JSON-RPC 2.0), même interface que `/api/*` |
-| `app/src/` | Interface React, 7 onglets (aperçu, navigateur, produit, historique, tableau, données, stack) |
-| `electron/` | Processus principal, preload, pty (terminal intégré) |
-| `scripts/` | Utilitaires de build et test |
+| `hooks/` | Plan capture, commit-time closing, tickets, Obsidian export, CLI |
+| `crawl/` | Playwright traversal of the app, dated screenshots |
+| `server/` | `/api/*` routes for browser and Electron |
+| `mcp/` | MCP server (stdio, JSON-RPC 2.0), same interface as `/api/*` |
+| `app/src/` | React interface, 7 tabs (overview, navigator, product, history, board, data, stack) |
+| `electron/` | Main process, preload, pty (integrated terminal) |
+| `scripts/` | Build and test utilities |
 
-## Téléchargement
+## Download
 
-Les binaires se prennent sur l'onglet
-[Releases](https://github.com/samuelboulery/ovrsee/releases). Ils ne sont **ni signés
-ni notariés** : macOS refuse le premier lancement — clic droit sur l'application,
-puis *Ouvrir* — et Windows affiche un avertissement SmartScreen, qu'on passe par
-*Informations complémentaires* puis *Exécuter quand même*.
+Binaries live on the [Releases](https://github.com/samuelboulery/ovrsee/releases)
+tab. They are **neither signed nor notarised**: macOS refuses the first launch —
+right-click the app, then *Open* — and Windows shows a SmartScreen warning, which
+you get past with *More info* then *Run anyway*.
 
-| Plateforme | Format |
+| Platform | Format |
 |---|---|
-| macOS (arm64) | `.dmg`, non signé |
-| Windows (x64) | Installeur NSIS, non signé |
+| macOS (arm64) | `.dmg`, unsigned |
+| Windows (x64) | NSIS installer, unsigned |
 
-Construits automatiquement par `.github/workflows/release.yml` à chaque tag `vX.Y.Z`
-poussé, publiés sur l'onglet Releases. En local, sans publication :
+Built automatically by `.github/workflows/release.yml` on every `vX.Y.Z` tag push,
+published to the Releases tab. Locally, without publishing:
 
 ```bash
-pnpm package:mac    # DMG dans release/ (arm64)
-pnpm package:win    # installeur NSIS dans release/ (x64, depuis Windows uniquement)
+pnpm package:mac    # DMG in release/ (arm64)
+pnpm package:win    # NSIS installer in release/ (x64, from Windows only)
 ```
 
-## Dépendances
+## Dependencies
 
-Sobriété délibérée : **4 dépendances de production**, le reste est du Node et du React nus.
+Deliberately minimal: **4 production dependencies**, everything else is plain Node and React.
 
 **Production**
 
-| Paquet | Version |
+| Package | Version |
 |---|---|
 | `@xterm/xterm` | 6.0.0 |
 | `@xterm/addon-fit` | ^0.11.0 |
 | `node-pty` | 1.1.0 |
 
-**Développement**
+**Development**
 
-| Paquet | Version |
+| Package | Version |
 |---|---|
 | `react` | ^19.2.8 |
 | `react-dom` | ^19.2.8 |
@@ -271,68 +265,63 @@ Sobriété délibérée : **4 dépendances de production**, le reste est du Node
 | `@types/react` | ^19.2.18 |
 | `@types/react-dom` | ^19.2.4 |
 
-Gestionnaire de paquets : `pnpm@10.34.5`, épinglé dans `package.json` et fait respecter par Corepack.
+Package manager: `pnpm@10.34.5`, pinned in `package.json` and enforced by Corepack.
 
-## Pièges connus
+## Known Traps
 
-**Un plan actif capte tous les commits.**
-Tant que `ovrsee/.active-plan` existe, le hook post-commit rattache chaque commit au
-plan — y compris un correctif sans rapport. `pnpm ovrsee:close` avant de changer de sujet.
+**An active plan captures every commit.**
+While `ovrsee/.active-plan` exists, the post-commit hook attaches all commits to it — including unrelated fixes. Run `pnpm ovrsee:close` before switching tasks.
 
-**Le crawl refuse de démarrer si `baseUrl` répond déjà.**
-C'est voulu. Rien dans une réponse HTTP ne distingue son propre serveur de celui d'un
-autre projet.
+**The crawler refuses to start if `baseUrl` already responds.**
+This is intentional. There is no way to distinguish your own server from another's in an HTTP response, and crawling the wrong app would produce backdated screenshots.
 
-**`node-pty` est un binaire natif.**
-Il est déballé de l'asar (`asarUnpack` dans `electron-builder.yml`) et
-`spawn-helper` doit garder son bit d'exécution — d'où `scripts/fix-pty-permissions.js`
-en postinstall. C'est le point de rupture classique de l'empaquetage, et il ne se voit
-qu'à l'exécution du DMG, jamais en dev.
+**`node-pty` is a native binary.**
+It is unpacked from the asar (`asarUnpack` in `electron-builder.yml`) and
+`spawn-helper` must retain its execute bit — hence `scripts/fix-pty-permissions.js` in postinstall.
+This is the classic packaging breaking point and only shows up when running the DMG, never in dev.
 
-**Un secret collé dans un plan approuvé part dans git en clair.**
-La parade est en amont : ne pas en coller. Les identifiants vivent dans un gestionnaire
-de mots de passe et dans un `ACCESS.md` non versionné.
+**A secret pasted into an approved plan goes into git history in plain text.**
+The fix is upstream — don't paste it. Credentials live in a password manager and in an unversioned `ACCESS.md`.
 
-## Serveur MCP
+## MCP Server
 
-Ovrsee expose un serveur MCP (Model Context Protocol) en stdio. C'est le moyen pour
-Claude Code de lire et modifier les tickets sans quitter son interface.
+Ovrsee exposes an MCP (Model Context Protocol) server over stdio. It's how Claude
+Code reads and edits tickets without leaving its interface.
 
-Capacités :
-- Lecture complète de `ovrsee/`
-- Écriture sur `ovrsee/tickets/` et `ovrsee/board.json` uniquement
-- Aucune exécution de code
+Capabilities:
+- Full read access to `ovrsee/`
+- Write access to `ovrsee/tickets/` and `ovrsee/board.json` only
+- No code execution
 
-Il ne lit que les projets du registre — celui qu'alimente `pnpm ovrsee:install`.
-Un chemin qui n'y figure pas est refusé, même s'il existe sur le disque.
+It only reads projects from the registry — the one `pnpm ovrsee:install` populates.
+A path not listed there is refused, even if it exists on disk.
 
-Pour l'enregistrer dans Claude Code :
+To register it in Claude Code:
 
 ```bash
-claude mcp add -s user ovrsee -- node /chemin/absolu/ovrsee/mcp/server.js
+claude mcp add -s user ovrsee -- node /absolute/path/ovrsee/mcp/server.js
 ```
 
-La portée `user` est la bonne : le serveur est multi-projet par construction,
-il n'a rien à voir avec le dépôt courant.
+The `user` scope is the right one: the server is multi-project by design, it has
+nothing to do with the current repo.
 
-Dans Claude Desktop, c'est `claude_desktop_config.json` :
+In Claude Desktop, it's `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "ovrsee": {
       "command": "node",
-      "args": ["/chemin/absolu/ovrsee/mcp/server.js"]
+      "args": ["/absolute/path/ovrsee/mcp/server.js"]
     }
   }
 }
 ```
 
-Les skills, elles, n'y sont pas visibles : `~/.claude/skills/` est lu par Claude
-Code — en ligne de commande comme dans l'application de bureau — mais pas par le
-chat de Claude Desktop, qui tient son propre catalogue.
+Skills aren't visible there: `~/.claude/skills/` is read by Claude Code — both the
+CLI and the desktop app — but not by the Claude Desktop chat, which keeps its own catalog.
 
-Pour le voir répondre à la main :
+To see it answer by hand:
 
 ```bash
 printf '%s\n' \
@@ -341,43 +330,42 @@ printf '%s\n' \
  | pnpm ovrsee:mcp
 ```
 
-(Le serveur lit JSON-RPC depuis stdin et écrit sur stdout. Rien d'autre ne doit
-sortir sur stdout : ce n'est pas un journal, c'est le transport.)
+(The server reads JSON-RPC from stdin and writes to stdout. Nothing else should
+print to stdout: it's the transport, not a log.)
 
-## Données produites
+## Data Produced
 
-Stockées dans le dépôt observé, sous `<repo>/ovrsee/` :
+Stored in the observed repo, under `<repo>/ovrsee/`:
 
 ```
-plans/<date>-<slug>.md    1 fichier = 1 plan approuvé
-pages/pages.json          pages, liens, résumés
-pages/scans.jsonl         1 ligne par scan — les échecs aussi
-pages/shots/<onglet>/     captures datées, rattachées à un commit
-tickets/*.md              tickets du tableau
-board.json                état du tableau
+plans/<date>-<slug>.md    1 file = 1 approved plan
+pages/pages.json          pages, links, summaries
+pages/scans.jsonl         1 line per scan — failures too
+pages/shots/<tab>/        dated screenshots, tied to a commit
+tickets/*.md              board tickets
+board.json                board state
 ```
 
-Backlog, historique et densité d'activité se calculent à partir des plans.
+Backlog, history, and activity density are all computed from the plans.
 
-## Note importante
+## Important Note
 
-**Un secret collé dans un plan approuvé se retrouve dans l'historique git,** et l'y
-retirer demande une réécriture. Ne pas l'ignorer via `.gitignore` — un plan non
-versionné ne sert à rien. La parade est en amont — ne pas coller de clé, de jeton
-ni de mot de passe dans un plan. Les identifiants vivent dans un gestionnaire et dans
-un `ACCESS.md` non versionné.
+**A secret pasted into an approved plan ends up in git history,** and removing it
+requires a rewrite. Don't gitignore it away — an unversioned plan is worthless.
+The fix is upstream — don't paste a key, token, or password into a plan. Credentials
+live in a password manager and in an unversioned `ACCESS.md`.
 
-## Tests
+## Running Tests
 
 ```bash
-pnpm test       # node --test sur hooks/ crawl/ server/ mcp/, puis app/src compilé
-pnpm typecheck  # tsc, ne couvre que app/src
+pnpm test       # Node tests (hooks, crawl, server, mcp) + UI tests (app/src)
+pnpm typecheck  # TypeScript check (app/src only)
 ```
 
-Aucun framework de test : `node:test` et `node:assert` seuls, dans tout le dépôt.
+The project uses Node's built-in `test` module only — no test frameworks, anywhere.
 
-## Voir aussi
+## See also
 
-- [`README.en.md`](./README.en.md) — version anglaise
-- [`cadrage-ovrsee.md`](./cadrage-ovrsee.md) — problème, alternatives écartées, périmètre
-- [`CLAUDE.md`](./CLAUDE.md) — référence technique du projet
+- [`README.fr.md`](./README.fr.md) — French version
+- [`CLAUDE.md`](./CLAUDE.md) — technical reference (French)
+- [`cadrage-ovrsee.md`](./cadrage-ovrsee.md) — design rationale (French)

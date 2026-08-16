@@ -41,6 +41,7 @@ non-authentifié, et un secret n'y transite jamais. Voir `electron/main.js` et
 | `mcp/` | Serveur MCP stdio (JSON-RPC 2.0), même interface que `/api/*` | non — `.js` |
 | `app/src/` | Interface React, 7 onglets | oui — TS strict |
 | `electron/` | Processus principal, preload, pty | non — `.js`/`.cjs` |
+| `site/` | Vitrine publique (ovrsee.app), page unique écrite à la main | non — HTML + `.js` |
 
 **`server/api.js` a trois hôtes, une seule implémentation** : le middleware du dev
 server Vite (`vite.config.js`), le gestionnaire du protocole `ovrsee://` du
@@ -58,7 +59,7 @@ en-têtes. Vérifier les deux.
 ```bash
 pnpm dev          # dev server Vite, port 5180 strict, sans terminal
 pnpm electron     # build:ui puis l'app complète, terminal compris
-pnpm test         # node --test sur hooks/ crawl/ server/ mcp/, puis app/src compilé
+pnpm test         # node --test sur hooks/ crawl/ server/ mcp/ scripts/, puis app/src compilé
 pnpm typecheck    # tsc, ne couvre QUE app/src
 pnpm build:ui     # vite build vers app/dist/
 pnpm package:mac  # DMG dans release/ (arm64, non signé)
@@ -129,6 +130,15 @@ page : pour ça, il faut lancer l'app.
   d'un flux JSON-RPC et coupe la conversation. Les traces vont sur stderr. Et
   tester `dispatch()` ne teste pas le fil : `mcp/mcp.test.js` fait les deux depuis
   qu'un protocole non conforme est passé sous une suite verte.
+- **`site/en/` est engendré, pas écrit.** `scripts/build-site-en.js` dérive la page
+  anglaise de `site/index.html` et `site/dict.json` au déploiement (`site.yml`) ; le
+  dossier est ignoré par git. Corollaire : le texte anglais se corrige dans
+  `dict.json`, jamais dans la page. Et les chemins d'assets de `index.html` sont
+  absolus depuis la racine (`/app.js`, `/styles.css`) précisément pour que `/en/` les
+  résolve — les repasser en relatifs casse la version anglaise, en silence.
+- **La langue vient de `document.documentElement.lang`.** `traduire()` (`site/app.js`)
+  applique la table inverse quand la langue est `fr` : sur une page déjà anglaise, une
+  valeur en dur la retraduirait intégralement en français au premier rendu.
 - **Un secret collé dans un plan approuvé part dans git en clair.** La parade est en
   amont : ne pas en coller.
 - **Un plan actif éclipse un ticket actif, jamais l'inverse.** `ovrsee/.active-ticket`

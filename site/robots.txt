@@ -1,0 +1,7 @@
+# Rien à cacher : la vitrine est une page publique, et la version anglaise en est
+# une seconde. La seule chose que ce fichier apporte vraiment, c'est la ligne
+# Sitemap — un robots.txt absent vaut autorisation, mais ne déclare rien.
+User-agent: *
+Allow: /
+
+Sitemap: https://ovrsee.app/sitemap.xml

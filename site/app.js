@@ -15,7 +15,10 @@ const ACCENT = '#7d76f0'
 
 /* ------------------------------------------------------------------ état -- */
 
-const état = { view: 'apercu', scale: 1, lang: 'fr' }
+// La langue vient du document, pas d'une valeur en dur : `/en/` est une page déjà
+// traduite (`scripts/build-site-en.js`), et `traduire()` y appliquerait sinon la table
+// inverse — la page anglaise repasserait en français au premier rendu.
+const état = { view: 'apercu', scale: 1, lang: document.documentElement.lang === 'en' ? 'en' : 'fr' }
 
 /* --------------------------------------------------------------- données -- */
 
@@ -90,8 +93,6 @@ function valeurs() {
 
   return {
     views, bars,
-    pickFr: () => rendre({ lang: 'fr' }),
-    pickEn: () => rendre({ lang: 'en' }),
     frStyle: styleOnglet(état.lang === 'fr'),
     enStyle: styleOnglet(état.lang === 'en'),
     stageWrapStyle: `width: 100%; overflow: hidden; height: ${Math.round(820 * état.scale)}px;`,
@@ -312,7 +313,7 @@ async function versionAffichée() {
 
 /* --------------------------------------------------------------- amorçage -- */
 
-fetch('dict.json')
+fetch('/dict.json')
   .then(r => (r.ok ? r.json() : {}))
   .catch(() => ({}))
   .then(d => { DICT = d; rendre({}) })

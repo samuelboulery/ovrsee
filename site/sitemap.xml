@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Deux URL, et les alternates croisées : sans elles, Google traite /en/ comme un
+     doublon de / plutôt que comme sa traduction. Chaque page se cite elle-même dans
+     son propre jeu d'alternates — c'est la règle, pas une redondance. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://ovrsee.app/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://ovrsee.app/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ovrsee.app/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ovrsee.app/"/>
+  </url>
+  <url>
+    <loc>https://ovrsee.app/en/</loc>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://ovrsee.app/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ovrsee.app/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ovrsee.app/"/>
+  </url>
+</urlset>

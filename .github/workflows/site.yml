@@ -1,13 +1,18 @@
 name: site
 
-# La vitrine est statique : aucun build, le dossier part tel quel. Le filtre de
-# chemins évite qu'un changement de code relance un déploiement — et,
+# La vitrine est statique. Une seule chose se construit : `site/en/index.html`, la
+# version anglaise, dérivée de `site/index.html` et `site/dict.json` — générée ici
+# plutôt que commitée, pour qu'elle ne puisse pas dériver de sa source. Le script n'a
+# aucune dépendance : le `node` du runner suffit, pas d'installation.
+#
+# Le filtre de chemins évite qu'un changement de code relance un déploiement — et,
 # symétriquement, `ci.yml` ignore `site/**`.
 on:
   push:
     branches: [main]
     paths:
       - 'site/**'
+      - 'scripts/build-site-en.js'
       - '.github/workflows/site.yml'
   workflow_dispatch:
 
@@ -34,6 +39,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - run: node scripts/build-site-en.js
 
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:

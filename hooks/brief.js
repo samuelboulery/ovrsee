@@ -100,7 +100,7 @@ function age(date, now) {
 }
 
 /** Première phrase de l'intention d'un plan, sans syntaxe markdown. */
-function intention(plan) {
+export function intention(plan) {
   const body = plan.body ?? ''
   const lines = body.split('\n')
   const start = lines.findIndex(l => /^#{1,4}\s/.test(l) && /contexte|probl[eè]me|intention/i.test(l))

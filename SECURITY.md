@@ -1,77 +1,79 @@
-# Sécurité
+<p align="center">
+  <a href="./SECURITY.md"><img alt="English" src="https://img.shields.io/badge/🇬🇧-English-4c3f91?style=for-the-badge"></a>
+  <a href="./SECURITY.fr.md"><img alt="Français" src="https://img.shields.io/badge/🇫🇷-Fran%C3%A7ais-3a3d4d?style=for-the-badge"></a>
+</p>
 
-## Signaler une vulnérabilité
+# Security
 
-**Ne l'ouvrez pas en issue publique.** Utilisez
-[Security Advisories](https://github.com/samuelboulery/ovrsee/security/advisories/new) :
-le signalement reste privé jusqu'à ce qu'un correctif existe.
+## Reporting a vulnerability
 
-Comptez quelques jours pour une première réponse. Ce projet est maintenu par une
-seule personne, sur son temps — c'est un délai réaliste, pas un engagement
-contractuel.
+**Do not open a public issue.** Use
+[Security Advisories](https://github.com/samuelboulery/ovrsee/security/advisories/new):
+the report stays private until a fix exists.
 
-## Versions suivies
+Expect a few days for a first response. This project is maintained by one person,
+on their own time — that is a realistic delay, not a contractual commitment.
 
-Seule la dernière version publiée reçoit des correctifs. Il n'y a pas de branche
-de maintenance.
+## Supported versions
 
-## Ce que l'application fait, et ne fait pas
+Only the latest published release receives fixes. There is no maintenance branch.
 
-L'invariant du projet borne la surface d'attaque, et il vaut d'être connu avant
-de chercher une faille :
+## What the application does, and does not do
 
-> **L'ovrsee lit ; il n'exécute que le terminal qu'on lui demande.**
+The project's invariant bounds the attack surface, and it is worth knowing before
+you go looking for a flaw:
 
-Concrètement :
+> **Ovrsee reads; the only thing it runs is the terminal you ask it for.**
 
-- **Le serveur MCP n'exécute aucun code** du projet observé. Il lit tout
-  `<repo>/ovrsee/` et n'écrit que `ovrsee/tickets/*.md` et `ovrsee/board.json`.
-- **Seuls les projets du registre sont lisibles.** Un chemin absent du registre
-  est refusé, même s'il existe sur le disque. Cette liste blanche est la
-  frontière : un contournement en est une vulnérabilité.
-- **Le terminal passe par IPC Electron, jamais par une socket locale.** Une
-  socket l'ouvrirait à tout processus tournant sous le même compte — c'est un
-  arbitrage explicite du cadrage, pas un oubli.
-- **Le crawl ne démarre pas si `baseUrl` répond déjà.** Rien dans une réponse
-  HTTP ne distingue son propre serveur de celui d'un autre projet.
-- **Le crawl est la seule exception à ce qui précède, et elle est voulue.**
-  `pnpm ovrsee:crawl` lance la commande `dev` écrite dans le `ovrsee.config.json`
-  du projet observé — il faut bien démarrer l'application pour la photographier.
-  C'est du code venant du dépôt observé, exécuté sur votre machine, au même titre
-  qu'un `pnpm dev` ou qu'un script d'installation npm. **N'inscrivez au registre
-  que des dépôts auxquels vous confieriez déjà un `pnpm dev`.** Le reste de
-  l'application n'exécute jamais rien du projet observé.
+Concretely:
+
+- **The MCP server executes no code** from the observed project. It reads all of
+  `<repo>/ovrsee/` and writes only `ovrsee/tickets/*.md` and `ovrsee/board.json`.
+- **Only projects in the registry are readable.** A path absent from the registry
+  is refused, even if it exists on disk. That allowlist is the boundary: a way
+  around it is a vulnerability.
+- **The terminal goes through Electron IPC, never a local socket.** A socket would
+  open it to any process running under the same account — an explicit decision of
+  the framing document, not an oversight.
+- **The crawl refuses to start if `baseUrl` already answers.** Nothing in an HTTP
+  response distinguishes your own server from another project's.
+- **The crawl is the one exception to the above, and it is deliberate.**
+  `pnpm ovrsee:crawl` runs the `dev` command declared in the observed project's
+  `ovrsee.config.json` — the application has to start before it can be
+  photographed. That is code from the observed repository, running on your
+  machine, exactly like a `pnpm dev` or an npm install script. **Only register
+  repositories you would already trust with a `pnpm dev`.** The rest of the
+  application never runs anything from the observed project.
 
 ## Secrets
 
-Aucun secret ne vit dans le dépôt observé. Les jetons d'intégration
-(Vercel, Netlify, Supabase) sont stockés dans
-`~/.claude/ovrsee/integrations.json`, **hors du dépôt**, chiffrés par
-`safeStorage`. Leur écriture, leur déchiffrement et l'appel réseau au
-fournisseur passent par IPC Electron et jamais par `/api/*` — cette route est
-aussi servie par le dev server Vite, en HTTP local non authentifié.
+No secret lives in the observed repository. Integration tokens (Vercel, Netlify,
+Supabase) are stored in `~/.claude/ovrsee/integrations.json`, **outside the
+repository**, encrypted with `safeStorage`. Writing them, decrypting them and the
+network call to the provider all go through Electron IPC and never through
+`/api/*` — that route is also served by the Vite dev server, over unauthenticated
+local HTTP.
 
-Les cookies de session du crawl (`.ovrsee-auth.json`) sont ignorés par git.
+The crawl's session cookies (`.ovrsee-auth.json`) are ignored by git.
 
-Un secret collé dans un plan approuvé, en revanche, part dans git en clair : la
-parade est en amont, ne pas en coller.
+A secret pasted into an approved plan, on the other hand, goes into git in the
+clear: the defence is upstream — do not paste one.
 
-## Binaires non signés
+## Unsigned binaries
 
-Les DMG et installeurs publiés ne sont **ni signés ni notariés**. macOS et
-Windows vous en avertiront au premier lancement. Si cela vous gêne, construisez
-depuis les sources : `pnpm install && pnpm package:mac` (ou `package:win`).
+Published DMGs and installers are **neither signed nor notarised**. macOS and
+Windows will warn you on first launch. If that bothers you, build from source:
+`pnpm install && pnpm package:mac` (or `package:win`).
 
-Vérifiez que le fichier téléchargé correspond bien à l'empreinte publiée sur la
-page de la release.
+Check that the downloaded file matches the checksum published on the release page.
 
-## Dépendances
+## Dependencies
 
-Le projet compte quatre dépendances de production — `@phosphor-icons/react`,
-`@xterm/xterm`, `@xterm/addon-fit` et `node-pty` — et cette sobriété est un
-choix de sécurité autant que de maintenance.
+The project has four production dependencies — `@phosphor-icons/react`,
+`@xterm/xterm`, `@xterm/addon-fit` and `node-pty` — and that restraint is a
+security choice as much as a maintenance one.
 
-Deux défenses sont en place contre les publications empoisonnées : pnpm bloque
-par défaut les scripts d'installation des dépendances (`onlyBuiltDependencies`
-n'autorise que `node-pty`, qui doit compiler), et `.npmrc` impose une
-quarantaine de 24 h sur les versions fraîchement publiées.
+Two defences are in place against poisoned publishes: pnpm blocks dependency
+install scripts by default (`onlyBuiltDependencies` allows only `node-pty`, which
+has to compile), and `.npmrc` imposes a 24 h quarantine on freshly published
+versions.

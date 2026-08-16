@@ -1,45 +1,49 @@
+<p align="center">
+  <a href="./CHANGELOG.md"><img alt="English" src="https://img.shields.io/badge/🇬🇧-English-4c3f91?style=for-the-badge"></a>
+  <a href="./CHANGELOG.fr.md"><img alt="Français" src="https://img.shields.io/badge/🇫🇷-Fran%C3%A7ais-3a3d4d?style=for-the-badge"></a>
+</p>
+
 # Changelog
 
-Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), et le
-versionnage [SemVer](https://semver.org/lang/fr/).
+The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
+versioning follows [SemVer](https://semver.org/).
 
-## [Non publié]
+## [Unreleased]
 
 ## [1.0.0-beta] — 2026-08-13
 
-Première version publiée. Les binaires ne sont ni signés ni notariés : macOS et
-Windows en avertissent au premier lancement.
+First published release. The binaries are neither signed nor notarised: macOS and
+Windows warn about it on first launch.
 
-### Ajouté
+### Added
 
-- **Sept onglets** : Aperçu, Navigateur, Produit, Historique, Tableau, Données,
-  Stack.
-- **Capture des plans** approuvés dans Claude Code, versionnés en markdown dans
+- **Seven tabs**: Overview, Browser, Product, History, Board, Data, Stack.
+- **Plan capture** for plans approved in Claude Code, versioned as markdown under
   `<repo>/ovrsee/plans/`.
-- **Crawl Playwright** du projet observé : chaque écran photographié, daté et
-  rattaché au commit qui l'a produit.
-- **Tableau de tickets** en kanban — un fichier markdown par ticket, colonnes
-  réglées dans `ovrsee/board.json`, epics et limites de WIP.
-- **Hook post-commit** rattachant chaque commit au plan actif.
-- **Terminal intégré** (pty réel), par IPC Electron et jamais par une socket
-  locale.
-- **Serveur MCP** stdio en JSON-RPC 2.0 : Claude lit tout `ovrsee/`, n'écrit que
-  les tickets et `board.json`, n'exécute aucun code.
-- **Deux skills** livrées, `ovrsee` et `ovrsee-tickets`, installables depuis
-  l'écran d'initialisation.
-- **Export Obsidian** avec wikilinks entre plans et tickets, et frontmatter
-  requêtable en Dataview.
-- **Onglet Aperçu** : santé du dépôt, branches, déploiements Vercel/Netlify et
-  état Supabase. Les jetons vivent hors du dépôt, chiffrés par `safeStorage`.
-- **Interface bilingue** français et anglais.
-- **Builds** macOS arm64 (DMG) et Windows x64 (NSIS), publiés à chaque tag.
+- **Playwright crawl** of the observed project: every screen photographed, dated
+  and tied to the commit that produced it.
+- **Ticket board** as a kanban — one markdown file per ticket, columns set in
+  `ovrsee/board.json`, epics and WIP limits.
+- **Post-commit hook** attaching each commit to the active plan.
+- **Built-in terminal** (a real pty), over Electron IPC and never a local socket.
+- **MCP server** over stdio in JSON-RPC 2.0: Claude reads all of `ovrsee/`, writes
+  only the tickets and `board.json`, and executes no code.
+- **Two skills** included, `ovrsee` and `ovrsee-tickets`, installable from the
+  setup screen.
+- **Obsidian export** with wikilinks between plans and tickets, and frontmatter
+  queryable in Dataview.
+- **Overview tab**: repository health, branches, Vercel/Netlify deployments and
+  Supabase status. Tokens live outside the repository, encrypted with
+  `safeStorage`.
+- **Bilingual interface**, English and French.
+- **Builds** for macOS arm64 (DMG) and Windows x64 (NSIS), published on every tag.
 
-### Connu
+### Known limitations
 
-- Pas de build macOS Intel ni Windows ARM.
-- Aucune mise à jour automatique : les versions se téléchargent à la main.
-- Le format de `ovrsee/` peut encore bouger d'ici la 1.0. Tout y étant en
-  markdown et en images, une migration se lira à l'œil nu.
+- No macOS Intel build, and no Windows ARM build.
+- No automatic updates: releases are downloaded by hand.
+- The `ovrsee/` format may still move before 1.0. Everything in it being markdown
+  and images, a migration will be readable with the naked eye.
 
-[Non publié]: https://github.com/samuelboulery/ovrsee/compare/v1.0.0-beta...HEAD
+[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.0.0-beta...HEAD
 [1.0.0-beta]: https://github.com/samuelboulery/ovrsee/releases/tag/v1.0.0-beta

@@ -1,63 +1,73 @@
-# Contribuer
+<p align="center">
+  <a href="./CONTRIBUTING.md"><img alt="English" src="https://img.shields.io/badge/🇬🇧-English-4c3f91?style=for-the-badge"></a>
+  <a href="./CONTRIBUTING.fr.md"><img alt="Français" src="https://img.shields.io/badge/🇫🇷-Fran%C3%A7ais-3a3d4d?style=for-the-badge"></a>
+</p>
 
-Merci de regarder ce projet. Il est maintenu par une seule personne : ouvrez une
-issue avant d'écrire du code pour une fonctionnalité, ça évite de travailler sur
-quelque chose qui ne sera pas fusionné.
+# Contributing
 
-## Mise en route
+Thanks for looking at this project. It is maintained by one person: open an issue
+before writing code for a feature — it saves you from working on something that
+will not be merged.
+
+## Getting started
 
 ```bash
 pnpm install
-pnpm dev        # interface seule, port 5180, sans terminal
-pnpm electron   # l'application complète, terminal compris
+pnpm dev        # interface only, port 5180, no terminal
+pnpm electron   # the full application, terminal included
 ```
 
-Il faut Node ≥ 22 et pnpm. La version de pnpm est épinglée par le champ
-`packageManager` : Corepack la fait respecter, ne la contournez pas.
+Node ≥ 22 and pnpm are required. The pnpm version is pinned by the
+`packageManager` field: Corepack enforces it, do not work around it.
 
-## Avant d'ouvrir une PR
+## Before opening a PR
 
 ```bash
-pnpm test        # node --test sur hooks/ crawl/ server/ mcp/, puis app/src compilé
-pnpm typecheck   # tsc — ne couvre QUE app/src
+pnpm test        # node --test on hooks/ crawl/ server/ mcp/ scripts/, then compiled app/src
+pnpm typecheck   # tsc — covers app/src ONLY
 pnpm lint
 ```
 
-Les trois doivent passer. La CI les rejoue sur macOS et sur Windows.
+All three must pass. CI replays them on macOS and on Windows.
 
-**Vérifiez sur ce que git contient, pas sur votre copie de travail.** Certains
-fichiers présents chez vous sont ignorés par git : un test qui en dépend passe
-en local et casse en CI. C'est arrivé.
+**Check against what git holds, not against your working copy.** Some files
+present on your machine are ignored by git: a test that depends on one passes
+locally and breaks in CI. It has happened.
 
 ```bash
 mkdir /tmp/verif && git archive HEAD | tar -x -C /tmp/verif
 cd /tmp/verif && pnpm install && pnpm test
 ```
 
-## Les règles qui ne se négocient pas
+## The rules that are not up for discussion
 
-**`pnpm` exclusivement.** Pas `npm`, pas `yarn`, pas `bun`. Un seul lockfile,
-`pnpm-lock.yaml`, toujours commité.
+**`pnpm` only.** Not `npm`, not `yarn`, not `bun`. One lockfile,
+`pnpm-lock.yaml`, always committed.
 
-**Aucun framework de test.** Les tests utilisent `node:test` et `node:assert`,
-rien d'autre. N'introduisez ni vitest, ni jest, ni mocha — écrivez dans le style
-existant. `app/src` ne fait pas exception : `scripts/test-ui.js` le compile dans
-un dossier jetable et lance le même `node --test` dessus.
+**No test framework.** Tests use `node:test` and `node:assert`, nothing else. Do
+not bring in vitest, jest or mocha — write in the existing style. `app/src` is no
+exception: `scripts/test-ui.js` compiles it into a throwaway folder and runs the
+same `node --test` on it.
 
-**Demandez avant d'ajouter une dépendance.** Le projet en a quatre en
-production, et c'est un choix — de sécurité autant que de maintenance. Ouvrez
-une issue qui explique pourquoi la bibliothèque standard ou une dépendance déjà
-présente ne suffit pas.
+**Ask before adding a dependency.** The project has four in production, and that
+is a choice — of security as much as of maintenance. Open an issue explaining why
+the standard library or a dependency already present is not enough.
 
-**Pas de fichier `.css` dans `app/src`.** Les styles passent par l'utilitaire
-`s()` de `app/src/style.ts`, sur les jetons du design system.
+**No `.css` file in `app/src`.** Styles go through the `s()` helper in
+`app/src/style.ts`, on the design system tokens.
 
-## Langue
+## Language
 
-Français pour les commentaires, la documentation et les messages d'interface.
-Anglais pour les identifiants et le code.
+English is the public language, French the working one.
 
-Les messages de commit suivent les Conventional Commits, en français :
+In English: the showcase site, the repository's front-door documents (this file,
+`README.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`). Each has its
+`*.fr.md` counterpart.
+
+In French: code comments, `CLAUDE.md`, `cadrage-ovrsee.md`, the plans and tickets
+under `ovrsee/`, and commit messages. English for identifiers and code, as always.
+
+Commit messages follow Conventional Commits, in French:
 
 ```
 feat: ajoute le filtre par étiquette au tableau
@@ -66,34 +76,37 @@ docs: précise la marche à suivre sous Windows
 chore: monte electron-builder en 26.16
 ```
 
-## Ce qu'on ne modifie pas
+## What is not edited by hand
 
-- **`ovrsee/`** est produit par des hooks. Seuls `ovrsee/tickets/*.md` et
-  `ovrsee/board.json` se saisissent. Les plans, les pages, les scans et les
-  captures s'écrivent tout seuls : les corriger à la main produit un état que le
-  prochain commit écrasera.
-- **`legacy/Ovrsee-A-Nocturne.dc.html`** est la maquette, du code tiers embarqué.
-  Hors périmètre.
-- **`_ds/`** est une bibliothèque de design systems. L'application ne charge que
+- **`ovrsee/`** is produced by hooks. Only `ovrsee/tickets/*.md` and
+  `ovrsee/board.json` are written by hand. Plans, pages, scans and screenshots
+  write themselves: fixing one manually produces a state the next commit will
+  overwrite.
+- **`legacy/Ovrsee-A-Nocturne.dc.html`** is the mockup, embedded third-party code.
+  Out of scope.
+- **`_ds/`** is a design system library. The application loads only
   `_ds/ovrsee/styles.css`.
-- **`graphify-out/graph.json`** est engendré. Il est versionné volontairement,
-  mais il se régénère — ne l'éditez pas.
+- **`graphify-out/graph.json`** is generated. It is versioned deliberately, but it
+  regenerates — do not edit it.
+- **`site/fr/`** is the French page, generated at publish time by
+  `scripts/build-site-fr.js` from `site/index.html` and `site/dict.json`. Fix
+  French wording in `dict.json`, never in a generated page.
 
-## Deux pièges qui coûtent une demi-journée
+## Two traps that cost half a day
 
-**Une route testée dans le navigateur n'est pas une route testée dans Electron.**
-`server/api.js` a trois hôtes — le middleware Vite, le protocole `ovrsee://` du
-processus principal, et le serveur MCP — qui appellent tous la même fonction
-`resolve()`. Le protocole custom n'a ni CORS, ni `Origin`, ni les mêmes en-têtes.
-Vérifiez les deux.
+**A route tested in the browser is not a route tested in Electron.**
+`server/api.js` has three hosts — the Vite middleware, the main process's
+`ovrsee://` protocol, and the MCP server — all calling the same `resolve()`
+function. The custom protocol has no CORS, no `Origin`, and not the same headers.
+Check both.
 
-**Le stdout du serveur MCP est le transport, pas un journal.** Un `console.log`
-ajouté n'importe où dans `hooks/` ou `server/` se retrouve au milieu d'un flux
-JSON-RPC et coupe la conversation. Les traces vont sur stderr.
+**The MCP server's stdout is the transport, not a log.** A `console.log` added
+anywhere under `hooks/` or `server/` lands in the middle of a JSON-RPC stream and
+cuts the conversation short. Traces go to stderr.
 
-## Le reste
+## The rest
 
-`CLAUDE.md` documente l'architecture, les pièges connus et les arbitrages déjà
-tranchés. Le cadrage — problème, alternatives écartées, périmètre — est dans
-`cadrage-ovrsee.md`. Les deux valent d'être lus avant de proposer un changement
-de structure.
+`CLAUDE.md` documents the architecture, the known traps and the decisions already
+settled. The framing — problem, discarded alternatives, scope — is in
+`cadrage-ovrsee.md`. Both are in French, and both are worth reading before
+proposing a structural change.

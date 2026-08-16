@@ -1508,7 +1508,7 @@ function t(key, lang, params) {
   // exception y emporte l'onglet entier — c'est le défaut que le garde-fou de
   // rendu a déjà eu à rattraper une fois. Le test de parité des dictionnaires
   // reste le vrai filet ; celui-ci n'est que la ceinture.
-  const translated = translations[lang]?.[key] ?? translations.fr?.[key] ?? key
+  const translated = translations[lang]?.[key] ?? translations.en?.[key] ?? key
 
   if (!params) return translated
 

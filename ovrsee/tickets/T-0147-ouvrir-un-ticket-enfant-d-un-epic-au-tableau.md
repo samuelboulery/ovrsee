@@ -2,7 +2,7 @@
 {
   "id": "T-0147",
   "titre": "Ouvrir un ticket enfant d'un epic au tableau",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": ["ui", "bug"],
   "cree": "2026-08-16",

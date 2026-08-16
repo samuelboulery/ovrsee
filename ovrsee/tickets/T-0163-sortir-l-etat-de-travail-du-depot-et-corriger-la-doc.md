@@ -2,7 +2,7 @@
 {
   "id": "T-0163",
   "titre": "Sortir l'état de travail du dépôt, et corriger la doc",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "basse",
   "tags": [
     "git",

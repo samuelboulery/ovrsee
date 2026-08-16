@@ -2,7 +2,7 @@
 {
   "id": "T-0161",
   "titre": "Fin de session, et hooks jamais enregistrés par l'installateur",
-  "colonne": "revue",
+  "colonne": "en-cours",
   "priorite": "moyenne",
   "tags": [
     "hooks",

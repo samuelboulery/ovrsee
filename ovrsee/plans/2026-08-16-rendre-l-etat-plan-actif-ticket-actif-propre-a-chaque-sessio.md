@@ -4,7 +4,49 @@
   "title": "Rendre l'état « plan actif / ticket actif » propre à chaque session",
   "opened": "2026-08-16",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "f7c3c17",
+      "date": "2026-08-16",
+      "files": [
+        ".gitignore",
+        "CLAUDE.md",
+        "README.fr.md",
+        "README.md",
+        "app/src/App.tsx",
+        "app/src/data.ts",
+        "app/src/menubar.test.ts",
+        "app/src/menubar.ts",
+        "app/src/render.test.tsx",
+        "app/src/tabs/Apercu.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Sante.tsx",
+        "hooks/active.js",
+        "hooks/active.test.js",
+        "hooks/gitignore-sync.js",
+        "hooks/gitignore-sync.test.js",
+        "hooks/install.js",
+        "hooks/install.test.js",
+        "hooks/ovrsee-capture-plan.js",
+        "hooks/ovrsee-capture-plan.test.js",
+        "hooks/ovrsee-cli.js",
+        "hooks/ovrsee-post-commit.js",
+        "hooks/ovrsee-post-commit.test.js",
+        "hooks/ovrsee-session-end.js",
+        "hooks/ovrsee-tool-edit-gate.js",
+        "hooks/ovrsee-tool-edit-gate.test.js",
+        "hooks/ovrsee-tool-edit.js",
+        "hooks/ovrsee-tool-stop.js",
+        "hooks/plans.js",
+        "hooks/plans.test.js",
+        "hooks/snapshot.js",
+        "hooks/tickets.js",
+        "hooks/tickets.test.js",
+        "server/api.js",
+        "skills/ovrsee-tickets/SKILL.md"
+      ]
+    }
+  ]
 }
 ---
 

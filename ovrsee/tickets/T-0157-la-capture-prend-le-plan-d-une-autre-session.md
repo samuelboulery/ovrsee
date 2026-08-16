@@ -2,7 +2,7 @@
 {
   "id": "T-0157",
   "titre": "La capture prend le plan d'une autre session",
-  "colonne": "revue",
+  "colonne": "en-cours",
   "priorite": "haute",
   "tags": [
     "hooks",

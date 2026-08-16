@@ -2,7 +2,7 @@
 {
   "id": "T-0156",
   "titre": "État plan/ticket propre à chaque session Claude",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "hooks",

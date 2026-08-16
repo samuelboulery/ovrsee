@@ -6,15 +6,6 @@ dist/
 .ovrsee-auth.json
 *.ovrsee-auth.json
 
-# État de travail des sessions Claude : quel plan et quel ticket chacune tient.
-# C'est local à une machine et à un instant — versionné, il produit un conflit
-# à chaque changement de branche, pour une information que personne ne relit.
-# `.active-plan` et `.active-ticket` sont les deux anciens pointeurs, encore
-# présents sur les dépôts d'avant la migration.
-ovrsee/.active/
-ovrsee/.active-plan
-ovrsee/.active-ticket
-
 # graphify-out/graph.json est VOLONTAIREMENT versionné : l'onglet Données le lit,
 # et l'ovrsee doit rester consultable sur un projet qui ne compile plus. En
 # revanche le cache et la visualisation se régénèrent depuis
@@ -65,3 +56,9 @@ site/fr/
 # Captures d'écran ovrsee : régénérées à chaque commit, purge auto côté
 # disque (30j puis 1/semaine) — inutile de les suivre dans git.
 ovrsee/pages/shots/
+
+# État de travail des sessions Claude (ovrsee) : local à une machine, jamais
+# versionné.
+ovrsee/.active/
+ovrsee/.active-plan
+ovrsee/.active-ticket

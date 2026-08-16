@@ -2,7 +2,7 @@
 {
   "id": "T-0162",
   "titre": "L'interface montre tous les plans actifs",
-  "colonne": "revue",
+  "colonne": "en-cours",
   "priorite": "moyenne",
   "tags": [
     "ui"

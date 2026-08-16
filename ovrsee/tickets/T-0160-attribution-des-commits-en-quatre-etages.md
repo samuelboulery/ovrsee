@@ -2,7 +2,7 @@
 {
   "id": "T-0160",
   "titre": "Attribution des commits en quatre étages",
-  "colonne": "revue",
+  "colonne": "en-cours",
   "priorite": "haute",
   "tags": [
     "hooks",

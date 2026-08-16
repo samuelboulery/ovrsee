@@ -1,10 +1,22 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Audit de consommation de tokens — constats et correctifs",
   "opened": "2026-08-16",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-16",
+  "commits": [
+    {
+      "sha": "f4a687e",
+      "date": "2026-08-16",
+      "files": [
+        "CLAUDE.md",
+        "hooks/brief.js",
+        "mcp/dispatch.js",
+        "mcp/mcp.test.js",
+        "mcp/server.js"
+      ]
+    }
+  ]
 }
 ---
 

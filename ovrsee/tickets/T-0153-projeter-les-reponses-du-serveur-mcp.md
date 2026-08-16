@@ -3,7 +3,7 @@
   "id": "T-0153",
   "titre": "Projeter les réponses du serveur MCP",
   "epic": "T-0148",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "m",
   "tags": [

@@ -3,7 +3,7 @@
   "id": "T-0154",
   "titre": "Densifier le CLAUDE.md du projet",
   "epic": "T-0148",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "basse",
   "charge": "s",
   "tags": [

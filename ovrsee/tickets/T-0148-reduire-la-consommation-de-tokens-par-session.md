@@ -3,7 +3,7 @@
   "id": "T-0148",
   "titre": "Réduire la consommation de tokens par session",
   "type": "epic",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "l",
   "tags": [

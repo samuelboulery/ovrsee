@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, statSy
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { installPostCommit } from './install.js'
+import { installPostCommit, signalInstalle } from './install.js'
 
 const START = '# ovrsee-hook-start'
 const END = '# ovrsee-hook-end'
@@ -172,4 +172,54 @@ test("un marqueur de fermeture sans ouverture n'est pas un problème", () => {
   const content = readFileSync(hookPath, 'utf8')
   // Le bloc est ajouté à la fin
   assert.ok(content.includes(START) && content.includes(END), 'le bloc est ajouté')
+})
+
+// --- le signal de session est-il enregistré ? ---
+
+/** Écrit un `settings.json` jetable et rend son chemin. */
+function tempSettings(contenu) {
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-settings-'))
+  const path = join(dir, 'settings.json')
+  writeFileSync(path, typeof contenu === 'string' ? contenu : JSON.stringify(contenu), 'utf8')
+  return path
+}
+
+/** Une entrée de hook telle que l'installateur en écrit. */
+const entree = script => ({ hooks: [{ type: 'command', command: `node '/x/hooks/${script}'` }] })
+
+test('signalInstalle : vrai quand les deux événements portent ovrsee-notify', () => {
+  const path = tempSettings({
+    hooks: {
+      Stop: [entree('ovrsee-tool-stop.js'), entree('ovrsee-notify.js')],
+      Notification: [entree('ovrsee-notify.js')],
+    },
+  })
+
+  assert.equal(signalInstalle(path), true)
+})
+
+test('signalInstalle : un seul des deux événements ne suffit pas', () => {
+  // `Stop` seul dirait « c'est à toi » sans jamais signaler une question ;
+  // `Notification` seul laisserait l'attente allumée après coup.
+  const stopSeul = tempSettings({ hooks: { Stop: [entree('ovrsee-notify.js')], Notification: [] } })
+  const notifSeule = tempSettings({ hooks: { Notification: [entree('ovrsee-notify.js')] } })
+
+  assert.equal(signalInstalle(stopSeul), false)
+  assert.equal(signalInstalle(notifSeule), false)
+})
+
+test('signalInstalle : un autre hook ovrsee ne compte pas pour celui-là', () => {
+  const path = tempSettings({
+    hooks: { Stop: [entree('ovrsee-tool-stop.js')], Notification: [entree('ovrsee-capture-audit.js')] },
+  })
+
+  assert.equal(signalInstalle(path), false)
+})
+
+test('signalInstalle : un fichier absent ou illisible vaut « non installé »', () => {
+  // Rendre faux plutôt que lever : l'appelant est le processus principal
+  // d'Electron, et une exception y coûterait plus que l'information.
+  assert.equal(signalInstalle(join(tmpdir(), 'ovrsee-absent-jamais-cree.json')), false)
+  assert.equal(signalInstalle(tempSettings('{ ceci n’est pas du JSON')), false)
+  assert.equal(signalInstalle(tempSettings({})), false, 'aucun hook du tout')
 })

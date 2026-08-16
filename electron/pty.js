@@ -152,6 +152,17 @@ export function writeTo(id, data) {
   sessions.get(id)?.pty.write(data)
 }
 
+/**
+ * Cette session existe-t-elle ici et maintenant ?
+ *
+ * Pour `electron/tray.js` : l'état qu'il retient vient du rendu, et une
+ * décision de la barre de menu ne doit désigner qu'un pty que ce processus
+ * possède réellement. `writeTo` ignore déjà un identifiant inconnu — le
+ * vérifier en amont permet de le *dire* au lieu de laisser passer un clic
+ * sans effet.
+ */
+export const hasSession = id => sessions.has(id)
+
 export function resize(id, cols, rows) {
   const session = sessions.get(id)
   if (!session) return

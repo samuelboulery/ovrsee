@@ -24,6 +24,13 @@
  *   stdin  {"hook_event_name":"Stop", ...}
  *          {"hook_event_name":"Notification","notification_type":"permission_prompt", ...}
  *   stdout {"terminalSequence":"<ESC>]777;ovrsee;stop<BEL>"}
+ *          {"terminalSequence":"<ESC>]777;ovrsee;question;<base64><BEL>"}
+ *
+ * La séquence porte en plus, quand il y en a un, le `message` de la charge
+ * utile — « Claude needs your permission to use Bash ». Le popover de la barre
+ * de menu (`electron/tray.js`) en a besoin : « une question » ne dit pas
+ * laquelle, et on n'autorise pas à l'aveugle. Le champ voyage en base64 parce
+ * que c'est du texte libre : un BEL qui s'y glisserait couperait la séquence.
  */
 
 import { existsSync, readFileSync } from 'node:fs'
@@ -40,7 +47,38 @@ import { fileURLToPath } from 'node:url'
 const TYPES_EN_ATTENTE = new Set(['permission_prompt', 'idle_prompt', 'agent_needs_input'])
 
 /**
- * Séquence pour un genre donné.
+ * Longueur retenue du détail, en caractères, avant encodage.
+ *
+ * Une séquence OSC traverse le pty octet par octet : c'est un canal de signal,
+ * pas de transfert. Le message des invites de permission tient largement
+ * dedans, et ce qui dépasse serait de toute façon illisible sur une ligne de
+ * popover.
+ */
+const MAX_DETAIL = 120
+
+/**
+ * Détail à joindre au signal, ou null.
+ *
+ * Seule une `Notification` en porte un : `Stop` dit « c'est à toi », il n'y a
+ * rien à préciser. Le champ est du texte libre côté Claude Code — on ne fait
+ * que le relayer, et `sequence()` le tronque.
+ *
+ * @param {unknown} payload
+ * @returns {string|null}
+ */
+export function detailPour(payload) {
+  if (!payload || typeof payload !== 'object') return null
+  if (payload.hook_event_name !== 'Notification') return null
+
+  const message = payload.message
+  if (typeof message !== 'string') return null
+
+  const propre = message.trim()
+  return propre === '' ? null : propre
+}
+
+/**
+ * Séquence pour un genre donné, et son détail éventuel.
  *
  * OSC 777 est le canal des notifications de terminal (rxvt, puis les autres) :
  * un émulateur qui ne le connaît pas l'ignore silencieusement au lieu
@@ -48,9 +86,18 @@ const TYPES_EN_ATTENTE = new Set(['permission_prompt', 'idle_prompt', 'agent_nee
  * Claude Code en ajoute un de son côté, et `app/src/attention.ts` tolère les
  * deux.
  *
+ * La forme courte, sans détail, est conservée telle quelle : c'est celle que
+ * `Stop` émet, et la seule que les versions précédentes savaient lire.
+ *
  * @param {'stop'|'question'} genre
+ * @param {string|null} [detail] texte libre, encodé en base64 dans la séquence
  */
-export const sequence = genre => `\u001b]777;ovrsee;${genre}\u0007`
+export const sequence = (genre, detail = null) => {
+  const corps = detail
+    ? `${genre};${Buffer.from(detail.slice(0, MAX_DETAIL), 'utf8').toString('base64')}`
+    : genre
+  return `\u001b]777;ovrsee;${corps}\u0007`
+}
 
 /**
  * Genre de signal appelé par une charge utile de hook, ou null s'il n'y a rien
@@ -119,7 +166,9 @@ function main() {
 
   if (!projetEquipe(payload?.cwd || process.cwd())) return
 
-  process.stdout.write(JSON.stringify({ terminalSequence: sequence(genre) }))
+  process.stdout.write(
+    JSON.stringify({ terminalSequence: sequence(genre, detailPour(payload)) }),
+  )
 }
 
 /**

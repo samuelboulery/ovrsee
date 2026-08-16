@@ -1,7 +1,8 @@
-import { useRef, useState, type ComponentType } from 'react'
+import { useEffect, useRef, useState, type ComponentType } from 'react'
 import { Compass, GitFork, NotePencil, Plus, type IconProps } from '@phosphor-icons/react'
 
 import { briefLines, buildActions, type Snapshot, type SettingsType } from './data'
+import { composer, resumeProjet, type MenuBarAttention } from './menubar'
 import { s } from './style'
 import { t, type TranslationKey } from './i18n'
 import { useTerminals, pasteToClaude } from './useTerminal'
@@ -98,10 +99,26 @@ export function Terminal({
 
   // Déclaré avant `useTerminals` pour lui être passé, mais il lit `active` et
   // `cibler` qui en sortent : d'où la référence, tenue à jour à chaque rendu.
-  const etat = useRef<{ active: string | null; cibler: (key: string) => void }>({
+  const etat = useRef<{
+    active: string | null
+    cibler: (key: string) => void
+    onProjet: (path: string) => void
+  }>({
     active: null,
     cibler: () => {},
+    onProjet,
   })
+
+  // Les signaux reçus, par clé de session. Une référence et pas un state : les
+  // rafraîchir déclencherait un rendu du panneau à chaque fin de tour de
+  // Claude, pour un affichage qui vit dans une autre fenêtre.
+  //
+  // Ce n'est que la moitié de ce que la barre de menu montre : l'autre est la
+  // liste des sessions ouvertes, qui existe indépendamment. Voir `composer()`.
+  const attentions = useRef<Record<string, MenuBarAttention>>({})
+  // Compteur de publication : un signal ne change pas les dépendances de
+  // l'effet ci-dessous, il faut le lui dire.
+  const [signaux, setSignaux] = useState(0)
 
   const {
     sessions,
@@ -116,21 +133,39 @@ export function Terminal({
     cibler,
     claudeKey,
     available,
-  } = useTerminals(snapshot?.root ?? null, (sessionKey, kind) => {
+    ptyIds,
+  } = useTerminals(snapshot?.root ?? null, (sessionKey, event) => {
+    const { kind, detail } = event
+    const projet = sessionKey.slice(0, Math.max(0, sessionKey.lastIndexOf('#')))
+    // Le nom du dossier plutôt que celui du registre : la notification peut
+    // venir d'un projet qui n'est pas l'affiché, dont le snapshot n'est pas là.
+    const nom = projet.split('/').filter(Boolean).pop() ?? projet
+
+    // La barre de menu reçoit tout, y compris ce qui est sous les yeux : elle
+    // affiche un état, pas un événement, et une session en attente doit y
+    // figurer même si sa fenêtre est au premier plan.
+    //
+    // Seul le signal est retenu ici ; la publication est faite par l'effet
+    // plus bas, qui sait aussi quelles sessions tournent. `ptyId` n'est pas
+    // relu de ce signal : il vient de `ptyIds`, qui fait autorité.
+    attentions.current = { ...attentions.current, [sessionKey]: { kind, detail, at: Date.now() } }
+    setSignaux(n => n + 1)
+
     // Rien à signaler si la session est sous les yeux : la notification
     // doublonnerait ce que l'utilisateur est déjà en train de regarder.
     if (sessionKey === etat.current.active && document.hasFocus()) return
     if (typeof Notification === 'undefined') return
 
     const titre = t(kind === 'question' ? 'terminal.notify_question' : 'terminal.notify_stop')
-    const projet = sessionKey.slice(0, Math.max(0, sessionKey.lastIndexOf('#')))
-    // Le nom du dossier plutôt que celui du registre : la notification peut
-    // venir d'un projet qui n'est pas l'affiché, dont le snapshot n'est pas là.
-    const nom = projet.split('/').filter(Boolean).pop() ?? projet
 
     // `tag` : une session qui signale deux fois remplace sa notification au
-    // lieu d'en empiler une seconde.
-    const notification = new Notification(titre, { body: nom, tag: sessionKey })
+    // lieu d'en empiler une seconde. Le détail, quand le hook en a joint un,
+    // dit *quelle* permission est demandée — « une question » ne suffit pas
+    // pour décider sans revenir à la fenêtre.
+    const notification = new Notification(titre, {
+      body: detail ? `${nom} — ${detail}` : nom,
+      tag: sessionKey,
+    })
     notification.onclick = () => {
       window.ovrsee?.app.focus()
       etat.current.cibler(sessionKey)
@@ -138,7 +173,61 @@ export function Terminal({
     }
   })
 
-  etat.current = { active, cibler }
+  etat.current = { active, cibler, onProjet }
+
+  /**
+   * Ce que la barre de menu affiche : les sessions Claude dont le pty tourne
+   * vraiment, plus le résumé du projet quand il n'y en a aucune.
+   *
+   * Filtré sur `ptyIds` et pas sur `allSessions` : un onglet dont le terminal
+   * n'a jamais été monté n'a pas de pty, et sa carte proposerait d'écrire dans
+   * le vide. Une session fermée en sort d'elle-même, sans élagage séparé.
+   */
+  const ouvertes = allSessions
+    .filter(session => session.kind === 'claude' && ptyIds[session.key])
+    .map(session => {
+      const projet = session.key.slice(0, Math.max(0, session.key.lastIndexOf('#')))
+      return {
+        sessionKey: session.key,
+        ptyId: ptyIds[session.key],
+        projet,
+        // Le nom du dossier plutôt que celui du registre : une session peut
+        // venir d'un projet qui n'est pas l'affiché, dont le snapshot est absent.
+        nom: projet.split('/').filter(Boolean).pop() ?? projet,
+      }
+    })
+
+  const projet = resumeProjet(snapshot)
+
+  // `JSON.stringify` comme clé de dépendance : `ouvertes` et `projet` sont
+  // reconstruits à chaque rendu, et les comparer par référence republierait
+  // sans fin. Les deux sont petits — quelques sessions, une poignée de champs.
+  const publie = JSON.stringify({ ouvertes, projet, signaux })
+  useEffect(() => {
+    void window.ovrsee?.menubar?.report({
+      sessions: composer(ouvertes, attentions.current),
+      projet,
+    })
+    // `ouvertes` et `projet` sont dans `publie` ; les lister aussi rendrait
+    // l'effet dépendant de références neuves à chaque rendu.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [publie])
+
+  // « Ouvrir la session » depuis le popover : même chemin que le clic sur une
+  // notification, la fenêtre étant déjà ramenée au premier plan par `tray.js`.
+  //
+  // Abonnement unique, et tout passe par `etat.current` : dépendre de
+  // `onProjet` réabonnerait à chaque rendu du panneau, pour un écouteur qui
+  // n'a besoin que de la version la plus récente.
+  useEffect(
+    () =>
+      window.ovrsee?.menubar?.onReveal(sessionKey => {
+        etat.current.cibler(sessionKey)
+        const projet = sessionKey.slice(0, Math.max(0, sessionKey.lastIndexOf('#')))
+        if (projet) etat.current.onProjet(projet)
+      }),
+    [],
+  )
 
   const error = active ? (errors[active] ?? null) : null
 

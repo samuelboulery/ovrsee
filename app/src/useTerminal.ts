@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { Integration, IntegrationProvider, IntegrationStatus, SchemaTable } from './data'
-import { extractAttention, type AttentionKind } from './attention'
+import { extractAttention, type AttentionEvent } from './attention'
+import type { MenuBarDecision, MenuBarEtat, MenuBarVue } from './menubar'
 import { getTerminalTheme } from './theme'
 // WHY: xterm est le terminal de VS Code, pas une imitation. Un rendu maison
 // devrait réimplémenter les séquences ANSI, le défilement et la sélection —
@@ -78,6 +79,27 @@ declare global {
        * notification ne peut pas faire depuis le rendu.
        */
       app: { focus: () => Promise<void> }
+      /**
+       * Barre de menu macOS — voir `electron/tray.js`.
+       *
+       * Absente dans un navigateur, comme le terminal : il n'y a pas de barre
+       * de statut à alimenter.
+       */
+      menubar?: {
+        /** Le rendu principal publie l'état complet ; le principal le retient. */
+        report: (etat: MenuBarEtat) => Promise<void>
+        /** Le popover s'abonne à cet état, augmenté de ce que seul le principal sait. */
+        listen: (handler: (vue: MenuBarVue) => void) => () => void
+        /**
+         * Répond à une session. Le rendu n'envoie que la décision — la touche
+         * correspondante est choisie dans le processus principal.
+         */
+        answer: (ptyId: string, decision: MenuBarDecision) => Promise<boolean>
+        /** Ramène la fenêtre sur cette session, puis referme le popover. */
+        reveal: (sessionKey: string) => Promise<void>
+        /** Côté fenêtre principale : le popover demande cette session. */
+        onReveal: (handler: (sessionKey: string) => void) => () => void
+      }
       /** Onglet Navigateur — voir `electron/preload.cjs`. */
       preview: {
         devtools: (
@@ -160,7 +182,7 @@ const claudeSlot = (project: string): Session => ({
  * Ce hook se contente de repérer le signal dans le flux ; s'il faut notifier,
  * et où le clic renvoie, se décide dans `Terminal.tsx`.
  */
-export type OnAttention = (sessionKey: string, kind: AttentionKind) => void
+export type OnAttention = (sessionKey: string, event: AttentionEvent, ptyId: string) => void
 
 /**
  * Ouvre les sessions du panneau et les relie chacune à un xterm.
@@ -175,6 +197,13 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
   const [sessions, setSessions] = useState<Session[]>([])
   const [active, setActive] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  // Clé de session → identifiant de pty, pour ce qui vit hors du hook.
+  //
+  // L'identifiant existe déjà dans `panes`, mais c'est une référence : rien ne
+  // re-rend quand il apparaît, et la barre de menu ne saurait jamais qu'une
+  // session vient de s'ouvrir. Un état, donc, et la présence d'une clé ici
+  // veut dire « ce pty tourne » — pas « cet onglet existe ».
+  const [ptyIds, setPtyIds] = useState<Record<string, string>>({})
 
   const panes = useRef(new Map<string, Pane>())
   const counter = useRef(0)
@@ -222,6 +251,11 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
     }
   }, [])
 
+  /** Le pty de cette session vient de mourir ou d'être fermé. */
+  const oublieId = useCallback((key: string) => {
+    setPtyIds(({ [key]: _parti, ...reste }) => reste)
+  }, [])
+
   // Un seul abonnement pour toutes les sessions : `listen` porte déjà
   // l'identifiant, et deux abonnements écriraient deux fois le même octet.
   // L'effet n'a pas de dépendances — la callback passe donc par une référence,
@@ -242,7 +276,7 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
         for (const [key, pane] of panes.current) {
           if (pane.id !== id) continue
           pane.xterm.write(scan.clean)
-          for (const kind of scan.events) attentionRef.current?.(key, kind)
+          for (const event of scan.events) attentionRef.current?.(key, event, id)
         }
       },
       (id, code) => {
@@ -251,6 +285,7 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
           if (pane.id !== id) continue
           pane.xterm.writeln(`\r\n\x1b[38;5;140m— session terminée (code ${code}) —\x1b[0m`)
           pane.id = null
+          oublieId(key)
           if (key.endsWith('#claude')) claudeSessionId = null
         }
       },
@@ -308,6 +343,7 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
         panes.current.delete(session.key)
         pane.gone = true
         pane.observer.disconnect()
+        oublieId(session.key)
         if (pane.id) {
           bridge.close(pane.id)
           if (pane.id === claudeSessionId) claudeSessionId = null
@@ -367,6 +403,7 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
           return
         }
         pane.id = result.id
+        setPtyIds(before => ({ ...before, [session.key]: result.id }))
         // Ne pointer `claudeSessionId` que si le projet de cette session est
         // toujours celui affiché : sinon un changement de projet pendant
         // l'ouverture ferait écrire `injectToClaude` dans une session cachée.
@@ -377,7 +414,7 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
 
     refs.current.set(session.key, ref)
     return ref
-  }, [projectPath])
+  }, [projectPath, oublieId])
 
   /** Ouvre un shell nu de plus, et s'y place. */
   const openShell = useCallback(() => {
@@ -467,6 +504,12 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
   return {
     sessions,
     allSessions,
+    /**
+     * Clé de session → identifiant de pty, pour les sessions qui tournent
+     * vraiment. Une clé d'`allSessions` absente d'ici est un onglet dont le
+     * terminal n'a jamais été monté.
+     */
+    ptyIds,
     active,
     setActive: handleSetActive,
     attach,

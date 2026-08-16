@@ -36,6 +36,14 @@ import { readSettings } from '../hooks/settings.js'
 import { readIntegrations, writeIntegrations } from '../hooks/integrations.js'
 import { checkVercel, checkNetlify, checkSupabase, fetchSupabaseSchema } from '../hooks/integrationProviders.js'
 import { openSession, writeTo, resize, closeSession, closeAll } from './pty.js'
+import {
+  answer as menubarAnswer,
+  createTray,
+  currentState,
+  destroyPopover,
+  reveal as menubarReveal,
+  setState,
+} from './tray.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const UI = join(HERE, '..', 'app', 'dist')
@@ -150,6 +158,15 @@ function closeDevtools(hostId) {
   if (!open.view.webContents.isDestroyed()) open.view.webContents.close()
 }
 
+/**
+ * Fenêtre principale.
+ *
+ * Tenue à part parce que deux choses la désignent sans être elle : la barre de
+ * menu, qui la ramène au premier plan, et la garde de `menubar:report`, qui
+ * n'accepte l'état que d'elle.
+ */
+let principale = null
+
 function createWindow() {
   const window = new BrowserWindow({
     width: 1400,
@@ -173,6 +190,15 @@ function createWindow() {
       // d'élément serait impossible.
       webviewTag: true,
     },
+  })
+
+  // Le popover part avec elle. Une fenêtre cachée compte dans
+  // `getAllWindows()` : sans cela `window-all-closed` ne se déclencherait
+  // plus, `closeAll()` ne serait plus appelé, et les sessions Claude
+  // survivraient sans interface.
+  window.on('closed', () => {
+    if (principale === window) principale = null
+    destroyPopover()
   })
 
   // L'invité est attaché par le rendu : c'est ici qu'on décide de ses
@@ -520,10 +546,33 @@ app.whenReady().then(() => {
     return true
   })
 
-  createWindow()
+  // Surface de la barre de menu. Le principal ne calcule rien : il retient
+  // l'état que le rendu principal publie et le republie au popover — voir
+  // l'en-tête de `tray.js` pour pourquoi le calcul n'est pas ici.
+  //
+  // `report` n'est accepté que de la fenêtre principale. Le popover est un
+  // rendu de la même origine : sans cette garde, il pourrait se réécrire son
+  // propre état, donc se fabriquer une session et un identifiant de pty.
+  ipcMain.handle('menubar:report', (event, etat) => {
+    if (event.sender !== principale?.webContents) return
+    setState(etat)
+  })
+  ipcMain.handle('menubar:pull', () => currentState())
+  ipcMain.handle('menubar:answer', (_event, ptyId, decision) => menubarAnswer(ptyId, decision))
+  ipcMain.handle('menubar:reveal', (_event, sessionKey) => {
+    if (typeof sessionKey === 'string') menubarReveal(sessionKey)
+  })
+
+  principale = createWindow()
+
+  createTray({
+    origin: ORIGIN,
+    preload: join(HERE, 'preload.cjs'),
+    getMainWindow: () => principale,
+  })
 
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0) principale = createWindow()
   })
 })
 

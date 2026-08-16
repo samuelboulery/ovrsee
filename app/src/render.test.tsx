@@ -5,6 +5,8 @@ import test from 'node:test'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import { Garde, Panne, messageDe } from './Garde'
+import { BandeauSignal, MenuBar, PEREMPTION_MS, ProjetCard, SessionCard } from './MenuBarPanel'
+import type { MenuBarSession } from './menubar'
 import type { Snapshot } from './data'
 import { Apercu } from './tabs/Apercu'
 import { Donnees } from './tabs/Donnees'
@@ -161,4 +163,93 @@ test('messageDe rend une chaîne quoi qu’on lui donne', () => {
   assert.equal(messageDe(new TypeError()), 'TypeError')
   assert.equal(messageDe('juste une chaîne'), 'juste une chaîne')
   assert.equal(messageDe(null), 'null')
+})
+
+// --- le popover de la barre de menu ---------------------------------------
+
+const session = (
+  attention: MenuBarSession['attention'] = { kind: 'question', detail: 'permission to use Bash', at: Date.now() },
+  patch: Partial<MenuBarSession> = {},
+): MenuBarSession => ({
+  sessionKey: '/tmp/projet#claude',
+  ptyId: 'pty-1',
+  projet: '/tmp/projet',
+  nom: 'projet',
+  attention,
+  ...patch,
+})
+
+test('barre de menu — une attente propose de décider', () => {
+  const html = renderToStaticMarkup(
+    <SessionCard session={session()} now={Date.now()} onAnswer={() => {}} />,
+  )
+
+  assert.match(html, /permission to use Bash/, 'le détail du hook est affiché')
+  assert.doesNotMatch(html, /disabled/, 'les boutons de décision sont actifs')
+})
+
+test('barre de menu — une attente périmée grise ses boutons', () => {
+  const now = Date.now()
+  const vieille = { kind: 'question' as const, detail: null, at: now - PEREMPTION_MS - 1 }
+  const html = renderToStaticMarkup(
+    <SessionCard session={session(vieille)} now={now} onAnswer={() => {}} />,
+  )
+
+  // Deux `disabled` : Autoriser et Refuser. « Ouvrir la session » reste actif —
+  // c'est le repli quand on ne peut plus décider d'ici.
+  assert.equal(html.match(/disabled/g)?.length, 2)
+})
+
+test('barre de menu — un « c’est à toi » n’offre pas de décision', () => {
+  const fini = { kind: 'stop' as const, detail: null, at: Date.now() }
+  const html = renderToStaticMarkup(
+    <SessionCard session={session(fini)} now={Date.now()} onAnswer={() => {}} />,
+  )
+
+  assert.doesNotMatch(html, /Autoriser|Allow/)
+  assert.doesNotMatch(html, /Refuser|Deny/)
+})
+
+test('barre de menu — une session muette paraît, sans rien à décider', () => {
+  // Le défaut qui a motivé T-0141 : elle n'apparaissait pas du tout.
+  const html = renderToStaticMarkup(
+    <SessionCard session={session(null)} now={Date.now()} onAnswer={() => {}} />,
+  )
+
+  assert.match(html, /projet/)
+  assert.match(html, /En cours|Running/)
+  assert.doesNotMatch(html, /Autoriser|Allow/)
+})
+
+test('barre de menu — le bloc projet dit où en est le dépôt', () => {
+  const html = renderToStaticMarkup(
+    <ProjetCard
+      projet={{
+        nom: 'ovrsee',
+        projet: '/tmp/projet',
+        planActif: 'Barre de menu macOS',
+        ticketsRestants: 7,
+        branche: 'main',
+        fichiersModifies: 25,
+        dernierScan: '2026-08-14',
+      }}
+    />,
+  )
+
+  assert.match(html, /Barre de menu macOS/)
+  assert.match(html, /7/)
+  assert.match(html, /main/)
+  assert.match(html, /2026-08-14/)
+})
+
+test('barre de menu — le bandeau nomme la commande qui manque', () => {
+  const html = renderToStaticMarkup(<BandeauSignal />)
+
+  assert.match(html, /pnpm ovrsee:install/)
+  assert.match(html, /role="alert"/)
+})
+
+test('barre de menu — le popover vide ne lève pas', () => {
+  const html = renderToStaticMarkup(<MenuBar />)
+  assert.match(html, /Aucune session|No open session/)
 })

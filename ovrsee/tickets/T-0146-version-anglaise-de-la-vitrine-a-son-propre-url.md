@@ -2,7 +2,7 @@
 {
   "id": "T-0146",
   "titre": "Version anglaise de la vitrine à sa propre URL",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "l",
   "tags": [

@@ -4,7 +4,7 @@ import test from 'node:test'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { genrePour, projetEquipe, sequence } from './ovrsee-notify.js'
+import { detailPour, genrePour, projetEquipe, sequence } from './ovrsee-notify.js'
 
 const RACINE = dirname(dirname(fileURLToPath(import.meta.url)))
 
@@ -57,4 +57,43 @@ test('notify : la séquence est celle que `app/src/attention.ts` sait lire', () 
   // les tient accordés.
   assert.equal(sequence('stop'), `${ESC}]777;ovrsee;stop${BEL}`)
   assert.equal(sequence('question'), `${ESC}]777;ovrsee;question${BEL}`)
+})
+
+test('notify : le détail voyage en base64 derrière le genre', () => {
+  const ESC = String.fromCharCode(27)
+  const BEL = String.fromCharCode(7)
+  const message = 'Claude needs your permission to use Bash'
+  const encode = Buffer.from(message, 'utf8').toString('base64')
+
+  assert.equal(sequence('question', message), `${ESC}]777;ovrsee;question;${encode}${BEL}`)
+})
+
+test('notify : un détail trop long est coupé plutôt que porté entier', () => {
+  // Une séquence OSC traverse le pty octet par octet : c'est un canal de
+  // signal, pas de transfert.
+  const encode = sequence('question', 'x'.repeat(500)).match(/;question;([^]+)/)[1]
+
+  assert.equal(Buffer.from(encode, 'base64').toString('utf8'), 'x'.repeat(120))
+})
+
+test('notify : seule une Notification porte un détail', () => {
+  assert.equal(
+    detailPour({ hook_event_name: 'Notification', message: '  besoin de Bash  ' }),
+    'besoin de Bash',
+    'le message est relayé, débarrassé de ses blancs',
+  )
+  assert.equal(
+    detailPour({ hook_event_name: 'Stop', message: 'ignoré' }),
+    null,
+    '`Stop` dit « c’est à toi » : il n’y a rien à préciser',
+  )
+
+  for (const payload of [null, undefined, {}, { hook_event_name: 'Notification' }]) {
+    assert.equal(detailPour(payload), null)
+  }
+  assert.equal(
+    detailPour({ hook_event_name: 'Notification', message: '   ' }),
+    null,
+    'un message vide ne vaut pas mieux que pas de message',
+  )
 })

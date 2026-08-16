@@ -2,7 +2,7 @@
 {
   "id": "T-0145",
   "titre": "Balisage sémantique de la vitrine, et résidus de l'export",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "m",
   "tags": [

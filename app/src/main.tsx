@@ -10,6 +10,7 @@ import { createRoot } from 'react-dom/client'
 import '../../_ds/ovrsee/styles.css'
 
 import { App } from './App'
+import { MenuBar } from './MenuBarPanel'
 import { initializeTheme } from './theme'
 
 // Initialiser le système de thème avant le rendu
@@ -18,8 +19,14 @@ initializeTheme()
 const container = document.getElementById('root')
 if (!container) throw new Error('#root introuvable')
 
+/**
+ * Le popover de la barre de menu est un second rendu de la même origine, pas
+ * une seconde application : `electron/tray.js` le charge sur cette route. Le
+ * branchement est ici plutôt que dans `App` — il n'a ni onglets, ni barre
+ * d'état, ni projet courant.
+ */
+const POPOVER = '/barre-de-menu'
+
 createRoot(container).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  <StrictMode>{window.location.pathname === POPOVER ? <MenuBar /> : <App />}</StrictMode>,
 )

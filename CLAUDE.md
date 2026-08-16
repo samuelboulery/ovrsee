@@ -130,6 +130,12 @@ page : pour ça, il faut lancer l'app.
   d'un flux JSON-RPC et coupe la conversation. Les traces vont sur stderr. Et
   tester `dispatch()` ne teste pas le fil : `mcp/mcp.test.js` fait les deux depuis
   qu'un protocole non conforme est passé sous une suite verte.
+- **Le signal de session et la barre de menu sont inertes tant que
+  `pnpm ovrsee:install` n'a pas tourné.** Le hook `ovrsee-notify.js` s'enregistre
+  dans `~/.claude/settings.json`, pas dans le dépôt : une machine équipée avant
+  son arrivée n'a rien dans `Stop` ni `Notification`, aucune notification ne
+  paraît, l'item de barre de menu reste vide — et rien dans le code ne le
+  laisse voir. Le vérifier avant de chercher un bug ailleurs.
 - **`site/fr/` est engendré, pas écrit.** `scripts/build-site-fr.js` dérive la page
   française de `site/index.html` — qui est **en anglais**, la langue source — et de
   `site/dict.json` au déploiement (`site.yml`) ; le dossier est ignoré par git.

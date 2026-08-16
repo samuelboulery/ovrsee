@@ -139,6 +139,55 @@ contextBridge.exposeInMainWorld('ovrsee', {
     },
   },
 
+  /**
+   * Barre de menu macOS — voir `electron/tray.js`.
+   *
+   * Deux rendus s'en servent et pas pour la même chose : la fenêtre principale
+   * publie l'état par `report`, le popover le lit par `listen` et répond par
+   * `answer`. Rien n'interdit à l'un d'appeler l'autre, et rien n'a besoin de
+   * l'interdire — les deux sont le même code, sur la même origine.
+   *
+   * `answer` ne prend pas de texte : seulement `allow` ou `deny`. Ce qui est
+   * réellement tapé dans le pty est décidé dans `tray.js`, pour la même raison
+   * que le programme lancé est décidé dans `pty.js`.
+   */
+  menubar: {
+    report: etat => ipcRenderer.invoke('menubar:report', etat),
+
+    /**
+     * @param {(etat: Array<object>) => void} handler
+     * @returns {() => void} désabonnement
+     */
+    listen(handler) {
+      const relais = (_event, etat) => handler(etat)
+      ipcRenderer.on('menubar:state', relais)
+      // L'état courant, sans attendre le prochain signal : le popover s'ouvre
+      // le plus souvent entre deux, et s'afficherait vide.
+      ipcRenderer.invoke('menubar:pull').then(etat => handler(etat))
+      return () => ipcRenderer.off('menubar:state', relais)
+    },
+
+    /**
+     * @param {string} ptyId
+     * @param {'allow'|'deny'} decision
+     */
+    answer: (ptyId, decision) => ipcRenderer.invoke('menubar:answer', ptyId, decision),
+
+    reveal: sessionKey => ipcRenderer.invoke('menubar:reveal', sessionKey),
+
+    /**
+     * Côté fenêtre principale : « le popover demande cette session ».
+     *
+     * @param {(sessionKey: string) => void} handler
+     * @returns {() => void} désabonnement
+     */
+    onReveal(handler) {
+      const relais = (_event, sessionKey) => handler(sessionKey)
+      ipcRenderer.on('menubar:reveal', relais)
+      return () => ipcRenderer.off('menubar:reveal', relais)
+    },
+  },
+
   integrations: {
     /**
      * Crée ou met à jour une intégration. `token` est write-only : omis, il

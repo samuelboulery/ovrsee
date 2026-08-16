@@ -1,10 +1,41 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Audit SEO de la vitrine `site/` — constats et correctifs",
   "opened": "2026-08-16",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-16",
+  "commits": [
+    {
+      "sha": "378ccae",
+      "date": "2026-08-16",
+      "files": [
+        ".github/workflows/site.yml",
+        ".gitignore",
+        "CHANGELOG.fr.md",
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "CODE_OF_CONDUCT.fr.md",
+        "CODE_OF_CONDUCT.md",
+        "CONTRIBUTING.fr.md",
+        "CONTRIBUTING.md",
+        "README.en.md",
+        "README.fr.md",
+        "README.md",
+        "SECURITY.fr.md",
+        "SECURITY.md",
+        "hooks/documentation.test.js",
+        "hooks/i18n.js",
+        "scripts/build-site-en.js",
+        "scripts/build-site-en.test.js",
+        "scripts/build-site-fr.js",
+        "scripts/build-site-fr.test.js",
+        "site/app.js",
+        "site/dict.json",
+        "site/index.html",
+        "site/sitemap.xml"
+      ]
+    }
+  ]
 }
 ---
 

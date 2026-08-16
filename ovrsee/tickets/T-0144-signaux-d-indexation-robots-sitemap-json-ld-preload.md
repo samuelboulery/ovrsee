@@ -2,7 +2,7 @@
 {
   "id": "T-0144",
   "titre": "Signaux d'indexation de la vitrine : robots, sitemap, JSON-LD, preload",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "s",
   "tags": [

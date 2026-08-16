@@ -111,6 +111,41 @@ export function installPostCommit(root, done) {
 /** Une entrée est-elle déjà celle de l'ovrsee ? */
 const isOvrsee = (entry, script) => JSON.stringify(entry).includes(script)
 
+/**
+ * Le signal de session est-il enregistré ?
+ *
+ * `ovrsee-notify.js` vit dans `~/.claude/settings.json` et pas dans le dépôt :
+ * une machine équipée avant son arrivée n'émet aucun signal, donc aucune
+ * notification et une barre de menu qui ne dira jamais qu'une session attend.
+ * La panne est parfaitement silencieuse — la barre de menu appelle ceci pour
+ * pouvoir la nommer (`electron/tray.js`).
+ *
+ * Les deux événements sont exigés : `Stop` seul dirait « c'est à toi » sans
+ * jamais signaler une question, et l'inverse laisserait l'attente allumée
+ * après coup.
+ *
+ * @param {string} [settingsPath] chemin du fichier, pour les tests
+ * @returns {boolean} faux aussi quand le fichier manque ou ne se lit pas
+ */
+export function signalInstalle(settingsPath = SETTINGS) {
+  if (!existsSync(settingsPath)) return false
+
+  let settings
+  try {
+    settings = JSON.parse(readFileSync(settingsPath, 'utf8'))
+  } catch {
+    // Un fichier illisible n'installe rien : le dire manquant est la réponse
+    // utile, et lever depuis le processus principal serait pire.
+    return false
+  }
+
+  const hooks = settings?.hooks ?? {}
+  return ['Stop', 'Notification'].every(event => {
+    const entries = hooks[event]
+    return Array.isArray(entries) && entries.some(e => isOvrsee(e, 'ovrsee-notify'))
+  })
+}
+
 function installClaudeHooks(done) {
   if (!existsSync(SETTINGS)) {
     done.push(`${SETTINGS} absent — hooks Claude Code non installés.`)

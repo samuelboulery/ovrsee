@@ -57,6 +57,14 @@
       "sha": "2ef6224",
       "date": "2026-08-16",
       "files": []
+    },
+    {
+      "sha": "edd8585",
+      "date": "2026-08-16",
+      "files": [
+        "hooks/ovrsee-capture-plan.js",
+        "hooks/ovrsee-capture-plan.test.js"
+      ]
     }
   ]
 }

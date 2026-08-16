@@ -32,6 +32,7 @@ import {
   touchProject,
 } from './plans.js'
 
+import { readActive, writeActive } from './active.js'
 import { projects } from './snapshot.js'
 
 // --- parsePlan -------------------------------------------------------------
@@ -395,12 +396,12 @@ const planOuvertAvecCommit = (title = 'A') => ({
   commits: [{ sha: 'aaa', date: '2026-07-02', files: [] }],
 })
 
-test('clore retire .active-plan : après, un commit ne se rattache plus à rien', () => {
+test('clore retire le pointeur : après, un commit ne se rattache plus à rien', () => {
   const dir = ovrseeWithPlans([['a.md', planOuvertAvecCommit()]])
-  writeFileSync(join(dir, '.active-plan'), 'a.md\n')
+  writeActive(dir, null, { plan: 'a.md' })
 
   assert.deepEqual(closeOpenPlans(dir), ['a.md'])
-  assert.equal(existsSync(join(dir, '.active-plan')), false)
+  assert.equal(readActive(dir, null).plan, null)
 })
 
 test('clore garde le pointeur s’il désigne un autre plan, encore ouvert', () => {
@@ -408,18 +409,70 @@ test('clore garde le pointeur s’il désigne un autre plan, encore ouvert', () 
     ['a.md', planOuvertAvecCommit('A')],
     ['b.md', { status: 'open', title: 'B', opened: '2026-07-03', commits: [] }],
   ])
-  writeFileSync(join(dir, '.active-plan'), 'b.md\n')
+  writeActive(dir, null, { plan: 'b.md' })
 
   // `b.md` n'a pas de commit : il reste ouvert, donc reste l'intention en cours.
   assert.deepEqual(closeOpenPlans(dir), ['a.md'])
-  assert.equal(readFileSync(join(dir, '.active-plan'), 'utf8').trim(), 'b.md')
+  assert.equal(readActive(dir, null).plan, 'b.md')
 })
 
 test('clore sans pointeur ne panique pas', () => {
   const dir = ovrseeWithPlans([['a.md', planOuvertAvecCommit()]])
 
   assert.deepEqual(closeOpenPlans(dir), ['a.md'])
+  assert.equal(readActive(dir, null).plan, null)
+})
+
+test('clore reprend un ancien .active-plan resté sur le disque', () => {
+  const dir = ovrseeWithPlans([['a.md', planOuvertAvecCommit()]])
+  writeFileSync(join(dir, '.active-plan'), 'a.md\n')
+
+  assert.deepEqual(closeOpenPlans(dir), ['a.md'])
   assert.equal(existsSync(join(dir, '.active-plan')), false)
+  assert.equal(readActive(dir, null).plan, null)
+})
+
+// --- clôture et sessions concurrentes ---------------------------------------
+
+test('clore pour une session ne ferme pas le plan d’une autre', () => {
+  const dir = ovrseeWithPlans([
+    ['a.md', planOuvertAvecCommit('A')],
+    ['b.md', planOuvertAvecCommit('B')],
+  ])
+  writeActive(dir, 'session-a', { plan: 'a.md' })
+  writeActive(dir, 'session-b', { plan: 'b.md' })
+
+  assert.deepEqual(closeOpenPlans(dir, () => {}, { session: 'session-a' }), ['a.md'])
+
+  // Le plan de la session voisine est intact, et elle le pointe toujours.
+  assert.equal(readPlans(dir).find(p => p.file === 'b.md').meta.status, 'open')
+  assert.equal(readActive(dir, 'session-b').plan, 'b.md')
+})
+
+test('clore pour une session ferme les plans que plus personne ne pointe', () => {
+  const dir = ovrseeWithPlans([
+    ['a.md', planOuvertAvecCommit('A')],
+    ['orphelin.md', planOuvertAvecCommit('Orphelin')],
+  ])
+  writeActive(dir, 'session-a', { plan: 'a.md' })
+
+  assert.deepEqual(closeOpenPlans(dir, () => {}, { session: 'session-a' }).sort(), [
+    'a.md',
+    'orphelin.md',
+  ])
+})
+
+test('sans session, le geste explicite ferme tout ce qui peut l’être', () => {
+  const dir = ovrseeWithPlans([
+    ['a.md', planOuvertAvecCommit('A')],
+    ['b.md', planOuvertAvecCommit('B')],
+  ])
+  writeActive(dir, 'session-a', { plan: 'a.md' })
+  writeActive(dir, 'session-b', { plan: 'b.md' })
+
+  assert.deepEqual(closeOpenPlans(dir).sort(), ['a.md', 'b.md'])
+  assert.equal(readActive(dir, 'session-a').plan, null)
+  assert.equal(readActive(dir, 'session-b').plan, null)
 })
 
 // --- rattachement d’un commit ----------------------------------------------

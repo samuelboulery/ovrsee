@@ -17,6 +17,7 @@ import { isAbsolute, join } from 'node:path'
 import { execFileSync } from 'node:child_process'
 import { userInfo } from 'node:os'
 
+import { sessionId } from '../hooks/active.js'
 import { readConfigClaude } from '../hooks/config-claude.js'
 import { install } from '../hooks/install.js'
 import { exportVault } from '../hooks/obsidian.js'
@@ -275,14 +276,21 @@ function ticketAction(body, root) {
   const list = () => ({ json: tableau(root) })
   const absent = () => ({ status: 404, json: { error: 'ticket introuvable' } })
 
+  // La session appelante, quand il y en a une : le serveur MCP est lancé par
+  // une session Claude et hérite de son identifiant, donc un ticket créé par le
+  // skill devient le ticket actif de CETTE session. Servi depuis le dev server
+  // ou depuis Electron, il n'y a pas de session — `sessionId()` rend `null` et
+  // l'état atterrit dans le seau partagé, exactement comme avant.
+  const session = sessionId()
+
   try {
     switch (action) {
       case 'create':
-        createTicket(ovrseeDir, body)
+        createTicket(ovrseeDir, body, new Date(), session)
         return list()
 
       case 'move':
-        return moveTicket(ovrseeDir, file, body?.colonne) ? list() : absent()
+        return moveTicket(ovrseeDir, file, body?.colonne, new Date(), session) ? list() : absent()
 
       case 'update':
         return updateTicket(ovrseeDir, file, body) ? list() : absent()

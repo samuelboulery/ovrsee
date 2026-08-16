@@ -48,7 +48,7 @@ type Vue = 'tickets' | 'commits'
 export function Historique({
   projet,
   plans,
-  activePlan,
+  activePlans,
   timeline,
   ticketTimeline,
   scans = [],
@@ -59,7 +59,7 @@ export function Historique({
   projet: string
   plans: Plan[]
   /** Fichier du plan actif, ou `null` — pour distinguer le rail d'une bande active. */
-  activePlan: string | null
+  activePlans: string[]
   timeline: TimelineEntry[]
   ticketTimeline: TicketTimelineEntry[]
   scans?: Scan[]
@@ -99,9 +99,9 @@ export function Historique({
               </div>
             </div>
           ) : vue === 'tickets' ? (
-            <TicketFrise entries={ticketTimeline} byFile={byFile} activePlan={activePlan} onOuvrirTicket={onOuvrirTicket} />
+            <TicketFrise entries={ticketTimeline} byFile={byFile} activePlans={activePlans} onOuvrirTicket={onOuvrirTicket} />
           ) : (
-            <CommitFrise entries={timeline} byFile={byFile} activePlan={activePlan} />
+            <CommitFrise entries={timeline} byFile={byFile} activePlans={activePlans} />
           )}
         </div>
 
@@ -137,11 +137,11 @@ function ViewSwitch({ vue, onChange }: { vue: Vue; onChange: (vue: Vue) => void 
 function CommitFrise({
   entries,
   byFile,
-  activePlan,
+  activePlans,
 }: {
   entries: TimelineEntry[]
   byFile: Map<string, Plan>
-  activePlan: string | null
+  activePlans: string[]
 }) {
   let previous: string | null = null
 
@@ -158,7 +158,7 @@ function CommitFrise({
             {entry.kind === 'commit' ? (
               <CommitRow commit={entry.commit} />
             ) : (
-              <PlanBand entry={entry} plan={byFile.get(entry.plan) ?? null} actif={entry.plan === activePlan} />
+              <PlanBand entry={entry} plan={byFile.get(entry.plan) ?? null} actif={activePlans.includes(entry.plan)} />
             )}
           </div>
         )
@@ -170,12 +170,12 @@ function CommitFrise({
 function TicketFrise({
   entries,
   byFile,
-  activePlan,
+  activePlans,
   onOuvrirTicket,
 }: {
   entries: TicketTimelineEntry[]
   byFile: Map<string, Plan>
-  activePlan: string | null
+  activePlans: string[]
   onOuvrirTicket: (file: string) => void
 }) {
   let previous: string | null = null
@@ -196,7 +196,7 @@ function TicketFrise({
               <PlanBandTickets
                 entry={entry}
                 plan={byFile.get(entry.plan) ?? null}
-                actif={entry.plan === activePlan}
+                actif={activePlans.includes(entry.plan)}
                 onOuvrirTicket={onOuvrirTicket}
               />
             )}

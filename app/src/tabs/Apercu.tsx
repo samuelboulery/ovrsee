@@ -111,7 +111,8 @@ export function Apercu({
   const deps = stackFrom(packageJson, snapshot.whys).length
   const scan = lastScan(snapshot.scans)
   const tickets = restant(snapshot.tickets, snapshot.board)
-  const planActif = plans.find(p => p.file === snapshot.activePlan) ?? null
+  // Le premier plan actif : la vignette d'aperçu n'a la place que d'un seul.
+  const planActif = plans.find(p => snapshot.activePlans.includes(p.file)) ?? null
   const plan = readme ? headings(readme) : []
   const hasEnvironments = (snapshot.config?.environments?.length ?? 0) > 0
 

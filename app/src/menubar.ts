@@ -148,10 +148,13 @@ export function resumeProjet(snapshot: Snapshot | null): MenuBarProjet | null {
 
   const git = snapshot.gitStatus ?? EMPTY_GIT_STATUS
   const ouverts = plansOuverts(snapshot.plans ?? [])
-  // `activePlan` est un nom de fichier ; c'est son titre qui se lit. À défaut,
+  // `activePlans` porte des noms de fichiers ; c'est leur titre qui se lit. Le
+  // popover n'a la place que d'un plan : on prend le premier actif. À défaut,
   // le plan ouvert le plus récent — `plansOuverts` les rend déjà triés.
   const actif =
-    (snapshot.plans ?? []).find(plan => plan.file === snapshot.activePlan) ?? ouverts[0] ?? null
+    (snapshot.plans ?? []).find(plan => (snapshot.activePlans ?? []).includes(plan.file)) ??
+    ouverts[0] ??
+    null
   const scan = lastScan(snapshot.scans ?? [])
 
   return {

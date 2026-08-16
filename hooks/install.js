@@ -146,19 +146,29 @@ export function signalInstalle(settingsPath = SETTINGS) {
   })
 }
 
-function installClaudeHooks(done) {
-  if (!existsSync(SETTINGS)) {
-    done.push(`${SETTINGS} absent — hooks Claude Code non installés.`)
+/**
+ * Enregistre tous les hooks de l'ovrsee dans `~/.claude/settings.json`.
+ *
+ * `settingsPath` existe pour les tests, comme dans `signalInstalle` : ils
+ * doivent pouvoir éprouver l'enregistrement sans réécrire la configuration
+ * Claude de la machine.
+ *
+ * @param {string[]} done journal des actions, rendu à l'appelant
+ * @param {string} [settingsPath]
+ */
+export function installClaudeHooks(done, settingsPath = SETTINGS) {
+  if (!existsSync(settingsPath)) {
+    done.push(`${settingsPath} absent — hooks Claude Code non installés.`)
     return
   }
 
-  const original = readFileSync(SETTINGS, 'utf8')
+  const original = readFileSync(settingsPath, 'utf8')
 
   let settings
   try {
     settings = JSON.parse(original)
   } catch (err) {
-    done.push(`${SETTINGS} illisible (${err.message}) — laissé intact.`)
+    done.push(`${settingsPath} illisible (${err.message}) — laissé intact.`)
     return
   }
 
@@ -180,6 +190,16 @@ function installClaudeHooks(done) {
     added.push('SessionStart — réinjection de l’état du projet')
   }
 
+  // Une session qui se termine rend son plan et son ticket. Sans ce hook, le
+  // pointeur survit à la session et le plan capte le travail suivant.
+  const sessionEnd = (hooks.SessionEnd ??= [])
+  if (!sessionEnd.some(e => isOvrsee(e, 'ovrsee-session-end'))) {
+    sessionEnd.push({
+      hooks: [{ type: 'command', command: commandFor('ovrsee-session-end.js'), timeout: 5 }],
+    })
+    added.push('SessionEnd — la session rend son plan actif')
+  }
+
   const postToolUse = (hooks.PostToolUse ??= [])
   if (!postToolUse.some(e => isOvrsee(e, 'ovrsee-capture-plan'))) {
     postToolUse.push({
@@ -187,6 +207,62 @@ function installClaudeHooks(done) {
       hooks: [{ type: 'command', command: commandFor('ovrsee-capture-plan.js') }],
     })
     added.push('PostToolUse/ExitPlanMode — capture des plans approuvés')
+  }
+
+  // Le suivi automatique des tickets. Ces trois-là manquaient : ils ne
+  // tournaient que sur les machines où quelqu'un les avait ajoutés à la main
+  // dans `~/.claude/settings.json`. Une machine fraîchement installée n'avait ni
+  // gate ni avancée de tickets, et rien dans le code ne le laissait voir.
+  if (!postToolUse.some(e => isOvrsee(e, 'ovrsee-tool-edit.js'))) {
+    postToolUse.push({
+      matcher: 'Edit|Write',
+      hooks: [{ type: 'command', command: commandFor('ovrsee-tool-edit.js') }],
+    })
+    added.push('PostToolUse/Edit|Write — ticket en cours à la première édition')
+  }
+
+  const preToolUse = (hooks.PreToolUse ??= [])
+  if (!preToolUse.some(e => isOvrsee(e, 'ovrsee-tool-edit-gate'))) {
+    preToolUse.push({
+      matcher: 'Edit|Write',
+      hooks: [{ type: 'command', command: commandFor('ovrsee-tool-edit-gate.js') }],
+    })
+    added.push('PreToolUse/Edit|Write — ticket exigé avant d’éditer du code')
+  }
+
+  const stop = (hooks.Stop ??= [])
+  if (!stop.some(e => isOvrsee(e, 'ovrsee-tool-stop'))) {
+    stop.push({
+      hooks: [{ type: 'command', command: commandFor('ovrsee-tool-stop.js') }],
+    })
+    added.push('Stop — ticket en revue quand du code reste non commité')
+  }
+
+  // La capture des audits : trois événements, un seul script — il se branche
+  // lui-même sur `hook_event_name`. Un audit lancé en commande slash ne passe
+  // pas par l'outil `Skill`, d'où `UserPromptSubmit`, et ses constats
+  // n'existent qu'au tour qui se termine, d'où `Stop`.
+  if (!postToolUse.some(e => isOvrsee(e, 'ovrsee-capture-audit'))) {
+    postToolUse.push({
+      matcher: 'Skill',
+      hooks: [{ type: 'command', command: commandFor('ovrsee-capture-audit.js') }],
+    })
+    added.push('PostToolUse/Skill — capture des audits')
+  }
+
+  const userPromptSubmit = (hooks.UserPromptSubmit ??= [])
+  if (!userPromptSubmit.some(e => isOvrsee(e, 'ovrsee-capture-audit'))) {
+    userPromptSubmit.push({
+      hooks: [{ type: 'command', command: commandFor('ovrsee-capture-audit.js') }],
+    })
+    added.push('UserPromptSubmit — audit lancé en commande slash')
+  }
+
+  if (!stop.some(e => isOvrsee(e, 'ovrsee-capture-audit'))) {
+    stop.push({
+      hooks: [{ type: 'command', command: commandFor('ovrsee-capture-audit.js') }],
+    })
+    added.push('Stop — constats de l’audit qui vient de tourner')
   }
 
   // Stop et Notification : le signal de session lu par le panneau terminal.
@@ -208,18 +284,18 @@ function installClaudeHooks(done) {
   }
 
   // Sauvegarde avant écriture : ce fichier n'est pas versionné.
-  const backup = `${SETTINGS}.avant-ovrsee`
-  copyFileSync(SETTINGS, backup)
+  const backup = `${settingsPath}.avant-ovrsee`
+  copyFileSync(settingsPath, backup)
 
   const updated = JSON.stringify(settings, null, 2) + '\n'
-  writeFileSync(SETTINGS, updated, 'utf8')
+  writeFileSync(settingsPath, updated, 'utf8')
 
   // Relecture : mieux vaut restaurer tout de suite qu'aller découvrir demain
   // une configuration cassée.
   try {
-    JSON.parse(readFileSync(SETTINGS, 'utf8'))
+    JSON.parse(readFileSync(settingsPath, 'utf8'))
   } catch (err) {
-    writeFileSync(SETTINGS, original, 'utf8')
+    writeFileSync(settingsPath, original, 'utf8')
     done.push(`Écriture invalide (${err.message}) — configuration restaurée.`)
     return
   }

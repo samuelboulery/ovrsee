@@ -123,7 +123,7 @@ When a plan is approved in Claude Code, it is captured automatically in `ovrsee/
 The post-commit hook then attaches each commit to the active plan. Close the plan when work is done:
 
 ```bash
-pnpm ovrsee:close     # removes .active-plan
+pnpm ovrsee:close     # releases the active plan
 ```
 
 While a plan is active, every commit gets attached to it — even unrelated fixes.
@@ -269,8 +269,11 @@ Package manager: `pnpm@10.34.5`, pinned in `package.json` and enforced by Corepa
 
 ## Known Traps
 
-**An active plan captures every commit.**
-While `ovrsee/.active-plan` exists, the post-commit hook attaches all commits to it — including unrelated fixes. Run `pnpm ovrsee:close` before switching tasks.
+**An active plan captures every commit of its session.**
+The active plan belongs to a Claude session, not to the repository: it lives in `ovrsee/.active/<session>.json`, which git ignores. Several sessions can therefore work side by side on the same repository without stealing each other's plan. Within one session, though, every commit is attached — including unrelated fixes. Run `pnpm ovrsee:close` before switching tasks.
+
+**A commit whose session is unknown may end up attached to nothing.**
+Attribution goes through four stages: a `T-XXXX` ticket quoted in the commit message, then the session (`CLAUDE_CODE_SESSION_ID`, inherited by the git hook), then the single active plan if there is only one, then nothing. A commit made outside Claude Code, with no ticket quoted, while two plans are active, is attached nowhere — and says so on stderr.
 
 **The crawler refuses to start if `baseUrl` already responds.**
 This is intentional. There is no way to distinguish your own server from another's in an HTTP response, and crawling the wrong app would produce backdated screenshots.

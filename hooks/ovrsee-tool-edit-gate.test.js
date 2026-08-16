@@ -95,3 +95,25 @@ test('moveTicket vers la colonne finale efface .active-ticket, ce que confirme t
 
   assert.equal(ticketActifManquant(ovrseeDir), true)
 })
+
+// --- sessions concurrentes -------------------------------------------------
+
+test('le ticket actif d’une session ne couvre pas les éditions d’une autre', () => {
+  const ovrseeDir = fixture()
+  createTicket(ovrseeDir, { titre: 'Ad hoc de A' }, new Date(), 'session-a')
+
+  assert.equal(ticketActifManquant(ovrseeDir, 'session-a'), false)
+  assert.equal(ticketActifManquant(ovrseeDir, 'session-b'), true)
+})
+
+test('deux sessions ont chacune leur ticket actif, sans se gêner', () => {
+  const ovrseeDir = fixture()
+  createTicket(ovrseeDir, { titre: 'Ad hoc de A' }, new Date(), 'session-a')
+  const b = createTicket(ovrseeDir, { titre: 'Ad hoc de B' }, new Date(), 'session-b')
+
+  // Solder celui de B ne rouvre pas la gate pour A.
+  moveTicket(ovrseeDir, b.file, 'fait', new Date(), 'session-b')
+
+  assert.equal(ticketActifManquant(ovrseeDir, 'session-a'), false)
+  assert.equal(ticketActifManquant(ovrseeDir, 'session-b'), true)
+})

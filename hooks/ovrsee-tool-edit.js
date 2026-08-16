@@ -23,6 +23,7 @@ import { fileURLToPath } from 'node:url'
 
 import { EN_COURS, moveTicket, readBoard, readTickets } from './tickets.js'
 import { isSafePlanFileName } from './plans.js'
+import { readActive, sessionId } from './active.js'
 
 function readStdin() {
   try {
@@ -128,10 +129,10 @@ function main() {
 
   if (!estUneEditionSource(root, payload?.tool_input?.file_path)) return
 
-  const pointer = join(ovrseeDir, '.active-plan')
-  if (!existsSync(pointer)) return // Pas de plan actif : rien à lier.
-
-  const planFile = readFileSync(pointer, 'utf8').trim()
+  // Le plan de CETTE session : celui d'une voisine ne doit pas voir ses tickets
+  // avancer parce qu'on a édité un fichier ici.
+  const planFile = readActive(ovrseeDir, sessionId(payload)).plan
+  if (!planFile) return // Pas de plan actif : rien à lier.
   if (!isSafePlanFileName(planFile)) return
 
   avancerTicketsEnCours(ovrseeDir, planFile)

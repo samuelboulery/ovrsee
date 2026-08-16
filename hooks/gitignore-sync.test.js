@@ -61,3 +61,23 @@ test('gère un .gitignore absent', () => {
   const contenu = readFileSync(join(root, '.gitignore'), 'utf8')
   assert.match(contenu, /ovrsee\/pages\/shots\//)
 })
+
+const lire = root => readFileSync(join(root, '.gitignore'), 'utf8')
+
+test('le bloc d’état de session est posé quels que soient les réglages', () => {
+  const root = fixture()
+
+  syncGitignore(root, {})
+  assert.match(lire(root), /ovrsee\/\.active\//)
+  assert.match(lire(root), /ovrsee\/\.active-ticket/)
+})
+
+test('le bloc d’état de session ne s’empile pas d’un appel à l’autre', () => {
+  const root = fixture()
+
+  syncGitignore(root, {})
+  syncGitignore(root, { gitignoreShots: true })
+  syncGitignore(root, {})
+
+  assert.equal(lire(root).match(/ovrsee\/\.active\//g).length, 1)
+})

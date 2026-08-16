@@ -92,12 +92,29 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
 
 ## Pièges connus
 
-- **Un plan actif capte tous les commits**, y compris un correctif sans rapport, tant
-  que `ovrsee/.active-plan` existe. `pnpm ovrsee:close` avant de changer de sujet.
-- **Un plan actif éclipse un ticket actif, jamais l'inverse.** Capturer un plan efface
-  `.active-ticket`, et tant qu'un plan est actif le gate l'ignore. Un ticket ad hoc
-  resté ouvert ne redevient pas actif tout seul — le rouvrir (`moveTicket` vers
-  `en-cours`) ou en créer un nouveau.
+- **Le plan actif est propre à une session Claude, pas au dépôt.** L'état vit dans
+  `ovrsee/.active/<session>.json` (`hooks/active.js`), gitignoré. Plusieurs sessions
+  travaillent donc côte à côte sans se voler leur plan. L'identifiant vient de
+  `session_id` dans le payload des hooks, et de `CLAUDE_CODE_SESSION_ID` — exporté dans
+  l'environnement de l'outil Bash, donc hérité par le hook git `post-commit`. Un
+  appelant sans identifiant (CLI, dev server) retombe sur un seau partagé.
+- **Un plan actif capte tous les commits de sa session**, y compris un correctif sans
+  rapport, tant qu'il est actif. `pnpm ovrsee:close` avant de changer de sujet ; la fin
+  de session (`SessionEnd`) rend le pointeur mais ne clôt pas le plan.
+- **Un commit dont on ne connaît pas la session ne se rattache pas toujours.**
+  L'attribution suit quatre étages (`planPourCommit`, `ovrsee-post-commit.js`) : ticket
+  `T-XXXX` cité dans le message, puis la session, puis l'unique plan actif s'il n'y en a
+  qu'un, puis rien. Un commit fait hors de Claude Code, sans ticket cité, alors que deux
+  plans sont actifs, n'est donc rattaché nulle part — et le dit sur stderr.
+- **Un plan actif éclipse le ticket actif de sa session, jamais l'inverse.** Capturer un
+  plan efface le ticket ad hoc de cette session, et tant qu'un plan est actif le gate
+  l'ignore. Un ticket ad hoc resté ouvert ne redevient pas actif tout seul — le rouvrir
+  (`moveTicket` vers `en-cours`) ou en créer un nouveau.
+- **La capture peut se tromper de plan.** `tool_input.plan` a disparu du payload
+  d'`ExitPlanMode` : `planFrom` lit le transcript de la session pour retrouver son
+  fichier de plan, et ne retombe sur « le fichier le plus récent de `~/.claude/plans/` »
+  qu'en dernier recours — un repli qui ignore la session *et* le projet, et qui a déjà
+  capturé le plan d'un autre dépôt. Il avertit sur stderr quand il en arrive là.
 - **Le registre est la seule source de projets.** `projects()` n'ajoute pas le dépôt
   courant sous prétexte qu'il porte un `ovrsee/` — sans quoi un clone frais s'ouvrait
   sur lui-même et l'écran de premier lancement ne paraissait jamais. Il faut donc

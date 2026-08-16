@@ -1,12 +1,15 @@
 /**
  * Applique les réglages `gitignoreShots` / `gitignorePlans` au `.gitignore`
- * du projet.
+ * du projet, et y garantit le bloc de l'état de session.
  *
- * Deux blocs à contenu fixe, gérés indépendamment l'un de l'autre et du reste
+ * Des blocs à contenu fixe, gérés indépendamment les uns des autres et du reste
  * du fichier : on retire le bloc existant (match exact sur son contenu), puis
  * on le ré-ajoute seulement si le réglage correspondant est actif. Le fichier
  * n'est réécrit que si son contenu a changé, pour ne pas produire de bruit de
  * mtime à chaque commit.
+ *
+ * Le bloc `.active/` ne dépend d'aucun réglage : cet état est local par nature,
+ * et le versionner n'est jamais un choix légitime.
  */
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
@@ -24,6 +27,20 @@ const BLOC_PLANS =
   `ovrsee/tickets/\n`
 
 /**
+ * L'état de travail des sessions Claude : quel plan et quel ticket chacune
+ * tient. Local à une machine et à un instant — versionné, il produit un conflit
+ * à chaque changement de branche pour une information que personne ne relit.
+ * Les deux dernières lignes sont les pointeurs d'avant les sessions, encore
+ * présents sur les dépôts qui n'ont pas encore migré.
+ */
+const BLOC_ACTIF =
+  `\n# État de travail des sessions Claude (ovrsee) : local à une machine, jamais\n` +
+  `# versionné.\n` +
+  `ovrsee/.active/\n` +
+  `ovrsee/.active-plan\n` +
+  `ovrsee/.active-ticket\n`
+
+/**
  * @param {string} root racine du dépôt
  * @param {{gitignoreShots?: boolean, gitignorePlans?: boolean}} settings
  */
@@ -33,9 +50,11 @@ export function syncGitignore(root, settings) {
 
   let next = original.split(BLOC_SHOTS).join('')
   next = next.split(BLOC_PLANS).join('')
+  next = next.split(BLOC_ACTIF).join('')
 
   if (settings?.gitignoreShots) next += BLOC_SHOTS
   if (settings?.gitignorePlans) next += BLOC_PLANS
+  next += BLOC_ACTIF
 
   if (next !== original) writeFileSync(path, next, 'utf8')
 }

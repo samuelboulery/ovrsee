@@ -125,7 +125,7 @@ Quand un plan est approuvé dans Claude Code, il est capturé automatiquement da
 Le hook post-commit rattache ensuite chaque commit au plan actif. Clore le plan quand son travail est fini :
 
 ```bash
-pnpm ovrsee:close     # retire .active-plan
+pnpm ovrsee:close     # rend le plan actif
 ```
 
 Tant qu'un plan est actif, le hook post-commit lui rattache **tout** commit — même ceux
@@ -275,9 +275,18 @@ Gestionnaire de paquets : `pnpm@10.34.5`, épinglé dans `package.json` et fait 
 
 ## Pièges connus
 
-**Un plan actif capte tous les commits.**
-Tant que `ovrsee/.active-plan` existe, le hook post-commit rattache chaque commit au
-plan — y compris un correctif sans rapport. `pnpm ovrsee:close` avant de changer de sujet.
+**Un plan actif capte tous les commits de sa session.**
+Le plan actif appartient à une session Claude, pas au dépôt : il vit dans
+`ovrsee/.active/<session>.json`, que git ignore. Plusieurs sessions travaillent donc côte
+à côte sur le même dépôt sans se voler leur plan. Au sein d'une session, en revanche,
+chaque commit est rattaché — y compris un correctif sans rapport. `pnpm ovrsee:close`
+avant de changer de sujet.
+
+**Un commit dont la session est inconnue peut n'être rattaché à rien.**
+L'attribution suit quatre étages : un ticket `T-XXXX` cité dans le message, puis la
+session (`CLAUDE_CODE_SESSION_ID`, hérité par le hook git), puis l'unique plan actif s'il
+n'y en a qu'un, puis rien. Un commit fait hors de Claude Code, sans ticket cité, alors que
+deux plans sont actifs, n'est rattaché nulle part — et le dit sur stderr.
 
 **Le crawl refuse de démarrer si `baseUrl` répond déjà.**
 C'est voulu. Rien dans une réponse HTTP ne distingue son propre serveur de celui d'un

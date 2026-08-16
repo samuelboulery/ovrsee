@@ -17,13 +17,14 @@ import {
   readdirSync,
   readFileSync,
   renameSync,
-  rmSync,
   unlinkSync,
   writeFileSync,
 } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { randomUUID } from 'node:crypto'
+
+import { activePlans, allActive, clearActive, readActive, withLock } from './active.js'
 
 const FENCE = '---'
 
@@ -113,6 +114,11 @@ export function readPlans(ovrseeDir, illisibles = []) {
  * Seul chemin d'écriture d'un plan existant — les trois appelants (capture,
  * post-commit, CLI) passent par ici plutôt que de refaire chacun le cycle.
  *
+ * Sous verrou : lire, transformer, écrire n'est pas atomique, et deux sessions
+ * qui commitent au même instant sur le même plan perdraient l'une des deux
+ * entrées de `commits`. L'écriture seule l'est déjà (tmp + rename) ; c'est
+ * l'intervalle qui ne l'était pas.
+ *
  * @param {string} ovrseeDir
  * @param {string} file nom de fichier, déjà validé par isSafePlanFileName
  * @param {(meta: object) => object | null} update rend la nouvelle meta, ou
@@ -120,21 +126,23 @@ export function readPlans(ovrseeDir, illisibles = []) {
  * @returns {boolean} true si le fichier a été réécrit
  */
 export function updatePlanMeta(ovrseeDir, file, update) {
-  const path = join(ovrseeDir, 'plans', file)
+  return withLock(ovrseeDir, () => {
+    const path = join(ovrseeDir, 'plans', file)
 
-  let plan
-  try {
-    plan = parsePlan(readFileSync(path, 'utf8'))
-  } catch {
-    return false
-  }
-  if (!plan) return false
+    let plan
+    try {
+      plan = parsePlan(readFileSync(path, 'utf8'))
+    } catch {
+      return false
+    }
+    if (!plan) return false
 
-  const meta = update(plan.meta)
-  if (!meta) return false
+    const meta = update(plan.meta)
+    if (!meta) return false
 
-  writeFileNoFollow(path, serializePlan(meta, plan.body))
-  return true
+    writeFileNoFollow(path, serializePlan(meta, plan.body))
+    return true
+  })
 }
 
 /**
@@ -328,24 +336,40 @@ export function touchProject(root, now = new Date()) {
  * règles de clôture différentes produiraient deux historiques différents selon
  * la façon dont le plan a été capturé.
  *
- * **Clore retire `.active-plan`** quand le pointeur désignait un plan qu'on
- * vient de fermer. Sans cela, le pointeur survivait à son plan et le hook
- * post-commit rattachait au dernier plan tout ce qui était commité ensuite —
- * un correctif sans rapport se retrouvait inscrit comme un commit de
- * l'intention précédente. Clore devient donc le signal de fin de travail :
- * après, un commit ne se rattache à rien, ce qui est vrai.
+ * **Clore retire le pointeur** des sessions qui désignaient un plan qu'on vient
+ * de fermer. Sans cela, le pointeur survivait à son plan et le hook post-commit
+ * rattachait au dernier plan tout ce qui était commité ensuite — un correctif
+ * sans rapport se retrouvait inscrit comme un commit de l'intention précédente.
+ * Clore devient donc le signal de fin de travail : après, un commit ne se
+ * rattache à rien, ce qui est vrai.
  *
  * Un plan ouvert sans commit garde son pointeur : c'est du travail approuvé
  * pas encore commencé, pas du travail terminé.
  *
+ * **Deux portées**, et c'est la différence qui rend le multi-session vivable :
+ *
+ * - `options` absent — le geste explicite (`pnpm ovrsee:close`, la route
+ *   `/api/plans/close-active`) : tout ce qui peut être clos l'est. Quelqu'un l'a
+ *   demandé, il sait ce qu'il fait.
+ * - `{ session }` — le geste automatique, à la capture d'un plan : on ne ferme
+ *   que **son** plan et les plans **orphelins**, ceux que plus aucune session ne
+ *   pointe. Le plan d'une session voisine, encore en travail, n'est jamais
+ *   fermé de l'extérieur. C'était le défaut le plus visible : approuver un plan
+ *   soldait l'intention d'à côté, en silence.
+ *
+ * @param {string} ovrseeDir
+ * @param {(message: string) => void} [log]
+ * @param {{session: string|null}} [options]
  * @returns {string[]} fichiers effectivement clos
  */
-export function closeOpenPlans(ovrseeDir, log = () => {}) {
+export function closeOpenPlans(ovrseeDir, log = () => {}, options = undefined) {
+  const portee = options ? porteeDeSession(ovrseeDir, options.session) : null
   const closed = []
 
   for (const plan of readPlans(ovrseeDir)) {
     const commits = plan.meta.commits ?? []
     if (plan.meta.status !== 'open' || commits.length === 0) continue
+    if (portee && !portee(plan.file)) continue
 
     const date = commits.at(-1)?.date
     if (!date) {
@@ -368,6 +392,18 @@ export function closeOpenPlans(ovrseeDir, log = () => {}) {
 }
 
 /**
+ * Ce qu'une session a le droit de fermer : le sien, et ce qui n'est à personne.
+ *
+ * @returns {(file: string) => boolean}
+ */
+function porteeDeSession(ovrseeDir, session) {
+  const mien = readActive(ovrseeDir, session).plan
+  const pointes = new Set(activePlans(ovrseeDir))
+
+  return file => file === mien || !pointes.has(file)
+}
+
+/**
  * Rattache un commit à un plan. Rend vrai s'il a été écrit.
  *
  * Vit ici, et non dans le hook, pour la même raison que `closeOpenPlans` : la
@@ -377,7 +413,7 @@ export function closeOpenPlans(ovrseeDir, log = () => {}) {
  * Deux refus, tous deux silencieux — il n'y a rien d'anormal à ne rien écrire :
  *
  * - **Plan clos.** Le pointeur peut lui survivre : il est effacé à la clôture,
- *   mais un `.active-plan` écrit avant cette règle, ou remis à la main,
+ *   mais un pointeur écrit avant cette règle, ou remis à la main,
  *   désignerait encore un plan terminé. Y rattacher les commits suivants
  *   ferait grossir indéfiniment une intention soldée, et sa date de clôture
  *   serait antérieure à son dernier commit.
@@ -401,21 +437,21 @@ export function attachCommitToPlan(ovrseeDir, file, commit) {
 }
 
 /**
- * Retire `.active-plan` s'il désignait l'un des plans qu'on vient de clore.
+ * Retire le pointeur de plan des sessions qui désignaient un plan clos.
+ *
+ * Toutes les sessions, pas seulement celle qui ferme : un plan clos ne doit
+ * plus capter de commit, quelle que soit la session qui le pointait encore.
  *
  * L'absence de pointeur n'est pas une panne : c'est l'état normal entre deux
- * intentions. Un échec d'effacement l'est encore moins — le fichier est déjà
- * parti, ou n'a jamais existé.
+ * intentions.
  */
 function clearActivePlan(ovrseeDir, closed) {
   if (closed.length === 0) return
 
-  const pointer = join(ovrseeDir, '.active-plan')
-  try {
-    if (!closed.includes(readFileSync(pointer, 'utf8').trim())) return
-    rmSync(pointer)
-  } catch {
-    // Pas de pointeur, ou illisible : rien à retirer.
+  for (const entree of allActive(ovrseeDir)) {
+    if (entree.plan && closed.includes(entree.plan)) {
+      clearActive(ovrseeDir, entree.session, 'plan', entree.plan)
+    }
   }
 }
 
@@ -437,7 +473,7 @@ export function isSafeSlug(slug) {
 
 /**
  * Un nom de fichier de plan est-il sûr à recoller à un chemin ?
- * Utilisé sur le contenu de `.active-plan`, seule valeur relue depuis le
+ * Utilisé sur le plan actif d'une session, seule valeur relue depuis le
  * disque et réinjectée dans un chemin.
  */
 export function isSafePlanFileName(file) {

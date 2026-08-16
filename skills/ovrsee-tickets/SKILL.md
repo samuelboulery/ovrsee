@@ -114,20 +114,26 @@ N'utiliser `moveTicket`/`updateTicket` à la main que pour corriger un
 déplacement, ou pour un ticket sans `plan` renseigné — ces hooks ne suivent que
 les tickets liés au plan actif.
 
-**Le ticket actif hors-plan (`ovrsee/.active-ticket`).** Sans plan actif,
-`ovrsee-tool-edit-gate.js` exige quand même un ticket avant la première édition
-de code — fix rapide, réponse ad hoc, correction d'un constat d'audit déjà
-capturé. Ce ticket actif se pose sans geste supplémentaire :
+**Le ticket actif hors-plan (`ovrsee/.active/<session>.json`).** Sans plan
+actif, `ovrsee-tool-edit-gate.js` exige quand même un ticket avant la première
+édition de code — fix rapide, réponse ad hoc, correction d'un constat d'audit
+déjà capturé. Ce ticket actif se pose sans geste supplémentaire :
 
-- `createTicket` sans `plan`, tant qu'aucun plan n'est actif, active
-  automatiquement le ticket qu'il vient de créer.
+- `createTicket` sans `plan`, tant que cette session n'a aucun plan actif,
+  active automatiquement le ticket qu'il vient de créer.
 - Déplacer un ticket déjà existant vers « en cours » (`moveTicket`) l'active
   aussi, s'il n'a pas de `plan` — pour reprendre un constat d'audit déjà
   ticketé sans en recréer un.
 - Déplacer le ticket actif vers la colonne finale l'efface.
 
-Un plan qui démarre efface le ticket actif : le plan reprend la main, et le
-gate redemande un ticket qui cite ce plan — jamais l'ancien ticket ad hoc.
+**Tout ceci a la portée d'une session Claude, pas du dépôt.** Plan actif comme
+ticket actif vivent dans `ovrsee/.active/<session>.json` : deux sessions
+travaillant sur le même dépôt ont chacune les siens, et ne se gênent pas. Ce qui
+suit vaut donc au sein d'une session.
+
+Un plan qui démarre efface le ticket actif de sa session : le plan reprend la
+main, et le gate redemande un ticket qui cite ce plan — jamais l'ancien ticket
+ad hoc.
 
 **Lier à un plan.** Un plan approuvé qui correspond à un ticket se cite dans
 `plan`. Les deux stocks restent indépendants : un ticket n'est pas un plan, un

@@ -15,10 +15,11 @@
  * `serializePlan` sont réutilisés tels quels plutôt que redéfinis ici.
  */
 
-import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync } from 'node:fs'
+import { mkdirSync, readdirSync, readFileSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { parsePlan, readPlans, serializePlan, slugify, writeFileNoFollow } from './plans.js'
+import { clearActive, readActive, withLock, writeActive } from './active.js'
 
 /**
  * Le tableau par défaut, servi tant que le projet n'a pas de `board.json`.
@@ -357,11 +358,22 @@ const ticketPath = (ovrseeDir, file) => join(ovrseeDir, 'tickets', requireFile(f
  * Crée un ticket et l'écrit.
  *
  * @param {string} ovrseeDir
+ * Sous verrou de bout en bout : `nextTicketId` rend le maximum lu plus un, donc
+ * deux sessions qui créent un ticket au même instant produisaient deux fichiers
+ * portant le même `T-XXXX`. Tout ce qui cite cet identifiant — un commit, un
+ * plan, l'avancée automatique des tickets — devenait ambigu, en silence.
+ *
+ * @param {string} ovrseeDir
  * @param {{titre: string, colonne?: string, priorite?: string, charge?: string, tags?: string[], corps?: string, plan?: string|null, type?: string, epic?: string}} champs
  * @param {Date} [now]
+ * @param {string|null} [session] la session appelante, pour le ticket actif
  * @returns {{file: string, meta: object, body: string}}
  */
-export function createTicket(ovrseeDir, champs, now = new Date()) {
+export function createTicket(ovrseeDir, champs, now = new Date(), session = null) {
+  return withLock(ovrseeDir, () => creerTicket(ovrseeDir, champs, now, session))
+}
+
+function creerTicket(ovrseeDir, champs, now, session) {
   const colonnes = readBoard(ovrseeDir)
   const titre = String(champs?.titre ?? '').trim()
   if (!titre) throw new Error('titre vide')
@@ -406,12 +418,19 @@ export function createTicket(ovrseeDir, champs, now = new Date()) {
   mkdirSync(join(ovrseeDir, 'tickets'), { recursive: true })
   writeFileNoFollow(ticketPath(ovrseeDir, file), serializePlan(meta, body))
 
-  // Un ticket créé sans plan, alors qu'aucun plan n'est actif, devient le
-  // ticket actif : seule façon hors-plan de satisfaire le gate sans étape
-  // manuelle supplémentaire. Écrase silencieusement un `.active-ticket`
-  // déjà posé, comme `ovrsee-capture-plan.js` réécrit toujours `.active-plan`.
-  if (meta.plan === null && meta.colonne !== colonneFinale(colonnes) && !existsSync(join(ovrseeDir, '.active-plan'))) {
-    writeFileNoFollow(join(ovrseeDir, '.active-ticket'), meta.id + '\n')
+  // Un ticket créé sans plan, alors que cette session n'a aucun plan actif,
+  // devient son ticket actif : seule façon hors-plan de satisfaire le gate sans
+  // étape manuelle supplémentaire. Écrase silencieusement le ticket actif de la
+  // session, comme `ovrsee-capture-plan.js` réécrit toujours son plan actif.
+  //
+  // « Aucun plan actif » se juge session par session : le plan d'une session
+  // voisine ne doit pas empêcher celle-ci d'ouvrir un ticket ad hoc.
+  if (
+    meta.plan === null &&
+    meta.colonne !== colonneFinale(colonnes) &&
+    !readActive(ovrseeDir, session).plan
+  ) {
+    writeActive(ovrseeDir, session, { ticket: meta.id })
   }
 
   return { file, meta, body }
@@ -426,36 +445,40 @@ export function createTicket(ovrseeDir, champs, now = new Date()) {
  * @returns {boolean} vrai si le fichier a été réécrit
  */
 function rewrite(ovrseeDir, file, transform, now) {
-  const path = ticketPath(ovrseeDir, file)
+  return withLock(ovrseeDir, () => {
+    const path = ticketPath(ovrseeDir, file)
 
-  let ticket
-  try {
-    ticket = parsePlan(readFileSync(path, 'utf8'))
-  } catch {
-    return false
-  }
-  if (!ticket) return false
+    let ticket
+    try {
+      ticket = parsePlan(readFileSync(path, 'utf8'))
+    } catch {
+      return false
+    }
+    if (!ticket) return false
 
-  const next = transform(ticket)
-  if (!next) return false
+    const next = transform(ticket)
+    if (!next) return false
 
-  writeFileNoFollow(path, serializePlan({ ...next.meta, maj: today(now) }, next.body))
-  return true
+    writeFileNoFollow(path, serializePlan({ ...next.meta, maj: today(now) }, next.body))
+    return true
+  })
 }
 
 /**
  * Déplace un ticket d'une colonne à l'autre. Ne touche à rien d'autre — sauf
- * `.active-ticket`, dont ce déplacement est le seul chemin d'écriture commun
+ * le ticket actif, dont ce déplacement est le seul chemin d'écriture commun
  * à tous les appelants (route UI, MCP, hooks) :
  *
- * - vers la colonne finale : efface `.active-ticket` s'il désignait ce ticket
+ * - vers la colonne finale : efface le ticket actif s'il désignait celui-ci
  *   (travail terminé, peu importe si c'est un commit, un drag kanban, ou un
  *   appel MCP) ;
- * - vers `en-cours`, pour un ticket sans plan et sans plan actif : pose
- *   `.active-ticket` — reprendre un ticket déjà ouvert (ex. issu d'un audit)
- *   n'oblige pas à en recréer un.
+ * - vers `en-cours`, pour un ticket sans plan et sans plan actif dans cette
+ *   session : pose le ticket actif — reprendre un ticket déjà ouvert (ex. issu
+ *   d'un audit) n'oblige pas à en recréer un.
+ *
+ * @param {string|null} [session] la session appelante, pour le ticket actif
  */
-export function moveTicket(ovrseeDir, file, colonne, now = new Date()) {
+export function moveTicket(ovrseeDir, file, colonne, now = new Date(), session = null) {
   requireFile(file)
   const colonnes = readBoard(ovrseeDir)
   requireColonne(colonnes, colonne)
@@ -475,14 +498,14 @@ export function moveTicket(ovrseeDir, file, colonne, now = new Date()) {
   const id = idFromFile(file)
   const finale = colonneFinale(colonnes)
   if (id && colonne === finale) {
-    clearActiveTicket(ovrseeDir, id)
+    clearActiveTicket(ovrseeDir, id, session)
   } else if (
     id &&
     colonne === 'en-cours' &&
     (planDuTicket === null || planDuTicket === undefined) &&
-    !existsSync(join(ovrseeDir, '.active-plan'))
+    !readActive(ovrseeDir, session).plan
   ) {
-    writeFileNoFollow(join(ovrseeDir, '.active-ticket'), id + '\n')
+    writeActive(ovrseeDir, session, { ticket: id })
   }
 
   return true
@@ -572,54 +595,58 @@ export function colonneFinale(colonnes) {
 /**
  * Un id de ticket est-il sûr à recoller à une comparaison ?
  *
- * `ovrsee/.active-ticket` est la seule valeur relue du disque puis réinjectée
- * dans une comparaison d'id — même regex que la validation d'`epic` plus haut.
+ * Le ticket actif est la seule valeur relue du disque puis réinjectée dans une
+ * comparaison d'id — même regex que la validation d'`epic` plus haut.
  */
 export function isSafeTicketId(id) {
   return typeof id === 'string' && /^T-\d+$/.test(id)
 }
 
 /**
- * L'id du ticket actif, ou `null`.
+ * L'id du ticket actif d'une session, ou `null`.
  *
- * Absent, illisible ou mal formé retombent tous sur `null` — un `.active-ticket`
- * douteux ne doit jamais faire planter un appelant, seulement se comporter comme
- * s'il n'existait pas.
+ * Absent, illisible ou mal formé retombent tous sur `null` — un état douteux ne
+ * doit jamais faire planter un appelant, seulement se comporter comme s'il
+ * n'existait pas.
+ *
+ * @param {string} ovrseeDir
+ * @param {string|null} [session] omise : le seau partagé, comme avant les
+ *   sessions.
  */
-export function readActiveTicket(ovrseeDir) {
-  try {
-    const id = readFileSync(join(ovrseeDir, '.active-ticket'), 'utf8').trim()
-    return isSafeTicketId(id) ? id : null
-  } catch {
-    return null
-  }
+export function readActiveTicket(ovrseeDir, session = null) {
+  const id = readActive(ovrseeDir, session).ticket
+  return isSafeTicketId(id) ? id : null
 }
 
 /**
- * Retire `.active-ticket`.
+ * Retire le ticket actif d'une session.
  *
  * @param {string} ovrseeDir
  * @param {string|null} [ticketId] fourni : n'efface que si le pointeur désigne
  *   bien ce ticket (mirroring `clearActivePlan` de `plans.js`). Omis : efface
  *   sans condition — un plan qui démarre éclipse tout ticket actif ad hoc.
- * @returns {boolean} vrai si le fichier a été supprimé
+ * @param {string|null} [session]
+ * @returns {boolean} vrai si un pointeur a été retiré
  */
-export function clearActiveTicket(ovrseeDir, ticketId = null) {
-  const pointer = join(ovrseeDir, '.active-ticket')
-  try {
-    if (ticketId !== null && readFileSync(pointer, 'utf8').trim() !== ticketId) return false
-    unlinkSync(pointer)
-    return true
-  } catch {
-    return false // Pas de pointeur, ou illisible : rien à retirer.
-  }
+export function clearActiveTicket(ovrseeDir, ticketId = null, session = null) {
+  const vu = readActiveTicket(ovrseeDir, session)
+  if (vu === null) return false
+  if (ticketId !== null && vu !== ticketId) return false
+
+  // Le ticket peut venir du seau de la session comme du seau partagé — c'est le
+  // repli de `readActive`. On le retire là où il est vraiment, sinon la lecture
+  // suivante le retrouverait ; le garde sur la valeur rend le second appel
+  // inoffensif quand le seau partagé en désigne un autre.
+  clearActive(ovrseeDir, session, 'ticket', vu)
+  clearActive(ovrseeDir, null, 'ticket', vu)
+  return true
 }
 
 /**
  * Avance en « revue » le ticket ad hoc actif, avant qu'un plan ne l'éclipse.
  *
  * Un ticket sans plan (`meta.plan === null`) qui satisfaisait le gate hors-plan
- * n'est plus suivi par aucun hook une fois `.active-ticket` effacé : ni
+ * n'est plus suivi par aucun hook une fois le ticket actif effacé : ni
  * `avancerTicketsEnRevue` (`ovrsee-tool-stop.js`) ni `avancerTicketsDuPlan`
  * (`ovrsee-post-commit.js`) ne le voient jamais passer, puisque tous deux ne
  * suivent que les tickets dont `meta.plan` cite le plan actif. Sans ce geste,
@@ -631,9 +658,10 @@ export function clearActiveTicket(ovrseeDir, ticketId = null) {
  * `en-cours`, cite déjà un plan, ou si le tableau n'a pas de colonne `revue`.
  *
  * @param {string} ovrseeDir
+ * @param {string|null} [session]
  */
-export function avancerTicketActifEclipse(ovrseeDir) {
-  const id = readActiveTicket(ovrseeDir)
+export function avancerTicketActifEclipse(ovrseeDir, session = null) {
+  const id = readActiveTicket(ovrseeDir, session)
   if (!id) return
 
   const colonnes = readBoard(ovrseeDir)
@@ -643,7 +671,7 @@ export function avancerTicketActifEclipse(ovrseeDir) {
   if (!ticket || ticket.meta.plan !== null || ticket.meta.colonne !== 'en-cours') return
 
   try {
-    moveTicket(ovrseeDir, ticket.file, 'revue')
+    moveTicket(ovrseeDir, ticket.file, 'revue', new Date(), session)
   } catch {
     // Un ticket qui ne peut pas être déplacé ne doit jamais faire échouer la capture.
   }

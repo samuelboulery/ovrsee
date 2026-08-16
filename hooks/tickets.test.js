@@ -32,6 +32,8 @@ import {
   clearActiveTicket,
 } from './tickets.js'
 
+import { writeActive } from './active.js'
+
 /** Un dossier `ovrsee/` jetable. */
 const fixture = () => {
   const root = mkdtempSync(join(tmpdir(), 'ovrsee-tickets-'))
@@ -794,6 +796,41 @@ test('moveTicket vers en-cours ne pose pas .active-ticket si un plan est actif',
 
   moveTicket(ovrseeDir, file, 'en-cours')
   assert.equal(readActiveTicket(ovrseeDir), null)
+})
+
+// --- ticket actif et sessions concurrentes ---------------------------------
+
+test('deux sessions gardent chacune leur ticket actif', () => {
+  const ovrseeDir = fixture()
+
+  const a = createTicket(ovrseeDir, { titre: 'Ad hoc de A' }, new Date(), 'session-a')
+  const b = createTicket(ovrseeDir, { titre: 'Ad hoc de B' }, new Date(), 'session-b')
+
+  assert.notEqual(a.meta.id, b.meta.id)
+  assert.equal(readActiveTicket(ovrseeDir, 'session-a'), a.meta.id)
+  assert.equal(readActiveTicket(ovrseeDir, 'session-b'), b.meta.id)
+})
+
+test('le plan actif d’une session n’empêche pas une autre d’ouvrir un ticket ad hoc', () => {
+  const ovrseeDir = fixture()
+  writeActive(ovrseeDir, 'session-a', { plan: '2026-08-16-plan-de-a.md' })
+
+  const { meta } = createTicket(ovrseeDir, { titre: 'Ad hoc de B' }, new Date(), 'session-b')
+
+  assert.equal(readActiveTicket(ovrseeDir, 'session-b'), meta.id)
+  assert.equal(readActiveTicket(ovrseeDir, 'session-a'), null)
+})
+
+test('solder le ticket d’une session laisse celui de l’autre en place', () => {
+  const ovrseeDir = fixture()
+
+  const a = createTicket(ovrseeDir, { titre: 'Ad hoc de A' }, new Date(), 'session-a')
+  const b = createTicket(ovrseeDir, { titre: 'Ad hoc de B' }, new Date(), 'session-b')
+
+  moveTicket(ovrseeDir, a.file, 'fait', new Date(), 'session-a')
+
+  assert.equal(readActiveTicket(ovrseeDir, 'session-a'), null)
+  assert.equal(readActiveTicket(ovrseeDir, 'session-b'), b.meta.id)
 })
 
 // --- avancerTicketActifEclipse ---------------------------------------------

@@ -348,8 +348,14 @@ export interface Snapshot {
   /** Le dossier `ovrsee/` existe-t-il ? Lu sur le disque, pas déduit. */
   equipped: boolean
   plans: Plan[]
-  /** Nom de fichier du plan qui capterait le prochain commit, ou `null`. */
-  activePlan: string | null
+  /**
+   * Les plans qui capteraient le prochain commit — un par session Claude.
+   *
+   * Une liste, et non un plan : plusieurs sessions peuvent travailler sur le
+   * même dépôt, chacune avec la sienne. Le serveur n'appartient à aucune, il ne
+   * peut donc pas en désigner une.
+   */
+  activePlans: string[]
   packageJson: PackageJson | null
   /** `ovrsee.config.json` du dépôt — celui que lit déjà le crawler. */
   config: OvrseeConfig | null

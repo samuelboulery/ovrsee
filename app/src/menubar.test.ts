@@ -132,7 +132,7 @@ const snapshot = (patch: Record<string, unknown> = {}): Snapshot =>
     root: '/Users/sam/code/ovrsee',
     packageJson: null,
     plans: [],
-    activePlan: null,
+    activePlans: [],
     tickets: [],
     board: [],
     scans: [],
@@ -150,7 +150,7 @@ test('menubar : le résumé nomme le plan actif et compte ce qui reste', () => {
     { file: 'a.md', status: 'open', title: 'Le plan actif', opened: '2026-08-14', closed: null, commits: [], body: '' },
     { file: 'b.md', status: 'open', title: 'Un autre', opened: '2026-08-01', closed: null, commits: [], body: '' },
   ]
-  const resume = resumeProjet(snapshot({ plans, activePlan: 'a.md' }))
+  const resume = resumeProjet(snapshot({ plans, activePlans: ['a.md'] }))
 
   assert.equal(resume?.nom, 'ovrsee', 'le nom du dossier à défaut de package.json')
   assert.equal(resume?.planActif, 'Le plan actif')

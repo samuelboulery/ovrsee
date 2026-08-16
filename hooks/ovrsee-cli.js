@@ -19,7 +19,7 @@
  */
 
 import { execFileSync } from 'node:child_process'
-import { existsSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import {
@@ -34,6 +34,7 @@ import {
 } from './plans.js'
 
 import { exportVault } from './obsidian.js'
+import { activePlans, sessionId, writeActive } from './active.js'
 
 import {
   avancerTicketsClos,
@@ -66,10 +67,12 @@ const commands = {
       console.log(`  clos    ${p.meta.closed}  ${p.meta.title}`)
     }
 
-    const pointer = join(ovrseeDir, '.active-plan')
-    console.log(
-      existsSync(pointer) ? `actif : ${readFileSync(pointer, 'utf8').trim()}` : 'aucun plan actif',
-    )
+    // Tous les plans actifs, pas seulement celui de cette invocation : le CLI
+    // n'appartient à aucune session, et dire « le » plan actif serait faux dès
+    // que deux sessions travaillent en même temps.
+    const actifs = activePlans(ovrseeDir)
+    if (actifs.length === 0) console.log('aucun plan actif')
+    else for (const file of actifs) console.log(`actif : ${file}`)
 
     // Afficher les épics avec leurs enfants
     const colonnes = readBoard(ovrseeDir)
@@ -116,8 +119,9 @@ const commands = {
   capture(path) {
     if (!path) throw new Error('usage : ovrsee-cli.js capture <fichier-de-plan.md>')
 
-    // Même règle que le hook automatique : ouvrir un plan ferme le précédent.
-    for (const file of closeOpenPlans(ovrseeDir, console.error)) {
+    // Même règle que le hook automatique : ouvrir un plan ferme le sien et ce
+    // que plus aucune session ne pointe, jamais le plan d'une session voisine.
+    for (const file of closeOpenPlans(ovrseeDir, console.error, { session: sessionId() })) {
       console.log(`clos : ${file}`)
     }
 
@@ -134,7 +138,10 @@ const commands = {
       commits: [],
     }
     writeFileNoFollow(join(ovrseeDir, 'plans', file), serializePlan(meta, text))
-    writeFileNoFollow(join(ovrseeDir, '.active-plan'), file + '\n')
+    // `sessionId()` retombe sur CLAUDE_CODE_SESSION_ID : une capture de secours
+    // lancée depuis une session Claude lui rend bien son plan, et le seau
+    // partagé prend le relais quand le CLI tourne seul dans un terminal.
+    writeActive(ovrseeDir, sessionId(), { plan: file })
     if (registerProject(root)) console.log(`projet enregistré : ${root}`)
     console.log(`capturé : ovrsee/plans/${file}`)
   },
@@ -184,7 +191,7 @@ const commands = {
           priorite: flags.priorite,
           corps: flags.corps,
           type: flags.epic ? 'epic' : undefined,
-        })
+        }, new Date(), sessionId())
         const typeLabel = flags.epic ? ' (epic)' : ''
         console.log(`créé : ${meta.id} en ${meta.colonne}${typeLabel} — ovrsee/tickets/${file}`)
         return
@@ -192,7 +199,9 @@ const commands = {
 
       case 'move': {
         if (!args[0] || !args[1]) throw new Error('usage : ticket move <fichier.md> <colonne>')
-        if (!moveTicket(ovrseeDir, args[0], args[1])) throw new Error(`ticket introuvable : ${args[0]}`)
+        if (!moveTicket(ovrseeDir, args[0], args[1], new Date(), sessionId())) {
+          throw new Error(`ticket introuvable : ${args[0]}`)
+        }
         console.log(`déplacé : ${args[0]} → ${args[1]}`)
         return
       }

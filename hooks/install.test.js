@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, statSy
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { installPostCommit, signalInstalle } from './install.js'
+import { installClaudeHooks, installPostCommit, signalInstalle } from './install.js'
 
 const START = '# ovrsee-hook-start'
 const END = '# ovrsee-hook-end'
@@ -222,4 +222,77 @@ test('signalInstalle : un fichier absent ou illisible vaut « non installé »',
   assert.equal(signalInstalle(join(tmpdir(), 'ovrsee-absent-jamais-cree.json')), false)
   assert.equal(signalInstalle(tempSettings('{ ceci n’est pas du JSON')), false)
   assert.equal(signalInstalle(tempSettings({})), false, 'aucun hook du tout')
+})
+
+// --- enregistrement des hooks Claude Code ----------------------------------
+
+/**
+ * Un `settings.json` jetable. Ces cas existent parce que l'oubli qu'ils
+ * couvrent était invisible : quatre hooks ne tournaient que sur les machines
+ * où quelqu'un les avait ajoutés à la main.
+ */
+const settingsJetable = (contenu = { hooks: {} }) => {
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-settings-'))
+  const path = join(dir, 'settings.json')
+  writeFileSync(path, JSON.stringify(contenu, null, 2), 'utf8')
+  return path
+}
+
+/** Les scripts ovrsee enregistrés pour un événement donné. */
+const scriptsDe = (settings, event) =>
+  (settings.hooks?.[event] ?? []).flatMap(e => (e.hooks ?? []).map(h => h.command)).join(' ')
+
+test('installClaudeHooks enregistre les sept hooks de l’ovrsee', () => {
+  const path = settingsJetable()
+
+  installClaudeHooks([], path)
+  const settings = JSON.parse(readFileSync(path, 'utf8'))
+
+  assert.match(scriptsDe(settings, 'SessionStart'), /ovrsee-session-start\.js/)
+  assert.match(scriptsDe(settings, 'SessionEnd'), /ovrsee-session-end\.js/)
+  assert.match(scriptsDe(settings, 'PostToolUse'), /ovrsee-capture-plan\.js/)
+  assert.match(scriptsDe(settings, 'PostToolUse'), /ovrsee-tool-edit\.js/)
+  assert.match(scriptsDe(settings, 'PostToolUse'), /ovrsee-capture-audit\.js/)
+  assert.match(scriptsDe(settings, 'PreToolUse'), /ovrsee-tool-edit-gate\.js/)
+  assert.match(scriptsDe(settings, 'Stop'), /ovrsee-tool-stop\.js/)
+  assert.match(scriptsDe(settings, 'Stop'), /ovrsee-notify\.js/)
+  assert.match(scriptsDe(settings, 'Notification'), /ovrsee-notify\.js/)
+  assert.match(scriptsDe(settings, 'UserPromptSubmit'), /ovrsee-capture-audit\.js/)
+})
+
+test('installClaudeHooks est réexécutable sans empiler les entrées', () => {
+  const path = settingsJetable()
+
+  installClaudeHooks([], path)
+  const apresUn = JSON.parse(readFileSync(path, 'utf8'))
+
+  const second = []
+  installClaudeHooks(second, path)
+  const apresDeux = JSON.parse(readFileSync(path, 'utf8'))
+
+  assert.deepEqual(apresDeux.hooks, apresUn.hooks)
+  assert.ok(second.some(l => /déjà installés/.test(l)))
+})
+
+test('installClaudeHooks garde les entrées qui ne sont pas les siennes', () => {
+  const path = settingsJetable({
+    hooks: { Stop: [{ hooks: [{ type: 'command', command: 'node /ailleurs/autre-chose.js' }] }] },
+  })
+
+  installClaudeHooks([], path)
+  const settings = JSON.parse(readFileSync(path, 'utf8'))
+
+  assert.match(scriptsDe(settings, 'Stop'), /autre-chose\.js/)
+  assert.match(scriptsDe(settings, 'Stop'), /ovrsee-tool-stop\.js/)
+})
+
+test('installClaudeHooks laisse intact un settings.json illisible', () => {
+  const path = settingsJetable()
+  writeFileSync(path, '{ pas du json', 'utf8')
+
+  const done = []
+  installClaudeHooks(done, path)
+
+  assert.equal(readFileSync(path, 'utf8'), '{ pas du json')
+  assert.ok(done.some(l => /illisible/.test(l)))
 })

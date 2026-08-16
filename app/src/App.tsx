@@ -653,7 +653,7 @@ export function App() {
                         <Historique
                           projet={projectDisplayName(snapshot)}
                           plans={plans}
-                          activePlan={snapshot.activePlan}
+                          activePlans={snapshot.activePlans}
                           timeline={snapshot.timeline ?? []}
                           ticketTimeline={snapshot.ticketTimeline ?? []}
                           scans={snapshot.scans ?? []}

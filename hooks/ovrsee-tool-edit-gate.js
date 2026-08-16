@@ -22,6 +22,7 @@ import { fileURLToPath } from 'node:url'
 
 import { colonneFinale, readActiveTicket, readBoard, readTickets } from './tickets.js'
 import { isSafePlanFileName } from './plans.js'
+import { readActive, sessionId } from './active.js'
 import { estUneEditionSource } from './ovrsee-tool-edit.js'
 
 function readStdin() {
@@ -69,15 +70,16 @@ export function ticketManquant(ovrseeDir, planFile) {
 }
 
 /**
- * Le ticket actif (`.active-ticket`, hors plan) existe-t-il encore et est-il
+ * Le ticket actif hors plan de cette session existe-t-il encore et est-il
  * ouvert ? Absent, introuvable ou en colonne finale comptent également comme
  * manquant : dans les trois cas la sortie est la même, en créer un.
  *
  * @param {string} ovrseeDir
+ * @param {string|null} [session]
  * @returns {boolean}
  */
-export function ticketActifManquant(ovrseeDir) {
-  const id = readActiveTicket(ovrseeDir)
+export function ticketActifManquant(ovrseeDir, session = null) {
+  const id = readActiveTicket(ovrseeDir, session)
   if (!id) return true
 
   const colonnes = readBoard(ovrseeDir)
@@ -105,9 +107,12 @@ function main() {
 
   if (!estUneEditionSource(root, payload?.tool_input?.file_path)) return
 
-  const planPointer = join(ovrseeDir, '.active-plan')
-  if (existsSync(planPointer)) {
-    const planFile = readFileSync(planPointer, 'utf8').trim()
+  // La portée est la session : le plan actif d'une session voisine ne doit ni
+  // couvrir ni bloquer les éditions de celle-ci.
+  const session = sessionId(payload)
+  const planFile = readActive(ovrseeDir, session).plan
+
+  if (planFile) {
     if (!isSafePlanFileName(planFile)) return
 
     if (ticketManquant(ovrseeDir, planFile)) {
@@ -121,9 +126,9 @@ function main() {
     return // Plan actif et ticket lié : rien d'autre à imposer.
   }
 
-  // Pas de plan actif : un ticket actif hors-plan (`.active-ticket`) doit
+  // Pas de plan actif dans cette session : un ticket actif hors-plan doit
   // couvrir cette édition, sinon rien ne trace ce travail.
-  if (ticketActifManquant(ovrseeDir)) {
+  if (ticketActifManquant(ovrseeDir, session)) {
     process.stderr.write(
       `Bloqué : ni plan actif ni ticket actif.\n` +
         `Crée un ticket — skill ovrsee-tickets, ou MCP createTicket — avant d'éditer du code.\n`,

@@ -85,7 +85,7 @@ export function Sante({
           <div style={s('font-size: 11px; color: var(--color-neutral-600); flex: 1;')}>
             {ouverts.length > 0 ? `${t('sante.open_plans')} · ${ouverts.length}` : t('sante.no_open_plans')}
           </div>
-          {snapshot.activePlan && ouverts.some(p => p.file === snapshot.activePlan) && (
+          {ouverts.some(p => snapshot.activePlans.includes(p.file)) && (
             <button
               type="button"
               disabled={clotureEnCours}
@@ -117,7 +117,7 @@ export function Sante({
         {ouverts.length > 0 && (
           <div style={s('border: 1px solid var(--color-border-card); border-radius: 8px; background: var(--color-surface-card); overflow: hidden;')}>
             {ouverts.map((plan, index) => {
-              const actif = plan.file === snapshot.activePlan
+              const actif = snapshot.activePlans.includes(plan.file)
               return (
                 <div
                   key={plan.file}

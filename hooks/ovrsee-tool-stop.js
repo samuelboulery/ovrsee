@@ -25,6 +25,7 @@ import { fileURLToPath } from 'node:url'
 
 import { EN_COURS, moveTicket, readBoard, readTickets } from './tickets.js'
 import { isSafePlanFileName } from './plans.js'
+import { readActive, sessionId } from './active.js'
 
 function readStdin() {
   try {
@@ -114,10 +115,10 @@ function main() {
   const ovrseeDir = join(root, 'ovrsee')
   if (!existsSync(ovrseeDir)) return // Projet non équipé.
 
-  const pointer = join(ovrseeDir, '.active-plan')
-  if (!existsSync(pointer)) return // Pas de plan actif : rien à lier.
-
-  const planFile = readFileSync(pointer, 'utf8').trim()
+  // Le plan de CETTE session : la fin d'un tour ici ne dit rien du travail
+  // d'une session voisine.
+  const planFile = readActive(ovrseeDir, sessionId(payload)).plan
+  if (!planFile) return // Pas de plan actif : rien à lier.
   if (!isSafePlanFileName(planFile)) return
 
   if (!aDuCodeNonCommite(root)) return

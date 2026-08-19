@@ -149,3 +149,4 @@
 {"date":"2026-08-19","commit":"ff157d6","ok":false,"error":"http://localhost:5180 répond déjà — un autre serveur occupe le port. Arrêtez-le, ou donnez un baseUrl libre dans ovrsee.config.json."}
 {"date":"2026-08-19","commit":"ff157d6","ok":true,"pages":7}
 {"date":"2026-08-19","commit":"ff157d6","ok":true,"pages":7}
+{"date":"2026-08-19","commit":"d6464f3","ok":true,"pages":7}

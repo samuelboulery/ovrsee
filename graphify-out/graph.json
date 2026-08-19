@@ -14744,8 +14744,8 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L105",
       "weight": 1.0,
-      "_src": "pty_opensession",
-      "_tgt": "shell_loginshell",
+      "_src": "shell_loginshell",
+      "_tgt": "pty_opensession",
       "source": "shell_loginshell",
       "target": "pty_opensession"
     },
@@ -19316,8 +19316,8 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L335",
       "weight": 1.0,
-      "_src": "main_projetconnu",
-      "_tgt": "snapshot_projects",
+      "_src": "snapshot_projects",
+      "_tgt": "main_projetconnu",
       "source": "snapshot_projects",
       "target": "main_projetconnu"
     },

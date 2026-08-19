@@ -4,7 +4,40 @@
   "title": "Rendre l'ovrsee utilisable sans cloner le dépôt",
   "opened": "2026-08-19",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "d6464f3",
+      "date": "2026-08-20",
+      "files": [
+        "CLAUDE.md",
+        "README.fr.md",
+        "README.md",
+        "app/src/App.tsx",
+        "app/src/ConfigCrawl.tsx",
+        "app/src/EquipmentPanel.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/data.test.ts",
+        "app/src/data.ts",
+        "app/src/render.test.tsx",
+        "app/src/tabs/Produit.tsx",
+        "app/src/useCrawl.ts",
+        "crawl/config.test.js",
+        "crawl/index.js",
+        "electron-builder.yml",
+        "electron/crawl.js",
+        "electron/crawl.test.js",
+        "electron/main.js",
+        "electron/preload.cjs",
+        "electron/pty.js",
+        "hooks/documentation.test.js",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/shell.js",
+        "package.json",
+        "pnpm-lock.yaml"
+      ]
+    }
+  ]
 }
 ---
 

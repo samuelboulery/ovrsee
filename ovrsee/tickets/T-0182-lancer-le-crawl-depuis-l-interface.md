@@ -2,12 +2,12 @@
 {
   "id": "T-0182",
   "titre": "Lancer le crawl depuis l'interface, avec sa progression",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "l",
   "tags": ["electron", "crawl", "ui"],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-rendre-l-ovrsee-utilisable-sans-cloner-le-depot.md",
   "epic": "T-0180"
 }

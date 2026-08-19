@@ -2,12 +2,12 @@
 {
   "id": "T-0184",
   "titre": "README : l'application d'abord, le dépôt ensuite",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "m",
   "tags": ["docs"],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-rendre-l-ovrsee-utilisable-sans-cloner-le-depot.md",
   "epic": "T-0180"
 }

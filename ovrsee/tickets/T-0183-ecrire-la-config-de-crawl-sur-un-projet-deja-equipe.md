@@ -2,12 +2,12 @@
 {
   "id": "T-0183",
   "titre": "Écrire la config de crawl sur un projet déjà équipé",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "s",
   "tags": ["ui", "crawl"],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-rendre-l-ovrsee-utilisable-sans-cloner-le-depot.md",
   "epic": "T-0180"
 }

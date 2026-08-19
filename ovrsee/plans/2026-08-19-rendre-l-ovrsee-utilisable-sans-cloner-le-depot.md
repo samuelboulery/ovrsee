@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Rendre l'ovrsee utilisable sans cloner le dépôt",
   "opened": "2026-08-19",
-  "closed": null,
+  "closed": "2026-08-20",
   "commits": [
     {
       "sha": "d6464f3",
@@ -41,6 +41,17 @@
       "sha": "8e68910",
       "date": "2026-08-20",
       "files": []
+    },
+    {
+      "sha": "a1dc714",
+      "date": "2026-08-20",
+      "files": [
+        "CLAUDE.md",
+        "crawl/index.js",
+        "electron/crawl.js",
+        "hooks/shell.js",
+        "hooks/shell.test.js"
+      ]
     }
   ]
 }

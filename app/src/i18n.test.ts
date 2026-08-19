@@ -76,7 +76,7 @@ test('i18n: tous les dictionnaires ont les mêmes clés', () => {
     // Accessibilité
     'a11y.tabs', 'a11y.projects', 'a11y.open_project', 'a11y.older_shot',
     'a11y.newer_shot', 'a11y.skill_installed', 'a11y.skill_to_install', 'a11y.edit',
-    'a11y.delete', 'a11y.resize', 'a11y.session_active', 'a11y.terminal_available',
+    'a11y.delete', 'a11y.resize',
     'a11y.remove_from_list', 'a11y.last_plan',
     // Menus
     'menu.file', 'menu.open_project', 'menu.reload_project', 'menu.reveal_ovrsee',

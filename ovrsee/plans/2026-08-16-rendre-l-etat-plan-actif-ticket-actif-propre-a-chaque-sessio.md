@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Rendre l'état « plan actif / ticket actif » propre à chaque session",
   "opened": "2026-08-16",
-  "closed": null,
+  "closed": "2026-08-16",
   "commits": [
     {
       "sha": "f7c3c17",

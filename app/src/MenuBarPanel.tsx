@@ -79,7 +79,13 @@ export function SessionCard({
   const decidable = estDecidable(session, now)
   const attente = session.attention?.kind === 'question'
   // Une session muette est le cas normal : elle tourne, elle n'a rien demandé.
-  const etat = session.attention === null ? 'menubar.running' : attente ? 'menubar.waiting' : 'menubar.idle'
+  // Une session au travail dit la même chose, mais elle, on le sait.
+  const etat =
+    session.attention === null || session.attention.kind === 'busy'
+      ? 'menubar.running'
+      : attente
+        ? 'menubar.waiting'
+        : 'menubar.idle'
 
   return (
     <li style={s(CARTE)}>

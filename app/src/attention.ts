@@ -11,16 +11,22 @@
  * ce qui n'est pas pour nous doit ressortir intact.
  */
 
-/** Ce que Claude vient de faire. */
-export type AttentionKind = 'stop' | 'question'
+/**
+ * Ce que Claude vient de faire.
+ *
+ * `reset` est le seul qui n'est pas un état : il dit qu'une conversation
+ * repart de zéro, donc que l'onglet ne doit plus annoncer la précédente.
+ */
+export type AttentionKind = 'stop' | 'question' | 'busy' | 'reset'
 
 /** Un signal reconnu, avec le détail que le hook y a joint s'il y en a un. */
 export interface AttentionEvent {
   kind: AttentionKind
   /**
-   * Le `message` de la charge utile du hook, décodé — « Claude needs your
-   * permission to use Bash ». Vaut null sur un `stop`, sur la forme courte
-   * héritée, et sur une charge illisible.
+   * Le détail joint par le hook, décodé — le `message` d'une question
+   * (« Claude needs your permission to use Bash »), la demande elle-même sur un
+   * `busy`. Vaut null sur un `stop`, sur la forme courte héritée, et sur une
+   * charge illisible.
    */
   detail: string | null
 }
@@ -54,7 +60,8 @@ const COMPLETE = new RegExp(`^${ESC}\\]777;ovrsee;([a-z-]+)(?:;([A-Za-z0-9+/=]*)
  */
 const MAX_CARRY = 700
 
-const isKind = (value: string): value is AttentionKind => value === 'stop' || value === 'question'
+const isKind = (value: string): value is AttentionKind =>
+  value === 'stop' || value === 'question' || value === 'busy' || value === 'reset'
 
 /**
  * Décode la charge base64 d'une séquence.
@@ -127,4 +134,28 @@ export function extractAttention(carry: string, chunk: string): AttentionScan {
   }
 
   return { clean, carry: '', events }
+}
+
+/** Longueur d'une étiquette d'onglet, en caractères, ellipse comprise. */
+const MAX_ETIQUETTE = 28
+
+/**
+ * Le nom d'onglet tiré d'une demande.
+ *
+ * Première ligne seulement : une demande collée sur dix lignes tient dans le
+ * signal, pas dans un onglet. Une commande slash garde son `/`, qui dit déjà ce
+ * que la session fait.
+ *
+ * Rend une chaîne vide quand il n'y a rien à en tirer — l'appelant garde alors
+ * le nom en place plutôt que d'afficher un onglet sans nom.
+ */
+export function etiquetteDe(prompt: string): string {
+  const ligne = (prompt.split('\n').find(l => l.trim() !== '') ?? '').trim()
+  if (ligne === '') return ''
+  // Coupe au mot quand il y en a un à portée : « sortir les epics du… » se lit,
+  // « sortir les epics d… » se devine.
+  if (ligne.length <= MAX_ETIQUETTE) return ligne
+  const tronque = ligne.slice(0, MAX_ETIQUETTE - 1)
+  const espace = tronque.lastIndexOf(' ')
+  return `${(espace > MAX_ETIQUETTE / 2 ? tronque.slice(0, espace) : tronque).trimEnd()}…`
 }

@@ -1,70 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 
 import {
-  CHARGES,
-  childrenOf,
-  colonneFinale,
-  epicProgress,
-  humanAge,
-  PRIORITES,
   sortTickets,
   ticketAction,
-  type Charge,
   type Colonne,
   type GitStatus,
   type Illisible,
-  type Priorite,
   type Tableau as TableauData,
   type TicketAction,
   type Ticket,
 } from '../data'
 import { Illisibles } from '../Illisibles'
 import { t } from '../i18n'
-import { Markdown } from '../markdown'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
 import { ViewBar } from '../ViewBar'
-
-/**
- * Deux glisser-déposer partagent la même surface : les cartes et les colonnes.
- *
- * Ils se distinguent au type MIME, pas à la devinette. Pendant un `dragover`
- * le navigateur interdit de lire les données transportées — seuls les *types*
- * sont visibles — donc c'est aussi la seule façon de savoir quoi surligner
- * avant le dépôt.
- */
-const TYPE_CARTE = 'text/plain'
-const TYPE_COLONNE = 'application/x-ovrsee-colonne'
-
-const estColonne = (transfert: DataTransfer) => transfert.types.includes(TYPE_COLONNE)
+import { Carte } from './TableauCarte'
+import { estColonne, TYPE_CARTE, TYPE_COLONNE } from './TableauDnd'
+import { Detail, type TicketPatch } from './TableauDetail'
+import { TableauEpics } from './TableauEpics'
 
 /** Où une colonne glissée veut atterrir : une cible, et de quel côté. */
 type Insertion = { index: number; apres: boolean }
-
-/**
- * Fait suivre chaque epic de ses enfants présents dans la même colonne.
- *
- * `sortTickets` n'a aucune notion d'epic — sans ce passage, les enfants d'un
- * même epic se dispersent dans la colonne au gré de leur priorité et de leur
- * date. Un enfant en priorité haute peut trier *avant* son epic en priorité
- * basse : les enfants sont donc exclus du parcours principal et réinjectés
- * juste après leur epic, jamais laissés à leur place d'origine. Purement un
- * ordre d'affichage : l'ordre stocké (celui de `board.json`) n'existe pas, il
- * est recalculé à chaque rendu, donc réordonner ici ne perd rien. Un enfant
- * dont l'epic est dans une autre colonne garde sa place.
- */
-const groupEpics = (tickets: Ticket[]): Ticket[] => {
-  const epicsIci = new Set(tickets.filter(t => t.type === 'epic').map(t => t.id))
-  const enfantIci = (t: Ticket) => t.epic !== undefined && epicsIci.has(t.epic)
-
-  const suite: Ticket[] = []
-  for (const ticket of tickets) {
-    if (enfantIci(ticket)) continue
-    suite.push(ticket)
-    if (ticket.type === 'epic') suite.push(...tickets.filter(t => t.epic === ticket.id))
-  }
-  return suite
-}
 
 /**
  * Le tableau du projet : des tickets qu'on saisit, priorise et déplace.
@@ -82,21 +39,6 @@ const groupEpics = (tickets: Ticket[]): Ticket[] => {
  * l'aveugle, et un réordonnancement par flèches ne dit jamais où la colonne va
  * tomber.
  */
-
-/**
- * Ce qu'un ticket peut recevoir en modification.
- *
- * `charge`, `type` et `epic` acceptent `null` pour effacer le champ — un
- * ticket redevient non estimé, non-epic, ou détaché. `Partial<Ticket>` seul ne
- * le permettrait pas : ses champs optionnels acceptent `undefined` (ne pas
- * toucher), pas `null` (effacer). D'où l'exclusion puis la redéfinition.
- */
-type TicketPatch = Partial<Omit<Ticket, 'charge' | 'type' | 'epic'>> & {
-  corps?: string
-  charge?: Charge | null
-  type?: 'epic' | null
-  epic?: string | null
-}
 
 /** Contexte d'un élément du Navigateur, à joindre au prochain ticket créé. */
 type ContexteElement = { corps: string; tags: string[] }
@@ -130,7 +72,7 @@ export function Tableau({
   const [insertion, setInsertion] = useState<Insertion | null>(null)
   const [ouverte, setOuverte] = useState<string | null>(focusTicket)
   const [edition, setEdition] = useState(false)
-  const [filtreEpic, setFiltreEpic] = useState<string | null>(null)
+  const [vue, setVue] = useState<'kanban' | 'epics'>('kanban')
   const [enAttente, setEnAttente] = useState<ContexteElement | null>(contexteElement)
 
   /**
@@ -275,14 +217,26 @@ export function Tableau({
   }
 
   const selection = tickets.find(t => t.file === ouverte) ?? null
-  // Sans filtre, tout s'affiche — epics, leurs enfants, les orphelins. « Voir
-  // enfants » isole les enfants d'un epic donné ; ça n'a jamais eu vocation à
-  // cacher les epics eux-mêmes de la vue par défaut.
-  const ticketsAffichables = filtreEpic ? tickets.filter(t => t.epic === filtreEpic) : tickets
 
   return (
     <div style={s('flex: 1; display: flex; flex-direction: column; overflow: hidden;')}>
       <ViewBar projet={projet} vue={t('tableau.title')} meta={`${tickets.length} tickets · ovrsee/tickets/`}>
+        <div className="seg">
+          {(['kanban', 'epics'] as const).map(id => (
+            <label key={id} className="seg-opt">
+              <input
+                type="radio"
+                name="tableau-vue"
+                checked={vue === id}
+                onChange={() => {
+                  setOuverte(null)
+                  setVue(id)
+                }}
+              />
+              {t(id === 'kanban' ? 'tableau.view_kanban' : 'tableau.view_epics')}
+            </label>
+          ))}
+        </div>
         <button
           type="button"
           className={edition ? 'btn btn-primary' : 'btn btn-ghost'}
@@ -312,24 +266,6 @@ export function Tableau({
             </button>
           </div>
         )}
-        {filtreEpic && (
-          <div style={s('margin: 12px 0 12px; padding: 10px 12px; border-radius: 6px; background: var(--color-surface-card); border: 1px solid var(--color-border-control); display: flex; align-items: center; gap: 10px;')}>
-            <span className="tag tag-accent" style={s('font-size: 10px;')}>epic</span>
-            <div style={s('font-size: 12px; color: var(--color-text);')}>
-              {t('tableau.children_of')} <span style={s('font-weight: 500;')}>{filtreEpic}</span>
-            </div>
-            <div style={s('flex: 1;')} />
-            <button
-              type="button"
-              className="btn btn-ghost"
-              style={s('font-size: 11.5px; padding: 4px 8px;')}
-              onClick={() => setFiltreEpic(null)}
-            >
-              {t('tableau.back')}
-            </button>
-          </div>
-        )}
-
         <Illisibles entries={illisibles} quoi="ticket" />
         <div style={s('font-size: 12px; color: var(--color-neutral-600);')}>
           {edition ? t('tableau.edit_mode_help') : t('tableau.read_mode_help')}
@@ -342,8 +278,11 @@ export function Tableau({
       </div>
 
       <div style={s('flex: 1; display: flex; overflow: hidden;')}>
-        {/* `stretch` plutôt que `flex-start` : une colonne vide doit rester une
-            cible de dépôt de la hauteur du tableau, sinon on vise un liseré. */}
+        {vue === 'epics' ? (
+          <TableauEpics tickets={tickets} board={board} onOuvrir={setOuverte} ouverte={ouverte} />
+        ) : (
+        /* `stretch` plutôt que `flex-start` : une colonne vide doit rester une
+           cible de dépôt de la hauteur du tableau, sinon on vise un liseré. */
         <div
           style={s('flex: 1; display: flex; gap: 12px; padding: 0 22px 20px; overflow-x: auto; align-items: stretch;')}
           onDragLeave={() => setInsertion(null)}
@@ -354,7 +293,7 @@ export function Tableau({
               colonne={colonne}
               index={index}
               colonnes={board}
-              tickets={groupEpics(sortTickets(ticketsAffichables.filter(t => t.colonne === colonne.id)))}
+              tickets={sortTickets(tickets.filter(t => t.colonne === colonne.id && t.type !== 'epic'))}
               edition={edition}
               finale={index === board.length - 1 && board.length > 1}
               survolee={survolee === colonne.id}
@@ -371,10 +310,7 @@ export function Tableau({
               ouverte={ouverte}
               onRenommer={patch => renommer(colonne.id, patch)}
               onRetirer={vers => retirer(colonne.id, vers)}
-              setFiltreEpic={setFiltreEpic}
               allTickets={tickets}
-              onModifier={modifier}
-              boardColonnes={board}
               saisieOuverte={index === 0 && Boolean(enAttente) && !edition}
             />
           ))}
@@ -391,6 +327,7 @@ export function Tableau({
             />
           )}
         </div>
+        )}
 
         {selection && !edition && (
           <Detail
@@ -412,9 +349,6 @@ export function Tableau({
     </div>
   )
 }
-
-const PANNEAU =
-  'width: 340px; min-width: 340px; border-left: 1px solid var(--color-border-card); padding: 0 18px 20px; overflow-y: auto; background: var(--color-surface-panel);'
 
 const COLONNE_LARGEUR = 'width: 268px; min-width: 268px;'
 
@@ -439,10 +373,7 @@ function ColonneVue({
   ouverte,
   onRenommer,
   onRetirer,
-  setFiltreEpic,
   allTickets,
-  onModifier,
-  boardColonnes,
   saisieOuverte = false,
 }: {
   colonne: Colonne
@@ -463,10 +394,7 @@ function ColonneVue({
   ouverte: string | null
   onRenommer: (patch: { titre?: string; wip?: number | null }) => void
   onRetirer: (vers?: string) => void
-  setFiltreEpic: (epic: string | null) => void
   allTickets: Ticket[]
-  onModifier: (file: string, patch: TicketPatch) => void
-  boardColonnes: Colonne[]
   /** Ouvre la saisie du titre au montage — arrivée d'un contexte d'élément depuis Navigateur. */
   saisieOuverte?: boolean
 }) {
@@ -715,21 +643,15 @@ function ColonneVue({
               {t('tableau.drop_here')}
             </div>
           )}
-          {tickets
-            .filter(ticket => !(ticket.epic && tickets.some(e => e.id === ticket.epic && e.type === 'epic')))
-            .map(ticket => (
-              <Carte
-                key={ticket.file}
-                ticket={ticket}
-                onOuvrir={onOuvrir}
-                ouverte={ouverte}
-                enfantsIci={ticket.type === 'epic' ? tickets.filter(c => c.epic === ticket.id) : undefined}
-                setFiltreEpic={setFiltreEpic}
-                allTickets={allTickets}
-                onModifier={onModifier}
-                boardColonnes={boardColonnes}
-              />
-            ))}
+          {tickets.map(ticket => (
+            <Carte
+              key={ticket.file}
+              ticket={ticket}
+              onOuvrir={onOuvrir}
+              ouverte={ouverte}
+              allTickets={allTickets}
+            />
+          ))}
         </div>
       )}
     </div>
@@ -805,419 +727,4 @@ function TuileAjout({
   )
 }
 
-/** Une pastille par priorité — c'est ce qui se lit avant le titre. */
-export const COULEUR_PRIORITE: Record<Priorite, string> = {
-  haute: 'var(--color-accent-400)',
-  moyenne: 'var(--color-neutral-500)',
-  basse: 'var(--color-neutral-700)',
-}
 
-function Carte({
-  ticket,
-  onOuvrir,
-  ouverte,
-  enfantsIci,
-  setFiltreEpic,
-  allTickets,
-  onModifier,
-  boardColonnes,
-}: {
-  ticket: Ticket
-  onOuvrir: (file: string) => void
-  /** Fichier du ticket dont le panneau Detail est ouvert — filet + halo, jamais un filet accent. */
-  ouverte: string | null
-  /** Enfants de cet epic présents dans cette même colonne — rendus imbriqués, sans liseré. */
-  enfantsIci?: Ticket[]
-  setFiltreEpic: (epic: string | null) => void
-  allTickets: Ticket[]
-  onModifier: (file: string, patch: TicketPatch) => void
-  boardColonnes: Colonne[]
-}) {
-  const isEpic = ticket.type === 'epic'
-  const selectionnee = ticket.file === ouverte
-  const children = isEpic ? childrenOf(allTickets, ticket.id) : []
-  const finalColumn = colonneFinale(boardColonnes)
-  const progress = isEpic ? epicProgress(children, finalColumn) : null
-  const parentEpic = ticket.epic ? allTickets.find(t => t.id === ticket.epic) : null
-
-  return (
-    <div
-      draggable
-      // Une carte enfant est rendue *dans* la carte de son epic : sans arrêter
-      // la propagation, cliquer un enfant ouvrait l'epic (le gestionnaire du
-      // parent s'exécutait ensuite et gagnait), et le glisser déplaçait l'epic
-      // (le `setData` du parent écrasait celui de l'enfant).
-      onDragStart={event => {
-        event.stopPropagation()
-        event.dataTransfer.setData(TYPE_CARTE, ticket.file)
-      }}
-      onClick={event => {
-        event.stopPropagation()
-        onOuvrir(ticket.file)
-      }}
-      style={s(
-        'border: 1px solid ' +
-          (selectionnee ? 'var(--color-border-selected)' : 'var(--color-border-card)') +
-          '; border-radius: 8px; padding: 10px 11px; background: ' +
-          (selectionnee ? 'var(--color-surface-elevated)' : 'var(--color-surface-card)') +
-          '; cursor: pointer;' +
-          (selectionnee ? ' box-shadow: var(--ring-selected);' : ''),
-      )}
-    >
-      <div style={s('display: flex; align-items: center; gap: 7px;')}>
-        <span
-          style={s(`width: 7px; height: 7px; border-radius: 50%; flex: none; background: ${COULEUR_PRIORITE[ticket.priorite] ?? COULEUR_PRIORITE.moyenne};`)}
-          title={`${t('tableau.priority_label')} ${ticket.priorite}`}
-        />
-        {ticket.charge && (
-          <span
-            style={s('font-size: 9px; color: var(--color-neutral-500); text-transform: uppercase; letter-spacing: 0.02em; flex: none;')}
-            title={`${t('tableau.charge_label')} ${ticket.charge}`}
-          >
-            {ticket.charge}
-          </span>
-        )}
-        {isEpic && (
-          <span
-            className="tag tag-outline"
-            style={s('font-size: 9px; padding: 2px 6px; margin: 0;')}
-            title="Epic"
-          >
-            epic
-          </span>
-        )}
-        <div style={s('font-size: 10px; color: var(--color-neutral-600); font-variant-numeric: tabular-nums;')}>
-          {ticket.id}
-        </div>
-        <div style={s('flex: 1;')} />
-        <div style={s('font-size: 10px; color: var(--color-neutral-600);')}>{humanAge(ticket.cree)}</div>
-      </div>
-
-      <div style={s('font-size: 12.5px; margin-top: 6px; line-height: 1.45; text-wrap: pretty;')}>
-        {ticket.titre}
-      </div>
-
-      {isEpic && progress && (
-        <div style={s('display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 11px;')}>
-          <div style={s('flex: 1; height: 4px; border-radius: 2px; background: var(--color-neutral-800); overflow: hidden;')}>
-            <div
-              style={s(`height: 100%; background: var(--color-accent-400); width: ${progress.percent}%;`)}
-            />
-          </div>
-          <span style={s('color: var(--color-neutral-600); white-space: nowrap;')}>
-            {progress.done}/{progress.total}
-          </span>
-        </div>
-      )}
-
-      <div style={s('display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;')}>
-        {ticket.tags.map(tag => (
-          <span key={tag} className="tag tag-neutral" style={s('font-size: 10px;')}>
-            {tag}
-          </span>
-        ))}
-        {ticket.plan && (
-          <span className="tag tag-outline" style={s('font-size: 10px;')} title={ticket.plan}>
-            plan
-          </span>
-        )}
-        {ticket.epic && (
-          <span
-            className="tag tag-outline"
-            style={s('font-size: 10px;')}
-            title={parentEpic ? `${t('tableau.child_of')} ${parentEpic.titre}` : t('tableau.parent_epic_missing')}
-          >
-            {parentEpic ? `${t('tableau.child_of')} ${ticket.epic}` : t('tableau.orphan_ticket')}
-          </span>
-        )}
-      </div>
-
-      <div style={s('display: flex; gap: 6px; margin-top: 8px;')}>
-        {isEpic && children.length > 0 && (
-          <button
-            type="button"
-            className="btn btn-ghost"
-            style={s('font-size: 10px; padding: 3px 6px; flex: 1;')}
-            onClick={(e) => {
-              e.stopPropagation()
-              setFiltreEpic(ticket.id)
-            }}
-          >
-            {t('tableau.view_children', { n: children.length })}
-          </button>
-        )}
-        {ticket.epic && (
-          <button
-            type="button"
-            className="btn btn-ghost"
-            style={s('font-size: 10px; padding: 3px 6px; flex: 1;')}
-            onClick={(e) => {
-              e.stopPropagation()
-              onModifier(ticket.file, { epic: null })
-            }}
-          >
-            {t('tableau.detach')}
-          </button>
-        )}
-      </div>
-
-      {enfantsIci && enfantsIci.length > 0 && (
-        <div style={s('display: flex; flex-direction: column; gap: 8px; margin-top: 10px;')}>
-          {enfantsIci.map(enfant => (
-            <Carte
-              key={enfant.file}
-              ticket={enfant}
-              onOuvrir={onOuvrir}
-              ouverte={ouverte}
-              setFiltreEpic={setFiltreEpic}
-              allTickets={allTickets}
-              onModifier={onModifier}
-              boardColonnes={boardColonnes}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function Detail({
-  ticket,
-  colonnes,
-  allTickets,
-  root,
-  gitStatus,
-  onFermer,
-  onModifier,
-  onDeplacer,
-  onSupprimer,
-}: {
-  ticket: Ticket
-  colonnes: Colonne[]
-  allTickets: Ticket[]
-  root: string
-  gitStatus?: GitStatus
-  onFermer: () => void
-  onModifier: (patch: TicketPatch) => void
-  onDeplacer: (colonne: string) => void
-  onSupprimer: () => void
-}) {
-  const [titre, setTitre] = useState(ticket.titre)
-  const [tags, setTags] = useState(ticket.tags.join(', '))
-  const [corps, setCorps] = useState(ticket.corps)
-  const [confirme, setConfirme] = useState(false)
-  // Un ticket s'ouvre pour être lu, pas pour être aussitôt modifié — le
-  // formulaire d'édition n'apparaît que sur demande explicite. Le panneau est
-  // remonté à chaque changement de ticket (`key={selection.file}` chez
-  // l'appelant), donc ouvrir un autre ticket revient toujours en lecture.
-  const [edition, setEdition] = useState(false)
-
-  const colonne = colonnes.find(c => c.id === ticket.colonne)
-  const parentEpic = ticket.epic ? allTickets.find(t => t.id === ticket.epic) : null
-  const nonCommite = gitStatus?.dirty.files?.includes(`ovrsee/tickets/${ticket.file}`) ?? false
-
-  return (
-    <div style={s(PANNEAU)}>
-      <div style={s('display: flex; align-items: center; gap: 8px; padding: 4px 0 12px; position: sticky; top: 0; background: var(--color-bg);')}>
-        <div style={s('font-size: 11px; color: var(--color-neutral-600); font-variant-numeric: tabular-nums;')}>
-          {ticket.id}
-        </div>
-        <div style={s('flex: 1;')} />
-        <button
-          type="button"
-          className={edition ? 'btn btn-primary' : 'btn btn-ghost'}
-          style={s('font-size: 12px;')}
-          onClick={() => setEdition(!edition)}
-        >
-          {edition ? t('tableau.finish_editing') : t('tableau.edit_ticket')}
-        </button>
-        <button type="button" className="btn btn-ghost" style={s('font-size: 12px;')} onClick={onFermer}>
-          {t('tableau.close')}
-        </button>
-      </div>
-
-      {edition ? (
-        <>
-          <input
-            className="input"
-            value={titre}
-            onChange={event => setTitre(event.target.value)}
-            onBlur={() => titre.trim() && titre !== ticket.titre && onModifier({ titre })}
-            style={s('font-size: 13px; width: 100%;')}
-          />
-
-          <div style={s('display: flex; gap: 8px; margin-top: 10px;')}>
-            <select
-              className="input"
-              value={ticket.colonne}
-              onChange={event => onDeplacer(event.target.value)}
-              style={s('font-size: 12px; flex: 1;')}
-            >
-              {colonnes.map(colonne => (
-                <option key={colonne.id} value={colonne.id}>
-                  {colonne.titre}
-                </option>
-              ))}
-            </select>
-            <select
-              className="input"
-              value={ticket.priorite}
-              onChange={event => onModifier({ priorite: event.target.value as Priorite })}
-              style={s('font-size: 12px; flex: 1;')}
-            >
-              {PRIORITES.map(priorite => (
-                <option key={priorite} value={priorite}>
-                  {priorite}
-                </option>
-              ))}
-            </select>
-            <select
-              className="input"
-              value={ticket.charge ?? ''}
-              onChange={event => onModifier({ charge: (event.target.value || null) as Charge | null })}
-              style={s('font-size: 12px; flex: 1;')}
-            >
-              <option value="">{t('tableau.charge_none')}</option>
-              {CHARGES.map(charge => (
-                <option key={charge} value={charge}>
-                  {charge}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div style={s('display: flex; align-items: center; gap: 8px; margin-top: 8px;')}>
-            <label style={s('display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--color-neutral-500); white-space: nowrap;')}>
-              <input
-                type="checkbox"
-                checked={ticket.type === 'epic'}
-                disabled={Boolean(ticket.epic)}
-                title={ticket.epic ? t('tableau.epic_checkbox_disabled') : undefined}
-                onChange={event => onModifier({ type: event.target.checked ? 'epic' : null })}
-              />
-              {t('tableau.epic_checkbox')}
-            </label>
-            {ticket.type !== 'epic' && (
-              <select
-                className="input"
-                value={ticket.epic ?? ''}
-                onChange={event => onModifier({ epic: event.target.value || null })}
-                style={s('font-size: 12px; flex: 1;')}
-              >
-                <option value="">{t('tableau.no_epic_parent')}</option>
-                {allTickets
-                  .filter(t => t.type === 'epic' && t.id !== ticket.id)
-                  .map(epic => (
-                    <option key={epic.id} value={epic.id}>
-                      {epic.titre}
-                    </option>
-                  ))}
-              </select>
-            )}
-          </div>
-
-          <input
-            className="input"
-            value={tags}
-            placeholder={t('tableau.tags_placeholder')}
-            onChange={event => setTags(event.target.value)}
-            onBlur={() => onModifier({ tags: tags.split(',').map(t => t.trim()).filter(Boolean) })}
-            style={s('font-size: 12px; width: 100%; margin-top: 8px;')}
-          />
-
-          <textarea
-            className="input"
-            value={corps}
-            placeholder={t('tableau.acceptance_criteria_placeholder')}
-            onChange={(event) => setCorps(event.target.value)}
-            onBlur={() => { if (corps !== ticket.corps) onModifier({ corps }) }}
-            style={s('font-size: 12px; width: 100%; margin-top: 8px; min-height: 220px; line-height: 1.55; font-family: var(--font-mono, monospace);')}
-          />
-        </>
-      ) : (
-        <>
-          <div style={s('font-size: 15px; font-weight: 500; line-height: 1.4;')}>{ticket.titre}</div>
-
-          <div style={s('font-size: 12px; color: var(--color-neutral-500); margin-top: 8px;')}>
-            {colonne?.titre ?? ticket.colonne} · {t('tableau.priority_label')} {ticket.priorite}
-            {ticket.charge && <> · {t('tableau.charge_label')} {ticket.charge}</>}
-          </div>
-
-          {(ticket.type === 'epic' || parentEpic || ticket.epic) && (
-            <div style={s('margin-top: 8px;')}>
-              {ticket.type === 'epic' ? (
-                <span className="tag tag-outline" style={s('font-size: 10px;')}>
-                  {t('tableau.epic_checkbox')}
-                </span>
-              ) : (
-                <span
-                  className="tag tag-outline"
-                  style={s('font-size: 10px;')}
-                  title={parentEpic ? undefined : t('tableau.parent_epic_missing')}
-                >
-                  {parentEpic ? `${t('tableau.child_of')} ${parentEpic.titre}` : t('tableau.orphan_ticket')}
-                </span>
-              )}
-            </div>
-          )}
-
-          {ticket.tags.length > 0 && (
-            <div style={s('display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;')}>
-              {ticket.tags.map(tag => (
-                <span key={tag} className="tag tag-neutral" style={s('font-size: 10px;')}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div style={s('font-size: 12px; margin-top: 12px; min-height: 220px; line-height: 1.55;')}>
-            {ticket.corps ? (
-              <Markdown text={ticket.corps} root={root} />
-            ) : (
-              <span style={s('color: var(--color-neutral-600);')}>{t('tableau.no_description')}</span>
-            )}
-          </div>
-        </>
-      )}
-
-      <div style={s('font-size: 10.5px; color: var(--color-neutral-600); margin-top: 10px; line-height: 1.6;')}>
-        <div>{t('tableau.created')} {humanAge(ticket.cree)} · {t('tableau.modified')} {humanAge(ticket.maj)}</div>
-        <div>
-          ovrsee/tickets/{ticket.file}
-          {nonCommite && (
-            <span
-              className="tag"
-              style={s(
-                'font-size: 10px; margin-left: 6px; color: var(--color-plan); background: var(--color-plan-bg); border: 1px solid var(--color-plan-border);',
-              )}
-            >
-              {t('tableau.uncommitted')}
-            </span>
-          )}
-        </div>
-        {ticket.plan && <div>{t('tableau.linked_plan')} {ticket.plan}</div>}
-      </div>
-
-      {edition && (
-        <div style={s('display: flex; justify-content: flex-end; margin-top: 14px;')}>
-          {confirme ? (
-            <div style={s('display: flex; align-items: center; gap: 8px;')}>
-              <span style={s('font-size: 11px; color: var(--color-neutral-400);')}>{t('tableau.delete_ticket_confirm')}</span>
-              <button type="button" className="btn btn-secondary" style={s('font-size: 11.5px;')} onClick={() => setConfirme(false)}>
-                {t('tableau.cancel')}
-              </button>
-              <button type="button" className="btn btn-primary" style={s('font-size: 11.5px;')} onClick={onSupprimer}>
-                {t('tableau.delete')}
-              </button>
-            </div>
-          ) : (
-            <button type="button" className="btn btn-ghost" style={s('font-size: 11.5px;')} onClick={() => setConfirme(true)}>
-              {t('tableau.delete')}
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}

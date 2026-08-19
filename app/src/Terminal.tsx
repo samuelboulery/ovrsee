@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react'
-import { Compass, GitFork, NotePencil, Plus, type IconProps } from '@phosphor-icons/react'
+import { Check, Compass, GitFork, NotePencil, Plus, Question, type IconProps } from '@phosphor-icons/react'
 
 import { briefLines, buildActions, type Snapshot, type SettingsType } from './data'
+import { etiquetteDe, type AttentionKind } from './attention'
 import { composer, resumeProjet, type MenuBarAttention } from './menubar'
 import { s } from './style'
 import { t, type TranslationKey } from './i18n'
@@ -26,7 +27,93 @@ const iconeCommande = (): Record<string, ComponentType<IconProps>> => ({
 
 export type Layout = 'bottom' | 'side' | 'full'
 
+/** Ce que `App` peut demander au panneau terminal quand il est monté. */
+export interface TerminalActions {
+  /** Un terminal a-t-il le focus ? Lu au moment du geste, jamais rendu. */
+  focus: () => boolean
+  ouvrirShell: () => void
+  /** Ferme l'onglet actif, ou `null` s'il n'est pas fermable (session Claude). */
+  fermerActif: (() => void) | null
+}
+
 const LAYOUT_IDS: Layout[] = ['bottom', 'side', 'full']
+
+/**
+ * Ce que chaque genre de signal annonce, pour le titre et le lecteur d'écran.
+ *
+ * `reset` n'y est pas : il efface un état au lieu d'en poser un, et n'atteint
+ * jamais le rendu.
+ */
+type EtatAffichable = Exclude<AttentionKind, 'reset'>
+
+const DIT_ATTENTION: Record<EtatAffichable, TranslationKey> = {
+  busy: 'terminal.attention_busy',
+  stop: 'terminal.attention_stop',
+  question: 'terminal.attention_question',
+}
+
+/**
+ * L'état d'une session, dans une case de largeur fixe.
+ *
+ * Fixe pour que passer de trois points à une coche ne fasse pas danser la
+ * rangée d'onglets. Trois points qui battent pendant le travail, une coche
+ * quand Claude rend la main, un point d'interrogation quand il attend une
+ * réponse — l'animation vit dans `_ds/ovrsee/styles.css` (`.battement`), seul
+ * endroit où une @keyframes peut être déclarée.
+ */
+function Etat({
+  kind,
+  actif,
+  dit,
+}: {
+  kind?: EtatAffichable
+  actif: boolean
+  /** Ce que le signal annonce, ou undefined quand il n'y a rien à annoncer. */
+  dit?: string
+}) {
+  const commun = { role: dit ? 'status' : undefined, 'aria-label': dit, title: dit }
+  const boite = 'width: 12px; flex: none; display: flex; align-items: center; justify-content: center; gap: 2px;'
+
+  if (kind === 'busy') {
+    return (
+      <span {...commun} style={s(boite)}>
+        {[0, 160, 320].map(retard => (
+          <span
+            key={retard}
+            className="battement"
+            style={s(
+              `width: 2px; height: 2px; border-radius: 50%; background: var(--color-accent); animation-delay: ${retard}ms;`,
+            )}
+          />
+        ))}
+      </span>
+    )
+  }
+
+  if (kind === 'stop' || kind === 'question') {
+    const Icone = kind === 'stop' ? Check : Question
+    return (
+      <span {...commun} style={s(boite)}>
+        <Icone
+          size={11}
+          weight="bold"
+          aria-hidden="true"
+          color={kind === 'stop' ? 'var(--color-ok)' : 'var(--color-accent)'}
+        />
+      </span>
+    )
+  }
+
+  return (
+    <span style={s(boite)}>
+      <span
+        style={s(
+          `width: 5px; height: 5px; border-radius: 50%; background: ${actif ? 'var(--color-accent)' : 'var(--color-text-ghost)'};`,
+        )}
+      />
+    </span>
+  )
+}
 
 const layoutLabel = (layout: Layout): string => {
   const map: Record<Layout, TranslationKey> = {
@@ -78,6 +165,7 @@ export function Terminal({
   onTerminalHeightChange,
   onTerminalWidthChange,
   onProjet,
+  actions,
 }: {
   layout: Layout
   onLayout: (layout: Layout) => void
@@ -94,6 +182,14 @@ export function Terminal({
   onTerminalWidthChange: (width: number) => void
   /** Affiche un projet — au clic sur une notification venue d'un autre. */
   onProjet: (path: string) => void
+  /**
+   * Ce que le menu natif peut demander au panneau — ⌘W, ⌘D.
+   *
+   * Une référence remplie à chaque rendu et vidée au démontage, plutôt que des
+   * rappels remontés : `App` est démonté de ce composant dès qu'on replie le
+   * panneau, et c'est justement l'absence qui doit se lire.
+   */
+  actions?: { current: TerminalActions | null }
 }) {
   const [notice, setNotice] = useState<string | null>(null)
 
@@ -102,10 +198,14 @@ export function Terminal({
   const etat = useRef<{
     active: string | null
     cibler: (key: string) => void
+    renommer: (key: string, label: string, options?: { manuel?: boolean }) => void
+    reinitialiser: (key: string) => void
     onProjet: (path: string) => void
   }>({
     active: null,
     cibler: () => {},
+    renommer: () => {},
+    reinitialiser: () => {},
     onProjet,
   })
 
@@ -119,6 +219,8 @@ export function Terminal({
   // Compteur de publication : un signal ne change pas les dépendances de
   // l'effet ci-dessous, il faut le lui dire.
   const [signaux, setSignaux] = useState(0)
+  /** Onglet dont le libellé est en cours de saisie. */
+  const [renomme, setRenomme] = useState<string | null>(null)
 
   const {
     sessions,
@@ -128,6 +230,8 @@ export function Terminal({
     attach,
     openShell,
     closeShell,
+    renommer,
+    reinitialiser,
     errors,
     focusClaude,
     cibler,
@@ -148,8 +252,27 @@ export function Terminal({
     // Seul le signal est retenu ici ; la publication est faite par l'effet
     // plus bas, qui sait aussi quelles sessions tournent. `ptyId` n'est pas
     // relu de ce signal : il vient de `ptyIds`, qui fait autorité.
+    // Une conversation repartie de zéro : l'onglet rend son nom et n'a plus
+    // rien à annoncer. `reset` n'est pas un état, il en efface un.
+    if (kind === 'reset') {
+      etat.current.reinitialiser(sessionKey)
+      const { [sessionKey]: _efface, ...reste } = attentions.current
+      attentions.current = reste
+      setSignaux(n => n + 1)
+      return
+    }
+
     attentions.current = { ...attentions.current, [sessionKey]: { kind, detail, at: Date.now() } }
     setSignaux(n => n + 1)
+
+    // La demande envoyée nomme l'onglet : c'est le seul moment où elle est
+    // connue. `manuel: false` — un onglet nommé au double-clic garde son nom.
+    if (kind === 'busy') {
+      if (detail) etat.current.renommer(sessionKey, etiquetteDe(detail), { manuel: false })
+      // Et rien de plus : une notification système au départ d'un tour
+      // annoncerait à l'utilisateur ce qu'il vient lui-même de demander.
+      return
+    }
 
     // Rien à signaler si la session est sous les yeux : la notification
     // doublonnerait ce que l'utilisateur est déjà en train de regarder.
@@ -173,7 +296,21 @@ export function Terminal({
     }
   })
 
-  etat.current = { active, cibler, onProjet }
+  etat.current = { active, cibler, renommer, reinitialiser, onProjet }
+
+  // Rempli à chaque rendu, vidé au démontage : `App` lit l'absence comme « le
+  // panneau n'est pas là », et ⌘W retombe alors sur la fermeture de fenêtre.
+  if (actions) {
+    actions.current = {
+      focus: () => Boolean(document.activeElement?.closest('.xterm')),
+      ouvrirShell: openShell,
+      // La session Claude n'est pas fermable : c'est le panneau lui-même.
+      fermerActif: active && active !== claudeKey ? () => closeShell(active) : null,
+    }
+  }
+  useEffect(() => () => {
+    if (actions) actions.current = null
+  }, [actions])
 
   /**
    * Ce que la barre de menu affiche : les sessions Claude dont le pty tourne
@@ -316,19 +453,23 @@ export function Terminal({
           'height: 36px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid var(--color-border-chrome);',
         )}
       >
-        <span
-          title={available ? t('a11y.session_active') : t('a11y.terminal_available')}
-          style={s(
-            available && !error
-              ? 'width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent); display: block; flex: none;'
-              : 'width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--color-text-discrete); display: block; flex: none;',
-          )}
-        />
-
         {/* Une pastille par session. Le shell nu sert à lancer un serveur de
             dev ou à suivre des logs sans occuper la session Claude. */}
         <div style={s('display: flex; align-items: center; gap: 2px; min-width: 0; overflow: hidden;')}>
-          {sessions.map(session => (
+          {sessions.map(session => {
+            // Un travail en cours vaut aussi pour l'onglet qu'on regarde : voir
+            // battre les points est le seul moyen de savoir que Claude n'a pas
+            // fini. La coche et la question, elles, ont été vues dès qu'on est
+            // sur l'onglet.
+            //
+            // Le `reset` est écarté au typage : il n'est jamais rangé dans
+            // `attentions`, il en sort les entrées.
+            const brut = attentions.current[session.key]
+            const genre = brut && brut.kind !== 'reset' ? brut.kind : null
+            const attente = genre && (genre === 'busy' || active !== session.key) ? genre : null
+            const dit = attente ? t(DIT_ATTENTION[attente]) : undefined
+
+            return (
             <div
               key={session.key}
               style={s(
@@ -336,14 +477,38 @@ export function Terminal({
                   (active === session.key ? 'background: var(--color-surface-active);' : 'background: transparent;'),
               )}
             >
-              <span
-                style={s(
-                  `width: 5px; height: 5px; border-radius: 50%; flex: none; background: ${active === session.key ? 'var(--color-accent)' : 'var(--color-text-ghost)'};`,
-                )}
-              />
+              <Etat kind={attente ?? undefined} actif={active === session.key} dit={dit} />
+              {renomme === session.key ? (
+                <input
+                  autoFocus
+                  className="input"
+                  defaultValue={session.label}
+                  aria-label={t('terminal.rename_aria', { label: session.label })}
+                  onBlur={() => setRenomme(null)}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter') {
+                      renommer(session.key, event.currentTarget.value)
+                      setRenomme(null)
+                    }
+                    if (event.key === 'Escape') setRenomme(null)
+                  }}
+                  style={s('width: 90px; height: 18px; font-family: var(--font-mono); font-size: 11.5px; padding: 0 4px;')}
+                />
+              ) : (
               <button
                 type="button"
-                onClick={() => setActive(session.key)}
+                title={t('terminal.rename')}
+                onClick={() => {
+                  // Un onglet qu'on ouvre a été vu : son signal a fini de
+                  // servir, et le garder allumé ferait mentir la pastille.
+                  if (attentions.current[session.key]) {
+                    const { [session.key]: _vu, ...reste } = attentions.current
+                    attentions.current = reste
+                    setSignaux(n => n + 1)
+                  }
+                  setActive(session.key)
+                }}
+                onDoubleClick={() => setRenomme(session.key)}
                 style={s(
                   'cursor: pointer; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .02em; padding: 0; border: 0; background: transparent; color: ' +
                     (active === session.key ? 'var(--color-text);' : 'var(--color-text-tertiary);'),
@@ -351,6 +516,7 @@ export function Terminal({
               >
                 {session.label}
               </button>
+              )}
               {session.kind !== 'claude' && (
                 <button
                   type="button"
@@ -365,7 +531,8 @@ export function Terminal({
                 </button>
               )}
             </div>
-          ))}
+            )
+          })}
           <button
             type="button"
             onClick={openShell}

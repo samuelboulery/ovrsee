@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { extractAttention } from './attention'
+import { etiquetteDe, extractAttention } from './attention'
 
 const ESC = String.fromCharCode(27)
 const BEL = String.fromCharCode(7)
@@ -127,4 +127,36 @@ test('attention : une séquence avec détail coupée en deux est recollée', () 
   const second = extractAttention(premier.carry, entier.slice(coupure))
   assert.deepEqual(second.events, [{ kind: 'question', detail: 'permission to use Bash' }])
   assert.equal(premier.clean + second.clean, 'debutfin')
+})
+
+test('attention : un « busy » porte la demande envoyée', () => {
+  const { events } = extractAttention('', seqDetail('busy', 'sortir les epics du Kanban'))
+
+  assert.deepEqual(events, [{ kind: 'busy', detail: 'sortir les epics du Kanban' }])
+})
+
+test('etiquetteDe : une demande courte passe telle quelle', () => {
+  assert.equal(etiquetteDe('lance les tests'), 'lance les tests')
+})
+
+test('etiquetteDe : seule la première ligne non vide compte', () => {
+  assert.equal(etiquetteDe('\n\n  corrige le lint\nsur tout le dépôt  '), 'corrige le lint')
+})
+
+test('etiquetteDe : une demande longue est coupée au mot', () => {
+  const nom = etiquetteDe('sortir les epics du Kanban et solder les issues ouvertes')
+
+  assert.equal(nom, 'sortir les epics du Kanban…')
+  assert.ok(nom.length <= 28, `${nom.length} caractères`)
+})
+
+test('etiquetteDe : un mot unique plus long que la coupe est tranché net', () => {
+  // Sans le garde sur la position de l'espace, couper au mot rendrait une
+  // étiquette vide dès qu'il n'y a pas d'espace à portée.
+  assert.equal(etiquetteDe('a'.repeat(60)), `${'a'.repeat(27)}…`)
+})
+
+test('etiquetteDe : une demande vide ne donne pas de nom', () => {
+  assert.equal(etiquetteDe('   \n  '), '')
+  assert.equal(etiquetteDe(''), '')
 })

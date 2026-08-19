@@ -108,6 +108,16 @@ export function installPostCommit(root, done) {
   done.push(`post-commit : bloc ovrsee installé dans ${hookPath}`)
 }
 
+/**
+ * Les événements qui portent le signal de session.
+ *
+ * Un seul script les sert tous — il ne fait qu'émettre une séquence, et le
+ * découper par événement dupliquerait la table des types de notification pour
+ * rien. Même liste à l'enregistrement et à la vérification, sans quoi on
+ * installerait ce qu'on ne contrôle pas.
+ */
+const SIGNAL_EVENTS = ['Stop', 'Notification', 'UserPromptSubmit', 'SessionStart']
+
 /** Une entrée est-elle déjà celle de l'ovrsee ? */
 const isOvrsee = (entry, script) => JSON.stringify(entry).includes(script)
 
@@ -120,9 +130,12 @@ const isOvrsee = (entry, script) => JSON.stringify(entry).includes(script)
  * La panne est parfaitement silencieuse — la barre de menu appelle ceci pour
  * pouvoir la nommer (`electron/tray.js`).
  *
- * Les deux événements sont exigés : `Stop` seul dirait « c'est à toi » sans
- * jamais signaler une question, et l'inverse laisserait l'attente allumée
- * après coup.
+ * Les quatre événements sont exigés : `Stop` seul dirait « c'est à toi » sans
+ * jamais signaler une question, l'inverse laisserait l'attente allumée après
+ * coup, sans `UserPromptSubmit` l'onglet ne dirait ni qu'il travaille ni sur
+ * quoi, et sans `SessionStart` il garderait le nom d'une conversation effacée.
+ * Un dépôt équipé avant l'arrivée de l'un d'eux se voit donc déclaré incomplet —
+ * c'est voulu : la panne serait sinon parfaitement muette.
  *
  * @param {string} [settingsPath] chemin du fichier, pour les tests
  * @returns {boolean} faux aussi quand le fichier manque ou ne se lit pas
@@ -140,7 +153,7 @@ export function signalInstalle(settingsPath = SETTINGS) {
   }
 
   const hooks = settings?.hooks ?? {}
-  return ['Stop', 'Notification'].every(event => {
+  return SIGNAL_EVENTS.every(event => {
     const entries = hooks[event]
     return Array.isArray(entries) && entries.some(e => isOvrsee(e, 'ovrsee-notify'))
   })
@@ -265,11 +278,12 @@ export function installClaudeHooks(done, settingsPath = SETTINGS) {
     added.push('Stop — constats de l’audit qui vient de tourner')
   }
 
-  // Stop et Notification : le signal de session lu par le panneau terminal.
-  // Deux événements, un seul script — il ne fait qu'émettre une séquence, et
-  // la séparer en deux fichiers dupliquerait la table des types de
-  // notification pour rien.
-  for (const event of ['Stop', 'Notification']) {
+  // Le signal de session lu par le panneau terminal. `UserPromptSubmit` et
+  // `SessionStart` portent déjà les entrées de `ovrsee-capture-audit` et de
+  // `ovrsee-session-start` : les entrées s'ajoutent au tableau, elles ne
+  // s'écrasent pas, et deux hooks du même événement peuvent avoir des sorties
+  // de formes différentes.
+  for (const event of SIGNAL_EVENTS) {
     const entries = (hooks[event] ??= [])
     if (entries.some(e => isOvrsee(e, 'ovrsee-notify'))) continue
     entries.push({

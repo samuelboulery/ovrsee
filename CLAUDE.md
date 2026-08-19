@@ -92,6 +92,12 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
 
 ## Pièges connus
 
+- **Le `colonne` d'un epic est inerte.** Le champ reste écrit dans le fichier — le
+  format n'a pas bougé — mais l'interface ne le lit plus : l'état d'un epic se déduit
+  de ses enfants (`epicEtat`, `app/src/data.ts`), et un epic ne se glisse plus. Le
+  Kanban ne contient que des tickets ; les epics vivent dans la vue « Epics » de
+  l'onglet Tableau (`app/src/tabs/TableauEpics.tsx`). Un epic posé « fait » à la main
+  dans son fichier n'apparaîtra donc nulle part comme tel.
 - **Le plan actif est propre à une session Claude, pas au dépôt.** L'état vit dans
   `ovrsee/.active/<session>.json` (`hooks/active.js`), gitignoré. Plusieurs sessions
   travaillent donc côte à côte sans se voler leur plan. L'identifiant vient de
@@ -145,8 +151,15 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
 - **Le signal de session et la barre de menu sont inertes tant que
   `pnpm ovrsee:install` n'a pas tourné.** `ovrsee-notify.js` s'enregistre dans
   `~/.claude/settings.json`, pas dans le dépôt : une machine équipée avant son arrivée
-  n'a rien dans `Stop` ni `Notification`, et rien dans le code ne le laisse voir. Le
-  vérifier avant de chercher un bug ailleurs.
+  n'a rien dans `Stop`, `Notification`, `UserPromptSubmit` ni `SessionStart`, et rien
+  dans le code ne le laisse voir. `signalInstalle` exige les **quatre** — c'est ce qui
+  rend la panne visible plutôt que muette. Le vérifier avant de chercher un bug ailleurs.
+- **`UserPromptSubmit` et `SessionStart` portent chacun deux hooks de l'ovrsee.**
+  `ovrsee-capture-audit.js` et `ovrsee-session-start.js` y étaient déjà, `ovrsee-notify.js`
+  s'y ajoute : c'est lui qui émet `busy` (avec la demande dont l'onglet tire son nom) et
+  `reset` (sur `/clear`, qui rend son nom d'origine à l'onglet). Les entrées s'ajoutent au
+  tableau du fichier de réglages, elles ne s'écrasent pas, et deux hooks du même événement
+  peuvent rendre des sorties de formes différentes.
 - **`site/fr/` est engendré, pas écrit.** `build-site-fr.js` dérive la page française de
   `site/index.html` — **en anglais**, la langue source — et de `site/dict.json` au
   déploiement ; le dossier est gitignoré. Le texte français se corrige donc dans

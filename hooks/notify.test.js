@@ -13,7 +13,7 @@ test('notify : une fin de tour signale « stop »', () => {
 })
 
 test('notify : seules les notifications qui attendent une réponse signalent', () => {
-  const attendues = ['permission_prompt', 'idle_prompt', 'agent_needs_input']
+  const attendues = ['permission_prompt', 'agent_needs_input']
   for (const notification_type of attendues) {
     assert.equal(
       genrePour({ hook_event_name: 'Notification', notification_type }),
@@ -23,8 +23,16 @@ test('notify : seules les notifications qui attendent une réponse signalent', (
   }
 
   // Ces types-là décrivent un événement déjà résolu : les signaler ferait
-  // sonner l'ovrsee pour rien.
-  const ignorees = ['auth_success', 'elicitation_complete', 'elicitation_response', 'agent_completed']
+  // sonner l'ovrsee pour rien. `idle_prompt` les a rejoints : il arrive une
+  // minute après un `Stop`, et changeait la coche « a rendu la main » en point
+  // d'interrogation sans qu'aucune question ait été posée.
+  const ignorees = [
+    'auth_success',
+    'elicitation_complete',
+    'elicitation_response',
+    'agent_completed',
+    'idle_prompt',
+  ]
   for (const notification_type of ignorees) {
     assert.equal(
       genrePour({ hook_event_name: 'Notification', notification_type }),
@@ -96,4 +104,33 @@ test('notify : seule une Notification porte un détail', () => {
     null,
     'un message vide ne vaut pas mieux que pas de message',
   )
+})
+
+test('notify : un départ de tour signale « busy » et porte la demande', () => {
+  const payload = { hook_event_name: 'UserPromptSubmit', prompt: 'lance les tests' }
+
+  assert.equal(genrePour(payload), 'busy')
+  assert.equal(detailPour(payload), 'lance les tests')
+})
+
+test('notify : un départ de tour sans demande signale quand même', () => {
+  // Le genre suffit à faire battre la pastille ; c'est le nom de l'onglet qui
+  // manque, et l'interface garde alors celui qu'il portait.
+  assert.equal(genrePour({ hook_event_name: 'UserPromptSubmit' }), 'busy')
+  assert.equal(detailPour({ hook_event_name: 'UserPromptSubmit' }), null)
+  assert.equal(detailPour({ hook_event_name: 'UserPromptSubmit', prompt: '   ' }), null)
+})
+
+test('notify : une conversation repartie de zéro demande la réinitialisation', () => {
+  for (const source of ['clear', 'startup']) {
+    assert.equal(genrePour({ hook_event_name: 'SessionStart', source }), 'reset', source)
+  }
+})
+
+test('notify : reprendre une conversation ne réinitialise pas son onglet', () => {
+  // `resume` et `compact` gardent la même conversation : son nom vaut toujours,
+  // et l'effacer perdrait une information juste.
+  for (const source of ['resume', 'compact', undefined]) {
+    assert.equal(genrePour({ hook_event_name: 'SessionStart', source }), null, String(source))
+  }
 })

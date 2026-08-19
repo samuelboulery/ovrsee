@@ -22,7 +22,7 @@ import { t } from '../i18n'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
 import { ViewBar } from '../ViewBar'
-import { COULEUR_PRIORITE } from './Tableau'
+import { COULEUR_PRIORITE } from './TableauCarte'
 
 /** `2026-08-08T12:00:00+02:00` → `2026-08-08`. Les plans, eux, datent déjà du jour. */
 const day = (date: string): string => date.slice(0, 10)

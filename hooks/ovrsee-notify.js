@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Hooks Stop et Notification : signalent au terminal qui entoure la session
- * que Claude vient de rendre la main.
+ * Hooks Stop, Notification, UserPromptSubmit et SessionStart : signalent au
+ * terminal qui entoure la session ce que Claude est en train de faire — au
+ * travail, en attente d'une réponse, rendu la main, ou reparti de zéro.
  *
  * Le signal est une séquence OSC écrite dans le terminal de la session, via le
  * champ `terminalSequence` de la sortie du hook. L'ovrsee possède ce terminal
@@ -23,8 +24,12 @@
  *
  *   stdin  {"hook_event_name":"Stop", ...}
  *          {"hook_event_name":"Notification","notification_type":"permission_prompt", ...}
+ *          {"hook_event_name":"UserPromptSubmit","prompt":"...", ...}
+ *          {"hook_event_name":"SessionStart","source":"clear", ...}
  *   stdout {"terminalSequence":"<ESC>]777;ovrsee;stop<BEL>"}
  *          {"terminalSequence":"<ESC>]777;ovrsee;question;<base64><BEL>"}
+ *          {"terminalSequence":"<ESC>]777;ovrsee;busy;<base64><BEL>"}
+ *          {"terminalSequence":"<ESC>]777;ovrsee;reset<BEL>"}
  *
  * La séquence porte en plus, quand il y en a un, le `message` de la charge
  * utile — « Claude needs your permission to use Bash ». Le popover de la barre
@@ -43,8 +48,18 @@ import { fileURLToPath } from 'node:url'
  * Les autres (`auth_success`, `elicitation_complete`, `agent_completed`…)
  * décrivent un événement déjà résolu : les signaler ferait sonner l'ovrsee
  * pour rien, et une notification qui sonne pour rien finit ignorée.
+ *
+ * `idle_prompt` en faisait partie et n'y est plus. Claude Code l'émet quand une
+ * session reste sans réponse une minute — donc juste après un `Stop`, dès qu'on
+ * est parti ailleurs. La coche « a rendu la main » se changeait alors toute
+ * seule en point d'interrogation, et le popover proposait d'autoriser une
+ * demande qui n'existait pas. Une session qu'on laisse de côté n'attend rien :
+ * c'est l'inverse, c'est elle qu'on fait attendre.
  */
-const TYPES_EN_ATTENTE = new Set(['permission_prompt', 'idle_prompt', 'agent_needs_input'])
+const TYPES_EN_ATTENTE = new Set(['permission_prompt', 'agent_needs_input'])
+
+/** Les démarrages de session qui repartent d'une conversation vide. */
+const SOURCES_NEUVES = new Set(['clear', 'startup'])
 
 /**
  * Longueur retenue du détail, en caractères, avant encodage.
@@ -59,21 +74,28 @@ const MAX_DETAIL = 120
 /**
  * Détail à joindre au signal, ou null.
  *
- * Seule une `Notification` en porte un : `Stop` dit « c'est à toi », il n'y a
- * rien à préciser. Le champ est du texte libre côté Claude Code — on ne fait
- * que le relayer, et `sequence()` le tronque.
+ * Deux événements en portent un : une `Notification` joint son `message`, un
+ * `UserPromptSubmit` joint la demande elle-même — c'est elle qui nommera
+ * l'onglet. `Stop` dit « c'est à toi », il n'y a rien à préciser.
+ *
+ * Les deux champs sont du texte libre côté Claude Code : on ne fait que les
+ * relayer, et `sequence()` les tronque puis les encode.
  *
  * @param {unknown} payload
  * @returns {string|null}
  */
 export function detailPour(payload) {
   if (!payload || typeof payload !== 'object') return null
-  if (payload.hook_event_name !== 'Notification') return null
 
-  const message = payload.message
-  if (typeof message !== 'string') return null
+  const brut =
+    payload.hook_event_name === 'Notification'
+      ? payload.message
+      : payload.hook_event_name === 'UserPromptSubmit'
+        ? payload.prompt
+        : null
+  if (typeof brut !== 'string') return null
 
-  const propre = message.trim()
+  const propre = brut.trim()
   return propre === '' ? null : propre
 }
 
@@ -89,7 +111,7 @@ export function detailPour(payload) {
  * La forme courte, sans détail, est conservée telle quelle : c'est celle que
  * `Stop` émet, et la seule que les versions précédentes savaient lire.
  *
- * @param {'stop'|'question'} genre
+ * @param {'stop'|'question'|'busy'|'reset'} genre
  * @param {string|null} [detail] texte libre, encodé en base64 dans la séquence
  */
 export const sequence = (genre, detail = null) => {
@@ -104,7 +126,7 @@ export const sequence = (genre, detail = null) => {
  * à signaler.
  *
  * @param {unknown} payload
- * @returns {'stop'|'question'|null}
+ * @returns {'stop'|'question'|'busy'|'reset'|null}
  */
 export function genrePour(payload) {
   if (!payload || typeof payload !== 'object') return null
@@ -112,6 +134,18 @@ export function genrePour(payload) {
   // Fin de tour : « Claude a fini, c'est à toi ». Claude Code n'a pas
   // d'événement de fin de session — c'est bien ce moment-là qui est utile.
   if (payload.hook_event_name === 'Stop') return 'stop'
+
+  // Départ de tour : la session se met au travail. C'est l'état où elle passe
+  // l'essentiel de son temps, et le seul moment où la demande est connue — d'où
+  // le nom que l'onglet en tire (`etiquetteDe`, app/src/attention.ts).
+  if (payload.hook_event_name === 'UserPromptSubmit') return 'busy'
+
+  // Conversation repartie de zéro : l'onglet ne doit plus annoncer celle
+  // d'avant. `resume` et `compact` reprennent la même conversation — leur nom
+  // vaut toujours, et le réinitialiser effacerait une information juste.
+  if (payload.hook_event_name === 'SessionStart') {
+    return SOURCES_NEUVES.has(payload.source) ? 'reset' : null
+  }
 
   if (payload.hook_event_name === 'Notification') {
     return TYPES_EN_ATTENTE.has(payload.notification_type) ? 'question' : null

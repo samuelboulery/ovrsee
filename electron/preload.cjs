@@ -88,6 +88,9 @@ contextBridge.exposeInMainWorld('ovrsee', {
      * la fenêtre émettrice, le rendu n'en désigne aucune.
      */
     focus: () => ipcRenderer.invoke('app:focus'),
+
+    /** Ferme la fenêtre émettrice. Même garde que `focus`. */
+    close: () => ipcRenderer.invoke('app:close'),
   },
 
   preview: {

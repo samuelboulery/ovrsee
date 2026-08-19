@@ -14,6 +14,8 @@ import { Historique } from './tabs/Historique'
 import { Produit } from './tabs/Produit'
 import { Stack } from './tabs/Stack'
 import { Tableau } from './tabs/Tableau'
+import { Detail } from './tabs/TableauDetail'
+import { TableauEpics } from './tabs/TableauEpics'
 
 /**
  * Les onglets rendus sur des instantanés dégradés.
@@ -89,6 +91,20 @@ const DEGRADES: Array<[string, Snapshot]> = [
   ],
 ]
 
+/** De quoi rendre le panneau de détail sur un instantané qui n'a aucun ticket. */
+const TICKET_NU = {
+  id: 'T-0000',
+  file: 'T-0000-rien.md',
+  titre: 'Rien',
+  colonne: 'backlog',
+  priorite: 'moyenne',
+  cree: '2026-08-01',
+  maj: '2026-08-01',
+  plan: null,
+  tags: [],
+  corps: '',
+} as unknown as Snapshot['tickets'][number]
+
 const RENDUS: Array<[string, (snap: Snapshot) => ReactElement]> = [
   [
     'Aperçu',
@@ -119,6 +135,32 @@ const RENDUS: Array<[string, (snap: Snapshot) => ReactElement]> = [
         board={snap.board ?? []}
         tickets={snap.tickets ?? []}
         onChange={() => {}}
+      />
+    ),
+  ],
+  [
+    'Tableau — vue Epics',
+    snap => (
+      <TableauEpics
+        tickets={snap.tickets ?? []}
+        board={snap.board ?? []}
+        onOuvrir={() => {}}
+        ouverte={null}
+      />
+    ),
+  ],
+  [
+    'Tableau — panneau de détail',
+    snap => (
+      <Detail
+        ticket={(snap.tickets ?? [])[0] ?? TICKET_NU}
+        colonnes={snap.board ?? []}
+        allTickets={snap.tickets ?? []}
+        root={snap.root}
+        onFermer={() => {}}
+        onModifier={() => {}}
+        onDeplacer={() => {}}
+        onSupprimer={() => {}}
       />
     ),
   ],

@@ -17,11 +17,11 @@
     "url": "https://github.com/samuelboulery/ovrsee/issues"
   },
   "homepage": "https://github.com/samuelboulery/ovrsee#readme",
-  "description": "Gestion de projet pour Claude Code : plans approuvés, commits qui les réalisent, tickets à faire — versionnés dans le dépôt.",
+  "description": "Gestion de projet pour Claude Code : plans approuv\u00e9s, commits qui les r\u00e9alisent, tickets \u00e0 faire \u2014 versionn\u00e9s dans le d\u00e9p\u00f4t.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.json && vite build",
-    "test": "node --test hooks/*.test.js crawl/*.test.js server/*.test.js mcp/*.test.js scripts/*.test.js && node scripts/test-ui.js",
+    "test": "node --test hooks/*.test.js crawl/*.test.js server/*.test.js mcp/*.test.js scripts/*.test.js electron/*.test.js && node scripts/test-ui.js",
     "test:ui": "node scripts/test-ui.js",
     "typecheck": "tsc -p tsconfig.json",
     "lint": "oxlint hooks crawl server mcp electron app/src site",
@@ -46,7 +46,6 @@
     "electron": "43.3.0",
     "electron-builder": "^26.15.3",
     "oxlint": "^1.78.0",
-    "playwright-core": "^1.62.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "typescript": "^7.0.2",
@@ -56,7 +55,8 @@
     "@phosphor-icons/react": "^2.1.10",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/xterm": "6.0.0",
-    "node-pty": "1.1.0"
+    "node-pty": "1.1.0",
+    "playwright-core": "^1.62.1"
   },
   "main": "electron/main.js"
 }

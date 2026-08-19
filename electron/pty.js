@@ -29,6 +29,8 @@
 import { spawn } from 'node-pty'
 import { existsSync } from 'node:fs'
 
+import { loginShell } from '../hooks/shell.js'
+
 /**
  * Ce qui est tapé une fois dans le shell qui vient de s'ouvrir, par genre de
  * session. `shell` n'a rien à taper : c'est un shell nu.
@@ -36,14 +38,6 @@ import { existsSync } from 'node:fs'
 const STARTUP_COMMAND = {
   claude: 'claude\n',
   shell: null,
-}
-
-const FALLBACK_SHELL = '/bin/zsh'
-
-/** Shell de connexion de l'utilisateur, ou zsh. */
-function loginShell() {
-  const shell = process.env.SHELL
-  return typeof shell === 'string' && existsSync(shell) ? shell : FALLBACK_SHELL
 }
 
 /**

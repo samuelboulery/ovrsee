@@ -21,6 +21,12 @@ const readmeEn = readFileSync(join(root, 'README.md'), 'utf8')
 const claudeMd = readFileSync(join(root, 'CLAUDE.md'), 'utf8')
 
 /**
+ * Les sous-commandes de pnpm lui-même. Elles n'ont pas à figurer dans
+ * `scripts` — et le README doit pouvoir dire `pnpm install`.
+ */
+const PNPM_NATIVES = new Set(['install', 'add', 'remove', 'update', 'dlx', 'exec', 'run'])
+
+/**
  * Extraits les commandes pnpm citées dans un texte.
  * Cherche les patterns comme `pnpm <script>`.
  * @param {string} text
@@ -30,6 +36,7 @@ function extractPnpmScripts(text) {
   const matches = text.match(/pnpm\s+([\w:-]+)/g) || []
   return matches
     .map(m => m.replace('pnpm ', ''))
+    .filter(name => !PNPM_NATIVES.has(name))
     .filter((v, i, a) => a.indexOf(v) === i) // déduplique
 }
 

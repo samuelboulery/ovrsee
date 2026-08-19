@@ -12,7 +12,7 @@
 
   ![version](https://img.shields.io/badge/version-1.0.0--beta-6c5ce7?style=flat-square)
   ![stack](https://img.shields.io/badge/stack-Electron%20%2B%20React%20%2B%20TypeScript-2d3436?style=flat-square)
-  ![prod deps](https://img.shields.io/badge/prod%20deps-4-00b894?style=flat-square)
+  ![prod deps](https://img.shields.io/badge/prod%20deps-5-00b894?style=flat-square)
 </div>
 
 Project management for Claude Code. Ovrsee keeps track of what you build: the plans you
@@ -104,20 +104,62 @@ The answers are not decorative: they pick which tabs show, where the terminal si
 and which command is offered when a fresh project opens. Everything stays editable
 in Preferences afterwards.
 
-## Quick start
+## Install
+
+### Install the app — the normal way
+
+Download the build for your platform from the
+[Releases](https://github.com/samuelboulery/ovrsee/releases) tab. They are **neither
+signed nor notarised**: macOS refuses the first launch — right-click the app, then
+*Open* — and Windows shows a SmartScreen warning, which you get past with *More info*
+then *Run anyway*.
+
+| Platform | Format |
+|---|---|
+| macOS (arm64) | `.dmg`, unsigned |
+| Windows (x64) | NSIS installer, unsigned |
+
+**There is nothing else to install.** No clone, no `pnpm`, no command line. Everything
+happens in the interface:
+
+1. Point at a repository. The equipment screen writes `ovrsee/`, installs the git and
+   Claude Code hooks, and offers the two skills.
+2. Fill in two fields — the command that starts your app, and the URL it answers on.
+   That writes `ovrsee.config.json`.
+3. Click **Crawl** on the Product tab. The app maps your screens and photographs them.
+
+Crawling drives the **Google Chrome already installed on your machine** — nothing is
+downloaded on first run. Without Chrome, every other tab still works; only the map stays
+empty.
+
+### From source — to contribute
 
 ```bash
-# Install once per project
-pnpm ovrsee:install /path/to/project
-
-# Map the application (requires ovrsee.config.json at project root)
-pnpm ovrsee:crawl /path/to/project
-
-# Read
+pnpm install
 pnpm electron          # app with integrated terminal
 pnpm dev               # or browser, no terminal
-pnpm ovrsee:brief     # or text from CLI
 ```
+
+This is also where the CLI equivalents live, for scripting or for equipping a project
+without opening the app:
+
+```bash
+pnpm ovrsee:install /path/to/project   # equip a repository
+pnpm ovrsee:crawl /path/to/project     # map it (needs ovrsee.config.json)
+pnpm ovrsee:brief                      # read the state as text
+```
+
+Packaging locally, without publishing:
+
+```bash
+pnpm package:mac    # DMG in release/ (arm64)
+pnpm package:win    # NSIS installer in release/ (x64, from Windows only)
+```
+
+Releases themselves are built by `.github/workflows/release.yml` on every `vX.Y.Z` tag
+push, on native runners, and published to the Releases tab.
+
+## Plans, commits, tickets
 
 When a plan is approved in Claude Code, it is captured automatically in `ovrsee/plans/`.
 The post-commit hook then attaches each commit to the active plan. Close the plan when work is done:
@@ -131,7 +173,8 @@ Closing is not optional: it lets you switch tasks without polluting the history.
 
 The **terminal is integrated in Electron only** — it runs over IPC, not a socket.
 This is intentional: a socket would be open to any process on the same user. It's
-a full terminal: the pty opens a login shell and starts `claude` in it.
+a full terminal: the pty opens a login shell and starts `claude` in it. The crawl takes
+the same route, for the same reason, and never `/api/*`.
 
 ## Claude Code Skills
 
@@ -218,37 +261,19 @@ crawling the wrong app would produce backdated screenshots of the wrong project.
 | `electron/` | Main process, preload, pty (integrated terminal) |
 | `scripts/` | Build and test utilities |
 
-## Download
-
-Binaries live on the [Releases](https://github.com/samuelboulery/ovrsee/releases)
-tab. They are **neither signed nor notarised**: macOS refuses the first launch —
-right-click the app, then *Open* — and Windows shows a SmartScreen warning, which
-you get past with *More info* then *Run anyway*.
-
-| Platform | Format |
-|---|---|
-| macOS (arm64) | `.dmg`, unsigned |
-| Windows (x64) | NSIS installer, unsigned |
-
-Built automatically by `.github/workflows/release.yml` on every `vX.Y.Z` tag push,
-published to the Releases tab. Locally, without publishing:
-
-```bash
-pnpm package:mac    # DMG in release/ (arm64)
-pnpm package:win    # NSIS installer in release/ (x64, from Windows only)
-```
-
 ## Dependencies
 
-Deliberately minimal: **4 production dependencies**, everything else is plain Node and React.
+Deliberately minimal: **5 production dependencies**, everything else is plain Node and React.
 
 **Production**
 
-| Package | Version |
-|---|---|
-| `@xterm/xterm` | 6.0.0 |
-| `@xterm/addon-fit` | ^0.11.0 |
-| `node-pty` | 1.1.0 |
+| Package | Version | Why |
+|---|---|---|
+| `@phosphor-icons/react` | ^2.1.10 | the interface's icons |
+| `@xterm/xterm` | 6.0.0 | the integrated terminal |
+| `@xterm/addon-fit` | ^0.11.0 | it follows the panel's size |
+| `node-pty` | 1.1.0 | a real pty behind that terminal |
+| `playwright-core` | ^1.62.1 | drives the crawl, in the packaged app too |
 
 **Development**
 
@@ -260,7 +285,6 @@ Deliberately minimal: **4 production dependencies**, everything else is plain No
 | `vite` | ^8.2.1 |
 | `electron` | 43.3.0 |
 | `electron-builder` | ^26.15.3 |
-| `playwright-core` | ^1.62.1 |
 | `@vitejs/plugin-react` | ^6.0.5 |
 | `@types/react` | ^19.2.18 |
 | `@types/react-dom` | ^19.2.4 |
@@ -277,6 +301,11 @@ Attribution goes through four stages: a `T-XXXX` ticket quoted in the commit mes
 
 **The crawler refuses to start if `baseUrl` already responds.**
 This is intentional. There is no way to distinguish your own server from another's in an HTTP response, and crawling the wrong app would produce backdated screenshots.
+
+**The crawl needs Google Chrome installed.**
+`playwright-core` ships with the app but no browser does: the crawler drives the system
+Chrome (`channel: 'chrome'`). Nothing is downloaded on first run, and nothing warns you
+up front — a machine without Chrome simply records a failed scan.
 
 **`node-pty` is a native binary.**
 It is unpacked from the asar (`asarUnpack` in `electron-builder.yml`) and
@@ -307,6 +336,16 @@ claude mcp add -s user ovrsee -- node /absolute/path/ovrsee/mcp/server.js
 
 The `user` scope is the right one: the server is multi-project by design, it has
 nothing to do with the current repo.
+
+From the **installed app**, with no clone, the server is inside the bundle. It is not
+`node` that runs it but the Ovrsee binary in node mode — that is what reads `app.asar`:
+
+```bash
+claude mcp add -s user ovrsee -- \
+  env ELECTRON_RUN_AS_NODE=1 \
+  "/Applications/Ovrsee.app/Contents/MacOS/Ovrsee" \
+  "/Applications/Ovrsee.app/Contents/Resources/app.asar/mcp/server.js"
+```
 
 In Claude Desktop, it's `claude_desktop_config.json`:
 

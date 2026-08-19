@@ -11,6 +11,7 @@ import { t } from './i18n'
 import { pasteToClaude } from './useTerminal'
 import { s } from './style'
 import { SkillsList, useSkills } from './SkillsPanel'
+import { ChampsCrawl } from './ConfigCrawl'
 
 /**
  * Écrit des commandes dans la session, une par une.
@@ -95,36 +96,6 @@ function Option({
         {children}
       </div>
     </div>
-  )
-}
-
-/** Un champ texte du formulaire de configuration. */
-function Champ({
-  id,
-  label,
-  valeur,
-  onValeur,
-}: {
-  id: string
-  label: string
-  valeur: string
-  onValeur: (valeur: string) => void
-}) {
-  return (
-    <label htmlFor={id} style={s('display: block; margin-top: 8px;')}>
-      <span style={s('display: block; font-size: 11px; color: var(--color-neutral-500);')}>
-        {label}
-      </span>
-      <input
-        id={id}
-        type="text"
-        className="input"
-        value={valeur}
-        onChange={event => onValeur(event.target.value)}
-        spellCheck={false}
-        style={s('margin-top: 4px; font-family: var(--font-mono); font-size: 12px;')}
-      />
-    </label>
   )
 }
 
@@ -284,20 +255,12 @@ export function EquipmentPanel({
               detail={t('equipment.config_crawl_note')}
             >
               {form.ecrireConfig && (
-                <>
-                  <Champ
-                    id="champ-dev"
-                    label={t('equipment.field_dev')}
-                    valeur={form.dev}
-                    onValeur={dev => change({ dev })}
-                  />
-                  <Champ
-                    id="champ-base-url"
-                    label={t('equipment.field_base_url')}
-                    valeur={form.baseUrl}
-                    onValeur={baseUrl => change({ baseUrl })}
-                  />
-                </>
+                <ChampsCrawl
+                  dev={form.dev}
+                  baseUrl={form.baseUrl}
+                  onDev={dev => change({ dev })}
+                  onBaseUrl={baseUrl => change({ baseUrl })}
+                />
               )}
             </Option>
           )}

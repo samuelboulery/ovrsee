@@ -36,6 +36,7 @@ import { readSettings } from '../hooks/settings.js'
 import { readIntegrations, writeIntegrations } from '../hooks/integrations.js'
 import { checkVercel, checkNetlify, checkSupabase, fetchSupabaseSchema } from '../hooks/integrationProviders.js'
 import { openSession, writeTo, resize, closeSession, closeAll } from './pty.js'
+import { startCrawl, stopCrawl, stopAllCrawls, crawlState, watchCrawl } from './crawl.js'
 import {
   answer as menubarAnswer,
   createTray,
@@ -327,6 +328,30 @@ app.whenReady().then(() => {
     }
     return openSession(event.sender, projectPath, kind)
   })
+
+  // Crawl. Même garde que `pty:open`, et pour la même raison : le registre est
+  // la liste blanche de ce que cette application touche. Le rendu ne fournit
+  // qu'un chemin de projet — ce qui est lancé est décidé dans `crawl.js`.
+  const projetConnu = p => typeof p === 'string' && projects().some(entry => entry.path === p)
+
+  ipcMain.handle('crawl:start', (event, projectPath) => {
+    if (!projetConnu(projectPath)) {
+      return { error: "ce dossier n'est pas dans la liste des projets de l'ovrsee" }
+    }
+    watchCrawl(event.sender)
+    return startCrawl(projectPath)
+  })
+  ipcMain.handle('crawl:stop', (_event, projectPath) => {
+    if (!projetConnu(projectPath)) return crawlState()
+    return stopCrawl(projectPath)
+  })
+  // L'état courant sans attendre le prochain signal : un onglet remonté
+  // pendant un crawl s'afficherait sinon inerte. Même motif que `menubar:pull`.
+  ipcMain.handle('crawl:pull', event => {
+    watchCrawl(event.sender)
+    return crawlState()
+  })
+
   ipcMain.handle('pty:write', (_event, id, data) => writeTo(id, data))
   ipcMain.handle('pty:resize', (_event, id, cols, rows) => resize(id, cols, rows))
   ipcMain.handle('pty:close', (_event, id) => closeSession(id))
@@ -589,4 +614,9 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
-app.on('before-quit', closeAll)
+app.on('before-quit', () => {
+  closeAll()
+  // Un crawl survit à la fenêtre : il est détaché, et il a lui-même démarré le
+  // serveur de dev du projet. Le laisser courir laisserait un port occupé.
+  stopAllCrawls()
+})

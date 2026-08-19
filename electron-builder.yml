@@ -15,9 +15,23 @@ files:
   - skills/**
   - app/dist/**
   - package.json
+  # Le crawl et le serveur MCP. Sans eux, l'application livrée serait une
+  # visionneuse : elle saurait lire un `ovrsee/` mais pas le produire, et il
+  # faudrait cloner le dépôt pour cartographier un projet.
+  - crawl/**
+  - mcp/**
   # Les modules réellement chargés par le processus principal. Le reste
-  # (Vite, React, Playwright, TypeScript) ne sert qu'au développement.
+  # (Vite, React, TypeScript) ne sert qu'au développement.
   - node_modules/node-pty/**
+  # WHY: le pilote du crawl. 13 Mo, aucune dépendance transitive, et aucun
+  # navigateur embarqué — `channel: 'chrome'` pilote le Chrome du système.
+  #
+  # Il est en `dependencies` et pas en `devDependencies`, et ce n'est pas un
+  # détail de rangement : electron-builder élague les dépendances de
+  # développement, et cette ligne seule ne suffisait pas à le retenir. Le paquet
+  # sortait sans lui, et le crawl échouait sur `ERR_MODULE_NOT_FOUND` — invisible
+  # en dev, où le dossier est là de toute façon.
+  - node_modules/playwright-core/**
 
 # Un binaire natif ne peut pas être chargé depuis une archive asar : il doit
 # exister comme fichier sur le disque. `spawn-helper` doit en plus conserver

@@ -143,6 +143,41 @@ contextBridge.exposeInMainWorld('ovrsee', {
   },
 
   /**
+   * Crawl du projet observé — voir `electron/crawl.js`.
+   *
+   * Même discipline que `terminal` : aucun nom de programme, aucun chemin de
+   * programme, aucune commande. Seulement un chemin de projet, que le processus
+   * principal vérifie contre le registre. Ce qui est lancé est décidé dans
+   * `crawl.js`, et c'est toujours le crawler de l'ovrsee.
+   *
+   * La commande `dev` du projet n'entre pas par ici non plus : le crawler lit
+   * `ovrsee.config.json` lui-même, sur le disque.
+   */
+  crawl: {
+    /**
+     * @param {string} projectPath dossier du projet
+     * @returns {Promise<{running: boolean, project: string|null, line: string|null} | {error: string}>}
+     */
+    start: projectPath => ipcRenderer.invoke('crawl:start', projectPath),
+
+    /** Arrête le crawl et le serveur de dev qu'il avait démarré. */
+    stop: projectPath => ipcRenderer.invoke('crawl:stop', projectPath),
+
+    /**
+     * @param {(etat: {running: boolean, project: string|null, line: string|null}) => void} handler
+     * @returns {() => void} désabonnement
+     */
+    listen(handler) {
+      const relais = (_event, etat) => handler(etat)
+      ipcRenderer.on('crawl:state', relais)
+      // L'état courant sans attendre le prochain signal : un onglet remonté
+      // pendant un crawl s'afficherait sinon inerte. Même motif que `menubar`.
+      ipcRenderer.invoke('crawl:pull').then(handler)
+      return () => ipcRenderer.off('crawl:state', relais)
+    },
+  },
+
+  /**
    * Barre de menu macOS — voir `electron/tray.js`.
    *
    * Deux rendus s'en servent et pas pour la même chose : la fenêtre principale

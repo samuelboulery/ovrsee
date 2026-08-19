@@ -106,20 +106,63 @@ Les réponses ne sont pas décoratives : elles choisissent les onglets affichés
 place du terminal et la commande proposée à l'ouverture d'un projet neuf. Tout
 reste modifiable ensuite dans les préférences.
 
-## Mise en route — trois commandes
+## Installation
+
+### Installer l'application — la voie normale
+
+Prendre la version de sa plateforme sur l'onglet
+[Releases](https://github.com/samuelboulery/ovrsee/releases). Les binaires ne sont **ni
+signés ni notariés** : macOS refuse le premier lancement — clic droit sur l'application,
+puis *Ouvrir* — et Windows affiche un avertissement SmartScreen, qu'on passe par
+*Informations complémentaires* puis *Exécuter quand même*.
+
+| Plateforme | Format |
+|---|---|
+| macOS (arm64) | `.dmg`, non signé |
+| Windows (x64) | Installeur NSIS, non signé |
+
+**Il n'y a rien d'autre à installer.** Pas de clone, pas de `pnpm`, pas de ligne de
+commande. Tout se fait dans l'interface :
+
+1. Désigner un dépôt. L'écran d'équipement écrit `ovrsee/`, installe les hooks git et
+   Claude Code, et propose les deux skills.
+2. Remplir deux champs — la commande qui démarre l'application, et l'URL où elle répond.
+   C'est ce qui écrit `ovrsee.config.json`.
+3. Cliquer sur **Crawler** dans l'onglet Produit. L'application parcourt les écrans et
+   les photographie.
+
+Le crawl pilote le **Google Chrome déjà installé sur la machine** — rien ne se télécharge
+au premier lancement. Sans Chrome, tous les autres onglets marchent ; seule la carte
+reste vide.
+
+### Depuis les sources — pour contribuer
 
 ```bash
-# 1. Installer une fois par projet
-pnpm ovrsee:install /chemin/du/projet
-
-# 2. Cartographier l'application (nécessite un ovrsee.config.json)
-pnpm ovrsee:crawl /chemin/du/projet
-
-# 3. Lire
+pnpm install
 pnpm electron          # application avec terminal intégré
 pnpm dev               # ou dans un navigateur, sans terminal
-pnpm ovrsee:brief     # ou en texte, depuis le terminal
 ```
+
+C'est là que vivent les équivalents en ligne de commande, pour scripter ou pour équiper
+un projet sans ouvrir l'application :
+
+```bash
+pnpm ovrsee:install /chemin/du/projet   # équiper un dépôt
+pnpm ovrsee:crawl /chemin/du/projet     # le cartographier (exige ovrsee.config.json)
+pnpm ovrsee:brief                       # lire l'état en texte
+```
+
+Empaqueter en local, sans publier :
+
+```bash
+pnpm package:mac    # DMG dans release/ (arm64)
+pnpm package:win    # installeur NSIS dans release/ (x64, depuis Windows uniquement)
+```
+
+Les releases, elles, sont construites par `.github/workflows/release.yml` à chaque tag
+`vX.Y.Z` poussé, sur des runners natifs, et publiées sur l'onglet Releases.
+
+## Plans, commits, tickets
 
 Quand un plan est approuvé dans Claude Code, il est capturé automatiquement dans `ovrsee/plans/`.
 Le hook post-commit rattache ensuite chaque commit au plan actif. Clore le plan quand son travail est fini :
@@ -135,7 +178,8 @@ sans encombrer l'historique.
 Le terminal intégré n'existe que dans l'application : il passe par IPC, qu'un
 navigateur n'a pas. C'est délibéré — l'exposer par une socket locale l'ouvrirait à
 tout processus tournant sous le même compte. C'est un terminal complet : le pty ouvre
-un shell de connexion et y lance `claude`.
+un shell de connexion et y lance `claude`. Le crawl emprunte la même voie, pour la même
+raison, et jamais `/api/*`.
 
 ## Skills Claude Code
 
@@ -223,38 +267,19 @@ celui d'un autre projet produirait des captures datées d'aujourd'hui montrant l
 | `electron/` | Processus principal, preload, pty (terminal intégré) |
 | `scripts/` | Utilitaires de build et test |
 
-## Téléchargement
-
-Les binaires se prennent sur l'onglet
-[Releases](https://github.com/samuelboulery/ovrsee/releases). Ils ne sont **ni signés
-ni notariés** : macOS refuse le premier lancement — clic droit sur l'application,
-puis *Ouvrir* — et Windows affiche un avertissement SmartScreen, qu'on passe par
-*Informations complémentaires* puis *Exécuter quand même*.
-
-| Plateforme | Format |
-|---|---|
-| macOS (arm64) | `.dmg`, non signé |
-| Windows (x64) | Installeur NSIS, non signé |
-
-Construits automatiquement par `.github/workflows/release.yml` à chaque tag `vX.Y.Z`
-poussé, publiés sur l'onglet Releases. En local, sans publication :
-
-```bash
-pnpm package:mac    # DMG dans release/ (arm64)
-pnpm package:win    # installeur NSIS dans release/ (x64, depuis Windows uniquement)
-```
-
 ## Dépendances
 
-Sobriété délibérée : **4 dépendances de production**, le reste est du Node et du React nus.
+Sobriété délibérée : **5 dépendances de production**, le reste est du Node et du React nus.
 
 **Production**
 
-| Paquet | Version |
-|---|---|
-| `@xterm/xterm` | 6.0.0 |
-| `@xterm/addon-fit` | ^0.11.0 |
-| `node-pty` | 1.1.0 |
+| Paquet | Version | Pourquoi |
+|---|---|---|
+| `@phosphor-icons/react` | ^2.1.10 | les icônes de l'interface |
+| `@xterm/xterm` | 6.0.0 | le terminal intégré |
+| `@xterm/addon-fit` | ^0.11.0 | il suit la taille du panneau |
+| `node-pty` | 1.1.0 | un vrai pty derrière ce terminal |
+| `playwright-core` | ^1.62.1 | pilote le crawl, y compris dans l'app livrée |
 
 **Développement**
 
@@ -266,7 +291,6 @@ Sobriété délibérée : **4 dépendances de production**, le reste est du Node
 | `vite` | ^8.2.1 |
 | `electron` | 43.3.0 |
 | `electron-builder` | ^26.15.3 |
-| `playwright-core` | ^1.62.1 |
 | `@vitejs/plugin-react` | ^6.0.5 |
 | `@types/react` | ^19.2.18 |
 | `@types/react-dom` | ^19.2.4 |
@@ -291,6 +315,12 @@ deux plans sont actifs, n'est rattaché nulle part — et le dit sur stderr.
 **Le crawl refuse de démarrer si `baseUrl` répond déjà.**
 C'est voulu. Rien dans une réponse HTTP ne distingue son propre serveur de celui d'un
 autre projet.
+
+**Le crawl exige Google Chrome installé.**
+`playwright-core` voyage avec l'application, aucun navigateur ne l'accompagne : le crawler
+pilote le Chrome du système (`channel: 'chrome'`). Rien ne se télécharge au premier
+lancement, et rien ne prévient d'avance — une machine sans Chrome consigne simplement un
+scan échoué.
 
 **`node-pty` est un binaire natif.**
 Il est déballé de l'asar (`asarUnpack` dans `electron-builder.yml`) et
@@ -319,6 +349,17 @@ Pour l'enregistrer dans Claude Code :
 
 ```bash
 claude mcp add -s user ovrsee -- node /chemin/absolu/ovrsee/mcp/server.js
+```
+
+Depuis l'**application installée**, sans dépôt cloné, le serveur voyage dans le paquet.
+Ce n'est pas `node` qui le lance mais le binaire Ovrsee en mode node — c'est lui qui sait
+lire `app.asar` :
+
+```bash
+claude mcp add -s user ovrsee -- \
+  env ELECTRON_RUN_AS_NODE=1 \
+  "/Applications/Ovrsee.app/Contents/MacOS/Ovrsee" \
+  "/Applications/Ovrsee.app/Contents/Resources/app.asar/mcp/server.js"
 ```
 
 La portée `user` est la bonne : le serveur est multi-projet par construction,

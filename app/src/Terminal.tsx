@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react'
-import { Check, Compass, GitFork, NotePencil, Plus, Question, type IconProps } from '@phosphor-icons/react'
+import { Check, GitFork, NotePencil, Plus, Question, type IconProps } from '@phosphor-icons/react'
 
 import { briefLines, buildActions, type Snapshot, type SettingsType } from './data'
 import { etiquetteDe, type AttentionKind } from './attention'
@@ -20,7 +20,6 @@ import { Divider, useResizable } from './useResizable'
  * pieds d'une table figée une fois pour toutes.
  */
 const iconeCommande = (): Record<string, ComponentType<IconProps>> => ({
-  [t('action.crawl')]: Compass,
   [t('action.graph')]: GitFork,
   [t('action.graph_obsidian')]: NotePencil,
 })

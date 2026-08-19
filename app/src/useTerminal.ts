@@ -78,7 +78,7 @@ declare global {
        * Ramène la fenêtre au premier plan. La seule chose qu'un clic sur une
        * notification ne peut pas faire depuis le rendu.
        */
-      app: { focus: () => Promise<void> }
+      app: { focus: () => Promise<void>; close: () => Promise<void> }
       /**
        * Barre de menu macOS — voir `electron/tray.js`.
        *
@@ -126,6 +126,11 @@ export interface Session {
   key: string
   kind: SessionKind
   label: string
+  /**
+   * Le nom d'origine, posé à la création et jamais modifié : c'est celui que
+   * l'onglet retrouve quand la conversation repart de zéro.
+   */
+  defaut: string
 }
 
 /** Ce qui vit derrière un onglet, hors du rendu React. */
@@ -175,6 +180,7 @@ const claudeSlot = (project: string): Session => ({
   key: `${project}#claude`,
   kind: 'claude',
   label: 'claude',
+  defaut: 'claude',
 })
 
 /**
@@ -206,6 +212,8 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
   const [ptyIds, setPtyIds] = useState<Record<string, string>>({})
 
   const panes = useRef(new Map<string, Pane>())
+  /** Onglets nommés au double-clic : le nom automatique ne les touche plus. */
+  const nommesMain = useRef(new Set<string>())
   const counter = useRef(0)
   // Sessions et onglet actif de chaque projet déjà visité, pour les retrouver
   // sans les rouvrir. `panes` sert déjà de collection inter-projets : les clés
@@ -424,6 +432,7 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
       key: `${projectPath}#shell-${n}`,
       kind: 'shell',
       label: `shell ${n}`,
+      defaut: `shell ${n}`,
     }
     const before = sessionsByProject.current.get(projectPath) ?? []
     const after = [...before, session]
@@ -432,6 +441,52 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
     activeByProject.current.set(projectPath, session.key)
     setActive(session.key)
   }, [projectPath])
+
+  /**
+   * Renomme un onglet. Un nom vide garde l'ancien — vider le champ est un
+   * geste d'annulation, pas une demande d'onglet sans nom.
+   *
+   * `manuel` distingue le double-clic du nom déduit de la demande envoyée. Un
+   * onglet nommé à la main ne se fait plus jamais renommer tout seul : on l'a
+   * appelé « build » pour le retrouver, pas pour le voir changer au prochain
+   * tour.
+   *
+   * Pas de persistance : les sessions ne survivent pas à l'application, et un
+   * nom qui leur survivrait désignerait un terminal disparu.
+   */
+  const renommer = useCallback(
+    (key: string, label: string, { manuel = true }: { manuel?: boolean } = {}) => {
+      const nom = label.trim()
+      if (!projectPath || !nom) return
+      if (!manuel && nommesMain.current.has(key)) return
+      if (manuel) nommesMain.current.add(key)
+      const suite = (sessionsByProject.current.get(projectPath) ?? []).map(session =>
+        session.key === key ? { ...session, label: nom } : session,
+      )
+      sessionsByProject.current.set(projectPath, suite)
+      setSessions(suite)
+    },
+    [projectPath],
+  )
+
+  /**
+   * Rend à un onglet son nom d'origine — une conversation repartie de zéro ne
+   * doit plus annoncer la précédente.
+   *
+   * Un onglet nommé au double-clic n'est pas touché : on l'a appelé « build »
+   * pour le retrouver, et un `/clear` ne défait pas ce choix-là.
+   */
+  const reinitialiser = useCallback(
+    (key: string) => {
+      if (!projectPath || nommesMain.current.has(key)) return
+      const suite = (sessionsByProject.current.get(projectPath) ?? []).map(session =>
+        session.key === key ? { ...session, label: session.defaut } : session,
+      )
+      sessionsByProject.current.set(projectPath, suite)
+      setSessions(suite)
+    },
+    [projectPath],
+  )
 
   /** Ferme un shell. La session Claude n'est pas fermable : c'est le panneau. */
   const closeShell = useCallback(
@@ -515,6 +570,8 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
     attach,
     openShell,
     closeShell,
+    renommer,
+    reinitialiser,
     errors,
     focusClaude,
     cibler,

@@ -187,25 +187,42 @@ function tempSettings(contenu) {
 /** Une entrée de hook telle que l'installateur en écrit. */
 const entree = script => ({ hooks: [{ type: 'command', command: `node '/x/hooks/${script}'` }] })
 
-test('signalInstalle : vrai quand les deux événements portent ovrsee-notify', () => {
+test('signalInstalle : vrai quand les quatre événements portent ovrsee-notify', () => {
   const path = tempSettings({
     hooks: {
       Stop: [entree('ovrsee-tool-stop.js'), entree('ovrsee-notify.js')],
       Notification: [entree('ovrsee-notify.js')],
+      UserPromptSubmit: [entree('ovrsee-capture-audit.js'), entree('ovrsee-notify.js')],
+      SessionStart: [entree('ovrsee-session-start.js'), entree('ovrsee-notify.js')],
     },
   })
 
   assert.equal(signalInstalle(path), true)
 })
 
-test('signalInstalle : un seul des deux événements ne suffit pas', () => {
+test('signalInstalle : trois événements sur quatre ne suffisent pas', () => {
   // `Stop` seul dirait « c'est à toi » sans jamais signaler une question ;
-  // `Notification` seul laisserait l'attente allumée après coup.
+  // `Notification` seul laisserait l'attente allumée après coup ; sans
+  // `UserPromptSubmit` l'onglet ne dit ni qu'il travaille ni sur quoi. C'est le
+  // cas d'une machine équipée avant l'arrivée du troisième — la déclarer
+  // installée rendrait la panne muette.
   const stopSeul = tempSettings({ hooks: { Stop: [entree('ovrsee-notify.js')], Notification: [] } })
   const notifSeule = tempSettings({ hooks: { Notification: [entree('ovrsee-notify.js')] } })
+  const sansDepart = tempSettings({
+    hooks: { Stop: [entree('ovrsee-notify.js')], Notification: [entree('ovrsee-notify.js')] },
+  })
+  const sansSession = tempSettings({
+    hooks: {
+      Stop: [entree('ovrsee-notify.js')],
+      Notification: [entree('ovrsee-notify.js')],
+      UserPromptSubmit: [entree('ovrsee-notify.js')],
+    },
+  })
 
   assert.equal(signalInstalle(stopSeul), false)
   assert.equal(signalInstalle(notifSeule), false)
+  assert.equal(signalInstalle(sansDepart), false)
+  assert.equal(signalInstalle(sansSession), false)
 })
 
 test('signalInstalle : un autre hook ovrsee ne compte pas pour celui-là', () => {
@@ -258,6 +275,10 @@ test('installClaudeHooks enregistre les sept hooks de l’ovrsee', () => {
   assert.match(scriptsDe(settings, 'Stop'), /ovrsee-notify\.js/)
   assert.match(scriptsDe(settings, 'Notification'), /ovrsee-notify\.js/)
   assert.match(scriptsDe(settings, 'UserPromptSubmit'), /ovrsee-capture-audit\.js/)
+  // Deux scripts sur le même événement : le signal s'ajoute à l'audit et à la
+  // réinjection d'état, il ne prend pas leur place.
+  assert.match(scriptsDe(settings, 'UserPromptSubmit'), /ovrsee-notify\.js/)
+  assert.match(scriptsDe(settings, 'SessionStart'), /ovrsee-notify\.js/)
 })
 
 test('installClaudeHooks est réexécutable sans empiler les entrées', () => {

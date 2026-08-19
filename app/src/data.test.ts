@@ -12,6 +12,7 @@ import {
   composerCommande,
   decideInjection,
   deliveredActions,
+  epicEtat,
   epicProgress,
   frDate,
   humanAge,
@@ -240,6 +241,31 @@ test("epicProgress calcule la progression des enfants", () => {
 
   // finalColumn null → pas de comptage
   assert.deepEqual(epicProgress(children, null), { done: 0, total: 3, percent: 0 })
+})
+
+test("epicEtat se déduit des enfants", () => {
+  const board = [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'en-cours', titre: 'En cours' },
+    { id: 'fait', titre: 'Fait' },
+  ] as Snapshot['board']
+  const enfants = (...colonnes: string[]) =>
+    colonnes.map((colonne, i) => ({ id: `T-${i}`, colonne })) as unknown as Ticket[]
+
+  assert.equal(epicEtat([], board), 'vide')
+  assert.equal(epicEtat(enfants('backlog', 'backlog'), board), 'non-commencee')
+  assert.equal(epicEtat(enfants('backlog', 'en-cours'), board), 'en-cours')
+  assert.equal(epicEtat(enfants('fait', 'backlog'), board), 'en-cours')
+  assert.equal(epicEtat(enfants('fait', 'fait'), board), 'terminee')
+})
+
+test("epicEtat : un tableau à une colonne n'a rien de terminé", () => {
+  // `colonneFinale` rend null sous une seule colonne — sans quoi tout ticket
+  // du tableau serait « fini » du seul fait d'exister.
+  const board = [{ id: 'tout', titre: 'Tout' }] as Snapshot['board']
+  const enfants = [{ id: 'T-1', colonne: 'tout' }] as unknown as Ticket[]
+
+  assert.equal(epicEtat(enfants, board), 'non-commencee')
 })
 
 test("restant avec epics : un epic vide compte pour 1", () => {

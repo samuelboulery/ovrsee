@@ -10,6 +10,47 @@ versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- The ticket panel header no longer reads as a darker, narrower band: it takes
+  its container's background and spans it edge to edge.
+- An epic state tag now carries its state's style whole — background, text and
+  border together — instead of a green label in a purple outline.
+- The `?` on a terminal tab now shows only for a real question — a session left
+  idle no longer turns its green check into a question mark.
+- `/clear` gives a terminal tab its original name back, unless it was renamed by
+  hand.
+- Removed the stray dot left of the terminal tabs, which read as an empty tab.
+- The epic detach button moved from the card to the bottom of the ticket panel,
+  and now says which epic it detaches from.
+
+### Added
+
+- ⌘W closes the focused terminal tab instead of the window; ⌘D opens a new
+  terminal (also in the View menu).
+- **Terminal tabs name themselves.** A tab takes the first words of the request
+  sent into it. A name typed by hand (double-click) is never overwritten.
+- **A live state on each terminal tab.** Three pulsing dots while Claude works,
+  a green check when it hands back, a question mark when it waits for an
+  answer — the dots stay still under `prefers-reduced-motion`.
+- **The ticket panel resizes**, and a button opens it as a full modal for a long
+  read.
+
+### Changed
+
+- **Epics leave the Kanban.** An epic no longer sits in a column: the Board tab
+  has a `Kanban` / `Epics` toggle, and an epic's state is derived from its
+  children — `no children`, `not started`, `in progress`, `done`. An epic can
+  therefore never be done while a child is still open. Child tickets are now
+  plain cards in their own column (#19, #21).
+
+### Added
+
+- **Session state on terminal tabs.** A tab's dot turns green when Claude hands
+  back and accent when it is waiting for an answer, so several sessions can be
+  followed without switching tabs (#18).
+- **Renaming a terminal.** Double-click a tab label (#20).
+
 ## [1.0.0-beta] — 2026-08-13
 
 First published release. The binaries are neither signed nor notarised: macOS and

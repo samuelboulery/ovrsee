@@ -46,7 +46,7 @@ import { Historique } from './tabs/Historique'
 import { Tableau } from './tabs/Tableau'
 import { Donnees } from './tabs/Donnees'
 import { Stack } from './tabs/Stack'
-import { Terminal, type Layout } from './Terminal'
+import { Terminal, type Layout, type TerminalActions } from './Terminal'
 import { Divider, useResizable } from './useResizable'
 import { TABS, TAB_ICONS, activeTabsInOrder, type TabId } from './views'
 
@@ -168,6 +168,9 @@ export function App() {
   const [focusRoute, setFocusRoute] = useState<string | null>(() => routeFromUrl())
   const [layout, setLayout] = useState<Layout>('bottom')
   const [terminal, setTerminal] = useState(true)
+  // Ce que le panneau terminal sait faire, quand il est monté. Vide sinon —
+  // c'est ce qui laisse ⌘W retomber sur la fermeture de fenêtre.
+  const terminalActions = useRef<TerminalActions | null>(null)
   // Pied de page réel de `StatusBar` (T-0111) : sous le terminal, pas coincée
   // entre le contenu de l'onglet et lui — voir StatusBarSlotContext.
   const [statusBarSlot, setStatusBarSlot] = useState<HTMLDivElement | null>(null)
@@ -406,6 +409,23 @@ export function App() {
       }
       if (command === 'sidebar:toggle') return setSidebarOuverte(ouverte => !ouverte)
       if (command === 'terminal:toggle') return setTerminal(ouvert => !ouvert)
+
+      // ⌘W : fermer l'onglet quand on tape dans un terminal, la fenêtre sinon.
+      // La décision est ici parce que `<Terminal>` est démonté quand le panneau
+      // est replié — sa référence vide *est* la réponse.
+      if (command === 'window:close') {
+        const fermer = terminalActions.current?.focus() ? terminalActions.current.fermerActif : null
+        if (fermer) return fermer()
+        return void window.ovrsee?.app.close()
+      }
+
+      // ⌘D : un shell de plus. Panneau replié, le premier appui le déplie —
+      // ouvrir un shell dans un composant pas encore monté demanderait un
+      // aller-retour d'état pour un cas de bord.
+      if (command === 'terminal:new') {
+        if (!terminalActions.current) return setTerminal(true)
+        return terminalActions.current.ouvrirShell()
+      }
 
       const disposition = command.startsWith('terminal:layout:') && command.slice(16)
       if (disposition) {
@@ -707,6 +727,7 @@ export function App() {
                   onTerminalHeightChange={setTerminalHeight}
                   onTerminalWidthChange={setTerminalWidth}
                   onProjet={setCurrent}
+                  actions={terminalActions}
                 />
               )}
             </div>

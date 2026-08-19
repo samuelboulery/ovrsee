@@ -406,3 +406,32 @@ textarea.input { height: auto; min-height: 90px; padding-top: 6px; padding-botto
 }
 .dialog-body { font-size: 14px; opacity: 0.85; }
 .dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
+
+/* — battement : la session travaille —
+   Trois points qui s'allument en cascade sur l'onglet d'un terminal. La règle
+   vit ici et pas dans le composant : `app/src` n'a pas de fichier CSS, et
+   `s()` ne sait pas déclarer de @keyframes. Le décalage de chaque point est
+   posé en style inline par l'appelant. */
+@keyframes ovrsee-battement {
+  0%, 80%, 100% { opacity: 0.25; }
+  40% { opacity: 1; }
+}
+.battement { animation: ovrsee-battement 1.2s ease-in-out infinite; }
+
+/* L'information ne dépend jamais du mouvement : les points restent affichés,
+   ils cessent seulement de battre. */
+@media (prefers-reduced-motion: reduce) {
+  .battement { animation: none; opacity: 0.7; }
+}
+
+/* — ligne cliquable de la vue Epics —
+   Une classe et pas un `useHover` par ligne : le survol et le focus clavier
+   demandent la même affordance, et une pseudo-classe les donne tous les deux
+   sans tenir d'état. Le fond au repos est ici et pas en inline : un style inline
+   bat toute règle de feuille, et `:hover` ne passerait jamais. Celui de la ligne
+   ouverte reste inline — lui doit bien l'emporter sur le survol. */
+.ligne-clic { background: transparent; }
+.ligne-clic:hover { background: var(--color-surface-hover); }
+.ligne-clic:focus-visible {
+  outline: 2px solid var(--color-accent); outline-offset: -2px;
+}

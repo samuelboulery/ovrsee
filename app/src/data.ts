@@ -935,6 +935,32 @@ export const epicProgress = (children: Ticket[], finalColumn: string | null): Ep
 }
 
 /**
+ * L'état d'un epic, déduit de ses enfants — jamais de son propre `colonne`.
+ *
+ * Un epic est un conteneur : lui donner un statut à part de ceux qu'il
+ * contient produit la contradiction qu'on a vécue, l'epic posé en « Fait »
+ * pendant que trois enfants dorment en Backlog. Dérivé, « terminé tant qu'il
+ * reste un enfant » devient impossible à écrire, pas seulement interdit.
+ *
+ * Sur un tableau à une seule colonne, `colonneFinale` rend `null` : rien n'y
+ * est jamais « terminé », et tout y est « non commencé ».
+ */
+export type EpicEtat = 'vide' | 'non-commencee' | 'en-cours' | 'terminee'
+
+export const epicEtat = (children: Ticket[], board: Colonne[]): EpicEtat => {
+  const enfants = liste(children)
+  if (enfants.length === 0) return 'vide'
+
+  const finale = colonneFinale(board)
+  if (finale && enfants.every(t => t.colonne === finale)) return 'terminee'
+
+  const premiere = liste(board)[0]?.id ?? null
+  if (premiere && enfants.every(t => t.colonne === premiere)) return 'non-commencee'
+
+  return 'en-cours'
+}
+
+/**
  * La colonne qui vaut « terminé », s'il y en a une.
  *
  * Miroir de `colonneFinale` dans `hooks/tickets.js` : la dernière colonne, mais

@@ -500,6 +500,14 @@ app.whenReady().then(() => {
     window.focus()
   })
 
+  // Même garde que `app:focus` : le principal vise la fenêtre émettrice, le
+  // rendu n'en désigne aucune. C'est ce qui rend le geste sûr — ⌘W passe
+  // désormais par l'interface, qui décide entre fermer un onglet de terminal et
+  // fermer la fenêtre.
+  ipcMain.handle('app:close', event => {
+    BrowserWindow.fromWebContents(event.sender)?.close()
+  })
+
   // Choisir un dossier. Le seul geste qui ne peut pas passer par `/api` : une
   // page web n'a pas le droit de connaître un chemin du disque tant que
   // l'utilisateur ne l'a pas désigné lui-même. Aucun argument venu du rendu —

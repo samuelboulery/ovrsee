@@ -119,7 +119,15 @@ export function buildMenu(lang = 'fr', createWindow) {
               },
               { type: 'separator' },
             ]),
-        { role: 'close', label: m('menu.close_window') },
+        // Pas `role: 'close'` : un accélérateur de menu est traité par le
+        // processus principal et n'atteint jamais le rendu. Or ⌘W doit fermer
+        // l'onglet quand on tape dans un terminal, et la fenêtre sinon — cette
+        // décision-là ne peut être prise que par l'interface.
+        {
+          label: m('menu.close_window'),
+          accelerator: 'CmdOrCtrl+W',
+          click: send('window:close'),
+        },
       ],
     },
 
@@ -154,6 +162,11 @@ export function buildMenu(lang = 'fr', createWindow) {
           label: m('menu.toggle_terminal'),
           accelerator: 'CmdOrCtrl+T',
           click: send('terminal:toggle'),
+        },
+        {
+          label: m('menu.new_terminal'),
+          accelerator: 'CmdOrCtrl+D',
+          click: send('terminal:new'),
         },
         {
           label: m('menu.terminal_bottom'),

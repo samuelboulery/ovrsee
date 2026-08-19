@@ -157,7 +157,16 @@ export function stopCrawl(projectPath) {
   try {
     process.kill(-session.child.pid, 'SIGTERM')
   } catch {
-    // Déjà mort entre la lecture et le signal : `exit` a fait le ménage.
+    // Deux cas tombent ici : le processus est mort entre la lecture et le
+    // signal — `exit` a fait le ménage — ou bien on est sous Windows, qui ne
+    // connaît pas les groupes de processus. Le repli n'arrête alors que le
+    // crawler ; le serveur de dev qu'il a lancé, lui, reçoit son `SIGTERM` du
+    // `stopApp` de `crawl/index.js`.
+    try {
+      session.child.kill('SIGTERM')
+    } catch {
+      /* déjà mort */
+    }
   }
   return crawlState()
 }

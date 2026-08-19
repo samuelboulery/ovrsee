@@ -147,7 +147,9 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   Et `-l` seul ne suffit pas : zsh ne source `.zshrc` — où vivent les PATH de pnpm,
   nvm, mise — que pour un shell **interactif**. Le terminal intégré échappait au
   piège sans le savoir, un pty étant interactif par nature ; le crawl, non. La règle
-  vit dans `hooks/shell.js`, partagée par les deux.
+  vit dans `hooks/shell.js`, partagée par les deux. **Windows garde le shell par
+  défaut** : il n'a ni zsh ni ce problème — une application graphique y hérite du PATH
+  du registre — et `spawn('/bin/zsh')` y levait un `ENOENT` que la CI seule voyait.
 - **Un crawl qui échoue doit dire ce qu'a dit la commande `dev`.** Elle tournait sous
   `stdio: 'ignore'` : un `pnpm: command not found` disparaissait, et il ne restait
   que « l'application n'a pas répondu en 60000 ms » — qui envoie chercher le problème

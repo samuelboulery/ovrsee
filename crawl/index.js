@@ -27,7 +27,7 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright-core'
 
 import { normalizeRoutes, pageSlug, sameOrigin } from './routes.js'
-import { cleanEnv, loginShell } from '../hooks/shell.js'
+import { cleanEnv, shellRun } from '../hooks/shell.js'
 import { writeFileNoFollow } from '../hooks/plans.js'
 
 const DEFAULTS = {
@@ -172,11 +172,21 @@ async function startApp(config) {
   // par l'utilisateur dans SON fichier de configuration, dans SON dépôt, au
   // même titre qu'un script npm. Elle n'est jamais construite à partir d'une
   // entrée externe.
-  const child = spawn(loginShell(), ['-lic', config.dev], {
+  const [fichier, args, options] = shellRun(config.dev)
+  const child = spawn(fichier, args, {
+    ...options,
     cwd: root,
     env: cleanEnv(),
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: true,
+  })
+
+  // Sans cet écouteur, un shell introuvable lève un événement `error` que
+  // personne n'attrape, et le crawl meurt sans rien consigner — l'échec
+  // deviendrait un silence, ce que ce système ne doit jamais produire.
+  let panne = null
+  child.on('error', err => {
+    panne = String(err?.message ?? err)
   })
 
   // Gardée pour l'échec, jetée en cas de succès. Non lue, elle remplirait le
@@ -201,9 +211,10 @@ async function startApp(config) {
 
   log(`attente de ${config.baseUrl}…`)
   try {
-    await waitForServer(config.baseUrl, config.readyTimeoutMs, () =>
-      partie ? `${trace}\n(la commande dev s'est arrêtée d'elle-même)` : trace,
-    )
+    await waitForServer(config.baseUrl, config.readyTimeoutMs, () => {
+      if (panne) return `${trace}\n(la commande dev n'a pas pu être lancée : ${panne})`
+      return partie ? `${trace}\n(la commande dev s'est arrêtée d'elle-même)` : trace
+    })
   } catch (err) {
     stopApp(child)
     throw err

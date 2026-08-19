@@ -31,6 +31,22 @@ export function loginShell() {
 }
 
 /**
+ * De quoi lancer une commande écrite par l'utilisateur, par plateforme.
+ *
+ * Windows n'a ni `zsh`, ni `-lic`, ni le problème que ces trois lettres
+ * résolvent : une application graphique y hérite du PATH de l'utilisateur, lu
+ * dans le registre. Le shell par défaut de `spawn` y convient donc, et c'est
+ * `cmd.exe` qui s'en charge.
+ *
+ * @param {string} commande la ligne `dev` du projet observé
+ * @returns {[string|undefined, string[]|undefined, {shell?: boolean}]} `[fichier, arguments, options]`
+ */
+export function shellRun(commande) {
+  if (process.platform === 'win32') return [commande, undefined, { shell: true }]
+  return [loginShell(), ['-lic', commande], {}]
+}
+
+/**
  * L'environnement à donner à un programme tiers qu'on lance.
  *
  * Trois nettoyages, tous pour la même raison — ce qui traîne dans

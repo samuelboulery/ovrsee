@@ -10,6 +10,37 @@ versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.1-beta] — 2026-08-20
+
+### Security
+
+- **A page served by localhost could write to the API.** The `X-Ovrsee` header
+  relied on the CORS preflight to keep third-party pages out, but Vite's default
+  policy allows *any* `localhost` origin, on any port — including the observed
+  project's own pages, the ones the Browser tab displays and the crawl visits.
+  From there, a `POST /api/projects {action:'init'}` was enough to write the
+  `dev` command that the next crawl executes. Every `/api/` route now checks the
+  request origin, reads included: `/api/config-claude` returned the hook commands
+  from `~/.claude/` with no header at all. Requests carrying no `Origin` are
+  accepted — that is every non-browser caller, Electron's `ovrsee://` protocol
+  among them.
+- **`redige()` masked only the first word of an `Authorization` header.** A
+  multi-field Digest gave away `response`, the hash derived from the password,
+  and any scheme outside the known three — AWS4-HMAC-SHA256, Negotiate — leaked
+  its signature next to a `***` that made the line look redacted. An unquoted
+  value is now consumed to the end of the line (#36).
+- **Scalars inside an array escaped secret masking.** A token stored in a list in
+  `settings.json` came out whole through `/api/config-claude`, while the same
+  token set directly on the key was masked.
+- The request body of the dev server is capped at 1 MB. An endless local POST
+  used to grow its memory until the process died.
+
+### Fixed
+
+- `crawl/auth.js` had drifted from `crawl/index.js`: it ran the `dev` command
+  without the login shell — so without pnpm's PATH outside a terminal — and threw
+  away whatever the command said before failing.
+
 ## [1.1.0-beta] — 2026-08-20
 
 ### Added
@@ -121,5 +152,7 @@ Windows warn about it on first launch.
 - The `ovrsee/` format may still move before 1.0. Everything in it being markdown
   and images, a migration will be readable with the naked eye.
 
-[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.0.0-beta...HEAD
+[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.1.1-beta...HEAD
+[1.1.1-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.0-beta...v1.1.1-beta
+[1.1.0-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.0.0-beta...v1.1.0-beta
 [1.0.0-beta]: https://github.com/samuelboulery/ovrsee/releases/tag/v1.0.0-beta

@@ -1,10 +1,68 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Cinq correctifs sur le panneau terminal et le panneau de ticket",
   "opened": "2026-08-19",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-19",
+  "commits": [
+    {
+      "sha": "ff157d6",
+      "date": "2026-08-19",
+      "files": [
+        "CHANGELOG.fr.md",
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "_ds/ovrsee/styles.css",
+        "app/src/App.tsx",
+        "app/src/MenuBarPanel.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/attention.test.ts",
+        "app/src/attention.ts",
+        "app/src/data.test.ts",
+        "app/src/data.ts",
+        "app/src/i18n.test.ts",
+        "app/src/render.test.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Tableau.tsx",
+        "app/src/tabs/TableauCarte.tsx",
+        "app/src/tabs/TableauDetail.tsx",
+        "app/src/tabs/TableauDnd.ts",
+        "app/src/tabs/TableauEpics.tsx",
+        "app/src/useTerminal.ts",
+        "electron/main.js",
+        "electron/menu.js",
+        "electron/preload.cjs",
+        "hooks/i18n.d.ts",
+        "hooks/i18n.js",
+        "hooks/install.js",
+        "hooks/install.test.js",
+        "hooks/notify.test.js",
+        "hooks/ovrsee-notify.js",
+        "ovrsee/plans/2026-08-16-rendre-l-etat-plan-actif-ticket-actif-propre-a-chaque-sessio.md",
+        "ovrsee/plans/2026-08-19-cinq-correctifs-sur-le-panneau-terminal-et-le-panneau-de-tic.md",
+        "ovrsee/plans/2026-08-19-en-tete-du-panneau-tags-d-etat-raccourcis-du-terminal.md",
+        "ovrsee/plans/2026-08-19-lire-un-ticket-en-grand-et-rendre-les-terminaux-bavards.md",
+        "ovrsee/plans/2026-08-19-sortir-les-epics-du-kanban-et-solder-les-4-issues-ouvertes.md",
+        "ovrsee/plans/2026-08-19-trois-retouches-sur-le-panneau-de-ticket-et-la-vue-epics.md",
+        "ovrsee/tickets/T-0164-sortir-les-epics-du-kanban-et-solder-les-issues-ouvertes.md",
+        "ovrsee/tickets/T-0165-l-etat-d-un-epic-se-derive-de-ses-enfants.md",
+        "ovrsee/tickets/T-0166-le-kanban-ne-montre-plus-que-des-tickets.md",
+        "ovrsee/tickets/T-0167-vue-epics-dans-l-onglet-tableau.md",
+        "ovrsee/tickets/T-0168-pastille-d-etat-de-session-sur-les-onglets-terminal.md",
+        "ovrsee/tickets/T-0169-renommer-un-terminal.md",
+        "ovrsee/tickets/T-0170-documenter-la-nouvelle-vie-des-epics.md",
+        "ovrsee/tickets/T-0171-lire-un-ticket-en-grand.md",
+        "ovrsee/tickets/T-0172-un-signal-busy-qui-porte-la-demande.md",
+        "ovrsee/tickets/T-0173-les-onglets-terminal-se-nomment-seuls.md",
+        "ovrsee/tickets/T-0174-un-etat-anime-sur-les-onglets-terminal.md",
+        "ovrsee/tickets/T-0175-trois-correctifs-sur-le-panneau-terminal.md",
+        "ovrsee/tickets/T-0176-detacher-et-icones-dans-le-panneau-de-ticket.md",
+        "ovrsee/tickets/T-0177-en-tete-du-panneau-et-tags-d-etat.md",
+        "ovrsee/tickets/T-0178-raccourcis-clavier-des-terminaux.md",
+        "ovrsee/tickets/T-0179-retouches-visuelles-du-panneau-et-de-la-vue-epics.md"
+      ]
+    }
+  ]
 }
 ---
 

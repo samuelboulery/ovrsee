@@ -2,12 +2,15 @@
 {
   "id": "T-0176",
   "titre": "« Détacher de l'epic » et icônes dans le panneau de ticket",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "basse",
   "charge": "xs",
-  "tags": ["ui", "tableau"],
+  "tags": [
+    "ui",
+    "tableau"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-cinq-correctifs-sur-le-panneau-terminal-et-le-panneau-de-tic.md"
 }
 ---

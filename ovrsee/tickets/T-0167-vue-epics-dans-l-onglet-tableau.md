@@ -2,12 +2,15 @@
 {
   "id": "T-0167",
   "titre": "Vue « Epics » dans l'onglet Tableau",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "m",
-  "tags": ["ui", "tableau"],
+  "tags": [
+    "ui",
+    "tableau"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-sortir-les-epics-du-kanban-et-solder-les-4-issues-ouvertes.md",
   "epic": "T-0164"
 }

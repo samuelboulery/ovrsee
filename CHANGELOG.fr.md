@@ -67,6 +67,11 @@ versionnage [SemVer](https://semver.org/lang/fr/).
   configuration sérialisés en JSON — depuis `recordScan()`, seul point
   d'écriture. Le nom de la variable et l'hôte restent lisibles : c'est ce qui
   sert au diagnostic (#26, #31).
+- Un en-tête `Authorization` ne laisse plus filer son credential. La valeur non
+  guillemetée s'arrêtait au premier mot : `Authorization: Bearer <jeton>`
+  s'écrivait `Authorization: *** <jeton>`, un `***` qui donnait le change
+  pendant que le jeton partait en clair. Le mot-clé de schéma fait désormais
+  partie de la valeur (#34).
 - `terminal.rename_aria` écrivait `{label}` là où `t()` ne substitue que `${…}` :
   un utilisateur de lecteur d'écran entendait « Renommer la session {label} » et
   ne savait pas quel terminal il renommait. Le test ajouté est un invariant sur

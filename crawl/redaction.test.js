@@ -62,6 +62,26 @@ test('un en-tête Authorization perd son credential, pas seulement son schéma',
   assert.equal(redige('Authorization: Bearer plainSecretToken123456789'), 'Authorization: ***')
   assert.equal(
     redige("curl -H 'Authorization: Digest cnonce=abc123' https://api.example.com/v1"),
-    "curl -H 'Authorization: *** https://api.example.com/v1",
+    "curl -H 'Authorization: ***",
+  )
+})
+
+test('un en-tête Authorization est masqué en entier, schéma inconnu compris', () => {
+  // `\S+` s'arrêtait au premier mot : un Digest multi-champs livrait `response`
+  // (le hash dérivé du mot de passe) et une signature SigV4 sortait en clair
+  // à côté d'un `***` qui donnait le change (#36).
+  assert.equal(
+    redige('Authorization: Digest username="Mufasa", realm="testrealm@host.com", nonce="dcd98b71", response="6629fae49393a05397450978507c4ef1"'),
+    'Authorization: ***',
+  )
+  assert.equal(
+    redige('Authorization: AWS4-HMAC-SHA256 Credential=AKIAIOSFODNN7EXAMPLE/20260820/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-date, Signature=5d672d79'),
+    'Authorization: ***',
+  )
+  assert.equal(redige('Authorization: Negotiate YIIFvQYJKoZIhvcSAQICAQ=='), 'Authorization: ***')
+  // La ligne suivante reste lisible : la rédaction s'arrête à la fin de ligne.
+  assert.equal(
+    redige('Authorization: Bearer abc123\nGET /v1/pages 401'),
+    'Authorization: ***\nGET /v1/pages 401',
   )
 })

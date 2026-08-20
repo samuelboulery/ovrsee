@@ -10,8 +10,66 @@ versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.0-beta] — 2026-08-20
+
+### Added
+
+- **Crawling from the app.** The `Crawl` button now runs the crawl itself, over
+  Electron IPC, with progress and a stop button — no cloning the repository and
+  no `pnpm ovrsee:crawl`. `crawl/`, `mcp/` and `playwright-core` travel in the
+  package (#24).
+- **A configuration form for a project that is already equipped**, which had no
+  route left to `ovrsee.config.json` once `ovrsee/` existed (#24).
+- **Commits no hook ever saw are caught up.** A squash-merge made on GitHub
+  creates its commit on their servers: no `post-commit`, no plan attached.
+  `hooks/reconcile.js`, wired to the git `post-merge` hook, re-attaches on
+  `git pull` from the tickets the message cites — several plans for one commit,
+  ranges included. `pnpm ovrsee:reconcile` catches up a repository equipped
+  before it (#27).
+- ⌘W closes the focused terminal tab instead of the window; ⌘D opens a new
+  terminal (also in the View menu).
+- **Terminal tabs name themselves.** A tab takes the first words of the request
+  sent into it. A name typed by hand (double-click) is never overwritten.
+- **A live state on each terminal tab.** Three pulsing dots while Claude works,
+  a green check when it hands back, a question mark when it waits for an
+  answer — the dots stay still under `prefers-reduced-motion`.
+- **The ticket panel resizes**, and a button opens it as a full modal for a long
+  read.
+- **Session state on terminal tabs.** A tab's dot turns green when Claude hands
+  back and accent when it is waiting for an answer, so several sessions can be
+  followed without switching tabs (#18).
+- **Renaming a terminal.** Double-click a tab label (#20).
+
+### Changed
+
+- **Epics leave the Kanban.** An epic no longer sits in a column: the Board tab
+  has a `Kanban` / `Epics` toggle, and an epic's state is derived from its
+  children — `no children`, `not started`, `in progress`, `done`. An epic can
+  therefore never be done while a child is still open. Child tickets are now
+  plain cards in their own column (#19, #21).
+- A failed crawl now says what the observed project's `dev` command said. It ran
+  under `stdio: 'ignore'`, so a `pnpm: command not found` vanished and only
+  "the app did not answer in 60000 ms" was left (#24).
+- Stopping a crawl kills the process group, not just the child: the crawl
+  started the observed project's dev server, and `child.kill()` would leave it
+  running on its port (#24).
+
 ### Fixed
 
+- **A secret no longer leaks into `scans.jsonl`.** The crawl kept 2 kB of the
+  `dev` command's output and wrote it into a versioned file; a command dying on
+  a missing environment variable sometimes prints its value. `redige()` masks
+  the known shapes — `*KEY=`, `*TOKEN=`, `sk-…`, `ghp_…`, JWT, URL password,
+  AWS key ids (`AKIA…`, `ASIA…`), Stripe underscore keys (`sk_live_`,
+  `pk_test_`) and JSON-serialised config objects — from `recordScan()`, the only
+  write point. The variable name and the host stay readable: that is what serves
+  diagnosis (#26, #31).
+- `terminal.rename_aria` wrote `{label}` where `t()` only substitutes `${…}`: a
+  screen-reader user heard "Rename session {label}" and could not tell which
+  terminal they were renaming. The added test is an invariant over both
+  dictionaries, so any future translation writing `{param}` breaks CI (#23).
+- `reconcile()` now names on stderr, at `pull` time, the tickets it settled from
+  a commit message written elsewhere (#29).
 - The ticket panel header no longer reads as a darker, narrower band: it takes
   its container's background and spans it edge to edge.
 - An epic state tag now carries its state's style whole — background, text and
@@ -23,33 +81,6 @@ versioning follows [SemVer](https://semver.org/).
 - Removed the stray dot left of the terminal tabs, which read as an empty tab.
 - The epic detach button moved from the card to the bottom of the ticket panel,
   and now says which epic it detaches from.
-
-### Added
-
-- ⌘W closes the focused terminal tab instead of the window; ⌘D opens a new
-  terminal (also in the View menu).
-- **Terminal tabs name themselves.** A tab takes the first words of the request
-  sent into it. A name typed by hand (double-click) is never overwritten.
-- **A live state on each terminal tab.** Three pulsing dots while Claude works,
-  a green check when it hands back, a question mark when it waits for an
-  answer — the dots stay still under `prefers-reduced-motion`.
-- **The ticket panel resizes**, and a button opens it as a full modal for a long
-  read.
-
-### Changed
-
-- **Epics leave the Kanban.** An epic no longer sits in a column: the Board tab
-  has a `Kanban` / `Epics` toggle, and an epic's state is derived from its
-  children — `no children`, `not started`, `in progress`, `done`. An epic can
-  therefore never be done while a child is still open. Child tickets are now
-  plain cards in their own column (#19, #21).
-
-### Added
-
-- **Session state on terminal tabs.** A tab's dot turns green when Claude hands
-  back and accent when it is waiting for an answer, so several sessions can be
-  followed without switching tabs (#18).
-- **Renaming a terminal.** Double-click a tab label (#20).
 
 ## [1.0.0-beta] — 2026-08-13
 

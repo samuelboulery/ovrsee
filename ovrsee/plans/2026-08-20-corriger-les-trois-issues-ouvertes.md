@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Corriger les trois issues ouvertes",
   "opened": "2026-08-20",
-  "closed": null,
+  "closed": "2026-08-20",
   "commits": [
     {
       "sha": "b419536",
@@ -23,6 +23,11 @@
     },
     {
       "sha": "ecbcde9",
+      "date": "2026-08-20",
+      "files": []
+    },
+    {
+      "sha": "ab69d26",
       "date": "2026-08-20",
       "files": []
     }

@@ -115,11 +115,17 @@ const shortSha = () => {
  */
 export function redige(texte) {
   return String(texte ?? '')
+    // Le guillemet optionnel autour du nom couvre le JSON stringifié
+    // (`"apiKey":"..."`), où il s'intercale entre le nom et le séparateur ;
+    // la valeur consomme une chaîne entière, espaces compris.
     .replace(
-      /\b([\w.-]*(?:KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD|AUTH|CREDENTIALS?)[\w.-]*)(\s*[=:]\s*)\S+/gi,
-      '$1$2***',
+      /(["']?)([\w.-]*(?:KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD|AUTH|CREDENTIALS?)[\w.-]*)\1(\s*[=:]\s*)("[^"]*"|'[^']*'|\S+)/gi,
+      '$1$2$1$3***',
     )
-    .replace(/\b(?:sk|rk)-[A-Za-z0-9_-]{8,}/g, '***')
+    .replace(/\b(?:sk|rk|pk)[-_][A-Za-z0-9_-]{8,}/g, '***')
+    // Identifiants de clé AWS : le message d'erreur du SDK les cite en clair.
+    .replace(/\b(?:AKIA|ASIA|AIDA|AROA|AGPA|ANPA|APKA|ABIA|ACCA)[A-Z0-9]{16}\b/g, '***')
+    .replace(/\bAIza[A-Za-z0-9_-]{20,}/g, '***')
     .replace(/\bgh[pousr]_[A-Za-z0-9]{16,}/g, '***')
     .replace(/\beyJ[A-Za-z0-9_-]{4,}\.[A-Za-z0-9_-]{4,}\.[A-Za-z0-9_-]+/g, '***')
     .replace(/(\b[a-z][a-z0-9+.-]*:\/\/[^\s:/@]+:)[^\s@]+@/gi, '$1***@')

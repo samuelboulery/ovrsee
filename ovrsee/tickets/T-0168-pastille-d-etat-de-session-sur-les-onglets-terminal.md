@@ -2,12 +2,15 @@
 {
   "id": "T-0168",
   "titre": "Pastille d'état de session sur les onglets terminal",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "s",
-  "tags": ["ui", "terminal"],
+  "tags": [
+    "ui",
+    "terminal"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-sortir-les-epics-du-kanban-et-solder-les-4-issues-ouvertes.md",
   "epic": "T-0164"
 }

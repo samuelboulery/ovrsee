@@ -2,12 +2,15 @@
 {
   "id": "T-0172",
   "titre": "Un signal « busy » qui porte la demande envoyée",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "s",
-  "tags": ["hooks", "terminal"],
+  "tags": [
+    "hooks",
+    "terminal"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-lire-un-ticket-en-grand-et-rendre-les-terminaux-bavards.md"
 }
 ---

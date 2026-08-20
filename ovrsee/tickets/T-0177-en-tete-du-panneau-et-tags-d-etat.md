@@ -2,12 +2,15 @@
 {
   "id": "T-0177",
   "titre": "En-tête du panneau de ticket et tags d'état d'epic",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "xs",
-  "tags": ["ui", "tableau"],
+  "tags": [
+    "ui",
+    "tableau"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-en-tete-du-panneau-tags-d-etat-raccourcis-du-terminal.md"
 }
 ---

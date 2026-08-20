@@ -2,12 +2,15 @@
 {
   "id": "T-0175",
   "titre": "Trois correctifs sur le panneau terminal",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "s",
-  "tags": ["ui", "terminal"],
+  "tags": [
+    "ui",
+    "terminal"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-cinq-correctifs-sur-le-panneau-terminal-et-le-panneau-de-tic.md"
 }
 ---

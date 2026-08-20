@@ -2,12 +2,14 @@
 {
   "id": "T-0165",
   "titre": "L'état d'un epic se dérive de ses enfants",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "s",
-  "tags": ["tableau"],
+  "tags": [
+    "tableau"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-sortir-les-epics-du-kanban-et-solder-les-4-issues-ouvertes.md",
   "epic": "T-0164"
 }

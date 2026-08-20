@@ -2,12 +2,15 @@
 {
   "id": "T-0173",
   "titre": "Les onglets terminal se nomment seuls",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "s",
-  "tags": ["ui", "terminal"],
+  "tags": [
+    "ui",
+    "terminal"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-lire-un-ticket-en-grand-et-rendre-les-terminaux-bavards.md"
 }
 ---

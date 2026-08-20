@@ -2,12 +2,15 @@
 {
   "id": "T-0179",
   "titre": "Retouches visuelles du panneau de ticket et de la vue Epics",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "basse",
   "charge": "xs",
-  "tags": ["ui", "tableau"],
+  "tags": [
+    "ui",
+    "tableau"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-trois-retouches-sur-le-panneau-de-ticket-et-la-vue-epics.md"
 }
 ---

@@ -2,12 +2,15 @@
 {
   "id": "T-0171",
   "titre": "Lire un ticket en grand : panneau tirable et modale",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "m",
-  "tags": ["ui", "tableau"],
+  "tags": [
+    "ui",
+    "tableau"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-lire-un-ticket-en-grand-et-rendre-les-terminaux-bavards.md"
 }
 ---

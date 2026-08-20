@@ -2,12 +2,14 @@
 {
   "id": "T-0170",
   "titre": "Documenter la nouvelle vie des epics",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "basse",
   "charge": "xs",
-  "tags": ["docs"],
+  "tags": [
+    "docs"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-sortir-les-epics-du-kanban-et-solder-les-4-issues-ouvertes.md",
   "epic": "T-0164"
 }

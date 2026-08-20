@@ -2,12 +2,16 @@
 {
   "id": "T-0178",
   "titre": "⌘W et ⌘D s'appliquent aux terminaux",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "s",
-  "tags": ["ui", "terminal", "electron"],
+  "tags": [
+    "ui",
+    "terminal",
+    "electron"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-19",
+  "maj": "2026-08-20",
   "plan": "2026-08-19-en-tete-du-panneau-tags-d-etat-raccourcis-du-terminal.md"
 }
 ---

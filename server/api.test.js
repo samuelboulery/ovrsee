@@ -677,3 +677,59 @@ test('POST init sans config ne déclenche pas la validation', () => {
   assert.doesNotMatch(result.json.error, /config de crawl invalide/)
 })
 
+
+/**
+ * L'origine, seconde barrière — et la seule qui tienne au dev server.
+ *
+ * L'en-tête `X-Ovrsee` compte sur le préflight CORS pour écarter les pages
+ * tierces, mais Vite autorise toute origine `localhost`, quel que soit le port.
+ * Une page servie par le projet observé — celle qu'affiche l'onglet Navigateur,
+ * celle que visite le crawl — passait donc, et un `init` lui suffisait à écrire
+ * la commande `dev` que le crawl suivant exécute.
+ */
+const avecOrigine = (origin, path = '/api/projects') =>
+  resolve(url(path), null, {
+    method: 'POST',
+    headers: { 'x-ovrsee': '1', origin },
+    body: { action: 'touch', path: '/nulle/part' },
+  })
+
+test('une page servie par un autre port de localhost est refusée', () => {
+  const result = avecOrigine('http://localhost:3000')
+  assert.equal(result.status, 403)
+  assert.match(result.json.error, /origine/)
+})
+
+test('une origine distante est refusée', () => {
+  assert.equal(avecOrigine('https://exemple.test').status, 403)
+})
+
+test("l'interface de l'ovrsee passe, au dev server comme dans Electron", () => {
+  // 404 « projet inconnu » : la garde a laissé passer, la route a répondu.
+  for (const origine of ['http://localhost:5180', 'http://127.0.0.1:5180', 'ovrsee://app']) {
+    assert.equal(avecOrigine(origine).status, 404, origine)
+  }
+})
+
+test("l'absence d'origine vaut acceptation — Electron, MCP et curl n'en envoient pas", () => {
+  const result = resolve(url('/api/projects'), null, {
+    method: 'POST',
+    headers: { 'x-ovrsee': '1' },
+    body: { action: 'touch', path: '/nulle/part' },
+  })
+  assert.equal(result.status, 404)
+})
+
+test('les lectures sont gardées aussi : /api/config-claude rend les hooks de ~/.claude', () => {
+  const result = resolve(url('/api/config-claude'), null, {
+    method: 'GET',
+    headers: { origin: 'http://localhost:3000' },
+  })
+  assert.equal(result.status, 403)
+})
+
+test('hors /api/, une origine refusée ne vole pas la requête à l’hôte', () => {
+  // Rendre 403 ici priverait le dev server et le protocole Electron de leurs
+  // propres chemins.
+  assert.equal(resolve(url('/index.html'), null, { headers: { origin: 'https://exemple.test' } }), null)
+})

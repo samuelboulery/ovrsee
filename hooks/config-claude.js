@@ -47,17 +47,26 @@ function maskSecrets(obj) {
 
   const result = {}
   for (const [key, value] of Object.entries(obj)) {
-    // Conteneurs (objets, tableaux) : toujours parcourir en profondeur
-    if (value !== null && typeof value === 'object') {
-      result[key] = Array.isArray(value)
-        ? value.map(item => (item !== null && typeof item === 'object' ? maskSecrets(item) : item))
-        : maskSecrets(value)
-    } else {
-      // Scalaires : masquer si clé non blanche
-      result[key] = WHITELIST_KEYS.has(key) ? value : '****'
-    }
+    result[key] = maskValue(key, value)
   }
   return result
+}
+
+/**
+ * Un scalaire porte la règle de sa clé, qu'il soit seul ou rangé dans un
+ * tableau.
+ *
+ * Les éléments scalaires d'un tableau repartaient en clair : un jeton dans une
+ * liste de `settings.json` sortait entier par /api/config-claude, alors que le
+ * même jeton posé directement sur la clé était masqué.
+ *
+ * @param {string} key clé qui porte la valeur — c'est elle qui décide
+ * @param {unknown} value
+ */
+function maskValue(key, value) {
+  if (Array.isArray(value)) return value.map(item => maskValue(key, item))
+  if (value !== null && typeof value === 'object') return maskSecrets(value)
+  return WHITELIST_KEYS.has(key) ? value : '****'
 }
 
 /**

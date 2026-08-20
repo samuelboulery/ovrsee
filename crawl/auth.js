@@ -20,6 +20,8 @@ import { join, resolve } from 'node:path'
 
 import { chromium } from 'playwright-core'
 
+import { cleanEnv, shellRun } from '../hooks/shell.js'
+
 const root = resolve(process.argv[2] ?? process.cwd())
 const config = JSON.parse(readFileSync(join(root, 'ovrsee.config.json'), 'utf8'))
 
@@ -50,7 +52,19 @@ function assertIgnored() {
 async function main() {
   assertIgnored()
 
-  const app = spawn(config.dev, { cwd: root, shell: true, stdio: 'ignore', detached: true })
+  // Même invocation que le crawl (`crawl/index.js`), et pour les mêmes deux
+  // raisons : `sh -c` n'a pas le PATH de pnpm hors d'un terminal, et une
+  // commande `dev` qui meurt sous `stdio: 'ignore'` ne laisse rien à lire — on
+  // cherche alors le problème dans le projet observé.
+  const [fichier, args, options] = shellRun(config.dev)
+  const app = spawn(fichier, args, {
+    ...options,
+    cwd: root,
+    env: cleanEnv(),
+    stdio: ['ignore', 'inherit', 'inherit'],
+    detached: true,
+  })
+  app.on('error', err => console.error(`commande dev : ${err?.message ?? err}`))
   const browser = await chromium.launch({ channel: 'chrome', headless: false })
 
   try {

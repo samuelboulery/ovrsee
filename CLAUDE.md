@@ -22,6 +22,12 @@ de l'implémenter.
 Corollaire déjà arbitré : le terminal passe par IPC Electron et **pas** par une socket
 locale. Une socket l'ouvrirait à tout processus tournant sous le même compte.
 
+**Le crawl emprunte la même voie** (`electron/crawl.js`, canaux `crawl:*`), et pour la
+même raison — surtout pas `/api/*`, qui est aussi servi par le dev server Vite en HTTP
+local non authentifié. La surface exposée ne reçoit qu'un chemin de projet, vérifié
+contre le registre : ni nom de programme, ni commande, ni même la ligne `dev` de la
+configuration, que le crawler lit lui-même sur le disque.
+
 Même corollaire pour les secrets d'intégration (Vercel/Netlify/Supabase, onglet
 Aperçu) : ils vivent dans `~/.claude/ovrsee/integrations.json`, **hors du dépôt
 observé** — ni `ovrsee/tickets/`, ni `ovrsee/board.json`, ni aucun autre fichier
@@ -36,9 +42,9 @@ non-authentifié, et un secret n'y transite jamais. Voir `electron/main.js` et
 | Dossier | Rôle |
 |---|---|
 | `hooks/` | Capture des plans, clôture au commit, tickets, brief, export Obsidian, skills, CLI |
-| `crawl/` | Parcours Playwright de l'app observée, captures datées |
+| `crawl/` | Parcours Playwright de l'app observée, captures datées — **embarqué dans le paquet** |
 | `server/api.js` | Routes `/api/*` pour navigateur et Electron |
-| `mcp/` | Serveur MCP stdio (JSON-RPC 2.0), même interface que `/api/*` |
+| `mcp/` | Serveur MCP stdio (JSON-RPC 2.0), même interface que `/api/*` — **embarqué dans le paquet** |
 | `app/src/` | Interface React, 7 onglets — **le seul dossier typé** (TS strict) |
 | `electron/` | Processus principal, preload, pty |
 | `site/` | Vitrine publique (ovrsee.app), page unique écrite à la main, en anglais |
@@ -136,6 +142,27 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
 - **Les réponses du MCP sont projetées.** `getPlans`, `listTickets` et `getGraph`
   omettent le corps ou rendent un résumé ; `full: true` donne l'entier. Le graphe
   complet pèse ~177 000 jetons — le défaut n'est pas une commodité, c'est une garde.
+- **La commande `dev` du projet passe par un shell `-lic`, pas par `sh -c`.**
+  Une application lancée depuis le Finder hérite d'un PATH minimal, sans `pnpm`.
+  Et `-l` seul ne suffit pas : zsh ne source `.zshrc` — où vivent les PATH de pnpm,
+  nvm, mise — que pour un shell **interactif**. Le terminal intégré échappait au
+  piège sans le savoir, un pty étant interactif par nature ; le crawl, non. La règle
+  vit dans `hooks/shell.js`, partagée par les deux. **Windows garde le shell par
+  défaut** : il n'a ni zsh ni ce problème — une application graphique y hérite du PATH
+  du registre — et `spawn('/bin/zsh')` y levait un `ENOENT` que la CI seule voyait.
+- **Un crawl qui échoue doit dire ce qu'a dit la commande `dev`.** Elle tournait sous
+  `stdio: 'ignore'` : un `pnpm: command not found` disparaissait, et il ne restait
+  que « l'application n'a pas répondu en 60000 ms » — qui envoie chercher le problème
+  dans le projet observé. Sa sortie est retenue (2 ko) et jointe à l'erreur écrite
+  dans `scans.jsonl`, que l'onglet Produit affiche désormais.
+- **Annuler un crawl tue le groupe de processus, pas le seul fils.** Le crawl démarre
+  lui-même le serveur de dev du projet observé (`dev` de `ovrsee.config.json`) ; un
+  `child.kill()` le laisserait tourner, le port resterait pris, et le crawl suivant
+  refuserait de démarrer. D'où `detached: true` au `spawn` et `process.kill(-pid)` —
+  le signe moins n'est pas une coquille.
+- **Le crawl embarqué exige Google Chrome installé.** `playwright-core` voyage dans le
+  paquet, aucun navigateur ne l'accompagne : `channel: 'chrome'` pilote celui du système.
+  Une machine sans Chrome ne prévient pas — elle consigne un scan échoué.
 - **`node-pty` est un binaire natif.** Déballé de l'asar (`asarUnpack` dans
   `electron-builder.yml`), et `spawn-helper` doit garder son bit d'exécution — d'où
   `scripts/fix-pty-permissions.js` en postinstall. Point de rupture classique de
@@ -180,8 +207,15 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   `CHANGELOG.md` — chacun a son pendant `*.fr.md`), et le repli de `t()`. En français :
   les commentaires, `CLAUDE.md`, `cadrage-ovrsee.md`, les plans et tickets d'`ovrsee/`,
   les messages de commit. Anglais pour le code et les identifiants.
-- **Quatre dépendances en production** (`@phosphor-icons/react`, `@xterm/xterm`,
-  `@xterm/addon-fit`, `node-pty`). Cette sobriété est un choix — demander avant d'en
-  ajouter une.
+- **Cinq dépendances en production** (`@phosphor-icons/react`, `@xterm/xterm`,
+  `@xterm/addon-fit`, `node-pty`, `playwright-core`). Cette sobriété est un choix —
+  demander avant d'en ajouter une.
+
+  `playwright-core` y est passé le jour où le crawl a été embarqué dans le paquet, et
+  son rangement n'est pas cosmétique : **electron-builder élague les
+  `devDependencies`**, quoi que dise la liste `files` d'`electron-builder.yml`. Le DMG
+  sortait sans lui et le crawl échouait sur `ERR_MODULE_NOT_FOUND` — invisible en dev,
+  où le dossier est là de toute façon. Toute dépendance dont l'application livrée a
+  besoin à l'exécution doit être en `dependencies`, sans exception.
 - Styles en CSS-in-JS via l'utilitaire `s()` d'`app/src/style.ts`, sur les jetons du
   design system Nocturne. Pas de fichier `.css` dans `app/src`.

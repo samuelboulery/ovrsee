@@ -667,6 +667,7 @@ export function App() {
                           layout={layout}
                           packageManager={settings?.packageManager ?? 'pnpm'}
                           onOuvrirDansNavigateur={onOuvrirDansNavigateur}
+                          onReload={reload}
                         />
                       )}
                       {tab === 'historique' && (

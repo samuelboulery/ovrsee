@@ -145,3 +145,9 @@
 {"date":"2026-08-16","commit":"f7c3c17","ok":true,"pages":7}
 {"date":"2026-08-16","commit":"5628b2c","ok":true,"pages":7}
 {"date":"2026-08-16","commit":"edd8585","ok":true,"pages":7}
+{"date":"2026-08-19","commit":"ff157d6","ok":false,"error":"l'application n'a pas répondu sur http://localhost:5180 en 60000 ms"}
+{"date":"2026-08-19","commit":"ff157d6","ok":false,"error":"http://localhost:5180 répond déjà — un autre serveur occupe le port. Arrêtez-le, ou donnez un baseUrl libre dans ovrsee.config.json."}
+{"date":"2026-08-19","commit":"ff157d6","ok":true,"pages":7}
+{"date":"2026-08-19","commit":"ff157d6","ok":true,"pages":7}
+{"date":"2026-08-19","commit":"d6464f3","ok":true,"pages":7}
+{"date":"2026-08-19","commit":"a1dc714","ok":true,"pages":7}

@@ -27,6 +27,7 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright-core'
 
 import { normalizeRoutes, pageSlug, sameOrigin } from './routes.js'
+import { cleanEnv, shellRun } from '../hooks/shell.js'
 import { writeFileNoFollow } from '../hooks/plans.js'
 
 const DEFAULTS = {
@@ -104,7 +105,7 @@ function recordScan(entry) {
 
 const sleep = ms => new Promise(done => setTimeout(done, ms))
 
-async function waitForServer(baseUrl, timeoutMs) {
+async function waitForServer(baseUrl, timeoutMs, sortie = () => '') {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
     try {
@@ -114,7 +115,16 @@ async function waitForServer(baseUrl, timeoutMs) {
       await sleep(500)
     }
   }
-  throw new Error(`l'application n'a pas répondu sur ${baseUrl} en ${timeoutMs} ms`)
+
+  // Ce que la commande `dev` a dit avant de renoncer. Sans ça, l'échec le plus
+  // fréquent — `pnpm: command not found`, quand l'ovrsee est lancé depuis le
+  // Finder — se lisait « l'application n'a pas répondu », ce qui envoie
+  // chercher le problème dans le projet observé plutôt que dans le PATH.
+  const dit = sortie().trim()
+  throw new Error(
+    `l'application n'a pas répondu sur ${baseUrl} en ${timeoutMs} ms` +
+      (dit ? `\n\nCe qu'a dit la commande dev :\n${dit}` : ' (et elle n\'a rien écrit)'),
+  )
 }
 
 /**
@@ -138,16 +148,73 @@ async function assertPortFree(baseUrl) {
   )
 }
 
+/** Ce que la commande `dev` a écrit, borné : c'est un message d'erreur, pas un journal. */
+const DERNIERS_OCTETS = 2000
+
 async function startApp(config) {
   await assertPortFree(config.baseUrl)
 
-  // shell: true parce que `dev` est une ligne de commande écrite par
-  // l'utilisateur dans SON fichier de configuration, dans SON dépôt — au même
-  // titre qu'un script npm. Elle n'est jamais construite à partir d'une entrée
-  // externe.
-  const child = spawn(config.dev, { cwd: root, shell: true, stdio: 'ignore', detached: true })
+  // `-lic`, pas `shell: true`, et les trois lettres comptent.
+  //
+  // `shell: true` lance `/bin/sh -c`, qui ne source rien. Lancé depuis le DMG,
+  // l'ovrsee hérite du PATH minimal d'une application graphique — `/usr/bin`,
+  // `/bin`, `/usr/sbin`, `/sbin` — où `pnpm` n'est pas. La commande sortait
+  // aussitôt sur un `command not found` que `stdio: 'ignore'` jetait, et
+  // l'attente du serveur expirait soixante secondes plus tard.
+  //
+  // `-l` seul ne suffit pas : zsh ne source `.zshrc` que pour un shell
+  // INTERACTIF, et c'est là que vivent les PATH des gestionnaires de version
+  // (pnpm, nvm, mise…). `-l` donne `.zprofile`, `-i` donne `.zshrc`. Le
+  // terminal intégré échappe au piège sans le savoir : un pty est interactif
+  // par nature.
+  //
+  // La ligne reste passée à un shell parce que `dev` est une commande écrite
+  // par l'utilisateur dans SON fichier de configuration, dans SON dépôt, au
+  // même titre qu'un script npm. Elle n'est jamais construite à partir d'une
+  // entrée externe.
+  const [fichier, args, options] = shellRun(config.dev)
+  const child = spawn(fichier, args, {
+    ...options,
+    cwd: root,
+    env: cleanEnv(),
+    stdio: ['ignore', 'pipe', 'pipe'],
+    detached: true,
+  })
+
+  // Sans cet écouteur, un shell introuvable lève un événement `error` que
+  // personne n'attrape, et le crawl meurt sans rien consigner — l'échec
+  // deviendrait un silence, ce que ce système ne doit jamais produire.
+  let panne = null
+  child.on('error', err => {
+    panne = String(err?.message ?? err)
+  })
+
+  // Gardée pour l'échec, jetée en cas de succès. Non lue, elle remplirait le
+  // tuyau et finirait par bloquer le serveur de dev.
+  let trace = ''
+  const retiens = morceau => {
+    trace = (trace + morceau).slice(-DERNIERS_OCTETS)
+  }
+  child.stdout.setEncoding('utf8')
+  child.stderr.setEncoding('utf8')
+  child.stdout.on('data', retiens)
+  child.stderr.on('data', retiens)
+
+  // Noté, pas agi : une commande qui rend la main n'a pas forcément renoncé —
+  // `docker compose up -d` sort aussitôt et le serveur arrive après. On attend
+  // donc le délai complet, mais on le dit dans le message d'échec, parce que
+  // c'est ce qui distingue « rien ne démarre » de « c'est long ».
+  let partie = false
+  child.on('exit', () => {
+    partie = true
+  })
+
+  log(`attente de ${config.baseUrl}…`)
   try {
-    await waitForServer(config.baseUrl, config.readyTimeoutMs)
+    await waitForServer(config.baseUrl, config.readyTimeoutMs, () => {
+      if (panne) return `${trace}\n(la commande dev n'a pas pu être lancée : ${panne})`
+      return partie ? `${trace}\n(la commande dev s'est arrêtée d'elle-même)` : trace
+    })
   } catch (err) {
     stopApp(child)
     throw err

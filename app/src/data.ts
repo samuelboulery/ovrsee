@@ -1429,18 +1429,16 @@ export function decideInjection(text: string): { mode: 'command' | 'context'; te
  * Une action perso qui contient `\n` retourne une erreur dans le tableau.
  */
 /**
- * Les trois commandes livrées avec l'ovrsee, composées avec le gestionnaire
- * de paquets du projet — extraites de `buildActions()` pour que la palette
- * ⌘K (T-0048) les propose sans les mêler aux actions personnalisées.
+ * Les commandes livrées avec l'ovrsee — extraites de `buildActions()` pour que
+ * la palette ⌘K (T-0048) les propose sans les mêler aux actions personnalisées.
+ *
+ * Le crawl n'en fait plus partie. Il y était en `!<pm> ovrsee:crawl`, **sans
+ * chemin de projet**, injecté dans une session dont le dossier courant est le
+ * projet observé — où ce script n'existe pas. C'est le bouton de l'onglet
+ * Produit qui lance désormais le crawl, par IPC et sur le bon dépôt.
  */
-export function deliveredActions(settings: SettingsType): Action[] {
-  const packageManager = settings.packageManager
-
+export function deliveredActions(_settings: SettingsType): Action[] {
   return [
-    {
-      label: t('action.crawl'),
-      text: `!${composerCommande('ovrsee:crawl', packageManager)}`,
-    },
     {
       label: t('action.graph'),
       text: '/graphify',

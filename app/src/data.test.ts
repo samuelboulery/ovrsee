@@ -483,12 +483,10 @@ test('buildActions compose les actions livrées avec le gestionnaire pnpm', () =
 
   const actions = buildActions(snap, settings)
 
-  // Trois actions livrées
+  // Deux actions livrées : le crawl n'y est plus, il a son bouton dans Produit.
   const delivered = actions.filter((a): a is { label: string; text: string } => !('error' in a))
-  assert.equal(delivered.length, 3)
-
-  // Première action : Crawl avec pnpm
-  assert.match(delivered[0].text, /^!pnpm ovrsee:crawl/)
+  assert.equal(delivered.length, 2)
+  assert.ok(delivered.every(a => !a.text.includes('ovrsee:crawl')))
 })
 
 test('buildActions compose les actions livrées avec le gestionnaire npm', () => {
@@ -508,11 +506,12 @@ test('buildActions compose les actions livrées avec le gestionnaire npm', () =>
   const actions = buildActions(snap, settings)
   const delivered = actions.filter((a): a is { label: string; text: string } => !('error' in a))
 
-  // Première action : Crawl avec npm run
-  assert.match(delivered[0].text, /^!npm run ovrsee:crawl/)
+  // Aucune action livrée ne dépend plus du gestionnaire de paquets.
+  assert.equal(delivered.length, 2)
+  assert.ok(delivered.every(a => !a.text.includes('ovrsee:crawl')))
 })
 
-test('deliveredActions retourne les trois commandes livrées, sans les personnalisées', () => {
+test('deliveredActions retourne les commandes livrées, sans les personnalisées', () => {
   const settings = {
     langue: 'fr',
     theme: 'auto',
@@ -527,8 +526,11 @@ test('deliveredActions retourne les trois commandes livrées, sans les personnal
 
   const actions = deliveredActions(settings)
 
-  assert.equal(actions.length, 3)
-  assert.match(actions[0].text, /^!pnpm ovrsee:crawl/)
+  // Le crawl a quitté la liste : il partait sans chemin de projet, dans une
+  // session dont le dossier courant est le projet observé — où le script
+  // n'existe pas. C'est le bouton de l'onglet Produit qui le lance.
+  assert.equal(actions.length, 2)
+  assert.ok(actions.every(a => !a.text.includes('ovrsee:crawl')))
   assert.ok(actions.every(a => a.label !== 'perso'))
 })
 
@@ -552,8 +554,8 @@ test('buildActions inclut les actions personnalisées valides', () => {
   const actions = buildActions(snap, settings)
   const withoutErrors = actions.filter((a): a is { label: string; text: string } => !('error' in a))
 
-  // 3 livrées + 2 personnalisées = 5
-  assert.equal(withoutErrors.length, 5)
+  // 2 livrées + 2 personnalisées = 4
+  assert.equal(withoutErrors.length, 4)
   assert.ok(withoutErrors.some(a => a.text === 'pnpm test'))
   assert.ok(withoutErrors.some(a => a.text === 'pnpm dev'))
 })

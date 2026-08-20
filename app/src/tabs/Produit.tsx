@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { ArrowsOutSimple, Compass, GitDiff, Minus, Plus } from '@phosphor-icons/react'
+import { ArrowsOutSimple, Compass, GitDiff, Minus, Plus, Stop } from '@phosphor-icons/react'
 
 import {
   CARD_H,
@@ -28,6 +28,8 @@ import { Divider, useResizable } from '../useResizable'
 import { usePanZoom } from '../usePanZoom'
 import { StatusBar } from '../StatusBar'
 import { ViewBar } from '../ViewBar'
+import { ConfigCrawl } from '../ConfigCrawl'
+import { crawlDisponible, useCrawl } from '../useCrawl'
 import type { Layout } from '../Terminal'
 
 /** Onglet Produit — maquette l. 85-274. */
@@ -36,11 +38,13 @@ export function Produit({
   layout,
   packageManager,
   onOuvrirDansNavigateur,
+  onReload,
 }: {
   snapshot: Snapshot
   layout: Layout
   packageManager: string
   onOuvrirDansNavigateur: (route: string) => void
+  onReload: () => void
 }) {
   const pages = snapshot.pages?.pages ?? []
   const redirects = snapshot.pages?.redirects ?? {}
@@ -97,7 +101,7 @@ export function Produit({
             <div style={s('font-size: 12.5px; color: var(--color-neutral-500); line-height: 1.5;')}>
               {t('produit.no_pages')}
             </div>
-            <CrawlButton packageManager={packageManager} />
+            <CrawlButton snapshot={snapshot} packageManager={packageManager} onReload={onReload} />
           </div>
         </div>
         <StatusBar />
@@ -122,7 +126,7 @@ export function Produit({
           <GitDiff size={14} weight="regular" aria-hidden="true" />
           {t('produit.compare_dates')}
         </button>
-        <CrawlButton packageManager={packageManager} />
+        <CrawlButton snapshot={snapshot} packageManager={packageManager} onReload={onReload} />
       </ViewBar>
       <div style={s('flex: 1; display: flex; min-width: 0; min-height: 0; position: relative;')}>
         <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
@@ -132,10 +136,25 @@ export function Produit({
           {failed && (
             <div
               style={s(
-                'display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 8px 11px; border-radius: 6px; background: var(--color-err-bg); border: 1px solid var(--color-err-border); font-size: 12px; color: var(--color-err);',
+                'margin: 0 0 14px; padding: 8px 11px; border-radius: 6px; background: var(--color-err-bg); border: 1px solid var(--color-err-border); font-size: 12px; color: var(--color-err);',
               )}
             >
-              {t('produit.last_scan_failed', { date: frDate(lastScan(snapshot.scans)?.date) })}
+              <div>
+                {t('produit.last_scan_failed', { date: frDate(lastScan(snapshot.scans)?.date) })}
+              </div>
+              {/* La raison, telle que le crawler l'a consignée dans
+                  `scans.jsonl`. Sans elle, le bandeau disait qu'un scan avait
+                  échoué sans jamais dire pourquoi — et la seule façon de le
+                  savoir était d'ouvrir le fichier à la main. */}
+              {lastScan(snapshot.scans)?.error && (
+                <pre
+                  style={s(
+                    'margin: 6px 0 0; font-family: var(--font-mono); font-size: 11px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; opacity: .85;',
+                  )}
+                >
+                  {lastScan(snapshot.scans)?.error}
+                </pre>
+              )}
             </div>
           )}
         </div>
@@ -254,31 +273,115 @@ export function Produit({
 }
 
 /**
- * Bouton Crawler — maquette 2d, en-tête. Copie la commande plutôt que de la
- * coller dans le terminal : importer `pasteToClaude` chargerait `@xterm/xterm`
- * (et son CSS) dans un onglet couvert par `render.test.tsx`, comme trouvé sur
- * Données. Même geste que `donnees.copy_command`.
+ * Bouton Crawler — maquette 2d, en-tête.
+ *
+ * Quatre états, dans cet ordre de garde :
+ *
+ * 1. **Navigateur** — `pnpm dev` n'a pas d'IPC, donc pas de crawl lançable. Le
+ *    bouton retombe sur le geste d'avant : copier la commande. Un bouton qui
+ *    prétendrait lancer quelque chose mentirait, comme ceux du terminal.
+ * 2. **Sans configuration** — `ovrsee.config.json` manque, le crawl échouerait
+ *    à coup sûr. Proposer de l'écrire plutôt que de laisser découvrir l'échec.
+ * 3. **En cours** — l'avancement, et de quoi arrêter.
+ * 4. **Prêt** — lancer.
+ *
+ * Le résultat n'a pas de quatrième chemin : succès comme échec, le crawler
+ * écrit sa trace dans `ovrsee/pages/scans.jsonl`, et c'est le rechargement du
+ * projet qui la fait paraître — bandeau `scanFailed` compris.
  */
-function CrawlButton({ packageManager }: { packageManager: string }) {
+function CrawlButton({
+  snapshot,
+  packageManager,
+  onReload,
+}: {
+  snapshot: Snapshot
+  packageManager: string
+  onReload: () => void
+}) {
   const [copie, setCopie] = useState(false)
+  const [configure, setConfigure] = useState(false)
+  const { enCours, ligne, demarrer, arreter } = useCrawl(snapshot.root, onReload)
 
+  // 1. Navigateur : pas d'IPC, on copie.
+  if (!crawlDisponible()) {
+    return (
+      <button
+        type="button"
+        className="btn btn-primary"
+        style={s('font-size: 12px;')}
+        onClick={() => {
+          navigator.clipboard
+            ?.writeText(composerCommande('ovrsee:crawl', packageManager))
+            .then(() => {
+              setCopie(true)
+              setTimeout(() => setCopie(false), 1500)
+            })
+            .catch(() => setCopie(false))
+        }}
+      >
+        <Compass size={14} weight="fill" aria-hidden="true" />
+        {copie ? t('produit.crawl_copied') : t('produit.crawl')}
+      </button>
+    )
+  }
+
+  // 3. En cours — testé avant la configuration : elle a pu être écrite dans la
+  // même session, et le snapshot n'est relu qu'à la fin du crawl.
+  if (enCours) {
+    return (
+      <div style={s('display: flex; align-items: center; gap: 8px; min-width: 0;')}>
+        <span
+          style={s(
+            'font-size: 11px; color: var(--color-neutral-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 34ch;',
+          )}
+          title={ligne ?? undefined}
+        >
+          {ligne ?? t('produit.crawl_running')}
+        </span>
+        <button
+          type="button"
+          className="btn"
+          style={s('font-size: 12px;')}
+          onClick={arreter}
+        >
+          <Stop size={14} weight="fill" aria-hidden="true" />
+          {t('produit.crawl_stop')}
+        </button>
+      </div>
+    )
+  }
+
+  // 2. Sans configuration.
+  if (snapshot.config === null) {
+    if (configure) {
+      return (
+        <ConfigCrawl
+          root={snapshot.root}
+          onEcrit={() => {
+            setConfigure(false)
+            onReload()
+          }}
+        />
+      )
+    }
+    return (
+      <button
+        type="button"
+        className="btn btn-primary"
+        style={s('font-size: 12px;')}
+        onClick={() => setConfigure(true)}
+      >
+        <Compass size={14} weight="fill" aria-hidden="true" />
+        {t('produit.crawl_configure')}
+      </button>
+    )
+  }
+
+  // 4. Prêt.
   return (
-    <button
-      type="button"
-      className="btn btn-primary"
-      style={s('font-size: 12px;')}
-      onClick={() => {
-        navigator.clipboard
-          ?.writeText(composerCommande('ovrsee:crawl', packageManager))
-          .then(() => {
-            setCopie(true)
-            setTimeout(() => setCopie(false), 1500)
-          })
-          .catch(() => setCopie(false))
-      }}
-    >
+    <button type="button" className="btn btn-primary" style={s('font-size: 12px;')} onClick={demarrer}>
       <Compass size={14} weight="fill" aria-hidden="true" />
-      {copie ? t('produit.crawl_copied') : t('produit.crawl')}
+      {t('produit.crawl')}
     </button>
   )
 }

@@ -75,11 +75,43 @@ function commandFor(scriptName) {
 
 /** Le bloc ovrsee du `post-commit`, installé ou remplacé sans toucher au reste. */
 export function installPostCommit(root, done) {
-  const hookPath = join(root, '.git', 'hooks', 'post-commit')
+  return installGitHook(
+    root,
+    'post-commit',
+    'ovrsee-post-commit.js',
+    'Rattache le commit au plan actif de ovrsee/.',
+    done,
+  )
+}
+
+/**
+ * Le bloc ovrsee du `post-merge`.
+ *
+ * `post-commit` ne voit que ce qui est committé ici. Un squash-merge fait sur
+ * GitHub crée son commit là-bas : il arrive par un `git pull`, et c'est ce
+ * hook-ci qui le rattrape — sans quoi le plan reste ouvert avec zéro commit, et
+ * `ovrsee:close` refuse de le clore faute de date.
+ */
+export function installPostMerge(root, done) {
+  return installGitHook(
+    root,
+    'post-merge',
+    'ovrsee-post-merge.js',
+    'Rattrape les commits arrivés par un pull (squash-merge GitHub).',
+    done,
+  )
+}
+
+/**
+ * Installe ou remplace le bloc ovrsee d'un hook git, sans toucher au reste du
+ * fichier — un dépôt a le droit d'avoir ses propres hooks.
+ */
+function installGitHook(root, hookName, scriptName, description, done) {
+  const hookPath = join(root, '.git', 'hooks', hookName)
   const block = [
     START,
-    '# Rattache le commit au plan actif de ovrsee/. Installé par: node hooks/install.js',
-    `${commandFor('ovrsee-post-commit.js')} || true`,
+    `# ${description} Installé par: node hooks/install.js`,
+    `${commandFor(scriptName)} || true`,
     END,
   ].join('\n')
 
@@ -105,7 +137,7 @@ export function installPostCommit(root, done) {
   writeFileNoFollow(hookPath, existing)
   chmodSync(hookPath, 0o755)
 
-  done.push(`post-commit : bloc ovrsee installé dans ${hookPath}`)
+  done.push(`${hookName} : bloc ovrsee installé dans ${hookPath}`)
 }
 
 /**
@@ -414,6 +446,7 @@ export function install(target, { skills = [], gitInit = false, commit = false, 
   if (config) writeOvrseeConfig(root, config, done)
 
   installPostCommit(root, done)
+  installPostMerge(root, done)
   installClaudeHooks(done)
   done.push(...installSkills(skills))
 

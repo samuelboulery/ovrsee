@@ -6,6 +6,7 @@
  *
  *   node hooks/ovrsee-cli.js status
  *   node hooks/ovrsee-cli.js close
+ *   node hooks/ovrsee-cli.js reconcile
  *   node hooks/ovrsee-cli.js capture <fichier-de-plan.md>
  *   node hooks/ovrsee-cli.js tickets
  *   node hooks/ovrsee-cli.js ticket new "<titre>" [--colonne pret] [--epic]
@@ -48,6 +49,7 @@ import {
   updateTicket,
   childrenOf,
 } from './tickets.js'
+import { reconcile as reconcileCommits } from './reconcile.js'
 
 const root = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
 const ovrseeDir = join(root, 'ovrsee')
@@ -114,6 +116,24 @@ const commands = {
       return
     }
     for (const file of closed) console.log(`clos : ${file}`)
+  },
+
+  /**
+   * Rattrape les commits qu'aucun hook n'a vus — ceux qu'un squash-merge fait
+   * sur GitHub a ramenés par un `git pull`.
+   *
+   * Le hook `post-merge` le fait désormais tout seul. Cette commande sert aux
+   * dépôts équipés avant lui, qui ont un retard à combler sans attendre le
+   * prochain pull.
+   */
+  reconcile() {
+    const fait = reconcileCommits(ovrseeDir, root)
+    if (fait.length === 0) {
+      console.log('aucun commit à rattraper')
+      return
+    }
+    for (const { sha, plans } of fait) console.log(`${sha} → ${plans.join(', ')}`)
+    console.log(`\n${fait.length} commit(s) rattaché(s). « close » peut maintenant les clore.`)
   },
 
   capture(path) {

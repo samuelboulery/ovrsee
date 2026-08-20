@@ -113,6 +113,15 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
 - **Un plan actif capte tous les commits de sa session**, y compris un correctif sans
   rapport, tant qu'il est actif. `pnpm ovrsee:close` avant de changer de sujet ; la fin
   de session (`SessionEnd`) rend le pointeur mais ne clôt pas le plan.
+- **Un squash-merge fait sur GitHub n'exécute aucun hook.** Le commit naît sur leurs
+  serveurs : `post-commit` ne le voit jamais, et le plan reste ouvert avec zéro commit —
+  donc inclosable, `closeOpenPlans` datant la clôture d'après le dernier commit. C'est
+  arrivé à cinq plans d'un coup (PR #22). Le rattrapage est dans `hooks/reconcile.js`,
+  branché sur le hook git **`post-merge`** : au `pull`, il rattache d'après les tickets
+  cités, et lui seul sait rendre **plusieurs** plans pour un commit — un squash en écrase
+  souvent cinq. Il ne devine rien : sans ticket cité, rien n'est rattaché, car au moment
+  du pull la session courante n'a aucun rapport avec le travail qui arrive. Un dépôt
+  équipé avant lui rattrape son retard avec `pnpm ovrsee:reconcile`.
 - **Un commit dont on ne connaît pas la session ne se rattache pas toujours.**
   L'attribution suit quatre étages (`planPourCommit`, `ovrsee-post-commit.js`) : ticket
   `T-XXXX` cité dans le message, puis la session, puis l'unique plan actif s'il n'y en a

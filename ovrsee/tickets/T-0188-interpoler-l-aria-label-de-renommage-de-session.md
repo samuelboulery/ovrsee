@@ -2,7 +2,7 @@
 {
   "id": "T-0188",
   "titre": "Interpoler l'aria-label de renommage de session",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": ["a11y", "i18n"],
   "cree": "2026-08-20",

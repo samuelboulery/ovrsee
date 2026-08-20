@@ -4,7 +4,24 @@
   "title": "Corriger les trois issues ouvertes",
   "opened": "2026-08-20",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "b419536",
+      "date": "2026-08-20",
+      "files": [
+        "CLAUDE.md",
+        "crawl/config.test.js",
+        "crawl/index.js",
+        "crawl/redaction.test.js",
+        "hooks/i18n.js",
+        "hooks/i18n.test.js",
+        "hooks/ovrsee-cli.js",
+        "hooks/ovrsee-post-commit.js",
+        "hooks/reconcile.js",
+        "hooks/reconcile.test.js"
+      ]
+    }
+  ]
 }
 ---
 

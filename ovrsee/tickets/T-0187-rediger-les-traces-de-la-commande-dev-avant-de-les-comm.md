@@ -2,9 +2,12 @@
 {
   "id": "T-0187",
   "titre": "Rédiger les traces de la commande dev avant de les committer",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
-  "tags": ["securite", "crawl"],
+  "tags": [
+    "securite",
+    "crawl"
+  ],
   "cree": "2026-08-20",
   "maj": "2026-08-20",
   "plan": "2026-08-20-corriger-les-trois-issues-ouvertes.md",

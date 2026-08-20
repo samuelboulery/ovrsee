@@ -2,9 +2,11 @@
 {
   "id": "T-0189",
   "titre": "Dire au pull quels tickets le rattrapage a soldés",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
-  "tags": ["hooks"],
+  "tags": [
+    "hooks"
+  ],
   "cree": "2026-08-20",
   "maj": "2026-08-20",
   "plan": "2026-08-20-corriger-les-trois-issues-ouvertes.md",

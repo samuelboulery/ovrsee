@@ -658,7 +658,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_app_tsx",
-      "community": 6,
+      "community": 7,
       "norm_label": "app.tsx"
     },
     {
@@ -667,7 +667,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L53",
       "id": "app_tabforpath",
-      "community": 6,
+      "community": 7,
       "norm_label": "tabforpath()"
     },
     {
@@ -676,7 +676,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L62",
       "id": "app_labelof",
-      "community": 6,
+      "community": 7,
       "norm_label": "labelof()"
     },
     {
@@ -685,7 +685,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L72",
       "id": "app_projectfromurl",
-      "community": 6,
+      "community": 7,
       "norm_label": "projectfromurl()"
     },
     {
@@ -694,7 +694,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L75",
       "id": "app_ticketfromurl",
-      "community": 6,
+      "community": 7,
       "norm_label": "ticketfromurl()"
     },
     {
@@ -703,7 +703,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L78",
       "id": "app_routefromurl",
-      "community": 6,
+      "community": 7,
       "norm_label": "routefromurl()"
     },
     {
@@ -712,7 +712,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L80",
       "id": "app_pushurl",
-      "community": 6,
+      "community": 7,
       "norm_label": "pushurl()"
     },
     {
@@ -721,7 +721,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L104",
       "id": "app_openproject",
-      "community": 6,
+      "community": 7,
       "norm_label": "openproject()"
     },
     {
@@ -730,7 +730,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L210",
       "id": "app_onpop",
-      "community": 6,
+      "community": 7,
       "norm_label": "onpop()"
     },
     {
@@ -739,7 +739,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L323",
       "id": "app_settableau",
-      "community": 6,
+      "community": 7,
       "norm_label": "settableau()"
     },
     {
@@ -757,7 +757,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L373",
       "id": "app_appliquerreglages",
-      "community": 6,
+      "community": 7,
       "norm_label": "appliquerreglages()"
     },
     {
@@ -766,7 +766,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L382",
       "id": "app_applyprojects",
-      "community": 6,
+      "community": 7,
       "norm_label": "applyprojects()"
     },
     {
@@ -775,7 +775,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L455",
       "id": "app_onkey",
-      "community": 6,
+      "community": 7,
       "norm_label": "onkey()"
     },
     {
@@ -784,7 +784,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L473",
       "id": "app_ontabpick",
-      "community": 6,
+      "community": 7,
       "norm_label": "ontabpick()"
     },
     {
@@ -793,7 +793,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L482",
       "id": "app_onouvrirticket",
-      "community": 6,
+      "community": 7,
       "norm_label": "onouvrirticket()"
     },
     {
@@ -802,7 +802,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L489",
       "id": "app_onouvrirdansnavigateur",
-      "community": 6,
+      "community": 7,
       "norm_label": "onouvrirdansnavigateur()"
     },
     {
@@ -811,7 +811,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L497",
       "id": "app_oncreerticketdepuiselement",
-      "community": 6,
+      "community": 7,
       "norm_label": "oncreerticketdepuiselement()"
     },
     {
@@ -820,7 +820,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L549",
       "id": "app_s",
-      "community": 6,
+      "community": 7,
       "norm_label": "s()"
     },
     {
@@ -829,7 +829,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/App.tsx",
       "source_location": "L1071",
       "id": "app_onclickoutside",
-      "community": 6,
+      "community": 7,
       "norm_label": "onclickoutside()"
     },
     {
@@ -856,7 +856,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesProfils.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_preferencesprofils_tsx",
-      "community": 13,
+      "community": 12,
       "norm_label": "preferencesprofils.tsx"
     },
     {
@@ -865,7 +865,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesProfils.tsx",
       "source_location": "L84",
       "id": "preferencesprofils_appliquerprofil",
-      "community": 13,
+      "community": 12,
       "norm_label": "appliquerprofil()"
     },
     {
@@ -874,7 +874,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesProfils.tsx",
       "source_location": "L104",
       "id": "preferencesprofils_profilcourant",
-      "community": 13,
+      "community": 12,
       "norm_label": "profilcourant()"
     },
     {
@@ -883,7 +883,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesProfils.tsx",
       "source_location": "L142",
       "id": "preferencesprofils_s",
-      "community": 13,
+      "community": 12,
       "norm_label": "s()"
     },
     {
@@ -892,7 +892,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesPanel.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_preferencespanel_tsx",
-      "community": 6,
+      "community": 7,
       "norm_label": "preferencespanel.tsx"
     },
     {
@@ -901,7 +901,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesPanel.tsx",
       "source_location": "L80",
       "id": "preferencespanel_deplaceronglet",
-      "community": 6,
+      "community": 7,
       "norm_label": "deplaceronglet()"
     },
     {
@@ -910,7 +910,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesPanel.tsx",
       "source_location": "L99",
       "id": "preferencespanel_basculeronglet",
-      "community": 6,
+      "community": 7,
       "norm_label": "basculeronglet()"
     },
     {
@@ -919,7 +919,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesPanel.tsx",
       "source_location": "L286",
       "id": "preferencespanel_deplacer",
-      "community": 6,
+      "community": 7,
       "norm_label": "deplacer()"
     },
     {
@@ -928,7 +928,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesPanel.tsx",
       "source_location": "L302",
       "id": "preferencespanel_s",
-      "community": 6,
+      "community": 7,
       "norm_label": "s()"
     },
     {
@@ -937,7 +937,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesPanel.tsx",
       "source_location": "L562",
       "id": "preferencespanel_onkey",
-      "community": 6,
+      "community": 7,
       "norm_label": "onkey()"
     },
     {
@@ -946,7 +946,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/PreferencesPanel.tsx",
       "source_location": "L578",
       "id": "preferencespanel_applique",
-      "community": 6,
+      "community": 7,
       "norm_label": "applique()"
     },
     {
@@ -1027,7 +1027,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/CommandPalette.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_commandpalette_tsx",
-      "community": 6,
+      "community": 7,
       "norm_label": "commandpalette.tsx"
     },
     {
@@ -1036,7 +1036,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/CommandPalette.tsx",
       "source_location": "L134",
       "id": "commandpalette_activate",
-      "community": 6,
+      "community": 7,
       "norm_label": "activate()"
     },
     {
@@ -1261,7 +1261,7 @@
       "source_file": "/Users/sam/code/cockpit/app/src/i18n.ts",
       "source_location": "L22",
       "id": "i18n_setcurrentlanguage",
-      "community": 6,
+      "community": 7,
       "norm_label": "setcurrentlanguage()"
     },
     {
@@ -1342,7 +1342,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useTerminal.ts",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_useterminal_ts",
-      "community": 6,
+      "community": 7,
       "norm_label": "useterminal.ts"
     },
     {
@@ -1351,7 +1351,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useTerminal.ts",
       "source_location": "L116",
       "id": "useterminal_terminalbridge",
-      "community": 6,
+      "community": 7,
       "norm_label": "terminalbridge()"
     },
     {
@@ -1360,7 +1360,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useTerminal.ts",
       "source_location": "L160",
       "id": "useterminal_injecttoclaude",
-      "community": 6,
+      "community": 7,
       "norm_label": "injecttoclaude()"
     },
     {
@@ -1369,7 +1369,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useTerminal.ts",
       "source_location": "L175",
       "id": "useterminal_pastetoclaude",
-      "community": 6,
+      "community": 7,
       "norm_label": "pastetoclaude()"
     },
     {
@@ -1378,7 +1378,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useTerminal.ts",
       "source_location": "L179",
       "id": "useterminal_claudeslot",
-      "community": 6,
+      "community": 7,
       "norm_label": "claudeslot()"
     },
     {
@@ -1387,7 +1387,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useTerminal.ts",
       "source_location": "L202",
       "id": "useterminal_useterminals",
-      "community": 6,
+      "community": 7,
       "norm_label": "useterminals()"
     },
     {
@@ -1549,7 +1549,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useResizable.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_useresizable_tsx",
-      "community": 4,
+      "community": 5,
       "norm_label": "useresizable.tsx"
     },
     {
@@ -1558,7 +1558,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useResizable.tsx",
       "source_location": "L45",
       "id": "useresizable_restore",
-      "community": 4,
+      "community": 5,
       "norm_label": "restore()"
     },
     {
@@ -1567,7 +1567,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useResizable.tsx",
       "source_location": "L54",
       "id": "useresizable_useresizable",
-      "community": 4,
+      "community": 5,
       "norm_label": "useresizable()"
     },
     {
@@ -1576,7 +1576,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useResizable.tsx",
       "source_location": "L152",
       "id": "useresizable_s",
-      "community": 4,
+      "community": 5,
       "norm_label": "s()"
     },
     {
@@ -1648,7 +1648,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/profilage.ts",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_profilage_ts",
-      "community": 13,
+      "community": 12,
       "norm_label": "profilage.ts"
     },
     {
@@ -1657,7 +1657,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/profilage.ts",
       "source_location": "L51",
       "id": "profilage_appliquerreponses",
-      "community": 13,
+      "community": 12,
       "norm_label": "appliquerreponses()"
     },
     {
@@ -1666,7 +1666,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/profilage.ts",
       "source_location": "L73",
       "id": "profilage_apercureponses",
-      "community": 13,
+      "community": 12,
       "norm_label": "apercureponses()"
     },
     {
@@ -1675,7 +1675,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/profilage.ts",
       "source_location": "L82",
       "id": "profilage_reponsesinitiales",
-      "community": 13,
+      "community": 12,
       "norm_label": "reponsesinitiales()"
     },
     {
@@ -1756,7 +1756,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_onboarding_tsx",
-      "community": 13,
+      "community": 12,
       "norm_label": "onboarding.tsx"
     },
     {
@@ -1765,7 +1765,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L94",
       "id": "onboarding_s",
-      "community": 13,
+      "community": 12,
       "norm_label": "s()"
     },
     {
@@ -1774,7 +1774,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L371",
       "id": "onboarding_repondre",
-      "community": 13,
+      "community": 12,
       "norm_label": "repondre()"
     },
     {
@@ -1783,7 +1783,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L376",
       "id": "onboarding_finaliser",
-      "community": 13,
+      "community": 12,
       "norm_label": "finaliser()"
     },
     {
@@ -1792,7 +1792,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L379",
       "id": "onboarding_terminer",
-      "community": 13,
+      "community": 12,
       "norm_label": "terminer()"
     },
     {
@@ -1801,7 +1801,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L381",
       "id": "onboarding_ajouter",
-      "community": 13,
+      "community": 12,
       "norm_label": "ajouter()"
     },
     {
@@ -1810,7 +1810,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Onboarding.tsx",
       "source_location": "L399",
       "id": "onboarding_onkey",
-      "community": 13,
+      "community": 12,
       "norm_label": "onkey()"
     },
     {
@@ -1936,7 +1936,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/theme.ts",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_theme_ts",
-      "community": 6,
+      "community": 7,
       "norm_label": "theme.ts"
     },
     {
@@ -1945,7 +1945,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/theme.ts",
       "source_location": "L70",
       "id": "theme_initializetheme",
-      "community": 6,
+      "community": 7,
       "norm_label": "initializetheme()"
     },
     {
@@ -1954,7 +1954,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/theme.ts",
       "source_location": "L82",
       "id": "theme_applytheme",
-      "community": 6,
+      "community": 7,
       "norm_label": "applytheme()"
     },
     {
@@ -1963,7 +1963,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/theme.ts",
       "source_location": "L95",
       "id": "theme_getcssvariables",
-      "community": 6,
+      "community": 7,
       "norm_label": "getcssvariables()"
     },
     {
@@ -1972,7 +1972,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/theme.ts",
       "source_location": "L142",
       "id": "theme_getterminaltheme",
-      "community": 6,
+      "community": 7,
       "norm_label": "getterminaltheme()"
     },
     {
@@ -2260,7 +2260,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_tabs_tableau_tsx",
-      "community": 14,
+      "community": 13,
       "norm_label": "tableau.tsx"
     },
     {
@@ -2269,7 +2269,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L89",
       "id": "tableau_ecrire",
-      "community": 14,
+      "community": 13,
       "norm_label": "ecrire()"
     },
     {
@@ -2278,7 +2278,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L102",
       "id": "tableau_deplacer",
-      "community": 14,
+      "community": 13,
       "norm_label": "deplacer()"
     },
     {
@@ -2287,7 +2287,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L113",
       "id": "tableau_creer",
-      "community": 14,
+      "community": 13,
       "norm_label": "creer()"
     },
     {
@@ -2296,7 +2296,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L144",
       "id": "tableau_fusionnerpatch",
-      "community": 14,
+      "community": 13,
       "norm_label": "fusionnerpatch()"
     },
     {
@@ -2305,7 +2305,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L152",
       "id": "tableau_modifier",
-      "community": 14,
+      "community": 13,
       "norm_label": "modifier()"
     },
     {
@@ -2314,7 +2314,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L159",
       "id": "tableau_supprimer",
-      "community": 14,
+      "community": 13,
       "norm_label": "supprimer()"
     },
     {
@@ -2323,7 +2323,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L164",
       "id": "tableau_renommer",
-      "community": 14,
+      "community": 13,
       "norm_label": "renommer()"
     },
     {
@@ -2332,7 +2332,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L182",
       "id": "tableau_retirer",
-      "community": 14,
+      "community": 13,
       "norm_label": "retirer()"
     },
     {
@@ -2341,7 +2341,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L192",
       "id": "tableau_ajouter",
-      "community": 14,
+      "community": 13,
       "norm_label": "ajouter()"
     },
     {
@@ -2350,7 +2350,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L206",
       "id": "tableau_reordonner",
-      "community": 14,
+      "community": 13,
       "norm_label": "reordonner()"
     },
     {
@@ -2359,7 +2359,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L416",
       "id": "tableau_cote",
-      "community": 14,
+      "community": 13,
       "norm_label": "cote()"
     },
     {
@@ -2368,7 +2368,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Tableau.tsx",
       "source_location": "L448",
       "id": "tableau_s",
-      "community": 14,
+      "community": 13,
       "norm_label": "s()"
     },
     {
@@ -2377,7 +2377,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_app_src_tabs_navigateur_tsx",
-      "community": 4,
+      "community": 5,
       "norm_label": "navigateur.tsx"
     },
     {
@@ -2386,7 +2386,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L69",
       "id": "navigateur_url_key",
-      "community": 4,
+      "community": 5,
       "norm_label": "url_key()"
     },
     {
@@ -2395,7 +2395,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L87",
       "id": "navigateur_apptheme",
-      "community": 4,
+      "community": 5,
       "norm_label": "apptheme()"
     },
     {
@@ -2404,7 +2404,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L96",
       "id": "navigateur_starturl",
-      "community": 4,
+      "community": 5,
       "norm_label": "starturl()"
     },
     {
@@ -2413,7 +2413,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L102",
       "id": "navigateur_normalize",
-      "community": 5,
+      "community": 2,
       "norm_label": "normalize()"
     },
     {
@@ -2422,7 +2422,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L117",
       "id": "navigateur_pickelement",
-      "community": 4,
+      "community": 5,
       "norm_label": "pickelement()"
     },
     {
@@ -2431,7 +2431,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L198",
       "id": "navigateur_devtoolsstyle",
-      "community": 4,
+      "community": 5,
       "norm_label": "devtoolsstyle()"
     },
     {
@@ -2440,7 +2440,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L207",
       "id": "navigateur_describe",
-      "community": 4,
+      "community": 5,
       "norm_label": "describe()"
     },
     {
@@ -2449,7 +2449,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L216",
       "id": "navigateur_corpsdepuis",
-      "community": 4,
+      "community": 5,
       "norm_label": "corpsdepuis()"
     },
     {
@@ -2458,7 +2458,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L239",
       "id": "navigateur_navigateur",
-      "community": 4,
+      "community": 5,
       "norm_label": "navigateur()"
     },
     {
@@ -2467,7 +2467,7 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/Navigateur.tsx",
       "source_location": "L628",
       "id": "navigateur_s",
-      "community": 4,
+      "community": 5,
       "norm_label": "s()"
     },
     {
@@ -2773,7 +2773,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_server_api_test_js",
-      "community": 5,
+      "community": 2,
       "norm_label": "api.test.js"
     },
     {
@@ -2782,7 +2782,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L12",
       "id": "api_test_url",
-      "community": 5,
+      "community": 2,
       "norm_label": "url()"
     },
     {
@@ -2791,7 +2791,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L21",
       "id": "api_test_projectwithshot",
-      "community": 5,
+      "community": 2,
       "norm_label": "projectwithshot()"
     },
     {
@@ -2800,7 +2800,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L159",
       "id": "api_test_withregistry",
-      "community": 5,
+      "community": 2,
       "norm_label": "withregistry()"
     },
     {
@@ -2809,7 +2809,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L163",
       "id": "api_test_post",
-      "community": 5,
+      "community": 2,
       "norm_label": "post()"
     },
     {
@@ -2818,7 +2818,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L233",
       "id": "api_test_postticket",
-      "community": 5,
+      "community": 2,
       "norm_label": "postticket()"
     },
     {
@@ -2827,7 +2827,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L237",
       "id": "api_test_projetenregistre",
-      "community": 5,
+      "community": 2,
       "norm_label": "projetenregistre()"
     },
     {
@@ -2836,7 +2836,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L324",
       "id": "api_test_postskills",
-      "community": 5,
+      "community": 2,
       "norm_label": "postskills()"
     },
     {
@@ -2845,7 +2845,7 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L518",
       "id": "api_test_configclaudeurl",
-      "community": 5,
+      "community": 2,
       "norm_label": "configclaudeurl()"
     },
     {
@@ -2854,8 +2854,17 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
       "source_location": "L649",
       "id": "api_test_initavecconfig",
-      "community": 5,
+      "community": 2,
       "norm_label": "initavecconfig()"
+    },
+    {
+      "label": "avecOrigine()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
+      "source_location": "L690",
+      "id": "api_test_avecorigine",
+      "community": 2,
+      "norm_label": "avecorigine()"
     },
     {
       "label": "api.js",
@@ -2863,59 +2872,68 @@
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_server_api_js",
-      "community": 7,
+      "community": 2,
       "norm_label": "api.js"
+    },
+    {
+      "label": "origineAutorisee()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/server/api.js",
+      "source_location": "L67",
+      "id": "api_origineautorisee",
+      "community": 2,
+      "norm_label": "origineautorisee()"
     },
     {
       "label": "usableDirectory()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L51",
+      "source_location": "L82",
       "id": "api_usabledirectory",
-      "community": 7,
+      "community": 21,
       "norm_label": "usabledirectory()"
     },
     {
       "label": "detectDefaults()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L73",
+      "source_location": "L104",
       "id": "api_detectdefaults",
-      "community": 7,
+      "community": 2,
       "norm_label": "detectdefaults()"
     },
     {
       "label": "getFolderState()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L90",
+      "source_location": "L121",
       "id": "api_getfolderstate",
-      "community": 7,
+      "community": 2,
       "norm_label": "getfolderstate()"
     },
     {
       "label": "validateCrawlConfig()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L149",
+      "source_location": "L180",
       "id": "api_validatecrawlconfig",
-      "community": 7,
+      "community": 2,
       "norm_label": "validatecrawlconfig()"
     },
     {
       "label": "projectAction()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L173",
+      "source_location": "L204",
       "id": "api_projectaction",
-      "community": 7,
+      "community": 6,
       "norm_label": "projectaction()"
     },
     {
       "label": "ticketAction()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L273",
+      "source_location": "L304",
       "id": "api_ticketaction",
       "community": 1,
       "norm_label": "ticketaction()"
@@ -2924,45 +2942,45 @@
       "label": "resolve()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L337",
+      "source_location": "L368",
       "id": "api_resolve",
-      "community": 5,
+      "community": 2,
       "norm_label": "resolve()"
     },
     {
       "label": "parseBody()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L482",
+      "source_location": "L520",
       "id": "api_parsebody",
-      "community": 7,
+      "community": 2,
       "norm_label": "parsebody()"
     },
     {
       "label": "readBody()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L491",
+      "source_location": "L536",
       "id": "api_readbody",
-      "community": 7,
+      "community": 2,
       "norm_label": "readbody()"
     },
     {
       "label": "nodeMiddleware()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L499",
+      "source_location": "L549",
       "id": "api_nodemiddleware",
-      "community": 7,
+      "community": 2,
       "norm_label": "nodemiddleware()"
     },
     {
       "label": "fetchHandler()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L520",
+      "source_location": "L570",
       "id": "api_fetchhandler",
-      "community": 7,
+      "community": 2,
       "norm_label": "fetchhandler()"
     },
     {
@@ -2971,7 +2989,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_mcp_dispatch_js",
-      "community": 7,
+      "community": 21,
       "norm_label": "dispatch.js"
     },
     {
@@ -2980,7 +2998,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L37",
       "id": "dispatch_appel",
-      "community": 7,
+      "community": 21,
       "norm_label": "appel()"
     },
     {
@@ -2989,7 +3007,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L61",
       "id": "dispatch_refus",
-      "community": 7,
+      "community": 21,
       "norm_label": "refus()"
     },
     {
@@ -2998,7 +3016,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L78",
       "id": "dispatch_projet",
-      "community": 7,
+      "community": 21,
       "norm_label": "projet()"
     },
     {
@@ -3007,7 +3025,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L87",
       "id": "dispatch_derniers",
-      "community": 7,
+      "community": 21,
       "norm_label": "derniers()"
     },
     {
@@ -3016,7 +3034,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L107",
       "id": "dispatch_sanscorps",
-      "community": 7,
+      "community": 21,
       "norm_label": "sanscorps()"
     },
     {
@@ -3025,7 +3043,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L242",
       "id": "dispatch_ecriture",
-      "community": 7,
+      "community": 21,
       "norm_label": "ecriture()"
     },
     {
@@ -3034,7 +3052,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/dispatch.js",
       "source_location": "L254",
       "id": "dispatch_dispatch",
-      "community": 7,
+      "community": 21,
       "norm_label": "dispatch()"
     },
     {
@@ -3079,7 +3097,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_mcp_mcp_test_js",
-      "community": 11,
+      "community": 6,
       "norm_label": "mcp.test.js"
     },
     {
@@ -3088,7 +3106,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L17",
       "id": "mcp_test_withregistry",
-      "community": 11,
+      "community": 6,
       "norm_label": "withregistry()"
     },
     {
@@ -3097,7 +3115,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L22",
       "id": "mcp_test_registerproject",
-      "community": 11,
+      "community": 6,
       "norm_label": "registerproject()"
     },
     {
@@ -3106,7 +3124,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L29",
       "id": "mcp_test_projectdir",
-      "community": 11,
+      "community": 6,
       "norm_label": "projectdir()"
     },
     {
@@ -3115,7 +3133,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L40",
       "id": "mcp_test_ecrireplan",
-      "community": 11,
+      "community": 6,
       "norm_label": "ecrireplan()"
     },
     {
@@ -3124,7 +3142,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L405",
       "id": "mcp_test_parlefil",
-      "community": 11,
+      "community": 6,
       "norm_label": "parlefil()"
     },
     {
@@ -3133,7 +3151,7 @@
       "source_file": "/Users/sam/code/ovrsee/mcp/mcp.test.js",
       "source_location": "L414",
       "id": "mcp_test_demande",
-      "community": 11,
+      "community": 6,
       "norm_label": "demande()"
     },
     {
@@ -3151,25 +3169,25 @@
       "source_file": "/Users/sam/code/ovrsee/crawl/auth.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_crawl_auth_js",
-      "community": 10,
+      "community": 8,
       "norm_label": "auth.js"
     },
     {
       "label": "assertIgnored()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/auth.js",
-      "source_location": "L37",
+      "source_location": "L39",
       "id": "auth_assertignored",
-      "community": 10,
+      "community": 8,
       "norm_label": "assertignored()"
     },
     {
       "label": "main()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/auth.js",
-      "source_location": "L50",
+      "source_location": "L52",
       "id": "auth_main",
-      "community": 10,
+      "community": 8,
       "norm_label": "main()"
     },
     {
@@ -3230,7 +3248,7 @@
       "label": "recordScan()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L140",
+      "source_location": "L142",
       "id": "index_recordscan",
       "community": 8,
       "norm_label": "recordscan()"
@@ -3239,7 +3257,7 @@
       "label": "sleep()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L150",
+      "source_location": "L152",
       "id": "index_sleep",
       "community": 8,
       "norm_label": "sleep()"
@@ -3248,7 +3266,7 @@
       "label": "waitForServer()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L152",
+      "source_location": "L154",
       "id": "index_waitforserver",
       "community": 8,
       "norm_label": "waitforserver()"
@@ -3257,7 +3275,7 @@
       "label": "assertPortFree()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L183",
+      "source_location": "L185",
       "id": "index_assertportfree",
       "community": 8,
       "norm_label": "assertportfree()"
@@ -3266,7 +3284,7 @@
       "label": "startApp()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L198",
+      "source_location": "L200",
       "id": "index_startapp",
       "community": 8,
       "norm_label": "startapp()"
@@ -3275,7 +3293,7 @@
       "label": "stopApp()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L269",
+      "source_location": "L271",
       "id": "index_stopapp",
       "community": 8,
       "norm_label": "stopapp()"
@@ -3284,7 +3302,7 @@
       "label": "pathOf()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L285",
+      "source_location": "L287",
       "id": "index_pathof",
       "community": 8,
       "norm_label": "pathof()"
@@ -3293,7 +3311,7 @@
       "label": "isIgnored()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L290",
+      "source_location": "L292",
       "id": "index_isignored",
       "community": 8,
       "norm_label": "isignored()"
@@ -3302,7 +3320,7 @@
       "label": "visitAll()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L297",
+      "source_location": "L299",
       "id": "index_visitall",
       "community": 8,
       "norm_label": "visitall()"
@@ -3311,7 +3329,7 @@
       "label": "retainable()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L369",
+      "source_location": "L371",
       "id": "index_retainable",
       "community": 8,
       "norm_label": "retainable()"
@@ -3320,7 +3338,7 @@
       "label": "orphanShots()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L404",
+      "source_location": "L406",
       "id": "index_orphanshots",
       "community": 8,
       "norm_label": "orphanshots()"
@@ -3329,7 +3347,7 @@
       "label": "pruneShots()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L412",
+      "source_location": "L414",
       "id": "index_pruneshots",
       "community": 8,
       "norm_label": "pruneshots()"
@@ -3338,7 +3356,7 @@
       "label": "run()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L422",
+      "source_location": "L424",
       "id": "index_run",
       "community": 8,
       "norm_label": "run()"
@@ -3610,7 +3628,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_timeline_test_js",
-      "community": 12,
+      "community": 11,
       "norm_label": "timeline.test.js"
     },
     {
@@ -3619,7 +3637,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.test.js",
       "source_location": "L6",
       "id": "timeline_test_commit",
-      "community": 12,
+      "community": 11,
       "norm_label": "commit()"
     },
     {
@@ -3628,7 +3646,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.test.js",
       "source_location": "L8",
       "id": "timeline_test_plan",
-      "community": 12,
+      "community": 11,
       "norm_label": "plan()"
     },
     {
@@ -3637,7 +3655,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.test.js",
       "source_location": "L18",
       "id": "timeline_test_ticket",
-      "community": 12,
+      "community": 11,
       "norm_label": "ticket()"
     },
     {
@@ -3916,7 +3934,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_tool_edit_js",
-      "community": 2,
+      "community": 4,
       "norm_label": "ovrsee-tool-edit.js"
     },
     {
@@ -3925,7 +3943,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit.js",
       "source_location": "L28",
       "id": "ovrsee_tool_edit_readstdin",
-      "community": 2,
+      "community": 4,
       "norm_label": "readstdin()"
     },
     {
@@ -3934,7 +3952,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit.js",
       "source_location": "L41",
       "id": "ovrsee_tool_edit_reporoot",
-      "community": 2,
+      "community": 4,
       "norm_label": "reporoot()"
     },
     {
@@ -3943,7 +3961,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit.js",
       "source_location": "L62",
       "id": "ovrsee_tool_edit_estuneeditionsource",
-      "community": 2,
+      "community": 4,
       "norm_label": "estuneeditionsource()"
     },
     {
@@ -3961,7 +3979,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit.js",
       "source_location": "L113",
       "id": "ovrsee_tool_edit_main",
-      "community": 2,
+      "community": 4,
       "norm_label": "main()"
     },
     {
@@ -4339,7 +4357,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_tool_stop_js",
-      "community": 2,
+      "community": 4,
       "norm_label": "ovrsee-tool-stop.js"
     },
     {
@@ -4348,7 +4366,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.js",
       "source_location": "L30",
       "id": "ovrsee_tool_stop_readstdin",
-      "community": 2,
+      "community": 4,
       "norm_label": "readstdin()"
     },
     {
@@ -4357,7 +4375,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.js",
       "source_location": "L43",
       "id": "ovrsee_tool_stop_reporoot",
-      "community": 2,
+      "community": 4,
       "norm_label": "reporoot()"
     },
     {
@@ -4366,7 +4384,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.js",
       "source_location": "L63",
       "id": "ovrsee_tool_stop_aducodenoncommite",
-      "community": 2,
+      "community": 4,
       "norm_label": "aducodenoncommite()"
     },
     {
@@ -4384,7 +4402,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.js",
       "source_location": "L101",
       "id": "ovrsee_tool_stop_main",
-      "community": 2,
+      "community": 4,
       "norm_label": "main()"
     },
     {
@@ -4465,7 +4483,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/whys.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_whys_js",
-      "community": 5,
+      "community": 2,
       "norm_label": "whys.js"
     },
     {
@@ -4474,7 +4492,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/whys.js",
       "source_location": "L76",
       "id": "whys_packageof",
-      "community": 5,
+      "community": 2,
       "norm_label": "packageof()"
     },
     {
@@ -4483,7 +4501,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/whys.js",
       "source_location": "L95",
       "id": "whys_whysinsource",
-      "community": 5,
+      "community": 2,
       "norm_label": "whysinsource()"
     },
     {
@@ -4492,7 +4510,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/whys.js",
       "source_location": "L135",
       "id": "whys_readwhys",
-      "community": 5,
+      "community": 2,
       "norm_label": "readwhys()"
     },
     {
@@ -4537,7 +4555,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_timeline_js",
-      "community": 5,
+      "community": 2,
       "norm_label": "timeline.js"
     },
     {
@@ -4546,7 +4564,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.js",
       "source_location": "L43",
       "id": "timeline_timeline",
-      "community": 5,
+      "community": 2,
       "norm_label": "timeline()"
     },
     {
@@ -4555,7 +4573,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/timeline.js",
       "source_location": "L125",
       "id": "timeline_tickettimeline",
-      "community": 5,
+      "community": 2,
       "norm_label": "tickettimeline()"
     },
     {
@@ -4564,7 +4582,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/reconcile.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_reconcile_test_js",
-      "community": 12,
+      "community": 11,
       "norm_label": "reconcile.test.js"
     },
     {
@@ -4573,7 +4591,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/reconcile.test.js",
       "source_location": "L50",
       "id": "reconcile_test_plan",
-      "community": 12,
+      "community": 11,
       "norm_label": "plan()"
     },
     {
@@ -4582,7 +4600,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/reconcile.test.js",
       "source_location": "L57",
       "id": "reconcile_test_ticket",
-      "community": 12,
+      "community": 11,
       "norm_label": "ticket()"
     },
     {
@@ -4591,7 +4609,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/reconcile.test.js",
       "source_location": "L74",
       "id": "reconcile_test_depot",
-      "community": 12,
+      "community": 11,
       "norm_label": "depot()"
     },
     {
@@ -4600,7 +4618,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/reconcile.test.js",
       "source_location": "L105",
       "id": "reconcile_test_metadu",
-      "community": 12,
+      "community": 11,
       "norm_label": "metadu()"
     },
     {
@@ -4654,7 +4672,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-session-end.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_session_end_js",
-      "community": 2,
+      "community": 4,
       "norm_label": "ovrsee-session-end.js"
     },
     {
@@ -4663,7 +4681,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-session-end.js",
       "source_location": "L29",
       "id": "ovrsee_session_end_readstdin",
-      "community": 2,
+      "community": 4,
       "norm_label": "readstdin()"
     },
     {
@@ -4672,7 +4690,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-session-end.js",
       "source_location": "L42",
       "id": "ovrsee_session_end_reporoot",
-      "community": 2,
+      "community": 4,
       "norm_label": "reporoot()"
     },
     {
@@ -4681,7 +4699,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-session-end.js",
       "source_location": "L54",
       "id": "ovrsee_session_end_main",
-      "community": 2,
+      "community": 4,
       "norm_label": "main()"
     },
     {
@@ -4690,7 +4708,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_config_claude_js",
-      "community": 20,
+      "community": 15,
       "norm_label": "config-claude.js"
     },
     {
@@ -4699,7 +4717,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L17",
       "id": "config_claude_configdir",
-      "community": 20,
+      "community": 15,
       "norm_label": "configdir()"
     },
     {
@@ -4708,70 +4726,79 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
       "source_location": "L44",
       "id": "config_claude_masksecrets",
-      "community": 20,
+      "community": 15,
       "norm_label": "masksecrets()"
+    },
+    {
+      "label": "maskValue()",
+      "file_type": "code",
+      "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
+      "source_location": "L66",
+      "id": "config_claude_maskvalue",
+      "community": 15,
+      "norm_label": "maskvalue()"
     },
     {
       "label": "parseFrontmatter()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L70",
+      "source_location": "L79",
       "id": "config_claude_parsefrontmatter",
-      "community": 20,
+      "community": 15,
       "norm_label": "parsefrontmatter()"
     },
     {
       "label": "readAgents()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L137",
+      "source_location": "L146",
       "id": "config_claude_readagents",
-      "community": 20,
+      "community": 15,
       "norm_label": "readagents()"
     },
     {
       "label": "readCommands()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L172",
+      "source_location": "L181",
       "id": "config_claude_readcommands",
-      "community": 20,
+      "community": 15,
       "norm_label": "readcommands()"
     },
     {
       "label": "readPlugins()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L207",
+      "source_location": "L216",
       "id": "config_claude_readplugins",
-      "community": 20,
+      "community": 15,
       "norm_label": "readplugins()"
     },
     {
       "label": "readHooks()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L235",
+      "source_location": "L244",
       "id": "config_claude_readhooks",
-      "community": 20,
+      "community": 15,
       "norm_label": "readhooks()"
     },
     {
       "label": "readEnv()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L258",
+      "source_location": "L267",
       "id": "config_claude_readenv",
-      "community": 20,
+      "community": 15,
       "norm_label": "readenv()"
     },
     {
       "label": "readConfigClaude()",
       "file_type": "code",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L284",
+      "source_location": "L293",
       "id": "config_claude_readconfigclaude",
-      "community": 20,
+      "community": 15,
       "norm_label": "readconfigclaude()"
     },
     {
@@ -4834,7 +4861,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_capture_plan_js",
-      "community": 11,
+      "community": 6,
       "norm_label": "ovrsee-capture-plan.js"
     },
     {
@@ -4843,7 +4870,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L40",
       "id": "ovrsee_capture_plan_readstdin",
-      "community": 11,
+      "community": 6,
       "norm_label": "readstdin()"
     },
     {
@@ -4852,7 +4879,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L53",
       "id": "ovrsee_capture_plan_reporoot",
-      "community": 11,
+      "community": 6,
       "norm_label": "reporoot()"
     },
     {
@@ -4861,7 +4888,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L72",
       "id": "ovrsee_capture_plan_plandir",
-      "community": 11,
+      "community": 6,
       "norm_label": "plandir()"
     },
     {
@@ -4870,7 +4897,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L77",
       "id": "ovrsee_capture_plan_readornull",
-      "community": 11,
+      "community": 6,
       "norm_label": "readornull()"
     },
     {
@@ -4879,7 +4906,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L96",
       "id": "ovrsee_capture_plan_enbarresavant",
-      "community": 11,
+      "community": 6,
       "norm_label": "enbarresavant()"
     },
     {
@@ -4888,7 +4915,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L114",
       "id": "ovrsee_capture_plan_planpathfromtranscript",
-      "community": 11,
+      "community": 6,
       "norm_label": "planpathfromtranscript()"
     },
     {
@@ -4897,7 +4924,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L160",
       "id": "ovrsee_capture_plan_planfrom",
-      "community": 11,
+      "community": 6,
       "norm_label": "planfrom()"
     },
     {
@@ -4906,7 +4933,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L200",
       "id": "ovrsee_capture_plan_titleof",
-      "community": 11,
+      "community": 6,
       "norm_label": "titleof()"
     },
     {
@@ -4915,7 +4942,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-capture-plan.js",
       "source_location": "L209",
       "id": "ovrsee_capture_plan_main",
-      "community": 11,
+      "community": 6,
       "norm_label": "main()"
     },
     {
@@ -5131,7 +5158,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/install.js",
       "source_location": "L175",
       "id": "install_signalinstalle",
-      "community": 4,
+      "community": 5,
       "norm_label": "signalinstalle()"
     },
     {
@@ -5194,7 +5221,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_snapshot_js",
-      "community": 5,
+      "community": 2,
       "norm_label": "snapshot.js"
     },
     {
@@ -5203,7 +5230,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L25",
       "id": "snapshot_readjson",
-      "community": 5,
+      "community": 2,
       "norm_label": "readjson()"
     },
     {
@@ -5212,7 +5239,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L44",
       "id": "snapshot_readtext",
-      "community": 5,
+      "community": 2,
       "norm_label": "readtext()"
     },
     {
@@ -5221,7 +5248,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L70",
       "id": "snapshot_projects",
-      "community": 7,
+      "community": 6,
       "norm_label": "projects()"
     },
     {
@@ -5230,7 +5257,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L88",
       "id": "snapshot_shotsbypage",
-      "community": 5,
+      "community": 2,
       "norm_label": "shotsbypage()"
     },
     {
@@ -5239,7 +5266,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L115",
       "id": "snapshot_scans",
-      "community": 5,
+      "community": 2,
       "norm_label": "scans()"
     },
     {
@@ -5248,7 +5275,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L144",
       "id": "snapshot_audits",
-      "community": 5,
+      "community": 2,
       "norm_label": "audits()"
     },
     {
@@ -5257,7 +5284,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L180",
       "id": "snapshot_commits",
-      "community": 5,
+      "community": 2,
       "norm_label": "commits()"
     },
     {
@@ -5266,7 +5293,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L205",
       "id": "snapshot_tableau",
-      "community": 5,
+      "community": 2,
       "norm_label": "tableau()"
     },
     {
@@ -5275,7 +5302,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L231",
       "id": "snapshot_vaultpath",
-      "community": 5,
+      "community": 2,
       "norm_label": "vaultpath()"
     },
     {
@@ -5284,7 +5311,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L243",
       "id": "snapshot_filedate",
-      "community": 5,
+      "community": 2,
       "norm_label": "filedate()"
     },
     {
@@ -5293,7 +5320,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L278",
       "id": "snapshot_readgraph",
-      "community": 5,
+      "community": 2,
       "norm_label": "readgraph()"
     },
     {
@@ -5302,7 +5329,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L351",
       "id": "snapshot_getvaultdate",
-      "community": 5,
+      "community": 2,
       "norm_label": "getvaultdate()"
     },
     {
@@ -5311,7 +5338,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L382",
       "id": "snapshot_snapshot",
-      "community": 5,
+      "community": 2,
       "norm_label": "snapshot()"
     },
     {
@@ -5320,7 +5347,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L461",
       "id": "snapshot_shotpath",
-      "community": 5,
+      "community": 2,
       "norm_label": "shotpath()"
     },
     {
@@ -5329,7 +5356,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L476",
       "id": "snapshot_inside",
-      "community": 5,
+      "community": 2,
       "norm_label": "inside()"
     },
     {
@@ -5338,7 +5365,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/snapshot.js",
       "source_location": "L505",
       "id": "snapshot_mediapath",
-      "community": 5,
+      "community": 2,
       "norm_label": "mediapath()"
     },
     {
@@ -5356,7 +5383,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_active_js",
-      "community": 2,
+      "community": 4,
       "norm_label": "active.js"
     },
     {
@@ -5365,7 +5392,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L56",
       "id": "active_dossieractif",
-      "community": 2,
+      "community": 4,
       "norm_label": "dossieractif()"
     },
     {
@@ -5374,7 +5401,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L66",
       "id": "active_assainirsession",
-      "community": 2,
+      "community": 4,
       "norm_label": "assainirsession()"
     },
     {
@@ -5383,7 +5410,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L85",
       "id": "active_sessionid",
-      "community": 2,
+      "community": 4,
       "norm_label": "sessionid()"
     },
     {
@@ -5392,7 +5419,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L89",
       "id": "active_cheminentree",
-      "community": 2,
+      "community": 4,
       "norm_label": "cheminentree()"
     },
     {
@@ -5401,7 +5428,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L92",
       "id": "active_lireentree",
-      "community": 2,
+      "community": 4,
       "norm_label": "lireentree()"
     },
     {
@@ -5410,7 +5437,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L118",
       "id": "active_perimee",
-      "community": 2,
+      "community": 4,
       "norm_label": "perimee()"
     },
     {
@@ -5419,7 +5446,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L126",
       "id": "active_oublier",
-      "community": 2,
+      "community": 4,
       "norm_label": "oublier()"
     },
     {
@@ -5428,7 +5455,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L142",
       "id": "active_migrerancienspointeurs",
-      "community": 2,
+      "community": 4,
       "norm_label": "migrerancienspointeurs()"
     },
     {
@@ -5437,7 +5464,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L169",
       "id": "active_ecrire",
-      "community": 2,
+      "community": 4,
       "norm_label": "ecrire()"
     },
     {
@@ -5446,7 +5473,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L179",
       "id": "active_readactive",
-      "community": 2,
+      "community": 4,
       "norm_label": "readactive()"
     },
     {
@@ -5455,7 +5482,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L208",
       "id": "active_writeactive",
-      "community": 2,
+      "community": 4,
       "norm_label": "writeactive()"
     },
     {
@@ -5464,7 +5491,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L224",
       "id": "active_clearactive",
-      "community": 2,
+      "community": 4,
       "norm_label": "clearactive()"
     },
     {
@@ -5473,7 +5500,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L247",
       "id": "active_allactive",
-      "community": 2,
+      "community": 4,
       "norm_label": "allactive()"
     },
     {
@@ -5482,7 +5509,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L272",
       "id": "active_activeplans",
-      "community": 2,
+      "community": 4,
       "norm_label": "activeplans()"
     },
     {
@@ -5491,7 +5518,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L277",
       "id": "active_dormir",
-      "community": 2,
+      "community": 4,
       "norm_label": "dormir()"
     },
     {
@@ -5500,7 +5527,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L300",
       "id": "active_withlock",
-      "community": 2,
+      "community": 4,
       "norm_label": "withlock()"
     },
     {
@@ -5509,7 +5536,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.js",
       "source_location": "L352",
       "id": "active_perimeverrou",
-      "community": 2,
+      "community": 4,
       "norm_label": "perimeverrou()"
     },
     {
@@ -5689,7 +5716,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_post_commit_js",
-      "community": 2,
+      "community": 4,
       "norm_label": "ovrsee-post-commit.js"
     },
     {
@@ -5698,7 +5725,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L27",
       "id": "ovrsee_post_commit_git",
-      "community": 2,
+      "community": 4,
       "norm_label": "git()"
     },
     {
@@ -5707,7 +5734,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L38",
       "id": "ovrsee_post_commit_changedfiles",
-      "community": 2,
+      "community": 4,
       "norm_label": "changedfiles()"
     },
     {
@@ -5716,7 +5743,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L64",
       "id": "ovrsee_post_commit_crawlutile",
-      "community": 2,
+      "community": 4,
       "norm_label": "crawlutile()"
     },
     {
@@ -5725,7 +5752,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L89",
       "id": "ovrsee_post_commit_planpourcommit",
-      "community": 2,
+      "community": 4,
       "norm_label": "planpourcommit()"
     },
     {
@@ -5734,7 +5761,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L108",
       "id": "ovrsee_post_commit_attachcommit",
-      "community": 2,
+      "community": 4,
       "norm_label": "attachcommit()"
     },
     {
@@ -5752,7 +5779,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-post-commit.js",
       "source_location": "L214",
       "id": "ovrsee_post_commit_spawncrawl",
-      "community": 2,
+      "community": 4,
       "norm_label": "spawncrawl()"
     },
     {
@@ -5761,7 +5788,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_git_status_js",
-      "community": 7,
+      "community": 6,
       "norm_label": "git-status.js"
     },
     {
@@ -5770,7 +5797,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L16",
       "id": "git_status_git",
-      "community": 7,
+      "community": 6,
       "norm_label": "git()"
     },
     {
@@ -5779,7 +5806,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L29",
       "id": "git_status_dirty",
-      "community": 7,
+      "community": 6,
       "norm_label": "dirty()"
     },
     {
@@ -5788,7 +5815,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L52",
       "id": "git_status_branches",
-      "community": 7,
+      "community": 6,
       "norm_label": "branches()"
     },
     {
@@ -5797,7 +5824,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L70",
       "id": "git_status_lastfetch",
-      "community": 7,
+      "community": 6,
       "norm_label": "lastfetch()"
     },
     {
@@ -5806,7 +5833,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/git-status.js",
       "source_location": "L82",
       "id": "git_status_gitstatus",
-      "community": 7,
+      "community": 6,
       "norm_label": "gitstatus()"
     },
     {
@@ -6256,7 +6283,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_active_test_js",
-      "community": 2,
+      "community": 4,
       "norm_label": "active.test.js"
     },
     {
@@ -6265,7 +6292,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.test.js",
       "source_location": "L19",
       "id": "active_test_ovrsee",
-      "community": 2,
+      "community": 4,
       "norm_label": "ovrsee()"
     },
     {
@@ -6274,7 +6301,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.test.js",
       "source_location": "L29",
       "id": "active_test_vieillirde",
-      "community": 2,
+      "community": 4,
       "norm_label": "vieillirde()"
     },
     {
@@ -6283,7 +6310,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/active.test.js",
       "source_location": "L268",
       "id": "active_test_allouer",
-      "community": 2,
+      "community": 4,
       "norm_label": "allouer()"
     },
     {
@@ -6292,7 +6319,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit-gate.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_tool_edit_gate_js",
-      "community": 2,
+      "community": 4,
       "norm_label": "ovrsee-tool-edit-gate.js"
     },
     {
@@ -6301,7 +6328,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit-gate.js",
       "source_location": "L28",
       "id": "ovrsee_tool_edit_gate_readstdin",
-      "community": 2,
+      "community": 4,
       "norm_label": "readstdin()"
     },
     {
@@ -6310,7 +6337,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit-gate.js",
       "source_location": "L41",
       "id": "ovrsee_tool_edit_gate_reporoot",
-      "community": 2,
+      "community": 4,
       "norm_label": "reporoot()"
     },
     {
@@ -6319,7 +6346,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit-gate.js",
       "source_location": "L66",
       "id": "ovrsee_tool_edit_gate_ticketmanquant",
-      "community": 2,
+      "community": 4,
       "norm_label": "ticketmanquant()"
     },
     {
@@ -6337,7 +6364,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-edit-gate.js",
       "source_location": "L91",
       "id": "ovrsee_tool_edit_gate_main",
-      "community": 2,
+      "community": 4,
       "norm_label": "main()"
     },
     {
@@ -6409,7 +6436,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_plans_js",
-      "community": 7,
+      "community": 6,
       "norm_label": "plans.js"
     },
     {
@@ -6445,7 +6472,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L128",
       "id": "plans_updateplanmeta",
-      "community": 2,
+      "community": 6,
       "norm_label": "updateplanmeta()"
     },
     {
@@ -6463,7 +6490,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L163",
       "id": "plans_history",
-      "community": 7,
+      "community": 6,
       "norm_label": "history()"
     },
     {
@@ -6481,7 +6508,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L192",
       "id": "plans_planfilename",
-      "community": 11,
+      "community": 6,
       "norm_label": "planfilename()"
     },
     {
@@ -6499,7 +6526,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L253",
       "id": "plans_registrypath",
-      "community": 7,
+      "community": 6,
       "norm_label": "registrypath()"
     },
     {
@@ -6508,7 +6535,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L257",
       "id": "plans_readregistry",
-      "community": 7,
+      "community": 6,
       "norm_label": "readregistry()"
     },
     {
@@ -6517,7 +6544,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L268",
       "id": "plans_writeregistry",
-      "community": 7,
+      "community": 6,
       "norm_label": "writeregistry()"
     },
     {
@@ -6526,7 +6553,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L282",
       "id": "plans_registerproject",
-      "community": 7,
+      "community": 6,
       "norm_label": "registerproject()"
     },
     {
@@ -6535,7 +6562,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L297",
       "id": "plans_unregisterproject",
-      "community": 7,
+      "community": 6,
       "norm_label": "unregisterproject()"
     },
     {
@@ -6544,7 +6571,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L316",
       "id": "plans_touchproject",
-      "community": 7,
+      "community": 6,
       "norm_label": "touchproject()"
     },
     {
@@ -6553,7 +6580,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L365",
       "id": "plans_closeopenplans",
-      "community": 2,
+      "community": 6,
       "norm_label": "closeopenplans()"
     },
     {
@@ -6562,7 +6589,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L399",
       "id": "plans_porteedesession",
-      "community": 2,
+      "community": 6,
       "norm_label": "porteedesession()"
     },
     {
@@ -6571,7 +6598,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L428",
       "id": "plans_attachcommittoplan",
-      "community": 2,
+      "community": 6,
       "norm_label": "attachcommittoplan()"
     },
     {
@@ -6580,7 +6607,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L448",
       "id": "plans_clearactiveplan",
-      "community": 2,
+      "community": 6,
       "norm_label": "clearactiveplan()"
     },
     {
@@ -6589,7 +6616,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L463",
       "id": "plans_issafeslug",
-      "community": 9,
+      "community": 6,
       "norm_label": "issafeslug()"
     },
     {
@@ -6598,7 +6625,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L479",
       "id": "plans_issafeplanfilename",
-      "community": 2,
+      "community": 4,
       "norm_label": "issafeplanfilename()"
     },
     {
@@ -6607,7 +6634,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_obsidian_test_js",
-      "community": 12,
+      "community": 11,
       "norm_label": "obsidian.test.js"
     },
     {
@@ -6616,7 +6643,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L13",
       "id": "obsidian_test_fixture",
-      "community": 12,
+      "community": 11,
       "norm_label": "fixture()"
     },
     {
@@ -6625,7 +6652,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L126",
       "id": "obsidian_test_vault",
-      "community": 12,
+      "community": 11,
       "norm_label": "vault()"
     },
     {
@@ -6634,7 +6661,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L127",
       "id": "obsidian_test_lire",
-      "community": 12,
+      "community": 11,
       "norm_label": "lire()"
     },
     {
@@ -6643,7 +6670,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L130",
       "id": "obsidian_test_frontmatter",
-      "community": 12,
+      "community": 11,
       "norm_label": "frontmatter()"
     },
     {
@@ -6652,7 +6679,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L137",
       "id": "obsidian_test_wikilinks",
-      "community": 12,
+      "community": 11,
       "norm_label": "wikilinks()"
     },
     {
@@ -6670,7 +6697,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_settings_js",
-      "community": 5,
+      "community": 2,
       "norm_label": "settings.js"
     },
     {
@@ -6679,7 +6706,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L86",
       "id": "settings_settingspath",
-      "community": 5,
+      "community": 2,
       "norm_label": "settingspath()"
     },
     {
@@ -6688,7 +6715,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L96",
       "id": "settings_readsettings",
-      "community": 5,
+      "community": 2,
       "norm_label": "readsettings()"
     },
     {
@@ -6697,7 +6724,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L110",
       "id": "settings_validerenum",
-      "community": 5,
+      "community": 2,
       "norm_label": "validerenum()"
     },
     {
@@ -6706,7 +6733,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L115",
       "id": "settings_valideronglets",
-      "community": 5,
+      "community": 2,
       "norm_label": "valideronglets()"
     },
     {
@@ -6715,7 +6742,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L132",
       "id": "settings_validerterminal",
-      "community": 5,
+      "community": 2,
       "norm_label": "validerterminal()"
     },
     {
@@ -6724,7 +6751,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L150",
       "id": "settings_validatesettings",
-      "community": 5,
+      "community": 2,
       "norm_label": "validatesettings()"
     },
     {
@@ -6733,7 +6760,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L226",
       "id": "settings_writesettings",
-      "community": 5,
+      "community": 2,
       "norm_label": "writesettings()"
     },
     {
@@ -6742,7 +6769,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/settings.js",
       "source_location": "L244",
       "id": "settings_mergesettings",
-      "community": 5,
+      "community": 2,
       "norm_label": "mergesettings()"
     },
     {
@@ -6787,7 +6814,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.test.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_hooks_ovrsee_tool_stop_test_js",
-      "community": 12,
+      "community": 11,
       "norm_label": "ovrsee-tool-stop.test.js"
     },
     {
@@ -6796,7 +6823,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.test.js",
       "source_location": "L11",
       "id": "ovrsee_tool_stop_test_git",
-      "community": 12,
+      "community": 11,
       "norm_label": "git()"
     },
     {
@@ -6805,7 +6832,7 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/ovrsee-tool-stop.test.js",
       "source_location": "L14",
       "id": "ovrsee_tool_stop_test_repo",
-      "community": 12,
+      "community": 11,
       "norm_label": "repo()"
     },
     {
@@ -6958,7 +6985,7 @@
       "source_file": "/Users/sam/code/ovrsee/site/app.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_site_app_js",
-      "community": 15,
+      "community": 14,
       "norm_label": "app.js"
     },
     {
@@ -6967,7 +6994,7 @@
       "source_file": "/Users/sam/code/ovrsee/site/app.js",
       "source_location": "L65",
       "id": "app_styleonglet",
-      "community": 15,
+      "community": 14,
       "norm_label": "styleonglet()"
     },
     {
@@ -6976,7 +7003,7 @@
       "source_file": "/Users/sam/code/ovrsee/site/app.js",
       "source_location": "L69",
       "id": "app_valeurs",
-      "community": 15,
+      "community": 14,
       "norm_label": "valeurs()"
     },
     {
@@ -6985,7 +7012,7 @@
       "source_file": "/Users/sam/code/ovrsee/site/app.js",
       "source_location": "L116",
       "id": "app_r_soudre",
-      "community": 15,
+      "community": 14,
       "norm_label": "resoudre()"
     },
     {
@@ -6994,7 +7021,7 @@
       "source_file": "/Users/sam/code/ovrsee/site/app.js",
       "source_location": "L119",
       "id": "app_interpoler",
-      "community": 15,
+      "community": 14,
       "norm_label": "interpoler()"
     },
     {
@@ -7003,7 +7030,7 @@
       "source_file": "/Users/sam/code/ovrsee/site/app.js",
       "source_location": "L132",
       "id": "app_appliquer",
-      "community": 15,
+      "community": 14,
       "norm_label": "appliquer()"
     },
     {
@@ -7012,7 +7039,7 @@
       "source_file": "/Users/sam/code/ovrsee/site/app.js",
       "source_location": "L168",
       "id": "app_lier",
-      "community": 15,
+      "community": 14,
       "norm_label": "lier()"
     },
     {
@@ -7021,7 +7048,7 @@
       "source_file": "/Users/sam/code/ovrsee/site/app.js",
       "source_location": "L233",
       "id": "app_traduire",
-      "community": 15,
+      "community": 14,
       "norm_label": "traduire()"
     },
     {
@@ -7030,7 +7057,7 @@
       "source_file": "/Users/sam/code/ovrsee/site/app.js",
       "source_location": "L253",
       "id": "app_rendre",
-      "community": 15,
+      "community": 14,
       "norm_label": "rendre()"
     },
     {
@@ -7039,7 +7066,7 @@
       "source_file": "/Users/sam/code/ovrsee/site/app.js",
       "source_location": "L267",
       "id": "app_mesurer",
-      "community": 15,
+      "community": 14,
       "norm_label": "mesurer()"
     },
     {
@@ -7048,7 +7075,7 @@
       "source_file": "/Users/sam/code/ovrsee/site/app.js",
       "source_location": "L276",
       "id": "app_r_v_ler",
-      "community": 15,
+      "community": 14,
       "norm_label": "reveler()"
     },
     {
@@ -7057,7 +7084,7 @@
       "source_file": "/Users/sam/code/ovrsee/site/app.js",
       "source_location": "L307",
       "id": "app_versionaffich_e",
-      "community": 15,
+      "community": 14,
       "norm_label": "versionaffichee()"
     },
     {
@@ -7075,7 +7102,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/crawl.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_electron_crawl_js",
-      "community": 4,
+      "community": 5,
       "norm_label": "crawl.js"
     },
     {
@@ -7084,7 +7111,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/crawl.js",
       "source_location": "L41",
       "id": "crawl_crawlstate",
-      "community": 4,
+      "community": 5,
       "norm_label": "crawlstate()"
     },
     {
@@ -7093,7 +7120,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/crawl.js",
       "source_location": "L50",
       "id": "crawl_publish",
-      "community": 4,
+      "community": 5,
       "norm_label": "publish()"
     },
     {
@@ -7102,7 +7129,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/crawl.js",
       "source_location": "L62",
       "id": "crawl_watchcrawl",
-      "community": 4,
+      "community": 5,
       "norm_label": "watchcrawl()"
     },
     {
@@ -7111,7 +7138,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/crawl.js",
       "source_location": "L76",
       "id": "crawl_decoupe",
-      "community": 4,
+      "community": 5,
       "norm_label": "decoupe()"
     },
     {
@@ -7120,7 +7147,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/crawl.js",
       "source_location": "L85",
       "id": "crawl_progression",
-      "community": 4,
+      "community": 5,
       "norm_label": "progression()"
     },
     {
@@ -7129,7 +7156,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/crawl.js",
       "source_location": "L95",
       "id": "crawl_startcrawl",
-      "community": 4,
+      "community": 5,
       "norm_label": "startcrawl()"
     },
     {
@@ -7138,7 +7165,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/crawl.js",
       "source_location": "L153",
       "id": "crawl_stopcrawl",
-      "community": 4,
+      "community": 5,
       "norm_label": "stopcrawl()"
     },
     {
@@ -7147,7 +7174,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/crawl.js",
       "source_location": "L175",
       "id": "crawl_stopallcrawls",
-      "community": 4,
+      "community": 5,
       "norm_label": "stopallcrawls()"
     },
     {
@@ -7156,7 +7183,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_electron_tray_js",
-      "community": 4,
+      "community": 5,
       "norm_label": "tray.js"
     },
     {
@@ -7165,7 +7192,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L72",
       "id": "tray_icone",
-      "community": 4,
+      "community": 5,
       "norm_label": "icone()"
     },
     {
@@ -7174,7 +7201,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L108",
       "id": "tray_popoverwindow",
-      "community": 4,
+      "community": 5,
       "norm_label": "popoverwindow()"
     },
     {
@@ -7183,7 +7210,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L169",
       "id": "tray_positionner",
-      "community": 4,
+      "community": 5,
       "norm_label": "positionner()"
     },
     {
@@ -7192,7 +7219,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L181",
       "id": "tray_basculer",
-      "community": 4,
+      "community": 5,
       "norm_label": "basculer()"
     },
     {
@@ -7201,7 +7228,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L205",
       "id": "tray_createtray",
-      "community": 4,
+      "community": 5,
       "norm_label": "createtray()"
     },
     {
@@ -7210,7 +7237,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L223",
       "id": "tray_vue",
-      "community": 4,
+      "community": 5,
       "norm_label": "vue()"
     },
     {
@@ -7219,7 +7246,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L226",
       "id": "tray_publier",
-      "community": 4,
+      "community": 5,
       "norm_label": "publier()"
     },
     {
@@ -7228,7 +7255,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L242",
       "id": "tray_setstate",
-      "community": 4,
+      "community": 5,
       "norm_label": "setstate()"
     },
     {
@@ -7237,7 +7264,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L261",
       "id": "tray_destroypopover",
-      "community": 4,
+      "community": 5,
       "norm_label": "destroypopover()"
     },
     {
@@ -7246,7 +7273,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L284",
       "id": "tray_answer",
-      "community": 4,
+      "community": 5,
       "norm_label": "answer()"
     },
     {
@@ -7255,7 +7282,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/tray.js",
       "source_location": "L315",
       "id": "tray_reveal",
-      "community": 4,
+      "community": 5,
       "norm_label": "reveal()"
     },
     {
@@ -7264,7 +7291,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_electron_main_js",
-      "community": 7,
+      "community": 6,
       "norm_label": "main.js"
     },
     {
@@ -7273,7 +7300,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L97",
       "id": "main_serveui",
-      "community": 5,
+      "community": 2,
       "norm_label": "serveui()"
     },
     {
@@ -7282,7 +7309,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L152",
       "id": "main_closedevtools",
-      "community": 7,
+      "community": 6,
       "norm_label": "closedevtools()"
     },
     {
@@ -7291,7 +7318,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L171",
       "id": "main_createwindow",
-      "community": 7,
+      "community": 6,
       "norm_label": "createwindow()"
     },
     {
@@ -7300,7 +7327,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L335",
       "id": "main_projetconnu",
-      "community": 7,
+      "community": 6,
       "norm_label": "projetconnu()"
     },
     {
@@ -7309,7 +7336,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L369",
       "id": "main_redact",
-      "community": 7,
+      "community": 6,
       "norm_label": "redact()"
     },
     {
@@ -7318,7 +7345,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/main.js",
       "source_location": "L408",
       "id": "main_inconnu",
-      "community": 7,
+      "community": 6,
       "norm_label": "inconnu()"
     },
     {
@@ -7327,7 +7354,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/menu.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_electron_menu_js",
-      "community": 4,
+      "community": 5,
       "norm_label": "menu.js"
     },
     {
@@ -7336,7 +7363,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/menu.js",
       "source_location": "L35",
       "id": "menu_send",
-      "community": 4,
+      "community": 5,
       "norm_label": "send()"
     },
     {
@@ -7345,7 +7372,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/menu.js",
       "source_location": "L55",
       "id": "menu_buildmenu",
-      "community": 4,
+      "community": 5,
       "norm_label": "buildmenu()"
     },
     {
@@ -7354,7 +7381,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L1",
       "id": "users_sam_code_ovrsee_electron_pty_js",
-      "community": 4,
+      "community": 5,
       "norm_label": "pty.js"
     },
     {
@@ -7363,7 +7390,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L60",
       "id": "pty_sessionenv",
-      "community": 4,
+      "community": 5,
       "norm_label": "sessionenv()"
     },
     {
@@ -7372,7 +7399,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L93",
       "id": "pty_opensession",
-      "community": 4,
+      "community": 5,
       "norm_label": "opensession()"
     },
     {
@@ -7381,7 +7408,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L144",
       "id": "pty_writeto",
-      "community": 4,
+      "community": 5,
       "norm_label": "writeto()"
     },
     {
@@ -7390,7 +7417,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L158",
       "id": "pty_hassession",
-      "community": 4,
+      "community": 5,
       "norm_label": "hassession()"
     },
     {
@@ -7399,7 +7426,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L160",
       "id": "pty_resize",
-      "community": 4,
+      "community": 5,
       "norm_label": "resize()"
     },
     {
@@ -7408,7 +7435,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L168",
       "id": "pty_closesession",
-      "community": 4,
+      "community": 5,
       "norm_label": "closesession()"
     },
     {
@@ -7417,7 +7444,7 @@
       "source_file": "/Users/sam/code/ovrsee/electron/pty.js",
       "source_location": "L180",
       "id": "pty_closeall",
-      "community": 4,
+      "community": 5,
       "norm_label": "closeall()"
     },
     {
@@ -7978,7 +8005,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "ovrsee application",
       "id": "navigateur_app"
     },
@@ -7991,7 +8018,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "navigateur tab",
       "id": "navigateur_tab"
     },
@@ -8004,7 +8031,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "browser content display panel",
       "id": "navigateur_browser_panel"
     },
@@ -8017,7 +8044,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "projects sidebar",
       "id": "navigateur_projects_sidebar"
     },
@@ -8030,7 +8057,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "top tab navigation",
       "id": "navigateur_tab_navigation"
     },
@@ -8043,7 +8070,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "claude code terminal panel",
       "id": "navigateur_claude_code_terminal"
     },
@@ -8056,7 +8083,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "status bar with scan info",
       "id": "navigateur_status_bar"
     },
@@ -8069,7 +8096,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "google homepage (displayed content)",
       "id": "navigateur_google_homepage"
     },
@@ -8082,7 +8109,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "ovrsee project",
       "id": "navigateur_ovrsee_project"
     },
@@ -8095,7 +8122,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 21,
+      "community": 20,
       "norm_label": "miette project",
       "id": "navigateur_miette_project"
     },
@@ -13028,6 +13055,18 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
+      "source_location": "L690",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_server_api_test_js",
+      "_tgt": "api_test_avecorigine",
+      "source": "users_sam_code_ovrsee_server_api_test_js",
+      "target": "api_test_avecorigine",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
@@ -13073,6 +13112,18 @@
       "_tgt": "api_test_url",
       "source": "api_test_url",
       "target": "api_test_configclaudeurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
+      "source_location": "L691",
+      "weight": 1.0,
+      "_src": "api_test_avecorigine",
+      "_tgt": "api_test_url",
+      "source": "api_test_url",
+      "target": "api_test_avecorigine",
       "confidence_score": 1.0
     },
     {
@@ -13208,10 +13259,34 @@
       "target": "api_resolve"
     },
     {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/ovrsee/server/api.test.js",
+      "source_location": "L691",
+      "weight": 1.0,
+      "_src": "api_test_avecorigine",
+      "_tgt": "api_resolve",
+      "source": "api_test_avecorigine",
+      "target": "api_resolve"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L51",
+      "source_location": "L67",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_server_api_js",
+      "_tgt": "api_origineautorisee",
+      "source": "users_sam_code_ovrsee_server_api_js",
+      "target": "api_origineautorisee",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/server/api.js",
+      "source_location": "L82",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_server_api_js",
       "_tgt": "api_usabledirectory",
@@ -13223,7 +13298,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L73",
+      "source_location": "L104",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_server_api_js",
       "_tgt": "api_detectdefaults",
@@ -13235,7 +13310,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L90",
+      "source_location": "L121",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_server_api_js",
       "_tgt": "api_getfolderstate",
@@ -13247,7 +13322,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L149",
+      "source_location": "L180",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_server_api_js",
       "_tgt": "api_validatecrawlconfig",
@@ -13259,7 +13334,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L173",
+      "source_location": "L204",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_server_api_js",
       "_tgt": "api_projectaction",
@@ -13271,7 +13346,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L273",
+      "source_location": "L304",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_server_api_js",
       "_tgt": "api_ticketaction",
@@ -13283,7 +13358,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L337",
+      "source_location": "L368",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_server_api_js",
       "_tgt": "api_resolve",
@@ -13295,7 +13370,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L482",
+      "source_location": "L520",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_server_api_js",
       "_tgt": "api_parsebody",
@@ -13307,7 +13382,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L491",
+      "source_location": "L536",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_server_api_js",
       "_tgt": "api_readbody",
@@ -13319,7 +13394,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L499",
+      "source_location": "L549",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_server_api_js",
       "_tgt": "api_nodemiddleware",
@@ -13331,7 +13406,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L520",
+      "source_location": "L570",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_server_api_js",
       "_tgt": "api_fetchhandler",
@@ -13343,7 +13418,19 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L180",
+      "source_location": "L373",
+      "weight": 1.0,
+      "_src": "api_resolve",
+      "_tgt": "api_origineautorisee",
+      "source": "api_origineautorisee",
+      "target": "api_resolve",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/server/api.js",
+      "source_location": "L211",
       "weight": 1.0,
       "_src": "api_projectaction",
       "_tgt": "api_usabledirectory",
@@ -13367,7 +13454,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L105",
+      "source_location": "L136",
       "weight": 1.0,
       "_src": "api_getfolderstate",
       "_tgt": "api_detectdefaults",
@@ -13403,7 +13490,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L206",
+      "source_location": "L237",
       "weight": 1.0,
       "_src": "api_projectaction",
       "_tgt": "api_getfolderstate",
@@ -13427,7 +13514,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L225",
+      "source_location": "L256",
       "weight": 1.0,
       "_src": "api_projectaction",
       "_tgt": "api_validatecrawlconfig",
@@ -13439,7 +13526,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L352",
+      "source_location": "L390",
       "weight": 1.0,
       "_src": "api_resolve",
       "_tgt": "api_projectaction",
@@ -13547,7 +13634,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L422",
+      "source_location": "L460",
       "weight": 1.0,
       "_src": "api_resolve",
       "_tgt": "api_ticketaction",
@@ -13667,7 +13754,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L524",
+      "source_location": "L574",
       "weight": 1.0,
       "_src": "api_fetchhandler",
       "_tgt": "api_resolve",
@@ -13919,7 +14006,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/server/api.js",
-      "source_location": "L522",
+      "source_location": "L572",
       "weight": 1.0,
       "_src": "api_fetchhandler",
       "_tgt": "api_parsebody",
@@ -14207,7 +14294,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/auth.js",
-      "source_location": "L37",
+      "source_location": "L39",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_auth_js",
       "_tgt": "auth_assertignored",
@@ -14219,7 +14306,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/auth.js",
-      "source_location": "L50",
+      "source_location": "L52",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_auth_js",
       "_tgt": "auth_main",
@@ -14231,7 +14318,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/auth.js",
-      "source_location": "L51",
+      "source_location": "L53",
       "weight": 1.0,
       "_src": "auth_main",
       "_tgt": "auth_assertignored",
@@ -14250,6 +14337,30 @@
       "_tgt": "integrationproviders_error",
       "source": "auth_assertignored",
       "target": "integrationproviders_error"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/ovrsee/crawl/auth.js",
+      "source_location": "L59",
+      "weight": 1.0,
+      "_src": "auth_main",
+      "_tgt": "shell_shellrun",
+      "source": "auth_main",
+      "target": "shell_shellrun"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/Users/sam/code/ovrsee/crawl/auth.js",
+      "source_location": "L63",
+      "weight": 1.0,
+      "_src": "auth_main",
+      "_tgt": "shell_cleanenv",
+      "source": "auth_main",
+      "target": "shell_cleanenv"
     },
     {
       "relation": "calls",
@@ -14327,7 +14438,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L140",
+      "source_location": "L142",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_recordscan",
@@ -14339,7 +14450,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L150",
+      "source_location": "L152",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_sleep",
@@ -14351,7 +14462,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L152",
+      "source_location": "L154",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_waitforserver",
@@ -14363,7 +14474,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L183",
+      "source_location": "L185",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_assertportfree",
@@ -14375,7 +14486,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L198",
+      "source_location": "L200",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_startapp",
@@ -14387,7 +14498,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L269",
+      "source_location": "L271",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_stopapp",
@@ -14399,7 +14510,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L285",
+      "source_location": "L287",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_pathof",
@@ -14411,7 +14522,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L290",
+      "source_location": "L292",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_isignored",
@@ -14423,7 +14534,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L297",
+      "source_location": "L299",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_visitall",
@@ -14435,7 +14546,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L369",
+      "source_location": "L371",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_retainable",
@@ -14447,7 +14558,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L404",
+      "source_location": "L406",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_orphanshots",
@@ -14459,7 +14570,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L412",
+      "source_location": "L414",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_pruneshots",
@@ -14471,7 +14582,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L422",
+      "source_location": "L424",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_crawl_index_js",
       "_tgt": "index_run",
@@ -14495,7 +14606,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L256",
+      "source_location": "L258",
       "weight": 1.0,
       "_src": "index_startapp",
       "_tgt": "index_log",
@@ -14507,7 +14618,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L313",
+      "source_location": "L315",
       "weight": 1.0,
       "_src": "index_visitall",
       "_tgt": "index_log",
@@ -14519,7 +14630,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L427",
+      "source_location": "L429",
       "weight": 1.0,
       "_src": "index_run",
       "_tgt": "index_log",
@@ -14555,7 +14666,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L423",
+      "source_location": "L425",
       "weight": 1.0,
       "_src": "index_run",
       "_tgt": "index_loadconfig",
@@ -14567,7 +14678,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L435",
+      "source_location": "L437",
       "weight": 1.0,
       "_src": "index_run",
       "_tgt": "index_usestoragestate",
@@ -14579,7 +14690,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L424",
+      "source_location": "L426",
       "weight": 1.0,
       "_src": "index_run",
       "_tgt": "index_shortsha",
@@ -14591,7 +14702,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L144",
+      "source_location": "L146",
       "weight": 1.0,
       "_src": "index_recordscan",
       "_tgt": "index_redige",
@@ -14603,7 +14714,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L498",
+      "source_location": "L500",
       "weight": 1.0,
       "_src": "index_run",
       "_tgt": "index_recordscan",
@@ -14615,7 +14726,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L159",
+      "source_location": "L161",
       "weight": 1.0,
       "_src": "index_waitforserver",
       "_tgt": "index_sleep",
@@ -14627,7 +14738,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L258",
+      "source_location": "L260",
       "weight": 1.0,
       "_src": "index_startapp",
       "_tgt": "index_waitforserver",
@@ -14639,7 +14750,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L199",
+      "source_location": "L201",
       "weight": 1.0,
       "_src": "index_startapp",
       "_tgt": "index_assertportfree",
@@ -14651,7 +14762,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L263",
+      "source_location": "L265",
       "weight": 1.0,
       "_src": "index_startapp",
       "_tgt": "index_stopapp",
@@ -14663,7 +14774,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L428",
+      "source_location": "L430",
       "weight": 1.0,
       "_src": "index_run",
       "_tgt": "index_startapp",
@@ -14711,7 +14822,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L477",
+      "source_location": "L479",
       "weight": 1.0,
       "_src": "index_run",
       "_tgt": "index_stopapp",
@@ -14723,7 +14834,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L306",
+      "source_location": "L308",
       "weight": 1.0,
       "_src": "index_visitall",
       "_tgt": "index_pathof",
@@ -14735,7 +14846,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L307",
+      "source_location": "L309",
       "weight": 1.0,
       "_src": "index_visitall",
       "_tgt": "index_isignored",
@@ -14747,7 +14858,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L439",
+      "source_location": "L441",
       "weight": 1.0,
       "_src": "index_run",
       "_tgt": "index_visitall",
@@ -14759,7 +14870,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L414",
+      "source_location": "L416",
       "weight": 1.0,
       "_src": "index_pruneshots",
       "_tgt": "index_retainable",
@@ -14771,7 +14882,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L485",
+      "source_location": "L487",
       "weight": 1.0,
       "_src": "index_run",
       "_tgt": "index_orphanshots",
@@ -14783,7 +14894,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/crawl/index.js",
-      "source_location": "L457",
+      "source_location": "L459",
       "weight": 1.0,
       "_src": "index_run",
       "_tgt": "index_pruneshots",
@@ -18131,7 +18242,19 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L70",
+      "source_location": "L66",
+      "weight": 1.0,
+      "_src": "users_sam_code_ovrsee_hooks_config_claude_js",
+      "_tgt": "config_claude_maskvalue",
+      "source": "users_sam_code_ovrsee_hooks_config_claude_js",
+      "target": "config_claude_maskvalue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
+      "source_location": "L79",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_hooks_config_claude_js",
       "_tgt": "config_claude_parsefrontmatter",
@@ -18143,7 +18266,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L137",
+      "source_location": "L146",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_hooks_config_claude_js",
       "_tgt": "config_claude_readagents",
@@ -18155,7 +18278,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L172",
+      "source_location": "L181",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_hooks_config_claude_js",
       "_tgt": "config_claude_readcommands",
@@ -18167,7 +18290,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L207",
+      "source_location": "L216",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_hooks_config_claude_js",
       "_tgt": "config_claude_readplugins",
@@ -18179,7 +18302,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L235",
+      "source_location": "L244",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_hooks_config_claude_js",
       "_tgt": "config_claude_readhooks",
@@ -18191,7 +18314,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L258",
+      "source_location": "L267",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_hooks_config_claude_js",
       "_tgt": "config_claude_readenv",
@@ -18203,7 +18326,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L284",
+      "source_location": "L293",
       "weight": 1.0,
       "_src": "users_sam_code_ovrsee_hooks_config_claude_js",
       "_tgt": "config_claude_readconfigclaude",
@@ -18215,7 +18338,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L138",
+      "source_location": "L147",
       "weight": 1.0,
       "_src": "config_claude_readagents",
       "_tgt": "config_claude_configdir",
@@ -18227,7 +18350,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L173",
+      "source_location": "L182",
       "weight": 1.0,
       "_src": "config_claude_readcommands",
       "_tgt": "config_claude_configdir",
@@ -18239,7 +18362,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L208",
+      "source_location": "L217",
       "weight": 1.0,
       "_src": "config_claude_readplugins",
       "_tgt": "config_claude_configdir",
@@ -18251,7 +18374,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L236",
+      "source_location": "L245",
       "weight": 1.0,
       "_src": "config_claude_readhooks",
       "_tgt": "config_claude_configdir",
@@ -18263,7 +18386,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L259",
+      "source_location": "L268",
       "weight": 1.0,
       "_src": "config_claude_readenv",
       "_tgt": "config_claude_configdir",
@@ -18275,7 +18398,19 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L153",
+      "source_location": "L68",
+      "weight": 1.0,
+      "_src": "config_claude_maskvalue",
+      "_tgt": "config_claude_masksecrets",
+      "source": "config_claude_masksecrets",
+      "target": "config_claude_maskvalue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
+      "source_location": "L162",
       "weight": 1.0,
       "_src": "config_claude_readagents",
       "_tgt": "config_claude_masksecrets",
@@ -18287,7 +18422,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L188",
+      "source_location": "L197",
       "weight": 1.0,
       "_src": "config_claude_readcommands",
       "_tgt": "config_claude_masksecrets",
@@ -18299,7 +18434,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L245",
+      "source_location": "L254",
       "weight": 1.0,
       "_src": "config_claude_readhooks",
       "_tgt": "config_claude_masksecrets",
@@ -18311,7 +18446,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L148",
+      "source_location": "L157",
       "weight": 1.0,
       "_src": "config_claude_readagents",
       "_tgt": "config_claude_parsefrontmatter",
@@ -18323,7 +18458,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L183",
+      "source_location": "L192",
       "weight": 1.0,
       "_src": "config_claude_readcommands",
       "_tgt": "config_claude_parsefrontmatter",
@@ -18335,7 +18470,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L286",
+      "source_location": "L295",
       "weight": 1.0,
       "_src": "config_claude_readconfigclaude",
       "_tgt": "config_claude_readagents",
@@ -18347,7 +18482,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L287",
+      "source_location": "L296",
       "weight": 1.0,
       "_src": "config_claude_readconfigclaude",
       "_tgt": "config_claude_readcommands",
@@ -18359,7 +18494,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L288",
+      "source_location": "L297",
       "weight": 1.0,
       "_src": "config_claude_readconfigclaude",
       "_tgt": "config_claude_readplugins",
@@ -18371,7 +18506,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L289",
+      "source_location": "L298",
       "weight": 1.0,
       "_src": "config_claude_readconfigclaude",
       "_tgt": "config_claude_readhooks",
@@ -18383,7 +18518,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/Users/sam/code/ovrsee/hooks/config-claude.js",
-      "source_location": "L290",
+      "source_location": "L299",
       "weight": 1.0,
       "_src": "config_claude_readconfigclaude",
       "_tgt": "config_claude_readenv",

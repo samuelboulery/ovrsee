@@ -10,6 +10,39 @@ versionnage [SemVer](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.1.1-beta] — 2026-08-20
+
+### Sécurité
+
+- **Une page servie par localhost pouvait écrire dans l'API.** L'en-tête
+  `X-Ovrsee` comptait sur le préflight CORS pour écarter les pages tierces, mais
+  la politique par défaut de Vite autorise *toute* origine `localhost`, quel que
+  soit le port — y compris les pages du projet observé, celles qu'affiche
+  l'onglet Navigateur et que visite le crawl. De là, un
+  `POST /api/projects {action:'init'}` suffisait à écrire la commande `dev` que
+  le crawl suivant exécute. Toutes les routes `/api/` vérifient désormais
+  l'origine, lectures comprises : `/api/config-claude` rendait les commandes des
+  hooks de `~/.claude/` sans exiger le moindre en-tête. Une requête sans
+  `Origin` est acceptée — c'est le cas de tout appelant qui n'est pas un
+  navigateur, le protocole `ovrsee://` d'Electron le premier.
+- **`redige()` ne masquait que le premier mot d'un en-tête `Authorization`.** Un
+  Digest multi-champs livrait `response`, le hash dérivé du mot de passe, et tout
+  schéma hors des trois connus — AWS4-HMAC-SHA256, Negotiate — sortait sa
+  signature à côté d'un `***` qui donnait le change. Une valeur non quotée est
+  maintenant consommée jusqu'à la fin de ligne (#36).
+- **Les scalaires rangés dans un tableau échappaient au masquage des secrets.**
+  Un jeton posé dans une liste de `settings.json` sortait entier par
+  `/api/config-claude`, alors que le même jeton posé directement sur la clé était
+  masqué.
+- Le corps des requêtes du dev server est plafonné à 1 Mo. Un POST local sans fin
+  faisait grossir sa mémoire jusqu'à le tuer.
+
+### Corrigé
+
+- `crawl/auth.js` avait divergé de `crawl/index.js` : il lançait la commande `dev`
+  sans le shell de connexion — donc sans le PATH de pnpm hors d'un terminal — et
+  jetait ce que disait la commande avant d'échouer.
+
 ## [1.1.0-beta] — 2026-08-20
 
 ### Ajouté
@@ -128,5 +161,7 @@ Windows en avertissent au premier lancement.
 - Le format de `ovrsee/` peut encore bouger d'ici la 1.0. Tout y étant en
   markdown et en images, une migration se lira à l'œil nu.
 
-[Non publié]: https://github.com/samuelboulery/ovrsee/compare/v1.0.0-beta...HEAD
+[Non publié]: https://github.com/samuelboulery/ovrsee/compare/v1.1.1-beta...HEAD
+[1.1.1-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.0-beta...v1.1.1-beta
+[1.1.0-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.0.0-beta...v1.1.0-beta
 [1.0.0-beta]: https://github.com/samuelboulery/ovrsee/releases/tag/v1.0.0-beta

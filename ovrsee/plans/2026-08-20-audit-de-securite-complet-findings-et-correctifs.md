@@ -25,6 +25,15 @@
       "sha": "da94b9f",
       "date": "2026-08-20",
       "files": []
+    },
+    {
+      "sha": "0ce8e04",
+      "date": "2026-08-20",
+      "files": [
+        "CHANGELOG.fr.md",
+        "CHANGELOG.md",
+        "package.json"
+      ]
     }
   ]
 }

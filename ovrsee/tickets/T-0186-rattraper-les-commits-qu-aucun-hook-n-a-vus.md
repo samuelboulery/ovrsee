@@ -2,7 +2,7 @@
 {
   "id": "T-0186",
   "titre": "Rattraper les commits qu'aucun hook n'a vus",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "charge": "m",
   "tags": [

@@ -34,3 +34,23 @@ test('une entrée absente ne fait pas lever', () => {
   assert.equal(redige(undefined), '')
   assert.equal(redige(null), '')
 })
+
+test('les préfixes de clés cloud sont masqués hors affectation', () => {
+  assert.equal(
+    redige('The AWS Access Key Id you provided does not exist: AKIAIOSFODNN7EXAMPLE'),
+    'The AWS Access Key Id you provided does not exist: ***',
+  )
+  assert.equal(redige('using sk_live_51H8xJ2eZabcdef for stripe'), 'using *** for stripe')
+  assert.equal(redige('key AIzaSyD-abc123def456ghi789jkl012mno rejected'), 'key *** rejected')
+})
+
+test('un objet de config sérialisé en JSON perd ses valeurs sensibles', () => {
+  assert.equal(
+    redige('{"apiKey":"AIzaSyD-abc","dbPassword":"hunter2 raw","host":"db.example.com"}'),
+    '{"apiKey":***,"dbPassword":***,"host":"db.example.com"}',
+  )
+})
+
+test('une valeur entre guillemets est masquée en entier, espaces compris', () => {
+  assert.equal(redige("PASSWORD='hunter 2 raw' next"), 'PASSWORD=*** next')
+})

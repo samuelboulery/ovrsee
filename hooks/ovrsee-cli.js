@@ -132,7 +132,10 @@ const commands = {
       console.log('aucun commit à rattraper')
       return
     }
-    for (const { sha, plans } of fait) console.log(`${sha} → ${plans.join(', ')}`)
+    for (const { sha, plans, tickets } of fait) {
+      const soldes = tickets?.length ? ` — ${tickets.join(', ')} soldé(s)` : ''
+      console.log(`${sha} → ${plans.join(', ')}${soldes}`)
+    }
     console.log(`\n${fait.length} commit(s) rattaché(s). « close » peut maintenant les clore.`)
   },
 

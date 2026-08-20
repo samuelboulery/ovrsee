@@ -95,10 +95,43 @@ const shortSha = () => {
   }
 }
 
+/**
+ * Masque ce qui ressemble à un secret.
+ *
+ * `scans.jsonl` est tracké par git, et l'échec d'un scan y emporte ce qu'a dit
+ * la commande `dev` du projet observé. Une commande qui meurt sur une variable
+ * d'environnement manquante l'imprime parfois avec sa valeur : sans ce filtre,
+ * le secret part dans l'historique git sans qu'aucun humain n'ait relu la ligne.
+ *
+ * Défense en profondeur, pas garantie : ce filtre attrape les formes connues.
+ * Un `scans.jsonl` en échec se relit avant d'être poussé.
+ *
+ * Ce qui reste lisible est délibéré — l'hôte d'une URL, le nom de la variable,
+ * `pnpm: command not found`. C'est ce qui sert au diagnostic, et c'est la raison
+ * d'être de cette trace.
+ *
+ * @param {string} texte
+ * @returns {string}
+ */
+export function redige(texte) {
+  return String(texte ?? '')
+    .replace(
+      /\b([\w.-]*(?:KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD|AUTH|CREDENTIALS?)[\w.-]*)(\s*[=:]\s*)\S+/gi,
+      '$1$2***',
+    )
+    .replace(/\b(?:sk|rk)-[A-Za-z0-9_-]{8,}/g, '***')
+    .replace(/\bgh[pousr]_[A-Za-z0-9]{16,}/g, '***')
+    .replace(/\beyJ[A-Za-z0-9_-]{4,}\.[A-Za-z0-9_-]{4,}\.[A-Za-z0-9_-]+/g, '***')
+    .replace(/(\b[a-z][a-z0-9+.-]*:\/\/[^\s:/@]+:)[^\s@]+@/gi, '$1***@')
+}
+
 /** Trace le scan, réussi ou non. C'est la seule écriture qui n'est jamais sautée. */
 function recordScan(entry) {
   mkdirSync(pagesDir, { recursive: true })
-  appendFileSync(join(pagesDir, 'scans.jsonl'), JSON.stringify(entry) + '\n', 'utf8')
+  // Rédigé ici plutôt qu'à la capture : c'est le seul point d'écriture, donc le
+  // seul endroit qu'un futur chemin d'échec ne pourra pas contourner.
+  const propre = entry.error ? { ...entry, error: redige(entry.error) } : entry
+  appendFileSync(join(pagesDir, 'scans.jsonl'), JSON.stringify(propre) + '\n', 'utf8')
 }
 
 // --- démarrage de l'application -------------------------------------------

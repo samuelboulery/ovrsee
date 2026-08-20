@@ -110,7 +110,8 @@ function dejaVus(ovrseeDir) {
  * @param {string} ovrseeDir
  * @param {string} root racine du dépôt
  * @param {(message: string) => void} [dire] pour tracer, sur stderr
- * @returns {Array<{sha: string, plans: string[]}>} ce qui a été rattaché
+ * @returns {Array<{sha: string, plans: string[], tickets: string[]}>} ce qui a été rattaché,
+ *   et les tickets que ce rattachement a soldés
  */
 export function reconcile(ovrseeDir, root, dire = () => {}) {
   const ouverts = readPlans(ovrseeDir).filter(p => p.meta.status === 'open')
@@ -141,6 +142,7 @@ export function reconcile(ovrseeDir, root, dire = () => {}) {
     if (!sha || vus.has(sha)) continue
 
     const rattaches = []
+    const soldes = []
     for (const plan of plansPourMessage(ovrseeDir, message)) {
       // `files: []`, et non la liste réelle : ce commit n'a pas été vu passer,
       // et un squash porte les fichiers de toute une branche. Les inscrire
@@ -148,13 +150,22 @@ export function reconcile(ovrseeDir, root, dire = () => {}) {
       // la relation plan → fichiers → page ne voudrait plus rien dire.
       if (attachCommitToPlan(ovrseeDir, plan, { sha, date, files: [] })) {
         rattaches.push(plan)
-        avancerTicketsDuPlan(ovrseeDir, plan, message)
+        soldes.push(...avancerTicketsDuPlan(ovrseeDir, plan, message))
       }
     }
 
     if (rattaches.length > 0) {
-      fait.push({ sha, plans: rattaches })
-      dire(`[ovrsee] ${sha} rattaché à ${rattaches.join(', ')}\n`)
+      fait.push({ sha, plans: rattaches, tickets: soldes })
+      // Les tickets sont nommés, pas seulement comptés : ce mouvement part du
+      // texte d'un message écrit ailleurs, sur un dépôt distant. La portée est
+      // étroite — seuls les tickets déjà en vol et liés à un plan ouvert d'ici
+      // bougent — mais une citation erronée solde quand même un vrai ticket.
+      // Le voir passer au `pull` est ce qui permet de le corriger.
+      dire(
+        `[ovrsee] ${sha} rattaché à ${rattaches.join(', ')}` +
+          (soldes.length > 0 ? ` — ${soldes.join(', ')} soldé(s)` : '') +
+          '\n',
+      )
     }
   }
 

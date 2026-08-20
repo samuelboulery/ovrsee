@@ -48,7 +48,10 @@ test("une commande dev introuvable dit laquelle, pas seulement qu'on a attendu",
       // Un port qu'on n'ouvre pas : l'attente doit expirer.
       baseUrl: 'http://localhost:5399',
       entryRoutes: ['/'],
-      readyTimeoutMs: 1500,
+      // Pas serré à la milliseconde : ce qu'on attend ici n'est pas le délai,
+      // c'est que `zsh -lic` ait eu le temps d'imprimer son `command not found`.
+      // À 1500 ms, la suite complète le prenait de vitesse une fois sur deux.
+      readyTimeoutMs: 6000,
     }),
   )
 

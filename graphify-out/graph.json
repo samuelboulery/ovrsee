@@ -16628,8 +16628,8 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/reconcile.js",
       "source_location": "L86",
       "weight": 1.0,
-      "_src": "reconcile_planspourmessage",
-      "_tgt": "tickets_readtickets",
+      "_src": "tickets_readtickets",
+      "_tgt": "reconcile_planspourmessage",
       "source": "tickets_readtickets",
       "target": "reconcile_planspourmessage"
     },
@@ -17876,8 +17876,8 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L27",
       "weight": 1.0,
-      "_src": "obsidian_test_fixture",
-      "_tgt": "reconcile_test_plan",
+      "_src": "reconcile_test_plan",
+      "_tgt": "obsidian_test_fixture",
       "source": "reconcile_test_plan",
       "target": "obsidian_test_fixture"
     },
@@ -17900,8 +17900,8 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/obsidian.test.js",
       "source_location": "L52",
       "weight": 1.0,
-      "_src": "obsidian_test_fixture",
-      "_tgt": "reconcile_test_ticket",
+      "_src": "reconcile_test_ticket",
+      "_tgt": "obsidian_test_fixture",
       "source": "reconcile_test_ticket",
       "target": "obsidian_test_fixture"
     },

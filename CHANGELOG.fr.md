@@ -10,8 +10,70 @@ versionnage [SemVer](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.1.0-beta] — 2026-08-20
+
+### Ajouté
+
+- **Crawler depuis l'application.** Le bouton `Crawler` lance désormais le crawl
+  lui-même, par IPC Electron, avec progression et arrêt — sans cloner le dépôt
+  ni passer par `pnpm ovrsee:crawl`. `crawl/`, `mcp/` et `playwright-core`
+  voyagent dans le paquet (#24).
+- **Un formulaire de configuration pour un projet déjà équipé**, qui n'avait
+  plus aucun chemin vers `ovrsee.config.json` une fois `ovrsee/` créé (#24).
+- **Les commits qu'aucun hook n'a vus sont rattrapés.** Un squash-merge fait sur
+  GitHub crée son commit sur leurs serveurs : pas de `post-commit`, pas de plan
+  rattaché. `hooks/reconcile.js`, branché sur le hook git `post-merge`,
+  rattache au `git pull` d'après les tickets cités par le message — plusieurs
+  plans pour un commit, intervalles compris. `pnpm ovrsee:reconcile` comble le
+  retard d'un dépôt équipé avant lui (#27).
+- ⌘W ferme l'onglet du terminal qui a le focus au lieu de la fenêtre ; ⌘D ouvre
+  un terminal de plus (article également dans le menu Affichage).
+- **Les onglets terminal se nomment seuls.** Un onglet prend les premiers mots de
+  la demande qu'on y envoie. Un nom saisi à la main (double-clic) n'est jamais
+  écrasé.
+- **Un état vivant sur chaque onglet terminal.** Trois points qui battent pendant
+  que Claude travaille, une coche verte quand il rend la main, un point
+  d'interrogation quand il attend une réponse — les points restent immobiles sous
+  `prefers-reduced-motion`.
+- **Le panneau de ticket se redimensionne**, et un bouton l'ouvre en modale pour
+  une longue lecture.
+- **État de session sur les onglets terminal.** La pastille d'un onglet passe au
+  vert quand Claude rend la main, à l'accent quand il attend une réponse : on
+  suit plusieurs sessions sans changer d'onglet (#18).
+- **Renommer un terminal.** Double-clic sur le libellé d'un onglet (#20).
+
+### Modifié
+
+- **Les epics sortent du Kanban.** Un epic n'a plus de colonne : l'onglet
+  Tableau porte une bascule `Kanban` / `Epics`, et l'état d'un epic se déduit de
+  ses enfants — `sans enfant`, `non commencée`, `en cours`, `terminée`. Un epic
+  ne peut donc jamais être terminé tant qu'un enfant reste ouvert. Les tickets
+  enfants sont désormais des cartes de plein droit dans leur colonne (#19, #21).
+- Un crawl qui échoue dit ce qu'a dit la commande `dev` du projet observé. Elle
+  tournait sous `stdio: 'ignore'` : un `pnpm: command not found` disparaissait
+  et il ne restait que « l'application n'a pas répondu en 60000 ms » (#24).
+- Arrêter un crawl tue le groupe de processus, pas le seul fils : le crawl a
+  démarré le serveur de dev du projet observé, et un `child.kill()` le
+  laisserait tourner sur son port (#24).
+
 ### Corrigé
 
+- **Un secret ne part plus dans `scans.jsonl`.** Le crawl retenait 2 ko de la
+  sortie de la commande `dev` et les écrivait dans un fichier versionné ; une
+  commande qui meurt sur une variable d'environnement manquante en imprime
+  parfois la valeur. `redige()` masque les formes connues — `*KEY=`, `*TOKEN=`,
+  `sk-…`, `ghp_…`, JWT, mot de passe d'URL, identifiants de clé AWS (`AKIA…`,
+  `ASIA…`), clés Stripe à underscore (`sk_live_`, `pk_test_`) et objets de
+  configuration sérialisés en JSON — depuis `recordScan()`, seul point
+  d'écriture. Le nom de la variable et l'hôte restent lisibles : c'est ce qui
+  sert au diagnostic (#26, #31).
+- `terminal.rename_aria` écrivait `{label}` là où `t()` ne substitue que `${…}` :
+  un utilisateur de lecteur d'écran entendait « Renommer la session {label} » et
+  ne savait pas quel terminal il renommait. Le test ajouté est un invariant sur
+  les deux dictionnaires entiers, donc toute traduction future qui écrit
+  `{param}` casse la CI (#23).
+- `reconcile()` nomme désormais sur stderr, au moment du `pull`, les tickets
+  qu'il solde d'après un message de commit écrit ailleurs (#29).
 - L'en-tête du panneau de ticket ne se lit plus comme une bande plus sombre et
   plus étroite : il prend le fond de son conteneur et le traverse d'un bord à
   l'autre.
@@ -24,35 +86,6 @@ versionnage [SemVer](https://semver.org/lang/fr/).
   onglet vide.
 - Le bouton de détachement d'un epic quitte la carte pour le bas du panneau de
   ticket, et dit désormais de quel epic il détache.
-
-### Ajouté
-
-- ⌘W ferme l'onglet du terminal qui a le focus au lieu de la fenêtre ; ⌘D ouvre
-  un terminal de plus (article également dans le menu Affichage).
-- **Les onglets terminal se nomment seuls.** Un onglet prend les premiers mots de
-  la demande qu'on y envoie. Un nom saisi à la main (double-clic) n'est jamais
-  écrasé.
-- **Un état vivant sur chaque onglet terminal.** Trois points qui battent pendant
-  que Claude travaille, une coche verte quand il rend la main, un point
-  d'interrogation quand il attend une réponse — les points restent immobiles sous
-  `prefers-reduced-motion`.
-- **Le panneau de ticket se redimensionne**, et un bouton l'ouvre en modale pour
-  une longue lecture.
-
-### Modifié
-
-- **Les epics sortent du Kanban.** Un epic n'a plus de colonne : l'onglet
-  Tableau porte une bascule `Kanban` / `Epics`, et l'état d'un epic se déduit de
-  ses enfants — `sans enfant`, `non commencée`, `en cours`, `terminée`. Un epic
-  ne peut donc jamais être terminé tant qu'un enfant reste ouvert. Les tickets
-  enfants sont désormais des cartes de plein droit dans leur colonne (#19, #21).
-
-### Ajouté
-
-- **État de session sur les onglets terminal.** La pastille d'un onglet passe au
-  vert quand Claude rend la main, à l'accent quand il attend une réponse : on
-  suit plusieurs sessions sans changer d'onglet (#18).
-- **Renommer un terminal.** Double-clic sur le libellé d'un onglet (#20).
 
 ## [1.0.0-beta] — 2026-08-13
 

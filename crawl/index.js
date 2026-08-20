@@ -118,8 +118,13 @@ export function redige(texte) {
     // Le guillemet optionnel autour du nom couvre le JSON stringifié
     // (`"apiKey":"..."`), où il s'intercale entre le nom et le séparateur ;
     // la valeur consomme une chaîne entière, espaces compris.
+    //
+    // Le schéma d'authentification fait partie de la valeur : sans lui, `\S+`
+    // s'arrêtait au mot-clé, `Authorization: Bearer <jeton>` devenait
+    // `Authorization: *** <jeton>` et le credential partait en clair à côté
+    // d'un `***` qui donnait le change.
     .replace(
-      /(["']?)([\w.-]*(?:KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD|AUTH|CREDENTIALS?)[\w.-]*)\1(\s*[=:]\s*)("[^"]*"|'[^']*'|\S+)/gi,
+      /(["']?)([\w.-]*(?:KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD|AUTH|CREDENTIALS?)[\w.-]*)\1(\s*[=:]\s*)("[^"]*"|'[^']*'|(?:Bearer|Basic|Digest)\s+\S+|\S+)/gi,
       '$1$2$1$3***',
     )
     .replace(/\b(?:sk|rk|pk)[-_][A-Za-z0-9_-]{8,}/g, '***')

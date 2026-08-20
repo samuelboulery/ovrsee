@@ -64,6 +64,10 @@ versioning follows [SemVer](https://semver.org/).
   `pk_test_`) and JSON-serialised config objects — from `recordScan()`, the only
   write point. The variable name and the host stay readable: that is what serves
   diagnosis (#26, #31).
+- An `Authorization` header no longer leaks its credential. The unquoted value
+  stopped at the first word, so `Authorization: Bearer <token>` was written as
+  `Authorization: *** <token>` — a `***` that gave the change while the token
+  went out in the clear. The scheme keyword is now part of the value (#34).
 - `terminal.rename_aria` wrote `{label}` where `t()` only substitutes `${…}`: a
   screen-reader user heard "Rename session {label}" and could not tell which
   terminal they were renaming. The added test is an invariant over both

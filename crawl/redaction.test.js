@@ -54,3 +54,14 @@ test('un objet de config sérialisé en JSON perd ses valeurs sensibles', () => 
 test('une valeur entre guillemets est masquée en entier, espaces compris', () => {
   assert.equal(redige("PASSWORD='hunter 2 raw' next"), 'PASSWORD=*** next')
 })
+
+test('un en-tête Authorization perd son credential, pas seulement son schéma', () => {
+  // `\S+` ne consommait que le mot-clé : le `***` masquait `Bearer` et laissait
+  // le jeton en clair juste à côté — une rédaction en trompe-l'œil (#34).
+  assert.equal(redige('AUTHORIZATION=Basic dXNlcjpwYXNzd29yZA=='), 'AUTHORIZATION=***')
+  assert.equal(redige('Authorization: Bearer plainSecretToken123456789'), 'Authorization: ***')
+  assert.equal(
+    redige("curl -H 'Authorization: Digest cnonce=abc123' https://api.example.com/v1"),
+    "curl -H 'Authorization: *** https://api.example.com/v1",
+  )
+})

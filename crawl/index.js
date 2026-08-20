@@ -119,12 +119,14 @@ export function redige(texte) {
     // (`"apiKey":"..."`), où il s'intercale entre le nom et le séparateur ;
     // la valeur consomme une chaîne entière, espaces compris.
     //
-    // Le schéma d'authentification fait partie de la valeur : sans lui, `\S+`
-    // s'arrêtait au mot-clé, `Authorization: Bearer <jeton>` devenait
-    // `Authorization: *** <jeton>` et le credential partait en clair à côté
-    // d'un `***` qui donnait le change.
+    // Une valeur non quotée est consommée jusqu'à la fin de ligne, schéma
+    // d'authentification compris : `\S+` ne prenait qu'un mot, donc
+    // `Authorization: Digest username="x", response=<hash>` ne masquait que le
+    // premier champ, et tout schéma hors liste (AWS4-HMAC-SHA256, Negotiate)
+    // laissait sa signature en clair à côté d'un `***` qui donnait le change.
+    // Masquer la fin de ligne sur-rédige parfois — c'est le sens sûr (#36).
     .replace(
-      /(["']?)([\w.-]*(?:KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD|AUTH|CREDENTIALS?)[\w.-]*)\1(\s*[=:]\s*)("[^"]*"|'[^']*'|(?:Bearer|Basic|Digest)\s+\S+|\S+)/gi,
+      /(["']?)([\w.-]*(?:KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD|AUTH|CREDENTIALS?)[\w.-]*)\1(\s*[=:]\s*)("[^"]*"|'[^']*'|[^\r\n]+)/gi,
       '$1$2$1$3***',
     )
     .replace(/\b(?:sk|rk|pk)[-_][A-Za-z0-9_-]{8,}/g, '***')

@@ -152,18 +152,25 @@ function attachCommit(ovrseeDir, root, sources, message, session, tickets) {
  * `devine` coupe le repli du ticket unique : quand le plan lui-même n'a été que
  * déduit (l'unique plan actif, faute de mieux), en déduire aussi le ticket
  * enchaînerait deux paris, et solderait un ticket que personne n'a désigné.
+ *
+ * Rend les identifiants des tickets réellement déplacés. `reconcile()` s'en sert
+ * pour dire au `git pull` ce qu'il vient de solder : ce mouvement-là part du
+ * texte d'un message de commit venu d'un remote, et un tableau qui bouge tout
+ * seul doit au moins le dire.
+ *
+ * @returns {string[]} identifiants des tickets passés en colonne finale
  */
 export function avancerTicketsDuPlan(ovrseeDir, planFile, message = '', devine = false) {
   const colonnes = readBoard(ovrseeDir)
   const finale = colonneFinale(colonnes)
-  if (!finale) return
+  if (!finale) return []
 
   // Sans colonne `en-cours`, rien ne distingue un ticket en vol d'un ticket
   // jamais commencé. Ne rien fermer est alors le défaut sûr : un tableau qui
   // garde un ticket de trop se corrige d'un geste, un tableau vidé tout seul
   // ne se remarque pas.
   const iEnCours = colonnes.findIndex(c => c.id === EN_COURS)
-  if (iEnCours === -1) return
+  if (iEnCours === -1) return []
 
   const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
   const liesAuPlan = readTickets(ovrseeDir, colonnes).filter(t => t.meta.plan === planFile)
@@ -188,13 +195,16 @@ export function avancerTicketsDuPlan(ovrseeDir, planFile, message = '', devine =
         ? enVol
         : []
 
+  const soldes = []
   for (const ticket of aFermer) {
     try {
       moveTicket(ovrseeDir, ticket.file, finale)
+      soldes.push(ticket.meta.id)
     } catch {
       // Un ticket qui ne peut pas être déplacé ne doit jamais faire échouer le commit.
     }
   }
+  return soldes
 }
 
 /**

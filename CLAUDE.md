@@ -122,6 +122,15 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   souvent cinq. Il ne devine rien : sans ticket cité, rien n'est rattaché, car au moment
   du pull la session courante n'a aucun rapport avec le travail qui arrive. Un dépôt
   équipé avant lui rattrape son retard avec `pnpm ovrsee:reconcile`.
+- **Le rattrapage solde des tickets d'après un message écrit ailleurs.** Le `%B` d'un
+  commit venu d'un remote fait foi : `reconcile()` cite le ticket, `avancerTicketsDuPlan`
+  le pousse en colonne finale, à chaque `git pull`, sans confirmation. La portée est
+  étroite — seuls bougent les tickets **déjà en vol** et liés à un plan **ouvert ici** ;
+  rien du backlog, rien d'inexistant. Mais une citation erronée (copier-coller, squash
+  d'une PR dont on n'a pas relu chaque ligne) solde un vrai ticket. D'où la trace : le
+  hook nomme sur stderr les tickets soldés, au moment du `pull`. Corriger se fait d'un
+  `moveTicket` en arrière — l'avancée manuelle est toujours plus vraie que la règle
+  automatique.
 - **Un commit dont on ne connaît pas la session ne se rattache pas toujours.**
   L'attribution suit quatre étages (`planPourCommit`, `ovrsee-post-commit.js`) : ticket
   `T-XXXX` cité dans le message, puis la session, puis l'unique plan actif s'il n'y en a
@@ -164,6 +173,13 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   que « l'application n'a pas répondu en 60000 ms » — qui envoie chercher le problème
   dans le projet observé. Sa sortie est retenue (2 ko) et jointe à l'erreur écrite
   dans `scans.jsonl`, que l'onglet Produit affiche désormais.
+- **Cette trace est rédigée à l'écriture, et ce n'est pas une garantie.** `scans.jsonl`
+  est versionné : une commande `dev` qui meurt sur une variable d'environnement manquante
+  l'imprime parfois avec sa valeur, et le secret partirait dans git sans qu'un humain ait
+  relu la ligne. `redige()` (`crawl/index.js`) masque les formes connues — `*KEY=`,
+  `*TOKEN=`, `sk-…`, `ghp_…`, JWT, mot de passe d'URL — depuis `recordScan()`, seul point
+  d'écriture. Les formes inconnues passent : relire un `scans.jsonl` en échec avant de le
+  pousser reste le dernier filet.
 - **Annuler un crawl tue le groupe de processus, pas le seul fils.** Le crawl démarre
   lui-même le serveur de dev du projet observé (`dev` de `ovrsee.config.json`) ; un
   `child.kill()` le laisserait tourner, le port resterait pris, et le crawl suivant

@@ -164,6 +164,19 @@ test('les tickets en vol suivent, ceux restés en backlog non', () => {
   assert.equal(intact.colonne, 'backlog')
 })
 
+test('le rattrapage nomme les tickets qu’il solde', () => {
+  // Ce mouvement part du texte d'un message écrit sur un dépôt distant. Le
+  // garder muet, c'est laisser découvrir un ticket soldé à tort dans le tableau,
+  // sans savoir quand ni pourquoi il a bougé.
+  const { root, ovrseeDir } = depot('feat: le lot (T-0001)')
+
+  const traces = []
+  const fait = reconcile(ovrseeDir, root, m => traces.push(m))
+
+  assert.deepEqual(fait[0].tickets, ['T-0001'])
+  assert.match(traces.join(''), /T-0001 soldé/)
+})
+
 test('plansPourMessage ignore les plans clos et les tickets sans plan', () => {
   const { ovrseeDir } = depot('init')
 

@@ -398,3 +398,34 @@ test('nested secrets in hooks are masked while preserving structure', () => {
     cleanup(testDir)
   }
 })
+
+test('un scalaire rangé dans un tableau est masqué comme les autres', () => {
+  // Les éléments scalaires d'un tableau repartaient en clair : un jeton dans
+  // une liste de `settings.json` sortait entier par /api/config-claude, alors
+  // que le même jeton posé directement sur la clé était masqué.
+  const testDir = setupTestDir()
+  try {
+    writeFileSync(
+      join(testDir, 'settings.json'),
+      JSON.stringify({
+        hooks: {
+          Stop: [
+            {
+              matcher: '*',
+              hooks: [{ type: 'command', command: 'echo ok', jetons: ['sk-live-abc', 'ghp_def'] }],
+            },
+          ],
+        },
+      }),
+    )
+
+    const entree = readHooks()['Stop'][0].hooks[0]
+
+    assert.deepEqual(entree.jetons, ['****', '****'])
+    // Ce qui sert au diagnostic reste lisible.
+    assert.equal(entree.command, 'echo ok')
+    assert.equal(entree.type, 'command')
+  } finally {
+    cleanup(testDir)
+  }
+})

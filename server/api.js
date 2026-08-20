@@ -39,6 +39,37 @@ import {
 } from '../hooks/tickets.js'
 
 /**
+ * Les seules origines dont une requête peut se réclamer.
+ *
+ * `ovrsee://app` est l'application empaquetée ; les deux autres sont le dev
+ * server, dont le port est fixé par `strictPort` dans `vite.config.js`.
+ *
+ * Un client qui n'est pas un navigateur — Electron sur son protocole, le
+ * serveur MCP, curl — n'envoie pas d'`Origin` du tout. C'est pour ça que
+ * l'absence vaut acceptation : refuser l'absence fermerait la porte à tous les
+ * appelants légitimes sans gêner une page, qui, elle, en envoie toujours un.
+ */
+const ORIGINES = new Set(['ovrsee://app', 'http://localhost:5180', 'http://127.0.0.1:5180'])
+
+/**
+ * L'en-tête `X-Ovrsee` ne suffisait pas.
+ *
+ * Il compte sur le préflight CORS pour écarter les pages tierces. Mais la
+ * politique par défaut de Vite autorise **toute** origine `localhost` ou
+ * `127.0.0.1`, quel que soit le port : une page servie par le projet observé —
+ * exactement ce que l'onglet Navigateur affiche et ce que le crawl visite —
+ * passait le préflight et pouvait poster ici. De là, un `init` écrivait la
+ * commande `dev` de `ovrsee.config.json`, que le crawl suivant exécute.
+ *
+ * L'origine se vérifie donc en plus, et sur les lectures aussi : `/api/config-claude`
+ * rend les commandes des hooks de `~/.claude/`, qu'aucune page n'a à lire.
+ */
+const origineAutorisee = headers => {
+  const origin = headers.origin ?? headers.Origin
+  return origin === undefined || origin === null || origin === '' || ORIGINES.has(origin)
+}
+
+/**
  * Un dossier réel, désigné par un chemin absolu, qui n'est pas un lien.
  *
  * Le chemin vient du rendu. Il n'ouvre qu'une lecture du `ovrsee/` qui s'y
@@ -336,6 +367,13 @@ function ticketAction(body, root) {
  */
 export function resolve(url, cwd = process.cwd(), request = {}) {
   const { method = 'GET', headers = {}, body = null } = request
+
+  // Avant tout le reste, et seulement sur nos routes : hors de `/api/`, rendre
+  // 403 volerait la requête à l'hôte, qui a ses propres chemins à servir.
+  if (url.pathname.startsWith('/api/') && !origineAutorisee(headers)) {
+    return { status: 403, json: { error: 'origine refusée' } }
+  }
+
   const known = () => projects()
   const asked = () => known().find(p => p.path === url.searchParams.get('path'))?.path ?? null
 
@@ -487,12 +525,24 @@ const parseBody = text => {
   }
 }
 
-/** Lit le corps d'une requête node avant de décider. */
+/**
+ * Lit le corps d'une requête node avant de décider.
+ *
+ * Plafonné : un POST local sans fin faisait grossir la mémoire du dev server
+ * jusqu'à l'OOM. Un ticket markdown n'approche pas le mégaoctet.
+ */
+const CORPS_MAX = 1_000_000
+
 const readBody = req =>
   new Promise(resolve => {
     let text = ''
-    req.on('data', chunk => (text += chunk))
-    req.on('end', () => resolve(parseBody(text)))
+    req.on('data', chunk => {
+      if (text.length > CORPS_MAX) return
+      text += chunk
+      if (text.length > CORPS_MAX) req.destroy()
+    })
+    req.on('end', () => resolve(text.length > CORPS_MAX ? null : parseBody(text)))
+    req.on('error', () => resolve(null))
   })
 
 /** Adaptateur pour le dev server Vite (connect). */

@@ -171,6 +171,15 @@ pnpm ovrsee:close     # releases the active plan
 While a plan is active, every commit gets attached to it — even unrelated fixes.
 Closing is not optional: it lets you switch tasks without polluting the history.
 
+**Squash-merging on GitHub runs no hook**, so the merge commit is born on their
+servers and nothing attaches it. `git pull` catches up: a `post-merge` hook reads
+the tickets cited in the message and attaches the commit to every open plan they
+belong to. A repository equipped before that hook existed catches up once with:
+
+```bash
+pnpm ovrsee:reconcile
+```
+
 The **terminal is integrated in Electron only** — it runs over IPC, not a socket.
 This is intentional: a socket would be open to any process on the same user. It's
 a full terminal: the pty opens a login shell and starts `claude` in it. The crawl takes
@@ -253,7 +262,7 @@ crawling the wrong app would produce backdated screenshots of the wrong project.
 
 | Directory | Role |
 |---|---|
-| `hooks/` | Plan capture, commit-time closing, tickets, Obsidian export, CLI |
+| `hooks/` | Plan capture, commit-time closing, catch-up on pull, tickets, Obsidian export, CLI |
 | `crawl/` | Playwright traversal of the app, dated screenshots |
 | `server/` | `/api/*` routes for browser and Electron |
 | `mcp/` | MCP server (stdio, JSON-RPC 2.0), same interface as `/api/*` |

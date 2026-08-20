@@ -175,6 +175,15 @@ Tant qu'un plan est actif, le hook post-commit lui rattache **tout** commit — 
 sans rapport. Clore n'est pas une formalité : c'est ce qui vous permet de changer de sujet
 sans encombrer l'historique.
 
+**Un squash-merge fait sur GitHub n'exécute aucun hook** : le commit naît sur leurs
+serveurs, et rien ne le rattache. Le `git pull` rattrape — un hook `post-merge` lit les
+tickets cités dans le message et rattache le commit à chacun des plans ouverts qui les
+portent. Un dépôt équipé avant ce hook comble son retard d'un coup :
+
+```bash
+pnpm ovrsee:reconcile
+```
+
 Le terminal intégré n'existe que dans l'application : il passe par IPC, qu'un
 navigateur n'a pas. C'est délibéré — l'exposer par une socket locale l'ouvrirait à
 tout processus tournant sous le même compte. C'est un terminal complet : le pty ouvre
@@ -259,7 +268,7 @@ celui d'un autre projet produirait des captures datées d'aujourd'hui montrant l
 
 | Dossier | Rôle |
 |---|---|
-| `hooks/` | Capture des plans, clôture au commit, tickets, export Obsidian, CLI |
+| `hooks/` | Capture des plans, clôture au commit, rattrapage au pull, tickets, export Obsidian, CLI |
 | `crawl/` | Parcours Playwright de l'app, captures datées |
 | `server/` | Routes `/api/*` pour navigateur et Electron |
 | `mcp/` | Serveur MCP stdio (JSON-RPC 2.0), même interface que `/api/*` |

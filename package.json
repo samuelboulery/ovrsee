@@ -28,6 +28,7 @@
     "ovrsee:install": "node hooks/install.js",
     "ovrsee:status": "node hooks/ovrsee-cli.js status",
     "ovrsee:close": "node hooks/ovrsee-cli.js close",
+    "ovrsee:reconcile": "node hooks/ovrsee-cli.js reconcile",
     "ovrsee:brief": "node hooks/ovrsee-session-start.js",
     "ovrsee:obsidian": "node hooks/ovrsee-cli.js obsidian",
     "ovrsee:crawl": "node crawl/index.js",

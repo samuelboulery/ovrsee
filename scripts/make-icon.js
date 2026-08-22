@@ -1,19 +1,26 @@
 #!/usr/bin/env node
 /**
- * Fabrique `build/icon.icns` à partir d'un dessin décrit ici.
+ * Fabrique `build/icon.icns` et `build/icon.ico` à partir de `build/icon.svg`.
  *
  *   node scripts/make-icon.js
  *
- * L'icône est la marque de l'ovrsee : un œil en grille de pixels 7×5
- * (maquette 2a, refonte T-0050) — mêmes coordonnées que `Logo` dans
- * `app/src/OnboardingArt.tsx`, en hex littéral parce qu'un SVG rendu hors
- * navigateur n'a pas de variables CSS à résoudre. Les deux formes sont à
- * garder d'accord — voir le WHY de ce fichier-là.
+ * **`build/icon.svg` est la source.** Il l'était déjà en fait — le script le
+ * décrivait en dur puis l'écrivait — mais il ne l'était pas en droit : on
+ * corrigeait le dessin dans ce fichier-ci. Depuis T-0202, le dessin se corrige
+ * dans le SVG, et ce script ne fait plus que décliner et assembler.
  *
- * Le dessin vit dans ce fichier plutôt que comme binaire opaque dans le dépôt :
- * on peut le relire, le corriger, et le régénérer. Playwright fait le rendu —
- * il est déjà là pour le crawl — puis `sips` et `iconutil`, fournis par macOS,
- * déclinent et assemblent.
+ * Conséquence sur le lien avec `Logo` (`app/src/OnboardingArt.tsx`) : les deux
+ * portaient les mêmes coordonnées, écrites deux fois. Elles restent à garder
+ * d'accord, mais le SVG fait désormais foi — voir le WHY de `OnboardingArt`.
+ *
+ * L'icône est la marque de l'ovrsee : un œil en grille de pixels 7×5
+ * (maquette 2a, refonte T-0050). Volontairement pauvre en détails : dans le
+ * Dock, elle fait 32 pixels de côté. La silhouette (le losange de l'œil) doit
+ * se reconnaître, le détail interne non.
+ *
+ * `sips` et `iconutil`, fournis par macOS, suffisent : `sips` lit le SVG
+ * directement. Le passage par un navigateur — Playwright, lancé pour rendre un
+ * SVG déjà sur le disque — a disparu avec T-0202.
  */
 
 import { execFileSync } from 'node:child_process'
@@ -21,69 +28,10 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { chromium } from 'playwright-core'
-
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const BUILD = join(ROOT, 'build')
 const ICONSET = join(BUILD, 'icon.iconset')
-
-// Palette du système Ovrsee (T-0045), littérale : ce SVG est rendu hors
-// navigateur, il n'a pas les variables CSS de `_ds/ovrsee/styles.css`.
-const GROUND = '#08090a'
-const PANEL = '#101114'
-const DIVIDER = '#1c1d24'
-const ACCENT = '#7d76f0'
-const OUTER = '#495969' // neutral-700
-const MID = '#8799ab' // neutral-500
-
-/**
- * Le dessin, en unités de 1024. Grille de pixels 7×5, module carré, gouttière
- * à 30 % du module (maquette 2a) — mêmes coordonnées que `Logo` dans
- * `app/src/OnboardingArt.tsx`.
- *
- * Volontairement pauvre en détails : dans le Dock, l'icône fait 32 pixels de
- * côté. Un pixel de la grille y vaut environ 2 pixels d'écran — la forme
- * générale (le losange de l'œil) reste lisible, le détail interne non, et
- * ce n'est pas grave : c'est la silhouette qui doit se reconnaître.
- */
-const MODULE = 90
-const GUTTER = 27
-const STEP = MODULE + GUTTER
-const GRID_W = 7 * MODULE + 6 * GUTTER
-const GRID_H = 5 * MODULE + 4 * GUTTER
-const OFFSET_X = (1024 - GRID_W) / 2
-const OFFSET_Y = (1024 - GRID_H) / 2
-
-const PIXELS = [
-  [0, 2, OUTER], [0, 3, OUTER], [0, 4, OUTER],
-  [1, 1, MID], [1, 5, MID],
-  [2, 0, MID], [2, 2, ACCENT], [2, 3, ACCENT], [2, 4, ACCENT], [2, 6, MID],
-  [3, 1, MID], [3, 5, MID],
-  [4, 2, OUTER], [4, 3, OUTER], [4, 4, OUTER],
-]
-
-const pixelRects = PIXELS.map(
-  ([ligne, colonne, fill]) =>
-    `<rect x="${OFFSET_X + colonne * STEP}" y="${OFFSET_Y + ligne * STEP}" width="${MODULE}" height="${MODULE}" fill="${fill}"/>`,
-).join('\n    ')
-
-const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <defs>
-    <linearGradient id="fond" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${PANEL}"/>
-      <stop offset="100%" stop-color="${GROUND}"/>
-    </linearGradient>
-  </defs>
-
-  <rect width="1024" height="1024" rx="228" fill="url(#fond)"/>
-  <rect x="6" y="6" width="1012" height="1012" rx="224" fill="none"
-        stroke="${DIVIDER}" stroke-width="12"/>
-
-  <g>
-    ${pixelRects}
-  </g>
-</svg>`
+const SOURCE = join(BUILD, 'icon.svg')
 
 /** Tailles exigées par un `.iconset` macOS : nom de fichier → côté en pixels. */
 const SIZES = [
@@ -132,31 +80,27 @@ function packIco(pngBuffers) {
   return Buffer.concat([header, ...entries, ...pngBuffers.map(p => p.data)])
 }
 
-async function render() {
+function render() {
+  readFileSync(SOURCE) // échoue net et tôt si la source manque
+
   mkdirSync(ICONSET, { recursive: true })
   const master = join(BUILD, 'icon-1024.png')
 
-  const browser = await chromium.launch({ channel: 'chrome', headless: true })
-  try {
-    const page = await browser.newPage({
-      viewport: { width: 1024, height: 1024 },
-      deviceScaleFactor: 1,
-    })
-    // `transparent` pour que les coins arrondis restent transparents.
-    await page.setContent(
-      `<body style="margin:0;background:transparent">${svg}</body>`,
-      { waitUntil: 'load' },
-    )
-    await page.screenshot({ path: master, omitBackground: true })
-  } finally {
-    await browser.close()
-  }
+  // Le maître est rasterisé une fois depuis le SVG ; les déclinaisons le
+  // réduisent, lui. Rasteriser chaque taille directement depuis le SVG
+  // donnerait des petits formats plus nets — et différents de ceux qu'on
+  // expédie depuis T-0050. Ce n'est pas ce ticket-ci qui change l'icône.
+  //
+  // `-z` seul ne convertit pas : sans `-s format png`, sips écrirait un SVG
+  // redimensionné sous un nom en `.png`.
+  execFileSync('sips', ['-s', 'format', 'png', '-z', '1024', '1024', SOURCE, '--out', master], {
+    stdio: 'ignore',
+  })
 
-  for (const [name, size] of SIZES) {
-    execFileSync('sips', ['-z', String(size), String(size), master, '--out', join(ICONSET, name)], {
-      stdio: 'ignore',
-    })
-  }
+  const png = (size, out) =>
+    execFileSync('sips', ['-z', String(size), String(size), master, '--out', out], { stdio: 'ignore' })
+
+  for (const [name, size] of SIZES) png(size, join(ICONSET, name))
 
   execFileSync('iconutil', ['-c', 'icns', ICONSET, '-o', join(BUILD, 'icon.icns')])
 
@@ -164,7 +108,7 @@ async function render() {
   // mac, rendu à part.
   const ICO_SIZES = [16, 32, 48, 256]
   const ico48 = join(ICONSET, 'icon_48x48.png')
-  execFileSync('sips', ['-z', '48', '48', master, '--out', ico48], { stdio: 'ignore' })
+  png(48, ico48)
   const icoSource = { 16: 'icon_16x16.png', 32: 'icon_32x32.png', 48: 'icon_48x48.png', 256: 'icon_256x256.png' }
   const pngBuffers = ICO_SIZES.map(size => ({ size, data: readFileSync(join(ICONSET, icoSource[size])) }))
   writeFileSync(join(BUILD, 'icon.ico'), packIco(pngBuffers))
@@ -174,11 +118,12 @@ async function render() {
   // electron-builder lit `build/` (buildResources) et reprend icon.icns /
   // icon.ico automatiquement. Le PNG maître sert aussi de source pour
   // d'autres usages.
-  writeFileSync(join(BUILD, 'icon.svg'), svg.trim() + '\n', 'utf8')
   console.log('build/icon.icns et build/icon.ico écrits')
 }
 
-render().catch(err => {
+try {
+  render()
+} catch (err) {
   console.error(`échec : ${err?.message ?? err}`)
   process.exit(1)
-})
+}

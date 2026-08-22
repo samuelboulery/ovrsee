@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Suites de la revue de la PR #61",
   "opened": "2026-08-22",
-  "closed": null,
+  "closed": "2026-08-22",
   "commits": [
     {
       "sha": "9814f77",

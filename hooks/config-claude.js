@@ -13,6 +13,8 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
+import { redige } from './redaction.js'
+
 /** Où Claude Code stocke sa configuration. */
 const configDir = () =>
   process.env.OVRSEE_CONFIG_CLAUDE_DIR ?? join(homedir(), '.claude')
@@ -60,13 +62,19 @@ function maskSecrets(obj) {
  * liste de `settings.json` sortait entier par /api/config-claude, alors que le
  * même jeton posé directement sur la clé était masqué.
  *
+ * Une clé blanche ne suffit pas : `command` porte des lignes de shell, et un
+ * hook qui embarque `Authorization: Bearer …` ou `?token=…` en dur sortait son
+ * jeton entier par /api/config-claude. Le contenu passe donc au même filtre que
+ * la trace d'un scan.
+ *
  * @param {string} key clé qui porte la valeur — c'est elle qui décide
  * @param {unknown} value
  */
 function maskValue(key, value) {
   if (Array.isArray(value)) return value.map(item => maskValue(key, item))
   if (value !== null && typeof value === 'object') return maskSecrets(value)
-  return WHITELIST_KEYS.has(key) ? value : '****'
+  if (!WHITELIST_KEYS.has(key)) return '****'
+  return typeof value === 'string' ? redige(value) : value
 }
 
 /**

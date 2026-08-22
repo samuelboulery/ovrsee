@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 
-import { redige } from './index.js'
+import { redige } from './redaction.js'
 
 test('une variable d’environnement sensible perd sa valeur, pas son nom', () => {
   assert.equal(redige('OPENAI_API_KEY=sk-abc123def456ghi'), 'OPENAI_API_KEY=***')
@@ -83,5 +83,18 @@ test('un en-tête Authorization est masqué en entier, schéma inconnu compris',
   assert.equal(
     redige('Authorization: Bearer abc123\nGET /v1/pages 401'),
     'Authorization: ***\nGET /v1/pages 401',
+  )
+})
+
+test('une affectation masquée n’emporte pas le diagnostic qui la suit', () => {
+  // Masquer jusqu'à la fin de ligne effaçait l'hôte et le code retour qui
+  // partagent la ligne, y compris derrière un faux positif (#39).
+  assert.equal(
+    redige('DEBUG: TOKEN_REFRESH_INTERVAL=300 seconds, next check at 10:00 host=db.example.com'),
+    'DEBUG: TOKEN_REFRESH_INTERVAL=*** seconds, next check at 10:00 host=db.example.com',
+  )
+  assert.equal(
+    redige('connect failed: DB_PASSWORD=hunter2, host=db.example.com, code=ECONNREFUSED'),
+    'connect failed: DB_PASSWORD=***, host=db.example.com, code=ECONNREFUSED',
   )
 })

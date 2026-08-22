@@ -2,10 +2,11 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { existsSync, mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
+import { EventEmitter } from 'node:events'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { resolve } from './api.js'
+import { nodeMiddleware, resolve } from './api.js'
 import { mediaPath, shotPath } from '../hooks/snapshot.js'
 import { registerProject } from '../hooks/plans.js'
 
@@ -732,4 +733,31 @@ test('hors /api/, une origine refusée ne vole pas la requête à l’hôte', ()
   // Rendre 403 ici priverait le dev server et le protocole Electron de leurs
   // propres chemins.
   assert.equal(resolve(url('/index.html'), null, { headers: { origin: 'https://exemple.test' } }), null)
+})
+
+test('un POST trop volumineux se solde, il ne reste pas pendu', async () => {
+  // `req.destroy()` sans argument n'émet ni `end` ni `error` : la Promise de
+  // `readBody` ne se résolvait jamais, le middleware n'atteignait jamais sa
+  // réponse et la requête restait ouverte à vie (#40). Le client, lui, voit
+  // seulement sa connexion coupée — c'est côté serveur que ça se vérifie.
+  const req = new EventEmitter()
+  Object.assign(req, {
+    url: '/api/projects',
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    destroy: () => req.emit('close'),
+  })
+  const res = { statusCode: 200, setHeader: () => {}, end: () => rendu('répondu') }
+
+  let rendu
+  const issue = Promise.race([
+    new Promise(fini => {
+      rendu = fini
+    }),
+    new Promise(fini => setTimeout(() => fini('pendue'), 2000).unref()),
+  ])
+  nodeMiddleware(process.cwd())(req, res, () => rendu('passée à l’hôte'))
+
+  req.emit('data', 'x'.repeat(1_500_001))
+  assert.notEqual(await issue, 'pendue')
 })

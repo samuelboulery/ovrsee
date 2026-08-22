@@ -2,7 +2,7 @@
 {
   "id": "T-0195",
   "titre": "Supprimer le layout shift au survol du dropdown des projets",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": ["ui", "issue-51"],
   "cree": "2026-08-22",

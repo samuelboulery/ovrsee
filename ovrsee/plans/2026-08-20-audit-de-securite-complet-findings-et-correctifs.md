@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Audit de sécurité complet — findings et correctifs",
   "opened": "2026-08-20",
-  "closed": null,
+  "closed": "2026-08-20",
   "commits": [
     {
       "sha": "c8db5a6",
@@ -34,6 +34,11 @@
         "CHANGELOG.md",
         "package.json"
       ]
+    },
+    {
+      "sha": "f10ab6e",
+      "date": "2026-08-20",
+      "files": []
     }
   ]
 }

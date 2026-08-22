@@ -2,10 +2,12 @@
 {
   "id": "T-0206",
   "titre": "Quatre fichiers dépassent le plafond de 800 lignes",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "basse",
   "charge": "l",
-  "tags": ["dette"],
+  "tags": [
+    "dette"
+  ],
   "cree": "2026-08-22",
   "maj": "2026-08-22",
   "plan": null,

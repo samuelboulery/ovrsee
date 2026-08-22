@@ -10148,8 +10148,8 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/useTerminal.ts",
       "source_location": "L434",
       "weight": 1.0,
-      "_src": "useterminal_useterminals",
-      "_tgt": "pty_terminalbridge",
+      "_src": "pty_terminalbridge",
+      "_tgt": "useterminal_useterminals",
       "source": "pty_terminalbridge",
       "target": "useterminal_useterminals"
     },

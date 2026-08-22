@@ -2,7 +2,7 @@
 {
   "id": "T-0134",
   "titre": "Charger graph.json à la demande",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "m",
   "tags": [

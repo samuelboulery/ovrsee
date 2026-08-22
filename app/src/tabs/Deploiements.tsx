@@ -11,7 +11,7 @@ import {
 } from '../data'
 import { t, type TranslationKey } from '../i18n'
 import { s } from '../style'
-import type { IntegrationsBridge } from '../useTerminal'
+import type { IntegrationsBridge } from '../pty'
 
 const DOT_ETAT: Record<IntegrationState, string> = {
   ok: 'var(--color-ok)',

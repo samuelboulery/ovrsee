@@ -18,7 +18,7 @@ import {
   type SettingsType,
   type Ticket,
 } from './data'
-import { pasteToClaude } from './useTerminal'
+import { pasteToClaude } from './pty'
 import { t } from './i18n'
 import { s } from './style'
 

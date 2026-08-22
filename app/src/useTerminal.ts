@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import type { Integration, IntegrationProvider, IntegrationStatus, SchemaTable } from './data'
 import { extractAttention, type AttentionEvent } from './attention'
-import type { MenuBarDecision, MenuBarEtat, MenuBarVue } from './menubar'
 import { getTerminalTheme } from './theme'
+// Les types de la passerelle et les fonctions de collage vivent dans `pty.ts`
+// depuis T-0133 : ce module-ci charge xterm, et il est le seul à devoir le faire.
+import { claude, terminalBridge, type SessionKind } from './pty'
 // WHY: xterm est le terminal de VS Code, pas une imitation. Un rendu maison
 // devrait réimplémenter les séquences ANSI, le défilement et la sélection —
 // et `claude` s'afficherait de travers au premier cas non couvert.
@@ -14,106 +15,6 @@ import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
 
-/** Genre de session. Le rendu ne nomme jamais de programme — voir `electron/pty.js`. */
-export type SessionKind = 'claude' | 'shell'
-
-/**
- * Passerelle exposée par `electron/preload.cjs`.
- *
- * Absente dans un navigateur : c'est le test de capacité de l'interface, et il
- * est franc — pas de terminal simulé, pas de bouton qui ment.
- */
-export interface TerminalBridge {
-  open: (projectPath: string, kind?: SessionKind) => Promise<{ id: string } | { error: string }>
-  write: (id: string, data: string) => Promise<void>
-  resize: (id: string, cols: number, rows: number) => Promise<void>
-  close: (id: string) => Promise<void>
-  listen: (
-    onData: (id: string, data: string) => void,
-    onExit: (id: string, code: number) => void,
-  ) => () => void
-}
-
-/** Les éditeurs dont le processus principal connaît le schéma d'URL. */
-export type Editeur = 'vscode' | 'cursor' | 'zed' | 'windsurf'
-
-/**
- * Passerelle des secrets d'intégration — voir `electron/preload.cjs`.
- *
- * Un jeton entre par `save` et ne ressort jamais : `save`/`remove` ne
- * rendent que `hasToken`, `checkStatus` qu'un statut déjà résolu. La lecture
- * seule (sans jeton) vient de `snapshot.integrations`, servi sur les trois
- * hôtes — pas besoin d'un `list` ici.
- */
-export interface IntegrationsBridge {
-  save: (
-    projectPath: string,
-    entry: { id?: string; provider: IntegrationProvider; label: string; url?: string; token?: string },
-  ) => Promise<Integration[] | { error: string }>
-  remove: (projectPath: string, id: string) => Promise<Integration[]>
-  checkStatus: (projectPath: string, id: string) => Promise<IntegrationStatus>
-  /** Introspection lecture-seule du schéma public, Supabase uniquement. */
-  fetchSchema: (
-    projectPath: string,
-    id: string,
-  ) => Promise<{ tables: SchemaTable[] } | { error: string }>
-}
-
-declare global {
-  interface Window {
-    ovrsee?: {
-      terminal: TerminalBridge
-      integrations: IntegrationsBridge
-      projects: {
-        /** Sélecteur de dossier du système. Rend null si l'utilisateur annule. */
-        pick: () => Promise<string | null>
-        /** Révèle le `ovrsee/` du projet dans le Finder. */
-        reveal: (projectPath: string) => Promise<boolean>
-        /** Ouvre le projet dans un éditeur, par schéma d'URL. */
-        edit: (projectPath: string, editor: Editeur) => Promise<boolean>
-      }
-      /** Commandes du menu natif — voir `electron/menu.js`. */
-      menu: { on: (handler: (command: string) => void) => () => void }
-      /**
-       * Ramène la fenêtre au premier plan. La seule chose qu'un clic sur une
-       * notification ne peut pas faire depuis le rendu.
-       */
-      app: { focus: () => Promise<void>; close: () => Promise<void> }
-      /**
-       * Barre de menu macOS — voir `electron/tray.js`.
-       *
-       * Absente dans un navigateur, comme le terminal : il n'y a pas de barre
-       * de statut à alimenter.
-       */
-      menubar?: {
-        /** Le rendu principal publie l'état complet ; le principal le retient. */
-        report: (etat: MenuBarEtat) => Promise<void>
-        /** Le popover s'abonne à cet état, augmenté de ce que seul le principal sait. */
-        listen: (handler: (vue: MenuBarVue) => void) => () => void
-        /**
-         * Répond à une session. Le rendu n'envoie que la décision — la touche
-         * correspondante est choisie dans le processus principal.
-         */
-        answer: (ptyId: string, decision: MenuBarDecision) => Promise<boolean>
-        /** Ramène la fenêtre sur cette session, puis referme le popover. */
-        reveal: (sessionKey: string) => Promise<void>
-        /** Côté fenêtre principale : le popover demande cette session. */
-        onReveal: (handler: (sessionKey: string) => void) => () => void
-      }
-      /** Onglet Navigateur — voir `electron/preload.cjs`. */
-      preview: {
-        devtools: (
-          targetId: number,
-          bounds: { x: number; y: number; width: number; height: number },
-          theme: 'dark' | 'light',
-        ) => Promise<boolean>
-        devtoolsClose: () => Promise<boolean>
-      }
-    }
-  }
-}
-
-const terminalBridge = (): TerminalBridge | null => window.ovrsee?.terminal ?? null
 
 /** Un onglet du panneau : ce que l'interface en montre. */
 export interface Session {
@@ -136,44 +37,6 @@ interface Pane {
   id: string | null
   /** Posé dès le démontage : ce qui arrive après ne doit plus rien toucher. */
   gone: boolean
-}
-
-/**
- * Session Claude courante, à portée de module.
- *
- * L'onglet Navigateur écrit dedans sans être un enfant du panneau terminal.
- * Faire descendre `inject` par les props obligerait à remonter le cycle de vie
- * de xterm jusqu'à `App.tsx`, et démonter `<Terminal>` (App.tsx:276) tuerait la
- * session — le panneau est repliable.
- */
-let claudeSessionId: string | null = null
-
-/**
- * Écrit dans le pty désigné. Rend false quand il n'y en a pas — c'est le cas
- * dans un navigateur, et l'appelant se rabat alors sur le presse-papier.
- */
-export function injectTo(ptyId: string | null, text: string): boolean {
-  const bridge = terminalBridge()
-  if (!bridge || !ptyId) return false
-  bridge.write(ptyId, text)
-  return true
-}
-
-/**
- * Colle un bloc dans le pty désigné sans le valider.
- *
- * Le mode « bracketed paste » du terminal est indispensable pour un texte
- * multiligne : sans lui, le premier retour à la ligne validerait la saisie et
- * le reste du bloc partirait comme autant de messages séparés. Rien n'est
- * envoyé — l'utilisateur relit et appuie sur Entrée.
- */
-export function pasteTo(ptyId: string | null, text: string): boolean {
-  return injectTo(ptyId, `\x1b[200~${text}\x1b[201~`)
-}
-
-/** Colle un bloc dans la session Claude du projet courant — voir `pasteTo`. */
-export function pasteToClaude(text: string): boolean {
-  return pasteTo(claudeSessionId, text)
 }
 
 const claudeSlot = (project: string): Session => ({
@@ -232,7 +95,7 @@ export function useTerminals(
   // portent le chemin du projet, donc aucune collision entre deux projets.
   const sessionsByProject = useRef(new Map<string, Session[]>())
   const activeByProject = useRef(new Map<string, string | null>())
-  // Lu par `attach()` pour ne pointer `claudeSessionId` que si le projet de la
+  // Lu par `attach()` pour ne pointer `claude.id` que si le projet de la
   // session qui vient de s'ouvrir est toujours celui affiché — sans ça, changer
   // de projet pendant l'ouverture ferait écrire `pasteToClaude` dans la
   // mauvaise session.
@@ -283,7 +146,7 @@ export function useTerminals(
           pane.xterm.writeln(`\r\n\x1b[38;5;140m— session terminée (code ${code}) —\x1b[0m`)
           pane.id = null
           oublieId(key)
-          if (key.endsWith('#claude')) claudeSessionId = null
+          if (key.endsWith('#claude')) claude.id = null
         }
       },
     )
@@ -298,7 +161,7 @@ export function useTerminals(
     if (!projectPath) {
       setSessions([])
       setActive(null)
-      claudeSessionId = null
+      claude.id = null
       return
     }
 
@@ -316,7 +179,7 @@ export function useTerminals(
       wasActive && projectSessions.some(s => s.key === wasActive) ? wasActive : claudeSlot(projectPath).key,
     )
 
-    claudeSessionId = panes.current.get(claudeSlot(projectPath).key)?.id ?? null
+    claude.id = panes.current.get(claudeSlot(projectPath).key)?.id ?? null
     setErrors({})
   }, [projectPath])
 
@@ -343,7 +206,7 @@ export function useTerminals(
         oublieId(session.key)
         if (pane.id) {
           bridge.close(pane.id)
-          if (pane.id === claudeSessionId) claudeSessionId = null
+          if (pane.id === claude.id) claude.id = null
         }
         pane.xterm.dispose()
         return
@@ -405,10 +268,10 @@ export function useTerminals(
         }
         pane.id = result.id
         setPtyIds(before => ({ ...before, [session.key]: result.id }))
-        // Ne pointer `claudeSessionId` que si le projet de cette session est
+        // Ne pointer `claude.id` que si le projet de cette session est
         // toujours celui affiché : sinon un changement de projet pendant
         // l'ouverture ferait écrire `pasteToClaude` dans une session cachée.
-        if (session.kind === 'claude' && activeProjectRef.current === projectPath) claudeSessionId = result.id
+        if (session.kind === 'claude' && activeProjectRef.current === projectPath) claude.id = result.id
         bridge.resize(result.id, xterm.cols, xterm.rows)
       })
     }
@@ -517,7 +380,7 @@ export function useTerminals(
       setActive(key)
       if (!projectPath || !key) return
       activeByProject.current.set(projectPath, key)
-      if (key.endsWith('#claude')) claudeSessionId = panes.current.get(key)?.id ?? null
+      if (key.endsWith('#claude')) claude.id = panes.current.get(key)?.id ?? null
     },
     [projectPath],
   )

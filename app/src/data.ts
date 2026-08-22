@@ -11,7 +11,6 @@ import { t } from './i18n'
 import { liste } from './liste'
 import type { Plan } from './plans'
 import type { Page } from './pages'
-import type { GraphifyGraph } from './graph'
 import type { Integration } from './api'
 
 /**
@@ -266,30 +265,6 @@ export interface Snapshot {
     orphanShots?: string[]
   } | null
   scans: Scan[]
-  graph: GraphifyGraph | null
-  /**
-   * D'où vient `graph` : Graphify, ou un coffre Obsidian déclaré en config.
-   *
-   * L'onglet Données l'affiche. Les deux sources n'ont ni la même fraîcheur ni
-   * la même fiabilité — l'une est analysée, l'autre écrite à la main — et une
-   * ligne dont on ignore l'origine ne se vérifie pas.
-   */
-  graphSource: 'graphify' | 'obsidian' | null
-  /**
-   * La source de graphe demandée : 'auto', 'graphify', ou 'obsidian'.
-   * Permet de distinguer un choix explicite du défaut.
-   */
-  sourceRequested: string
-  /**
-   * true si la source demandée n'a pas pu être trouvée.
-   * Affiche une alerte distincte selon le type de source.
-   */
-  sourceMissing: boolean
-  /**
-   * Date du graphe, au format YYYY-MM-DD, ou null si non daté.
-   * Affichée dans le badge de provenance.
-   */
-  sourceDate: string | null
   /** slug de page → captures successives, de la plus récente à la plus ancienne */
   shots: Record<string, string[]>
   /** Commits et plans mêlés, du plus récent au plus ancien. */

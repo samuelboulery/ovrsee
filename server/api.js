@@ -24,7 +24,7 @@ import { exportVault } from '../hooks/obsidian.js'
 import { closeOpenPlans, registerProject, touchProject, unregisterProject } from '../hooks/plans.js'
 import { readSettings, writeSettings, validateSettings, mergeSettings } from '../hooks/settings.js'
 import { installSkills, readSkills } from '../hooks/skills.js'
-import { projects, snapshot, shotPath, mediaPath, tableau, readJson } from '../hooks/snapshot.js'
+import { projects, snapshot, shotPath, mediaPath, tableau, readJson, readGraph } from '../hooks/snapshot.js'
 import { gitStatus } from '../hooks/git-status.js'
 import {
   addColumn,
@@ -465,6 +465,15 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
       // On ne lit que des projets enregistrés : un chemin arbitraire dans la
       // barre d'adresse ne doit pas devenir une lecture de disque arbitraire.
       return root ? { json: snapshot(root) } : { status: 404, json: { error: 'projet inconnu' } }
+    }
+
+    // Le graphe, à la demande — T-0134. Séparé du snapshot parce qu'il pèse
+    // 687 ko et que l'onglet Données est le seul à le lire : le payer à chaque
+    // changement de projet coûtait une lecture synchrone pour rien.
+    case '/api/graph': {
+      const root = asked()
+      if (!root) return { status: 404, json: { error: 'projet inconnu' } }
+      return { json: readGraph(root, readJson(join(root, 'ovrsee.config.json'))) }
     }
 
     case '/api/shot': {

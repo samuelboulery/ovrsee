@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { SidebarSimple } from '@phosphor-icons/react'
 
 import { t, setCurrentLanguage } from './i18n'
@@ -33,9 +33,22 @@ import { Navigateur } from './tabs/Navigateur'
 import { Produit } from './tabs/Produit'
 import { Historique } from './tabs/Historique'
 import { Tableau } from './tabs/Tableau'
-import { Donnees } from './tabs/Donnees'
+import { Donnees, oublierGraphe } from './tabs/Donnees'
 import { Stack } from './tabs/Stack'
-import { Terminal, type Layout, type TerminalActions } from './Terminal'
+import type { Layout, TerminalActions } from './Terminal'
+
+/**
+ * Le panneau terminal en morceau séparé — T-0133.
+ *
+ * xterm et sa feuille de style pèsent 488 ko, le tiers du bundle, pour une
+ * fonction que beaucoup de sessions n'ouvrent jamais. Le `lazy()` seul ne
+ * suffisait pas : `pasteToClaude` vivait dans le même module que xterm et trois
+ * composants du chargement initial l'importaient. Il est passé dans `pty.ts`.
+ *
+ * Pas de `fallback` visible : le panneau apparaît quand son morceau arrive, et
+ * un squelette d'un dixième de seconde vaudrait moins que rien du tout.
+ */
+const Terminal = lazy(() => import('./Terminal').then(m => ({ default: m.Terminal })))
 import { Divider, useResizable } from './useResizable'
 import { activeTabsInOrder, type TabId } from './views'
 import { labelOf, projectFromUrl, pushUrl, routeFromUrl, tabForPath, ticketFromUrl } from './route'
@@ -269,8 +282,17 @@ export function App() {
     return () => clearInterval(timer)
   }, [current])
 
+  /** Incrémenté par `reload`. Seul l'onglet Données l'écoute — voir plus bas. */
+  const [relectures, setRelectures] = useState(0)
+
   const reload = () => {
     if (!current) return
+    // Le graphe ne vient plus du snapshot (T-0134) et l'onglet Données le garde
+    // entre deux ouvertures (T-0208) : un rechargement explicite doit le jeter,
+    // sinon un graphe régénéré par un commit resterait affiché périmé. Le
+    // compteur fait relire l'onglet déjà monté ; l'oubli fait relire le suivant.
+    oublierGraphe(current)
+    setRelectures(n => n + 1)
     fetchSnapshot(current)
       .then(setSnapshot)
       .catch(err => setError(String(err.message ?? err)))
@@ -615,11 +637,7 @@ export function App() {
                       {tab === 'donnees' && (
                         <Donnees
                           projet={projectDisplayName(snapshot)}
-                          graph={snapshot.graph}
-                          source={snapshot.graphSource}
-                          sourceRequested={snapshot.sourceRequested}
-                          sourceMissing={snapshot.sourceMissing}
-                          sourceDate={snapshot.sourceDate}
+                          relectures={relectures}
                           vaultDeclared={Boolean(snapshot.config?.obsidianVault)}
                           config={snapshot.config}
                           root={snapshot.root}
@@ -632,21 +650,30 @@ export function App() {
                 </main>
               )}
 
+              {/* Le `Suspense` attrape l'attente, pas le rejet : un morceau qui
+                  ne charge pas — périmé après un rebuild, illisible sur
+                  `ovrsee://` — remontait jusqu'à la racine et vidait l'écran. Le
+                  même garde-fou que les onglets, avec son indice à lui : ce
+                  n'est pas un fichier d'`ovrsee/` qui a échoué. */}
               {terminal && !settings?.terminal?.disabled && (
-                <Terminal
-                  layout={layout}
-                  onLayout={setLayout}
-                  onToggle={() => setTerminal(false)}
-                  onReload={reload}
-                  snapshot={snapshot}
-                  settings={settings}
-                  terminalHeight={terminalHeight}
-                  terminalWidth={terminalWidth}
-                  onTerminalHeightChange={setTerminalHeight}
-                  onTerminalWidthChange={setTerminalWidth}
-                  onProjet={setCurrent}
-                  actions={terminalActions}
-                />
+                <Garde quoi={t('garde.terminal')} indice={t('garde.terminal_hint')}>
+                  <Suspense fallback={null}>
+                    <Terminal
+                      layout={layout}
+                      onLayout={setLayout}
+                      onToggle={() => setTerminal(false)}
+                      onReload={reload}
+                      snapshot={snapshot}
+                      settings={settings}
+                      terminalHeight={terminalHeight}
+                      terminalWidth={terminalWidth}
+                      onTerminalHeightChange={setTerminalHeight}
+                      onTerminalWidthChange={setTerminalWidth}
+                      onProjet={setCurrent}
+                      actions={terminalActions}
+                    />
+                  </Suspense>
+                </Garde>
               )}
             </div>
 

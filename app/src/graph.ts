@@ -233,3 +233,37 @@ export function stackFrom(
 
   return [...prod, ...dev]
 }
+
+/**
+ * Ce que rend `/api/graph` — le graphe et sa provenance.
+ *
+ * Hors du snapshot depuis T-0134 : `graphify-out/graph.json` pèse 687 ko, et
+ * l'onglet Données est le seul à le lire. Le charger au changement de projet
+ * coûtait une lecture synchrone que personne ne regardait.
+ */
+export interface GraphPayload {
+  graph: GraphifyGraph | null
+  /**
+   * D'où vient `graph` : Graphify, ou un coffre Obsidian déclaré en config.
+   *
+   * L'onglet Données l'affiche. Les deux sources n'ont ni la même fraîcheur ni
+   * la même fiabilité — l'une est analysée, l'autre écrite à la main — et une
+   * ligne dont on ignore l'origine ne se vérifie pas.
+   */
+  graphSource: 'graphify' | 'obsidian' | null
+  /**
+   * La source de graphe demandée : 'auto', 'graphify', ou 'obsidian'.
+   * Permet de distinguer un choix explicite du défaut.
+   */
+  sourceRequested: string
+  /**
+   * true si la source demandée n'a pas pu être trouvée.
+   * Affiche une alerte distincte selon le type de source.
+   */
+  sourceMissing: boolean
+  /**
+   * Date du graphe, au format YYYY-MM-DD, ou null si non daté.
+   * Affichée dans le badge de provenance.
+   */
+  sourceDate: string | null
+}

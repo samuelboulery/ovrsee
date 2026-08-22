@@ -2,14 +2,14 @@
 {
   "id": "T-0133",
   "titre": "Charger le terminal en lazy pour sortir xterm du démarrage",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "s",
   "tags": [
     "perf"
   ],
   "cree": "2026-08-13",
-  "maj": "2026-08-14",
+  "maj": "2026-08-22",
   "plan": "2026-08-13-audit-final-avant-publication-et-les-trois-correctifs-qu-il.md"
 }
 ---

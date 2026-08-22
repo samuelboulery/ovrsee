@@ -10,7 +10,8 @@ import { etiquetteDe, type AttentionKind } from './attention'
 import { composer, resumeProjet, type MenuBarAttention } from './menubar'
 import { s } from './style'
 import { t, type TranslationKey } from './i18n'
-import { useTerminals, pasteTo } from './useTerminal'
+import { useTerminals } from './useTerminal'
+import { pasteTo } from './pty'
 import { Divider, useResizable } from './useResizable'
 
 /**

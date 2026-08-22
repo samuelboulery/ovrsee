@@ -77,6 +77,9 @@ function refus(chemin) {
 /** Le snapshot d'un projet, ou l'erreur qui l'empêche. */
 const projet = chemin => appel('/api/project', chemin)
 
+/** Le graphe d'un projet — hors du snapshot depuis T-0134. */
+const graphe = chemin => appel('/api/graph', chemin)
+
 /**
  * Le tri décroissant sur une date de frontmatter, puis les N premiers.
  *
@@ -189,7 +192,7 @@ const OUTILS = {
   // réponse est déjà dans le contexte au moment où on le lit. D'où un résumé
   // par défaut, et le blob seulement sur `full`.
   getGraph: (chemin, args) => {
-    const snap = projet(chemin)
+    const snap = graphe(chemin)
     if (snap.isError) return snap
 
     const graph = snap.content.graph

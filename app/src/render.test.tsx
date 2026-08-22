@@ -175,7 +175,10 @@ const RENDUS: Array<[string, (snap: Snapshot) => ReactElement]> = [
       />
     ),
   ],
-  ['Données', snap => <Donnees projet="ovrsee" graph={snap.graph} source={snap.graphSource} vaultDeclared={false} />],
+  // Le graphe ne vient plus du snapshot (T-0134) : l'onglet le demande lui-même
+  // au montage, et `useEffect` ne tourne pas sous `renderToStaticMarkup`. Ce
+  // rendu-ci est donc celui de l'état « en cours de lecture ».
+  ['Données', snap => <Donnees projet="ovrsee" root={snap.root} vaultDeclared={false} />],
   ['Stack', snap => <Stack snapshot={snap} />],
 ]
 
@@ -195,6 +198,16 @@ test('le panneau de panne nomme l’endroit et le message', () => {
   assert.match(html, /onglet Produit/)
   assert.match(html, /pages\.pages is not iterable/)
   assert.match(html, /role="alert"/)
+})
+
+test('un indice remplace le renvoi vers ovrsee/, il ne s’y ajoute pas', () => {
+  // Le panneau terminal échoue parce que son morceau de bundle n'arrive pas.
+  // Envoyer chercher un fichier d'`ovrsee/` serait une fausse piste.
+  const html = renderToStaticMarkup(
+    <Panne quoi="le panneau terminal" message="Failed to fetch dynamically imported module" indice="Rouvrir l’application recharge le panneau." />,
+  )
+  assert.match(html, /recharge le panneau/)
+  assert.doesNotMatch(html, /<code>ovrsee\/<\/code>/)
 })
 
 test('le garde-fou laisse passer ce qui ne lève pas', () => {

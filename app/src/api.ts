@@ -6,6 +6,7 @@
  */
 
 import type { Colonne, GitStatus, Project, SettingsType, Snapshot, Ticket } from './data'
+import type { GraphPayload } from './graph'
 
 const json = async <T,>(url: string, signal?: AbortSignal): Promise<T> => {
   const response = await fetch(url, { signal })
@@ -198,6 +199,16 @@ export const fetchTableau = (path: string, signal?: AbortSignal) =>
  */
 export const fetchSnapshot = (path: string, signal?: AbortSignal) =>
   json<Snapshot>(`/api/project?path=${encodeURIComponent(path)}`, signal)
+
+/**
+ * Le graphe d'un projet, et d'où il vient — T-0134.
+ *
+ * Séparé du snapshot pour la même raison que le `signal` existe ci-dessus : le
+ * fichier de Graphify pèse 687 ko, et le lire au changement de projet payait à
+ * chaque fois un onglet que la plupart des sessions n'ouvrent pas.
+ */
+export const fetchGraph = (path: string, signal?: AbortSignal) =>
+  json<GraphPayload>(`/api/graph?path=${encodeURIComponent(path)}`, signal)
 
 /**
  * Préférences de l'ovrsee : globales si pas de projet, fusionnées si projet.

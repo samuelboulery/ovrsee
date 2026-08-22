@@ -29,6 +29,12 @@ export function messageDe(error: unknown): string {
 interface GardeProps {
   /** Ce qui a échoué, nommé comme l'utilisateur le voit : « l'onglet Produit ». */
   quoi: string
+  /**
+   * Où chercher, quand ce n'est pas un fichier d'`ovrsee/`. Le panneau terminal
+   * échoue pour une autre raison — son morceau de bundle n'arrive pas — et
+   * l'indice par défaut enverrait chercher au mauvais endroit.
+   */
+  indice?: string
   children: ReactNode
 }
 
@@ -51,7 +57,7 @@ export class Garde extends Component<GardeProps, GardeState> {
 
   render() {
     if (this.state.error === null) return this.props.children
-    return <Panne quoi={this.props.quoi} message={messageDe(this.state.error)} />
+    return <Panne quoi={this.props.quoi} message={messageDe(this.state.error)} indice={this.props.indice} />
   }
 }
 
@@ -61,7 +67,7 @@ export class Garde extends Component<GardeProps, GardeState> {
  * Séparé du garde-fou pour être rendu — et donc éprouvé — sans avoir à faire
  * lever une exception à React.
  */
-export function Panne({ quoi, message }: { quoi: string; message: string }) {
+export function Panne({ quoi, message, indice }: { quoi: string; message: string; indice?: string }) {
   return (
     <div
       role="alert"
@@ -80,8 +86,11 @@ export function Panne({ quoi, message }: { quoi: string; message: string }) {
         {message}
       </div>
       <div style={s('font-size: 11.5px; color: var(--color-neutral-600); max-width: 56ch;')}>
-        {t('garde.file_error')} <code>ovrsee/</code> que l'ovrsee ne
-        sait pas lire.
+        {indice ?? (
+          <>
+            {t('garde.file_error')} <code>ovrsee/</code> que l'ovrsee ne sait pas lire.
+          </>
+        )}
       </div>
     </div>
   )

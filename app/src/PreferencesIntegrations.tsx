@@ -16,13 +16,13 @@ import type { Integration, IntegrationProvider } from './data'
 import { t, type TranslationKey } from './i18n'
 import { ErrorBox, Field } from './PreferencesControls'
 import { s } from './style'
-import type { IntegrationsBridge } from './useTerminal'
+import type { IntegrationsBridge } from './pty'
 
 /**
- * Lu directement sur `window`, sans importer `useTerminal.ts` : ce module
- * charge `@xterm/xterm` (et sa feuille de style), absent du rendu serveur des
- * tests (`prefs.test.tsx`). Seul le *type* du pont est importé — effacé à la
- * compilation.
+ * Lu directement sur `window`. Le *type* du pont vient de `pty.ts`, jamais de
+ * `useTerminal.ts` : ce dernier charge `@xterm/xterm` et sa feuille de style,
+ * absents du rendu serveur des tests (`prefs.test.tsx`) — et le tirer ici
+ * annulerait le morceau paresseux du terminal (T-0133).
  */
 const bridge = (): IntegrationsBridge | null => {
   if (typeof window === 'undefined') return null

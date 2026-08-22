@@ -2,14 +2,14 @@
 {
   "id": "T-0134",
   "titre": "Charger graph.json à la demande",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "m",
   "tags": [
     "perf"
   ],
   "cree": "2026-08-13",
-  "maj": "2026-08-14",
+  "maj": "2026-08-22",
   "plan": "2026-08-13-audit-final-avant-publication-et-les-trois-correctifs-qu-il.md"
 }
 ---

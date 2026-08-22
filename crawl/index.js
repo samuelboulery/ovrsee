@@ -321,25 +321,56 @@ async function visitAll(page, config) {
 const DAY = 24 * 60 * 60 * 1000
 
 /**
- * Tout garder sur trente jours, puis une capture par semaine.
+ * Deux jours entiers, puis une capture par jour, puis une par semaine.
  *
  * Décidé avant l'accumulation, parce qu'une politique de rétention choisie
  * après coup ne peut plus rendre ce qu'elle a laissé grossir.
+ *
+ * L'étage journalier est arrivé après coup, lui (T-0136) : « tout garder sur
+ * trente jours » n'avait pas prévu qu'un crawl tourne à chaque commit. Sur ce
+ * dépôt, 879 captures pour huit pages en treize jours — douze photographies du
+ * même écran par jour, dont onze ne montrent rien que la douzième ne montre.
+ * Le ticket visait la compression : mesure faite, il n'y a rien à y gagner.
+ * Chrome écrit déjà un PNG serré sur une interface à plats, et le même écran en
+ * JPEG qualité 85 sort *plus gros* (97 ko contre 96). Le poids était dans le
+ * nombre.
+ *
+ * Les deux jours pleins ne sont pas de la prudence : plusieurs crawls d'un même
+ * après-midi se comparent entre eux, et c'est le seul moment où ils le méritent.
+ * Ils garantissent aussi que la capture qu'on vient d'écrire — celle que
+ * `pages.json` cite — survit au ménage qui suit immédiatement.
+ *
+ * La granularité est le jour, pas l'heure : un nom de fichier ne porte que
+ * `YYYY-MM-DD` et un sha. Départager deux captures du même jour se fait donc
+ * sur le nom, faute de mieux — arbitraire, mais stable d'un ménage à l'autre.
  */
 export function retainable(files, now = new Date()) {
   const parsed = files
     .map(file => ({ file, at: Date.parse(file.slice(0, 10)) }))
     .filter(f => !Number.isNaN(f.at))
-    .sort((a, b) => b.at - a.at)
+    .sort((a, b) => b.at - a.at || b.file.localeCompare(a.file))
 
   const keep = new Set()
+  const daysSeen = new Set()
   const weeksSeen = new Set()
 
   for (const { file, at } of parsed) {
-    if (now.getTime() - at <= 30 * DAY) {
+    const age = now.getTime() - at
+
+    if (age <= 2 * DAY) {
       keep.add(file)
       continue
     }
+
+    if (age <= 30 * DAY) {
+      const day = Math.floor(at / DAY)
+      if (!daysSeen.has(day)) {
+        daysSeen.add(day)
+        keep.add(file)
+      }
+      continue
+    }
+
     const week = Math.floor(at / (7 * DAY))
     if (!weeksSeen.has(week)) {
       weeksSeen.add(week)

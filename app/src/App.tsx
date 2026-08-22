@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { SidebarSimple } from '@phosphor-icons/react'
 
 import { t, setCurrentLanguage } from './i18n'
@@ -35,7 +35,20 @@ import { Historique } from './tabs/Historique'
 import { Tableau } from './tabs/Tableau'
 import { Donnees } from './tabs/Donnees'
 import { Stack } from './tabs/Stack'
-import { Terminal, type Layout, type TerminalActions } from './Terminal'
+import type { Layout, TerminalActions } from './Terminal'
+
+/**
+ * Le panneau terminal en morceau séparé — T-0133.
+ *
+ * xterm et sa feuille de style pèsent 488 ko, le tiers du bundle, pour une
+ * fonction que beaucoup de sessions n'ouvrent jamais. Le `lazy()` seul ne
+ * suffisait pas : `pasteToClaude` vivait dans le même module que xterm et trois
+ * composants du chargement initial l'importaient. Il est passé dans `pty.ts`.
+ *
+ * Pas de `fallback` visible : le panneau apparaît quand son morceau arrive, et
+ * un squelette d'un dixième de seconde vaudrait moins que rien du tout.
+ */
+const Terminal = lazy(() => import('./Terminal').then(m => ({ default: m.Terminal })))
 import { Divider, useResizable } from './useResizable'
 import { activeTabsInOrder, type TabId } from './views'
 import { labelOf, projectFromUrl, pushUrl, routeFromUrl, tabForPath, ticketFromUrl } from './route'
@@ -615,11 +628,6 @@ export function App() {
                       {tab === 'donnees' && (
                         <Donnees
                           projet={projectDisplayName(snapshot)}
-                          graph={snapshot.graph}
-                          source={snapshot.graphSource}
-                          sourceRequested={snapshot.sourceRequested}
-                          sourceMissing={snapshot.sourceMissing}
-                          sourceDate={snapshot.sourceDate}
                           vaultDeclared={Boolean(snapshot.config?.obsidianVault)}
                           config={snapshot.config}
                           root={snapshot.root}
@@ -633,20 +641,22 @@ export function App() {
               )}
 
               {terminal && !settings?.terminal?.disabled && (
-                <Terminal
-                  layout={layout}
-                  onLayout={setLayout}
-                  onToggle={() => setTerminal(false)}
-                  onReload={reload}
-                  snapshot={snapshot}
-                  settings={settings}
-                  terminalHeight={terminalHeight}
-                  terminalWidth={terminalWidth}
-                  onTerminalHeightChange={setTerminalHeight}
-                  onTerminalWidthChange={setTerminalWidth}
-                  onProjet={setCurrent}
-                  actions={terminalActions}
-                />
+                <Suspense fallback={null}>
+                  <Terminal
+                    layout={layout}
+                    onLayout={setLayout}
+                    onToggle={() => setTerminal(false)}
+                    onReload={reload}
+                    snapshot={snapshot}
+                    settings={settings}
+                    terminalHeight={terminalHeight}
+                    terminalWidth={terminalWidth}
+                    onTerminalHeightChange={setTerminalHeight}
+                    onTerminalWidthChange={setTerminalWidth}
+                    onProjet={setCurrent}
+                    actions={terminalActions}
+                  />
+                </Suspense>
               )}
             </div>
 

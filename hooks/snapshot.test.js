@@ -4,7 +4,7 @@ import { mkdirSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { snapshot, vaultPath } from './snapshot.js'
+import { readGraph, readJson, snapshot, vaultPath } from './snapshot.js'
 import { DEFAULT_SETTINGS, writeSettings } from './settings.js'
 import { writeIntegrations } from './integrations.js'
 
@@ -147,6 +147,14 @@ test('un projet sain ne signale rien', () => {
 
 // --- source du graphe ------------------------------------------------------
 
+/**
+ * Le graphe d'un projet, comme la route `/api/graph` le lit.
+ *
+ * Passait par `snapshot()` avant T-0134, qui l'en a sorti : 687 ko lus à chaque
+ * changement de projet pour un onglet souvent fermé.
+ */
+const graphe = dir => readGraph(dir, readJson(join(dir, 'ovrsee.config.json')))
+
 /** Un `graphify-out/graph.json` minimal mais valide. */
 const poserGraphify = dir => {
   mkdirSync(join(dir, 'graphify-out'), { recursive: true })
@@ -170,7 +178,7 @@ test('sans coffre déclaré, le graphe vient de Graphify', () => {
   const dir = project()
   poserGraphify(dir)
 
-  const snap = snapshot(dir)
+  const snap = graphe(dir)
   assert.equal(snap.graphSource, 'graphify')
   assert.equal(snap.graph.nodes[0].label, 'venu de graphify')
 })
@@ -183,7 +191,7 @@ test('Graphify l’emporte sur un coffre déclaré', () => {
   // Le point du test, et il vient du cadrage (§3) : la vue base de données
   // n'est pas reconstruite parce que Graphify la fait mieux et à jour à chaque
   // commit. Une note écrite à la main ne peut pas la recouvrir.
-  const snap = snapshot(dir)
+  const snap = graphe(dir)
   assert.equal(snap.graphSource, 'graphify')
   assert.equal(snap.graph.nodes[0].label, 'venu de graphify')
 })
@@ -192,7 +200,7 @@ test("le coffre sert quand Graphify n’a rien produit", () => {
   const dir = project()
   poserCoffre(dir)
 
-  const snap = snapshot(dir)
+  const snap = graphe(dir)
   assert.equal(snap.graphSource, 'obsidian')
   assert.equal(snap.graph.nodes[0].label, 'Commandes')
 })
@@ -204,13 +212,13 @@ test('un coffre déclaré mais illisible rend null, sans Graphify pour le sauver
     JSON.stringify({ obsidianVault: 'coffre-absent' }),
   )
 
-  const snap = snapshot(dir)
+  const snap = graphe(dir)
   assert.equal(snap.graph, null)
   assert.equal(snap.graphSource, null)
 })
 
 test('sans source du tout, le graphe est null et le dit', () => {
-  const snap = snapshot(project())
+  const snap = graphe(project())
   assert.equal(snap.graph, null)
   assert.equal(snap.graphSource, null)
 })
@@ -226,8 +234,8 @@ test('un chemin de coffre en ~ est développé, pas collé au dépôt', () => {
 
 // --- Résolution à trois niveaux de sourceGraphe ---
 
-test('snapshot inclut sourceRequested, sourceMissing et sourceDate', () => {
-  const snap = snapshot(project())
+test('le graphe porte sourceRequested, sourceMissing et sourceDate', () => {
+  const snap = graphe(project())
   assert(typeof snap.sourceRequested === 'string')
   assert(typeof snap.sourceMissing === 'boolean')
   assert(snap.sourceDate === null || typeof snap.sourceDate === 'string')
@@ -237,7 +245,7 @@ test('sourceRequested = "auto" et sourceMissing = false quand Graphify existe', 
   const dir = project()
   poserGraphify(dir)
 
-  const snap = snapshot(dir)
+  const snap = graphe(dir)
   assert.equal(snap.sourceRequested, 'auto')
   assert.equal(snap.sourceMissing, false)
   assert.equal(snap.graphSource, 'graphify')
@@ -247,7 +255,7 @@ test('sourceRequested = "auto" et sourceMissing = false quand le coffre existe',
   const dir = project()
   poserCoffre(dir)
 
-  const snap = snapshot(dir)
+  const snap = graphe(dir)
   assert.equal(snap.sourceRequested, 'auto')
   assert.equal(snap.sourceMissing, false)
   assert.equal(snap.graphSource, 'obsidian')
@@ -257,7 +265,7 @@ test('sourceDate donne la date du graphe Graphify', () => {
   const dir = project()
   poserGraphify(dir)
 
-  const snap = snapshot(dir)
+  const snap = graphe(dir)
   // La date est au format YYYY-MM-DD
   assert.match(snap.sourceDate, /\d{4}-\d{2}-\d{2}/)
 })
@@ -266,13 +274,13 @@ test('sourceDate donne la date la plus récente du coffre', () => {
   const dir = project()
   poserCoffre(dir)
 
-  const snap = snapshot(dir)
+  const snap = graphe(dir)
   // La date est au format YYYY-MM-DD
   assert.match(snap.sourceDate, /\d{4}-\d{2}-\d{2}/)
 })
 
 test("sourceDate est null quand il n'y a pas de source", () => {
-  const snap = snapshot(project())
+  const snap = graphe(project())
   assert.equal(snap.sourceDate, null)
 })
 
@@ -290,7 +298,7 @@ test('choix explicite de Graphify avec sourceMissing quand absent', () => {
     process.env.OVRSEE_SETTINGS = settingsFile
     writeSettings(DEFAULT_SETTINGS)
 
-    const snap = snapshot(dir)
+    const snap = graphe(dir)
     assert.equal(snap.sourceRequested, 'graphify')
     assert.equal(snap.sourceMissing, true)
     assert.equal(snap.graph, null)
@@ -314,7 +322,7 @@ test("choix explicite d'Obsidian avec sourceMissing quand absent", () => {
     process.env.OVRSEE_SETTINGS = settingsFile
     writeSettings(DEFAULT_SETTINGS)
 
-    const snap = snapshot(dir)
+    const snap = graphe(dir)
     assert.equal(snap.sourceRequested, 'obsidian')
     assert.equal(snap.sourceMissing, true)
     assert.equal(snap.graph, null)

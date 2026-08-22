@@ -252,6 +252,11 @@ function fileDate(path) {
 /**
  * Le graphe du projet, et d'où il vient.
  *
+ * Hors du snapshot depuis T-0134 : `graphify-out/graph.json` pèse 687 ko, lus
+ * et analysés à chaque changement de projet même quand l'onglet Données reste
+ * fermé — et la lecture est synchrone. La route `/api/graph` l'appelle quand
+ * l'onglet s'ouvre, et elle seule.
+ *
  * Trois niveaux de résolution pour `sourceGraphe` :
  * 1. Défaut : `'auto'` (Graphify si présent, sinon Obsidian)
  * 2. Profil global : `~/.claude/ovrsee/settings.json`
@@ -275,7 +280,7 @@ function fileDate(path) {
  *
  * @returns {{graph: object|null, graphSource: 'graphify'|'obsidian'|null, sourceRequested: string, sourceMissing: boolean, sourceDate: string|null}}
  */
-function readGraph(root, config) {
+export function readGraph(root, config) {
   // Résolution à trois niveaux : défaut → profil global → config projet
   const globalSettings = readSettings()
   const merged = mergeSettings(globalSettings, config)
@@ -429,10 +434,6 @@ export function snapshot(root) {
     // `WHY:` posé au-dessus d'un import. L'onglet Stack les affichait comme
     // s'il les lisait déjà ; il devinait à partir des plans.
     whys: readWhys(root),
-    // Graphify, ou le coffre Obsidian déclaré dans la config. `graphSource` dit
-    // lequel : l'onglet Données affiche la provenance, et un badge qui ment sur
-    // l'origine d'une donnée est exactement ce que ce projet cherche à éviter.
-    ...readGraph(root, config),
     shots: shotsByPage(root),
     // Les commits bruts ne sont pas renvoyés en plus : la frise porte déjà
     // sha, date et sujet, et deux copies de la même liste divergeraient.

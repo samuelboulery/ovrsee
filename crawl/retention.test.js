@@ -6,10 +6,29 @@ import { retainable } from './index.js'
 const NOW = new Date('2026-08-08T12:00:00Z')
 const shot = date => `${date}-abc123.png`
 
-test('tout est gardé sur les trente derniers jours', () => {
+test('une capture par jour est gardée sur les trente derniers jours', () => {
   const files = ['2026-08-08', '2026-08-01', '2026-07-20', '2026-07-12'].map(shot)
   const keep = retainable(files, NOW)
-  assert.equal(keep.size, 4, 'aucune capture récente ne doit disparaître')
+  assert.equal(keep.size, 4, 'aucun de ces jours-là ne doit disparaître')
+})
+
+test('sur deux jours, tous les crawls du jour survivent', () => {
+  // Le cas qui a motivé T-0136 : douze crawls du même jour, et pages.json cite
+  // le dernier écrit. Aucun ne doit tomber tant qu'il est frais.
+  const files = ['aaa', 'bbb', 'ccc'].map(sha => `2026-08-08-${sha}.png`)
+  assert.equal(retainable(files, NOW).size, 3)
+})
+
+test('au-delà de deux jours, une seule capture par jour survit', () => {
+  const files = ['aaa', 'bbb', 'ccc'].map(sha => `2026-08-01-${sha}.png`)
+  const keep = retainable(files, NOW)
+  assert.equal(keep.size, 1, 'douze photographies du même écran ne valent pas plus qu\'une')
+  assert.ok(keep.has('2026-08-01-ccc.png'), 'le départage se fait sur le nom, de façon stable')
+})
+
+test('des jours différents gardent chacun leur capture', () => {
+  const files = ['2026-08-05', '2026-08-04', '2026-08-03'].map(shot)
+  assert.equal(retainable(files, NOW).size, 3)
 })
 
 test('au-delà de trente jours, une seule capture par semaine survit', () => {

@@ -94,7 +94,13 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   **`_ds/ovrsee/styles.css`** (`app/src/main.tsx`), pas `nocturne-*`, qui ne sert plus
   qu'à la maquette.
 - **`graphify-out/graph.json`** est versionné volontairement (l'onglet Données le lit,
-  et lui seul) ; `graphify-out/cache/` et `graph.html` sont ignorés.
+  et lui seul) ; `graphify-out/cache/` et `graph.html` sont ignorés. Il ne passe **pas**
+  par le snapshot : 687 ko lus synchrones à chaque changement de projet pour un onglet
+  souvent fermé. La route `/api/graph` le sert au montage de l'onglet, et elle seule.
+- **`app/src/pty.ts` ne doit jamais importer xterm**, et `useTerminal.ts` reste le seul
+  qui le fasse. Le panneau terminal est en `lazy()` — c'est le tiers du bundle. Trois
+  composants du chargement initial ont besoin de `pasteToClaude` : le mettre à côté de
+  xterm annulait le découpage en silence, le morceau se recréait sans que rien n'échoue.
 
 ## Pièges connus
 

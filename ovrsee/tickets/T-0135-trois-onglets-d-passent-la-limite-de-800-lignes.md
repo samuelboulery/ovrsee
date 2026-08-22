@@ -2,14 +2,14 @@
 {
   "id": "T-0135",
   "titre": "Trois onglets dépassent la limite de 800 lignes",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "basse",
   "charge": "l",
   "tags": [
     "dette"
   ],
   "cree": "2026-08-13",
-  "maj": "2026-08-14",
+  "maj": "2026-08-22",
   "plan": "2026-08-13-audit-final-avant-publication-et-les-trois-correctifs-qu-il.md"
 }
 ---

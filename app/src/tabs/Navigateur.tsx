@@ -5,7 +5,7 @@ import { type Snapshot } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
-import { pasteToClaude } from '../useTerminal'
+import { pasteToClaude } from '../pty'
 import { Divider, useResizable } from '../useResizable'
 import { ElementPanel, HorsApplication, NavButton } from './NavigateurPanneaux'
 import {

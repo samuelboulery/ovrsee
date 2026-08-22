@@ -8,7 +8,7 @@ import {
   type SettingsType,
 } from './data'
 import { t } from './i18n'
-import { pasteToClaude } from './useTerminal'
+import { pasteToClaude } from './pty'
 import { s } from './style'
 import { SkillsList, useSkills } from './SkillsPanel'
 import { ChampsCrawl } from './ConfigCrawl'

@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Database } from '@phosphor-icons/react'
 
-import { frDate, tablesFrom, type GraphifyGraph, type Integration, type SchemaTable, type Snapshot } from '../data'
+import { frDate, tablesFrom, type Integration, type SchemaTable } from '../data'
+import { fetchGraph } from '../api'
+import type { GraphPayload } from '../graph'
 import { t } from '../i18n'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
 import { ViewBar } from '../ViewBar'
-import type { IntegrationsBridge } from '../useTerminal'
+import type { IntegrationsBridge } from '../pty'
 
 /**
  * Lu directement sur `window`, sans importer `useTerminal.ts` : ce module
@@ -19,7 +21,7 @@ const bridge = (): IntegrationsBridge | null => {
   return window.ovrsee?.integrations ?? null
 }
 
-type Source = Snapshot['graphSource']
+type Source = GraphPayload['graphSource']
 
 /**
  * Ce qu'on dit quand il n'y a aucune ligne.
@@ -194,11 +196,6 @@ function confStyle(conf: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS' | 'LIVE'): strin
 
 export function Donnees({
   projet,
-  graph,
-  source,
-  sourceRequested,
-  sourceMissing,
-  sourceDate,
   vaultDeclared = false,
   config = null,
   root,
@@ -206,16 +203,39 @@ export function Donnees({
 }: {
   /** Nom affiché du projet, pour le fil d'Ariane de la barre de vue. */
   projet: string
-  graph: GraphifyGraph | null
-  source: Source
-  sourceRequested?: string
-  sourceMissing?: boolean
-  sourceDate?: string | null
   vaultDeclared?: boolean
   config?: { obsidianVault?: string } | null
   root?: string
   integrations?: Integration[]
 }) {
+  // Le graphe n'arrive plus par le snapshot — T-0134. C'est le montage de cet
+  // onglet qui le demande, et lui seul : 687 ko lus à chaque changement de
+  // projet pour un écran que la plupart des sessions n'ouvrent pas.
+  const [payload, setPayload] = useState<GraphPayload | null>(null)
+  const [graphErreur, setGraphErreur] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!root) return
+    const ctrl = new AbortController()
+    setPayload(null)
+    setGraphErreur(null)
+    fetchGraph(root, ctrl.signal)
+      .then(setPayload)
+      .catch((err: unknown) => {
+        // Une lecture annulée n'est pas une panne : changer de projet pendant
+        // le chargement abandonne la précédente, et le dire serait un mensonge.
+        if (ctrl.signal.aborted) return
+        setGraphErreur(String((err as Error)?.message ?? err))
+      })
+    return () => ctrl.abort()
+  }, [root])
+
+  const graph = payload?.graph ?? null
+  const source = payload?.graphSource ?? null
+  const sourceRequested = payload?.sourceRequested
+  const sourceMissing = payload?.sourceMissing
+  const sourceDate = payload?.sourceDate
+  const chargement = !payload && !graphErreur
   const PROVENANCE: Record<'graphify' | 'obsidian', { badge: string; intro: string }> = {
     graphify: {
       badge: t('donnees.from_graphify'),
@@ -303,7 +323,19 @@ export function Donnees({
           </div>
         )}
 
-        {tables.length === 0 ? (
+        {graphErreur && (
+          <div
+            style={s(
+              'margin-bottom: 16px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
+            )}
+          >
+            {t('donnees.load_error', { error: graphErreur })}
+          </div>
+        )}
+
+        {chargement ? (
+          <div style={s('font-size: 12px; color: var(--color-neutral-500);')}>{t('donnees.loading')}</div>
+        ) : tables.length === 0 ? (
           <div>
             <EtatVide titre={rien.titre} detail={rien.detail} source={source} />
             {coffreIgnore && <CoffreIgnore />}

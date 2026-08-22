@@ -2,7 +2,7 @@
 {
   "id": "T-0155",
   "titre": "Le CLAUDE.md nie l'existence de la CI",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "xs",
   "tags": [
@@ -10,7 +10,7 @@
     "bug"
   ],
   "cree": "2026-08-16",
-  "maj": "2026-08-16",
+  "maj": "2026-08-22",
   "plan": null
 }
 ---

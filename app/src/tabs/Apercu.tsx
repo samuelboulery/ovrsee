@@ -24,7 +24,7 @@ import { t } from '../i18n'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
 import { ViewBar } from '../ViewBar'
-import type { Editeur } from '../useTerminal'
+import type { Editeur } from '../pty'
 
 /** Crochets appelés par le gestionnaire de paquets, jamais tapés à la main. */
 const LIFECYCLE = new Set([

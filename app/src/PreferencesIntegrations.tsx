@@ -16,7 +16,7 @@ import type { Integration, IntegrationProvider } from './data'
 import { t, type TranslationKey } from './i18n'
 import { ErrorBox, Field } from './PreferencesControls'
 import { s } from './style'
-import type { IntegrationsBridge } from './useTerminal'
+import type { IntegrationsBridge } from './pty'
 
 /**
  * Lu directement sur `window`, sans importer `useTerminal.ts` : ce module

@@ -1346,25 +1346,31 @@ function ProjectRow({
         )}
 
         {/* Confirmation en deux temps, sur place. Pas de `window.confirm` : un
-            dialogue modal bloque la boucle d'événements de la fenêtre. */}
-        {(hover || confirming) && (
-          <button
-            type="button"
-            title="Retirer de la liste — aucun fichier n'est supprimé"
-            onClick={event => {
-              event.stopPropagation()
-              if (confirming) onRemove()
-              else setConfirming(true)
-            }}
-            className="btn btn-ghost"
-            style={s(
-              'font-size: 10px; line-height: 1; padding: 2px 6px; ' +
-                (confirming ? 'color: var(--color-accent);' : 'color: var(--color-neutral-500);'),
-            )}
-          >
-            {confirming ? 'retirer ?' : '×'}
-          </button>
-        )}
+            dialogue modal bloque la boucle d'événements de la fenêtre.
+
+            Toujours monté, seulement masqué : monter le bouton au survol le
+            faisait entrer dans le flux, comprimer le nom et pousser le badge —
+            la ligne sautait sous la souris (issue #51). `visibility` réserve sa
+            place sans le montrer. */}
+        <button
+          type="button"
+          title="Retirer de la liste — aucun fichier n'est supprimé"
+          aria-hidden={!hover && !confirming}
+          tabIndex={hover || confirming ? 0 : -1}
+          onClick={event => {
+            event.stopPropagation()
+            if (confirming) onRemove()
+            else setConfirming(true)
+          }}
+          className="btn btn-ghost"
+          style={s(
+            'font-size: 10px; line-height: 1; padding: 2px 6px; flex: none; ' +
+              (hover || confirming ? 'visibility: visible; ' : 'visibility: hidden; ') +
+              (confirming ? 'color: var(--color-accent);' : 'color: var(--color-neutral-500);'),
+          )}
+        >
+          {confirming ? 'retirer ?' : '×'}
+        </button>
       </div>
       <div
         title="Dernier commit rattaché à un plan"

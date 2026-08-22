@@ -176,10 +176,14 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
 - **Cette trace est rédigée à l'écriture, et ce n'est pas une garantie.** `scans.jsonl`
   est versionné : une commande `dev` qui meurt sur une variable d'environnement manquante
   l'imprime parfois avec sa valeur, et le secret partirait dans git sans qu'un humain ait
-  relu la ligne. `redige()` (`crawl/index.js`) masque les formes connues — `*KEY=`,
+  relu la ligne. `redige()` (`hooks/redaction.js`) masque les formes connues — `*KEY=`,
   `*TOKEN=`, `sk-…`, `ghp_…`, JWT, mot de passe d'URL — depuis `recordScan()`, seul point
-  d'écriture. Les formes inconnues passent : relire un `scans.jsonl` en échec avant de le
-  pousser reste le dernier filet.
+  d'écriture. Un nom d'en-tête d'authentification (`*AUTH*`, `*CREDENTIAL*`) emporte toute
+  la fin de ligne ; une affectation ordinaire s'arrête à l'espace suivant, sans quoi
+  l'hôte et le code retour qui la partagent disparaissaient avec elle. Les formes inconnues
+  passent : relire un `scans.jsonl` en échec avant de le pousser reste le dernier filet.
+  Le même filtre garde `/api/config-claude` : sa liste blanche décide par le nom de la clé,
+  et une `command` de hook peut porter un jeton en dur.
 - **Annuler un crawl tue le groupe de processus, pas le seul fils.** Le crawl démarre
   lui-même le serveur de dev du projet observé (`dev` de `ovrsee.config.json`) ; un
   `child.kill()` le laisserait tourner, le port resterait pris, et le crawl suivant

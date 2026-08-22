@@ -429,3 +429,40 @@ test('un scalaire rangé dans un tableau est masqué comme les autres', () => {
     cleanup(testDir)
   }
 })
+
+test('un secret écrit en dur dans une commande whitelistée ne sort pas', () => {
+  // La liste blanche décidait par le nom de la clé seul : `command` étant
+  // lisible, une commande de hook qui embarquait son jeton le livrait entier
+  // par /api/config-claude (#42).
+  const testDir = setupTestDir()
+  try {
+    writeFileSync(
+      join(testDir, 'settings.json'),
+      JSON.stringify({
+        hooks: {
+          Stop: [
+            {
+              matcher: '*',
+              hooks: [
+                {
+                  type: 'command',
+                  command:
+                    'curl -H "Authorization: Bearer sk-live-abcdef123456" https://hooks.exemple.test/notify?token=abcdef123456',
+                },
+              ],
+            },
+          ],
+        },
+      }),
+    )
+
+    const { command } = readHooks()['Stop'][0].hooks[0]
+
+    assert.ok(!command.includes('sk-live-abcdef123456'), command)
+    assert.ok(!command.includes('token=abcdef123456'), command)
+    // Le nom du programme reste lisible : c'est ce qui sert au diagnostic.
+    assert.match(command, /^curl /)
+  } finally {
+    cleanup(testDir)
+  }
+})

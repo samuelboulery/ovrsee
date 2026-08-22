@@ -539,7 +539,13 @@ const readBody = req =>
     req.on('data', chunk => {
       if (text.length > CORPS_MAX) return
       text += chunk
-      if (text.length > CORPS_MAX) req.destroy()
+      // `req.destroy()` sans argument n'émet ni `end` ni `error` : attendre un
+      // de ces deux événements laissait la requête pendue pour toujours. On
+      // tranche ici, la destruction n'étant plus qu'un moyen de couper le flux.
+      if (text.length > CORPS_MAX) {
+        resolve(null)
+        req.destroy()
+      }
     })
     req.on('end', () => resolve(text.length > CORPS_MAX ? null : parseBody(text)))
     req.on('error', () => resolve(null))

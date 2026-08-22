@@ -14,7 +14,7 @@
 
 import type { ReactNode } from 'react'
 
-import { DotsSixVertical, Monitor, Moon, Sun } from '@phosphor-icons/react'
+import { DotsSixVertical, Moon } from '@phosphor-icons/react'
 
 import { s } from './style'
 
@@ -227,12 +227,6 @@ export function ErrorBox({ children }: { children: ReactNode }) {
  * ~20 (rail de navigation compris), au-delà de quoi les dessiner à la main
  * coûte plus cher que le paquet.
  */
-
-/** Moniteur — le thème suit le système. */
-export const IconSystem = () => <Monitor size={16} aria-hidden="true" />
-
-/** Soleil — thème clair. */
-export const IconLight = () => <Sun size={16} aria-hidden="true" />
 
 /** Lune — thème sombre. */
 export const IconDark = () => <Moon size={16} aria-hidden="true" />

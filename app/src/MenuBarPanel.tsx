@@ -22,7 +22,6 @@ import {
   type MenuBarVue,
 } from './menubar'
 import { s } from './style'
-import { applyTheme } from './theme'
 
 /**
  * Cadence de rafraîchissement de l'horloge.
@@ -250,12 +249,11 @@ export function MenuBar() {
     fetchSettings()
       .then(settings => {
         setCurrentLanguage(settings.langue)
-        applyTheme(settings.theme)
         setReglages(n => n + 1)
       })
       .catch(() => {
-        // Sans réglages, la détection navigateur et le thème par défaut font
-        // l'affaire : un popover est trop peu pour justifier un écran d'erreur.
+        // Sans réglages, la détection navigateur fait l'affaire : un popover
+        // est trop peu pour justifier un écran d'erreur.
       })
   }, [])
 

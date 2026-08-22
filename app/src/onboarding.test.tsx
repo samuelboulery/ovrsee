@@ -31,7 +31,6 @@ const settings = (patch: Record<string, unknown> = {}): SettingsType =>
     sourceGraphe: 'auto',
     customActions: [],
     onboardingVu: false,
-    claude: { niveau: 'intermediaire', usage: 'terminal' },
     ...patch,
   }) as unknown as SettingsType
 
@@ -83,13 +82,11 @@ test('appliquerReponses : le bootstrap suit la case', () => {
   )
 })
 
-test('appliquerReponses : langue, thème, densité et claude restent intacts', () => {
-  const avant = settings({ langue: 'en', theme: 'light', claude: { niveau: 'expert', usage: 'ide' } })
+test('appliquerReponses : langue et densité restent intactes', () => {
+  const avant = settings({ langue: 'en' })
   const result = appliquerReponses(avant, reponses({ profil: 'sobre' }))
   assert.equal(result.langue, 'en')
-  assert.equal(result.theme, 'light')
   assert.deepEqual(result.densiteActivite, avant.densiteActivite)
-  assert.deepEqual(result.claude, { niveau: 'expert', usage: 'ide' })
 })
 
 test('appliquerReponses : marque la présentation comme vue', () => {
@@ -158,7 +155,7 @@ test('les trois écrans rendent sans lever', () => {
 test('les écrans rendent aussi sur des préférences dégradées', () => {
   // Le fichier de préférences vient d'un disque qu'on ne contrôle pas ; un
   // rendu qui lève emporterait la fenêtre entière au tout premier lancement.
-  const abime = { onglets: undefined, terminal: undefined, claude: undefined } as unknown as SettingsType
+  const abime = { onglets: undefined, terminal: undefined } as unknown as SettingsType
   for (const etape of [0, 1, 2]) {
     // Un rendu qui lève fait échouer le test de lui-même : pas besoin
     // d'`assert.doesNotThrow`, que la déclaration de `node:test` n'expose pas.

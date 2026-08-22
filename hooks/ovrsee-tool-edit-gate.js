@@ -17,13 +17,13 @@
 
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
-import { join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 
 import { colonneFinale, readActiveTicket, readBoard, readTickets } from './tickets.js'
 import { isSafePlanFileName } from './plans.js'
 import { readActive, sessionId } from './active.js'
 import { estUneEditionSource } from './ovrsee-tool-edit.js'
+import { estPrincipal } from './principal.js'
 
 function readStdin() {
   try {
@@ -143,7 +143,7 @@ function main() {
  * Sans cette garde, l'importer pour éprouver `ticketManquant` lirait stdin et
  * appellerait `process.exit` à chaque `pnpm test`.
  */
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (estPrincipal(import.meta.url)) {
   try {
     main()
   } catch (err) {

@@ -7,8 +7,7 @@
  *
  * Deux niveaux : global dans `~/.claude/ovrsee/settings.json`, surcharges
  * par `ovrsee.config.json` (versionné git du projet). Les champs personnels
- * (`langue`, `theme`, `densiteActivite`, `onboardingVu`, `claude`) ne se
- * surchargent pas.
+ * (`langue`, `densiteActivite`, `onboardingVu`) ne se surchargent pas.
  */
 
 import { homedir } from 'node:os'
@@ -20,7 +19,6 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
  *
  * @type {{
  *   langue: string,
- *   theme: string,
  *   densiteActivite: {granularite: string, fenetre: string},
  *   onglets: {actifs: string[], ordre: string[]},
  *   terminal: {visible: boolean, disposition: string, hauteur: number, largeur: number},
@@ -29,14 +27,12 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
  *   sourceGraphe: string,
  *   customActions: Array<{label: string, text: string}>,
  *   onboardingVu: boolean,
- *   claude: {niveau: string, usage: string},
  *   gitignoreShots: boolean,
  *   gitignorePlans: boolean,
  * }}
  */
 export const DEFAULT_SETTINGS = {
   langue: 'fr',
-  theme: 'auto',
   densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
   onglets: {
     actifs: ['apercu', 'navigateur', 'produit', 'historique', 'tableau', 'donnees', 'stack'],
@@ -60,21 +56,11 @@ export const DEFAULT_SETTINGS = {
   // ment. Le défaut est le bon même sur un fichier abîmé : mieux vaut une
   // présentation de trop qu'un premier lancement muet.
   onboardingVu: false,
-  // Ni `niveau` ni `usage` ne sont plus posés par l'accueil (la galerie de
-  // profils remplace les deux questions) — le champ reste pour compatibilité
-  // mais retombe toujours sur son défaut.
-  claude: { niveau: 'intermediaire', usage: 'terminal' },
   // Alignés sur l'état constaté du dépôt ovrsee lui-même au moment d'écrire
   // ce réglage : captures ignorées, plans/tickets versionnés.
   gitignoreShots: true,
   gitignorePlans: false,
 }
-
-/** Les valeurs admises pour `claude.niveau`, du plus neuf au plus aguerri. */
-export const NIVEAUX_CLAUDE = ['debutant', 'intermediaire', 'avance', 'expert']
-
-/** Les valeurs admises pour `claude.usage` — par quoi Claude Code est lancé. */
-export const USAGES_CLAUDE = ['terminal', 'ide', 'desktop', 'autre']
 
 /**
  * Chemin du fichier de préférences globales.
@@ -105,7 +91,7 @@ export function readSettings() {
 
 /**
  * Pose `out[cle]` si `valeur` est une chaîne admise par `options`. Motif
- * répété pour chaque champ à énumération fermée (langue, theme, disposition…).
+ * répété pour chaque champ à énumération fermée (langue, disposition…).
  */
 function validerEnum(out, cle, valeur, options) {
   if (typeof valeur === 'string' && options.includes(valeur)) out[cle] = valeur
@@ -140,8 +126,11 @@ function validerTerminal(input, out) {
 /**
  * Validation par champ : chaque champ invalide retombe à son défaut.
  *
- * Pas de validation tout-ou-rien. Un `theme: 42` ne vide pas tout l'objet —
+ * Pas de validation tout-ou-rien. Un `langue: 42` ne vide pas tout l'objet —
  * c'est le défaut de ce champ uniquement, et les autres restent en place.
+ *
+ * Une clé inconnue est simplement ignorée : un profil écrit par une version
+ * antérieure (`theme`, `claude`, retirés en T-0200/T-0201) se lit sans erreur.
  *
  * @param {unknown} partial données reçues
  * @param {object} [defaults] schéma de référence
@@ -153,7 +142,6 @@ export function validateSettings(partial, defaults = DEFAULT_SETTINGS) {
 
   // Champs de premier niveau
   validerEnum(out, 'langue', partial.langue, ['fr', 'en'])
-  validerEnum(out, 'theme', partial.theme, ['light', 'dark', 'auto'])
   validerEnum(out, 'packageManager', partial.packageManager, ['pnpm', 'npm', 'yarn', 'bun'])
   validerEnum(out, 'sourceGraphe', partial.sourceGraphe, ['auto', 'graphify', 'obsidian'])
 
@@ -204,17 +192,6 @@ export function validateSettings(partial, defaults = DEFAULT_SETTINGS) {
     out.gitignorePlans = partial.gitignorePlans
   }
 
-  // Objet imbriqué : claude
-  if (partial.claude && typeof partial.claude === 'object') {
-    const { niveau, usage } = partial.claude
-    if (NIVEAUX_CLAUDE.includes(niveau)) {
-      out.claude.niveau = niveau
-    }
-    if (USAGES_CLAUDE.includes(usage)) {
-      out.claude.usage = usage
-    }
-  }
-
   return out
 }
 
@@ -232,9 +209,8 @@ export function writeSettings(settings) {
 /**
  * Fusionne le profil global avec les surcharges du projet.
  *
- * Les champs personnels (`langue`, `theme`, `densiteActivite`, `onboardingVu`,
- * `claude`) ne se surchargent jamais — c'est la préférence de l'utilisateur,
- * pas du projet. Un dépôt cloné n'a surtout pas à décider qu'on a déjà vu la
+ * Les champs personnels (`langue`, `densiteActivite`, `onboardingVu`) ne se
+ * surchargent jamais — c'est la préférence de l'utilisateur, pas du projet. Un dépôt cloné n'a surtout pas à décider qu'on a déjà vu la
  * présentation.
  *
  * @param {object} global profil utilisateur

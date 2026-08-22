@@ -21,9 +21,10 @@ import { s } from './style'
  * plus sombre, ailes latérales plus claires), iris de 3 modules en accent
  * au centre de la ligne médiane.
  *
- * Coordonnées partagées avec `scripts/make-icon.js` — la même grille y est
- * redessinée en hex littéral (pas de variables CSS dans un SVG rendu hors
- * navigateur). Un changement ici doit s'y répercuter, voir le WHY plus haut.
+ * Coordonnées partagées avec `build/icon.svg` — la même grille y est écrite en
+ * hex littéral (pas de variables CSS dans un SVG rendu hors navigateur). Un
+ * changement ici doit s'y répercuter, voir le WHY plus haut. Depuis T-0202,
+ * `scripts/make-icon.js` ne redessine plus rien : il décline le SVG.
  */
 const MODULE = 90
 const GUTTER = 27

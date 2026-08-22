@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
+import { decideInjection } from './brief'
 import {
   projectAction,
   getFolderState,
   fetchSettings,
-  decideInjection,
   type FolderState,
   type SettingsType,
 } from './data'

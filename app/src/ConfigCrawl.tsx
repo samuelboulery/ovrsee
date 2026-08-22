@@ -19,7 +19,7 @@ import { t } from './i18n'
 import { s } from './style'
 
 /** Un champ texte du formulaire de configuration. */
-export function Champ({
+function Champ({
   id,
   label,
   valeur,

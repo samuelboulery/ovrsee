@@ -17,12 +17,11 @@
 import { existsSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { resolve } from 'node:path'
 
 import { reconcile } from './reconcile.js'
+import { estPrincipal } from './principal.js'
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (estPrincipal(import.meta.url)) {
   try {
     const root = execFileSync('git', ['rev-parse', '--show-toplevel'], {
       cwd: process.cwd(),

@@ -37,6 +37,7 @@
     "electron": "pnpm build:ui && electron .",
     "build:ui": "vite build",
     "postinstall": "node scripts/fix-pty-permissions.js",
+    "icon": "node scripts/make-icon.js",
     "package:mac": "pnpm build:ui && electron-builder --mac",
     "package:win": "pnpm build:ui && electron-builder --win"
   },

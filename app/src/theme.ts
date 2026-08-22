@@ -1,18 +1,14 @@
 /**
- * Système de thème : jetons et injection de variables CSS.
+ * Jetons de couleur de l'application et injection des variables CSS.
  *
- * Les couleurs thématiques vivent ici. L'application applique un thème au démarrage
- * selon les préférences utilisateur, et écoute les changements d'attribut
- * `data-theme` sur l'élément racine.
- *
- * Catégories :
- * - Thématiques (sombre/clair) : bg primaire/secondaire, text
- * - xterm : couleurs du terminal
- * - Marque/UI (non thématisées) : #7d76f0, #8682cf, #ffffff (webview), #000 (mask)
+ * Il n'y a qu'un thème (T-0075 : aucune maquette claire n'existe). Le
+ * basculement — `applyTheme`, `data-theme`, `settings.theme` — a été retiré
+ * en T-0200 : il promettait un réglage sans effet. Le remettre le jour où une
+ * maquette claire existe est du travail neuf de toute façon.
  */
 
 /**
- * Palette sombre (défaut).
+ * Palette sombre — la seule.
  */
 export const darkTheme = {
   // Fonds principaux (statusbar, panneaux terminal) — niveau "rails et
@@ -51,21 +47,8 @@ export const darkTheme = {
 }
 
 /**
- * Constantes non thématisées (marque, webview, masques).
- */
-export const unthemedColors = {
-  brand: '#7d76f0', // Marque Ovrsee (curseur xterm, bordures)
-  brandAlt: '#8682cf', // Marque secondaire (SVG)
-  webviewBg: '#ffffff', // Fond webview Chromium
-  maskBlack: '#000', // mask-image
-} as const
-
-/**
- * Injecte les variables CSS du thème au démarrage.
+ * Injecte les variables CSS `--theme-*` au démarrage.
  * Appelé une seule fois dans main.tsx.
- *
- * Crée une balise <style> avec les jetons --theme-* et recalcule
- * au changement de `data-theme`.
  */
 export function initializeTheme(): void {
   const style = document.createElement('style')
@@ -76,91 +59,50 @@ export function initializeTheme(): void {
 }
 
 /**
- * Applique un thème à l'élément racine.
- * @param theme 'light' | 'dark' | 'auto'
- */
-export function applyTheme(theme: string): void {
-  if (theme === 'auto') {
-    // Retire l'attribut pour que la cascade CSS utilise prefers-color-scheme
-    document.documentElement.removeAttribute('data-theme')
-  } else {
-    document.documentElement.dataset.theme = theme
-  }
-}
-
-/**
- * Retourne la chaîne CSS avec les variables du thème donné.
- * @param theme 'light' | 'dark' | 'auto'
+ * La chaîne CSS des jetons `--theme-*`.
+ *
+ * Le thème sombre ne redéfinit AUCUN jeton `--color-*` du système Ovrsee.
+ *
+ * Une première version en recopiait les quatre-vingt-dix valeurs pour les
+ * « thématiser » — et l'accent changeait de teinte au passage, le fond
+ * dérivait. L'apparence par défaut de l'application changeait sans que
+ * personne l'ait demandé.
+ *
+ * `_ds/ovrsee/styles.css` EST le thème sombre : il est déjà chargé, il fait
+ * autorité. Ne sont déclarés ici que les jetons qui remplacent les couleurs
+ * autrefois écrites en dur dans les composants.
  */
 function getCSSVariables(): string {
-  /**
-   * Le thème sombre ne redéfinit AUCUN jeton `--color-*` du système Ovrsee.
-   *
-   * Une première version en recopiait les quatre-vingt-dix valeurs pour les
-   * « thématiser » — et l'accent changeait de teinte au passage, le fond
-   * dérivait. L'apparence par défaut de l'application changeait sans que
-   * personne l'ait demandé.
-   *
-   * `_ds/ovrsee/styles.css` EST le thème sombre : il est déjà chargé, il
-   * fait autorité. Ne sont déclarés ici que les jetons `--theme-*`, ceux qui
-   * remplacent les couleurs autrefois écrites en dur dans les composants.
-   */
-  const themeTokens = (palette: typeof darkTheme) => ({
-    '--theme-bg-primary': palette.bgPrimary,
-    '--theme-bg-lightbox': palette.bgLightbox,
-    '--theme-xterm-bg': palette.xtermBg,
-    '--theme-xterm-fg': palette.xtermFg,
-    '--theme-xterm-cursor': palette.xtermCursor,
-    '--theme-xterm-selection': palette.xtermSelection,
-    '--theme-xterm-black': palette.xtermBlack,
-    '--theme-xterm-bright-black': palette.xtermBrightBlack,
-    '--theme-xterm-white': palette.xtermWhite,
-    '--theme-xterm-bright-white': palette.xtermBrightWhite,
-    '--theme-xterm-magenta': palette.xtermMagenta,
-    '--theme-xterm-bright-magenta': palette.xtermBrightMagenta,
-  })
+  const tokens: Record<string, string> = {
+    '--theme-bg-primary': darkTheme.bgPrimary,
+    '--theme-bg-lightbox': darkTheme.bgLightbox,
+    '--theme-xterm-bg': darkTheme.xtermBg,
+    '--theme-xterm-fg': darkTheme.xtermFg,
+    '--theme-xterm-cursor': darkTheme.xtermCursor,
+    '--theme-xterm-selection': darkTheme.xtermSelection,
+    '--theme-xterm-black': darkTheme.xtermBlack,
+    '--theme-xterm-bright-black': darkTheme.xtermBrightBlack,
+    '--theme-xterm-white': darkTheme.xtermWhite,
+    '--theme-xterm-bright-white': darkTheme.xtermBrightWhite,
+    '--theme-xterm-magenta': darkTheme.xtermMagenta,
+    '--theme-xterm-bright-magenta': darkTheme.xtermBrightMagenta,
+  }
 
-  const bloc = (tokens: Record<string, string>, indent: string): string =>
-    Object.entries(tokens)
-      .map(([key, val]) => `${indent}${key}: ${val};`)
-      .join('\n')
+  const lignes = Object.entries(tokens)
+    .map(([cle, valeur]) => `      ${cle}: ${valeur};`)
+    .join('\n')
 
-  // Un seul thème pour l'instant : aucune maquette claire n'existe côté
-  // Ovrsee App.dc.html (T-0075). `:root` porte les jetons sombres quel que
-  // soit `data-theme` ; `_ds/ovrsee/styles.css` fournit le reste.
   return `
     :root {
-${bloc(themeTokens(darkTheme), '      ')}
+${lignes}
     }
   `
 }
 
 /**
- * Retourne la palette xterm pour le thème courant.
- * Appelée au démarrage et quand le thème change.
+ * La palette xterm, dérivée de `darkTheme`.
  */
-export function getTerminalTheme(): {
-  background: string
-  foreground: string
-  cursor: string
-  selectionBackground: string
-  black: string
-  brightBlack: string
-  white: string
-  brightWhite: string
-  magenta: string
-  brightMagenta: string
-  red: string
-  brightRed: string
-  green: string
-  brightGreen: string
-  yellow: string
-  brightYellow: string
-  blue: string
-  brightBlue: string
-  cyan: string
-  brightCyan: string
-} {
+export function getTerminalTheme() {
   const palette = darkTheme
 
   return {

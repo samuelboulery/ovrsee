@@ -113,12 +113,7 @@ declare global {
   }
 }
 
-export const terminalBridge = (): TerminalBridge | null => window.ovrsee?.terminal ?? null
-
-/**
- * Palette xterm thématisée, calculée au démarrage.
- * getTerminalTheme() retourne la palette selon le thème courant.
- */
+const terminalBridge = (): TerminalBridge | null => window.ovrsee?.terminal ?? null
 
 /** Un onglet du panneau : ce que l'interface en montre. */
 export interface Session {
@@ -174,11 +169,6 @@ export function injectTo(ptyId: string | null, text: string): boolean {
  */
 export function pasteTo(ptyId: string | null, text: string): boolean {
   return injectTo(ptyId, `\x1b[200~${text}\x1b[201~`)
-}
-
-/** Écrit dans la session Claude du projet courant — voir `injectTo`. */
-export function injectToClaude(text: string): boolean {
-  return injectTo(claudeSessionId, text)
 }
 
 /** Colle un bloc dans la session Claude du projet courant — voir `pasteTo`. */
@@ -244,7 +234,7 @@ export function useTerminals(
   const activeByProject = useRef(new Map<string, string | null>())
   // Lu par `attach()` pour ne pointer `claudeSessionId` que si le projet de la
   // session qui vient de s'ouvrir est toujours celui affiché — sans ça, changer
-  // de projet pendant l'ouverture ferait écrire `injectToClaude` dans la
+  // de projet pendant l'ouverture ferait écrire `pasteToClaude` dans la
   // mauvaise session.
   const activeProjectRef = useRef(projectPath)
   // L'abonnement au flux ne se refait jamais ; sans cette référence il
@@ -257,31 +247,6 @@ export function useTerminals(
   // l'autre : React appelle une référence changeante avec `null` puis avec
   // l'élément, ce qui détruirait et rouvrirait la session à chaque rendu.
   const refs = useRef(new Map<string, (host: HTMLDivElement | null) => void>())
-
-  // Un xterm ne relit sa palette qu'à la création (`theme: getTerminalTheme()`
-  // ligne ~248) : sans ce ré-abonnement, un terminal déjà ouvert reste figé
-  // sur le thème du moment de son ouverture quand l'utilisateur bascule
-  // clair/sombre ensuite — le `data-theme` change, `getTerminalTheme()` en
-  // tiendrait compte s'il était rappelé, mais rien ne le rappelait.
-  useEffect(() => {
-    const reapply = () => {
-      const theme = getTerminalTheme()
-      for (const pane of panes.current.values()) pane.xterm.options.theme = theme
-    }
-
-    const observer = new MutationObserver(reapply)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
-
-    // Le thème 'auto' n'a pas d'attribut `data-theme` : c'est
-    // prefers-color-scheme qui tranche, donc c'est lui qu'il faut écouter.
-    const media = window.matchMedia('(prefers-color-scheme: dark)')
-    media.addEventListener('change', reapply)
-
-    return () => {
-      observer.disconnect()
-      media.removeEventListener('change', reapply)
-    }
-  }, [])
 
   /** Le pty de cette session vient de mourir ou d'être fermé. */
   const oublieId = useCallback((key: string) => {
@@ -442,7 +407,7 @@ export function useTerminals(
         setPtyIds(before => ({ ...before, [session.key]: result.id }))
         // Ne pointer `claudeSessionId` que si le projet de cette session est
         // toujours celui affiché : sinon un changement de projet pendant
-        // l'ouverture ferait écrire `injectToClaude` dans une session cachée.
+        // l'ouverture ferait écrire `pasteToClaude` dans une session cachée.
         if (session.kind === 'claude' && activeProjectRef.current === projectPath) claudeSessionId = result.id
         bridge.resize(result.id, xterm.cols, xterm.rows)
       })

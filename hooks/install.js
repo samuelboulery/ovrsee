@@ -39,6 +39,7 @@ import { fileURLToPath } from 'node:url'
 import { writeFileNoFollow } from './plans.js'
 import { installSkills } from './skills.js'
 import { DEFAULT_COLUMNS } from './tickets.js'
+import { estPrincipal } from './principal.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const START = '# ovrsee-hook-start'
@@ -92,7 +93,7 @@ export function installPostCommit(root, done) {
  * hook-ci qui le rattrape — sans quoi le plan reste ouvert avec zéro commit, et
  * `ovrsee:close` refuse de le clore faute de date.
  */
-export function installPostMerge(root, done) {
+function installPostMerge(root, done) {
   return installGitHook(
     root,
     'post-merge',
@@ -454,7 +455,7 @@ export function install(target, { skills = [], gitInit = false, commit = false, 
 }
 
 // Exécution directe seulement : importé, ce fichier n'écrit rien.
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+if (estPrincipal(import.meta.url)) {
   const args = process.argv.slice(2)
   const flag = args.indexOf('--skills')
   const skills = flag === -1 ? [] : (args[flag + 1] ?? '').split(',').filter(Boolean)

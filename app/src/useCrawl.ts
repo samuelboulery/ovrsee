@@ -28,7 +28,7 @@ interface CrawlBridge {
 }
 
 /** Le pont Electron, ou `null` dans un navigateur. */
-export function crawlBridge(): CrawlBridge | null {
+function crawlBridge(): CrawlBridge | null {
   return (globalThis as { ovrsee?: { crawl?: CrawlBridge } }).ovrsee?.crawl ?? null
 }
 

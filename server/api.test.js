@@ -400,7 +400,7 @@ test('GET /api/settings sans projet rend le profil global', () => {
   assert.ok(result && 'json' in result)
   assert.equal(result.status, undefined)
   assert.equal(result.json.langue, 'fr')
-  assert.equal(result.json.theme, 'auto')
+  assert.equal(result.json.sourceGraphe, 'auto')
 
   delete process.env.OVRSEE_SETTINGS
 })
@@ -460,12 +460,12 @@ test('POST /api/settings valide et écrit', () => {
   const result = resolve(
     url('/api/settings'),
     dir,
-    { method: 'POST', headers: { 'x-ovrsee': '1' }, body: { langue: 'en', theme: 'dark' } },
+    { method: 'POST', headers: { 'x-ovrsee': '1' }, body: { langue: 'en', sourceGraphe: 'obsidian' } },
   )
 
   assert.ok(result && 'json' in result)
   assert.equal(result.json.langue, 'en')
-  assert.equal(result.json.theme, 'dark')
+  assert.equal(result.json.sourceGraphe, 'obsidian')
 
   delete process.env.OVRSEE_SETTINGS
 })
@@ -477,12 +477,12 @@ test('POST /api/settings rejette les valeurs invalides', () => {
   const result = resolve(
     url('/api/settings'),
     dir,
-    { method: 'POST', headers: { 'x-ovrsee': '1' }, body: { langue: 'de', theme: 42 } },
+    { method: 'POST', headers: { 'x-ovrsee': '1' }, body: { langue: 'de', sourceGraphe: 42 } },
   )
 
   assert.ok(result && 'json' in result)
   assert.equal(result.json.langue, 'fr')
-  assert.equal(result.json.theme, 'auto')
+  assert.equal(result.json.sourceGraphe, 'auto')
 
   delete process.env.OVRSEE_SETTINGS
 })
@@ -499,16 +499,16 @@ test('POST /api/settings partiel préserve les champs non transmis', () => {
   )
   assert.equal(result.json.langue, 'en')
 
-  // POST partiel : juste theme
+  // POST partiel : juste sourceGraphe
   result = resolve(
     url('/api/settings'),
     dir,
-    { method: 'POST', headers: { 'x-ovrsee': '1' }, body: { theme: 'dark' } },
+    { method: 'POST', headers: { 'x-ovrsee': '1' }, body: { sourceGraphe: 'obsidian' } },
   )
 
-  // Vérifier que langue n'a pas changé, que theme a changé, onglets intacts
+  // Vérifier que langue n'a pas changé, que sourceGraphe a changé, onglets intacts
   assert.equal(result.json.langue, 'en')
-  assert.equal(result.json.theme, 'dark')
+  assert.equal(result.json.sourceGraphe, 'obsidian')
   assert.deepEqual(result.json.onglets.actifs, ['apercu', 'navigateur', 'produit', 'historique', 'tableau', 'donnees', 'stack'])
 
   delete process.env.OVRSEE_SETTINGS

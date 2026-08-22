@@ -13,7 +13,9 @@
   "compilerOptions": {
     "noEmit": false,
     "outDir": "app/.test-build",
-    "rootDir": "app/src",
+    // Pas de `rootDir` : `app/src` importe `hooks/i18n.js`, que `allowJs` fait
+    // entrer dans le programme. La racine commune est donc le dépôt, et la
+    // sortie garde son arborescence (`app/src/…` et `hooks/…` côte à côte).
     "module": "commonjs",
     "moduleResolution": "bundler",
     "verbatimModuleSyntax": false,

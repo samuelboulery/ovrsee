@@ -26,8 +26,8 @@
 
 import { execFileSync } from 'node:child_process'
 import { appendFileSync, existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
-import { join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
+import { estPrincipal } from './principal.js'
 
 /**
  * Noms exacts tels qu'invoqués par l'outil Skill : `plugin:skill` pour les
@@ -202,7 +202,7 @@ function main() {
  * `logAudit` lirait stdin et appellerait `process.exit(0)` à chaque
  * `pnpm test`.
  */
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (estPrincipal(import.meta.url)) {
   try {
     main()
   } catch (err) {

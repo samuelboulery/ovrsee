@@ -5,6 +5,10 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
+    // `hooks/i18n.js` n'est pas typé, mais son littéral l'est : `allowJs` laisse
+    // TypeScript en dériver `TranslationKey` au lieu d'un `.d.ts` qui recopie
+    // 780 clés à la main. Sans `checkJs` — les hooks restent du JS ordinaire.
+    "allowJs": true,
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true,

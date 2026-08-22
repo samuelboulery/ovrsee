@@ -29,7 +29,6 @@ const ORDRE = ['apercu', 'navigateur', 'produit', 'historique', 'tableau', 'donn
 const settings = (patch: Record<string, unknown> = {}): SettingsType =>
   ({
     langue: 'fr',
-    theme: 'auto',
     densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
     onglets: { actifs: [...ORDRE], ordre: [...ORDRE] },
     terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
@@ -122,7 +121,7 @@ const DEGRADES: Array<[string, SettingsType]> = [
   ['bootstrap absent', settings({ bootstrap: undefined })],
   ['actions absentes', settings({ customActions: undefined })],
   ['actions présentes', settings({ customActions: [{ label: 'Test', text: 'pnpm test' }] })],
-  ['champs de premier niveau absents', settings({ theme: undefined, langue: undefined, packageManager: undefined, sourceGraphe: undefined })],
+  ['champs de premier niveau absents', settings({ langue: undefined, packageManager: undefined, sourceGraphe: undefined })],
 ]
 
 for (const [nomSection, Section] of SECTIONS) {
@@ -209,14 +208,12 @@ test('appliquerProfil : les onglets du template passent en tête, dans son ordre
 
 test('appliquerProfil : ne touche que les onglets et le terminal', () => {
   const avant = settings({
-    theme: 'dark',
     langue: 'en',
     customActions: [{ label: 'Test', text: 'pnpm test' }],
     terminal: { visible: true, disposition: 'bottom', hauteur: 300, largeur: 500 },
   })
   const apres = appliquerProfil(avant, profil('sobre'))
 
-  assert.equal(apres.theme, 'dark')
   assert.equal(apres.langue, 'en')
   assert.deepEqual(apres.densiteActivite, avant.densiteActivite)
   assert.deepEqual(apres.customActions, avant.customActions)

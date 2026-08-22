@@ -18,7 +18,6 @@
 import { execFileSync, spawn } from 'node:child_process'
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 // WHY: photographier une application exige de la faire tourner. Playwright
 // est le seul pilote qui gère l'attente du réseau, l'état d'authentification
@@ -30,6 +29,7 @@ import { normalizeRoutes, pageSlug, sameOrigin } from './routes.js'
 import { redige } from '../hooks/redaction.js'
 import { cleanEnv, shellRun } from '../hooks/shell.js'
 import { writeFileNoFollow } from '../hooks/plans.js'
+import { estPrincipal } from '../hooks/principal.js'
 
 const DEFAULTS = {
   dev: 'pnpm dev',
@@ -465,7 +465,7 @@ async function run() {
 
 // Exécuté seulement en invocation directe : les tests importent `retainable`
 // sans vouloir démarrer un navigateur.
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (estPrincipal(import.meta.url)) {
   run().catch(err => {
     const message = String(err?.message ?? err)
     // L'échec est une information, pas un silence. Sans cette ligne, l'ovrsee

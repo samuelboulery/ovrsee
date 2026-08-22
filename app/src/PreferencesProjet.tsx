@@ -26,7 +26,7 @@ type SectionProps = {
 }
 
 /** Les lignes prêtes à poser dans le terminal. */
-export function BlocActions({ settings, onSettings }: SectionProps) {
+function BlocActions({ settings, onSettings }: SectionProps) {
   const [label, setLabel] = useState('')
   const [texte, setTexte] = useState('')
   const [erreur, setErreur] = useState<TranslationKey | null>(null)
@@ -185,7 +185,7 @@ export function BlocActions({ settings, onSettings }: SectionProps) {
 }
 
 /** Les commandes proposées une seule fois, à l'initialisation d'un projet neuf. */
-export function BlocDemarrage({ settings, onSettings }: SectionProps) {
+function BlocDemarrage({ settings, onSettings }: SectionProps) {
   const bootstrap = settings.bootstrap ?? ['/project-setup']
 
   return (
@@ -238,7 +238,7 @@ export function BlocDemarrage({ settings, onSettings }: SectionProps) {
 }
 
 /** Gestionnaire de paquets et source de graphe. */
-export function BlocAvance({ settings, onSettings }: SectionProps) {
+function BlocAvance({ settings, onSettings }: SectionProps) {
   return (
     <>
       {/* Une liste, pas un champ libre : `validateSettings` n'accepte que ces

@@ -323,7 +323,6 @@ export interface Action {
 
 export interface SettingsType {
   langue: string
-  theme: string
   densiteActivite: { granularite: string; fenetre: string }
   onglets: { actifs: string[]; ordre: string[] }
   terminal: { visible: boolean; disposition: string; hauteur: number; largeur: number; disabled?: boolean }
@@ -333,8 +332,6 @@ export interface SettingsType {
   customActions?: Action[]
   /** La présentation de premier lancement a-t-elle été vue — ou passée ? */
   onboardingVu?: boolean
-  /** Ce que la présentation a appris de l'usage de Claude Code. */
-  claude?: { niveau: string; usage: string }
   /** `ovrsee/pages/shots/` doit-il être gitignoré dans le projet ? */
   gitignoreShots?: boolean
   /** `ovrsee/plans/` et `ovrsee/tickets/` doivent-ils être gitignorés ? */
@@ -793,7 +790,7 @@ export const mediaUrl = (root: string, file: string) =>
 /**
  * Préférences de l'ovrsee : globales si pas de projet, fusionnées si projet.
  *
- * Les champs `langue`, `theme`, `densiteActivite` ne se surchargent jamais
+ * Les champs `langue`, `densiteActivite` ne se surchargent jamais
  * par le projet — c'est une préférence personnelle.
  */
 export const fetchSettings = (projectPath?: string): Promise<SettingsType> =>

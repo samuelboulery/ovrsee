@@ -115,11 +115,6 @@ declare global {
 
 export const terminalBridge = (): TerminalBridge | null => window.ovrsee?.terminal ?? null
 
-/**
- * Palette xterm thématisée, calculée au démarrage.
- * getTerminalTheme() retourne la palette selon le thème courant.
- */
-
 /** Un onglet du panneau : ce que l'interface en montre. */
 export interface Session {
   /** Identifiant local, stable tant que l'onglet vit. Pas l'identifiant du pty. */
@@ -257,31 +252,6 @@ export function useTerminals(
   // l'autre : React appelle une référence changeante avec `null` puis avec
   // l'élément, ce qui détruirait et rouvrirait la session à chaque rendu.
   const refs = useRef(new Map<string, (host: HTMLDivElement | null) => void>())
-
-  // Un xterm ne relit sa palette qu'à la création (`theme: getTerminalTheme()`
-  // ligne ~248) : sans ce ré-abonnement, un terminal déjà ouvert reste figé
-  // sur le thème du moment de son ouverture quand l'utilisateur bascule
-  // clair/sombre ensuite — le `data-theme` change, `getTerminalTheme()` en
-  // tiendrait compte s'il était rappelé, mais rien ne le rappelait.
-  useEffect(() => {
-    const reapply = () => {
-      const theme = getTerminalTheme()
-      for (const pane of panes.current.values()) pane.xterm.options.theme = theme
-    }
-
-    const observer = new MutationObserver(reapply)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
-
-    // Le thème 'auto' n'a pas d'attribut `data-theme` : c'est
-    // prefers-color-scheme qui tranche, donc c'est lui qu'il faut écouter.
-    const media = window.matchMedia('(prefers-color-scheme: dark)')
-    media.addEventListener('change', reapply)
-
-    return () => {
-      observer.disconnect()
-      media.removeEventListener('change', reapply)
-    }
-  }, [])
 
   /** Le pty de cette session vient de mourir ou d'être fermé. */
   const oublieId = useCallback((key: string) => {

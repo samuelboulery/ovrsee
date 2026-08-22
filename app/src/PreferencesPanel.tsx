@@ -23,7 +23,6 @@ import { TAB_KEYS } from './PreferencesPreview'
 import { SectionProfils } from './PreferencesProfils'
 import { SectionProjet } from './PreferencesProjet'
 import { s } from './style'
-import { applyTheme } from './theme'
 import { TAB_ICONS, type TabId } from './views'
 
 /**
@@ -569,14 +568,14 @@ export function PreferencesModal({
   }, [onClose])
 
   /**
-   * Thème et langue s'appliquent avant l'écriture.
+   * La langue s'applique avant l'écriture.
    *
-   * Les autres réglages peuvent attendre les 300 ms du différé, mais ces deux-là
-   * sont l'aperçu de leur propre effet : un thème qui bascule un tiers de
-   * seconde après le clic se lit comme une latence, pas comme une réponse.
+   * Les autres réglages peuvent attendre les 300 ms du différé, mais celui-ci
+   * est l'aperçu de son propre effet : une interface qui change de langue un
+   * tiers de seconde après le clic se lit comme une latence, pas comme une
+   * réponse.
    */
   const applique = (suivant: SettingsType) => {
-    if (suivant.theme !== settings?.theme) applyTheme(suivant.theme)
     if (suivant.langue !== settings?.langue) setCurrentLanguage(suivant.langue)
     setSettings(suivant)
   }

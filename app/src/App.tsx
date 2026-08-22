@@ -7,7 +7,6 @@ import {
   SidebarSimple,
 } from '@phosphor-icons/react'
 
-import { applyTheme } from './theme'
 import { t, setCurrentLanguage } from './i18n'
 import {
   estAbandon,
@@ -248,17 +247,9 @@ export function App() {
         setTerminalWidth(s.terminal.largeur)
         setLayout(s.terminal.disposition as Layout)
         setTerminal(s.terminal.visible && !s.terminal.disabled)
-        applyTheme(s.theme)
       })
       .catch(err => setError(String(err.message ?? err)))
   }, [])
-
-  // Applique le thème quand il change dans les paramètres
-  useEffect(() => {
-    if (settings) {
-      applyTheme(settings.theme)
-    }
-  }, [settings?.theme])
 
   /**
    * Persistance des tailles du terminal, après le geste et pas pendant.
@@ -373,7 +364,6 @@ export function App() {
   const appliquerReglages = (next: SettingsType) => {
     setSettings(next)
     setCurrentLanguage(next.langue)
-    applyTheme(next.theme)
     setTerminal(next.terminal?.visible ?? true)
     setLayout((next.terminal?.disposition ?? 'bottom') as Layout)
   }

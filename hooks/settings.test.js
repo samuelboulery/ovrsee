@@ -17,7 +17,6 @@ const tempDir = () => mkdtempSync(join(tmpdir(), 'ovrsee-settings-'))
 
 test('DEFAULT_SETTINGS a le schéma complet', () => {
   assert(DEFAULT_SETTINGS.langue === 'fr')
-  assert(DEFAULT_SETTINGS.theme === 'auto')
   assert(Array.isArray(DEFAULT_SETTINGS.onglets.actifs))
   assert(Array.isArray(DEFAULT_SETTINGS.onglets.ordre))
   assert(DEFAULT_SETTINGS.terminal.visible === true)
@@ -73,16 +72,6 @@ test('validateSettings : langue invalide retombe au défaut', () => {
 test('validateSettings : langue valide acceptée', () => {
   const result = validateSettings({ langue: 'en' })
   assert.equal(result.langue, 'en')
-})
-
-test('validateSettings : theme invalide retombe au défaut', () => {
-  const result = validateSettings({ theme: 42 })
-  assert.equal(result.theme, 'auto')
-})
-
-test('validateSettings : theme valide accepté', () => {
-  const result = validateSettings({ theme: 'dark' })
-  assert.equal(result.theme, 'dark')
 })
 
 test('validateSettings : densiteActivite.granularite invalide', () => {
@@ -151,11 +140,11 @@ test('writeSettings écrit et readSettings relit', () => {
   try {
     const file = join(dir, 'settings.json')
     process.env.OVRSEE_SETTINGS = file
-    const custom = validateSettings({ langue: 'en', theme: 'dark' })
+    const custom = validateSettings({ langue: 'en', sourceGraphe: 'obsidian' })
     writeSettings(custom)
     const read = readSettings()
     assert.equal(read.langue, 'en')
-    assert.equal(read.theme, 'dark')
+    assert.equal(read.sourceGraphe, 'obsidian')
   } finally {
     delete process.env.OVRSEE_SETTINGS
     rmSync(dir, { recursive: true })
@@ -167,13 +156,6 @@ test('mergeSettings : projet ne surcharge pas langue', () => {
   const project = { langue: 'fr' }
   const result = mergeSettings(global, project)
   assert.equal(result.langue, 'en')
-})
-
-test('mergeSettings : projet ne surcharge pas theme', () => {
-  const global = { ...DEFAULT_SETTINGS, theme: 'dark' }
-  const project = { theme: 'light' }
-  const result = mergeSettings(global, project)
-  assert.equal(result.theme, 'dark')
 })
 
 test('mergeSettings : projet ne surcharge pas densiteActivite', () => {
@@ -237,10 +219,10 @@ test('validateSettings : gitignorePlans valide accepté', () => {
 })
 
 test('mergeSettings : fusion partielle conserve globale pour non-surchargés', () => {
-  const global = { ...DEFAULT_SETTINGS, theme: 'dark' }
+  const global = { ...DEFAULT_SETTINGS, langue: 'en' }
   const project = { onglets: { actifs: ['apercu'] } }
   const result = mergeSettings(global, project)
-  assert.equal(result.theme, 'dark')
+  assert.equal(result.langue, 'en')
   assert.deepEqual(result.onglets.actifs, ['apercu'])
 })
 
@@ -312,8 +294,6 @@ test('DEFAULT_SETTINGS.customActions est un tableau vide', () => {
 
 test('DEFAULT_SETTINGS : la présentation est due au premier lancement', () => {
   assert.equal(DEFAULT_SETTINGS.onboardingVu, false)
-  assert.equal(DEFAULT_SETTINGS.claude.niveau, 'intermediaire')
-  assert.equal(DEFAULT_SETTINGS.claude.usage, 'terminal')
 })
 
 test('validateSettings : onboardingVu non booléen retombe au défaut', () => {
@@ -322,24 +302,23 @@ test('validateSettings : onboardingVu non booléen retombe au défaut', () => {
   assert.equal(validateSettings({ onboardingVu: true }).onboardingVu, true)
 })
 
-test('validateSettings : claude valide champ par champ', () => {
-  // Un niveau inconnu ne doit pas emporter l'usage, qui est bon.
-  const result = validateSettings({ claude: { niveau: 'gourou', usage: 'ide' } })
-  assert.equal(result.claude.niveau, 'intermediaire')
-  assert.equal(result.claude.usage, 'ide')
-})
-
-test('validateSettings : claude non-objet → défaut', () => {
-  assert.deepEqual(validateSettings({ claude: 'terminal' }).claude, DEFAULT_SETTINGS.claude)
-  assert.deepEqual(validateSettings({ claude: null }).claude, DEFAULT_SETTINGS.claude)
-})
-
-test('mergeSettings : un dépôt ne décide ni de la présentation ni du profil Claude', () => {
+test('mergeSettings : un dépôt ne décide pas que la présentation a été vue', () => {
   const global = { ...structuredClone(DEFAULT_SETTINGS), onboardingVu: false }
-  const merged = mergeSettings(global, {
-    onboardingVu: true,
-    claude: { niveau: 'expert', usage: 'desktop' },
-  })
+  const merged = mergeSettings(global, { onboardingVu: true })
   assert.equal(merged.onboardingVu, false)
-  assert.deepEqual(merged.claude, DEFAULT_SETTINGS.claude)
+})
+
+/**
+ * Un profil écrit par une version antérieure porte encore `theme` et `claude`
+ * (retirés en T-0200/T-0201). Il doit se lire sans erreur, clés ignorées.
+ */
+test('validateSettings : une clé d’une version antérieure est ignorée', () => {
+  const result = validateSettings({
+    langue: 'en',
+    theme: 'light',
+    claude: { niveau: 'expert', usage: 'ide' },
+  })
+  assert.equal(result.langue, 'en')
+  assert.equal(result.theme, undefined)
+  assert.equal(result.claude, undefined)
 })

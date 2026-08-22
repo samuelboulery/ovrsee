@@ -471,7 +471,6 @@ test('buildActions compose les actions livrées avec le gestionnaire pnpm', () =
   const snap = snapshot({})
   const settings = {
     langue: 'fr',
-    theme: 'auto',
     densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
     onglets: { actifs: [], ordre: [] },
     terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
@@ -493,7 +492,6 @@ test('buildActions compose les actions livrées avec le gestionnaire npm', () =>
   const snap = snapshot({})
   const settings = {
     langue: 'fr',
-    theme: 'auto',
     densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
     onglets: { actifs: [], ordre: [] },
     terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
@@ -514,7 +512,6 @@ test('buildActions compose les actions livrées avec le gestionnaire npm', () =>
 test('deliveredActions retourne les commandes livrées, sans les personnalisées', () => {
   const settings = {
     langue: 'fr',
-    theme: 'auto',
     densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
     onglets: { actifs: [], ordre: [] },
     terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
@@ -538,7 +535,6 @@ test('buildActions inclut les actions personnalisées valides', () => {
   const snap = snapshot({})
   const settings = {
     langue: 'fr',
-    theme: 'auto',
     densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
     onglets: { actifs: [], ordre: [] },
     terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
@@ -564,7 +560,6 @@ test('buildActions rejette les actions personnalisées avec sauts de ligne', () 
   const snap = snapshot({})
   const settings = {
     langue: 'fr',
-    theme: 'auto',
     densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
     onglets: { actifs: [], ordre: [] },
     terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },

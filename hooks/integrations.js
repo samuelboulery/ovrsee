@@ -23,7 +23,7 @@ export const PROVIDERS = ['vercel', 'netlify', 'supabase', 'autre']
  * `OVRSEE_INTEGRATIONS` env var pour les tests, même logique que
  * `settingsPath()` dans `settings.js`.
  */
-export const integrationsPath = () =>
+const integrationsPath = () =>
   process.env.OVRSEE_INTEGRATIONS ?? join(homedir(), '.claude', 'ovrsee', 'integrations.json')
 
 /**

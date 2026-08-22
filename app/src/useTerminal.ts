@@ -113,7 +113,7 @@ declare global {
   }
 }
 
-export const terminalBridge = (): TerminalBridge | null => window.ovrsee?.terminal ?? null
+const terminalBridge = (): TerminalBridge | null => window.ovrsee?.terminal ?? null
 
 /** Un onglet du panneau : ce que l'interface en montre. */
 export interface Session {
@@ -169,11 +169,6 @@ export function injectTo(ptyId: string | null, text: string): boolean {
  */
 export function pasteTo(ptyId: string | null, text: string): boolean {
   return injectTo(ptyId, `\x1b[200~${text}\x1b[201~`)
-}
-
-/** Écrit dans la session Claude du projet courant — voir `injectTo`. */
-export function injectToClaude(text: string): boolean {
-  return injectTo(claudeSessionId, text)
 }
 
 /** Colle un bloc dans la session Claude du projet courant — voir `pasteTo`. */
@@ -239,7 +234,7 @@ export function useTerminals(
   const activeByProject = useRef(new Map<string, string | null>())
   // Lu par `attach()` pour ne pointer `claudeSessionId` que si le projet de la
   // session qui vient de s'ouvrir est toujours celui affiché — sans ça, changer
-  // de projet pendant l'ouverture ferait écrire `injectToClaude` dans la
+  // de projet pendant l'ouverture ferait écrire `pasteToClaude` dans la
   // mauvaise session.
   const activeProjectRef = useRef(projectPath)
   // L'abonnement au flux ne se refait jamais ; sans cette référence il
@@ -412,7 +407,7 @@ export function useTerminals(
         setPtyIds(before => ({ ...before, [session.key]: result.id }))
         // Ne pointer `claudeSessionId` que si le projet de cette session est
         // toujours celui affiché : sinon un changement de projet pendant
-        // l'ouverture ferait écrire `injectToClaude` dans une session cachée.
+        // l'ouverture ferait écrire `pasteToClaude` dans une session cachée.
         if (session.kind === 'claude' && activeProjectRef.current === projectPath) claudeSessionId = result.id
         bridge.resize(result.id, xterm.cols, xterm.rows)
       })

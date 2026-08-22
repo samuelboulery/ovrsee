@@ -58,7 +58,7 @@ const tabForPath = (pathname: string): TabId =>
  * Lu dans `TABS`, qui porte déjà la clé : une seconde table identifiant → clé
  * finissait par diverger de celle-ci.
  */
-export const labelOf = (id: TabId): string =>
+const labelOf = (id: TabId): string =>
   t(TABS.find(([tab]) => tab === id)?.[1] ?? 'tabs.apercu')
 
 /**

@@ -21,10 +21,10 @@
 
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
-import { join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 
 import { clearActive, sessionId } from './active.js'
+import { estPrincipal } from './principal.js'
 
 function readStdin() {
   try {
@@ -78,7 +78,7 @@ function main() {
  * Le corps ne tourne que si le fichier est lancé comme hook — sans quoi
  * l'importer lirait stdin à chaque `pnpm test`.
  */
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (estPrincipal(import.meta.url)) {
   try {
     main()
   } catch (err) {

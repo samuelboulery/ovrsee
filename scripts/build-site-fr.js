@@ -14,6 +14,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { estPrincipal } from '../hooks/principal.js'
 
 const SITE = join(dirname(fileURLToPath(import.meta.url)), '..', 'site')
 
@@ -113,7 +114,7 @@ export function sources() {
   }
 }
 
-if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
+if (estPrincipal(import.meta.url)) {
   const { html, dict } = sources()
   mkdirSync(join(SITE, 'fr'), { recursive: true })
   writeFileSync(join(SITE, 'fr', 'index.html'), construire(html, dict))

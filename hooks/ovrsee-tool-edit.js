@@ -19,11 +19,11 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync } from 'node:fs'
 import { isAbsolute, join, relative, resolve, sep } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 import { EN_COURS, moveTicket, readBoard, readTickets } from './tickets.js'
 import { isSafePlanFileName } from './plans.js'
 import { readActive, sessionId } from './active.js'
+import { estPrincipal } from './principal.js'
 
 function readStdin() {
   try {
@@ -145,7 +145,7 @@ function main() {
  * `estUneEditionSource` lirait stdin et appellerait `process.exit(0)` à chaque
  * `pnpm test`.
  */
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (estPrincipal(import.meta.url)) {
   try {
     main()
   } catch (err) {

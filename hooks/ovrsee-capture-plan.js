@@ -25,7 +25,6 @@ import { execFileSync } from 'node:child_process'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
 import {
   serializePlan,
@@ -36,6 +35,7 @@ import {
 } from './plans.js'
 import { avancerTicketActifEclipse, clearActiveTicket, avancerTicketsClos } from './tickets.js'
 import { sessionId, writeActive } from './active.js'
+import { estPrincipal } from './principal.js'
 
 function readStdin() {
   try {
@@ -271,7 +271,7 @@ function main() {
  * Sans cette garde, l'importer pour en éprouver une décision (`planFrom`,
  * `titleOf`) lirait stdin et écrirait des fichiers à chaque `pnpm test`.
  */
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (estPrincipal(import.meta.url)) {
   try {
     main()
   } catch (err) {

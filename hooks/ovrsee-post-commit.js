@@ -12,7 +12,7 @@
 
 import { execFileSync, spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { attachCommitToPlan, isSafePlanFileName } from './plans.js'
@@ -21,6 +21,7 @@ import { avancerTicketsClos, colonneFinale, EN_COURS, readBoard, readTickets, mo
 import { readSettings, mergeSettings } from './settings.js'
 import { syncGitignore } from './gitignore-sync.js'
 import { readJson } from './snapshot.js'
+import { estPrincipal } from './principal.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 
@@ -229,7 +230,7 @@ function spawnCrawl(root) {
  * Sans cette garde, l'importer pour en éprouver une décision lancerait un
  * crawl — c'est-à-dire une application et un navigateur — à chaque `pnpm test`.
  */
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (estPrincipal(import.meta.url)) {
   try {
     const root = git(['rev-parse', '--show-toplevel'], process.cwd())
     const ovrseeDir = join(root, 'ovrsee')

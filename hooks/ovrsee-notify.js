@@ -40,7 +40,7 @@
 
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { estPrincipal } from './principal.js'
 
 /**
  * Les types de notification qui appellent une réponse humaine.
@@ -209,7 +209,7 @@ function main() {
  * Le corps ne tourne que si le fichier est lancé comme hook — sans quoi
  * l'importer pour éprouver `genrePour` lirait stdin à chaque `pnpm test`.
  */
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (estPrincipal(import.meta.url)) {
   try {
     main()
   } catch (err) {

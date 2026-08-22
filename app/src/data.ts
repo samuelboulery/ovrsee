@@ -475,7 +475,7 @@ export function pageName(page: Page, pages: Page[]): string {
  */
 export const CARD_W = 220
 export const CARD_H = 210
-export const COL_STEP = 244
+const COL_STEP = 244
 export const ROW_STEP = 250
 
 export interface Placed {

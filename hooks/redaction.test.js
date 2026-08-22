@@ -98,3 +98,26 @@ test('une affectation masquée n’emporte pas le diagnostic qui la suit', () =>
     'connect failed: DB_PASSWORD=***, host=db.example.com, code=ECONNREFUSED',
   )
 })
+
+test('redige masque un bloc PEM en entier', () => {
+  const pem =
+    '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkq\nhkiG9w0BAQEFAASC\n-----END PRIVATE KEY-----'
+  assert.equal(redige(`fatal: cannot read key\n${pem}\nexit 1`), 'fatal: cannot read key\n***\nexit 1')
+  assert.equal(
+    redige('-----BEGIN RSA PRIVATE KEY-----\nAAAA\n-----END RSA PRIVATE KEY-----'),
+    '***',
+  )
+})
+
+test('redige masque les jetons npm, GitLab et Slack', () => {
+  assert.equal(redige('npm ERR! npm_abcdefghij0123456789 refusé'), 'npm ERR! *** refusé')
+  assert.equal(redige('remote: glpat-AbCdEfGhIjKlMnOpQrSt'), 'remote: ***')
+  assert.equal(redige('slack: xoxb-1234567890-abcdef'), 'slack: ***')
+})
+
+test('redige laisse lisible ce qui n’est pas un secret', () => {
+  // Le diagnostic est la raison d'être de la trace : un mot qui commence par
+  // `npm_` mais qui n'a pas la longueur d'un jeton reste entier.
+  assert.equal(redige('npm_config_registry vide'), 'npm_config_registry vide')
+  assert.equal(redige('pnpm: command not found'), 'pnpm: command not found')
+})

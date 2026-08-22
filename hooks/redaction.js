@@ -43,7 +43,18 @@ export function redige(texte) {
       /(["']?)([\w.-]*(?:KEY|TOKEN|SECRET|PASSWORD|PASSWD|PWD)[\w.-]*)\1(\s*[=:]\s*)("[^"]*"|'[^']*'|[^\s,;]+)/gi,
       '$1$2$1$3***',
     )
+    // Un bloc PEM part en entier, pas ligne à ligne : le corps est du base64
+    // sans séparateur, donc aucune des règles ci-dessus ne l'accroche, et une
+    // commande `dev` qui meurt en imprimant une clé privée l'écrirait tel quel
+    // dans `scans.jsonl`, versionné.
+    .replace(
+      /-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----[\s\S]*?-----END (?:[A-Z0-9 ]+ )?PRIVATE KEY-----/g,
+      '***',
+    )
     .replace(/\b(?:sk|rk|pk)[-_][A-Za-z0-9_-]{8,}/g, '***')
+    .replace(/\bnpm_[A-Za-z0-9]{16,}/g, '***')
+    .replace(/\bglpat-[A-Za-z0-9_-]{16,}/g, '***')
+    .replace(/\bxox[abprs]-[A-Za-z0-9-]{10,}/g, '***')
     // Identifiants de clé AWS : le message d'erreur du SDK les cite en clair.
     .replace(/\b(?:AKIA|ASIA|AIDA|AROA|AGPA|ANPA|APKA|ABIA|ACCA)[A-Z0-9]{16}\b/g, '***')
     .replace(/\bAIza[A-Za-z0-9_-]{20,}/g, '***')

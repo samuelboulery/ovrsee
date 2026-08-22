@@ -196,6 +196,15 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   `electron-builder.yml`), et `spawn-helper` doit garder son bit d'exécution — d'où
   `scripts/fix-pty-permissions.js` en postinstall. Point de rupture classique de
   l'empaquetage, invisible en dev : il ne se voit qu'à l'exécution du DMG.
+- **En pnpm 11, `.npmrc` ne porte plus que l'authentification et le registre.**
+  Tout autre réglage y est lu comme s'il n'existait pas — sans avertissement. Le
+  dépôt a perdu ainsi sa quarantaine anti-ChainDrop : `minimum-release-age=1440`
+  vivait dans `.npmrc`, et la bascule de `packageManager` en `pnpm@11` l'a rendue
+  muette. Les réglages vivent donc dans `pnpm-workspace.yaml`, en camelCase
+  (`minimumReleaseAge`, `allowBuilds`). Même piège que `onlyBuiltDependencies`,
+  encore lu en pnpm 11 mais n'autorisant plus rien. La vérification tient en une
+  commande, et elle vaut d'être faite après toute montée de version :
+  `pnpm config list` doit montrer le réglage attendu.
 - **`pnpm package:win` ne se lance pas depuis ce Mac.** `node-pty` se compile à
   l'installation (node-gyp) pour la plateforme courante, et il n'y a pas de
   cross-compile mac→windows fiable. Il faut `pnpm install` puis `pnpm package:win`

@@ -5,8 +5,29 @@
 #
 # node-pty est un module natif : sans son script de compilation, il n'y a pas
 # de binaire, donc pas de terminal.
-onlyBuiltDependencies:
-  - node-pty
+#
+# En pnpm 11 la clé est `allowBuilds` et c'est une **map**, pas une liste :
+# l'ancien `onlyBuiltDependencies` est encore lu mais n'autorise plus rien, en
+# silence — et une liste sous `allowBuilds` non plus.
+allowBuilds:
+  node-pty: true
+  # electron-builder n'en a besoin que pour l'installeur Windows, construit sur
+  # un runner natif ; rien ici ne le compile.
+  electron-winstaller: false
+
+# Quarantaine de 24 h sur les versions fraîchement publiées.
+#
+# Le 2026-08-04, le ver ChainDrop a empoisonné 444 paquets npm en moins de
+# quatre heures via un hook `preinstall`. Les retraits arrivent, mais après
+# coup : refuser une version de moins d'un jour laisse le temps au registre de
+# la retirer avant qu'elle n'atteigne ce dépôt.
+#
+# Ce réglage vivait dans `.npmrc` jusqu'à pnpm 11, qui n'y lit plus que
+# l'authentification et le registre : la ligne y était devenue muette, et la
+# quarantaine levée sans que rien ne le dise. Même piège que
+# `onlyBuiltDependencies` ci-dessus, sur le réglage voisin. Vérification :
+# `pnpm config get minimumReleaseAge` doit rendre 1440, pas `undefined`.
+minimumReleaseAge: 1440
 
 # @phosphor-icons/react publie dist/index.cjs.js (syntaxe CommonJS) sous un
 # package.json racine "type": "module", sans package.json imbriqué dans

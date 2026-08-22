@@ -251,9 +251,33 @@ function ecriture(chemin, body) {
  * @param {object} args arguments passés par le client
  * @returns {{content: *} | {isError: true, code: number, message: string}}
  */
+/**
+ * Au-delà, ce n'est plus un argument d'outil : c'est un corps de ticket qui a
+ * dérapé. Le seuil est large — un ticket réel n'en approche pas le dixième.
+ */
+const ARG_MAX = 100_000
+
+/**
+ * Une chaîne d'argument dépasse-t-elle la borne ?
+ *
+ * Les `maxLength` du schéma annoncé (`mcp/server.js`) sont une indication
+ * donnée au modèle, pas une garde : rien n'oblige un appelant à les respecter.
+ * La garde est ici, du côté qui écrit sur le disque.
+ */
+const tropLong = valeur => {
+  if (typeof valeur === 'string') return valeur.length > ARG_MAX
+  if (Array.isArray(valeur)) return valeur.some(tropLong)
+  return false
+}
+
 export function dispatch(outil, args = {}) {
   const fn = OUTILS[outil]
   if (!fn) return { isError: true, code: 400, message: `Outil inconnu : ${outil}` }
+
+  const enorme = Object.entries(args ?? {}).find(([, valeur]) => tropLong(valeur))
+  if (enorme) {
+    return { isError: true, code: 400, message: `Argument trop long : ${enorme[0]}` }
+  }
 
   try {
     if (outil === 'listProjects') return fn()

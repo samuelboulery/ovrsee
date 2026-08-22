@@ -2,14 +2,14 @@
 {
   "id": "T-0190",
   "titre": "Confirmer la commande dev avant le premier crawl d'un dépôt",
-  "colonne": "backlog",
+  "colonne": "pret",
   "priorite": "haute",
   "tags": [
     "crawl",
     "securite"
   ],
   "cree": "2026-08-20",
-  "maj": "2026-08-20",
+  "maj": "2026-08-22",
   "plan": "2026-08-20-audit-de-securite-complet-findings-et-correctifs.md",
   "charge": "s"
 }
@@ -38,3 +38,16 @@ Le crawl n'est pas le seul chemin : `pnpm ovrsee:auth` lance la même commande.
 - [ ] L'accord est retenu par projet — il ne se redemande pas à chaque crawl.
 - [ ] Modifier `dev` dans `ovrsee.config.json` redemande l'accord.
 - [ ] Un projet déjà crawlé avant ce changement n'a pas à réaccorder.
+
+## Relevé le 2026-08-22
+
+L'audit du 2026-08-22 (`2026-08-22-audit-de-cybersecurite-complet-findings-et-correctifs.md`) rouvre ce constat et le classe premier.
+La chaîne est confirmée dans l'arbre courant : `hooks/ovrsee-post-commit.js:269`
+lance `spawnCrawl()` dès qu'un commit touche du code, et `crawl/index.js:179`
+passe `config.dev` à `shellRun()`, c'est-à-dire à un `zsh -lic`. La valeur est
+relue sur le disque à chaque crawl : `validateCrawlConfig()` (`server/api.js:180`)
+ne garde que l'écriture par l'API, jamais la relecture. Ouvrir puis crawler un
+dépôt reçu — le geste que l'application encourage — exécute donc son code.
+
+C'est le seul endroit où l'invariant du cadrage (« l'ovrsee lit ; il n'exécute
+que le terminal qu'on lui demande ») est enfreint par construction.

@@ -37,6 +37,7 @@ import { readIntegrations, writeIntegrations } from '../hooks/integrations.js'
 import { checkVercel, checkNetlify, checkSupabase, fetchSupabaseSchema } from '../hooks/integrationProviders.js'
 import { openSession, writeTo, resize, closeSession, closeAll } from './pty.js'
 import { startCrawl, stopCrawl, stopAllCrawls, crawlState, watchCrawl } from './crawl.js'
+import { ouvrable } from './lien-externe.js'
 import {
   answer as menubarAnswer,
   createTray,
@@ -209,6 +210,15 @@ function createWindow() {
     delete webPreferences.preload
     webPreferences.nodeIntegration = false
     webPreferences.contextIsolation = true
+    // Le reste de l'objet vient aussi de l'attribut `webpreferences` de la
+    // balise, donc du rendu : ne remettre que les trois clés ci-dessus
+    // laissait un rendu compromis lever `webSecurity` et faire lire le disque
+    // à une page distante. On repose donc tout ce qui compte, pas trois clés.
+    webPreferences.sandbox = true
+    webPreferences.webSecurity = true
+    webPreferences.allowRunningInsecureContent = false
+    webPreferences.nodeIntegrationInSubFrames = false
+    webPreferences.experimentalFeatures = false
   })
 
   // Les invités de cette fenêtre. Sert de liste blanche à `preview:devtools` :
@@ -225,7 +235,10 @@ function createWindow() {
     guests.add(guest)
     guest.once('destroyed', () => guests.delete(guest))
     guest.setWindowOpenHandler(({ url }) => {
-      shell.openExternal(url)
+      // L'URL vient d'une page qu'on n'a pas écrite : `openExternal` la
+      // remettrait au système, qui lancerait l'application enregistrée pour
+      // son schéma. Seuls http et https sortent (`lien-externe.js`).
+      if (ouvrable(url)) shell.openExternal(url)
       return { action: 'deny' }
     })
   })
@@ -251,7 +264,7 @@ function createWindow() {
   // Un lien externe s'ouvre dans le navigateur, jamais dans la fenêtre : le
   // rendu ne doit jamais naviguer ailleurs que sur son propre schéma.
   window.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url)
+    if (ouvrable(url)) shell.openExternal(url)
     return { action: 'deny' }
   })
   window.webContents.on('will-navigate', (event, url) => {

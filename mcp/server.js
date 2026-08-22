@@ -22,6 +22,17 @@ const rl = createInterface({
   terminal: false,
 })
 
+/**
+ * Les formes de chaîne annoncées aux outils.
+ *
+ * Un schéma sans `maxLength` dit au modèle qu'un argument n'a pas de taille.
+ * C'est une indication, pas une garde — `dispatch()` borne pour de vrai, du
+ * côté qui écrit sur le disque.
+ */
+const CHEMIN = { type: 'string', maxLength: 4096 }
+const COURT = { type: 'string', maxLength: 200 }
+const CORPS = { type: 'string', maxLength: 100_000 }
+
 /** Les outils annoncés, dans l'ordre où ils se lisent. */
 const TOOLS = [
   {
@@ -34,7 +45,7 @@ const TOOLS = [
     description: 'Résumé d\'un projet : compteurs, dates, statut',
     inputSchema: {
       type: 'object',
-      properties: { path: { type: 'string' } },
+      properties: { path: CHEMIN },
       required: ['path'],
     },
   },
@@ -43,7 +54,7 @@ const TOOLS = [
     description: 'Texte du brief d\'un projet',
     inputSchema: {
       type: 'object',
-      properties: { path: { type: 'string' } },
+      properties: { path: CHEMIN },
       required: ['path'],
     },
   },
@@ -52,7 +63,7 @@ const TOOLS = [
     description: 'Structure des colonnes d\'un projet',
     inputSchema: {
       type: 'object',
-      properties: { path: { type: 'string' } },
+      properties: { path: CHEMIN },
       required: ['path'],
     },
   },
@@ -62,7 +73,7 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        path: { type: 'string' },
+        path: CHEMIN,
         limit: { type: 'number', default: 20 },
         full: { type: 'boolean', default: false, description: 'Inclure le corps markdown — réponse nettement plus volumineuse' },
       },
@@ -75,7 +86,7 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        path: { type: 'string' },
+        path: CHEMIN,
         limit: { type: 'number', default: 10 },
         full: { type: 'boolean', default: false, description: 'Inclure le corps markdown de chaque plan' },
       },
@@ -87,7 +98,7 @@ const TOOLS = [
     description: 'Chronologie des commits d\'un projet, par semaine',
     inputSchema: {
       type: 'object',
-      properties: { path: { type: 'string' } },
+      properties: { path: CHEMIN },
       required: ['path'],
     },
   },
@@ -97,7 +108,7 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        path: { type: 'string' },
+        path: CHEMIN,
         full: { type: 'boolean', default: false, description: 'Renvoie le graphe entier au lieu du résumé' },
       },
       required: ['path'],
@@ -109,16 +120,16 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        path: { type: 'string' },
-        titre: { type: 'string' },
-        colonne: { type: 'string' },
-        priorite: { type: 'string' },
-        charge: { type: 'string' },
-        tags: { type: 'array', items: { type: 'string' } },
-        plan: { type: 'string' },
-        corps: { type: 'string' },
-        type: { type: 'string' },
-        epic: { type: 'string' },
+        path: CHEMIN,
+        titre: COURT,
+        colonne: COURT,
+        priorite: COURT,
+        charge: COURT,
+        tags: { type: 'array', items: COURT, maxItems: 32 },
+        plan: COURT,
+        corps: CORPS,
+        type: COURT,
+        epic: COURT,
       },
       required: ['path', 'titre'],
     },
@@ -129,14 +140,14 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        path: { type: 'string' },
-        file: { type: 'string' },
-        titre: { type: 'string' },
-        colonne: { type: 'string' },
-        priorite: { type: 'string' },
-        charge: { type: 'string' },
-        tags: { type: 'array', items: { type: 'string' } },
-        corps: { type: 'string' },
+        path: CHEMIN,
+        file: COURT,
+        titre: COURT,
+        colonne: COURT,
+        priorite: COURT,
+        charge: COURT,
+        tags: { type: 'array', items: COURT, maxItems: 32 },
+        corps: CORPS,
       },
       required: ['path', 'file'],
     },
@@ -147,9 +158,9 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: {
-        path: { type: 'string' },
-        file: { type: 'string' },
-        colonne: { type: 'string' },
+        path: CHEMIN,
+        file: COURT,
+        colonne: COURT,
       },
       required: ['path', 'file', 'colonne'],
     },

@@ -15,7 +15,7 @@
 
 import { execFileSync, spawn } from 'node:child_process'
 import { createInterface } from 'node:readline/promises'
-import { readFileSync } from 'node:fs'
+import { chmodSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 import { chromium } from 'playwright-core'
@@ -80,7 +80,12 @@ async function main() {
     await rl.question('Une fois connecté, appuyez sur Entrée pour enregistrer la session… ')
     rl.close()
 
-    await context.storageState({ path: join(root, statePath) })
+    const cible = join(root, statePath)
+    await context.storageState({ path: cible })
+    // Playwright écrit sous l'umask courant, soit 0644 en général. Le fichier
+    // porte un jeton de session valide : le refuser à git ne suffit pas s'il
+    // reste lisible par un autre compte de la machine.
+    chmodSync(cible, 0o600)
     console.log(`session enregistrée dans ${statePath}`)
     console.log('Le prochain crawl atteindra les pages protégées.')
   } finally {

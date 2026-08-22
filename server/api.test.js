@@ -58,6 +58,33 @@ test('/api/project refuse un chemin non enregistré plutôt que de lire le disqu
   assert.equal(result.status, 404)
 })
 
+// --- /api/graph ------------------------------------------------------------
+// Le graphe est sorti du snapshot avec T-0134 : sa liste blanche est celle du
+// registre, comme /api/project, et c'est une route neuve — elle doit être
+// exercée ici, pas seulement depuis l'onglet Données.
+
+test('/api/graph rend le graphe et sa provenance', () => {
+  const dir = projectWithShot()
+  mkdirSync(join(dir, 'graphify-out'), { recursive: true })
+  writeFileSync(
+    join(dir, 'graphify-out', 'graph.json'),
+    JSON.stringify({ nodes: [{ id: 'a', label: 'venu de graphify' }], links: [] }),
+  )
+
+  const result = resolve(url(`/api/graph?path=${encodeURIComponent(dir)}`), dir)
+
+  assert.ok(result && 'json' in result)
+  assert.equal(result.json.graphSource, 'graphify')
+  assert.equal(result.json.graph.nodes[0].label, 'venu de graphify')
+})
+
+test('/api/graph refuse un chemin non enregistré plutôt que de lire le disque', () => {
+  const dir = projectWithShot()
+  const result = resolve(url('/api/graph?path=%2Fetc'), dir)
+
+  assert.equal(result.status, 404)
+})
+
 test('/api/shot sert une capture du projet', () => {
   const dir = projectWithShot()
   const result = resolve(

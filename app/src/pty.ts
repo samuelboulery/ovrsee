@@ -112,7 +112,6 @@ declare global {
 
 export const terminalBridge = (): TerminalBridge | null => window.ovrsee?.terminal ?? null
 
-
 /**
  * Session Claude courante, à portée de module.
  *

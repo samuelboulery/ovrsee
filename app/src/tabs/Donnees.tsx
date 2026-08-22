@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Database } from '@phosphor-icons/react'
 
-import { frDate, tablesFrom, type Integration, type SchemaTable } from '../data'
+import { estAbandon, frDate, tablesFrom, type GraphPayload, type Integration, type SchemaTable } from '../data'
 import { fetchGraph } from '../api'
-import type { GraphPayload } from '../graph'
 import { t } from '../i18n'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
@@ -11,10 +10,10 @@ import { ViewBar } from '../ViewBar'
 import type { IntegrationsBridge } from '../pty'
 
 /**
- * Lu directement sur `window`, sans importer `useTerminal.ts` : ce module
- * charge `@xterm/xterm` (et sa feuille de style), absent du rendu serveur des
- * tests (`render.test.tsx`). Seul le *type* du pont est importé — effacé à la
- * compilation.
+ * Lu directement sur `window`. Le *type* du pont vient de `pty.ts`, jamais de
+ * `useTerminal.ts` : ce dernier charge `@xterm/xterm` et sa feuille de style,
+ * absents du rendu serveur des tests (`render.test.tsx`) — et le tirer ici
+ * annulerait le morceau paresseux du terminal (T-0133).
  */
 const bridge = (): IntegrationsBridge | null => {
   if (typeof window === 'undefined') return null
@@ -194,8 +193,25 @@ function confStyle(conf: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS' | 'LIVE'): strin
   return styles[conf]
 }
 
+/**
+ * Le dernier graphe lu, par racine de projet — T-0208.
+ *
+ * L'onglet est en rendu conditionnel : le quitter le démonte, y revenir refait
+ * l'aller-retour de 687 ko. Une `Map` à portée de module survit au démontage
+ * là où `useState` ne le fait pas. `oublierGraphe()` est appelé par le
+ * rechargement d'`App.tsx` — c'est le seul moment où le fichier peut avoir
+ * changé sous nos pieds.
+ */
+const cacheGraphe = new Map<string, GraphPayload>()
+
+/** Jette le graphe gardé pour ce projet — voir `cacheGraphe`. */
+export const oublierGraphe = (root: string): void => {
+  cacheGraphe.delete(root)
+}
+
 export function Donnees({
   projet,
+  relectures = 0,
   vaultDeclared = false,
   config = null,
   root,
@@ -203,32 +219,47 @@ export function Donnees({
 }: {
   /** Nom affiché du projet, pour le fil d'Ariane de la barre de vue. */
   projet: string
+  /**
+   * Compteur de rechargements d'`App`. Change pour relire le graphe alors que
+   * l'onglet est déjà monté — sans lui, `reload` ne toucherait que le cache et
+   * l'écran garderait son graphe périmé jusqu'au prochain montage.
+   */
+  relectures?: number
   vaultDeclared?: boolean
   config?: { obsidianVault?: string } | null
-  root?: string
+  /**
+   * Racine du projet. Obligatoire depuis T-0209 : l'onglet va chercher son
+   * graphe lui-même, et un `root` absent le laissait sur « Lecture… » à vie.
+   */
+  root: string
   integrations?: Integration[]
 }) {
   // Le graphe n'arrive plus par le snapshot — T-0134. C'est le montage de cet
   // onglet qui le demande, et lui seul : 687 ko lus à chaque changement de
   // projet pour un écran que la plupart des sessions n'ouvrent pas.
-  const [payload, setPayload] = useState<GraphPayload | null>(null)
+  const [payload, setPayload] = useState<GraphPayload | null>(() => cacheGraphe.get(root) ?? null)
   const [graphErreur, setGraphErreur] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!root) return
-    const ctrl = new AbortController()
-    setPayload(null)
+    const garde = cacheGraphe.get(root)
+    setPayload(garde ?? null)
     setGraphErreur(null)
+    if (garde) return
+
+    const ctrl = new AbortController()
     fetchGraph(root, ctrl.signal)
-      .then(setPayload)
+      .then(recu => {
+        cacheGraphe.set(root, recu)
+        setPayload(recu)
+      })
       .catch((err: unknown) => {
         // Une lecture annulée n'est pas une panne : changer de projet pendant
         // le chargement abandonne la précédente, et le dire serait un mensonge.
-        if (ctrl.signal.aborted) return
+        if (estAbandon(err)) return
         setGraphErreur(String((err as Error)?.message ?? err))
       })
     return () => ctrl.abort()
-  }, [root])
+  }, [root, relectures])
 
   const graph = payload?.graph ?? null
   const source = payload?.graphSource ?? null

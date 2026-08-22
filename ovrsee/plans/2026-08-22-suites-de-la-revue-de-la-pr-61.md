@@ -4,7 +4,13 @@
   "title": "Suites de la revue de la PR #61",
   "opened": "2026-08-22",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "9814f77",
+      "date": "2026-08-22",
+      "files": []
+    }
+  ]
 }
 ---
 

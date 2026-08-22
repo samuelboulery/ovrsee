@@ -2,7 +2,7 @@
 {
   "id": "T-0209",
   "titre": "/api/graph : root absent et liste blanche non testée",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": ["api", "test"],
   "cree": "2026-08-22",

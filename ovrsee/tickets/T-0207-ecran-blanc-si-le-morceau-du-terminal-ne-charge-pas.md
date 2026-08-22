@@ -2,7 +2,7 @@
 {
   "id": "T-0207",
   "titre": "Écran blanc si le morceau du terminal ne charge pas",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": ["ui", "robustesse"],
   "cree": "2026-08-22",

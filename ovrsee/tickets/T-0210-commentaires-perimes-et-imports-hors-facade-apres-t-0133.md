@@ -2,7 +2,7 @@
 {
   "id": "T-0210",
   "titre": "Commentaires périmés et imports hors façade après T-0133",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "basse",
   "tags": ["proprete"],
   "cree": "2026-08-22",

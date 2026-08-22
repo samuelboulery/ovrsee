@@ -2,7 +2,7 @@
 {
   "id": "T-0208",
   "titre": "Le graphe est relu à chaque ouverture de l'onglet Données",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": ["perf", "ui"],
   "cree": "2026-08-22",

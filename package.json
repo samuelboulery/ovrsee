@@ -5,7 +5,7 @@
   "license": "MIT",
   "author": "Samuel Boulery",
   "type": "module",
-  "packageManager": "pnpm@10.34.5",
+  "packageManager": "pnpm@11.22.0+sha512.1ff870c4c6133dfd88fb2afc46dd13d47f09c9794b438c6fdb47ca98caf3bc16381ee0be93a091b8e3824cf01f889f46d7d9e20910fb0be1ab0fb5baa80dd621",
   "engines": {
     "node": ">=22"
   },
@@ -17,7 +17,7 @@
     "url": "https://github.com/samuelboulery/ovrsee/issues"
   },
   "homepage": "https://github.com/samuelboulery/ovrsee#readme",
-  "description": "Gestion de projet pour Claude Code : plans approuv\u00e9s, commits qui les r\u00e9alisent, tickets \u00e0 faire \u2014 versionn\u00e9s dans le d\u00e9p\u00f4t.",
+  "description": "Gestion de projet pour Claude Code : plans approuvés, commits qui les réalisent, tickets à faire — versionnés dans le dépôt.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.json && vite build",

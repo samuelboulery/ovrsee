@@ -113,7 +113,7 @@ async function waitForServer(baseUrl, timeoutMs, sortie = () => '') {
   const deadline = Date.now() + timeoutMs
   while (Date.now() < deadline) {
     try {
-      await fetch(baseUrl, { signal: AbortSignal.timeout(2000) })
+      await fetch(baseUrl, { redirect: 'manual', signal: AbortSignal.timeout(2000) })
       return
     } catch {
       await sleep(500)
@@ -142,7 +142,7 @@ async function waitForServer(baseUrl, timeoutMs, sortie = () => '') {
  */
 async function assertPortFree(baseUrl) {
   try {
-    await fetch(baseUrl, { signal: AbortSignal.timeout(2000) })
+    await fetch(baseUrl, { redirect: 'manual', signal: AbortSignal.timeout(2000) })
   } catch {
     return // personne ne répond : la voie est libre
   }

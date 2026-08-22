@@ -227,10 +227,11 @@ que `EDITORS` juste au-dessus.
   restant, et le seul qui contredit l'invariant du cadrage.
 - **T-0191** : passer `excerpt` par `redige()` à l'écriture ; même point d'appel que
   `recordScan()`.
-- **Nouveau** : signature et notarisation macOS (`electron-builder.yml`,
+- **T-0192** : signature et notarisation macOS (`electron-builder.yml`,
   `identity: null`) avant toute distribution hors usage personnel. Sans
   auto-updater, ce n'est pas urgent — mais `release.yml` publie déjà des binaires
-  non signés sur Releases.
+  non signés sur Releases. Le ticket existait depuis l'audit du 2026-08-20 : il
+  passe de basse à moyenne, plutôt qu'un doublon de plus.
 
 ## Fichiers touchés
 

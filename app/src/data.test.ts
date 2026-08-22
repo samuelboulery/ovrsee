@@ -1,17 +1,13 @@
 import assert from 'node:assert/strict'
+import { briefLines, buildActions, buildInjections, decideInjection, deliveredActions } from './brief'
 import test from 'node:test'
 
 import { setCurrentLanguage } from './i18n'
 import {
-  briefLines,
-  buildActions,
-  buildInjections,
   childrenOf,
   colonneFinale,
   commitsDeLaFrise,
   composerCommande,
-  decideInjection,
-  deliveredActions,
   epicEtat,
   epicProgress,
   frDate,

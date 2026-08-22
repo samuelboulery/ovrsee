@@ -9,10 +9,15 @@
  * plein texte dans les plans ou les commits, pas de registre extensible.
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { deliveredActions } from './brief'
 import { FolderOpen, Gear, MagnifyingGlass, Terminal as TerminalIcon, Ticket as TicketIcon } from '@phosphor-icons/react'
 
 import { TAB_ICONS, activeTabsInOrder, type TabId } from './views'
-import { deliveredActions, type Project, type SettingsType, type Ticket } from './data'
+import {
+  type Project,
+  type SettingsType,
+  type Ticket,
+} from './data'
 import { pasteToClaude } from './useTerminal'
 import { t } from './i18n'
 import { s } from './style'

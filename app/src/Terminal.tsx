@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react'
+import { briefLines, buildActions } from './brief'
 import { Check, GitFork, NotePencil, Plus, Question, type IconProps } from '@phosphor-icons/react'
 
-import { briefLines, buildActions, type Snapshot, type SettingsType } from './data'
+import {
+  type Snapshot,
+  type SettingsType,
+} from './data'
 import { etiquetteDe, type AttentionKind } from './attention'
 import { composer, resumeProjet, type MenuBarAttention } from './menubar'
 import { s } from './style'

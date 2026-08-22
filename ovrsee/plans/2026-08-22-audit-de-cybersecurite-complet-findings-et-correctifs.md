@@ -1,10 +1,16 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Audit de cybersécurité complet — findings et correctifs",
   "opened": "2026-08-22",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-22",
+  "commits": [
+    {
+      "sha": "5307e98",
+      "date": "2026-08-22",
+      "files": []
+    }
+  ]
 }
 ---
 

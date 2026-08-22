@@ -154,26 +154,36 @@ interface Pane {
 let claudeSessionId: string | null = null
 
 /**
- * Écrit dans la session Claude. Rend false s'il n'y en a pas — c'est le cas
+ * Écrit dans le pty désigné. Rend false quand il n'y en a pas — c'est le cas
  * dans un navigateur, et l'appelant se rabat alors sur le presse-papier.
  */
-export function injectToClaude(text: string): boolean {
+export function injectTo(ptyId: string | null, text: string): boolean {
   const bridge = terminalBridge()
-  if (!bridge || !claudeSessionId) return false
-  bridge.write(claudeSessionId, text)
+  if (!bridge || !ptyId) return false
+  bridge.write(ptyId, text)
   return true
 }
 
 /**
- * Colle un bloc dans la session Claude sans le valider.
+ * Colle un bloc dans le pty désigné sans le valider.
  *
  * Le mode « bracketed paste » du terminal est indispensable pour un texte
  * multiligne : sans lui, le premier retour à la ligne validerait la saisie et
  * le reste du bloc partirait comme autant de messages séparés. Rien n'est
  * envoyé — l'utilisateur relit et appuie sur Entrée.
  */
+export function pasteTo(ptyId: string | null, text: string): boolean {
+  return injectTo(ptyId, `\x1b[200~${text}\x1b[201~`)
+}
+
+/** Écrit dans la session Claude du projet courant — voir `injectTo`. */
+export function injectToClaude(text: string): boolean {
+  return injectTo(claudeSessionId, text)
+}
+
+/** Colle un bloc dans la session Claude du projet courant — voir `pasteTo`. */
 export function pasteToClaude(text: string): boolean {
-  return injectToClaude(`\x1b[200~${text}\x1b[201~`)
+  return pasteTo(claudeSessionId, text)
 }
 
 const claudeSlot = (project: string): Session => ({
@@ -191,6 +201,14 @@ const claudeSlot = (project: string): Session => ({
 export type OnAttention = (sessionKey: string, event: AttentionEvent, ptyId: string) => void
 
 /**
+ * Prévenu quand l'utilisateur tape dans une session.
+ *
+ * Le hook ne sait pas ce que la frappe veut dire — `Terminal.tsx` le sait : une
+ * frappe dans une session qui attendait une réponse *est* la réponse.
+ */
+export type OnSaisie = (sessionKey: string) => void
+
+/**
  * Ouvre les sessions du panneau et les relie chacune à un xterm.
  *
  * Une session `claude` par projet, ouverte d'office ; autant de shells nus que
@@ -199,7 +217,11 @@ export type OnAttention = (sessionKey: string, event: AttentionEvent, ptyId: str
  * tourner, montées hors écran (même motif qu'entre sessions d'un même projet,
  * voir `Terminal.tsx`), et réapparaissent telles quelles au retour.
  */
-export function useTerminals(projectPath: string | null, onAttention?: OnAttention) {
+export function useTerminals(
+  projectPath: string | null,
+  onAttention?: OnAttention,
+  onSaisie?: OnSaisie,
+) {
   const [sessions, setSessions] = useState<Session[]>([])
   const [active, setActive] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -229,6 +251,8 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
   // capturerait la callback du premier rendu et notifierait avec un état périmé.
   const attentionRef = useRef(onAttention)
   attentionRef.current = onAttention
+  const saisieRef = useRef(onSaisie)
+  saisieRef.current = onSaisie
   // Une fonction de référence par session, gardée telle quelle d'un rendu à
   // l'autre : React appelle une référence changeante avec `null` puis avec
   // l'élément, ce qui détruirait et rouvrirait la session à chaque rendu.
@@ -395,7 +419,11 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
       pane.observer.observe(host)
       panes.current.set(session.key, pane)
 
-      xterm.onData(data => pane.id && bridge.write(pane.id, data))
+      xterm.onData(data => {
+        if (!pane.id) return
+        saisieRef.current?.(session.key)
+        bridge.write(pane.id, data)
+      })
 
       bridge.open(projectPath, session.kind).then(result => {
         if ('error' in result) {
@@ -507,17 +535,16 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
   )
 
   /**
-   * Place le curseur dans la session Claude.
+   * Place le curseur dans la session désignée.
    *
    * Un bouton qui écrit dans le terminal sans y donner le clavier obligerait à
    * cliquer dans la grille pour compléter la commande — le collage servirait à
    * moitié.
    */
-  const focusClaude = useCallback(() => {
-    if (!projectPath) return
-    const pane = panes.current.get(claudeSlot(projectPath).key)
-    pane?.xterm.focus()
-  }, [projectPath])
+  const focusSession = useCallback((key: string | null) => {
+    if (!key) return
+    panes.current.get(key)?.xterm.focus()
+  }, [])
 
   /** Change l'onglet actif du projet courant, et s'en souvient pour le retour. */
   const handleSetActive = useCallback(
@@ -573,7 +600,7 @@ export function useTerminals(projectPath: string | null, onAttention?: OnAttenti
     renommer,
     reinitialiser,
     errors,
-    focusClaude,
+    focusSession,
     cibler,
     claudeKey: projectPath ? claudeSlot(projectPath).key : null,
     available: Boolean(terminalBridge()),

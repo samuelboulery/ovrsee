@@ -17,7 +17,10 @@
 /**
  * Les traductions structurées par langue et domaine.
  *
- * @type {Object.<Language, Object>}
+ * Volontairement sans `@type` : c'est ce littéral qui **est** le type. Avec
+ * `allowJs`, TypeScript en dérive `TranslationKey` (voir plus bas) et une clé
+ * inconnue passée à `t()` devient une erreur de compilation, sans qu'aucune
+ * déclaration ne recopie le trousseau à côté.
  */
 const translations = {
   fr: {
@@ -1569,9 +1572,15 @@ const translations = {
 }
 
 /**
+ * Une clé du dictionnaire, dérivée du dictionnaire lui-même.
+ *
+ * @typedef {keyof typeof translations['fr']} TranslationKey
+ */
+
+/**
  * Récupère une traduction.
  *
- * @param {string} key - Clé de traduction
+ * @param {TranslationKey} key - Clé de traduction
  * @param {'fr' | 'en'} lang - Langue ('fr' ou 'en')
  * @param {Object<string, string|number>} [params] - Paramètres nommés pour substitution
  * @returns {string} La chaîne traduite avec les paramètres substitués

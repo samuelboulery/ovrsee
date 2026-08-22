@@ -6,7 +6,7 @@ import { etiquetteDe, type AttentionKind } from './attention'
 import { composer, resumeProjet, type MenuBarAttention } from './menubar'
 import { s } from './style'
 import { t, type TranslationKey } from './i18n'
-import { useTerminals, pasteToClaude } from './useTerminal'
+import { useTerminals, pasteTo } from './useTerminal'
 import { Divider, useResizable } from './useResizable'
 
 /**
@@ -232,7 +232,7 @@ export function Terminal({
     renommer,
     reinitialiser,
     errors,
-    focusClaude,
+    focusSession,
     cibler,
     claudeKey,
     available,
@@ -293,6 +293,20 @@ export function Terminal({
       etat.current.cibler(sessionKey)
       if (projet) onProjet(projet)
     }
+  },
+  // Une frappe dans une session qui attendait une réponse *est* la réponse :
+  // l'invite de permission se referme et Claude repart. Aucun signal ne le dit
+  // — `UserPromptSubmit` ne concerne que les demandes tapées dans la
+  // conversation — et la pastille serait restée sur « attend une réponse »,
+  // masquée sur l'onglet actif, donc muette pendant tout le travail qui suit.
+  sessionKey => {
+    if (attentions.current[sessionKey]?.kind !== 'question') return
+    // Sans détail : renommer l'onglet d'après une touche n'aurait aucun sens.
+    attentions.current = {
+      ...attentions.current,
+      [sessionKey]: { kind: 'busy', detail: null, at: Date.now() },
+    }
+    setSignaux(n => n + 1)
   })
 
   etat.current = { active, cibler, renommer, reinitialiser, onProjet }
@@ -394,24 +408,30 @@ export function Terminal({
   const sizing = layout === 'side' ? widthSide : height
 
   /**
-   * Un clic écrit dans la session quand elle existe, et copie sinon.
+   * Un clic écrit dans le terminal affiché quand il y en a un, et copie sinon.
+   *
+   * L'onglet actif, et pas la session `claude` : un raccourci cliqué depuis un
+   * shell nu partait chez `claude` et volait l'onglet au passage, alors que le
+   * geste désigne le terminal qu'on a sous les yeux (issue #49). La session
+   * `claude` reste le repli quand aucun onglet n'a de pty — c'est le cas au tout
+   * premier rendu, avant que `pty:open` ait répondu.
    *
    * Tout passe par le collage encadré, commandes comprises : le texte se dépose
-   * dans la saisie de `claude` sans être validé. C'est délibéré — une commande
-   * qui partait au clic ne laissait aucune place au contexte qu'on voulait lui
-   * ajouter. Le curseur suit, sinon il faudrait cliquer dans la grille pour
-   * compléter.
+   * dans la saisie sans être validé. C'est délibéré — une commande qui partait
+   * au clic ne laissait aucune place au contexte qu'on voulait lui ajouter. Le
+   * curseur suit, sinon il faudrait cliquer dans la grille pour compléter.
    *
    * Le repli n'est pas un pis-aller déguisé : le libellé du panneau change
    * aussi, pour que le bouton ne prétende jamais écrire dans une session
    * inexistante.
    */
   const activate = async (label: string, text: string) => {
-    if (pasteToClaude(text)) {
-      if (claudeKey) setActive(claudeKey)
+    const cible = active && ptyIds[active] ? active : claudeKey
+    if (cible && pasteTo(ptyIds[cible] ?? null, text)) {
+      setActive(cible)
       // Après le rendu : une session inactive est `inert`, et `focus()` n'y
       // prend pas tant que React n'a pas commis le changement d'onglet.
-      setTimeout(focusClaude, 0)
+      setTimeout(() => focusSession(cible), 0)
       setNotice(`« ${label} » écrit dans le terminal`)
       setTimeout(() => setNotice(null), 2000)
       return
@@ -500,7 +520,13 @@ export function Terminal({
                 onClick={() => {
                   // Un onglet qu'on ouvre a été vu : son signal a fini de
                   // servir, et le garder allumé ferait mentir la pastille.
-                  if (attentions.current[session.key]) {
+                  //
+                  // Sauf « au travail » : celui-là n'est pas une notification
+                  // qu'on acquitte, c'est un état qui dure. L'effacer au clic
+                  // rendait la pastille muette pendant que Claude réfléchissait,
+                  // jusqu'au `Stop` suivant (issue #53).
+                  const vu = attentions.current[session.key]
+                  if (vu && vu.kind !== 'busy') {
                     const { [session.key]: _vu, ...reste } = attentions.current
                     attentions.current = reste
                     setSignaux(n => n + 1)

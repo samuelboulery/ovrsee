@@ -2,7 +2,7 @@
 {
   "id": "T-0194",
   "titre": "Un raccourci de commande écrit dans l'onglet actif",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": ["terminal", "issue-49"],
   "cree": "2026-08-22",

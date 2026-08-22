@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Corriger les issues #49, #51 et #53",
   "opened": "2026-08-22",
-  "closed": null,
+  "closed": "2026-08-22",
   "commits": [
     {
       "sha": "67eed85",

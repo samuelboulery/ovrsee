@@ -2,7 +2,7 @@
 {
   "id": "T-0196",
   "titre": "L'icône d'état ne perd plus « il réfléchit »",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": ["terminal", "issue-53"],
   "cree": "2026-08-22",

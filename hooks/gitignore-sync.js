@@ -10,6 +10,10 @@
  *
  * Le bloc `.active/` ne dépend d'aucun réglage : cet état est local par nature,
  * et le versionner n'est jamais un choix légitime.
+ *
+ * Exception : un dépôt qui ignore `ovrsee/` en entier n'a besoin d'aucun bloc.
+ * Les ré-écrire reviendrait à salir son `.gitignore` à chaque commit avec des
+ * motifs déjà couverts.
  */
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
@@ -47,14 +51,19 @@ const BLOC_ACTIF =
 export function syncGitignore(root, settings) {
   const path = join(root, '.gitignore')
   const original = existsSync(path) ? readFileSync(path, 'utf8') : ''
+  const ovrseeEntierementIgnore = original
+    .split('\n')
+    .some(ligne => /^\/?ovrsee\/?$/.test(ligne.trim()))
 
   let next = original.split(BLOC_SHOTS).join('')
   next = next.split(BLOC_PLANS).join('')
   next = next.split(BLOC_ACTIF).join('')
 
-  if (settings?.gitignoreShots) next += BLOC_SHOTS
-  if (settings?.gitignorePlans) next += BLOC_PLANS
-  next += BLOC_ACTIF
+  if (!ovrseeEntierementIgnore) {
+    if (settings?.gitignoreShots) next += BLOC_SHOTS
+    if (settings?.gitignorePlans) next += BLOC_PLANS
+    next += BLOC_ACTIF
+  }
 
   if (next !== original) writeFileSync(path, next, 'utf8')
 }

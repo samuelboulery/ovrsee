@@ -81,3 +81,26 @@ test('le bloc d’état de session ne s’empile pas d’un appel à l’autre',
 
   assert.equal(lire(root).match(/ovrsee\/\.active\//g).length, 1)
 })
+
+test('un dépôt qui ignore ovrsee/ en entier ne reçoit aucun bloc', () => {
+  const root = fixture('node_modules/\novrsee/\n')
+
+  syncGitignore(root, { gitignoreShots: true, gitignorePlans: true })
+
+  const contenu = lire(root)
+  assert.equal(contenu, 'node_modules/\novrsee/\n')
+})
+
+test('ignorer ovrsee/ en entier retire les blocs déjà posés', () => {
+  const root = fixture()
+  syncGitignore(root, { gitignoreShots: true, gitignorePlans: true })
+  writeFileSync(join(root, '.gitignore'), `${lire(root)}ovrsee/\n`, 'utf8')
+
+  syncGitignore(root, { gitignoreShots: true, gitignorePlans: true })
+
+  const contenu = lire(root)
+  assert.doesNotMatch(contenu, /ovrsee\/pages\/shots\//)
+  assert.doesNotMatch(contenu, /ovrsee\/plans\//)
+  assert.doesNotMatch(contenu, /ovrsee\/\.active\//)
+  assert.match(contenu, /^ovrsee\/$/m)
+})

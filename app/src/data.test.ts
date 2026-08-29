@@ -25,6 +25,7 @@ import {
   stackFrom,
   stripMarkdown,
   tablesFrom,
+  ticketsPrets,
   type Plan,
   type Snapshot,
   type Ticket,
@@ -189,6 +190,38 @@ test('restant compte les tickets hors de la dernière colonne', () => {
   assert.equal(restant(tickets, board), 1)
   assert.equal(restant([], board), 0)
   assert.equal(restant(tickets, [] as unknown as Snapshot['board']), 2)
+})
+
+test('ticketsPrets ne compte que la colonne « prêt »', () => {
+  const tickets = [
+    { id: 'T-1', colonne: 'backlog' },
+    { id: 'T-2', colonne: 'a-specifier' },
+    { id: 'T-3', colonne: 'pret' },
+    { id: 'T-4', colonne: 'pret' },
+    { id: 'T-5', colonne: 'en-cours' },
+    { id: 'T-6', colonne: 'fait' },
+  ] as unknown as Ticket[]
+  // C'est tout l'objet de l'issue #52 : le backlog n'est pas actionnable.
+  assert.equal(ticketsPrets(tickets), 2)
+  assert.equal(ticketsPrets([]), 0)
+})
+
+test('ticketsPrets rend 0 sur un board qui ne reprend pas l’id « pret »', () => {
+  const tickets = [
+    { id: 'T-1', colonne: 'todo' },
+    { id: 'T-2', colonne: 'doing' },
+  ] as unknown as Ticket[]
+  assert.equal(ticketsPrets(tickets), 0)
+})
+
+test('ticketsPrets : un epic avec enfants prêts ne compte pas double', () => {
+  const tickets = [
+    { id: 'E-1', type: 'epic', colonne: 'pret' },
+    { id: 'T-1', epic: 'E-1', colonne: 'pret' },
+    { id: 'T-2', epic: 'E-1', colonne: 'pret' },
+  ] as unknown as Ticket[]
+  // L'epic s'efface derrière ses enfants, comme dans `restant`.
+  assert.equal(ticketsPrets(tickets), 2)
 })
 
 test("childrenOf retourne les enfants d'un epic triés", () => {

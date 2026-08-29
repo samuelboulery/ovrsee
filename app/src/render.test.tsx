@@ -294,7 +294,7 @@ test('barre de menu — le bloc projet dit où en est le dépôt', () => {
         nom: 'ovrsee',
         projet: '/tmp/projet',
         planActif: 'Barre de menu macOS',
-        ticketsRestants: 7,
+        ticketsPrets: 7,
         branche: 'main',
         fichiersModifies: 25,
         dernierScan: '2026-08-14',

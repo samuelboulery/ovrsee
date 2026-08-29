@@ -2,14 +2,14 @@
 {
   "id": "T-0191",
   "titre": "Rédiger les extraits de pages.json",
-  "colonne": "pret",
+  "colonne": "revue",
   "priorite": "haute",
   "tags": [
     "crawl",
     "securite"
   ],
   "cree": "2026-08-20",
-  "maj": "2026-08-22",
+  "maj": "2026-08-29",
   "plan": "2026-08-20-audit-de-securite-complet-findings-et-correctifs.md",
   "charge": "xs"
 }
@@ -30,9 +30,9 @@ pour les traces d'échec vaut mot pour mot ici.
 
 ## Critères d'acceptation
 
-- [ ] Les `excerpt` de `pages.json` passent par `redige()` avant écriture.
-- [ ] Le titre des pages aussi — il vient du même DOM.
-- [ ] Un test couvre un extrait qui contient un jeton de forme connue.
+- [x] Les `excerpt` de `pages.json` passent par `redige()` avant écriture.
+- [x] Le titre des pages aussi — il vient du même DOM.
+- [x] Un test couvre un extrait qui contient un jeton de forme connue.
 
 ## Relevé le 2026-08-22
 

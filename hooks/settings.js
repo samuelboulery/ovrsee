@@ -211,7 +211,8 @@ export function writeSettings(settings) {
  *
  * Les champs personnels (`langue`, `densiteActivite`, `onboardingVu`) ne se
  * surchargent jamais — c'est la préférence de l'utilisateur, pas du projet. Un dépôt cloné n'a surtout pas à décider qu'on a déjà vu la
- * présentation.
+ * présentation. `bootstrap` non plus (issue #70) : envoyé au terminal Claude,
+ * un dépôt cloné n'a pas à décider quelle commande s'y exécute.
  *
  * @param {object} global profil utilisateur
  * @param {object} project surcharges du projet (ovrsee.config.json)
@@ -225,11 +226,10 @@ export function mergeSettings(global, project = {}) {
   validerOnglets(project.onglets, out.onglets, DEFAULT_SETTINGS.onglets.ordre)
   validerTerminal(project.terminal, out.terminal)
 
-  if (Array.isArray(project.bootstrap)) {
-    if (project.bootstrap.every(x => typeof x === 'string')) {
-      out.bootstrap = project.bootstrap
-    }
-  }
+  // `bootstrap` n'est PAS surchargeable : c'est ce que l'utilisateur veut
+  // voir tourner dans son terminal, une préférence de poste — pas une
+  // propriété du dépôt observé. Le laisser dicter par un dépôt cloné
+  // ouvrirait l'exécution de commandes arbitraires côté terminal (issue #70).
 
   validerEnum(out, 'packageManager', project.packageManager, ['pnpm', 'npm', 'yarn', 'bun'])
   validerEnum(out, 'sourceGraphe', project.sourceGraphe, ['auto', 'graphify', 'obsidian'])

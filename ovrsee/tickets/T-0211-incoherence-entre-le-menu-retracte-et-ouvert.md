@@ -2,7 +2,7 @@
 {
   "id": "T-0211",
   "titre": "Incohérence entre le menu rétracté et ouvert",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": ["ui", "sidebar"],
   "cree": "2026-08-29",

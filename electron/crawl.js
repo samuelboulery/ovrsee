@@ -8,6 +8,12 @@
  * depuis le rendu : la surface exposée dans `preload.cjs` ne reçoit qu'un chemin
  * de projet, déjà vérifié contre le registre par `main.js`.
  *
+ * Ce fichier la LIT malgré tout, mais pour une seule chose : savoir s'il faut
+ * demander l'accord et quoi afficher dans la question (`devSurDisque`,
+ * `accordRequis`). Elle est relue ici sur le disque, jamais reçue du rendu, et
+ * ce n'est pas cette lecture qui s'exécute — le crawler relit lui-même et
+ * revérifie de son côté (`crawl/confiance.js`).
+ *
  * Comme le terminal, ça passe par IPC et pas par `/api/*` : cette route est
  * aussi servie par le dev server Vite, en HTTP local non authentifié, et faire
  * démarrer un processus depuis là l'ouvrirait à tout ce qui tourne sous le même
@@ -20,11 +26,51 @@
  */
 
 import { spawn } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { DEV_DEFAUT, estApprouve } from '../crawl/confiance.js'
+
 const HERE = dirname(fileURLToPath(import.meta.url))
 const CRAWLER = join(HERE, '..', 'crawl', 'index.js')
+
+/**
+ * La commande `dev` telle qu'elle est SUR LE DISQUE, ou `null` si le projet n'a
+ * pas de configuration lisible.
+ *
+ * Relue ici, jamais reçue du rendu : c'est toute la garantie du contrôle. Un
+ * rendu compromis qui pourrait proposer la chaîne à approuver approuverait ce
+ * qu'il veut, et le sujet serait entièrement contourné.
+ *
+ * Le repli sur `DEV_DEFAUT` reproduit celui du crawler : sans lui, l'accord
+ * porterait sur une chaîne que le crawler n'exécutera pas.
+ *
+ * @param {string} projectPath
+ * @returns {string|null}
+ */
+export function devSurDisque(projectPath) {
+  try {
+    const config = JSON.parse(readFileSync(join(projectPath, 'ovrsee.config.json'), 'utf8'))
+    const dev = config?.dev
+    return typeof dev === 'string' ? dev : DEV_DEFAUT
+  } catch {
+    // Configuration absente ou cassée : rien à approuver. Le crawl échouera
+    // pour cette raison-là, et il l'écrira dans `scans.jsonl` comme avant.
+    return null
+  }
+}
+
+/**
+ * Faut-il demander l'accord avant de lancer ce crawl ?
+ *
+ * @param {string} projectPath
+ * @returns {boolean}
+ */
+export function accordRequis(projectPath) {
+  const dev = devSurDisque(projectPath)
+  return dev !== null && !estApprouve(projectPath, dev)
+}
 
 /**
  * Le crawl en cours, par projet. Un seul à la fois et par projet : deux crawls

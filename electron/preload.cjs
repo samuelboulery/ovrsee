@@ -164,6 +164,21 @@ contextBridge.exposeInMainWorld('ovrsee', {
     stop: projectPath => ipcRenderer.invoke('crawl:stop', projectPath),
 
     /**
+     * Accorde la confiance à la commande `dev` d'un projet, au sortir du
+     * formulaire d'équipement.
+     *
+     * `devSaisi` n'est PAS la chaîne approuvée : le processus principal relit
+     * toujours le disque et n'approuve que ce qu'il y trouve. Elle ne sert qu'à
+     * savoir si le disque dit bien ce que l'utilisateur vient de taper — sinon
+     * la question lui est posée, dans une modale native.
+     *
+     * @param {string} projectPath dossier du projet
+     * @param {string|null} devSaisi la commande saisie au formulaire, ou `null`
+     * @returns {Promise<boolean>} vrai si l'accord est enregistré
+     */
+    approve: (projectPath, devSaisi) => ipcRenderer.invoke('crawl:approve', projectPath, devSaisi),
+
+    /**
      * @param {(etat: {running: boolean, project: string|null, line: string|null}) => void} handler
      * @returns {() => void} désabonnement
      */

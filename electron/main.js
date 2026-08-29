@@ -36,7 +36,16 @@ import { readSettings } from '../hooks/settings.js'
 import { readIntegrations, writeIntegrations } from '../hooks/integrations.js'
 import { checkVercel, checkNetlify, checkSupabase, fetchSupabaseSchema } from '../hooks/integrationProviders.js'
 import { openSession, writeTo, resize, closeSession, closeAll } from './pty.js'
-import { startCrawl, stopCrawl, stopAllCrawls, crawlState, watchCrawl } from './crawl.js'
+import {
+  accordRequis,
+  crawlState,
+  devSurDisque,
+  startCrawl,
+  stopAllCrawls,
+  stopCrawl,
+  watchCrawl,
+} from './crawl.js'
+import { approuver, devApprouve } from '../crawl/confiance.js'
 import { ouvrable } from './lien-externe.js'
 import {
   answer as menubarAnswer,
@@ -347,12 +356,96 @@ app.whenReady().then(() => {
   // qu'un chemin de projet — ce qui est lancé est décidé dans `crawl.js`.
   const projetConnu = p => typeof p === 'string' && projects().some(entry => entry.path === p)
 
-  ipcMain.handle('crawl:start', (event, projectPath) => {
+  /**
+   * La question de confiance d'espace de travail, en modale NATIVE.
+   *
+   * Native, et pas dessinée par le rendu, pour deux raisons : le rendu affiche
+   * du contenu hostile (markdown de plans, titres de pages crawlées), donc une
+   * modale HTML y serait usurpable — position, superposition, faux bouton — et
+   * un contrôle situé dans le code qu'on vient de compromettre ne contrôle
+   * rien. Un accord se demande par du chrome que la page ne peut pas peindre.
+   *
+   * Le texte dit la vérité : ce qui se décide n'est pas « cette ligne est-elle
+   * inoffensive » — `pnpm dev` l'est à l'œil, et ce qu'il exécute vit dans le
+   * `package.json` du dépôt — mais « est-ce que je fais confiance à la
+   * provenance de ce dépôt ».
+   *
+   * @param {Electron.WebContents} sender
+   * @param {string} projectPath
+   * @param {string} dev la commande relue sur le disque
+   * @returns {Promise<boolean>}
+   */
+  const demanderAccord = async (sender, projectPath, dev) => {
+    const avant = devApprouve(projectPath)
+    const fenetre = BrowserWindow.fromWebContents(sender)
+    const options = {
+      type: 'warning',
+      buttons: ['Annuler', 'Exécuter'],
+      // Le défaut ET l'échappement tombent sur Annuler : une modale qu'on
+      // acquitte sans lire ne doit rien accorder.
+      defaultId: 0,
+      cancelId: 0,
+      message: 'Exécuter la commande dev de ce dépôt ?',
+      detail:
+        `Ovrsee va lancer « ${dev} » dans ${projectPath}.\n\n` +
+        (avant !== null && avant !== dev
+          ? `La commande approuvée était « ${avant} ». Elle a changé depuis.\n\n`
+          : '') +
+        "Cela exécute du code de ce dépôt — la commande, les scripts qu'elle appelle " +
+        "et leurs dépendances. Ne l'autorisez que si vous faites confiance à la " +
+        'provenance de ce dépôt.',
+    }
+    const { response } = fenetre
+      ? await dialog.showMessageBox(fenetre, options)
+      : await dialog.showMessageBox(options)
+    return response === 1
+  }
+
+  ipcMain.handle('crawl:start', async (event, projectPath) => {
     if (!projetConnu(projectPath)) {
       return { error: "ce dossier n'est pas dans la liste des projets de l'ovrsee" }
     }
+
+    // La commande est relue ici, jamais reçue du rendu. Le crawler la relira de
+    // son côté et revérifiera : ce n'est pas une redondance étourdie, c'est le
+    // processus principal qui pose la question au bon moment et le crawler qui
+    // se garde parce que c'est lui qui exécute.
+    const dev = devSurDisque(projectPath)
+    if (accordRequis(projectPath)) {
+      if (!(await demanderAccord(event.sender, projectPath, dev))) return crawlState()
+      approuver(projectPath, dev)
+    }
+
     watchCrawl(event.sender)
     return startCrawl(projectPath)
+  })
+
+  /**
+   * L'accord donné au formulaire d'équipement.
+   *
+   * Le rendu n'envoie qu'un chemin de projet et la commande qu'il vient de
+   * SAISIR — jamais celle à approuver. Ce qui est approuvé est toujours ce qui
+   * a atterri sur le disque : `writeOvrseeConfig()` CONSERVE un
+   * `ovrsee.config.json` déjà présent, et un dépôt reçu qui embarque le sien
+   * ferait sinon approuver une commande qui n'est pas celle qui s'exécutera —
+   * un contrôle qui approuve la mauvaise chaîne est pire que pas de contrôle,
+   * il rassure.
+   *
+   * D'où la comparaison : accord tacite seulement si le disque dit exactement
+   * ce que l'utilisateur a tapé ; sinon la modale, avec la vraie valeur.
+   */
+  ipcMain.handle('crawl:approve', async (event, projectPath, devSaisi) => {
+    if (!projetConnu(projectPath)) return false
+
+    const dev = devSurDisque(projectPath)
+    if (dev === null) return false
+    if (!accordRequis(projectPath)) return true
+
+    if (typeof devSaisi !== 'string' || devSaisi !== dev) {
+      if (!(await demanderAccord(event.sender, projectPath, dev))) return false
+    }
+    approuver(projectPath, dev)
+    return true
   })
   ipcMain.handle('crawl:stop', (_event, projectPath) => {
     if (!projetConnu(projectPath)) return crawlState()

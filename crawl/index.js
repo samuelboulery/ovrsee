@@ -251,6 +251,19 @@ const isIgnored = (path, patterns) =>
   patterns.some(pattern => new RegExp('^' + pattern.replace(/\*/g, '.*') + '$').test(path))
 
 /**
+ * Filtre le titre et l'extrait captés dans le DOM de l'application observée,
+ * au plus près de la source — avant qu'ils n'entrent dans `visited[]` — pour
+ * que `pages.json`, versionné, et tout consommateur en aval (skill `ovrsee`,
+ * outil MCP `getProjectSummary`) héritent du filtre sans repasser dessus.
+ *
+ * `redige()` s'applique avant la troncature à 400 caractères : sectionner
+ * d'abord aurait pu couper un jeton en deux et le laisser passer à moitié.
+ */
+export function sanitizePageCapture(title, text) {
+  return { title: redige(title), text: redige(text).slice(0, 400) }
+}
+
+/**
  * Parcours en largeur depuis les routes d'entrée, en suivant les liens
  * internes. Rend une entrée par chemin concret visité.
  */
@@ -298,12 +311,11 @@ async function visitAll(page, config) {
       ),
     ]
 
-    visited.push({
-      path,
-      title: (await page.title()) || path,
-      text: (await page.evaluate(() => document.body?.innerText ?? '')).slice(0, 400),
-      links: outgoing,
-    })
+    const { title, text } = sanitizePageCapture(
+      (await page.title()) || path,
+      await page.evaluate(() => document.body?.innerText ?? ''),
+    )
+    visited.push({ path, title, text, links: outgoing })
 
     for (const link of outgoing) {
       if (!seen.has(link)) queue.push(new URL(link, config.baseUrl).href)

@@ -21,6 +21,7 @@ import { join, resolve } from 'node:path'
 import { chromium } from 'playwright-core'
 
 import { cleanEnv, shellRun } from '../hooks/shell.js'
+import { assurerConfiance, DEV_DEFAUT } from './confiance.js'
 
 const root = resolve(process.argv[2] ?? process.cwd())
 const config = JSON.parse(readFileSync(join(root, 'ovrsee.config.json'), 'utf8'))
@@ -52,11 +53,18 @@ function assertIgnored() {
 async function main() {
   assertIgnored()
 
+  // Deuxième site d'exécution de la commande `dev`, et celui qu'aucune
+  // interface n'appelle — donc celui qu'on oublie. La garde y est la même que
+  // dans `crawl/index.js`, et porte sur la chaîne exacte passée à `shellRun`.
+  // Ici un humain est toujours devant : la question se pose en TTY.
+  const dev = config.dev ?? DEV_DEFAUT
+  await assurerConfiance(root, dev)
+
   // Même invocation que le crawl (`crawl/index.js`), et pour les mêmes deux
   // raisons : `sh -c` n'a pas le PATH de pnpm hors d'un terminal, et une
   // commande `dev` qui meurt sous `stdio: 'ignore'` ne laisse rien à lire — on
   // cherche alors le problème dans le projet observé.
-  const [fichier, args, options] = shellRun(config.dev)
+  const [fichier, args, options] = shellRun(dev)
   const app = spawn(fichier, args, {
     ...options,
     cwd: root,

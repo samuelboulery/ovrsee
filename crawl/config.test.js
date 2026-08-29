@@ -20,14 +20,30 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { approuver } from './confiance.js'
+
 const HERE = dirname(fileURLToPath(import.meta.url))
 
+/**
+ * Un magasin de confiance jetable. Sans `OVRSEE_TRUST`, ces tests liraient —
+ * et écriraient — le profil réel de la machine ; et le crawler refuserait
+ * d'exécuter la commande, ce qui masquerait l'échec qu'on veut éprouver.
+ */
+function magasinNeuf() {
+  process.env.OVRSEE_TRUST = join(mkdtempSync(join(tmpdir(), 'ovrsee-trust-')), 'trust.json')
+  return process.env.OVRSEE_TRUST
+}
+
 test('sans ovrsee.config.json, le scan échoué est consigné', () => {
+  const magasin = magasinNeuf()
   const dir = mkdtempSync(join(tmpdir(), 'ovrsee-crawl-'))
 
   // Sort en 0 : l'échec est une donnée, pas un plantage — le hook post-commit
   // ne doit pas faire échouer un commit parce qu'un scan n'a pas pu tourner.
-  execFileSync(process.execPath, [join(HERE, 'index.js'), dir], { stdio: 'ignore' })
+  execFileSync(process.execPath, [join(HERE, 'index.js'), dir], {
+    stdio: 'ignore',
+    env: { ...process.env, OVRSEE_TRUST: magasin },
+  })
 
   const lignes = readFileSync(join(dir, 'ovrsee', 'pages', 'scans.jsonl'), 'utf8')
     .split('\n')
@@ -40,11 +56,13 @@ test('sans ovrsee.config.json, le scan échoué est consigné', () => {
 })
 
 test("une commande dev introuvable dit laquelle, pas seulement qu'on a attendu", () => {
+  const magasin = magasinNeuf()
   const dir = mkdtempSync(join(tmpdir(), 'ovrsee-crawl-dev-'))
+  const dev = 'ovrsee-commande-absente-pour-le-test'
   writeFileSync(
     join(dir, 'ovrsee.config.json'),
     JSON.stringify({
-      dev: 'ovrsee-commande-absente-pour-le-test',
+      dev,
       // Un port qu'on n'ouvre pas : l'attente doit expirer.
       baseUrl: 'http://localhost:5399',
       entryRoutes: ['/'],
@@ -55,7 +73,13 @@ test("une commande dev introuvable dit laquelle, pas seulement qu'on a attendu",
     }),
   )
 
-  execFileSync(process.execPath, [join(HERE, 'index.js'), dir], { stdio: 'ignore' })
+  // L'échec éprouvé ici est celui de la commande, pas celui de la confiance :
+  // le dépôt est donc approuvé d'abord.
+  approuver(dir, dev)
+  execFileSync(process.execPath, [join(HERE, 'index.js'), dir], {
+    stdio: 'ignore',
+    env: { ...process.env, OVRSEE_TRUST: magasin },
+  })
 
   const scan = JSON.parse(
     readFileSync(join(dir, 'ovrsee', 'pages', 'scans.jsonl'), 'utf8').trim(),
@@ -67,5 +91,5 @@ test("une commande dev introuvable dit laquelle, pas seulement qu'on a attendu",
   // un PATH sans `pnpm`, quand l'ovrsee est lancé depuis le Finder — envoyait
   // chercher le problème dans le projet observé.
   assert.match(scan.error, /n'a pas répondu/)
-  assert.match(scan.error, /ovrsee-commande-absente-pour-le-test/)
+  assert.match(scan.error, new RegExp(dev))
 })

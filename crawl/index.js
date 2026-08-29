@@ -26,13 +26,17 @@ import { join, resolve } from 'node:path'
 import { chromium } from 'playwright-core'
 
 import { normalizeRoutes, pageSlug, sameOrigin } from './routes.js'
+import { assurerConfiance, DEV_DEFAUT } from './confiance.js'
 import { redige } from '../hooks/redaction.js'
 import { cleanEnv, shellRun } from '../hooks/shell.js'
 import { writeFileNoFollow } from '../hooks/plans.js'
 import { estPrincipal } from '../hooks/principal.js'
 
 const DEFAULTS = {
-  dev: 'pnpm dev',
+  // Partagé avec `crawl/confiance.js` : c'est la chaîne approuvée quand la
+  // configuration n'en déclare pas. Deux défauts divergents feraient approuver
+  // une commande et en exécuter une autre.
+  dev: DEV_DEFAUT,
   baseUrl: 'http://localhost:5173',
   readyTimeoutMs: 60_000,
   entryRoutes: ['/'],
@@ -424,6 +428,14 @@ function pruneShots(dir) {
 
 async function run() {
   const config = loadConfig()
+
+  // Avant tout le reste : aucun port sondé, aucun navigateur, aucune trace.
+  // `config.dev` est ici la chaîne exacte qui partira à `shellRun()` dans
+  // `startApp` — c'est elle qu'on compare à l'accord, et personne ne relit le
+  // fichier entre les deux. Un `dev` changé depuis l'accord fait donc échouer
+  // la comparaison, ce qui referme la course entre l'accord et le lancement.
+  await assurerConfiance(root, config.dev)
+
   const commit = shortSha()
   const date = new Date().toISOString().slice(0, 10)
 

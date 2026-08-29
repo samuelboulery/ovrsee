@@ -2,9 +2,12 @@
 {
   "id": "T-0213",
   "titre": "Le projet observé peut surcharger bootstrap, envoyé au terminal Claude",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
-  "tags": ["securite", "settings"],
+  "tags": [
+    "securite",
+    "settings"
+  ],
   "cree": "2026-08-29",
   "maj": "2026-08-29",
   "plan": null

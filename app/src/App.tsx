@@ -516,7 +516,9 @@ export function App() {
               elle passe en icône-seule plutôt que de disparaître — c'est ce qui
               garde les 7 vues à un clic sans réserver la largeur d'une barre
               ouverte. Le redimensionnement (Divider) ne vaut que déployée : une
-              largeur d'icônes ne se règle pas à la souris. */}
+              largeur d'icônes ne se règle pas à la souris — mais sa largeur nette
+              (1px, marges négatives comprises) reste réservée par un espaceur
+              inerte, sans quoi le contenu sautait de 1px au basculement (issue #50). */}
           <Sidebar
             collapsed={!sidebarOuverte}
             settings={settings}
@@ -531,7 +533,11 @@ export function App() {
             onOpenPalette={() => setPaletteOuverte(true)}
             ticketsRestant={snapshot ? restant(snapshot.tickets ?? [], snapshot.board ?? []) : 0}
           />
-          {sidebarOuverte && <Divider axis="x" resizable={sidebar} />}
+          {sidebarOuverte ? (
+            <Divider axis="x" resizable={sidebar} />
+          ) : (
+            <div style={s('flex: none; width: 1px;')} />
+          )}
 
           <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0;')}>
             <div

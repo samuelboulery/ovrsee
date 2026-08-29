@@ -29,7 +29,6 @@ import {
   type SettingsType,
   type Snapshot,
 } from './data'
-import { Logo } from './OnboardingArt'
 import { s } from './style'
 import { TAB_ICONS, activeTabsInOrder, type TabId } from './views'
 
@@ -102,17 +101,17 @@ export function Message({ text }: { text: string }) {
   )
 }
 
-/** Largeur fixe du rail replié — logo + picto 17px centrés (maquette 2a/2k). */
+/** Largeur fixe du rail replié — pictos 17px centrés (maquette 2a/2k). */
 const RAIL_COLLAPSED_WIDTH = 56
 
 /**
  * Barre latérale — maquette l. 45-71, rail des vues intégré (T-0047, maquette
  * 1b/2b : Projets puis Vues dans une seule colonne).
  *
- * Repliée (`collapsed`), elle ne montre que les 7 pictos de vue, sans projets
- * ni activité — c'est la lecture « rail replié » de la maquette 2k. Les
- * Préférences restent joignables par ⌘, dans ce mode : pas besoin d'un
- * bouton en plus dans une colonne de 52px.
+ * Repliée (`collapsed`), elle ne montre que la recherche et les 7 pictos de
+ * vue, sans projets ni activité — c'est la lecture « rail replié » de la
+ * maquette 2k. Mêmes contrôles qu'ouverte, en icône seule : pas de logo ni
+ * d'autre picto qui n'existerait pas côté ouvert (issue #50).
  */
 export function Sidebar({
   collapsed,
@@ -156,9 +155,16 @@ export function Sidebar({
           `width: ${RAIL_COLLAPSED_WIDTH}px; flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; background: var(--color-surface); border-right: 1px solid var(--color-border-chrome); padding: 10px 0;`,
         )}
       >
-        <div style={s('padding-bottom: 8px;')}>
-          <Logo size={28} />
-        </div>
+        <button
+          type="button"
+          title={`${t('palette.placeholder')} (⌘K)`}
+          onClick={onOpenPalette}
+          style={s(
+            'width: 36px; height: 36px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: transparent; border: none; color: var(--color-text-quaternary); cursor: pointer;',
+          )}
+        >
+          <MagnifyingGlass size={16} aria-hidden="true" />
+        </button>
         {views.map(([id, cle, path]) => (
           <RailLink key={id} id={id} label={t(cle)} path={path} active={tab === id} onTabPick={onTabPick} compact />
         ))}

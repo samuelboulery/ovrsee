@@ -8,6 +8,7 @@ import {
   type SettingsType,
 } from './data'
 import { t } from './i18n'
+import { approuverCrawl } from './useCrawl'
 import { pasteToClaude } from './pty'
 import { s } from './style'
 import { SkillsList, useSkills } from './SkillsPanel'
@@ -182,7 +183,17 @@ export function EquipmentPanel({
       // ce panneau disparaît — emportant la liste de ce qui vient d'être écrit,
       // que personne n'aurait eu le temps de lire. C'est le bouton suivant qui
       // la déclenche, quand l'utilisateur a fini de lire.
-      .then(result => setDone(result.done ?? []))
+      .then(result => {
+        setDone(result.done ?? [])
+        // La confiance d'espace de travail s'accorde ici, au seul moment où un
+        // humain a composé la commande lui-même. Elle ne passe pas par
+        // `/api/*` — cette surface est aussi servie par le dev server Vite, en
+        // HTTP local non authentifié — mais par IPC, comme le terminal et les
+        // secrets d'intégration. On envoie la commande saisie pour comparaison
+        // seulement : c'est celle qui est sur le disque qui sera approuvée, et
+        // si le dépôt avait déjà la sienne, la question est posée.
+        approuverCrawl(root, form.ecrireConfig ? form.dev : null)
+      })
       .catch(err => onError(String(err.message ?? err)))
       .finally(() => setBusy(false))
   }

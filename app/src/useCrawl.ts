@@ -25,11 +25,28 @@ interface CrawlBridge {
   start: (projectPath: string) => Promise<CrawlState | { error: string }>
   stop: (projectPath: string) => Promise<CrawlState>
   listen: (handler: (etat: CrawlState) => void) => () => void
+  approve?: (projectPath: string, devSaisi: string | null) => Promise<boolean>
 }
 
 /** Le pont Electron, ou `null` dans un navigateur. */
 function crawlBridge(): CrawlBridge | null {
   return (globalThis as { ovrsee?: { crawl?: CrawlBridge } }).ovrsee?.crawl ?? null
+}
+
+/**
+ * Accorde la confiance à la commande `dev` d'un projet qu'on vient d'équiper.
+ *
+ * `devSaisi` est ce que l'utilisateur a tapé au formulaire, pas ce qui sera
+ * approuvé : le processus principal relit le disque et n'approuve que ce qu'il
+ * y trouve. La valeur ne sert qu'à distinguer « le disque dit ce que vous venez
+ * de taper » — accord tacite — de « le dépôt avait déjà sa propre commande »,
+ * qui pose la question.
+ *
+ * Sans IPC (mode navigateur), l'appel ne fait rien : aucun accord ne s'y donne,
+ * et le crawl n'y est de toute façon pas lançable.
+ */
+export function approuverCrawl(root: string, devSaisi: string | null): void {
+  void crawlBridge()?.approve?.(root, devSaisi)
 }
 
 /** `true` quand le crawl est lançable d'un clic — donc seulement dans Electron. */

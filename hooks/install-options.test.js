@@ -17,6 +17,9 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 process.env.HOME = mkdtempSync(join(tmpdir(), 'ovrsee-home-'))
+// Même précaution pour le magasin de confiance : `install()` ne doit rien y
+// écrire, et le vérifier sur le profil réel de la machine serait pire encore.
+process.env.OVRSEE_TRUST = join(mkdtempSync(join(tmpdir(), 'ovrsee-trust-')), 'trust.json')
 
 const { install } = await import('./install.js')
 
@@ -109,4 +112,16 @@ test("un commit impossible n'empêche pas l'équipement", () => {
 
   assert.ok(existsSync(join(dir, 'ovrsee', 'plans')), 'équipé malgré tout')
   assert.match(done.join('\n'), /premier commit impossible/)
+})
+
+test("install n'accorde aucune confiance — /api/* ne décide pas de ça", () => {
+  const dir = depot()
+
+  install(dir, { config: { dev: 'npm start', baseUrl: 'http://localhost:3000' } })
+
+  // `install()` est atteignable depuis `/api/project` action `init`, servie
+  // aussi par le dev server Vite en HTTP local non authentifié. Une décision de
+  // confiance qui s'obtiendrait par un POST local n'en serait pas une : l'accord
+  // passe par le canal IPC `crawl:approve`, et par lui seul.
+  assert.equal(existsSync(process.env.OVRSEE_TRUST), false)
 })

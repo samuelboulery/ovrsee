@@ -175,7 +175,7 @@ export function ProjetCard({ projet }: { projet: MenuBarProjet }) {
         <div style={s(LIGNE)}>
           <span style={s('color:var(--color-text-tertiary)')}>{t('menubar.tickets')}</span>
           <span style={s('color:var(--color-text-secondary)')}>
-            {t('menubar.tickets_left', { n: projet.ticketsRestants })}
+            {t('menubar.tickets_left', { n: projet.ticketsPrets })}
           </span>
         </div>
 

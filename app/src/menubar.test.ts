@@ -189,6 +189,6 @@ test('menubar : un instantané dégradé ne fait pas lever', () => {
 
   assert.equal(resume?.branche, null)
   assert.equal(resume?.fichiersModifies, 0)
-  assert.equal(resume?.ticketsRestants, 0)
+  assert.equal(resume?.ticketsPrets, 0)
   assert.equal(resume?.dernierScan, null)
 })

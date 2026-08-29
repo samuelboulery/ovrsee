@@ -15,7 +15,7 @@
  */
 
 import type { AttentionKind } from './attention'
-import { EMPTY_GIT_STATUS, lastScan, plansOuverts, restant, type Snapshot } from './data'
+import { EMPTY_GIT_STATUS, lastScan, plansOuverts, ticketsPrets, type Snapshot } from './data'
 
 /**
  * Ce qu'on peut répondre depuis le popover.
@@ -58,7 +58,8 @@ export interface MenuBarProjet {
   nom: string
   projet: string
   planActif: string | null
-  ticketsRestants: number
+  /** Tickets en colonne « Prêt » — le backlog n'est pas actionnable (issue #52). */
+  ticketsPrets: number
   branche: string | null
   fichiersModifies: number
   /** Date du dernier scan réussi, `YYYY-MM-DD`, ou null. */
@@ -161,7 +162,7 @@ export function resumeProjet(snapshot: Snapshot | null): MenuBarProjet | null {
     nom: snapshot.packageJson?.name ?? snapshot.root.split('/').filter(Boolean).pop() ?? snapshot.root,
     projet: snapshot.root,
     planActif: actif?.title ?? null,
-    ticketsRestants: restant(snapshot.tickets ?? [], snapshot.board ?? []),
+    ticketsPrets: ticketsPrets(snapshot.tickets ?? []),
     branche: git.branch,
     fichiersModifies: git.dirty.staged + git.dirty.unstaged + git.dirty.untracked,
     // Un scan en échec n'est pas un dernier scan : il ne dit rien de l'état

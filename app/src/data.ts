@@ -421,17 +421,15 @@ export const projectDisplayName = (snapshot: Pick<Snapshot, 'root' | 'packageJso
   snapshot.packageJson?.name ?? snapshot.root.split('/').filter(Boolean).at(-1) ?? snapshot.root
 
 /**
- * Ce qui reste à faire.
- *
- * Compte les tickets à faire, avec une logique spéciale pour les epics :
+ * Compte des tickets retenus par `colonneCompte`, avec une logique spéciale
+ * pour les epics :
  * - Epic AVEC enfants : ne compte pas (ses enfants comptent à sa place)
  * - Epic SANS enfant : compte pour 1
  * - Enfant d'un epic existant : compte (les enfants prennent la place de l'epic)
  * - Enfant orphelin (epic inexistant) : compte comme ticket ordinaire
- * - Ticket ordinaire : compte toujours
+ * - Ticket ordinaire : compte s'il est dans une colonne retenue
  */
-export const restant = (tickets: Ticket[], board: Colonne[]): number => {
-  const fini = colonneFinale(board)
+const compterTickets = (tickets: Ticket[], colonneCompte: (colonne: string) => boolean): number => {
   const ticketsList = liste(tickets)
 
   // Déterminer quels epics ont des enfants
@@ -443,13 +441,32 @@ export const restant = (tickets: Ticket[], board: Colonne[]): number => {
 
   return ticketsList
     .filter(t => {
-      if (t.colonne === fini) return false // Rien en colonne finale ne compte
+      if (!colonneCompte(t.colonne)) return false
       if (t.type === 'epic' && epicsAvecEnfants.has(t.id)) return false // Epic AVEC enfants ne compte pas
       // Epic vide, enfant, ou ticket ordinaire → compte (les enfants prennent la place de l'epic)
       return true
     })
     .length
 }
+
+/** Ce qui reste à faire — tout ticket hors de la colonne finale. */
+export const restant = (tickets: Ticket[], board: Colonne[]): number => {
+  const fini = colonneFinale(board)
+  return compterTickets(tickets, colonne => colonne !== fini)
+}
+
+/**
+ * Ce qui est actionnable maintenant — les tickets en colonne « Prêt ».
+ *
+ * Contrairement à `restant()`, ignore le backlog et « à spécifier » : y
+ * atterrissent des intentions dont on ne sait pas encore si elles se feront
+ * (issue #52). L'id `pret` est celui du tableau par défaut (`DEFAULT_COLUMNS`
+ * dans `hooks/board.js`) ; un projet dont le board ne l'a pas repris rend 0,
+ * comme `colonneFinale` rend `null` sur un board sans dernière colonne
+ * significative.
+ */
+export const ticketsPrets = (tickets: Ticket[]): number =>
+  compterTickets(tickets, colonne => colonne === 'pret')
 
 
 /**

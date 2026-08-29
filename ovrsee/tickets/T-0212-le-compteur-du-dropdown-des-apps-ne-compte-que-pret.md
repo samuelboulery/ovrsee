@@ -2,9 +2,12 @@
 {
   "id": "T-0212",
   "titre": "Le compteur du dropdown des apps ne compte que « Prêt »",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
-  "tags": ["ui", "menubar"],
+  "tags": [
+    "ui",
+    "menubar"
+  ],
   "cree": "2026-08-29",
   "maj": "2026-08-29",
   "plan": null

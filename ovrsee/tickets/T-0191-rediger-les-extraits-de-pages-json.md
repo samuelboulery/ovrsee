@@ -2,7 +2,7 @@
 {
   "id": "T-0191",
   "titre": "Rédiger les extraits de pages.json",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "crawl",

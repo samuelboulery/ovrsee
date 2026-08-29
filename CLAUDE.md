@@ -240,6 +240,24 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
 - **La langue vient de `document.documentElement.lang`.** `traduire()` (`site/app.js`)
   applique la table inverse dès que la langue n'est pas `fr` : une valeur en dur
   retraduirait une page déjà française intégralement en anglais au premier rendu.
+- **La commande `dev` d'un dépôt exige un accord, et il vit hors du dépôt.**
+  `ovrsee.config.json` est versionné : sa ligne `dev` est donc fournie par le dépôt
+  observé, pas par l'utilisateur, et le crawl l'exécute dans un shell. L'accord se
+  garde dans `~/.claude/ovrsee/trust.json` (`OVRSEE_TRUST` pour les tests) — jamais
+  dans `<projet>/ovrsee/`, qu'un clone hostile livrerait avec sa propre approbation,
+  même raison qu'`integrations.json`. Ce qui est retenu est la **chaîne exacte** qui
+  part à `shellRun()`, en clair, sans `trim()` ni casse : changer `dev` redemande
+  l'accord, et c'est ce qui referme la course entre la question posée dans Electron et
+  la relecture faite par le crawler. La garde (`assurerConfiance`, `crawl/confiance.js`)
+  est aux **deux** sites d'exécution — `crawl/index.js` et `crawl/auth.js`, qu'aucune
+  interface n'appelle — jamais aux points d'entrée : on ne peut pas l'oublier en
+  ajoutant un appelant. Sans humain (hook `post-commit`, `stdin` non TTY) elle
+  **refuse** au lieu de demander : `scans.jsonl` porte l'échec, l'onglet Produit
+  l'affiche, et le prochain clic sur « Crawler » ouvre la modale native qui débloque.
+  Rien de tout ça ne passe par `/api/*` — le canal IPC `crawl:approve` relit toujours
+  le disque et n'approuve jamais une chaîne reçue du rendu. Ce n'est pas une revue de
+  commande : `pnpm dev` est inoffensif à l'œil, ce qu'il exécute vit dans le
+  `package.json`. On accorde une confiance à une provenance.
 - **Un secret collé dans un plan approuvé part dans git en clair.** La parade est en
   amont : ne pas en coller.
 

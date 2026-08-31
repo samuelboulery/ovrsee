@@ -172,3 +172,20 @@ test('pages.json déclare une capture pour chaque onglet', () => {
     )
   }
 })
+
+// Le badge « version » est dynamique (shields lit package.json sur GitHub) ; celui
+// des dépendances de production ne peut pas l'être — shields ne sait pas compter
+// les clés d'un objet JSON. Ce test tient donc le chiffre à jour à sa place.
+test('le badge des dépendances de production annonce le bon compte', () => {
+  const attendu = Object.keys(pkg.dependencies).length
+
+  for (const [nom, readme] of [['README.md', readmeEn], ['README.fr.md', readmeFr]]) {
+    const badge = readme.match(/img\.shields\.io\/badge\/[^-)]*(?:prod|deps)[^-)]*-(\d+)-/)
+    assert(badge, `Badge des dépendances de production introuvable dans ${nom}`)
+    assert.equal(
+      Number(badge[1]),
+      attendu,
+      `${nom} annonce ${badge[1]} dépendances de production, package.json en déclare ${attendu}`
+    )
+  }
+})

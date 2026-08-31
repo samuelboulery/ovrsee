@@ -217,8 +217,9 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   sur une vraie machine Windows, ou un runner CI Windows.
 - **Sortir une version se fait par tag, pas en local.** Bump `version`, commit,
   `git tag vX.Y.Z && git push --tags` : `release.yml` construit DMG et NSIS sur des
-  runners natifs et publie sur Releases (dépôt privé — les destinataires doivent être
-  collaborateurs pour le voir). `pnpm package:*` en local ne publie rien.
+  runners natifs et publie sur Releases (**dépôt public** : le binaire est
+  téléchargeable par n'importe qui, sans compte — c'est ce qui donne son poids à
+  T-0192, la signature du paquet macOS). `pnpm package:*` en local ne publie rien.
 - **Le signal de session et la barre de menu sont inertes tant que
   `pnpm ovrsee:install` n'a pas tourné.** `ovrsee-notify.js` s'enregistre dans
   `~/.claude/settings.json`, pas dans le dépôt : une machine équipée avant son arrivée
@@ -258,6 +259,13 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   le disque et n'approuve jamais une chaîne reçue du rendu. Ce n'est pas une revue de
   commande : `pnpm dev` est inoffensif à l'œil, ce qu'il exécute vit dans le
   `package.json`. On accorde une confiance à une provenance.
+- **Ce qui protège le dev server du DNS rebinding n'est pas notre code.** C'est le
+  `hostValidationMiddleware` de Vite, posé **avant** les hooks `configureServer` —
+  donc avant le middleware `/api`. Sans lui, un domaine qui se rebinde sur 127.0.0.1
+  devient même origine que l'interface, et la garde d'origine de `server/api.js` tombe
+  avec la politique CORS. Deux gestes anodins le lèvent, en silence et sans rien
+  casser de visible : poser `server.host` dans `vite.config.js`, ou élargir
+  `server.allowedHosts`. Le commentaire y est, à relire avant d'y toucher.
 - **Un secret collé dans un plan approuvé part dans git en clair.** La parade est en
   amont : ne pas en coller.
 

@@ -3,11 +3,14 @@
   "id": "T-0197",
   "titre": "Dégraissage repo-wide issu de l'audit ponytail",
   "type": "epic",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
-  "tags": ["dette", "audit"],
+  "tags": [
+    "dette",
+    "audit"
+  ],
   "cree": "2026-08-22",
-  "maj": "2026-08-22",
+  "maj": "2026-08-31",
   "plan": null
 }
 ---

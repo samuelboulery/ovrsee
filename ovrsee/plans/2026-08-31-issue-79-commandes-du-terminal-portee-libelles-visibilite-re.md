@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Issue #79 — commandes du terminal : portée, libellés, visibilité, rétraction",
   "opened": "2026-08-31",
-  "closed": null,
+  "closed": "2026-08-31",
   "commits": [
     {
       "sha": "40bdb70",
@@ -23,6 +23,11 @@
     },
     {
       "sha": "23549e5",
+      "date": "2026-08-31",
+      "files": []
+    },
+    {
+      "sha": "8cc0368",
       "date": "2026-08-31",
       "files": []
     }

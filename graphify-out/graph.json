@@ -13886,8 +13886,8 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/tabs/navigateur-webview.test.ts",
       "source_location": "L117",
       "weight": 1.0,
-      "_src": "navigateur_webview_test_touche",
-      "_tgt": "navigateur_webview_actionclavier",
+      "_src": "navigateur_webview_actionclavier",
+      "_tgt": "navigateur_webview_test_touche",
       "source": "navigateur_webview_actionclavier",
       "target": "navigateur_webview_test_touche"
     },

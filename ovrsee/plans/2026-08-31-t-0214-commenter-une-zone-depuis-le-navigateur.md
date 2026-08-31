@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "T-0214 — commenter une zone depuis le navigateur",
   "opened": "2026-08-31",
-  "closed": null,
+  "closed": "2026-08-31",
   "commits": [
     {
       "sha": "c8fdcda",

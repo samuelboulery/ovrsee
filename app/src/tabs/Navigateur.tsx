@@ -7,7 +7,7 @@ import { s } from '../style'
 import { StatusBar } from '../StatusBar'
 import { pasteToClaude } from '../pty'
 import { Divider, useResizable } from '../useResizable'
-import { ElementPanel, HorsApplication, NavButton } from './NavigateurPanneaux'
+import { CarteElement, HorsApplication, NavButton } from './NavigateurPanneaux'
 import {
   ALLOW_POPUPS,
   CANCEL_PICK,
@@ -69,6 +69,9 @@ export function Navigateur({
   const [logsOpen, setLogsOpen] = useState(false)
   const [picking, setPicking] = useState(false)
   const [picked, setPicked] = useState<Picked | null>(null)
+  // Ce qu'on a voulu dire de l'élément. Reparti de zéro à chaque sélection :
+  // un commentaire qui survivrait au clic suivant parlerait d'autre chose.
+  const [comment, setComment] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
 
   // Les DevTools sont une vue native posée au-dessus du DOM par le processus
@@ -98,15 +101,6 @@ export function Navigateur({
     invert: true,
   })
   const pane = dock === 'side' ? paneWidth : paneHeight
-
-  const elementPanelWidth = useResizable({
-    key: 'navigateur.element-panel',
-    initial: 340,
-    min: 280,
-    max: () => window.innerWidth * 0.5,
-    axis: 'x',
-    invert: true,
-  })
 
   const moveDock = (next: Dock) => {
     setDock(next)
@@ -162,6 +156,10 @@ export function Navigateur({
         event.preventDefault()
         setPicking(p => !p)
       }
+      // Échap referme la carte, exactement comme sa croix. La saisie a le
+      // focus à l'ouverture : sans ça, il faudrait viser la croix à la souris
+      // pour abandonner un commentaire.
+      if (event.key === 'Escape') fermerCarte()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -281,7 +279,10 @@ export function Navigateur({
     setPicking(true)
     try {
       const result = (await element.executeJavaScript(`(${pickElement})()`)) as Picked | null
-      if (result) setPicked(result)
+      if (result) {
+        setComment('')
+        setPicked(result)
+      }
     } catch (err) {
       say(t('navigateur.selection_failed', { error: err instanceof Error ? err.message : String(err) }))
     } finally {
@@ -289,16 +290,30 @@ export function Navigateur({
     }
   }
 
+  /**
+   * Ferme la carte.
+   *
+   * Rien à annuler côté page : quand la carte paraît, `pickElement` a déjà
+   * rendu sa valeur et retiré ses écouteurs. `CANCEL_PICK` ne sert qu'à
+   * interrompre une sélection **en cours**, et c'est `select()` qui l'envoie.
+   */
+  const fermerCarte = () => {
+    setPicked(null)
+    setComment('')
+  }
+
   const envoyerAClaude = async () => {
     if (!picked) return
-    await send('Élément', describe(picked))
+    await send('Élément', describe(picked, comment))
     setPicked(null)
+    setComment('')
   }
 
   const onTicketDepuisElement = () => {
     if (!picked) return
-    onCreerTicketDepuisElement(corpsDepuis(picked), ['navigateur'])
+    onCreerTicketDepuisElement(corpsDepuis(picked, comment), ['navigateur'])
     setPicked(null)
+    setComment('')
   }
 
   /**
@@ -366,13 +381,6 @@ export function Navigateur({
   }, [devtools, visible, dock, pane.size, placeDevtools])
 
   const errors = logs.filter(l => l.level === 'error').length
-  const currentRoute = (() => {
-    try {
-      return new URL(url).pathname
-    } catch {
-      return null
-    }
-  })()
   const host = (() => {
     try {
       return new URL(url).host
@@ -472,10 +480,9 @@ export function Navigateur({
         )}
       </div>
 
-      {/* La colonne aperçu+DevTools+journal à gauche, le panneau de
-          l'élément sélectionné à droite — ouvert seulement le temps d'une
-          sélection. */}
-      <div style={s('flex: 1; display: flex; min-height: 0; min-width: 0;')}>
+      {/* Aperçu, DevTools et journal, sur toute la largeur — la colonne de
+          droite a disparu avec le panneau de l'élément (T-0214), qui est
+          devenu une carte flottante posée sur l'aperçu. */}
       <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
 
       {/* Aperçu et DevTools partagent cette zone : en colonne quand ils sont
@@ -517,6 +524,18 @@ export function Navigateur({
           {...ALLOW_POPUPS}
           style={s('position: absolute; inset: 0; width: 100%; height: 100%;')}
         />
+
+        {/* Au-dessus de l'aperçu, pas à côté : ce qu'on regarde c'est le site. */}
+        {picked && (
+          <CarteElement
+            picked={picked}
+            comment={comment}
+            onComment={setComment}
+            onSend={envoyerAClaude}
+            onTicket={onTicketDepuisElement}
+            onClose={fermerCarte}
+          />
+        )}
 
         {failure && (
           <div
@@ -619,22 +638,6 @@ export function Navigateur({
         >
           {notice}
         </div>
-      )}
-      </div>
-
-      {picked && (
-        <>
-          <Divider axis="x" resizable={elementPanelWidth} />
-          <ElementPanel
-            picked={picked}
-            width={elementPanelWidth.size}
-            routes={snapshot.pages?.pages?.map(page => page.route) ?? []}
-            currentRoute={currentRoute}
-            onSend={envoyerAClaude}
-            onTicket={onTicketDepuisElement}
-            onClose={() => setPicked(null)}
-          />
-        </>
       )}
       </div>
 

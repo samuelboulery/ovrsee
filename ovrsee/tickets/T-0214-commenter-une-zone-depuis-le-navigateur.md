@@ -2,7 +2,7 @@
 {
   "id": "T-0214",
   "titre": "Commenter une zone depuis le navigateur",
-  "colonne": "backlog",
+  "colonne": "en-cours",
   "priorite": "haute",
   "tags": [
     "ui",
@@ -11,7 +11,7 @@
   ],
   "cree": "2026-08-31",
   "maj": "2026-08-31",
-  "plan": "2026-08-31-tour-du-depot-ovrsee-backlog-priorise-et-lot-d-intendance.md",
+  "plan": "2026-08-31-t-0214-commenter-une-zone-depuis-le-navigateur.md",
   "charge": "s"
 }
 ---
@@ -35,27 +35,38 @@ personne qui a cliqué. Or ce qu'on veut dire d'une zone (« ce bouton devrait
 - `onCreerTicketDepuisElement(corps, ['navigateur'])` (`Navigateur.tsx:300`)
   ouvre déjà la création de ticket avec le corps pré-rempli.
 
-Il manque **une seule chose** : la saisie du commentaire entre le clic et
-l'envoi. Aujourd'hui le pick part directement.
+## Ce que la demande a élargi
 
-## Ce qui est demandé
+Le 31 août 2026, la saisie du commentaire ne s'ajoute plus au panneau existant :
+**elle le remplace**. `ElementPanel` est une colonne de 340 px redimensionnables
+qui pousse l'aperçu et occupe la moitié de l'écran pour trois champs de texte.
 
-Après le clic sur un élément, une zone de saisie apparaît près de la sélection.
-Entrée envoie à Claude ; un bouton en fait un ticket. Le commentaire se place en
-tête du texte produit, avant le descriptif technique.
+Trois décisions prises :
+
+- **Une seule carte flottante**, en haut à droite, posée au-dessus du site — pas
+  de pastille repliée à déplier, un seul objet à l'écran.
+- **Elle n'affiche que le sélecteur.** Le texte et la route disparaissent : la
+  route est déjà dans la barre d'URL juste au-dessus.
+- **La liste « Routes connues » est supprimée.** Elle n'avait aucun rapport avec
+  l'élément cliqué, et l'onglet Produit liste déjà les pages.
 
 ## Critères d'acceptation
 
-- [ ] Après un `pickElement`, un champ de saisie s'affiche au lieu d'envoyer
-      aussitôt.
+- [ ] Après un `pickElement`, une carte flotte en haut à droite **au-dessus de
+      l'aperçu**, au lieu du panneau latéral. Le focus est dans la saisie.
+- [ ] La carte porte le sélecteur, une zone de commentaire et deux actions —
+      envoyer, créer un ticket.
 - [ ] `Entrée` envoie le commentaire **et** le descriptif à Claude via
       `pasteToClaude()` ; le repli presse-papier hors Electron est conservé.
 - [ ] `Maj+Entrée` insère un retour à la ligne au lieu d'envoyer.
-- [ ] Un bouton « En faire un ticket » crée le ticket avec le commentaire en
-      tête du corps et le tag `navigateur`.
-- [ ] `Échap` annule la saisie **et** la sélection — le `CANCEL_PICK`
+- [ ] « Créer un ticket » crée le ticket avec le commentaire en tête du corps et
+      le tag `navigateur`.
+- [ ] `Échap` ferme la carte **et** annule la sélection — le `CANCEL_PICK`
       (`navigateur-webview.ts:38`) reste la voie d'annulation, non dédoublée.
-- [ ] Un commentaire vide reste permis : le comportement d'aujourd'hui
-      (descriptif seul) ne régresse pas.
+- [ ] Un commentaire vide reste permis : la sortie est alors identique à celle
+      d'aujourd'hui, au caractère près.
+- [ ] `ElementPanel`, `PanelField` et le `useResizable` du panneau sont retirés ;
+      l'aperçu occupe toute la largeur.
 - [ ] `describe()` et `corpsDepuis()` restent des fonctions pures testées dans
       `node:test`, commentaire compris.
+- [ ] Aucune couleur en dur — `hooks/couleurs.test.js` reste vert.

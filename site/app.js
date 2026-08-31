@@ -35,13 +35,15 @@ const VUES = [
   { id: 'stack', label: 'Stack', icon: 'stack', key: '7' },
 ]
 
-// Seules quatre vues ont une maquette : cliquer les autres ne doit rien faire,
-// plutôt que d'afficher un cadre vide.
-const DÉMONTRABLES = new Set(['apercu', 'produit', 'historique', 'tableau'])
+// Le panneau Activité de l'onglet Historique, en comptes bruts par jour — commits,
+// tickets, plans, du plus ancien au plus récent. Ce ne sont pas des pixels :
+// `valeurs()` les normalise comme le fait `ActivityPanel` dans l'application, pour
+// que la journée la plus chargée touche le haut de la boîte. Un jour à zéro rend un
+// trait résiduel, jamais une colonne vide.
+const HAUTEUR_ACTIVITE = 88
 
-// Barres empilées de l'onglet Activité — commits, tickets, plans.
-const HAUTEURS = [
-  [5, 6, 8], [7, 9, 14], [10, 4, 6], [6, 12, 20], [9, 8, 11], [6, 3, 4], [4, 2, 0],
+const ACTIVITE = [
+  [5, 6, 8], [7, 9, 14], [10, 4, 6], [6, 12, 20], [9, 8, 11], [6, 3, 4], [0, 0, 0],
   [8, 10, 16], [7, 14, 24], [11, 7, 9], [5, 9, 13], [8, 5, 7], [6, 11, 18], [9, 13, 22],
 ]
 
@@ -51,12 +53,18 @@ const MÉTA = {
     produit: { title: 'Graphe de navigation', meta: '7 pages · 42 liens · reconstruit au commit 0ca659f', left: 'graphe reconstruit il y a 3 h · 7 pages · 42 liens', right: 'glisser · ⌥ molette pour zoomer' },
     historique: { title: 'Chronologie du projet', meta: '43 plans · 128 commits', left: '43 plans · 9 ouverts · dernier commit il y a 3 h', right: '' },
     tableau: { title: 'Tableau', meta: '43 tickets · ovrsee/tickets/', left: '', right: '' },
+    navigateur: { title: 'Navigateur', meta: '', left: 'localhost:5173 répond · chargé en 412 ms', right: 'sélecteur : ⇧⌘E' },
+    donnees: { title: 'Tables', meta: '', left: '', right: '' },
+    stack: { title: 'Stack', meta: '', left: '', right: '' },
   },
   en: {
     apercu: { title: 'Overview', meta: '', left: 'main · 0ca659f · 3 modified files', right: 'active plan: View bar and status bar on all six tabs' },
     produit: { title: 'Navigation graph', meta: '7 pages · 42 links · rebuilt at commit 0ca659f', left: 'graph rebuilt 3 h ago · 7 pages · 42 links', right: 'drag · ⌥ scroll to zoom' },
     historique: { title: 'Project timeline', meta: '43 plans · 128 commits', left: '43 plans · 9 open · last commit 3 h ago', right: '' },
     tableau: { title: 'Board', meta: '43 tickets · ovrsee/tickets/', left: '', right: '' },
+    navigateur: { title: 'Browser', meta: '', left: 'localhost:5173 responds · loaded in 412 ms', right: 'selector: ⇧⌘E' },
+    donnees: { title: 'Tables', meta: '', left: '', right: '' },
+    stack: { title: 'Stack', meta: '', left: '', right: '' },
   },
 }
 
@@ -77,21 +85,34 @@ function valeurs() {
       key: d.key,
       count: d.count ?? '',
       icon: (actif ? 'ph-fill ph-' : 'ph ph-') + d.icon,
-      pick: () => { if (DÉMONTRABLES.has(d.id)) rendre({ view: d.id }) },
+      pick: () => rendre({ view: d.id }),
+      rowClass: actif ? 'view-row view-row-active' : 'view-row',
       iconStyle: `font-size: 16px; flex: none; color: ${actif ? ACCENT : '#7f858f'};`,
       labelStyle: `flex: 1; font-size: 12.5px; color: ${actif ? '#f2f3f5' : '#b6bac1'}; font-weight: ${actif ? 500 : 400}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;`,
       badgeStyle: d.count
         ? 'display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 17px; padding: 0 5px; border-radius: 4px; background: #33363f; font-family: \'IBM Plex Mono\', monospace; font-size: 10px; color: #a2a8b2; flex: none;'
         : 'display: none;',
-      rowStyle: `height: 31px; padding: 0 8px; gap: 10px; border-radius: 6px; display: flex; align-items: center; font-size: 12.5px; cursor: ${DÉMONTRABLES.has(d.id) ? 'pointer' : 'default'}; ${actif ? 'background: #2a2d38;' : ''}`,
+      rowStyle: `height: 31px; padding: 0 8px; gap: 10px; border-radius: 6px; display: flex; align-items: center; font-size: 12.5px; cursor: pointer; ${actif ? 'background: #2a2d38;' : ''}`,
     }
   })
 
-  const bars = HAUTEURS.map(h => ({
-    commits: `background: #3a3c47; height: ${h[0]}px; border-radius: 1px;`,
-    tickets: `background: #4c46b4; height: ${h[1]}px; border-radius: 1px;`,
-    plans: `background: ${ACCENT}; height: ${Math.max(2, h[2])}px; border-radius: 1px;`,
-  }))
+  // Un segment absent n'est pas une barre de zéro pixel : il n'existe pas, sans quoi
+  // le `gap` du conteneur en garderait la trace.
+  const segment = (couleur, n, k) =>
+    n > 0 ? `background: ${couleur}; height: ${Math.max(2, n * k).toFixed(1)}px; border-radius: 1px;` : 'display: none;'
+
+  const chargeMax = Math.max(...ACTIVITE.map(j => j[0] + j[1] + j[2]))
+
+  const bars = ACTIVITE.map(j => {
+    const total = j[0] + j[1] + j[2]
+    const k = total === 0 ? 0 : (HAUTEUR_ACTIVITE * (total / chargeMax)) / total
+    return {
+      commits: segment('#3a3c47', j[0], k),
+      tickets: segment('#4c46b4', j[1], k),
+      plans: segment(ACCENT, j[2], k),
+      vide: total === 0 ? 'background: #2b2d35; height: 3px; border-radius: 1px;' : 'display: none;',
+    }
+  })
 
   return {
     views, bars,
@@ -107,6 +128,15 @@ function valeurs() {
     isProduit: v === 'produit',
     isHistorique: v === 'historique',
     isTableau: v === 'tableau',
+    isNavigateur: v === 'navigateur',
+    isDonnees: v === 'donnees',
+    isStack: v === 'stack',
+    // Le navigateur est le seul onglet sans barre de vue : sa barre d'outils en
+    // tient lieu, comme dans l'application.
+    showViewBar: v !== 'navigateur',
+    // Le `|` ne sépare rien quand la vue ne met rien à droite : `⌘K` reste seul,
+    // comme `StatusBar` le fait dans l'application.
+    showStatusSep: !!m.right,
   }
 }
 
@@ -149,7 +179,11 @@ function appliquer(racine, ctx) {
       clone.removeAttribute('data-for')
       clone.removeAttribute('data-as')
       clone.setAttribute('data-clone', '')
-      clone.style.display = ''
+      // Le `display` du clone ne se réassigne pas ici : le patron est capturé avant
+      // d'être masqué, donc le clone porte déjà celui d'origine. L'effacer faisait
+      // retomber en `block` un `display: flex` inline — les colonnes du graphique
+      // d'activité s'empilaient alors depuis le haut, `justify-content` devenu
+      // inerte, sans que rien n'échoue.
       lier(clone, { ...ctx, [alias]: item })
       parent.insertBefore(clone, patron)
     }

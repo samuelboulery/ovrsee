@@ -192,7 +192,7 @@
               <span>Views</span><span>7</span>
             </div>
             <div style="display: flex; flex-direction: column; gap: 2px; padding: 0 10px;">
-              <div data-for="views" data-as="v" onClick="{{ v.pick }}" style="{{ v.rowStyle }}">
+              <div data-for="views" data-as="v" onClick="{{ v.pick }}" class="{{ v.rowClass }}" style="{{ v.rowStyle }}">
                   <svg data-icon="{{ v.icon }}" style="width:1em;height:1em;fill:currentColor;flex:none;{{ v.iconStyle }}" aria-hidden="true"><use href=""/></svg>
                   <span style="{{ v.labelStyle }}">{{ v.label }}</span>
                   <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6b7078; flex: none;">{{ v.key }}</span>
@@ -214,7 +214,7 @@
 
           <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
 
-            <div style="height: 46px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 1px solid #22242b;">
+            <div data-if="showViewBar" style="height: 46px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 1px solid #22242b;">
               <span style="font-size: 12.5px; color: #7f858f; white-space: nowrap;">ovrsee</span>
               <span style="font-size: 12.5px; color: #585d66;">/</span>
               <span style="font-size: 12.5px; font-weight: 500; color: #f2f3f5; white-space: nowrap;">{{ viewTitle }}</span>
@@ -252,7 +252,24 @@
                   <span style="display: inline-flex; align-items: center; padding: 5px 10px; font-size: 12px; line-height: 1; border-radius: 5px; color: #a2a8b2;">By commits</span>
                 </div>
 
-              <div data-if="isTableau" style="display: inline-flex; align-items: center; height: 27px; padding: 5px 11px; border-radius: 6px; font-size: 11.5px; font-weight: 500; color: #a2a8b2;">Edit columns</div>
+              <div data-if="isTableau" style="display: flex; align-items: center; gap: 8px;">
+                  <div style="display: inline-flex; align-items: center; height: 27px; padding: 5px 11px; border-radius: 6px; font-size: 11.5px; font-weight: 500; color: #a2a8b2;">Edit columns</div>
+                  <div style="display: inline-flex; align-items: center; gap: 2px; padding: 2px; background: #191b22; border: 1px solid #2b2d35; border-radius: 7px;">
+                    <span style="display: inline-flex; align-items: center; padding: 5px 10px; font-size: 12px; line-height: 1; border-radius: 5px; background: #33363f; color: #f2f3f5;">Kanban</span>
+                    <span style="display: inline-flex; align-items: center; padding: 5px 10px; font-size: 12px; line-height: 1; border-radius: 5px; color: #a2a8b2;">Epics</span>
+                  </div>
+                </div>
+
+              <div data-if="isDonnees" style="display: flex; align-items: center; gap: 8px;">
+                  <span style="display: inline-flex; align-items: center; font-size: 10.5px; padding: 3px 8px; border-radius: 4px; background: #22242b; color: #a2a8b2;">read from Graphify — 2026-08-14</span>
+                  <div style="display: inline-flex; align-items: center; height: 27px; padding: 0 11px; border-radius: 6px; background: #191b22; border: 1px solid #363841; color: #d5d8dd; font-size: 11.5px; font-weight: 500;">Check live schema</div>
+                </div>
+
+              <div data-if="isStack" style="display: inline-flex; align-items: center; gap: 2px; padding: 2px; background: #191b22; border: 1px solid #2b2d35; border-radius: 7px;">
+                  <span style="display: inline-flex; align-items: center; padding: 5px 10px; font-size: 12px; line-height: 1; border-radius: 5px; background: #33363f; color: #f2f3f5;">All</span>
+                  <span style="display: inline-flex; align-items: center; padding: 5px 10px; font-size: 12px; line-height: 1; border-radius: 5px; color: #a2a8b2;">Production</span>
+                  <span style="display: inline-flex; align-items: center; padding: 5px 10px; font-size: 12px; line-height: 1; border-radius: 5px; color: #a2a8b2;">Without a reason</span>
+                </div>
             </div>
 
             <div style="flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;">
@@ -506,6 +523,7 @@
                           <div style="{{ b.commits }}"></div>
                           <div style="{{ b.tickets }}"></div>
                           <div style="{{ b.plans }}"></div>
+                          <div style="{{ b.vide }}"></div>
                         </div>
                     </div>
                     <div style="display: flex; gap: 16px; font-size: 10px; color: #8b919b; font-family: 'IBM Plex Mono', monospace;">
@@ -548,6 +566,65 @@
 
                     <div style="width: 268px; min-width: 268px; display: flex; flex-direction: column; gap: 8px; border-radius: 8px; padding: 10px; background: #0d0e12;">
                       <div style="display: flex; align-items: center; gap: 6px; padding: 0 2px;">
+                        <div style="font-size: 12.5px; font-weight: 500; color: #f2f3f5;">Backlog</div>
+                        <div style="font-size: 11px; color: #7f858f;">14</div>
+                        <div style="flex: 1;"></div>
+                        <div style="font-size: 14px; line-height: 1; color: #a2a8b2;">+</div>
+                      </div>
+                      <div style="border: 1px solid #2b2d35; border-radius: 8px; padding: 10px 11px; background: #131519;">
+                        <div style="display: flex; align-items: center; gap: 7px;">
+                          <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: #585d66;"></span>
+                          <span style="font-size: 9px; color: #8b919b; text-transform: uppercase; letter-spacing: .02em; flex: none;">L</span>
+                          <div style="font-size: 10px; color: #7f858f;">T-0192</div>
+                          <div style="flex: 1;"></div>
+                          <div style="font-size: 10px; color: #7f858f;">3 w ago</div>
+                        </div>
+                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">Sign and notarise the macOS package</div>
+                      </div>
+                      <div style="border: 1px solid #2b2d35; border-radius: 8px; padding: 10px 11px; background: #131519;">
+                        <div style="display: flex; align-items: center; gap: 7px;">
+                          <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: #585d66;"></span>
+                          <div style="font-size: 10px; color: #7f858f;">T-0218</div>
+                          <div style="flex: 1;"></div>
+                          <div style="font-size: 10px; color: #7f858f;">2 w ago</div>
+                        </div>
+                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">A light theme</div>
+                      </div>
+                    </div>
+
+                    <div style="width: 268px; min-width: 268px; display: flex; flex-direction: column; gap: 8px; border-radius: 8px; padding: 10px; background: #0d0e12;">
+                      <div style="display: flex; align-items: center; gap: 6px; padding: 0 2px;">
+                        <div style="font-size: 12.5px; font-weight: 500; color: #f2f3f5;">To spec</div>
+                        <div style="font-size: 11px; color: #7f858f;">6</div>
+                        <div style="flex: 1;"></div>
+                        <div style="font-size: 14px; line-height: 1; color: #a2a8b2;">+</div>
+                      </div>
+                      <div style="border: 1px solid #2b2d35; border-radius: 8px; padding: 10px 11px; background: #131519;">
+                        <div style="display: flex; align-items: center; gap: 7px;">
+                          <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: #e3b341;"></span>
+                          <span style="font-size: 9px; color: #8b919b; text-transform: uppercase; letter-spacing: .02em; flex: none;">M</span>
+                          <div style="font-size: 10px; color: #7f858f;">T-0219</div>
+                          <div style="flex: 1;"></div>
+                          <div style="font-size: 10px; color: #7f858f;">6 d ago</div>
+                        </div>
+                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">Images in tickets</div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;">
+                          <span style="display: inline-flex; align-items: center; font-size: 10px; padding: 1px 6px; border-radius: 4px; color: #a2a8b2; border: 1px solid #363841;">tickets</span>
+                        </div>
+                      </div>
+                      <div style="border: 1px solid #2b2d35; border-radius: 8px; padding: 10px 11px; background: #131519;">
+                        <div style="display: flex; align-items: center; gap: 7px;">
+                          <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: #585d66;"></span>
+                          <div style="font-size: 10px; color: #7f858f;">T-0217</div>
+                          <div style="flex: 1;"></div>
+                          <div style="font-size: 10px; color: #7f858f;">9 d ago</div>
+                        </div>
+                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">Claude sessions of the other projects</div>
+                      </div>
+                    </div>
+
+                    <div style="width: 268px; min-width: 268px; display: flex; flex-direction: column; gap: 8px; border-radius: 8px; padding: 10px; background: #0d0e12;">
+                      <div style="display: flex; align-items: center; gap: 6px; padding: 0 2px;">
                         <div style="font-size: 12.5px; font-weight: 500; color: #f2f3f5;">Ready</div>
                         <div style="font-size: 11px; color: #7f858f;">18</div>
                         <div style="flex: 1;"></div>
@@ -557,21 +634,14 @@
                         <div style="display: flex; align-items: center; gap: 7px;">
                           <span style="width: 7px; height: 7px; border-radius: 50%; flex: none; background: #e3b341;"></span>
                           <span style="font-size: 9px; color: #8b919b; text-transform: uppercase; letter-spacing: .02em; flex: none;">M</span>
-                          <span style="display: inline-flex; align-items: center; font-size: 9px; padding: 2px 6px; border-radius: 4px; border: 1px solid #7d76f0; color: #7d76f0;">epic</span>
-                          <div style="font-size: 10px; color: #7f858f;">T-0125</div>
+                          <div style="font-size: 10px; color: #7f858f;">T-0127</div>
                           <div style="flex: 1;"></div>
                           <div style="font-size: 10px; color: #7f858f;">2 d ago</div>
                         </div>
-                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">Rework of the app chrome</div>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 11px;">
-                          <div style="flex: 1; height: 4px; border-radius: 2px; background: #585d66; overflow: hidden;"><div style="height: 100%; background: #857ef1; width: 40%;"></div></div>
-                          <span style="color: #7f858f;">2/5</span>
-                        </div>
+                        <div style="font-size: 12.5px; margin-top: 6px; line-height: 1.45; color: #f2f3f5;">View bar on the remaining tabs</div>
                         <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px;">
                           <span style="display: inline-flex; align-items: center; font-size: 10px; padding: 1px 6px; border-radius: 4px; color: #a2a8b2; border: 1px solid #363841;">chrome</span>
-                        </div>
-                        <div style="display: flex; gap: 6px; margin-top: 8px;">
-                          <div style="font-size: 10px; padding: 3px 6px; flex: 1; text-align: center; border-radius: 6px; color: #a2a8b2;">View 3 children</div>
+                          <span style="display: inline-flex; align-items: center; font-size: 10px; padding: 1px 6px; border-radius: 4px; color: #7d76f0; border: 1px solid #7d76f0;">child of T-0125</span>
                         </div>
                       </div>
                       <div style="border: 1px solid #2b2d35; border-radius: 8px; padding: 10px 11px; background: #131519;">
@@ -669,6 +739,213 @@
                   </div>
                 </div>
 
+              <div data-if="isNavigateur" style="flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;">
+                  <div style="height: 40px; flex: none; display: flex; align-items: center; gap: 6px; padding: 0 12px; border-bottom: 1px solid #22242b;">
+                    <div style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: #a2a8b2; font-family: -apple-system, 'SF Pro Text', ui-sans-serif, system-ui, sans-serif; font-size: 14px;">←</div>
+                    <div style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: #585d66; font-family: -apple-system, 'SF Pro Text', ui-sans-serif, system-ui, sans-serif; font-size: 14px;">→</div>
+                    <div style="width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: #a2a8b2; font-family: -apple-system, 'SF Pro Text', ui-sans-serif, system-ui, sans-serif; font-size: 14px;">⟳</div>
+                    <div style="flex: 1; height: 26px; display: flex; align-items: center; padding: 0 10px; border-radius: 6px; border: 1px solid #2b2d35; background: #191b22; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #b6bac1;">localhost:5173/pricing</div>
+                    <div style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 6px; border: 1px solid #7d76f0; background: #191b22; color: #f2f3f5; font-size: 11.5px; font-weight: 500;">
+                      <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 14px; color: #7d76f0;" aria-hidden="true"><use href="#i-cursor-click"/></svg>Cancel
+                    </div>
+                    <div style="display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 6px; background: #7d76f0; color: #0a0a12; font-size: 11.5px; font-weight: 500;">DevTools</div>
+                    <div style="display: inline-flex; align-items: center; gap: 2px; padding: 2px; border-radius: 6px; background: #191b22; border: 1px solid #2b2d35;">
+                      <span style="font-size: 10.5px; padding: 3px 8px; border-radius: 4px; background: #2a2d38; color: #f2f3f5;">Bottom</span>
+                      <span style="font-size: 10.5px; padding: 3px 8px; border-radius: 4px; color: #8b919b;">Right</span>
+                    </div>
+                  </div>
+
+                  <div style="flex: 1; position: relative; min-height: 0; background: #ffffff; overflow: hidden;">
+                    <div style="height: 52px; display: flex; align-items: center; gap: 26px; padding: 0 40px; border-bottom: 1px solid #e6e8ec;">
+                      <span style="font-size: 14px; font-weight: 600; color: #101418;">Acme</span>
+                      <span style="font-size: 12.5px; color: #5b6472;">Product</span>
+                      <span style="font-size: 12.5px; color: #5b6472;">Pricing</span>
+                      <span style="font-size: 12.5px; color: #5b6472;">Docs</span>
+                      <span style="flex: 1;"></span>
+                      <span style="display: inline-flex; align-items: center; height: 28px; padding: 0 14px; border-radius: 6px; background: #101418; color: #ffffff; font-size: 12px;">Get started</span>
+                    </div>
+                    <div style="padding: 46px 40px 0; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+                      <div style="font-size: 30px; font-weight: 600; color: #101418; letter-spacing: -.02em;">Pricing that scales with you</div>
+                      <div style="font-size: 13.5px; color: #5b6472;">Three plans, no seat minimum, cancel whenever.</div>
+                    </div>
+                    <div style="display: flex; gap: 16px; justify-content: center; padding: 34px 40px;">
+                      <div style="width: 220px; border: 1px solid #e6e8ec; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="font-size: 12.5px; color: #5b6472;">Solo</div>
+                        <div style="font-size: 24px; font-weight: 600; color: #101418;">$9</div>
+                        <div style="height: 1px; background: #eef0f3; margin: 4px 0;"></div>
+                        <div style="height: 8px; border-radius: 4px; background: #eef0f3;"></div>
+                        <div style="height: 8px; border-radius: 4px; background: #eef0f3; width: 70%;"></div>
+                      </div>
+                      <div style="width: 220px; border: 1px solid #7d76f0; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 8px 30px rgba(16,20,24,.08);">
+                        <div style="font-size: 12.5px; color: #7d76f0;">Team</div>
+                        <div style="font-size: 24px; font-weight: 600; color: #101418;">$29</div>
+                        <div style="height: 1px; background: #eef0f3; margin: 4px 0;"></div>
+                        <div style="height: 8px; border-radius: 4px; background: #eef0f3;"></div>
+                        <div style="height: 8px; border-radius: 4px; background: #eef0f3; width: 84%;"></div>
+                      </div>
+                      <div style="width: 220px; border: 1px solid #e6e8ec; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="font-size: 12.5px; color: #5b6472;">Scale</div>
+                        <div style="font-size: 24px; font-weight: 600; color: #101418;">$99</div>
+                        <div style="height: 1px; background: #eef0f3; margin: 4px 0;"></div>
+                        <div style="height: 8px; border-radius: 4px; background: #eef0f3;"></div>
+                        <div style="height: 8px; border-radius: 4px; background: #eef0f3; width: 62%;"></div>
+                      </div>
+                    </div>
+
+                    <div style="position: absolute; top: 12px; right: 12px; width: 286px; border-radius: 10px; border: 1px solid #2b2d35; background: #0d0e12; box-shadow: 0 24px 60px rgba(0,0,0,.55); padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="flex: 1; min-width: 0; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7d76f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">section.pricing &gt; div.card--featured</span>
+                        <span style="font-size: 13px; color: #7f858f;">×</span>
+                      </div>
+                      <div style="min-height: 54px; border-radius: 6px; border: 1px solid #2b2d35; background: #131519; padding: 8px 9px; font-size: 12px; color: #6b7078;">What's wrong here…</div>
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="flex: 1; display: inline-flex; align-items: center; justify-content: center; height: 28px; border-radius: 6px; border: 1px solid #363841; color: #d5d8dd; font-size: 11.5px; font-weight: 500;">Create a ticket</span>
+                        <span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px; border-radius: 6px; background: #7d76f0; color: #0a0a12; font-size: 11.5px; font-weight: 500;">
+                          <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 13px;" aria-hidden="true"><use href="#i-arrow-up-right"/></svg>Send to Claude
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="flex: none; border-top: 1px solid #22242b; background: #0d0e12; padding: 8px 14px 10px; display: flex; flex-direction: column; gap: 7px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <span style="display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; color: #d5d8dd;">
+                        <svg style="width:1em;height:1em;fill:currentColor;flex:none;font-size: 11px; color: #7f858f;" aria-hidden="true"><use href="#i-caret-down"/></svg>Console — 3 errors, 1 warning
+                      </span>
+                      <span style="flex: 1;"></span>
+                      <span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 6px; border: 1px solid #363841; background: #191b22; color: #d5d8dd; font-size: 11px;">Send to Claude</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+                      <div style="display: flex; gap: 7px;"><span style="color: #e5677a; flex: none;">✕</span><span style="color: #a2a8b2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Uncaught TypeError: plans.map is not a function<span style="color: #6b7078;"> · pricing.tsx:42</span></span></div>
+                      <div style="display: flex; gap: 7px;"><span style="color: #e5677a; flex: none;">✕</span><span style="color: #a2a8b2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">GET /api/prices 500 (Internal Server Error)<span style="color: #6b7078;"> · fetch</span></span></div>
+                      <div style="display: flex; gap: 7px;"><span style="color: #e3b341; flex: none;">▲</span><span style="color: #a2a8b2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Each child in a list should have a unique key prop<span style="color: #6b7078;"> · react-dom</span></span></div>
+                    </div>
+                  </div>
+                </div>
+
+              <div data-if="isDonnees" style="flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden;">
+                  <div style="flex: 1; min-height: 0; overflow: hidden; padding: 20px 22px; display: flex; flex-direction: column; gap: 16px;">
+                    <div style="font-size: 12px; color: #7f858f; max-width: 720px; line-height: 1.5;">Introspection rebuilt at every commit. The ovrsee recomputes nothing.</div>
+                    <div style="display: flex; flex-direction: column;">
+                      <div style="display: flex; align-items: center; gap: 16px; padding: 0 10px 8px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #6b7078; border-bottom: 1px solid #22242b;">
+                        <span style="width: 220px; flex: none;">Table</span>
+                        <span style="width: 90px; flex: none;">Columns</span>
+                        <span style="flex: 1;">Used by</span>
+                        <span style="width: 120px; flex: none; text-align: right;">Confidence</span>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 16px; padding: 11px 10px; border-bottom: 1px solid #191b22;">
+                        <span style="width: 220px; flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #f2f3f5;">projects</span>
+                        <span style="width: 90px; flex: none; font-size: 12.5px; color: #7f858f;">9</span>
+                        <span style="flex: 1; font-size: 12.5px; color: #a2a8b2;">Overview · Board · History</span>
+                        <span style="width: 120px; flex: none; text-align: right;"><span style="display: inline-flex; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: .06em; padding: 2px 7px; border-radius: 999px; background: #4c46b4; color: #f2f3f5;">LIVE</span></span>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 16px; padding: 11px 10px; border-bottom: 1px solid #191b22;">
+                        <span style="width: 220px; flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #f2f3f5;">tickets</span>
+                        <span style="width: 90px; flex: none; font-size: 12.5px; color: #7f858f;">12</span>
+                        <span style="flex: 1; font-size: 12.5px; color: #a2a8b2;">Board · Ticket detail</span>
+                        <span style="width: 120px; flex: none; text-align: right;"><span style="display: inline-flex; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: .06em; padding: 2px 7px; border-radius: 999px; background: #7d76f0; color: #0a0a12;">EXTRACTED</span></span>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 16px; padding: 11px 10px; border-bottom: 1px solid #191b22;">
+                        <span style="width: 220px; flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #f2f3f5;">plans</span>
+                        <span style="width: 90px; flex: none; font-size: 12.5px; color: #7f858f;">7</span>
+                        <span style="flex: 1; font-size: 12.5px; color: #a2a8b2;">History · Overview</span>
+                        <span style="width: 120px; flex: none; text-align: right;"><span style="display: inline-flex; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: .06em; padding: 2px 7px; border-radius: 999px; background: #33363f; color: #a2a8b2;">INFERRED</span></span>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 16px; padding: 11px 10px; border-bottom: 1px solid #191b22;">
+                        <span style="width: 220px; flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #f2f3f5;">scans</span>
+                        <span style="width: 90px; flex: none; font-size: 12.5px; color: #7f858f;">6</span>
+                        <span style="flex: 1; font-size: 12.5px; color: #a2a8b2;">Product</span>
+                        <span style="width: 120px; flex: none; text-align: right;"><span style="display: inline-flex; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: .06em; padding: 2px 7px; border-radius: 999px; border: 1px dashed #363841; color: #7f858f;">AMBIGUOUS</span></span>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 16px; padding: 11px 10px;">
+                        <span style="width: 220px; flex: none; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #f2f3f5;">integrations</span>
+                        <span style="width: 90px; flex: none; font-size: 12.5px; color: #7f858f;">4</span>
+                        <span style="flex: 1; font-size: 12.5px; color: #7f858f;">no page identified</span>
+                        <span style="width: 120px; flex: none; text-align: right;"><span style="display: inline-flex; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: .06em; padding: 2px 7px; border-radius: 999px; background: #33363f; color: #a2a8b2;">INFERRED</span></span>
+                      </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                      <div style="font-size: 14px; font-weight: 500; color: #f2f3f5;">Live schema</div>
+                      <span style="display: inline-flex; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: .06em; padding: 2px 7px; border-radius: 999px; background: #4c46b4; color: #f2f3f5;">LIVE</span>
+                    </div>
+                    <div style="border: 1px solid #2b2d35; border-radius: 8px; overflow: hidden; max-width: 640px;">
+                      <div style="padding: 8px 12px; background: #191b22; border-bottom: 1px solid #2b2d35; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: #d5d8dd;">projects</div>
+                      <div style="display: flex; gap: 16px; padding: 8px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: #6b7078; border-bottom: 1px solid #191b22;">
+                        <span style="width: 180px; flex: none;">Column</span><span style="width: 120px; flex: none;">Type</span><span style="flex: 1;">Key</span>
+                      </div>
+                      <div style="display: flex; gap: 16px; padding: 8px 12px; font-size: 12px; color: #a2a8b2; border-bottom: 1px solid #191b22;">
+                        <span style="width: 180px; flex: none; font-family: 'IBM Plex Mono', monospace; color: #f2f3f5;">id</span><span style="width: 120px; flex: none;">uuid</span><span style="flex: 1;"><span style="display: inline-flex; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; padding: 1px 6px; border-radius: 999px; background: #33363f; color: #d5d8dd;">PK</span></span>
+                      </div>
+                      <div style="display: flex; gap: 16px; padding: 8px 12px; font-size: 12px; color: #a2a8b2; border-bottom: 1px solid #191b22;">
+                        <span style="width: 180px; flex: none; font-family: 'IBM Plex Mono', monospace; color: #f2f3f5;">root</span><span style="width: 120px; flex: none;">text</span><span style="flex: 1;"></span>
+                      </div>
+                      <div style="display: flex; gap: 16px; padding: 8px 12px; font-size: 12px; color: #a2a8b2;">
+                        <span style="width: 180px; flex: none; font-family: 'IBM Plex Mono', monospace; color: #f2f3f5;">owner_id</span><span style="width: 120px; flex: none;">uuid</span><span style="flex: 1; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7f858f;">n → 1 users.id</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              <div data-if="isStack" style="flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden;">
+                  <div style="flex: 1; min-height: 0; overflow: hidden; padding: 20px 22px; display: flex; flex-direction: column; gap: 18px;">
+                    <div style="max-width: 420px; display: flex; flex-direction: column; gap: 7px;">
+                      <div style="height: 4px; border-radius: 2px; background: #191b22; overflow: hidden;"><div style="height: 100%; width: 43%; background: #7d76f0;"></div></div>
+                      <div style="font-size: 11.5px; color: #7f858f;">18 of 42 have one.</div>
+                    </div>
+                    <div style="display: flex; gap: 28px; min-height: 0;">
+                      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #6b7078;">Production · 5</div>
+                        <div style="border: 1px solid #2b2d35; border-radius: 8px; background: #131519; padding: 13px 15px; display: flex; gap: 14px;">
+                          <div style="width: 190px; flex: none;">
+                            <div style="font-size: 13px; font-weight: 500; color: #f2f3f5;">playwright-core</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7f858f; margin-top: 2px;">1.55.0</div>
+                          </div>
+                          <div style="flex: 1; font-size: 12px; color: #a2a8b2; line-height: 1.5;">Drives the system Chrome to crawl the observed app. In dependencies, not dev: electron-builder prunes the others.</div>
+                        </div>
+                        <div style="border: 1px solid #2b2d35; border-radius: 8px; background: #131519; padding: 13px 15px; display: flex; gap: 14px;">
+                          <div style="width: 190px; flex: none;">
+                            <div style="font-size: 13px; font-weight: 500; color: #f2f3f5;">node-pty</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7f858f; margin-top: 2px;">1.0.0</div>
+                          </div>
+                          <div style="flex: 1; font-size: 12px; color: #a2a8b2; line-height: 1.5;">The terminal panel needs a real pty, native binary unpacked from the asar.</div>
+                        </div>
+                        <div style="border: 1px solid #2b2d35; border-radius: 8px; background: #131519; padding: 13px 15px; display: flex; gap: 14px;">
+                          <div style="width: 190px; flex: none;">
+                            <div style="font-size: 13px; font-weight: 500; color: #f2f3f5;">@xterm/xterm</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7f858f; margin-top: 2px;">5.5.0</div>
+                          </div>
+                          <div style="flex: 1; font-size: 12.5px; color: #585d66; line-height: 1.5;">No reason written. A WHY: comment above its import will show up here.</div>
+                        </div>
+                      </div>
+                      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px;">
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #6b7078;">Development · 37</div>
+                        <div style="border: 1px solid #2b2d35; border-radius: 8px; background: #131519; padding: 13px 15px; display: flex; gap: 14px;">
+                          <div style="width: 170px; flex: none;">
+                            <div style="font-size: 13px; font-weight: 500; color: #f2f3f5;">electron</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7f858f; margin-top: 2px;">38.2.0</div>
+                          </div>
+                          <div style="flex: 1; font-size: 12px; color: #a2a8b2; line-height: 1.5;">The terminal and the crawl go through IPC, never a local socket.</div>
+                        </div>
+                        <div style="border: 1px solid #2b2d35; border-radius: 8px; background: #131519; padding: 13px 15px; display: flex; gap: 14px;">
+                          <div style="width: 170px; flex: none;">
+                            <div style="font-size: 13px; font-weight: 500; color: #f2f3f5;">vite</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7f858f; margin-top: 2px;">7.1.7</div>
+                          </div>
+                          <div style="flex: 1; font-size: 12px; color: #a2a8b2; line-height: 1.5;">Dev server and build of the interface, hosting the same /api routes as Electron.</div>
+                        </div>
+                        <div style="border: 1px solid #2b2d35; border-radius: 8px; background: #131519; padding: 13px 15px; display: flex; gap: 14px;">
+                          <div style="width: 170px; flex: none;">
+                            <div style="font-size: 13px; font-weight: 500; color: #f2f3f5;">oxlint</div>
+                            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7f858f; margin-top: 2px;">1.20.0</div>
+                          </div>
+                          <div style="flex: 1; font-size: 12.5px; color: #585d66; line-height: 1.5;">No reason written. A WHY: comment above its import will show up here.</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               <div data-if="isProduit" style="flex: 1; display: flex; min-width: 0; min-height: 0;">
                   <div style="flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;">
                     <div style="flex: none; padding: 12px 22px 0;">
@@ -748,12 +1025,13 @@
             <div style="height: 26px; flex: none; display: flex; align-items: center; gap: 14px; padding: 0 14px; border-top: 1px solid #22242b; background: #0b0c0e; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #737983;">
               <div style="display: flex; align-items: center; gap: 6px; min-width: 0;">
                 <span data-if="isApercu" style="width: 5px; height: 5px; border-radius: 50%; background: #e3b341; flex: none;"></span>
+                <span data-if="isNavigateur" style="width: 5px; height: 5px; border-radius: 50%; background: #4cc38a; flex: none;"></span>
                 <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ statusLeft }}</span>
               </div>
               <div style="flex: 1;"></div>
               <div style="display: flex; align-items: center; gap: 8px; flex: none;">
-                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #737983;">{{ statusRight }}</span>
-                <span style="color: #585d66;">|</span>
+                <span style="font-family: -apple-system, 'SF Pro Text', ui-sans-serif, system-ui, sans-serif; font-size: 10.5px; color: #737983;">{{ statusRight }}</span>
+                <span data-if="showStatusSep" style="color: #585d66;">|</span>
                 <span style="font-family: -apple-system, 'SF Pro Text', ui-sans-serif, system-ui, sans-serif; font-size: 10.5px; color: #a2a8b2;">⌘K</span>
               </div>
             </div>

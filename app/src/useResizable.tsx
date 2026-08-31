@@ -23,6 +23,16 @@ export interface Resizable {
     onDoubleClick: () => void
   }
   dragging: boolean
+  /**
+   * Pose une taille sans la faire remonter — pour restaurer, pas pour choisir.
+   *
+   * Une taille épinglée à une page (`terminalPins.ts`) est restaurée au
+   * changement d'onglet. Sans ce silence, la restauration passerait pour un
+   * geste : `onResize` remonterait à `App`, qui écrit dans les préférences
+   * après 300 ms, et la hauteur d'une seule page deviendrait la hauteur
+   * globale.
+   */
+  setSizeQuiet: (next: number) => void
 }
 
 export type Axis = 'x' | 'y'
@@ -55,6 +65,8 @@ export function useResizable({ key, initial, min, max, axis, invert, onResize }:
   const [size, setSize] = useState(() => (onResize ? initial : restore(key, initial)))
   const [dragging, setDragging] = useState(false)
   const origin = useRef({ pointer: 0, size: 0 })
+  /** Armé le temps d'une restauration, pour que l'effet de conservation passe son tour. */
+  const muet = useRef(false)
 
   const clamp = useCallback(
     (value: number) => {
@@ -103,7 +115,31 @@ export function useResizable({ key, initial, min, max, axis, invert, onResize }:
     document.body.style.userSelect = ''
   }
 
+  /**
+   * Restaure une taille sans la signaler.
+   *
+   * Le garde d'égalité n'est pas cosmétique : sans changement d'état, l'effet
+   * de conservation ne tourne pas, et le drapeau resté armé avalerait la
+   * prochaine vraie écriture.
+   */
+  const setSizeQuiet = useCallback(
+    (next: number) => {
+      const borne = clamp(next)
+      setSize(current => {
+        if (borne === current) return current
+        muet.current = true
+        return borne
+      })
+    },
+    [clamp],
+  )
+
   useEffect(() => {
+    if (muet.current) {
+      muet.current = false
+      return
+    }
+
     if (onResize) {
       // Callback fourni : utilisée pour les préférences
       onResize(size)
@@ -127,6 +163,7 @@ export function useResizable({ key, initial, min, max, axis, invert, onResize }:
   return {
     size,
     dragging,
+    setSizeQuiet,
     handleProps: {
       onPointerDown,
       onPointerMove,
@@ -142,17 +179,30 @@ export function useResizable({ key, initial, min, max, axis, invert, onResize }:
  * Le trait reste discret comme les séparateurs de la maquette ; c'est la zone
  * sensible, invisible, qui rend le geste facile à attraper.
  */
-export function Divider({ axis, resizable }: { axis: Axis; resizable: Resizable }) {
+export function Divider({
+  axis,
+  resizable,
+  locked,
+  lockedTitle,
+}: {
+  axis: Axis
+  resizable: Resizable
+  /** Épinglé : la poignée ne répond plus. Aucune marque visuelle — le geste inerte suffit. */
+  locked?: boolean
+  lockedTitle?: string
+}) {
   const vertical = axis === 'x'
+  const curseur = locked ? 'default' : vertical ? 'col-resize' : 'row-resize'
 
   return (
     <div
-      {...resizable.handleProps}
-      title="Glisser pour redimensionner · double-clic pour réinitialiser"
+      {...(locked ? {} : resizable.handleProps)}
+      title={locked ? lockedTitle : 'Glisser pour redimensionner · double-clic pour réinitialiser'}
       style={s(
-        vertical
-          ? 'flex: none; width: 9px; margin: 0 -4px; cursor: col-resize; z-index: 10; display: flex; justify-content: center;'
-          : 'flex: none; height: 9px; margin: -4px 0; cursor: row-resize; z-index: 10; display: flex; align-items: center;',
+        (vertical
+          ? 'flex: none; width: 9px; margin: 0 -4px; z-index: 10; display: flex; justify-content: center;'
+          : 'flex: none; height: 9px; margin: -4px 0; z-index: 10; display: flex; align-items: center;') +
+          ` cursor: ${curseur};`,
       )}
     >
       <div

@@ -1,6 +1,18 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react'
 import { briefLines, buildActions } from './brief'
-import { Check, GitFork, NotePencil, Plus, Question, type IconProps } from '@phosphor-icons/react'
+import {
+  Check,
+  GitFork,
+  Minus,
+  NotePencil,
+  Plus,
+  PushPin,
+  Question,
+  Square,
+  SquareHalf,
+  SquareHalfBottom,
+  type IconProps,
+} from '@phosphor-icons/react'
 
 import {
   type Snapshot,
@@ -12,7 +24,9 @@ import { s } from './style'
 import { t, type TranslationKey } from './i18n'
 import { useTerminals } from './useTerminal'
 import { pasteTo } from './pty'
+import { pinFor, pinKey, readPins, togglePin, writePins, type Pins } from './terminalPins'
 import { Divider, useResizable } from './useResizable'
+import type { TabId } from './views'
 
 /**
  * Icône par commande livrée — maquette l. 555-558. `buildActions()` compose le
@@ -129,6 +143,27 @@ const layoutLabel = (layout: Layout): string => {
 }
 
 /**
+ * Un carré Phosphor par disposition — la part pleine dit où va le terminal.
+ *
+ * En `fill` et pas en `regular` : c'est le poids qui donne la géométrie juste.
+ * `SquareHalf` rempli l'est à droite, `SquareHalfBottom` en bas — aucune
+ * rotation à écrire. En `regular`, ce dernier hachure sa moitié de barres
+ * verticales, illisible à 13 px.
+ *
+ * L'état actif se dit par la pastille du segmenté, jamais par le poids : les
+ * trois icônes gardent la même graisse, sinon « plein » paraîtrait toujours
+ * sélectionné.
+ */
+const LAYOUT_ICONS: Record<Layout, ComponentType<IconProps>> = {
+  'bottom': SquareHalfBottom,
+  'side': SquareHalf,
+  'full': Square,
+}
+
+/** `.seg-opt` est calibré pour du texte ; une icône seule n'a pas besoin de ses 10 px. */
+const SEG_ICONE = 'padding: 5px 8px;'
+
+/**
  * Le panneau se dimensionne selon sa disposition.
  *
  * « Plein » n'a pas de taille propre : il prend tout. Les deux autres ont leur
@@ -158,6 +193,7 @@ const panelStyle = (layout: Layout, size: number): string => {
  * d'interface ; un bouton qui copie fait ce qu'il annonce.
  */
 export function Terminal({
+  tab,
   layout,
   onLayout,
   onToggle,
@@ -171,6 +207,8 @@ export function Terminal({
   onProjet,
   actions,
 }: {
+  /** La vue affichée — c'est à elle que s'épingle une taille de panneau. */
+  tab: TabId
   layout: Layout
   onLayout: (layout: Layout) => void
   onToggle: () => void
@@ -413,6 +451,54 @@ export function Terminal({
   const sizing = layout === 'side' ? widthSide : height
 
   /**
+   * Les tailles épinglées à une page.
+   *
+   * Le magasin est relu une fois au montage : personne d'autre que ce panneau
+   * n'y écrit, et le panneau est démonté dès qu'on le replie.
+   */
+  const [pins, setPins] = useState<Pins>(readPins)
+  const epingle = pinFor(pins, tab, layout)
+
+  /**
+   * Arriver sur une page pose sa taille : la sienne si elle est épinglée, la
+   * taille globale sinon — sans quoi la hauteur d'une page épinglée suivrait
+   * sur toutes les autres.
+   *
+   * La restauration est silencieuse : `App` prendrait sinon une arrivée pour
+   * un geste et écrirait la taille d'une seule page dans les préférences
+   * (voir `setSizeQuiet`).
+   *
+   * Elle ne se déclenche qu'au **changement de page ou de disposition**, jamais
+   * sur l'épingle elle-même : poser ou retirer une épingle ne doit rien faire
+   * bouger sous les yeux. Dépinglé, le panneau garde la taille qu'il a ; c'est
+   * seulement le séparateur qui redevient vivant.
+   */
+  const restaurer = sizing.setSizeQuiet
+  const globale = layout === 'side' ? terminalWidth : terminalHeight
+  const cle = pinKey(tab, layout)
+  const pageVue = useRef(cle)
+  // Les épingles et la taille globale sont lues au moment de l'arrivée, pas
+  // suivies : les faire entrer dans les dépendances relancerait l'effet à
+  // chaque image d'un glissement.
+  const aLArrivee = useRef({ epingle, globale })
+  aLArrivee.current = { epingle, globale }
+
+  useEffect(() => {
+    if (pageVue.current === cle) return
+    pageVue.current = cle
+    const { epingle: retenue, globale: defaut } = aLArrivee.current
+    restaurer(retenue ?? defaut)
+  }, [cle, restaurer])
+
+  // Dépingler ne fait pas sauter le panneau : la taille courante reste, seul
+  // le séparateur redevient vivant.
+  const basculerEpingle = () => {
+    const suivant = togglePin(pins, tab, layout, sizing.size)
+    setPins(suivant)
+    writePins(suivant)
+  }
+
+  /**
    * Un clic écrit dans le terminal affiché quand il y en a un, et copie sinon.
    *
    * L'onglet actif, et pas la session `claude` : un raccourci cliqué depuis un
@@ -470,7 +556,14 @@ export function Terminal({
 
   return (
     <>
-      {layout !== 'full' && <Divider axis={layout === 'side' ? 'x' : 'y'} resizable={sizing} />}
+      {layout !== 'full' && (
+        <Divider
+          axis={layout === 'side' ? 'x' : 'y'}
+          resizable={sizing}
+          locked={epingle !== undefined}
+          lockedTitle={t('terminal.pinned')}
+        />
+      )}
       <div style={s(panelStyle(layout, sizing.size))}>
       <div
         style={s(
@@ -578,26 +671,62 @@ export function Terminal({
         </div>
 
         <div style={s('flex: 1;')} />
-        <span className="kicker">{t('terminal.layouts')}</span>
-        <div className="seg">
-          {LAYOUT_IDS.map(id => (
-            <label key={id} className="seg-opt">
-              <input
-                type="radio"
-                name="terminal-layout"
-                checked={layout === id}
-                onChange={() => onLayout(id)}
-              />
-              {layoutLabel(id)}
-            </label>
-          ))}
+        {/* Le libellé « Disposition » ne disparaît pas, il change de support :
+            il nomme le groupe pour les lecteurs d'écran, et chaque carré garde
+            son infobulle. La barre y gagne les 190 px que prenaient le kicker
+            et les trois mots. */}
+        <div className="seg" role="radiogroup" aria-label={t('terminal.layouts')}>
+          {LAYOUT_IDS.map(id => {
+            const Icone = LAYOUT_ICONS[id]
+            return (
+              <label key={id} className="seg-opt" style={s(SEG_ICONE)} title={layoutLabel(id)}>
+                <input
+                  type="radio"
+                  name="terminal-layout"
+                  aria-label={layoutLabel(id)}
+                  checked={layout === id}
+                  onChange={() => onLayout(id)}
+                />
+                <Icone size={13} weight="fill" aria-hidden="true" />
+              </label>
+            )
+          })}
         </div>
+        {/* Rien à épingler en « plein » : le panneau n'y a pas de taille propre. */}
+        {layout !== 'full' && (
+          <button
+            type="button"
+            className="btn-icon"
+            onClick={basculerEpingle}
+            aria-pressed={epingle !== undefined}
+            title={t(epingle !== undefined ? 'terminal.unpin' : 'terminal.pin')}
+            aria-label={t(epingle !== undefined ? 'terminal.unpin' : 'terminal.pin')}
+            style={s(
+              'cursor: pointer; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; ' +
+                (epingle !== undefined
+                  ? 'background: var(--color-surface-active);'
+                  : 'background: transparent;'),
+            )}
+          >
+            <PushPin
+              size={14}
+              weight={epingle !== undefined ? 'fill' : 'regular'}
+              aria-hidden="true"
+              color={epingle !== undefined ? 'var(--color-accent)' : 'var(--color-text-quaternary)'}
+            />
+          </button>
+        )}
         <button
           type="button"
+          className="btn-icon"
           onClick={onToggle}
-          style={s('cursor: pointer; border: 0; background: transparent; font-size: 11.5px; color: var(--color-text-quaternary);')}
+          title={t('terminal.reduce')}
+          aria-label={t('terminal.reduce')}
+          style={s(
+            'cursor: pointer; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; background: transparent;',
+          )}
         >
-          {t('terminal.reduce')}
+          <Minus size={14} aria-hidden="true" color="var(--color-text-quaternary)" />
         </button>
       </div>
 

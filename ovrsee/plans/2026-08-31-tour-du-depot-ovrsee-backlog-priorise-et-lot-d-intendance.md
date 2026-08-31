@@ -1,10 +1,16 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Tour du dépôt ovrsee — backlog priorisé et lot d'intendance",
   "opened": "2026-08-31",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-31",
+  "commits": [
+    {
+      "sha": "04ec9c2",
+      "date": "2026-08-31",
+      "files": []
+    }
+  ]
 }
 ---
 

@@ -10,6 +10,67 @@ versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.2-beta] — 2026-08-31
+
+### Security
+
+- **A repository could get its `dev` command run without anyone agreeing to
+  it.** `ovrsee.config.json` is versioned, so its `dev` line is written by
+  whoever authored the observed repository — and the crawl handed it to a shell.
+  A commit touching sources was enough to start it. That command now requires an
+  explicit agreement, kept in `~/.claude/ovrsee/trust.json`, outside the observed
+  repository — a hostile clone must not ship its own approval. What is remembered
+  is the exact string handed to `shellRun()`, so changing `dev` asks again. The
+  guard sits at both execution sites rather than at the entry points, so adding a
+  caller cannot forget it. With no human present (the `post-commit` hook, a
+  non-TTY stdin) it refuses instead of asking, and the Product tab shows the
+  failed scan.
+- **The observed repository could override `bootstrap`.** That array is offered
+  to the Claude terminal, and an entry starting with `!` or `/` runs immediately.
+  A cloned repository no longer has any say in it: `bootstrap` is a workstation
+  preference, not a property of the repository being watched.
+- **`pages.json` leaked what the observed application printed on screen.**
+  Redaction only covered `scans.jsonl`, yet the crawl also writes `pages.json` —
+  versioned too — whose `excerpt` holds 400 characters of the observed app's
+  `innerText`, and `title` its DOM title. An admin page showing a token, a debug
+  page printing its configuration, an application error rendered on screen: the
+  text went into git unfiltered.
+- **Redaction cut off more than the secret.** A sensitive name followed by `=`
+  or `:` swallowed the rest of the line, false positives included — the host and
+  exit code sharing that line disappeared with it. An authentication header name
+  still takes the whole line; an ordinary assignment now stops at the next space.
+- A full cybersecurity audit hardened the webview boundary, secret handling and
+  the supply chain. `readBody` never resolved after `req.destroy()` on an
+  oversized body, and `/api/config-claude` returned hook commands that can carry
+  a hardcoded token.
+
+### Changed
+
+- **The terminal no longer loads at startup.** xterm is a third of the bundle and
+  now sits behind `lazy()`; `graph.json` (687 KB, read synchronously on every
+  project change for a tab that is often closed) left the snapshot for a route
+  served when the Data tab mounts. The main bundle went from 972 KB to 616 KB,
+  252 KB to 164 KB gzipped. Screenshot retention was made cheaper at the same
+  time.
+- A repo-wide slimming pass removed wiring that promised settings nobody sets,
+  exports announcing a public surface that did not exist, and code restating by
+  hand what the machine can derive. No visible change in behavior.
+- Dependency bumps: oxlint, Electron, Vite and the React group.
+
+### Fixed
+
+- The command shortcut wrote into the `claude` session whatever tab was being
+  looked at, and switched to it. With several terminals open, a click from the
+  second one wrote into the first.
+- The collapsed sidebar rail diverged from the open one in three ways: search was
+  missing entirely, a logo appeared that exists nowhere when open, and the whole
+  thing was off by one pixel.
+- The project dropdown counter totalled backlog, to-specify and ready tickets —
+  inflating a number that claims to say what is left to do. It counts ready
+  tickets only.
+- Session status did not always update, and the dropdown shifted the layout as it
+  opened.
+
 ## [1.1.1-beta] — 2026-08-20
 
 ### Security
@@ -152,7 +213,8 @@ Windows warn about it on first launch.
 - The `ovrsee/` format may still move before 1.0. Everything in it being markdown
   and images, a migration will be readable with the naked eye.
 
-[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.1.1-beta...HEAD
+[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.1.2-beta...HEAD
+[1.1.2-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.1-beta...v1.1.2-beta
 [1.1.1-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.0-beta...v1.1.1-beta
 [1.1.0-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.0.0-beta...v1.1.0-beta
 [1.0.0-beta]: https://github.com/samuelboulery/ovrsee/releases/tag/v1.0.0-beta

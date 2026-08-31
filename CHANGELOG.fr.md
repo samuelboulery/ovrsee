@@ -10,6 +10,71 @@ versionnage [SemVer](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.1.2-beta] — 2026-08-31
+
+### Sécurité
+
+- **La commande `dev` d'un dépôt pouvait s'exécuter sans que personne l'ait
+  accordé.** `ovrsee.config.json` est versionné : sa ligne `dev` est donc écrite
+  par l'auteur du dépôt observé, et le crawl la passait à un shell. Un commit
+  touchant des sources suffisait à la lancer. Cette commande exige désormais un
+  accord explicite, gardé dans `~/.claude/ovrsee/trust.json`, **hors du dépôt
+  observé** — un clone hostile ne doit pas livrer sa propre approbation. Ce qui
+  est retenu est la chaîne exacte qui part à `shellRun()` : changer `dev`
+  redemande l'accord. La garde est aux deux sites d'exécution plutôt qu'aux
+  points d'entrée, de sorte qu'on ne peut pas l'oublier en ajoutant un appelant.
+  Sans humain (hook `post-commit`, `stdin` non TTY), elle refuse au lieu de
+  demander, et l'onglet Produit affiche le scan en échec.
+- **Le dépôt observé pouvait surcharger `bootstrap`.** Ce tableau est proposé à
+  l'envoi vers le terminal Claude, et une entrée commençant par `!` ou `/`
+  s'exécute immédiatement. Un dépôt cloné n'a plus voix au chapitre :
+  `bootstrap` est une préférence de poste, pas une propriété du dépôt observé.
+- **`pages.json` laissait fuiter ce que l'application observée affichait à
+  l'écran.** La rédaction ne couvrait que `scans.jsonl`, alors que le crawl écrit
+  aussi `pages.json` — versionné lui aussi — dont le champ `excerpt` porte 400
+  caractères d'`innerText` de l'application observée, et `title` le titre de son
+  DOM. Une page d'administration qui affiche un jeton, une page de debug qui
+  imprime sa configuration, une erreur applicative rendue à l'écran : le texte
+  partait dans git sans filtre.
+- **La rédaction coupait plus que le secret.** Un nom sensible suivi de `=` ou
+  `:` emportait toute la fin de ligne, faux positifs compris — l'hôte et le code
+  retour qui la partageaient disparaissaient avec elle. Un nom d'en-tête
+  d'authentification emporte toujours la ligne entière ; une affectation
+  ordinaire s'arrête désormais à l'espace suivant.
+- Un audit de cybersécurité complet a durci la frontière du webview, le
+  traitement des secrets et la chaîne d'approvisionnement. `readBody` ne
+  résolvait jamais après `req.destroy()` sur un corps trop gros, et
+  `/api/config-claude` rendait des commandes de hook susceptibles de porter un
+  jeton en dur.
+
+### Modifié
+
+- **Le terminal ne se charge plus au démarrage.** xterm pèse le tiers du bundle
+  et passe derrière `lazy()` ; `graph.json` (687 ko, lus de façon synchrone à
+  chaque changement de projet pour un onglet souvent fermé) sort du snapshot au
+  profit d'une route servie au montage de l'onglet Données. Le bundle principal
+  passe de 972 ko à 616 ko, de 252 ko à 164 ko une fois gzippé. La rétention des
+  captures a été allégée au passage.
+- Une passe de dégraissage sur tout le dépôt a retiré du câblage promettant des
+  réglages que personne ne pose, des exports annonçant une surface publique
+  inexistante, et du code recopiant à la main ce que la machine sait dériver.
+  Aucun changement de comportement visible.
+- Montées de version : oxlint, Electron, Vite et le groupe react.
+
+### Corrigé
+
+- Le raccourci de commande écrivait dans la session `claude` quel que soit
+  l'onglet regardé, et basculait dessus. Avec plusieurs terminaux ouverts, un
+  clic depuis le second écrivait dans le premier.
+- Le rail replié de la barre latérale divergeait de l'ouvert sur trois points :
+  la recherche manquait entièrement, un logo apparaissait qui n'existe nulle part
+  en mode ouvert, et l'ensemble était décalé d'un pixel.
+- Le compteur du sélecteur de projets totalisait le backlog, les tickets à
+  spécifier et les tickets prêts — gonflant un chiffre qui prétend dire ce qui
+  reste à faire. Il ne compte plus que les tickets prêts.
+- Les états de session ne se mettaient pas toujours à jour, et le sélecteur
+  décalait la mise en page en s'ouvrant.
+
 ## [1.1.1-beta] — 2026-08-20
 
 ### Sécurité
@@ -161,7 +226,8 @@ Windows en avertissent au premier lancement.
 - Le format de `ovrsee/` peut encore bouger d'ici la 1.0. Tout y étant en
   markdown et en images, une migration se lira à l'œil nu.
 
-[Non publié]: https://github.com/samuelboulery/ovrsee/compare/v1.1.1-beta...HEAD
+[Non publié]: https://github.com/samuelboulery/ovrsee/compare/v1.1.2-beta...HEAD
+[1.1.2-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.1-beta...v1.1.2-beta
 [1.1.1-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.0-beta...v1.1.1-beta
 [1.1.0-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.0.0-beta...v1.1.0-beta
 [1.0.0-beta]: https://github.com/samuelboulery/ovrsee/releases/tag/v1.0.0-beta

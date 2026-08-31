@@ -2,14 +2,14 @@
 {
   "id": "T-0193",
   "titre": "Documenter la dépendance à la validation d'hôte de Vite",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "basse",
   "tags": [
     "documentation",
     "securite"
   ],
   "cree": "2026-08-20",
-  "maj": "2026-08-20",
+  "maj": "2026-08-31",
   "plan": "2026-08-20-audit-de-securite-complet-findings-et-correctifs.md",
   "charge": "xs"
 }

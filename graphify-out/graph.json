@@ -11099,8 +11099,8 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Terminal.tsx",
       "source_location": "L546",
       "weight": 1.0,
-      "_src": "terminal_ecrire",
-      "_tgt": "pty_pasteto",
+      "_src": "pty_pasteto",
+      "_tgt": "terminal_ecrire",
       "source": "pty_pasteto",
       "target": "terminal_ecrire"
     },
@@ -11135,8 +11135,8 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Terminal.tsx",
       "source_location": "L546",
       "weight": 1.0,
-      "_src": "terminal_ecrire",
-      "_tgt": "pty_submitto",
+      "_src": "pty_submitto",
+      "_tgt": "terminal_ecrire",
       "source": "pty_submitto",
       "target": "terminal_ecrire"
     },
@@ -11147,8 +11147,8 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Terminal.tsx",
       "source_location": "L582",
       "weight": 1.0,
-      "_src": "terminal_activate",
-      "_tgt": "pty_cibledecommande",
+      "_src": "pty_cibledecommande",
+      "_tgt": "terminal_activate",
       "source": "pty_cibledecommande",
       "target": "terminal_activate"
     },
@@ -11243,8 +11243,8 @@
       "source_file": "/Users/sam/code/ovrsee/app/src/Terminal.tsx",
       "source_location": "L86",
       "weight": 1.0,
-      "_src": "terminal_boutonbande",
-      "_tgt": "i18n_t",
+      "_src": "i18n_t",
+      "_tgt": "terminal_boutonbande",
       "source": "i18n_t",
       "target": "terminal_boutonbande"
     },

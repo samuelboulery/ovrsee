@@ -47,9 +47,9 @@ test('un message sans ticket ne cite rien', () => {
 
 // --- fixture ---------------------------------------------------------------
 
-const PLAN = (nom, statut = 'open') =>
+const PLAN = (nom, statut = 'open', opened = '2026-01-01') =>
   `---\n${JSON.stringify(
-    { status: statut, title: nom, opened: '2026-01-01', closed: null, commits: [] },
+    { status: statut, title: nom, opened, closed: null, commits: [] },
     null,
     2,
   )}\n---\n\nCorps.\n`
@@ -71,7 +71,7 @@ const TICKET = (id, plan, colonne = 'en-cours') =>
   )}\n---\n\nCorps.\n`
 
 /** Un dépôt git avec un `ovrsee/` peuplé, et un commit qui cite des tickets. */
-function depot(message, { colonne = 'en-cours' } = {}) {
+function depot(message, { colonne = 'en-cours', opened = '2026-01-01', commitDate } = {}) {
   const root = mkdtempSync(join(tmpdir(), 'ovrsee-reconcile-'))
   const ovrseeDir = join(root, 'ovrsee')
   mkdirSync(join(ovrseeDir, 'plans'), { recursive: true })
@@ -85,14 +85,19 @@ function depot(message, { colonne = 'en-cours' } = {}) {
     ],
   }))
 
-  writeFileSync(join(ovrseeDir, 'plans', 'a.md'), PLAN('Plan A'))
-  writeFileSync(join(ovrseeDir, 'plans', 'b.md'), PLAN('Plan B'))
-  writeFileSync(join(ovrseeDir, 'plans', 'clos.md'), PLAN('Plan clos', 'closed'))
+  writeFileSync(join(ovrseeDir, 'plans', 'a.md'), PLAN('Plan A', 'open', opened))
+  writeFileSync(join(ovrseeDir, 'plans', 'b.md'), PLAN('Plan B', 'open', opened))
+  writeFileSync(join(ovrseeDir, 'plans', 'clos.md'), PLAN('Plan clos', 'closed', opened))
   writeFileSync(join(ovrseeDir, 'tickets', 'T-0001-a.md'), TICKET('T-0001', 'a.md', colonne))
   writeFileSync(join(ovrseeDir, 'tickets', 'T-0002-b.md'), TICKET('T-0002', 'b.md', colonne))
   writeFileSync(join(ovrseeDir, 'tickets', 'T-0003-c.md'), TICKET('T-0003', 'clos.md', colonne))
 
-  const git = args => execFileSync('git', args, { cwd: root, stdio: 'ignore' })
+  // `commitDate` sert à dater le commit plus tôt dans la journée que l'instant
+  // où le test tourne : c'est la seule façon de reproduire la fenêtre ratée.
+  const env = commitDate
+    ? { ...process.env, GIT_AUTHOR_DATE: commitDate, GIT_COMMITTER_DATE: commitDate }
+    : process.env
+  const git = args => execFileSync('git', args, { cwd: root, stdio: 'ignore', env })
   git(['init', '-q'])
   git(['config', 'user.email', 't@t'])
   git(['config', 'user.name', 't'])
@@ -118,6 +123,28 @@ test('un commit qui cite deux tickets rattache leurs deux plans', () => {
   assert.deepEqual(fait[0].plans.sort(), ['a.md', 'b.md'])
   assert.equal(metaDu(ovrseeDir, 'a.md').commits.length, 1)
   assert.equal(metaDu(ovrseeDir, 'b.md').commits.length, 1)
+})
+
+test('un plan ouvert aujourd’hui voit les commits d’aujourd’hui', () => {
+  // Le cas nominal, et il ne passait pas : `git log --since=<date nue>` est
+  // résolu par approxidate à l'heure **courante** de ce jour, pas à minuit.
+  // Un plan ouvert le matin et squash-mergé l'après-midi restait donc
+  // inrattrapable jusqu'au lendemain — précisément la panne que ce module
+  // existe pour réparer. La fixture ouvrait ses plans au 2026-01-01, assez
+  // loin pour que l'heure ne change rien.
+  const aujourdhui = new Date().toISOString().slice(0, 10)
+  const { root, ovrseeDir } = depot('feat: le lot (T-0001)', {
+    opened: aujourdhui,
+    // Tôt ce matin : un commit daté de l'instant présent tomberait du bon côté
+    // de la fenêtre ratée, et le test passerait sans rien prouver.
+    commitDate: `${aujourdhui}T00:30:00`,
+  })
+
+  const fait = reconcile(ovrseeDir, root)
+
+  assert.equal(fait.length, 1)
+  assert.deepEqual(fait[0].plans, ['a.md'])
+  assert.equal(metaDu(ovrseeDir, 'a.md').commits.length, 1)
 })
 
 test('un plan clos ne gagne aucun commit', () => {

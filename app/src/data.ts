@@ -229,6 +229,8 @@ export interface SettingsType {
   packageManager: string
   sourceGraphe: string
   customActions?: Action[]
+  /** Les actions attachées à un projet, indexées par son chemin (T-0216). */
+  projectActions?: Record<string, Action[]>
   /** La présentation de premier lancement a-t-elle été vue — ou passée ? */
   onboardingVu?: boolean
   /** `ovrsee/pages/shots/` doit-il être gitignoré dans le projet ? */

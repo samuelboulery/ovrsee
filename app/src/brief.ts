@@ -180,18 +180,20 @@ export function buildActions(
   snapshot: Snapshot | null,
   settings: SettingsType,
 ): Array<Action | { label: string; error: string }> {
-  // Actions personnalisées, validées
-  const custom = (settings.customActions ?? []).map(action => {
-    // Rejette les sauts de ligne
-    if (action.text.includes('\n')) {
-      return {
-        label: action.label,
-        error: t('actions.newline_refused'),
-      }
-    }
-    return action
-  })
+  // Rejette les sauts de ligne — une action multiligne est plusieurs commandes
+  // envoyées au shell d'un coup, ce qui n'est pas explicite au clic.
+  const valider = (action: Action) =>
+    action.text.includes('\n') ? { label: action.label, error: t('actions.newline_refused') } : action
 
-  return [...deliveredActions(settings), ...custom]
+  // Les actions du projet ouvert d'abord : ce sont les plus proches du travail
+  // en cours. Elles vivent dans `~/.claude/ovrsee/settings.json` indexées par
+  // chemin, jamais dans le dépôt observé (T-0216).
+  const duProjet = snapshot ? (settings.projectActions?.[snapshot.root] ?? []) : []
+
+  return [
+    ...deliveredActions(settings),
+    ...duProjet.map(valider),
+    ...(settings.customActions ?? []).map(valider),
+  ]
 }
 

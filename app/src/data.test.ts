@@ -609,6 +609,65 @@ test('buildActions rejette les actions personnalisées avec sauts de ligne', () 
   assert.match(errors[0].error, /saut de ligne|line break/)
 })
 
+// --- buildActions : les actions attachées à un projet (T-0216, issue #79) ---
+
+/** Un profil minimal — seules les actions changent d'un test à l'autre. */
+const reglages = (patch: Partial<SettingsType> = {}): SettingsType =>
+  ({
+    langue: 'fr',
+    densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
+    onglets: { actifs: [], ordre: [] },
+    terminal: { visible: true, disposition: 'bottom', hauteur: 244, largeur: 468 },
+    bootstrap: [],
+    packageManager: 'pnpm',
+    sourceGraphe: 'auto',
+    customActions: [],
+    ...patch,
+  }) as SettingsType
+
+test('buildActions inclut les actions du projet ouvert, pas celles des autres', () => {
+  const actions = buildActions(
+    snapshot({ root: '/tmp/projet' }),
+    reglages({
+      projectActions: {
+        '/tmp/projet': [{ label: 'Dev d’ici', text: '!pnpm run dev' }],
+        '/tmp/ailleurs': [{ label: 'Dev d’ailleurs', text: '!make serve' }],
+      },
+    }),
+  )
+  const labels = actions.map(a => a.label)
+  assert.ok(labels.includes('Dev d’ici'))
+  assert.ok(!labels.includes('Dev d’ailleurs'))
+})
+
+test('buildActions sans snapshot ne rend aucune action de projet', () => {
+  const actions = buildActions(
+    null,
+    reglages({ projectActions: { '/tmp/projet': [{ label: 'Dev', text: '!pnpm run dev' }] } }),
+  )
+  assert.ok(!actions.map(a => a.label).includes('Dev'))
+})
+
+test('buildActions rejette les sauts de ligne dans une action de projet aussi', () => {
+  const actions = buildActions(
+    snapshot({ root: '/tmp/projet' }),
+    reglages({
+      projectActions: { '/tmp/projet': [{ label: 'Deux lignes', text: 'pnpm test\npnpm build' }] },
+    }),
+  )
+  const errors = actions.filter((a): a is { label: string; error: string } => 'error' in a)
+  assert.equal(errors.length, 1)
+  assert.equal(errors[0].label, 'Deux lignes')
+})
+
+// Le panneau n'a plus qu'une liste : c'est `decideInjection` qui décide de la
+// pastille, plus le classement en deux sections (issue #79).
+test('le mode d’une action dit ce qui arrive au clic', () => {
+  assert.equal(decideInjection('!pnpm run dev').mode, 'command')
+  assert.equal(decideInjection('/graphify').mode, 'command')
+  assert.equal(decideInjection('pnpm run dev').mode, 'context')
+})
+
 // --- decideInjection : contexte vs commande ---
 
 test('decideInjection : commande avec ! → mode command avec \\n', () => {

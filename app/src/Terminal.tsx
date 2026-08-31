@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react'
-import { briefLines, buildActions } from './brief'
+import { briefLines, buildActions, decideInjection } from './brief'
 import {
   Check,
   GitFork,
   Minus,
   NotePencil,
+  PencilSimple,
+  Play,
   Plus,
   PushPin,
+  SidebarSimple,
   Question,
   Square,
   SquareHalf,
@@ -205,6 +208,7 @@ export function Terminal({
   onTerminalHeightChange,
   onTerminalWidthChange,
   onProjet,
+  onOpenPreferences,
   actions,
 }: {
   /** La vue affichée — c'est à elle que s'épingle une taille de panneau. */
@@ -224,6 +228,8 @@ export function Terminal({
   onTerminalWidthChange: (width: number) => void
   /** Affiche un projet — au clic sur une notification venue d'un autre. */
   onProjet: (path: string) => void
+  /** Ouvre les préférences sur la section Projet, pour y créer une commande. */
+  onOpenPreferences?: () => void
   /**
    * Ce que le menu natif peut demander au panneau — ⌘W, ⌘D.
    *
@@ -460,6 +466,31 @@ export function Terminal({
   const epingle = pinFor(pins, tab, layout)
 
   /**
+   * La bande de commandes est-elle déployée ?
+   *
+   * `localStorage` et pas les préférences : c'est une habitude de poste, comme
+   * la rétractation de la barre latérale (`App.tsx`) et les épingles de taille
+   * — la faire transiter par l'API coûterait un schéma et un aller-retour pour
+   * un booléen qui ne quitte jamais la machine. Le stockage peut lever (mode
+   * privé) : le défaut est « déployée ».
+   */
+  const [bandeOuverte, setBandeOuverte] = useState(() => {
+    try {
+      return localStorage.getItem('ovrsee.terminal.actions') !== 'ferme'
+    } catch {
+      return true
+    }
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('ovrsee.terminal.actions', bandeOuverte ? 'ouvert' : 'ferme')
+    } catch {
+      /* Rien à faire : la préférence ne survivra pas à la session. */
+    }
+  }, [bandeOuverte])
+
+  /**
    * Arriver sur une page pose sa taille : la sienne si elle est épinglée, la
    * taille globale sinon — sans quoi la hauteur d'une page épinglée suivrait
    * sur toutes les autres.
@@ -542,15 +573,12 @@ export function Terminal({
   // Construit les actions livrées et personnalisées quand les paramètres sont disponibles
   const allActions = settings ? buildActions(snapshot, settings) : []
 
-  // Sépare les actions en deux catégories : commandes (! ou /) et contexte (texte brut)
-  const commands = allActions.filter((a): a is { label: string; text: string } => {
-    if ('error' in a) return false // Ignore les erreurs pour le classement
-    return a.text.startsWith('!') || a.text.startsWith('/')
-  })
-  const context = allActions.filter((a): a is { label: string; text: string } => {
-    if ('error' in a) return false
-    return !a.text.startsWith('!') && !a.text.startsWith('/')
-  })
+  // Une seule liste, plus deux sections. Le tri en « Commandes » et « Contexte
+  // pour Claude » était syntaxique — un `pnpm run dev` sans `!` tombait sous
+  // « Contexte », ce qu'il n'est pas (issue #79). Ce qui distingue vraiment
+  // deux actions, c'est ce qui se passe au clic : `decideInjection` le dit, et
+  // une pastille par ligne le montre.
+  const actionsListe = allActions.filter((a): a is { label: string; text: string } => !('error' in a))
   const actionErrors = allActions.filter((a): a is { label: string; error: string } => 'error' in a)
   const icones = iconeCommande()
 
@@ -692,6 +720,28 @@ export function Terminal({
             )
           })}
         </div>
+        {/* La bande de commandes se replie : sur un écran étroit, ses 268 px
+            valent plus au terminal qu'à des boutons qu'on ne clique pas
+            toujours. */}
+        <button
+          type="button"
+          className="btn-icon"
+          onClick={() => setBandeOuverte(ouverte => !ouverte)}
+          aria-pressed={bandeOuverte}
+          title={t(bandeOuverte ? 'terminal.actions_hide' : 'terminal.actions_show')}
+          aria-label={t(bandeOuverte ? 'terminal.actions_hide' : 'terminal.actions_show')}
+          style={s(
+            'cursor: pointer; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; ' +
+              (bandeOuverte ? 'background: var(--color-surface-active);' : 'background: transparent;'),
+          )}
+        >
+          <SidebarSimple
+            size={14}
+            weight={bandeOuverte ? 'fill' : 'regular'}
+            aria-hidden="true"
+            color={bandeOuverte ? 'var(--color-accent)' : 'var(--color-text-quaternary)'}
+          />
+        </button>
         {/* Rien à épingler en « plein » : le panneau n'y a pas de taille propre. */}
         {layout !== 'full' && (
           <button
@@ -788,11 +838,12 @@ export function Terminal({
           </div>
         </div>
 
+        {bandeOuverte && (
         <div
           style={s(
             layout === 'side'
               ? 'flex: none; border-top: 1px solid var(--color-border-chrome); padding: 12px 14px;'
-              : 'width: 268px; flex: none; border-left: 1px solid var(--color-border-chrome); padding: 12px 14px;',
+              : 'width: 268px; flex: none; border-left: 1px solid var(--color-border-chrome); padding: 12px 14px; overflow: auto;',
           )}
         >
           {/* La session s'ouvre pour tout projet du registre — c'est ce qui
@@ -810,33 +861,61 @@ export function Terminal({
             </div>
           )}
 
-          {/* Section : Commandes pour Claude */}
           <div
             style={s(
               'font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-discrete);',
             )}
           >
-            {t('terminal.commands_section')}
+            {t('terminal.actions_section')}
           </div>
           <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
-            {commands.map(action => {
+            {actionsListe.map(action => {
               const Icone = icones[action.label]
+              // La pastille de mode dit ce qui arrive au clic : partir tout de
+              // suite, ou s'écrire et attendre. Elle reste en gris pour ne pas
+              // concurrencer l'icône d'accent des commandes livrées.
+              const part = decideInjection(action.text).mode === 'command'
+              const Mode = part ? Play : PencilSimple
               return (
                 <button
                   key={action.label}
                   type="button"
                   onClick={() => activate(action.label, action.text)}
                   style={s(
-                    'cursor: pointer; display: flex; align-items: center; gap: 8px; height: 28px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--color-border-control); background: var(--color-surface-control); color: var(--color-text-secondary);',
+                    'cursor: pointer; display: flex; align-items: center; gap: 8px; min-height: 28px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--color-border-control); background: var(--color-surface-control); color: var(--color-text-secondary);',
                   )}
-                  title={action.text}
+                  title={`${action.text} — ${t(part ? 'terminal.mode_run' : 'terminal.mode_paste')}`}
                 >
+                  <Mode
+                    size={12}
+                    weight={part ? 'fill' : 'regular'}
+                    aria-hidden="true"
+                    color="var(--color-text-quaternary)"
+                    style={{ flex: 'none' }}
+                  />
                   {Icone && <Icone size={14} weight="regular" aria-hidden="true" color="var(--color-accent)" />}
-                  {action.label}
+                  <span style={s('overflow: hidden; text-overflow: ellipsis; white-space: nowrap;')}>
+                    {action.label}
+                  </span>
                 </button>
               )
             })}
           </div>
+
+          {/* La fonctionnalité était invisible : il fallait savoir aller dans
+              les préférences pour deviner qu'on pouvait en ajouter (issue #79). */}
+          {onOpenPreferences && (
+            <button
+              type="button"
+              onClick={onOpenPreferences}
+              style={s(
+                'cursor: pointer; display: flex; align-items: center; gap: 7px; width: 100%; height: 28px; margin-top: 7px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px dashed var(--color-border-control); background: transparent; color: var(--color-text-quaternary);',
+              )}
+            >
+              <Plus size={12} weight="bold" aria-hidden="true" style={{ flex: 'none' }} />
+              {t('terminal.create_action')}
+            </button>
+          )}
 
           {/* Affiche les erreurs si présentes */}
           {actionErrors.length > 0 && (
@@ -855,37 +934,9 @@ export function Terminal({
             </div>
           )}
 
-          {/* Section : Contexte pour Claude */}
-          {context.length > 0 && (
-            <>
-              <div
-                style={s(
-                  'font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-discrete); margin-top: 18px;',
-                )}
-              >
-                {t('terminal.context_section')}
-              </div>
-              <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
-                {context.map(action => (
-                  <button
-                    key={action.label}
-                    type="button"
-                    onClick={() => activate(action.label, action.text)}
-                    style={s(
-                      'cursor: pointer; display: flex; align-items: center; height: 28px; text-align: left; font-size: 11.5px; padding: 0 10px; border-radius: 6px; border: 1px solid var(--color-border-control); background: var(--color-surface-control); color: var(--color-text-secondary);',
-                    )}
-                    title={action.text}
-                  >
-                    {action.label}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* Hors des deux sections : ce bouton n'écrit rien dans le terminal,
-              il fait relire `ovrsee/` à l'interface. Le ranger avec les
-              commandes laissait croire qu'il lançait quelque chose. */}
+          {/* Hors de la liste : ce bouton n'écrit rien dans le terminal, il
+              fait relire `ovrsee/` à l'interface. Le ranger avec les commandes
+              laissait croire qu'il lançait quelque chose. */}
           <div style={s('margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--color-border-chrome);')}>
             <button
               type="button"
@@ -910,6 +961,7 @@ export function Terminal({
                   : t('terminal.click_copies'))}
           </div>
         </div>
+        )}
       </div>
       </div>
     </>

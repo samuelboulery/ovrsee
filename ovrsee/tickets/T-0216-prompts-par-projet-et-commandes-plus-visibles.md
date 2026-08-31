@@ -2,7 +2,7 @@
 {
   "id": "T-0216",
   "titre": "Prompts par projet et commandes plus visibles",
-  "colonne": "backlog",
+  "colonne": "revue",
   "priorite": "moyenne",
   "tags": [
     "ui",
@@ -11,7 +11,7 @@
   ],
   "cree": "2026-08-31",
   "maj": "2026-08-31",
-  "plan": "2026-08-31-tour-du-depot-ovrsee-backlog-priorise-et-lot-d-intendance.md",
+  "plan": "2026-08-31-issue-79-commandes-du-terminal-portee-libelles-visibilite-re.md",
   "charge": "m"
 }
 ---
@@ -37,6 +37,9 @@ recopie que `onglets`, `terminal`, `packageManager`, `sourceGraphe`,
 **La fonctionnalité est invisible.** Rien dans le panneau terminal ne dit qu'on
 peut en ajouter ; il faut savoir aller dans les préférences.
 
+**Ajout hors issue** : la bande ne se replie pas. Ses 268 px sont pris au
+terminal même quand on ne clique jamais dedans.
+
 ## La contrainte à ne pas contourner
 
 Les prompts par projet **ne passent pas par `ovrsee.config.json`**. Ce fichier
@@ -48,16 +51,23 @@ cloné ne dicte pas ce qui part dans le terminal. La portée projet s'obtient en
 
 ## Critères d'acceptation
 
-- [ ] Les deux sections portent des noms qui disent ce qu'elles font — la
-      seconde ne s'appelle plus « Contexte pour Claude ».
-- [ ] Une action peut être globale ou attachée à un projet ; les deux se
-      saisissent depuis les préférences et l'écran dit laquelle est laquelle.
-- [ ] Les actions de projet vivent dans `~/.claude/ovrsee/settings.json`,
-      indexées par chemin. **Aucune n'est lue depuis `ovrsee.config.json`**, et
-      un test le vérifie.
-- [ ] `mergeSettings` n'ouvre aucun nouveau champ surchargeable par le dépôt
+- [x] Les deux sections ont disparu : une seule liste, « Mes commandes », où
+      chaque action porte une pastille disant ce qui arrive au clic — partir
+      tout de suite (`▷`) ou s'écrire sans envoyer (`✎`). Plus de libellé à
+      démentir.
+- [x] Une action peut être globale ou attachée à un projet ; deux blocs dans
+      les préférences, « Ce projet seulement » et « Partout ».
+- [x] Les actions de projet vivent dans `~/.claude/ovrsee/settings.json`,
+      indexées par chemin (`projectActions`). **Aucune n'est lue depuis
+      `ovrsee.config.json`**, et un test le vérifie.
+- [x] `mergeSettings` n'ouvre aucun nouveau champ surchargeable par le dépôt
       observé.
-- [ ] Un bouton visible dans le panneau terminal ouvre la création d'action.
-- [ ] Les `customActions` existantes restent lisibles et actives sans migration
+- [x] Un bouton visible dans le panneau terminal ouvre la création d'action.
+- [x] Les `customActions` existantes restent lisibles et actives sans migration
       manuelle : elles deviennent les actions globales.
-- [ ] Le refus des actions multilignes (`brief.ts:184-191`) est conservé.
+- [x] Le refus des actions multilignes est conservé, et vaut pour les deux
+      listes (`actionValide` dans `hooks/settings.js`, `valider` dans
+      `brief.ts`).
+- [x] La bande de commandes se replie depuis la barre du terminal, et l'état
+      est retenu d'une session à l'autre (`localStorage`, comme la barre
+      latérale).

@@ -5,7 +5,7 @@ import { type Snapshot } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
-import { pasteToClaude } from '../pty'
+import { submitToClaude } from '../pty'
 import { Divider, useResizable } from '../useResizable'
 import { CarteElement, HorsApplication, NavButton } from './NavigateurPanneaux'
 import {
@@ -249,9 +249,16 @@ export function Navigateur({
     }
   }, [])
 
-  /** Envoie à Claude, ou copie s'il n'y a pas de session — comme le panneau terminal. */
+  /**
+   * Envoie à Claude, ou copie s'il n'y a pas de session.
+   *
+   * Ici on **valide** : les deux boutons de cet onglet disent « envoyer », et
+   * un texte qui attend un Entrée de plus n'est pas envoyé. Ailleurs —
+   * palette, panneau d'équipement — `pasteToClaude` colle sans valider, parce
+   * qu'on y prépare une demande qu'on veut relire.
+   */
   const send = async (label: string, text: string) => {
-    if (pasteToClaude(text)) return say(t('navigateur.sent_to_claude', { label }))
+    if (submitToClaude(text)) return say(t('navigateur.sent_to_claude', { label }))
     try {
       await navigator.clipboard.writeText(text)
       say(t('navigateur.copied', { label }))

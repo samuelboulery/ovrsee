@@ -137,6 +137,13 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   souvent cinq. Il ne devine rien : sans ticket cité, rien n'est rattaché, car au moment
   du pull la session courante n'a aucun rapport avec le travail qui arrive. Un dépôt
   équipé avant lui rattrape son retard avec `pnpm ovrsee:reconcile`.
+- **`reconcile` rattache, il ne clôt pas.** Un plan dont le commit est déjà cité — le cas
+  normal quand le travail a été commité ici avant d'être squashé là-bas — lui fait
+  répondre « aucun commit à rattraper », et il reste ouvert malgré tout. C'est
+  `pnpm ovrsee:close` qui date la clôture, et c'est lui qu'il faut après un squash-merge
+  fait sur GitHub. Attention à sa portée : il clôt **tous** les plans ouverts, pas celui
+  qu'on vise — deux PR mergées de suite en soldent deux d'un coup. Il n'a pas non plus
+  d'aide en ligne : `close --help` n'affiche rien et exécute la commande.
 - **Le rattrapage solde des tickets d'après un message écrit ailleurs.** Le `%B` d'un
   commit venu d'un remote fait foi : `reconcile()` cite le ticket, `avancerTicketsDuPlan`
   le pousse en colonne finale, à chaque `git pull`, sans confirmation. La portée est

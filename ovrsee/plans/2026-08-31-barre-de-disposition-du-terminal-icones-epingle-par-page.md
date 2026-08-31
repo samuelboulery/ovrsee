@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Barre de disposition du terminal : icônes + épingle par page",
   "opened": "2026-08-31",
-  "closed": null,
+  "closed": "2026-08-31",
   "commits": [
     {
       "sha": "0aaca82",

@@ -2,7 +2,7 @@
 {
   "id": "T-0223",
   "titre": "Un commit s'inscrit dans tous les plans qu'il réalise",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "hooks",

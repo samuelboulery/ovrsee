@@ -4,7 +4,25 @@
   "title": "Un plan ne doit plus pouvoir rester ouvert sans commit",
   "opened": "2026-08-31",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "9261e11",
+      "date": "2026-08-31",
+      "files": [
+        ".github/workflows/site.yml",
+        "CLAUDE.md",
+        "hooks/ovrsee-cli.js",
+        "hooks/ovrsee-post-commit.js",
+        "hooks/ovrsee-post-commit.test.js",
+        "hooks/plans.js",
+        "hooks/plans.test.js",
+        "scripts/build-site-fr.js",
+        "scripts/build-site-fr.test.js",
+        "site/dict.json",
+        "site/index.html"
+      ]
+    }
+  ]
 }
 ---
 

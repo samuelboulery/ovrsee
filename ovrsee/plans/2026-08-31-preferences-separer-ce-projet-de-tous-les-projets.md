@@ -1,10 +1,16 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Préférences : séparer « ce projet » de « tous les projets »",
   "opened": "2026-08-31",
-  "closed": null,
-  "commits": []
+  "closed": "2026-08-31",
+  "commits": [
+    {
+      "sha": "8cc0368",
+      "date": "2026-08-31",
+      "files": []
+    }
+  ]
 }
 ---
 

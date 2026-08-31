@@ -2,7 +2,7 @@
 {
   "id": "T-0221",
   "titre": "Documenter la clôture des plans après un squash-merge",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "basse",
   "tags": [
     "doc",

@@ -131,7 +131,14 @@ export function reconcile(ovrseeDir, root, dire = () => {}) {
   // message à corps — c'est-à-dire à tous ceux de ce dépôt.
   let brut
   try {
-    brut = git(['log', `--since=${depuis}`, '--format=%h%x00%cs%x00%B%x01'], root)
+    // L'heure explicite n'est pas une coquetterie. Git résout une date nue par
+    // approxidate : il en complète l'heure avec **l'heure courante**, pas
+    // minuit. `--since=2026-08-31` lancé à 20 h 38 veut donc dire « depuis
+    // 20 h 38 », et laisse dehors tout ce qui a été commité plus tôt le même
+    // jour — c'est-à-dire un plan ouvert le matin et squash-mergé l'après-midi,
+    // précisément la panne que ce module répare. Il ne fonctionnait que le
+    // lendemain.
+    brut = git(['log', `--since=${depuis}T00:00:00`, '--format=%h%x00%cs%x00%B%x01'], root)
   } catch {
     // Pas un dépôt git, ou git absent : rien à rattraper, rien à signaler.
     return []

@@ -26,6 +26,25 @@
         "app/src/tabs/navigateur-webview.ts",
         "hooks/i18n.js"
       ]
+    },
+    {
+      "sha": "d1fa9d5",
+      "date": "2026-08-31",
+      "files": [
+        "app/src/pty.test.ts",
+        "app/src/pty.ts",
+        "app/src/tabs/Navigateur.tsx",
+        "hooks/i18n.js"
+      ]
+    },
+    {
+      "sha": "afe7fc2",
+      "date": "2026-08-31",
+      "files": [
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/navigateur-webview.test.ts",
+        "app/src/tabs/navigateur-webview.ts"
+      ]
     }
   ]
 }

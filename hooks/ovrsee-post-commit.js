@@ -65,7 +65,7 @@ function changedFiles(root) {
 export const crawlUtile = sources => Array.isArray(sources) && sources.length > 0
 
 /**
- * Le plan auquel ce commit appartient, et d'où on le tient.
+ * Les plans que ce commit réalise, et d'où on les tient.
  *
  * Le hook git ne reçoit aucun payload : il ne sait pas quelle session a
  * commité. Tant qu'un seul plan pouvait être actif, la question ne se posait
@@ -73,42 +73,57 @@ export const crawlUtile = sources => Array.isArray(sources) && sources.length > 
  * ainsi que des commits se retrouvaient inscrits sous l'intention d'une session
  * voisine.
  *
- * Quatre étages, du plus sûr au plus hasardeux :
+ * **Deux sources qui s'additionnent, et un repli** :
  *
- * 1. **Un ticket cité dans le message.** `fix: ... (T-0124)` est la convention
- *    déjà suivie par ce dépôt, et la seule qui marche depuis un terminal
- *    extérieur à Claude Code.
+ * 1. **Les tickets cités dans le message.** `fix: ... (T-0124)` est la
+ *    convention déjà suivie par ce dépôt, et la seule qui marche depuis un
+ *    terminal extérieur à Claude Code.
  * 2. **La session.** `CLAUDE_CODE_SESSION_ID` est exporté dans l'environnement
  *    de l'outil Bash, donc hérité par ce hook quand le `git commit` vient d'une
  *    session Claude.
- * 3. **L'unique plan actif**, s'il n'y en a qu'un : rien à confondre.
+ * 3. **L'unique plan actif**, s'il n'y en a qu'un — mais seulement si les deux
+ *    précédents n'ont rien dit : deviner par-dessus une réponse sûre serait un
+ *    pari de trop.
  * 4. **Rien.** Un commit non rattaché se corrige ; un commit rattaché à la
  *    mauvaise intention ne se voit pas.
  *
- * @returns {{file: string, source: 'ticket'|'session'|'unique'}|null}
+ * Les deux premières s'additionnaient déjà dans les faits sans que le code le
+ * dise : un commit peut réaliser le plan du ticket qu'il cite **et** celui sous
+ * lequel il a été écrit. S'arrêter au premier étage laissait le second sans
+ * aucun commit — donc inclosable, `closeOpenPlans` datant la clôture d'après le
+ * dernier commit. Un plan restait ouvert pour toujours, en silence (T-0223).
+ *
+ * L'union ne vaut que pour la trace. Le pouvoir de solder un ticket, lui, ne se
+ * partage pas — voir l'appel à `avancerTicketsDuPlan` plus bas.
+ *
+ * @returns {Array<{file: string, source: 'ticket'|'session'|'unique'}>}
  */
-export function planPourCommit(ovrseeDir, message, session, tickets) {
+export function plansPourCommit(ovrseeDir, message, session, tickets) {
+  const trouves = []
+  const ajoute = (file, source) => {
+    if (!isSafePlanFileName(file)) return
+    if (trouves.some(p => p.file === file)) return
+    trouves.push({ file, source })
+  }
+
   const cites = new Set(String(message ?? '').match(/T-\d{4}/g) ?? [])
   for (const ticket of tickets) {
-    if (cites.has(ticket.meta.id) && isSafePlanFileName(ticket.meta.plan)) {
-      return { file: ticket.meta.plan, source: 'ticket' }
-    }
+    if (cites.has(ticket.meta.id)) ajoute(ticket.meta.plan, 'ticket')
   }
 
-  const duSession = readActive(ovrseeDir, session).plan
-  if (session && isSafePlanFileName(duSession)) return { file: duSession, source: 'session' }
+  if (session) ajoute(readActive(ovrseeDir, session).plan, 'session')
 
-  const actifs = activePlans(ovrseeDir)
-  if (actifs.length === 1 && isSafePlanFileName(actifs[0])) {
-    return { file: actifs[0], source: 'unique' }
+  if (trouves.length === 0) {
+    const actifs = activePlans(ovrseeDir)
+    if (actifs.length === 1) ajoute(actifs[0], 'unique')
   }
 
-  return null
+  return trouves
 }
 
 function attachCommit(ovrseeDir, root, sources, message, session, tickets) {
-  const choisi = planPourCommit(ovrseeDir, message, session, tickets)
-  if (!choisi) {
+  const candidats = plansPourCommit(ovrseeDir, message, session, tickets)
+  if (candidats.length === 0) {
     const actifs = activePlans(ovrseeDir)
     if (actifs.length > 1) {
       process.stderr.write(
@@ -116,7 +131,7 @@ function attachCommit(ovrseeDir, root, sources, message, session, tickets) {
           `dans le message. Citer « T-XXXX » dans le message pour trancher.\n`,
       )
     }
-    return null
+    return []
   }
 
   const commit = {
@@ -127,8 +142,8 @@ function attachCommit(ovrseeDir, root, sources, message, session, tickets) {
 
   // La règle — plan clos, sha déjà là — vit dans plans.js : elle décide de ce
   // que l'historique raconte, et enfouie ici elle ne se vérifierait qu'en
-  // committant pour de vrai.
-  return attachCommitToPlan(ovrseeDir, choisi.file, commit) ? choisi : null
+  // committant pour de vrai. Un plan qui la refuse ne compte pas comme rattaché.
+  return candidats.filter(c => attachCommitToPlan(ovrseeDir, c.file, commit))
 }
 
 /**
@@ -251,7 +266,7 @@ if (estPrincipal(import.meta.url)) {
         // Sans message, on n'attribue rien de plus qu'avant.
       }
 
-      const choisi = attachCommit(
+      const rattaches = attachCommit(
         ovrseeDir,
         root,
         sources,
@@ -259,9 +274,21 @@ if (estPrincipal(import.meta.url)) {
         sessionId(),
         readTickets(ovrseeDir),
       )
-      if (choisi) {
-        process.stdout.write(`[ovrsee] commit rattaché à ${choisi.file}\n`)
-        avancerTicketsDuPlan(ovrseeDir, choisi.file, message, choisi.source === 'unique')
+      for (const plan of rattaches) {
+        process.stdout.write(`[ovrsee] commit rattaché à ${plan.file}\n`)
+      }
+
+      // Le seul endroit où l'union ne se généralise pas. Inscrire un commit
+      // dans un plan est une trace ; solder ses tickets est une décision. Quand
+      // le message cite un ticket, il désigne le plan qui a le droit d'avancer —
+      // et le plan de session, réalisé par le même commit, n'en tire aucun
+      // pouvoir sur des tickets que personne n'a nommés. Sans citation, le seul
+      // plan trouvé décide, comme avant.
+      const decident = rattaches.some(p => p.source === 'ticket')
+        ? rattaches.filter(p => p.source === 'ticket')
+        : rattaches
+      for (const plan of decident) {
+        avancerTicketsDuPlan(ovrseeDir, plan.file, message, plan.source === 'unique')
       }
       // Filet à chaque commit : rattrape un ticket resté en retard, quelle
       // que soit la raison (CLI qui aurait oublié d'avancer, dérive passée).

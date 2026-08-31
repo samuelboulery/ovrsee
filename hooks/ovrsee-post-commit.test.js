@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { crawlUtile, avancerTicketsDuPlan, planPourCommit } from './ovrsee-post-commit.js'
+import { crawlUtile, avancerTicketsDuPlan, plansPourCommit } from './ovrsee-post-commit.js'
 import { createTicket, readTickets } from './tickets.js'
 import { writeActive } from './active.js'
 
@@ -213,73 +213,114 @@ test('une citation ne ressuscite pas un ticket jamais commencé', () => {
   assert.equal(readTickets(ovrseeDir).find(t => t.file === dormant.file).meta.colonne, 'backlog')
 })
 
-// --- planPourCommit : à quelle intention ce commit appartient-il ? -----------
+// --- plansPourCommit : quelles intentions ce commit réalise-t-il ? -----------
 
 const PLAN_A = '2026-08-16-plan-a.md'
 const PLAN_B = '2026-08-16-plan-b.md'
 
-test('planPourCommit suit le ticket cité dans le message, avant tout le reste', () => {
+// La panne de T-0223 : un commit citant un ticket du plan A, fait pendant que
+// la session travaille sous le plan B, réalise les deux. L'ancienne version
+// s'arrêtait au premier étage qui répondait, et B repartait sans commit — donc
+// inclosable, puisque `closeOpenPlans` date d'après le dernier commit.
+test('plansPourCommit rend le plan du ticket cité ET celui de la session', () => {
   const ovrseeDir = fixture()
   const { meta } = createTicket(ovrseeDir, { titre: 'Sous A', colonne: 'en-cours', plan: PLAN_A })
   writeActive(ovrseeDir, 'session-b', { plan: PLAN_B })
 
-  const choisi = planPourCommit(
+  const trouves = plansPourCommit(
     ovrseeDir,
     `fix: quelque chose (${meta.id})`,
     'session-b',
     readTickets(ovrseeDir),
   )
 
-  assert.deepEqual(choisi, { file: PLAN_A, source: 'ticket' })
+  assert.deepEqual(trouves, [
+    { file: PLAN_A, source: 'ticket' },
+    { file: PLAN_B, source: 'session' },
+  ])
 })
 
-test('planPourCommit suit la session quand le message ne cite rien', () => {
+test('plansPourCommit ne rend qu’une fois un plan que le ticket et la session désignent', () => {
+  const ovrseeDir = fixture()
+  const { meta } = createTicket(ovrseeDir, { titre: 'Sous A', colonne: 'en-cours', plan: PLAN_A })
+  writeActive(ovrseeDir, 'session-a', { plan: PLAN_A })
+
+  const trouves = plansPourCommit(
+    ovrseeDir,
+    `fix: quelque chose (${meta.id})`,
+    'session-a',
+    readTickets(ovrseeDir),
+  )
+
+  assert.deepEqual(trouves, [{ file: PLAN_A, source: 'ticket' }])
+})
+
+test('plansPourCommit suit la session quand le message ne cite rien', () => {
   const ovrseeDir = fixture()
   writeActive(ovrseeDir, 'session-a', { plan: PLAN_A })
   writeActive(ovrseeDir, 'session-b', { plan: PLAN_B })
 
-  const choisi = planPourCommit(ovrseeDir, 'fix: sans citation', 'session-b', readTickets(ovrseeDir))
+  const trouves = plansPourCommit(ovrseeDir, 'fix: sans citation', 'session-b', readTickets(ovrseeDir))
 
-  assert.deepEqual(choisi, { file: PLAN_B, source: 'session' })
+  // La session ne rend que le sien : le plan d'à côté n'est pas réalisé par ce
+  // commit, et l'union n'est pas une rafle.
+  assert.deepEqual(trouves, [{ file: PLAN_B, source: 'session' }])
 })
 
-test('planPourCommit retombe sur l’unique plan actif quand la session est inconnue', () => {
+test('plansPourCommit retombe sur l’unique plan actif quand la session est inconnue', () => {
   const ovrseeDir = fixture()
   writeActive(ovrseeDir, 'session-a', { plan: PLAN_A })
 
-  const choisi = planPourCommit(ovrseeDir, 'fix: depuis un terminal', null, readTickets(ovrseeDir))
+  const trouves = plansPourCommit(ovrseeDir, 'fix: depuis un terminal', null, readTickets(ovrseeDir))
 
-  assert.deepEqual(choisi, { file: PLAN_A, source: 'unique' })
+  assert.deepEqual(trouves, [{ file: PLAN_A, source: 'unique' }])
 })
 
-test('planPourCommit ne rattache rien quand deux plans sont actifs et que rien ne tranche', () => {
+test('le repli sur l’unique plan actif reste un dernier recours, pas un ajout', () => {
+  const ovrseeDir = fixture()
+  const { meta } = createTicket(ovrseeDir, { titre: 'Sous A', colonne: 'en-cours', plan: PLAN_A })
+  writeActive(ovrseeDir, 'session-b', { plan: PLAN_B })
+
+  // Le ticket cité a répondu : l'unique plan actif n'a pas à s'y ajouter — ce
+  // serait deviner par-dessus une réponse sûre.
+  const trouves = plansPourCommit(
+    ovrseeDir,
+    `fix: quelque chose (${meta.id})`,
+    null,
+    readTickets(ovrseeDir),
+  )
+
+  assert.deepEqual(trouves, [{ file: PLAN_A, source: 'ticket' }])
+})
+
+test('plansPourCommit ne rattache rien quand deux plans sont actifs et que rien ne tranche', () => {
   const ovrseeDir = fixture()
   writeActive(ovrseeDir, 'session-a', { plan: PLAN_A })
   writeActive(ovrseeDir, 'session-b', { plan: PLAN_B })
 
-  assert.equal(planPourCommit(ovrseeDir, 'fix: sans rien', null, readTickets(ovrseeDir)), null)
+  assert.deepEqual(plansPourCommit(ovrseeDir, 'fix: sans rien', null, readTickets(ovrseeDir)), [])
 })
 
-test('planPourCommit ne rattache rien sans aucun plan actif', () => {
+test('plansPourCommit ne rattache rien sans aucun plan actif', () => {
   const ovrseeDir = fixture()
 
-  assert.equal(planPourCommit(ovrseeDir, 'fix: rien', 'session-a', readTickets(ovrseeDir)), null)
+  assert.deepEqual(plansPourCommit(ovrseeDir, 'fix: rien', 'session-a', readTickets(ovrseeDir)), [])
 })
 
-test('planPourCommit ignore un ticket cité qui ne cite aucun plan', () => {
+test('plansPourCommit ignore un ticket cité qui ne cite aucun plan', () => {
   const ovrseeDir = fixture()
   const { meta } = createTicket(ovrseeDir, { titre: 'Hors plan', colonne: 'en-cours' })
   writeActive(ovrseeDir, 'session-a', { plan: PLAN_A })
 
-  const choisi = planPourCommit(
+  const trouves = plansPourCommit(
     ovrseeDir,
     `fix: ad hoc (${meta.id})`,
     'session-a',
     readTickets(ovrseeDir),
   )
 
-  // Le ticket ne mène à aucun plan : on descend d'un étage, on ne renonce pas.
-  assert.deepEqual(choisi, { file: PLAN_A, source: 'session' })
+  // Le ticket ne mène à aucun plan : il n'ajoute rien, la session répond seule.
+  assert.deepEqual(trouves, [{ file: PLAN_A, source: 'session' }])
 })
 
 test('un plan seulement deviné ne solde pas un ticket que personne n’a cité', () => {

@@ -13,6 +13,8 @@ on:
     paths:
       - 'site/**'
       - 'scripts/build-site-fr.js'
+      # Le numéro de version affiché en est estampillé : un bump republie la page.
+      - 'package.json'
       - '.github/workflows/site.yml'
   workflow_dispatch:
 

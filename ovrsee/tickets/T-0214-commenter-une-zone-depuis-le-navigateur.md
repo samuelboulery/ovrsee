@@ -2,7 +2,7 @@
 {
   "id": "T-0214",
   "titre": "Commenter une zone depuis le navigateur",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

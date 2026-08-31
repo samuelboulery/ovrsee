@@ -4,7 +4,30 @@
   "title": "T-0214 — commenter une zone depuis le navigateur",
   "opened": "2026-08-31",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "c8fdcda",
+      "date": "2026-08-31",
+      "files": [
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/NavigateurPanneaux.tsx",
+        "app/src/tabs/navigateur-webview.test.ts",
+        "app/src/tabs/navigateur-webview.ts",
+        "hooks/i18n.js"
+      ]
+    },
+    {
+      "sha": "540bd1d",
+      "date": "2026-08-31",
+      "files": [
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/tabs/NavigateurPanneaux.tsx",
+        "app/src/tabs/navigateur-webview.test.ts",
+        "app/src/tabs/navigateur-webview.ts",
+        "hooks/i18n.js"
+      ]
+    }
+  ]
 }
 ---
 

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react'
 import { briefLines, buildActions, decideInjection } from './brief'
 import {
-  Check,
   GitFork,
   Minus,
   NotePencil,
@@ -10,7 +9,6 @@ import {
   Plus,
   PushPin,
   SidebarSimple,
-  Question,
   Square,
   SquareHalf,
   SquareHalfBottom,
@@ -21,8 +19,9 @@ import {
   type Snapshot,
   type SettingsType,
 } from './data'
-import { etiquetteDe, type AttentionKind } from './attention'
-import { composer, resumeProjet, type MenuBarAttention } from './menubar'
+import { etiquetteDe } from './attention'
+import { DIT_ATTENTION, Etat } from './EtatSession'
+import { composer, resumeProjet, type MenuBarAttention, type MenuBarSession } from './menubar'
 import { s } from './style'
 import { t, type TranslationKey } from './i18n'
 import { useTerminals } from './useTerminal'
@@ -58,83 +57,6 @@ export interface TerminalActions {
 }
 
 const LAYOUT_IDS: Layout[] = ['bottom', 'side', 'full']
-
-/**
- * Ce que chaque genre de signal annonce, pour le titre et le lecteur d'écran.
- *
- * `reset` n'y est pas : il efface un état au lieu d'en poser un, et n'atteint
- * jamais le rendu.
- */
-type EtatAffichable = Exclude<AttentionKind, 'reset'>
-
-const DIT_ATTENTION: Record<EtatAffichable, TranslationKey> = {
-  busy: 'terminal.attention_busy',
-  stop: 'terminal.attention_stop',
-  question: 'terminal.attention_question',
-}
-
-/**
- * L'état d'une session, dans une case de largeur fixe.
- *
- * Fixe pour que passer de trois points à une coche ne fasse pas danser la
- * rangée d'onglets. Trois points qui battent pendant le travail, une coche
- * quand Claude rend la main, un point d'interrogation quand il attend une
- * réponse — l'animation vit dans `_ds/ovrsee/styles.css` (`.battement`), seul
- * endroit où une @keyframes peut être déclarée.
- */
-function Etat({
-  kind,
-  actif,
-  dit,
-}: {
-  kind?: EtatAffichable
-  actif: boolean
-  /** Ce que le signal annonce, ou undefined quand il n'y a rien à annoncer. */
-  dit?: string
-}) {
-  const commun = { role: dit ? 'status' : undefined, 'aria-label': dit, title: dit }
-  const boite = 'width: 12px; flex: none; display: flex; align-items: center; justify-content: center; gap: 2px;'
-
-  if (kind === 'busy') {
-    return (
-      <span {...commun} style={s(boite)}>
-        {[0, 160, 320].map(retard => (
-          <span
-            key={retard}
-            className="battement"
-            style={s(
-              `width: 2px; height: 2px; border-radius: 50%; background: var(--color-accent); animation-delay: ${retard}ms;`,
-            )}
-          />
-        ))}
-      </span>
-    )
-  }
-
-  if (kind === 'stop' || kind === 'question') {
-    const Icone = kind === 'stop' ? Check : Question
-    return (
-      <span {...commun} style={s(boite)}>
-        <Icone
-          size={11}
-          weight="bold"
-          aria-hidden="true"
-          color={kind === 'stop' ? 'var(--color-ok)' : 'var(--color-accent)'}
-        />
-      </span>
-    )
-  }
-
-  return (
-    <span style={s(boite)}>
-      <span
-        style={s(
-          `width: 5px; height: 5px; border-radius: 50%; background: ${actif ? 'var(--color-accent)' : 'var(--color-text-ghost)'};`,
-        )}
-      />
-    </span>
-  )
-}
 
 const layoutLabel = (layout: Layout): string => {
   const map: Record<Layout, TranslationKey> = {
@@ -208,6 +130,7 @@ export function Terminal({
   onTerminalHeightChange,
   onTerminalWidthChange,
   onProjet,
+  onSessions,
   onOpenPreferences,
   actions,
 }: {
@@ -228,6 +151,16 @@ export function Terminal({
   onTerminalWidthChange: (width: number) => void
   /** Affiche un projet — au clic sur une notification venue d'un autre. */
   onProjet: (path: string) => void
+  /**
+   * L'état des sessions Claude, republié à chaque signal.
+   *
+   * Exactement ce que la barre de menu reçoit — même `composer()`, même appel :
+   * le sélecteur de projet montre ce que le popover montre, il ne le recalcule
+   * pas. Vidé au démontage, parce que replier le panneau démonte ce composant
+   * et coupe l'écoute des pty : annoncer un état qu'on ne reçoit plus serait un
+   * mensonge d'interface.
+   */
+  onSessions: (sessions: MenuBarSession[]) => void
   /** Ouvre les préférences sur la section Projet, pour y créer une commande. */
   onOpenPreferences?: () => void
   /**
@@ -403,14 +336,23 @@ export function Terminal({
   // sans fin. Les deux sont petits — quelques sessions, une poignée de champs.
   const publie = JSON.stringify({ ouvertes, projet, signaux })
   useEffect(() => {
-    void window.ovrsee?.menubar?.report({
-      sessions: composer(ouvertes, attentions.current),
-      projet,
-    })
+    const sessions = composer(ouvertes, attentions.current)
+    onSessions(sessions)
+    void window.ovrsee?.menubar?.report({ sessions, projet })
     // `ouvertes` et `projet` sont dans `publie` ; les lister aussi rendrait
-    // l'effet dépendant de références neuves à chaque rendu.
+    // l'effet dépendant de références neuves à chaque rendu. `onSessions` non
+    // plus : `App` la redéfinit à chaque rendu et l'effet republierait sans fin.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publie])
+
+  // Panneau replié : plus aucun pty n'est écouté, donc plus aucun état à
+  // montrer. La barre de menu, elle, garde le sien — c'est `tray.js` qui le
+  // retient, et le vider ici viderait le popover à chaque repli.
+  useEffect(
+    () => () => onSessions([]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  )
 
   // « Ouvrir la session » depuis le popover : même chemin que le clic sur une
   // notification, la fenêtre étant déjà ramenée au premier plan par `tray.js`.

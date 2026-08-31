@@ -800,6 +800,7 @@ const translations = {
     'statusbar.last_commit': 'dernier commit ${age}',
     // Palette ⌘K
     'palette.placeholder': 'Rechercher, aller à…',
+    'palette.recent_projects': 'Projets récents',
     'palette.tickets': 'Tickets',
     'palette.commands': 'Commandes',
     'palette.no_results': 'Aucun résultat',
@@ -1584,6 +1585,7 @@ const translations = {
     'statusbar.last_commit': 'last commit ${age}',
     // Command palette
     'palette.placeholder': 'Search, jump to…',
+    'palette.recent_projects': 'Recent projects',
     'palette.tickets': 'Tickets',
     'palette.commands': 'Commands',
     'palette.no_results': 'No results',

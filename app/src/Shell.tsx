@@ -29,6 +29,8 @@ import {
   type SettingsType,
   type Snapshot,
 } from './data'
+import { DIT_ATTENTION, Etat } from './EtatSession'
+import { agregerEtat, type EtatSession, type MenuBarSession } from './menubar'
 import { s } from './style'
 import { TAB_ICONS, activeTabsInOrder, type TabId } from './views'
 
@@ -295,6 +297,7 @@ export function ProjectSwitcher({
   projects,
   current,
   snapshot,
+  sessions,
   onPick,
   onProjects,
   onError,
@@ -303,6 +306,12 @@ export function ProjectSwitcher({
   current: string | null
   /** L'instantané du projet affiché, pour que sa pastille suive le tableau sans re-fetch. */
   snapshot: Snapshot | null
+  /**
+   * Les sessions Claude vivantes, tous projets confondus — la même liste que
+   * la barre de menu reçoit (`composer()`), passée par `App`. Vide quand le
+   * panneau terminal est replié : il n'écoute alors aucun pty.
+   */
+  sessions: readonly MenuBarSession[]
   onPick: (path: string) => void
   onProjects: (list: Project[], select?: string | null) => void
   onError: (message: string) => void
@@ -311,6 +320,10 @@ export function ProjectSwitcher({
   const ref = useRef<HTMLDivElement>(null)
   const active = projects.find(p => p.path === current) ?? null
   const picker = window.ovrsee?.projects
+  // L'état condensé de l'issue #47 : une question l'emporte sur du travail en
+  // cours, qui l'emporte sur le repos. `null` quand aucune session ne tourne —
+  // le bouton garde alors son carré d'accent, qui ne dit que « ce projet-ci ».
+  const global = agregerEtat(sessions)
 
   useEffect(() => {
     if (!open) return
@@ -339,7 +352,11 @@ export function ProjectSwitcher({
           'display: flex; align-items: center; gap: 8px; height: 24px; padding: 0 9px; border-radius: 6px; border: 1px solid var(--color-border-card); background: var(--color-surface-control); cursor: pointer;',
         )}
       >
-        <span style={s('width: 5px; height: 5px; border-radius: 2px; background: var(--color-accent); flex: none;')} />
+        {global ? (
+          <Etat kind={global} actif dit={t(DIT_ATTENTION[global])} />
+        ) : (
+          <span style={s('width: 5px; height: 5px; border-radius: 2px; background: var(--color-accent); flex: none;')} />
+        )}
         <span style={s('font-size: 12px; font-weight: 500; color: var(--color-text); white-space: nowrap;')}>
           {active?.name ?? '…'}
         </span>
@@ -352,12 +369,19 @@ export function ProjectSwitcher({
             'position: absolute; top: 30px; left: 0; width: 260px; z-index: 20; padding: 6px; border-radius: 8px; border: 1px solid var(--color-border-card); background: var(--color-surface-elevated); box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
           )}
         >
-          {projects.map(project => (
+          {/* Hauteur bornée et défilement interne : onze projets au registre
+              donnaient un popover qui débordait de la fenêtre. Le bouton
+              « Ouvrir un projet » reste hors de ce conteneur, donc visible
+              sans avoir à défiler (T-0224). */}
+          <div style={s('max-height: min(50vh, 320px); overflow-y: auto; display: flex; flex-direction: column; gap: 2px;')}>
+          {projects.map((project, index) => (
             <ProjectRow
               key={project.path}
               project={project}
               active={project.path === current}
               snapshot={project.path === current ? snapshot : null}
+              etat={agregerEtat(sessions.filter(session => session.projet === project.path))}
+              raccourci={index < 9 ? index + 1 : undefined}
               onPick={path => {
                 onPick(path)
                 setOpen(false)
@@ -369,6 +393,7 @@ export function ProjectSwitcher({
               }}
             />
           ))}
+          </div>
           {picker && (
             <button
               type="button"
@@ -486,6 +511,8 @@ function ProjectRow({
   project,
   active,
   snapshot,
+  etat,
+  raccourci,
   onPick,
   onRemove,
 }: {
@@ -493,6 +520,14 @@ function ProjectRow({
   active: boolean
   /** Instantané déjà chargé par l'application, pour le projet affiché. */
   snapshot: Snapshot | null
+  /**
+   * L'état de la session Claude de ce projet, ou `null` s'il n'en a aucune
+   * d'ouverte dans cette instance. Les deux se distinguent à l'écran : un
+   * projet sans session n'est pas un projet au repos (T-0217).
+   */
+  etat: EtatSession | null
+  /** Numéro du raccourci ⇧⌘N, pour les neuf premiers projets. */
+  raccourci?: number
   onPick: (path: string) => void
   onRemove: () => void
 }) {
@@ -557,13 +592,17 @@ function ProjectRow({
       )}
     >
       <div style={s('display: flex; align-items: center; gap: 9px;')}>
-        <div style={s('width: 7px; flex: none; display: flex; align-items: center; justify-content: center;')}>
-          <div
-            style={s(
-              `width: 7px; height: 7px; border-radius: 2px; background: ${active ? 'var(--color-accent)' : 'var(--color-text-ghost)'};`,
-            )}
-          />
-        </div>
+        {etat ? (
+          <Etat kind={etat} actif={active} dit={t(DIT_ATTENTION[etat])} />
+        ) : (
+          <div style={s('width: 7px; flex: none; display: flex; align-items: center; justify-content: center;')}>
+            <div
+              style={s(
+                `width: 7px; height: 7px; border-radius: 2px; background: ${active ? 'var(--color-accent)' : 'var(--color-text-ghost)'};`,
+              )}
+            />
+          </div>
+        )}
         <div
           style={s(
             `flex: 1; min-width: 0; font-size: 12.5px; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; ${active ? 'font-weight: 500; color: var(--color-text);' : 'color: var(--color-text-tertiary);'}`,
@@ -572,6 +611,15 @@ function ProjectRow({
         >
           {project.name}
         </div>
+
+        {!confirming && typeof raccourci === 'number' && (
+          <span
+            aria-hidden="true"
+            style={s('font-family: var(--font-mono); font-size: 10px; color: var(--color-text-faint); flex: none;')}
+          >
+            ⇧⌘{raccourci}
+          </span>
+        )}
 
         {!confirming && (
           <div

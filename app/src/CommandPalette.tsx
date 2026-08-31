@@ -29,6 +29,9 @@ type Item =
   | { kind: 'ticket'; key: string; label: string; sub: string; file: string }
   | { kind: 'command'; key: string; label: string; text: string }
 
+/** Projets listés sans recherche — au-delà, il faut taper. */
+const RECENTS = 5
+
 export function CommandPalette({
   settings,
   tickets,
@@ -72,8 +75,13 @@ export function CommandPalette({
     const match = (label: string) => q === '' || normalise(label).includes(q)
 
     const activeViews = activeTabsInOrder(settings)
+    // Sans recherche, la liste est bornée aux plus récents : `projects` arrive
+    // trié par dernière ouverture (`hooks/snapshot.js`), et onze projets au
+    // registre mangeaient la palette avant qu'on ait tapé quoi que ce soit. La
+    // recherche, elle, porte sur tous — c'est ce que le titre de section dit.
     const projectItems: Item[] = projects
       .filter(project => match(project.name))
+      .slice(0, q === '' ? RECENTS : undefined)
       .map(
         project =>
           ({
@@ -121,7 +129,7 @@ export function CommandPalette({
       : []
 
     return [
-      { title: t('sidebar.projects'), items: projectItems },
+      { title: q === '' ? t('palette.recent_projects') : t('sidebar.projects'), items: projectItems },
       { title: t('sidebar.views'), items: [...views, ...preferences] },
       { title: t('palette.tickets'), items: ticketItems },
       { title: t('palette.commands'), items: commands },

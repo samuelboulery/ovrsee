@@ -1,10 +1,27 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Aperçu de la vitrine : sept onglets vivants, et l'app telle qu'elle est",
   "opened": "2026-08-31",
-  "closed": null,
-  "commits": []
+  "closed": "2026-09-01",
+  "commits": [
+    {
+      "sha": "1f97b41",
+      "date": "2026-09-01",
+      "files": [
+        "scripts/build-site-fr.test.js",
+        "site/app.js",
+        "site/dict.json",
+        "site/index.html",
+        "site/styles.css"
+      ]
+    },
+    {
+      "sha": "357b425",
+      "date": "2026-09-01",
+      "files": []
+    }
+  ]
 }
 ---
 

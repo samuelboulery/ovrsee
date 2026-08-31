@@ -2,7 +2,7 @@
 {
   "id": "T-0216",
   "titre": "Prompts par projet et commandes plus visibles",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

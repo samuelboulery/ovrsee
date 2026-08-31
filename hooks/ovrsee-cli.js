@@ -36,6 +36,7 @@ import {
 } from './plans.js'
 
 import { exportVault } from './obsidian.js'
+import { estPrincipal } from './principal.js'
 import { activePlans, sessionId, writeActive } from './active.js'
 
 import {
@@ -57,6 +58,39 @@ const ovrseeDir = join(root, 'ovrsee')
 
 /** Un appel git dans le dépôt courant. Échoue bruyamment : c'est un outil manuel. */
 const git = args => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim()
+
+export const USAGE_CLOSE = [
+  'usage : ovrsee-cli.js close [<plan.md>] [--commit <sha>]',
+  '',
+  '  sans argument      clôt TOUS les plans ouverts portant un commit',
+  '  <plan.md>          ne clôt que ce plan',
+  '  --commit <sha>     rattache ce commit au plan visé avant de le clore',
+].join('\n')
+
+/**
+ * Lit les arguments de `close`.
+ *
+ * Extrait du corps de la commande pour être testable : la première version
+ * écartait le plan visé quand `--commit` était absent — `indexOf` rend -1, et
+ * `-1 + 1` désigne le premier argument. Un bug d'index dans un `filter`, invisible
+ * tant que la commande n'avait qu'un seul plan à clore.
+ *
+ * @param {string[]} rest
+ * @returns {{aide: boolean, cible: string|null, sha: string|null}}
+ */
+export function argumentsClose(rest) {
+  if (rest.includes('--help') || rest.includes('-h')) return { aide: true, cible: null, sha: null }
+
+  const drapeau = rest.indexOf('--commit')
+  const sha = drapeau === -1 ? null : (rest[drapeau + 1] ?? null)
+  if (drapeau !== -1 && !sha) throw new Error(USAGE_CLOSE)
+
+  const valeur = drapeau === -1 ? -1 : drapeau + 1
+  const cible = rest.filter((arg, i) => !arg.startsWith('--') && i !== valeur)[0] ?? null
+  if (sha && !cible) throw new Error('--commit exige le plan à rattacher\n' + USAGE_CLOSE)
+
+  return { aide: false, cible, sha }
+}
 
 const commands = {
   status() {
@@ -142,25 +176,11 @@ const commands = {
    * `--help` affiche cette aide **sans rien clore**. Avant, elle clôturait tout.
    */
   close(...rest) {
-    const usage = [
-      'usage : ovrsee-cli.js close [<plan.md>] [--commit <sha>]',
-      '',
-      '  sans argument      clôt TOUS les plans ouverts portant un commit',
-      '  <plan.md>          ne clôt que ce plan',
-      '  --commit <sha>     rattache ce commit au plan visé avant de le clore',
-    ].join('\n')
-
-    if (rest.includes('--help') || rest.includes('-h')) {
-      console.log(usage)
+    const { aide, cible, sha } = argumentsClose(rest)
+    if (aide) {
+      console.log(USAGE_CLOSE)
       return
     }
-
-    const drapeau = rest.indexOf('--commit')
-    const sha = drapeau === -1 ? null : rest[drapeau + 1]
-    if (drapeau !== -1 && !sha) throw new Error(usage)
-
-    const cible = rest.filter((arg, i) => !arg.startsWith('--') && i !== drapeau + 1)[0] ?? null
-    if (sha && !cible) throw new Error('--commit exige le plan à rattacher\n' + usage)
 
     if (sha) {
       const court = git(['rev-parse', '--short', sha])
@@ -344,11 +364,19 @@ const commands = {
   },
 }
 
-const [command, ...rest] = process.argv.slice(2)
-const run = commands[command]
+/**
+ * Le dispatch ne tourne que si le fichier est lancé comme outil.
+ *
+ * Sans cette garde, l'importer pour éprouver `argumentsClose` exécuterait une
+ * commande avec l'`argv` du lanceur de tests — et sortirait en code 1.
+ */
+if (estPrincipal(import.meta.url)) {
+  const [command, ...rest] = process.argv.slice(2)
+  const run = commands[command]
 
-if (!run) {
-  console.error(`commandes : ${Object.keys(commands).join(', ')}`)
-  process.exit(1)
+  if (!run) {
+    console.error(`commandes : ${Object.keys(commands).join(', ')}`)
+    process.exit(1)
+  }
+  run(...rest)
 }
-run(...rest)

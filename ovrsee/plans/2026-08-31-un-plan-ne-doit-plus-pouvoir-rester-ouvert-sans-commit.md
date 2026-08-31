@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Un plan ne doit plus pouvoir rester ouvert sans commit",
   "opened": "2026-08-31",
-  "closed": null,
+  "closed": "2026-08-31",
   "commits": [
     {
       "sha": "9261e11",
@@ -21,6 +21,11 @@
         "site/dict.json",
         "site/index.html"
       ]
+    },
+    {
+      "sha": "c43e68d",
+      "date": "2026-08-31",
+      "files": []
     }
   ]
 }

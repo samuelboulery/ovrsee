@@ -686,6 +686,7 @@ export function App() {
                 <Garde quoi={t('garde.terminal')} indice={t('garde.terminal_hint')}>
                   <Suspense fallback={null}>
                     <Terminal
+                      tab={tab}
                       layout={layout}
                       onLayout={setLayout}
                       onToggle={() => setTerminal(false)}

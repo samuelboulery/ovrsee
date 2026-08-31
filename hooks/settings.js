@@ -26,6 +26,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
  *   packageManager: string,
  *   sourceGraphe: string,
  *   customActions: Array<{label: string, text: string}>,
+ *   projectActions: Record<string, Array<{label: string, text: string}>>,
  *   onboardingVu: boolean,
  *   gitignoreShots: boolean,
  *   gitignorePlans: boolean,
@@ -51,6 +52,11 @@ export const DEFAULT_SETTINGS = {
   packageManager: 'pnpm',
   sourceGraphe: 'auto',
   customActions: [],
+  // Les mêmes, mais attachées à un projet : `{ '<chemin>': [action, …] }`.
+  // Hors du dépôt observé et non surchargeable — un dépôt cloné n'a pas à
+  // décider ce qui part dans le terminal (issue #70, même raison que
+  // `bootstrap`). Voir `mergeSettings`.
+  projectActions: {},
   // Faux tant que la présentation de premier lancement n'a pas été vue — ou
   // passée, ce qui compte pour vue : un accueil qui rejoue est un accueil qui
   // ment. Le défaut est le bon même sur un fichier abîmé : mieux vaut une
@@ -124,6 +130,22 @@ function validerTerminal(input, out) {
 }
 
 /**
+ * Une action du terminal est-elle utilisable ?
+ *
+ * Le saut de ligne est refusé ici et pas seulement à la saisie : une action
+ * multiligne est plusieurs commandes envoyées au shell d'un coup, ce qui n'est
+ * pas explicite au clic. Même prédicat pour les actions globales et celles
+ * d'un projet — les deux finissent dans le même terminal.
+ */
+function actionValide(action) {
+  if (!action || typeof action !== 'object') return false
+  if (typeof action.label !== 'string' || !action.label.trim()) return false
+  if (typeof action.text !== 'string' || !action.text.trim()) return false
+  if (action.text.includes('\n')) return false
+  return true
+}
+
+/**
  * Validation par champ : chaque champ invalide retombe à son défaut.
  *
  * Pas de validation tout-ou-rien. Un `langue: 42` ne vide pas tout l'objet —
@@ -170,15 +192,19 @@ export function validateSettings(partial, defaults = DEFAULT_SETTINGS) {
 
   // Tableau : customActions — chaque action validée individuellement
   if (Array.isArray(partial.customActions)) {
-    const valides = partial.customActions.filter(action => {
-      if (!action || typeof action !== 'object') return false
-      if (typeof action.label !== 'string' || !action.label.trim()) return false
-      if (typeof action.text !== 'string' || !action.text.trim()) return false
-      // Rejette les actions avec sauts de ligne
-      if (action.text.includes('\n')) return false
-      return true
-    })
-    out.customActions = valides
+    out.customActions = partial.customActions.filter(actionValide)
+  }
+
+  // Objet : projectActions — une liste d'actions par chemin de projet. Une
+  // valeur qui n'est pas un tableau est ignorée, comme partout ici : un
+  // fichier abîmé sur une clé ne doit pas emporter les autres projets.
+  if (partial.projectActions && typeof partial.projectActions === 'object' &&
+      !Array.isArray(partial.projectActions)) {
+    const parProjet = {}
+    for (const [chemin, actions] of Object.entries(partial.projectActions)) {
+      if (Array.isArray(actions)) parProjet[chemin] = actions.filter(actionValide)
+    }
+    out.projectActions = parProjet
   }
 
   if (typeof partial.onboardingVu === 'boolean') {
@@ -230,6 +256,9 @@ export function mergeSettings(global, project = {}) {
   // voir tourner dans son terminal, une préférence de poste — pas une
   // propriété du dépôt observé. Le laisser dicter par un dépôt cloné
   // ouvrirait l'exécution de commandes arbitraires côté terminal (issue #70).
+  // `customActions` et `projectActions` sont là pour la même raison : les
+  // actions d'un projet vivent dans ce fichier-ci, indexées par chemin, jamais
+  // dans l'`ovrsee.config.json` du dépôt observé (T-0216).
 
   validerEnum(out, 'packageManager', project.packageManager, ['pnpm', 'npm', 'yarn', 'bun'])
   validerEnum(out, 'sourceGraphe', project.sourceGraphe, ['auto', 'graphify', 'obsidian'])

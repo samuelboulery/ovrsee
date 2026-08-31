@@ -1,12 +1,20 @@
 /**
  * La section « Projet » des préférences.
  *
- * Trois blocs qui avaient chacun leur entrée de navigation et n'en méritaient
- * pas : les actions du terminal, les commandes jouées à l'initialisation, et
- * les deux réglages avancés. Ce qui les réunit est ce qui les distingue du
- * reste — ce sont les seuls réglages que `ovrsee.config.json` peut surcharger
- * par projet (`hooks/settings.js`, `mergeSettings`), là où le thème et la
- * langue restent personnels.
+ * Ce qui vaut pour le **projet ouvert**, et rien d'autre : sa couleur d'accent
+ * (registre, `hooks/plans.js`), ses commandes (`projectActions`, indexées par
+ * chemin), ce qu'il tient hors du suivi git, ses intégrations
+ * (`~/.claude/ovrsee/integrations.json`).
+ *
+ * Le démarrage et les deux réglages avancés vivaient ici et n'en étaient pas :
+ * ils valent pour tous les projets. Ils sont montés par `SectionGeneral`
+ * (`PreferencesPanel.tsx`) et restent définis ici, à côté du seul bloc qui leur
+ * ressemble. Une section qui porte le nom d'un projet ne doit contenir que ce
+ * qu'on change en changeant de projet.
+ *
+ * « Porter sur le projet » ne veut pas dire « venir du projet » : les commandes
+ * ne se lisent jamais dans `ovrsee.config.json`, versionné donc fourni par le
+ * dépôt observé (issue #70, T-0216).
  *
  * Ils sont sortis de `PreferencesPanel.tsx` sans changer de logique : ce
  * fichier-là dépassait déjà les 800 lignes de `CLAUDE.md`.
@@ -15,25 +23,41 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { ACCENTS } from '../../hooks/accents'
-import type { Integration, IntegrationProvider, SettingsType } from './data'
+import type { Action, Integration, IntegrationProvider, SettingsType } from './data'
 import { t, type TranslationKey } from './i18n'
 import { BlocIntegrations } from './PreferencesIntegrations'
 import { ErrorBox, Field, GroupLabel, Row, SectionTitle, Switch } from './PreferencesControls'
 import { s } from './style'
+
+/** Le nom du dossier d'un chemin — le chemin entier tiendrait mal dans l'aide. */
+const basename = (chemin: string) => chemin.split('/').filter(Boolean).pop() ?? chemin
 
 type SectionProps = {
   settings: SettingsType
   onSettings: (settings: SettingsType) => void
 }
 
-/** Les lignes prêtes à poser dans le terminal. */
-function BlocActions({ settings, onSettings }: SectionProps) {
+/**
+ * Les lignes prêtes à poser dans le terminal.
+ *
+ * Monté deux fois par `SectionProjet` : une fois sur les actions globales
+ * (`customActions`), une fois sur celles du projet ouvert
+ * (`projectActions[root]`). D'où les actions passées en propriété plutôt que
+ * lues dans `settings` — le formulaire est le même, la liste ne l'est pas.
+ */
+export function BlocActions({
+  actions,
+  onActions,
+  aide,
+}: {
+  actions: Action[]
+  onActions: (actions: Action[]) => void
+  aide: string
+}) {
   const [label, setLabel] = useState('')
   const [texte, setTexte] = useState('')
   const [erreur, setErreur] = useState<TranslationKey | null>(null)
   const [edite, setEdite] = useState<number | null>(null)
-
-  const actions = settings.customActions ?? []
 
   const valider = (): TranslationKey | null => {
     if (!label.trim()) return 'pref.err_label_required'
@@ -57,7 +81,7 @@ function BlocActions({ settings, onSettings }: SectionProps) {
         ? [...actions, action]
         : actions.map((existante, i) => (i === edite ? action : existante))
 
-    onSettings({ ...settings, customActions: suivantes })
+    onActions(suivantes)
     setLabel('')
     setTexte('')
     setEdite(null)
@@ -66,7 +90,7 @@ function BlocActions({ settings, onSettings }: SectionProps) {
   return (
     <>
       <p style={s('margin: 0 0 14px; font-size: 12px; color: var(--color-neutral-500);')}>
-        {t('pref.actions_desc')}
+        {aide}
       </p>
 
       <div
@@ -168,12 +192,7 @@ function BlocActions({ settings, onSettings }: SectionProps) {
               type="button"
               className="btn btn-ghost"
               aria-label={`${t('pref.actions_delete')} — ${action.label}`}
-              onClick={() =>
-                onSettings({
-                  ...settings,
-                  customActions: actions.filter((_, i) => i !== index),
-                })
-              }
+              onClick={() => onActions(actions.filter((_, i) => i !== index))}
               style={s('font-size: 12px; padding: 2px 7px;')}
             >
               ✕
@@ -186,7 +205,7 @@ function BlocActions({ settings, onSettings }: SectionProps) {
 }
 
 /** Les commandes proposées une seule fois, à l'initialisation d'un projet neuf. */
-function BlocDemarrage({ settings, onSettings }: SectionProps) {
+export function BlocDemarrage({ settings, onSettings }: SectionProps) {
   const bootstrap = settings.bootstrap ?? ['/project-setup']
 
   return (
@@ -238,10 +257,20 @@ function BlocDemarrage({ settings, onSettings }: SectionProps) {
   )
 }
 
-/** Gestionnaire de paquets et source de graphe. */
-function BlocAvance({ settings, onSettings }: SectionProps) {
+/**
+ * Gestionnaire de paquets et source de graphe.
+ *
+ * Deux défauts, valables pour tous les projets — d'où leur place dans
+ * « Général » — mais qu'un `ovrsee.config.json` peut surcharger pour le sien
+ * (`mergeSettings`, `hooks/settings.js`). L'aide le dit, sans quoi on croirait
+ * la valeur affichée vraie partout.
+ */
+export function BlocAvance({ settings, onSettings }: SectionProps) {
   return (
     <>
+      <p style={s('margin: 0 0 14px; font-size: 12px; color: var(--color-neutral-500);')}>
+        {t('pref.advanced_desc')}
+      </p>
       {/* Une liste, pas un champ libre : `validateSettings` n'accepte que ces
           quatre-là, et toute autre saisie était écrite puis rejetée à la
           relecture — le réglage retombait au défaut sans rien dire. */}
@@ -397,12 +426,23 @@ export function SectionProjet({
       <SectionTitle>{t('pref.project')}</SectionTitle>
       <GroupLabel>{t('pref.appearance_title')}</GroupLabel>
       <BlocApparence accent={accent} onAccent={onAccent} disabled={!root} />
-      <GroupLabel>{t('pref.actions_title')}</GroupLabel>
-      <BlocActions settings={settings} onSettings={onSettings} />
-      <GroupLabel>{t('pref.bootstrap_title')}</GroupLabel>
-      <BlocDemarrage settings={settings} onSettings={onSettings} />
-      <GroupLabel>{t('pref.advanced')}</GroupLabel>
-      <BlocAvance settings={settings} onSettings={onSettings} />
+      {/* Les commandes globales ne sont pas ici : elles se saisissent depuis
+          « Général », avec le reste de ce qui vaut pour tous les projets. */}
+      {root && (
+        <>
+          <GroupLabel>{t('pref.actions_title')}</GroupLabel>
+          <BlocActions
+            actions={settings.projectActions?.[root] ?? []}
+            onActions={actions =>
+              onSettings({
+                ...settings,
+                projectActions: { ...settings.projectActions, [root]: actions },
+              })
+            }
+            aide={t('pref.actions_project_desc', { projet: basename(root) })}
+          />
+        </>
+      )}
       <GroupLabel>{t('pref.gitignore_title')}</GroupLabel>
       <BlocGitignore settings={settings} onSettings={onSettings} />
       <div ref={integrationsRef}>

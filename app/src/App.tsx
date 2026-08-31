@@ -698,6 +698,10 @@ export function App() {
                       onTerminalHeightChange={setTerminalHeight}
                       onTerminalWidthChange={setTerminalWidth}
                       onProjet={setCurrent}
+                      onOpenPreferences={() => {
+                        setPreferencesInitial({ section: 'projet' })
+                        setPreferencesOuvertes(true)
+                      }}
                       actions={terminalActions}
                     />
                   </Suspense>

@@ -2,7 +2,7 @@
 {
   "id": "T-0222",
   "titre": "Reconcile ne voit pas les commits du jour",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [],
   "cree": "2026-08-31",

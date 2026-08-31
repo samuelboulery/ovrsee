@@ -21,7 +21,7 @@ import {
 } from './PreferencesControls'
 import { TAB_KEYS } from './PreferencesPreview'
 import { SectionProfils } from './PreferencesProfils'
-import { SectionProjet } from './PreferencesProjet'
+import { BlocActions, BlocAvance, BlocDemarrage, SectionProjet } from './PreferencesProjet'
 import { s } from './style'
 import { TAB_ICONS, type TabId } from './views'
 
@@ -188,6 +188,22 @@ export function SectionGeneral({
           options={crans.map(({ value, label }) => ({ value, label }))}
         />
       </Row>
+
+      {/* Ce qui vaut pour tous les projets. C'était dans la section « Projet »,
+          où l'on éditait donc un réglage global depuis l'écran d'un projet :
+          les commandes valables partout, la commande jouée à l'initialisation
+          (`bootstrap`, jamais surchargeable — issue #70), et les deux défauts
+          qu'un `ovrsee.config.json` peut, lui, surcharger. */}
+      <GroupLabel>{t('pref.actions_title')}</GroupLabel>
+      <BlocActions
+        actions={settings.customActions ?? []}
+        onActions={customActions => onSettings({ ...settings, customActions })}
+        aide={t('pref.actions_global_desc')}
+      />
+      <GroupLabel>{t('pref.bootstrap_title')}</GroupLabel>
+      <BlocDemarrage settings={settings} onSettings={onSettings} />
+      <GroupLabel>{t('pref.advanced')}</GroupLabel>
+      <BlocAvance settings={settings} onSettings={onSettings} />
 
       {/* La présentation ne se rouvre jamais d'elle-même : sans cette entrée,
           elle serait perdue dès le premier projet ajouté. */}
@@ -499,7 +515,17 @@ export function PreferencesModal({
   initialProvider?: IntegrationProvider
 }) {
   const [settings, setSettings] = useState<SettingsType | null>(null)
-  const [section, setSection] = useState<SectionId>(initialSection ?? 'interface')
+  // « Ce projet » ne paraît que s'il y a un projet : sans lui la section n'a
+  // rien à régler, et sa liste de commandes n'a même pas de clé où vivre.
+  const sections = root ? SECTIONS : SECTIONS.filter(item => item.id !== 'projet')
+  const [section, setSection] = useState<SectionId>(
+    initialSection && (root || initialSection !== 'projet') ? initialSection : 'interface',
+  )
+  // Le projet peut se fermer pendant que la modale est ouverte : corriger
+  // l'état, pas seulement le rendu, sinon plus aucune entrée n'est courante.
+  useEffect(() => {
+    if (!root && section === 'projet') setSection('interface')
+  }, [root, section])
   const [etat, setEtat] = useState<'vide' | 'chargement' | 'ecriture' | 'ecrit'>('chargement')
   const [erreur, setErreur] = useState<string | null>(null)
 
@@ -637,7 +663,7 @@ export function PreferencesModal({
             'flex: none; width: 220px; display: flex; flex-direction: column; gap: 2px; padding: 16px 10px; overflow-y: auto; background: var(--color-surface); border-right: 1px solid var(--color-divider);',
           )}
         >
-          {SECTIONS.map(item => (
+          {sections.map(item => (
             <button
               key={item.id}
               type="button"

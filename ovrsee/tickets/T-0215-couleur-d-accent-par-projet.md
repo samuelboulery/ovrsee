@@ -2,7 +2,7 @@
 {
   "id": "T-0215",
   "titre": "Couleur d'accent par projet",
-  "colonne": "backlog",
+  "colonne": "en-cours",
   "priorite": "haute",
   "tags": [
     "ui",
@@ -11,7 +11,7 @@
   ],
   "cree": "2026-08-31",
   "maj": "2026-08-31",
-  "plan": "2026-08-31-tour-du-depot-ovrsee-backlog-priorise-et-lot-d-intendance.md",
+  "plan": "2026-08-31-t-0215-couleur-d-accent-par-projet.md",
   "charge": "s"
 }
 ---

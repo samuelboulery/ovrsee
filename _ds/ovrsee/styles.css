@@ -71,7 +71,12 @@
   --color-border-selected: #4d5060; /* contour sélectionné */
   --color-divider: var(--color-border-card);
 
-  --color-accent: #7d76f0;
+  /* La teinte de marque, jamais surchargée : `--color-accent` en part et peut
+     changer par projet (T-0215), `--color-brand` reste le violet — c'est ce qui
+     permet à la pastille « violet » des préférences de se peindre en violet
+     dans une application peinte en cyan. */
+  --color-brand: #7d76f0;
+  --color-accent: var(--color-brand);
   --color-accent-2: #8682cf;
 
   /* Statuts — teinte / filet / fond, valeurs de la maquette. */
@@ -155,6 +160,94 @@
   --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.5);
 }
 
+/* Accents par projet (T-0215, issue #48) — la palette fermée.
+   `--color-accent` est le seul jeton de marque de l'interface : le surcharger
+   sur <html> repeint les 75 usages d'`app/src` d'un coup, sans rechargement.
+
+   Sélecteur d'attribut nu, sans `:root` : la même règle sert deux endroits —
+   l'élément racine (l'accent du projet ouvert, posé par `App.tsx`) et les
+   pastilles de choix des préférences, qui se peignent alors en
+   `var(--color-accent)` sans écrire un seul hex dans un composant
+   (`hooks/couleurs.test.js` reste vert sans nouvelle exemption).
+
+   Le violet n'a pas de bloc : c'est l'absence d'attribut. Un projet sans
+   accent affiche donc le `:root` d'origine par construction, pas par recopie.
+
+   Valeurs littérales, comme les rampes ci-dessus : même profil de luminosité
+   que la rampe violette (S 80, L 96 → 19), teinte tournée. La base est plus
+   sombre d'un cran sur les teintes chaudes, qui à luminosité égale lavent.
+   `hooks/accents.test.js` vérifie le contraste de chacune. */
+/* Le violet ne redéfinit rien : il rend la marque. Son bloc n'existe que pour
+   les pastilles de choix, l'élément racine n'en porte jamais l'attribut. */
+[data-accent='violet'] {
+  --color-accent: var(--color-brand);
+}
+
+[data-accent='ambre'] {
+  --color-accent: #ecce55;
+  --color-accent-100: #fdfaed;
+  --color-accent-200: #faf3d6;
+  --color-accent-300: #f6e8b1;
+  --color-accent-400: #f1da7e;
+  --color-accent-500: #ecce55;
+  --color-accent-600: #e7c127;
+  --color-accent-700: #c19f15;
+  --color-accent-800: #8a710f;
+  --color-accent-900: #57480a;
+}
+
+[data-accent='vert'] {
+  --color-accent: #55ec9c;
+  --color-accent-100: #edfdf5;
+  --color-accent-200: #d6fae7;
+  --color-accent-300: #b1f6d1;
+  --color-accent-400: #7ef1b4;
+  --color-accent-500: #55ec9b;
+  --color-accent-600: #27e780;
+  --color-accent-700: #15c165;
+  --color-accent-800: #0f8a48;
+  --color-accent-900: #0a572e;
+}
+
+[data-accent='cyan'] {
+  --color-accent: #55ceec;
+  --color-accent-100: #edfafd;
+  --color-accent-200: #d6f3fa;
+  --color-accent-300: #b1e8f6;
+  --color-accent-400: #7edaf1;
+  --color-accent-500: #55ceec;
+  --color-accent-600: #27c1e7;
+  --color-accent-700: #159fc1;
+  --color-accent-800: #0f718a;
+  --color-accent-900: #0a4857;
+}
+
+[data-accent='rose'] {
+  --color-accent: #ee639d;
+  --color-accent-100: #fdedf4;
+  --color-accent-200: #fad6e5;
+  --color-accent-300: #f6b1ce;
+  --color-accent-400: #f17eae;
+  --color-accent-500: #ec5594;
+  --color-accent-600: #e72777;
+  --color-accent-700: #c1155d;
+  --color-accent-800: #8a0f42;
+  --color-accent-900: #570a2a;
+}
+
+[data-accent='orange'] {
+  --color-accent: #ed805e;
+  --color-accent-100: #fdf1ed;
+  --color-accent-200: #faded6;
+  --color-accent-300: #f6c1b1;
+  --color-accent-400: #f1997e;
+  --color-accent-500: #ec7855;
+  --color-accent-600: #e75427;
+  --color-accent-700: #c13d15;
+  --color-accent-800: #8a2c0f;
+  --color-accent-900: #571c0a;
+}
+
 body {
   background: var(--color-bg);
   color: var(--color-text);
@@ -219,9 +312,9 @@ figcaption {
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 /* Primaire = fond plein, jamais un filet/texte accent — l'accent ne sert pas
    de couleur de libellé (audit §5, règle d'or n°2). */
-.btn-primary { background: #7d76f0; color: #0a0a12; }
-.btn-primary:hover { background: color-mix(in srgb, #7d76f0 90%, white); }
-.btn-primary:active { background: color-mix(in srgb, #7d76f0 85%, black); }
+.btn-primary { background: var(--color-accent); color: #0a0a12; }
+.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 90%, white); }
+.btn-primary:active { background: color-mix(in srgb, var(--color-accent) 85%, black); }
 .btn-secondary { background: var(--color-surface-control); border-color: var(--color-border-control); color: #d5d8dd; }
 .btn-secondary:hover { background: var(--color-surface-hover); }
 .btn-secondary:active { background: var(--color-surface-active); }

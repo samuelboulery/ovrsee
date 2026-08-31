@@ -133,6 +133,37 @@ for (const [nomSection, Section] of SECTIONS) {
   }
 }
 
+test('SectionProjet : les six pastilles d’accent, la choisie cochée', () => {
+  const html = renderToStaticMarkup(
+    <SectionProjet settings={settings()} onSettings={() => {}} root="/tmp/p" accent="cyan" onAccent={() => {}} />,
+  )
+
+  assert.equal((html.match(/role="radio"/g) ?? []).length, 6, 'six teintes attendues')
+  assert(html.includes('data-accent="cyan"'), 'la pastille cyan ne porte pas son attribut')
+  assert(html.includes('aria-checked="true"'), 'aucune pastille cochée')
+})
+
+test('SectionProjet : sans accent choisi, le violet est coché', () => {
+  const html = renderToStaticMarkup(
+    <SectionProjet settings={settings()} onSettings={() => {}} root="/tmp/p" onAccent={() => {}} />,
+  )
+  // Le violet est le premier bouton : sa pastille précède la première coche.
+  assert(html.indexOf('aria-checked="true"') < html.indexOf('data-accent="ambre"'))
+})
+
+test('SectionProjet : un accent inconnu venu du disque retombe sur le violet', () => {
+  const html = renderToStaticMarkup(
+    <SectionProjet settings={settings()} onSettings={() => {}} root="/tmp/p" accent="mauve" onAccent={() => {}} />,
+  )
+  // Le violet ouvre la liste : sa coche précède la pastille suivante.
+  assert(html.indexOf('aria-checked="true"') < html.indexOf('data-accent="ambre"'))
+})
+
+test('SectionProjet : sans projet ouvert, les pastilles sont inertes', () => {
+  const html = renderToStaticMarkup(<SectionProjet settings={settings()} onSettings={() => {}} />)
+  assert.equal((html.match(/disabled=""/g) ?? []).length >= 6, true, 'pastilles actives sans projet')
+})
+
 test('SectionInterface : terminal désactivé montre le bouton d’activation, pas le switch', () => {
   const desactive = settings({
     terminal: { visible: false, disposition: 'bottom', hauteur: 244, largeur: 468, disabled: true },

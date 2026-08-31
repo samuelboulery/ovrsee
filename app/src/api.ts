@@ -38,7 +38,7 @@ export async function closeActivePlans(path: string): Promise<{ closed: string[]
   return result
 }
 
-export type ProjectAction = 'add' | 'remove' | 'touch' | 'init' | 'export-obsidian'
+export type ProjectAction = 'accent' | 'add' | 'remove' | 'touch' | 'init' | 'export-obsidian'
 
 /**
  * Ajoute, retire, remonte en tête, équipe un projet ou en exporte le coffre.
@@ -46,7 +46,7 @@ export type ProjectAction = 'add' | 'remove' | 'touch' | 'init' | 'export-obsidi
  * serveur.
  *
  * `payload` porte ce qui est propre à un geste — les skills à installer pour
- * `init`. Les autres n'en ont pas besoin, d'où le paramètre optionnel plutôt
+ * `init`, la teinte pour `accent`. Les autres n'en ont pas besoin, d'où le paramètre optionnel plutôt
  * qu'une seconde fonction par action.
  *
  * `X-Ovrsee` n'est pas une authentification : c'est ce qui empêche une page

@@ -104,6 +104,15 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
 
 ## Pièges connus
 
+- **`--color-accent` change par projet, `--color-brand` jamais.** L'accent d'un projet
+  (T-0215) est un identifiant posé sur `<html>` par `App.tsx` ; les blocs
+  `[data-accent='…']` d'`_ds/ovrsee/styles.css` redéfinissent le jeton et sa rampe, et
+  les 75 usages `var(--color-accent)` suivent sans rechargement. Le violet n'a pas de
+  valeurs à lui : son bloc rend `--color-brand`, que rien ne surcharge — c'est ce qui
+  permet à la pastille « violet » des préférences de rester violette dans une
+  application peinte en cyan. Un projet sans accent ne porte pas l'attribut du tout.
+  La couleur vit dans le registre (`setProjectAccent`, `hooks/plans.js`), **pas** dans
+  `ovrsee.config.json` : c'est une préférence de poste, et ce fichier est versionné.
 - **Le `colonne` d'un epic est inerte.** Le champ reste écrit dans le fichier — le
   format n'a pas bougé — mais l'interface ne le lit plus : l'état d'un epic se déduit
   de ses enfants (`epicEtat`, `app/src/data.ts`), et un epic ne se glisse plus. Le

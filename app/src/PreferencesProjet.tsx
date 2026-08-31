@@ -14,6 +14,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { ACCENTS } from '../../hooks/accents'
 import type { Integration, IntegrationProvider, SettingsType } from './data'
 import { t, type TranslationKey } from './i18n'
 import { BlocIntegrations } from './PreferencesIntegrations'
@@ -296,14 +297,93 @@ export function BlocGitignore({ settings, onSettings }: SectionProps) {
   )
 }
 
-/** Les cinq blocs, sous un seul titre. */
+/**
+ * La couleur d'accent du projet (T-0215, issue #48).
+ *
+ * Elle ne passe pas par `settings` : c'est une préférence de **poste**, tenue
+ * par le registre (`hooks/plans.js`, `setProjectAccent`) et non par le fichier
+ * de réglages — `ovrsee.config.json` est versionné, et deux personnes sur le
+ * même dépôt n'ont aucune raison de partager la même couleur. D'où un couple
+ * `accent`/`onAccent` à part plutôt que le `onSettings` des autres blocs.
+ *
+ * Les pastilles se peignent sans écrire une seule couleur ici : `data-accent`
+ * redéfinit `--color-accent` sur la pastille elle-même, exactement comme il le
+ * fait sur `<html>` pour l'application entière.
+ */
+function BlocApparence({
+  accent,
+  onAccent,
+  disabled,
+}: {
+  accent?: string
+  onAccent?: (accent: string) => void
+  disabled: boolean
+}) {
+  return (
+    <Row
+      label={t('pref.accent_title')}
+      hint={t('pref.accent_hint')}
+      stacked
+      last
+    >
+      <div
+        role="radiogroup"
+        aria-label={t('pref.accent_title')}
+        style={s('display: flex; flex-wrap: wrap; gap: 8px;')}
+      >
+        {/* Le registre est un fichier qu'on ne contrôle pas : une teinte retirée
+            de la palette y survivrait. Elle retombe sur le défaut plutôt que de
+            laisser le groupe sans coche. */}
+        {ACCENTS.map(nom => {
+          const choisi = nom === (accent && ACCENTS.includes(accent) ? accent : 'violet')
+          return (
+            <button
+              key={nom}
+              type="button"
+              role="radio"
+              aria-checked={choisi}
+              disabled={disabled || !onAccent}
+              onClick={() => onAccent?.(nom)}
+              style={s(
+                'display: flex; align-items: center; gap: 7px; padding: 6px 10px 6px 7px; border-radius: 999px; background: transparent; font-family: var(--font-body); font-size: 11.5px;' +
+                  (disabled || !onAccent ? ' opacity: .45; cursor: not-allowed;' : ' cursor: pointer;') +
+                  (choisi
+                    ? ' border: 1px solid var(--color-accent); color: var(--color-text);'
+                    : ' border: 1px solid var(--color-divider); color: var(--color-neutral-500);'),
+              )}
+            >
+              <span
+                aria-hidden="true"
+                data-accent={nom}
+                style={s(
+                  'display: block; width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent);',
+                )}
+              />
+              {t(`pref.accent_${nom}` as TranslationKey)}
+            </button>
+          )
+        })}
+      </div>
+    </Row>
+  )
+}
+
+/** Les six blocs, sous un seul titre. */
 export function SectionProjet({
   settings,
   onSettings,
   root,
   integrations = [],
+  accent,
+  onAccent,
   initialProvider,
-}: SectionProps & { root?: string; integrations?: Integration[]; initialProvider?: IntegrationProvider }) {
+}: SectionProps & {
+  root?: string
+  integrations?: Integration[]
+  accent?: string
+  onAccent?: (accent: string) => void
+  initialProvider?: IntegrationProvider
+}) {
   // Le bloc Intégrations est le dernier des cinq : arrivé ici depuis le CTA de
   // l'Aperçu (provider présélectionné), il faut le faire défiler jusqu'à la
   // vue plutôt que le laisser sous la ligne de flottaison.
@@ -315,6 +395,8 @@ export function SectionProjet({
   return (
     <>
       <SectionTitle>{t('pref.project')}</SectionTitle>
+      <GroupLabel>{t('pref.appearance_title')}</GroupLabel>
+      <BlocApparence accent={accent} onAccent={onAccent} disabled={!root} />
       <GroupLabel>{t('pref.actions_title')}</GroupLabel>
       <BlocActions settings={settings} onSettings={onSettings} />
       <GroupLabel>{t('pref.bootstrap_title')}</GroupLabel>

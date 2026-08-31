@@ -21,7 +21,13 @@ import { sessionId } from '../hooks/active.js'
 import { readConfigClaude } from '../hooks/config-claude.js'
 import { install } from '../hooks/install.js'
 import { exportVault } from '../hooks/obsidian.js'
-import { closeOpenPlans, registerProject, touchProject, unregisterProject } from '../hooks/plans.js'
+import {
+  closeOpenPlans,
+  registerProject,
+  setProjectAccent,
+  touchProject,
+  unregisterProject,
+} from '../hooks/plans.js'
 import { readSettings, writeSettings, validateSettings, mergeSettings } from '../hooks/settings.js'
 import { installSkills, readSkills } from '../hooks/skills.js'
 import { projects, snapshot, shotPath, mediaPath, tableau, readJson, readGraph } from '../hooks/snapshot.js'
@@ -222,6 +228,17 @@ function projectAction(body) {
       if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
       touchProject(path)
       return list()
+
+    // Une couleur est inerte : pas de secret, pas d'exécution — donc `/api`
+    // comme les autres gestes du registre, et pas l'IPC réservé aux jetons
+    // d'intégration et au terminal.
+    case 'accent': {
+      if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
+      if (!setProjectAccent(path, body?.accent)) {
+        return { status: 400, json: { error: 'accent inconnu' } }
+      }
+      return list()
+    }
 
     case 'export-obsidian': {
       if (!known()) return { status: 404, json: { error: 'projet inconnu' } }

@@ -4,7 +4,29 @@
   "title": "T-0215 — Couleur d'accent par projet",
   "opened": "2026-08-31",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "f3da750",
+      "date": "2026-08-31",
+      "files": [
+        "CLAUDE.md",
+        "_ds/ovrsee/styles.css",
+        "app/src/App.tsx",
+        "app/src/PreferencesPanel.tsx",
+        "app/src/PreferencesProjet.tsx",
+        "app/src/api.ts",
+        "app/src/data.ts",
+        "app/src/prefs.test.tsx",
+        "hooks/accents.js",
+        "hooks/accents.test.js",
+        "hooks/i18n.js",
+        "hooks/plans.js",
+        "hooks/plans.test.js",
+        "server/api.js",
+        "server/api.test.js"
+      ]
+    }
+  ]
 }
 ---
 

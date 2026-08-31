@@ -2,7 +2,7 @@
 {
   "id": "T-0215",
   "titre": "Couleur d'accent par projet",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "ui",

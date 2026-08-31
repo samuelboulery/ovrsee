@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Issue #47 — voir les autres projets sans dérouler",
   "opened": "2026-08-31",
-  "closed": null,
+  "closed": "2026-09-01",
   "commits": [
     {
       "sha": "5dd23c9",
@@ -18,6 +18,11 @@
         "app/src/menubar.ts",
         "hooks/i18n.js"
       ]
+    },
+    {
+      "sha": "18c19f5",
+      "date": "2026-09-01",
+      "files": []
     }
   ]
 }

@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Panneau des commandes : rétraction sur place, et exécution au clic",
   "opened": "2026-08-31",
-  "closed": null,
+  "closed": "2026-09-01",
   "commits": [
     {
       "sha": "5dd23c9",
@@ -32,6 +32,11 @@
     },
     {
       "sha": "53fac6b",
+      "date": "2026-09-01",
+      "files": []
+    },
+    {
+      "sha": "18c19f5",
       "date": "2026-09-01",
       "files": []
     }

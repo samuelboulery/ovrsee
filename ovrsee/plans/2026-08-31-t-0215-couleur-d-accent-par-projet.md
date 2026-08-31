@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "T-0215 — Couleur d'accent par projet",
   "opened": "2026-08-31",
-  "closed": null,
+  "closed": "2026-08-31",
   "commits": [
     {
       "sha": "f3da750",

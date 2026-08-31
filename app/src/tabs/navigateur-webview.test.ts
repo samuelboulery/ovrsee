@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 
 import { setCurrentLanguage } from '../i18n'
 import { CarteElement } from './NavigateurPanneaux'
-import { corpsDepuis, describe, type Picked } from './navigateur-webview'
+import { actionClavier, corpsDepuis, describe, type Picked } from './navigateur-webview'
 
 // Les libellés de la carte sont traduits : sans langue fixée, le test dépendrait
 // de `navigator.language`, qui n'existe pas forcément sous `node --test`.
@@ -106,4 +106,34 @@ test('CarteElement : porte la saisie et les deux actions', () => {
   assert.match(html, /<textarea/)
   assert.match(html, /marge fausse/)
   assert.match(html, /Créer un ticket/)
+})
+
+/**
+ * Le raccourci ⇧⌘E ne faisait que retourner le booléen d'affichage : il
+ * n'armait rien dans la page, et laissait le bouton coincé sur « Annuler ».
+ */
+
+const touche = (key: string, mods: { metaKey?: boolean; shiftKey?: boolean } = {}) =>
+  actionClavier({ key, metaKey: false, shiftKey: false, ...mods })
+
+test('actionClavier : ⇧⌘E bascule la sélection', () => {
+  assert.equal(touche('e', { metaKey: true, shiftKey: true }), 'basculer')
+  // Maj enfoncée, le navigateur rend « E » majuscule.
+  assert.equal(touche('E', { metaKey: true, shiftKey: true }), 'basculer')
+})
+
+test('actionClavier : ⌘E ou ⇧E seuls ne basculent rien', () => {
+  assert.equal(touche('e', { metaKey: true }), null)
+  assert.equal(touche('e', { shiftKey: true }), null)
+  assert.equal(touche('e'), null)
+})
+
+test('actionClavier : Échap annule', () => {
+  assert.equal(touche('Escape'), 'annuler')
+})
+
+test('actionClavier : toute autre touche ne demande rien', () => {
+  assert.equal(touche('a'), null)
+  assert.equal(touche('Enter'), null)
+  assert.equal(touche('f', { metaKey: true, shiftKey: true }), null)
 })

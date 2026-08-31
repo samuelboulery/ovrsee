@@ -12,6 +12,7 @@ import {
   ALLOW_POPUPS,
   CANCEL_PICK,
   DOCKS,
+  actionClavier,
   DOCK_KEY,
   MAX_LOGS,
   URL_KEY,
@@ -146,21 +147,22 @@ export function Navigateur({
     // `ovrsee/`, et rechargerait la page inspectée pour rien.
   }, [snapshot.root])
 
+  /**
+   * Le clavier, renvoyé par ref plutôt que par dépendance d'effet.
+   *
+   * L'écouteur doit voir l'état du **rendu courant** — `picking`, `picked`, et
+   * le `select()` d'aujourd'hui. Posé en dépendance, il se réabonnerait à
+   * chaque frappe ; capturé une fois pour toutes, il lirait l'état du rendu où
+   * `visible` a changé. La ref tranche : un abonnement, toujours à jour.
+   */
+  const auClavier = useRef<(event: KeyboardEvent) => void>(() => {})
+
   // ⇧⌘E bascule le sélecteur — annoncé par la barre d'état (maquette 2c).
   // Bindé seulement onglet visible : sinon un raccourci global s'active en
   // arrière-plan pendant qu'on tape ailleurs dans l'application.
   useEffect(() => {
     if (!visible) return
-    const onKey = (event: KeyboardEvent) => {
-      if (event.metaKey && event.shiftKey && event.key.toLowerCase() === 'e') {
-        event.preventDefault()
-        setPicking(p => !p)
-      }
-      // Échap referme la carte, exactement comme sa croix. La saisie a le
-      // focus à l'ouverture : sans ça, il faudrait viser la croix à la souris
-      // pour abandonner un commentaire.
-      if (event.key === 'Escape') fermerCarte()
-    }
+    const onKey = (event: KeyboardEvent) => auClavier.current(event)
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [visible])
@@ -280,6 +282,10 @@ export function Navigateur({
 
     if (picking) {
       await element.executeJavaScript(CANCEL_PICK).catch(() => {})
+      // Remis à false ici aussi, et pas seulement par le `finally` de la
+      // sélection en cours : si rien n'était réellement armé dans la page,
+      // personne ne rendrait la main et le bouton resterait sur « Annuler ».
+      setPicking(false)
       return
     }
 
@@ -307,6 +313,31 @@ export function Navigateur({
   const fermerCarte = () => {
     setPicked(null)
     setComment('')
+  }
+
+  // Réassigné à chaque rendu : c'est ce qui garde le raccourci sur l'état
+  // courant. `select()` est le même chemin que le bouton — le raccourci se
+  // contentait de retourner `picking`, sans jamais rien armer dans la page.
+  auClavier.current = (event: KeyboardEvent) => {
+    const action = actionClavier(event)
+    if (!action) return
+
+    if (action === 'basculer') {
+      event.preventDefault()
+      return void select()
+    }
+
+    // Échap : désarmer une sélection en cours, sinon refermer la carte. Un
+    // seul geste d'abandon, qui fait ce qui est en cours — et qui laisse
+    // filer la touche quand il n'y a rien à abandonner, l'onglet n'étant pas
+    // seul à l'écouter.
+    if (picking) {
+      event.preventDefault()
+      void select()
+    } else if (picked) {
+      event.preventDefault()
+      fermerCarte()
+    }
   }
 
   const envoyerAClaude = async () => {

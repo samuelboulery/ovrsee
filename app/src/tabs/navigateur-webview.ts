@@ -198,6 +198,26 @@ export function pickElement(): Promise<Picked | null> {
   })
 }
 
+/** Ce qu'une touche demande à l'onglet. */
+export type ActionClavier = 'basculer' | 'annuler' | null
+
+/**
+ * La décision clavier, sortie du composant pour être testable.
+ *
+ * `⇧⌘E` bascule le sélecteur — armer *et* désarmer par le même geste, comme le
+ * bouton. Le raccourci se contentait de retourner le booléen d'affichage sans
+ * jamais armer quoi que ce soit dans la page : le bouton passait à « Annuler »
+ * et plus rien ne répondait.
+ *
+ * `event.key` vaut « E » majuscule quand Maj est enfoncée — d'où le repli en
+ * minuscules.
+ */
+export function actionClavier(event: Pick<KeyboardEvent, 'key' | 'metaKey' | 'shiftKey'>): ActionClavier {
+  if (event.metaKey && event.shiftKey && event.key.toLowerCase() === 'e') return 'basculer'
+  if (event.key === 'Escape') return 'annuler'
+  return null
+}
+
 /** Le panneau des DevTools : replié, en bas, ou sur le côté. */
 export function devtoolsStyle(open: boolean, dock: Dock, size: number): string {
   if (!open) return 'flex: none; width: 0; height: 0; overflow: hidden;'

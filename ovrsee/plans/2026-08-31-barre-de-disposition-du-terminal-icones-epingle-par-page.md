@@ -4,7 +4,20 @@
   "title": "Barre de disposition du terminal : icônes + épingle par page",
   "opened": "2026-08-31",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "0aaca82",
+      "date": "2026-08-31",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/terminalPins.test.ts",
+        "app/src/terminalPins.ts",
+        "app/src/useResizable.tsx",
+        "hooks/i18n.js"
+      ]
+    }
+  ]
 }
 ---
 

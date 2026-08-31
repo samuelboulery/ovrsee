@@ -2,7 +2,7 @@
 {
   "id": "T-0220",
   "titre": "Barre du terminal en icônes et épingle de taille par page",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

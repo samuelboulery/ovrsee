@@ -172,3 +172,38 @@ export function submitTo(ptyId: string | null, text: string): boolean {
 export function submitToClaude(text: string): boolean {
   return submitTo(claude.id, text)
 }
+
+/** Ce qu'un clic sur une commande a trouvé comme destination. */
+export type CibleCommande = { cible: string } | { neuf: true }
+
+/**
+ * Où part une commande cliquée.
+ *
+ * La cible naturelle est l'onglet **sous les yeux** — un raccourci cliqué
+ * depuis un shell nu partait chez `claude` et volait l'onglet au passage
+ * (issue #49). La session Claude ne reste que le repli du tout premier rendu,
+ * avant que `pty:open` ait répondu.
+ *
+ * Une commande qui part toute seule ne s'écrit pas par-dessus ce qui tourne :
+ * elle ouvre son propre terminal. Ce qui se colle sans être validé, en
+ * revanche, va toujours dans la cible — c'est du texte à relire, pas une
+ * commande, et occupé ou non n'y change rien.
+ *
+ * `null` quand aucune session n'a de pty : l'appelant se rabat alors sur le
+ * presse-papier, comme dans un navigateur.
+ */
+export function cibleDeCommande(entree: {
+  mode: 'command' | 'context'
+  /** Clé de l'onglet actif, ou null au tout premier rendu. */
+  actif: string | null
+  claudeKey: string | null
+  ptyIds: Readonly<Record<string, string>>
+  /** Sessions où une commande tourne — voir `occupees` dans `Terminal.tsx`. */
+  occupees: ReadonlySet<string>
+}): CibleCommande | null {
+  const { mode, actif, claudeKey, ptyIds, occupees } = entree
+  const cible = actif && ptyIds[actif] ? actif : claudeKey && ptyIds[claudeKey] ? claudeKey : null
+  if (!cible) return null
+  if (mode === 'command' && occupees.has(cible)) return { neuf: true }
+  return { cible }
+}

@@ -47,6 +47,12 @@ export interface MenuBarAttention {
   at: number
 }
 
+/**
+ * Un état montrable. `reset` en est exclu : `Terminal.tsx` l'efface au lieu de
+ * le stocker, il n'atteint jamais un rendu.
+ */
+export type EtatSession = Exclude<AttentionKind, 'reset'>
+
 /** Une session telle que le popover l'affiche. */
 export interface MenuBarSession extends MenuBarOuverte {
   /** `null` quand la session tourne sans avoir rien signalé. */
@@ -133,6 +139,26 @@ export function composer(
       if (a.attention && b.attention) return b.attention.at - a.attention.at
       return a.nom.localeCompare(b.nom) || a.sessionKey.localeCompare(b.sessionKey)
     })
+}
+
+/**
+ * L'état d'un lot de sessions, en un seul signe.
+ *
+ * L'ordre est celui de l'issue #47 : une question l'emporte sur du travail en
+ * cours, qui l'emporte sur le repos. Ce qui compte est ce qui **attend
+ * quelqu'un**, pas ce qui est le plus récent.
+ *
+ * `null` n'est pas un état : il dit qu'aucune session n'est ouverte pour ce
+ * lot. Le distinguer du repos est tout l'objet de T-0217 — un projet jamais
+ * ouvert dans cette instance n'a pas de pty, et lui prêter « au repos » serait
+ * un état deviné. Une session ouverte mais qui n'a rien signalé, elle, est
+ * bien au repos : `stop`.
+ */
+export const agregerEtat = (sessions: readonly MenuBarSession[]): EtatSession | null => {
+  if (sessions.length === 0) return null
+  if (sessions.some(session => session.attention?.kind === 'question')) return 'question'
+  if (sessions.some(session => session.attention?.kind === 'busy')) return 'busy'
+  return 'stop'
 }
 
 /**

@@ -4,6 +4,7 @@ import test from 'node:test'
 import type { Snapshot } from './data'
 import {
   PEREMPTION_MS,
+  agregerEtat,
   compteEnAttente,
   composer,
   estDecidable,
@@ -191,4 +192,50 @@ test('menubar : un instantané dégradé ne fait pas lever', () => {
   assert.equal(resume?.fichiersModifies, 0)
   assert.equal(resume?.ticketsPrets, 0)
   assert.equal(resume?.dernierScan, null)
+})
+
+test('menubar : aucune session ouverte ne rend aucun état, pas un repos', () => {
+  // La distinction de T-0217 : un projet jamais ouvert dans cette instance n'a
+  // pas de pty. Lui prêter « au repos » serait un état deviné.
+  assert.equal(agregerEtat([]), null)
+})
+
+test('menubar : une session ouverte et silencieuse est au repos', () => {
+  assert.equal(agregerEtat(composer([ouverte()], {})), 'stop')
+})
+
+test('menubar : une question l\'emporte sur le travail et sur le repos', () => {
+  const sessions = composer(
+    [ouverte(), ouverte({ sessionKey: '/p/deux#claude', projet: '/p/deux', nom: 'deux' })],
+    {
+      '/p/un#claude': attention({ kind: 'busy' }),
+      '/p/deux#claude': attention({ kind: 'question' }),
+    },
+  )
+
+  assert.equal(agregerEtat(sessions), 'question')
+})
+
+test('menubar : le travail l\'emporte sur le repos', () => {
+  const sessions = composer(
+    [ouverte(), ouverte({ sessionKey: '/p/deux#claude', projet: '/p/deux', nom: 'deux' })],
+    {
+      '/p/un#claude': attention({ kind: 'stop' }),
+      '/p/deux#claude': attention({ kind: 'busy' }),
+    },
+  )
+
+  assert.equal(agregerEtat(sessions), 'busy')
+})
+
+test('menubar : filtrer par projet donne l\'état de ce projet seul', () => {
+  // Ce que fait chaque ligne du sélecteur : la question d'un autre projet ne
+  // doit pas déteindre sur la sienne.
+  const sessions = composer(
+    [ouverte(), ouverte({ sessionKey: '/p/deux#claude', projet: '/p/deux', nom: 'deux' })],
+    { '/p/deux#claude': attention({ kind: 'question' }) },
+  )
+
+  assert.equal(agregerEtat(sessions.filter(s => s.projet === '/p/un')), 'stop')
+  assert.equal(agregerEtat(sessions.filter(s => s.projet === '/p/trois')), null)
 })

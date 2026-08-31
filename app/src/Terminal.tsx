@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react'
 import { briefLines, buildActions, decideInjection } from './brief'
 import {
-  Check,
+  CaretDown,
+  CaretLeft,
+  CaretRight,
+  CaretUp,
   GitFork,
   Minus,
   NotePencil,
@@ -9,8 +12,6 @@ import {
   Play,
   Plus,
   PushPin,
-  SidebarSimple,
-  Question,
   Square,
   SquareHalf,
   SquareHalfBottom,
@@ -21,12 +22,13 @@ import {
   type Snapshot,
   type SettingsType,
 } from './data'
-import { etiquetteDe, type AttentionKind } from './attention'
-import { composer, resumeProjet, type MenuBarAttention } from './menubar'
+import { etiquetteDe } from './attention'
+import { DIT_ATTENTION, Etat } from './EtatSession'
+import { composer, resumeProjet, type MenuBarAttention, type MenuBarSession } from './menubar'
 import { s } from './style'
 import { t, type TranslationKey } from './i18n'
 import { useTerminals } from './useTerminal'
-import { pasteTo } from './pty'
+import { cibleDeCommande, pasteTo, submitTo } from './pty'
 import { pinFor, pinKey, readPins, togglePin, writePins, type Pins } from './terminalPins'
 import { Divider, useResizable } from './useResizable'
 import type { TabId } from './views'
@@ -60,79 +62,43 @@ export interface TerminalActions {
 const LAYOUT_IDS: Layout[] = ['bottom', 'side', 'full']
 
 /**
- * Ce que chaque genre de signal annonce, pour le titre et le lecteur d'écran.
+ * Le bouton qui replie et déplie le panneau des commandes.
  *
- * `reset` n'y est pas : il efface un état au lieu d'en poser un, et n'atteint
- * jamais le rendu.
- */
-type EtatAffichable = Exclude<AttentionKind, 'reset'>
-
-const DIT_ATTENTION: Record<EtatAffichable, TranslationKey> = {
-  busy: 'terminal.attention_busy',
-  stop: 'terminal.attention_stop',
-  question: 'terminal.attention_question',
-}
-
-/**
- * L'état d'une session, dans une case de largeur fixe.
+ * Dans le panneau, jamais dans la barre d'outils du terminal : un bouton qui
+ * commande un panneau se tient dedans, et replié il reste le seul contenu de
+ * la bande — c'est ce qui dit que le panneau existe encore (T-0225).
  *
- * Fixe pour que passer de trois points à une coche ne fasse pas danser la
- * rangée d'onglets. Trois points qui battent pendant le travail, une coche
- * quand Claude rend la main, un point d'interrogation quand il attend une
- * réponse — l'animation vit dans `_ds/ovrsee/styles.css` (`.battement`), seul
- * endroit où une @keyframes peut être déclarée.
+ * Le chevron pointe vers le geste : vers le bord quand il replie, vers le
+ * centre quand il rouvre. En disposition « côté », la bande est en bas et les
+ * chevrons deviennent verticaux.
  */
-function Etat({
-  kind,
-  actif,
-  dit,
+function BoutonBande({
+  ouverte,
+  layout,
+  onToggle,
 }: {
-  kind?: EtatAffichable
-  actif: boolean
-  /** Ce que le signal annonce, ou undefined quand il n'y a rien à annoncer. */
-  dit?: string
+  ouverte: boolean
+  layout: Layout
+  onToggle: () => void
 }) {
-  const commun = { role: dit ? 'status' : undefined, 'aria-label': dit, title: dit }
-  const boite = 'width: 12px; flex: none; display: flex; align-items: center; justify-content: center; gap: 2px;'
-
-  if (kind === 'busy') {
-    return (
-      <span {...commun} style={s(boite)}>
-        {[0, 160, 320].map(retard => (
-          <span
-            key={retard}
-            className="battement"
-            style={s(
-              `width: 2px; height: 2px; border-radius: 50%; background: var(--color-accent); animation-delay: ${retard}ms;`,
-            )}
-          />
-        ))}
-      </span>
-    )
-  }
-
-  if (kind === 'stop' || kind === 'question') {
-    const Icone = kind === 'stop' ? Check : Question
-    return (
-      <span {...commun} style={s(boite)}>
-        <Icone
-          size={11}
-          weight="bold"
-          aria-hidden="true"
-          color={kind === 'stop' ? 'var(--color-ok)' : 'var(--color-accent)'}
-        />
-      </span>
-    )
-  }
+  const Icone =
+    layout === 'side' ? (ouverte ? CaretDown : CaretUp) : ouverte ? CaretRight : CaretLeft
+  const dit = t(ouverte ? 'terminal.actions_hide' : 'terminal.actions_show')
 
   return (
-    <span style={s(boite)}>
-      <span
-        style={s(
-          `width: 5px; height: 5px; border-radius: 50%; background: ${actif ? 'var(--color-accent)' : 'var(--color-text-ghost)'};`,
-        )}
-      />
-    </span>
+    <button
+      type="button"
+      className="btn-icon"
+      onClick={onToggle}
+      aria-expanded={ouverte}
+      title={dit}
+      aria-label={dit}
+      style={s(
+        'flex: none; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 0; border-radius: 6px; background: transparent;',
+      )}
+    >
+      <Icone size={13} weight="bold" aria-hidden="true" color="var(--color-text-quaternary)" />
+    </button>
   )
 }
 
@@ -208,6 +174,7 @@ export function Terminal({
   onTerminalHeightChange,
   onTerminalWidthChange,
   onProjet,
+  onSessions,
   onOpenPreferences,
   actions,
 }: {
@@ -228,6 +195,16 @@ export function Terminal({
   onTerminalWidthChange: (width: number) => void
   /** Affiche un projet — au clic sur une notification venue d'un autre. */
   onProjet: (path: string) => void
+  /**
+   * L'état des sessions Claude, republié à chaque signal.
+   *
+   * Exactement ce que la barre de menu reçoit — même `composer()`, même appel :
+   * le sélecteur de projet montre ce que le popover montre, il ne le recalcule
+   * pas. Vidé au démontage, parce que replier le panneau démonte ce composant
+   * et coupe l'écoute des pty : annoncer un état qu'on ne reçoit plus serait un
+   * mensonge d'interface.
+   */
+  onSessions: (sessions: MenuBarSession[]) => void
   /** Ouvre les préférences sur la section Projet, pour y créer une commande. */
   onOpenPreferences?: () => void
   /**
@@ -264,6 +241,27 @@ export function Terminal({
   // Ce n'est que la moitié de ce que la barre de menu montre : l'autre est la
   // liste des sessions ouvertes, qui existe indépendamment. Voir `composer()`.
   const attentions = useRef<Record<string, MenuBarAttention>>({})
+  /**
+   * Les sessions où une commande cliquée tourne encore.
+   *
+   * Rien dans un pty ne dit de façon fiable qu'une commande y tourne : le
+   * signal `busy` vient des hooks de Claude Code, et un `pnpm dev` dans un
+   * shell nu n'émet rien. On ne retient donc que ce qu'on a lancé soi-même —
+   * relâché dès que l'utilisateur tape dedans, ce qui veut dire qu'il a repris
+   * la main, ou que le pty disparaît. Se tromper coûte un terminal de trop,
+   * jamais une commande écrasée.
+   *
+   * Une référence, pas un state : personne ne l'affiche.
+   */
+  const occupees = useRef<Set<string>>(new Set())
+  /**
+   * L'écriture qui attend l'ouverture d'un shell.
+   *
+   * `openShell()` rend sa clé tout de suite mais son pty n'existe qu'après
+   * l'aller-retour IPC. Sans ce relais, le texte retomberait sur la session
+   * Claude et partirait chez elle.
+   */
+  const enAttente = useRef<{ key: string; text: string; label: string } | null>(null)
   // Compteur de publication : un signal ne change pas les dépendances de
   // l'effet ci-dessous, il faut le lui dire.
   const [signaux, setSignaux] = useState(0)
@@ -349,6 +347,10 @@ export function Terminal({
   // conversation — et la pastille serait restée sur « attend une réponse »,
   // masquée sur l'onglet actif, donc muette pendant tout le travail qui suit.
   sessionKey => {
+    // Taper dans une session, c'est en reprendre la main : la commande qu'on y
+    // avait lancée ne la réserve plus.
+    occupees.current.delete(sessionKey)
+
     if (attentions.current[sessionKey]?.kind !== 'question') return
     // Sans détail : renommer l'onglet d'après une touche n'aurait aucun sens.
     attentions.current = {
@@ -403,14 +405,23 @@ export function Terminal({
   // sans fin. Les deux sont petits — quelques sessions, une poignée de champs.
   const publie = JSON.stringify({ ouvertes, projet, signaux })
   useEffect(() => {
-    void window.ovrsee?.menubar?.report({
-      sessions: composer(ouvertes, attentions.current),
-      projet,
-    })
+    const sessions = composer(ouvertes, attentions.current)
+    onSessions(sessions)
+    void window.ovrsee?.menubar?.report({ sessions, projet })
     // `ouvertes` et `projet` sont dans `publie` ; les lister aussi rendrait
-    // l'effet dépendant de références neuves à chaque rendu.
+    // l'effet dépendant de références neuves à chaque rendu. `onSessions` non
+    // plus : `App` la redéfinit à chaque rendu et l'effet republierait sans fin.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [publie])
+
+  // Panneau replié : plus aucun pty n'est écouté, donc plus aucun état à
+  // montrer. La barre de menu, elle, garde le sien — c'est `tray.js` qui le
+  // retient, et le vider ici viderait le popover à chaque repli.
+  useEffect(
+    () => () => onSessions([]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  )
 
   // « Ouvrir la session » depuis le popover : même chemin que le clic sur une
   // notification, la fenêtre étant déjà ramenée au premier plan par `tray.js`.
@@ -529,33 +540,65 @@ export function Terminal({
     writePins(suivant)
   }
 
+  /** Dépose le texte dans une session : validé si c'est une commande. */
+  const ecrire = (key: string, text: string, part: boolean): boolean => {
+    const ptyId = ptyIds[key] ?? null
+    if (!(part ? submitTo(ptyId, text) : pasteTo(ptyId, text))) return false
+    // Ce qu'on vient de lancer occupe la session jusqu'à ce qu'on y tape.
+    if (part) occupees.current.add(key)
+    setActive(key)
+    // Après le rendu : une session inactive est `inert`, et `focus()` n'y
+    // prend pas tant que React n'a pas commis le changement d'onglet.
+    setTimeout(() => focusSession(key), 0)
+    return true
+  }
+
+  const annoncer = (message: string) => {
+    setNotice(message)
+    setTimeout(() => setNotice(null), 2000)
+  }
+
   /**
    * Un clic écrit dans le terminal affiché quand il y en a un, et copie sinon.
    *
-   * L'onglet actif, et pas la session `claude` : un raccourci cliqué depuis un
-   * shell nu partait chez `claude` et volait l'onglet au passage, alors que le
-   * geste désigne le terminal qu'on a sous les yeux (issue #49). La session
-   * `claude` reste le repli quand aucun onglet n'a de pty — c'est le cas au tout
-   * premier rendu, avant que `pty:open` ait répondu.
+   * Ce que fait le clic dépend de la commande, et `decideInjection` le dit
+   * depuis toujours — la pastille de chaque ligne le montre. Une commande
+   * (`!…`, `/…`) **part** ; le reste se colle sans être validé, pour laisser
+   * ajouter le contexte qu'on voulait lui joindre. Le curseur suit dans les
+   * deux cas, sinon il faudrait cliquer dans la grille pour compléter.
    *
-   * Tout passe par le collage encadré, commandes comprises : le texte se dépose
-   * dans la saisie sans être validé. C'est délibéré — une commande qui partait
-   * au clic ne laissait aucune place au contexte qu'on voulait lui ajouter. Le
-   * curseur suit, sinon il faudrait cliquer dans la grille pour compléter.
+   * Une commande qui part ne s'écrit pas par-dessus ce qui tourne : session
+   * occupée, elle ouvre son propre terminal. Le choix vit dans
+   * `cibleDeCommande` (`pty.ts`), à part et testé.
    *
    * Le repli n'est pas un pis-aller déguisé : le libellé du panneau change
    * aussi, pour que le bouton ne prétende jamais écrire dans une session
    * inexistante.
    */
   const activate = async (label: string, text: string) => {
-    const cible = active && ptyIds[active] ? active : claudeKey
-    if (cible && pasteTo(ptyIds[cible] ?? null, text)) {
-      setActive(cible)
-      // Après le rendu : une session inactive est `inert`, et `focus()` n'y
-      // prend pas tant que React n'a pas commis le changement d'onglet.
-      setTimeout(() => focusSession(cible), 0)
-      setNotice(`« ${label} » écrit dans le terminal`)
-      setTimeout(() => setNotice(null), 2000)
+    const part = decideInjection(text).mode === 'command'
+    // Le texte brut, jamais celui de `decideInjection` : son `\n` de mode
+    // `command` ferait un retour de trop derrière le `\r` de `submitTo`.
+    const ou = cibleDeCommande({
+      mode: part ? 'command' : 'context',
+      actif: active,
+      claudeKey,
+      ptyIds,
+      occupees: occupees.current,
+    })
+
+    if (ou && 'neuf' in ou) {
+      const key = openShell()
+      if (key) {
+        // Le pty n'existe pas encore : l'effet plus bas écrira dès qu'il paraît.
+        // La session n'est marquée occupée qu'à l'écriture, pas ici : son pty
+        // n'existe pas encore, et l'effet d'élagage plus bas retirerait la
+        // marque avant même que la commande soit partie.
+        enAttente.current = { key, text, label }
+        return
+      }
+    } else if (ou && ecrire(ou.cible, text, part)) {
+      annoncer(part ? `« ${label} » lancé dans le terminal` : `« ${label} » écrit dans le terminal`)
       return
     }
 
@@ -569,6 +612,36 @@ export function Terminal({
       setTimeout(() => setNotice(null), 2000)
     }
   }
+
+  /**
+   * Écrit la commande qui attendait l'ouverture d'un shell.
+   *
+   * `ptyIds` est un state : la clé y apparaît au retour de `pty:open`, et c'est
+   * le seul moment où l'écriture peut aboutir. Le `setTimeout` laisse au XTerm
+   * le temps de s'attacher — écrire dans un pty dont la grille n'est pas encore
+   * montée fait perdre l'écho de la ligne.
+   */
+  useEffect(() => {
+    const attente = enAttente.current
+    if (!attente || !ptyIds[attente.key]) return
+    enAttente.current = null
+    const timer = setTimeout(() => {
+      if (submitTo(ptyIds[attente.key] ?? null, attente.text)) {
+        occupees.current.add(attente.key)
+        focusSession(attente.key)
+        annoncer(`« ${attente.label} » lancé dans un nouveau terminal`)
+      }
+    }, 60)
+    return () => clearTimeout(timer)
+    // `focusSession` et `annoncer` sont stables pour ce qui nous intéresse ;
+    // les lister relancerait l'effet à chaque rendu du panneau.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ptyIds])
+
+  /** Un pty disparu ne réserve plus rien — session fermée, ou morte. */
+  useEffect(() => {
+    for (const key of occupees.current) if (!ptyIds[key]) occupees.current.delete(key)
+  }, [ptyIds])
 
   // Construit les actions livrées et personnalisées quand les paramètres sont disponibles
   const allActions = settings ? buildActions(snapshot, settings) : []
@@ -720,28 +793,6 @@ export function Terminal({
             )
           })}
         </div>
-        {/* La bande de commandes se replie : sur un écran étroit, ses 268 px
-            valent plus au terminal qu'à des boutons qu'on ne clique pas
-            toujours. */}
-        <button
-          type="button"
-          className="btn-icon"
-          onClick={() => setBandeOuverte(ouverte => !ouverte)}
-          aria-pressed={bandeOuverte}
-          title={t(bandeOuverte ? 'terminal.actions_hide' : 'terminal.actions_show')}
-          aria-label={t(bandeOuverte ? 'terminal.actions_hide' : 'terminal.actions_show')}
-          style={s(
-            'cursor: pointer; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 6px; ' +
-              (bandeOuverte ? 'background: var(--color-surface-active);' : 'background: transparent;'),
-          )}
-        >
-          <SidebarSimple
-            size={14}
-            weight={bandeOuverte ? 'fill' : 'regular'}
-            aria-hidden="true"
-            color={bandeOuverte ? 'var(--color-accent)' : 'var(--color-text-quaternary)'}
-          />
-        </button>
         {/* Rien à épingler en « plein » : le panneau n'y a pas de taille propre. */}
         {layout !== 'full' && (
           <button
@@ -838,7 +889,23 @@ export function Terminal({
           </div>
         </div>
 
-        {bandeOuverte && (
+        {/* Le panneau est toujours rendu, dans l'une de deux formes : déployé,
+            ou réduit à une bande qui ne porte que son bouton. Le faire
+            disparaître ne laissait rien à l'écran pour dire qu'il existe, et
+            son bouton vivait dans la barre d'outils du terminal — loin de ce
+            qu'il commande (T-0225). */}
+        {!bandeOuverte ? (
+          <div
+            style={s(
+              (layout === 'side'
+                ? 'height: 28px; border-top: 1px solid var(--color-border-chrome);'
+                : 'width: 28px; border-left: 1px solid var(--color-border-chrome);') +
+                ' flex: none; display: flex; align-items: center; justify-content: center; padding: 4px;',
+            )}
+          >
+            <BoutonBande ouverte={false} layout={layout} onToggle={() => setBandeOuverte(true)} />
+          </div>
+        ) : (
         <div
           style={s(
             layout === 'side'
@@ -861,12 +928,15 @@ export function Terminal({
             </div>
           )}
 
-          <div
-            style={s(
-              'font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-discrete);',
-            )}
-          >
-            {t('terminal.actions_section')}
+          <div style={s('display: flex; align-items: center; gap: 8px;')}>
+            <div
+              style={s(
+                'flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-text-discrete);',
+              )}
+            >
+              {t('terminal.actions_section')}
+            </div>
+            <BoutonBande ouverte layout={layout} onToggle={() => setBandeOuverte(false)} />
           </div>
           <div style={s('display: flex; flex-direction: column; gap: 7px; margin-top: 11px;')}>
             {actionsListe.map(action => {

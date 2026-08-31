@@ -53,6 +53,7 @@ import { Divider, useResizable } from './useResizable'
 import { activeTabsInOrder, type TabId } from './views'
 import { labelOf, projectFromUrl, pushUrl, routeFromUrl, tabForPath, ticketFromUrl } from './route'
 import { Message, ProjectSwitcher, ScanBadge, Sidebar, openProject } from './Shell'
+import type { MenuBarSession } from './menubar'
 
 
 
@@ -62,6 +63,14 @@ export function App() {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null)
   const [settings, setSettings] = useState<SettingsType | null>(null)
   const [error, setError] = useState<string | null>(null)
+  /**
+   * L'état des sessions Claude, publié par le panneau terminal.
+   *
+   * Ici et pas dans `Terminal.tsx` : le sélecteur de projet vit dans la barre
+   * de titre, hors du panneau. Vide quand le panneau est replié — il est alors
+   * démonté, plus aucun pty n'est écouté (T-0217).
+   */
+  const [sessions, setSessions] = useState<MenuBarSession[]>([])
 
   // L'écran des préférences s'ouvre d'ici et pas de la barre latérale : le
   // menu natif l'ouvre aussi, et son gestionnaire vit dans ce composant.
@@ -420,11 +429,39 @@ export function App() {
       } else if (event.key.toLowerCase() === 'k') {
         setPaletteOuverte(before => !before)
         event.preventDefault()
+      } else if (event.shiftKey && /^Digit[1-9]$/.test(event.code)) {
+        // ⇧⌘N : le Nᵉ projet de la liste, déjà triée par dernière ouverture.
+        // ⌘N seul appartient aux vues (`electron/menu.js`), et `event.code`
+        // plutôt que `event.key` parce qu'avec Shift la touche « 1 » rend « ! »
+        // ou « & » selon la disposition du clavier.
+        //
+        // Trois trous connus sur macOS : ⇧⌘3, ⇧⌘4 et ⇧⌘5 sont les captures
+        // d'écran du système, qui les prend avant toute application. Rien à
+        // faire côté app — le geste reste possible au clic, et les six autres
+        // marchent. Windows et Linux n'ont pas ce conflit (⇧⌃N y est libre).
+        const projet = projects[Number(event.code.slice(5)) - 1]
+        if (projet) {
+          onProjetPick(projet.path)
+          event.preventDefault()
+        }
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [])
+    // `projects` : sans lui l'écouteur garderait la liste vide du premier rendu.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projects])
+
+  /**
+   * Afficher un projet — sélecteur, palette ⌘K et ⇧⌘1..9 font le même geste.
+   *
+   * Le reste suit tout seul : l'instantané, l'accent et le `touch` du registre
+   * sont des effets de `current` (plus bas dans ce fichier).
+   */
+  const onProjetPick = (path: string) => {
+    setCurrent(path)
+    pushUrl(window.location.pathname, path)
+  }
 
   /**
    * Changer de vue — rail (`Sidebar`) et palette ⌘K (`CommandPalette`) font
@@ -519,10 +556,8 @@ export function App() {
           projects={projects}
           current={current}
           snapshot={snapshot}
-          onPick={path => {
-            setCurrent(path)
-            pushUrl(window.location.pathname, path)
-          }}
+          sessions={sessions}
+          onPick={onProjetPick}
           onProjects={applyProjects}
           onError={setError}
         />
@@ -698,6 +733,7 @@ export function App() {
                       onTerminalHeightChange={setTerminalHeight}
                       onTerminalWidthChange={setTerminalWidth}
                       onProjet={setCurrent}
+                      onSessions={setSessions}
                       onOpenPreferences={() => {
                         setPreferencesInitial({ section: 'projet' })
                         setPreferencesOuvertes(true)
@@ -792,10 +828,7 @@ export function App() {
           current={current}
           onClose={() => setPaletteOuverte(false)}
           onTabPick={onTabPick}
-          onPick={path => {
-            setCurrent(path)
-            pushUrl(window.location.pathname, path)
-          }}
+          onPick={onProjetPick}
           onOpenPreferences={() => setPreferencesOuvertes(true)}
           onOpenTicket={onOuvrirTicket}
         />

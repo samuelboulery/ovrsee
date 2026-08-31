@@ -2,7 +2,7 @@
 {
   "id": "T-0217",
   "titre": "État des sessions Claude des autres projets",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",
@@ -11,7 +11,7 @@
   ],
   "cree": "2026-08-31",
   "maj": "2026-08-31",
-  "plan": "2026-08-31-tour-du-depot-ovrsee-backlog-priorise-et-lot-d-intendance.md",
+  "plan": "2026-08-31-issue-47-voir-les-autres-projets-sans-derouler.md",
   "charge": "m"
 }
 ---

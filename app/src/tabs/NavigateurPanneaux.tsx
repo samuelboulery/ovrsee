@@ -1,36 +1,39 @@
 /**
- * Les blocs qui bordent la vue de l'onglet Navigateur : panneau de l'élément
+ * Les blocs qui bordent la vue de l'onglet Navigateur : carte de l'élément
  * sélectionné, boutons de navigation, écran « hors application ».
  *
  * Sortis de `Navigateur.tsx` (T-0206) : ils prennent tout en props.
  */
 
-import { X } from '@phosphor-icons/react'
-import { type ReactNode } from 'react'
+import { PaperPlaneRight, X } from '@phosphor-icons/react'
 
 import { t } from '../i18n'
 import { s } from '../style'
 import { type Picked } from './navigateur-webview'
 
 /**
- * Panneau de l'élément sélectionné — ouvert seulement le temps d'une
- * sélection (maquette 2c posait la colonne en permanence ; à l'usage, elle
- * gênait plus qu'elle n'aidait quand rien n'était sélectionné), et
- * redimensionnable comme les autres panneaux de l'onglet.
+ * Ce qu'on a voulu dire de l'élément cliqué — une carte qui flotte au-dessus
+ * de l'aperçu, en haut à droite.
+ *
+ * Elle remplace la colonne de droite (T-0214) : 340 px redimensionnables qui
+ * poussaient l'aperçu et occupaient la moitié de l'écran pour trois champs de
+ * texte. Ce qu'on regarde, c'est le site — pas la fiche de l'élément.
+ *
+ * Elle ne montre que le **sélecteur**. Le texte et la route ont disparu avec
+ * le panneau : la route est déjà dans la barre d'URL, à quelques pixels
+ * au-dessus, et la répéter n'apprenait rien.
  */
-export function ElementPanel({
+export function CarteElement({
   picked,
-  width,
-  routes,
-  currentRoute,
+  comment,
+  onComment,
   onSend,
   onTicket,
   onClose,
 }: {
   picked: Picked
-  width: number
-  routes: string[]
-  currentRoute: string | null
+  comment: string
+  onComment: (next: string) => void
   onSend: () => void
   onTicket: () => void
   onClose: () => void
@@ -38,83 +41,71 @@ export function ElementPanel({
   return (
     <div
       style={s(
-        `width: ${width}px; flex: none; border-left: 1px solid var(--color-divider); background: var(--color-surface-panel); display: flex; flex-direction: column; overflow-y: auto;`,
+        // `z-index` n'est pas décoratif : sans lui la carte passe sous la
+        // `<webview>`, qui est une vue à part entière.
+        'position: absolute; top: 12px; right: 12px; z-index: 3; width: 286px; display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--color-border-card); border-radius: var(--radius-lg); background: var(--color-surface-card); box-shadow: var(--shadow-lg);',
       )}
     >
-      <div style={s('height: 38px; flex: none; display: flex; align-items: center; padding: 0 12px; border-bottom: 1px solid var(--color-divider);')}>
-        <div style={s('font-size: 12px; font-weight: 500; flex: 1;')}>{t('navigateur.selected_element')}</div>
+      <div style={s('display: flex; align-items: flex-start; gap: 8px;')}>
+        <div
+          title={picked.selector}
+          style={s(
+            'flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 11px; color: var(--color-plan); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.5;',
+          )}
+        >
+          {picked.selector}
+        </div>
         <button
           type="button"
           onClick={onClose}
           aria-label={t('navigateur.dismiss_selection')}
-          style={s('background: transparent; border: 0; cursor: pointer; color: var(--color-neutral-600); display: flex; padding: 0;')}
+          style={s(
+            'background: transparent; border: 0; cursor: pointer; color: var(--color-neutral-600); display: flex; padding: 0; flex: none;',
+          )}
         >
-          <X size={14} weight="regular" aria-hidden="true" />
+          <X size={13} weight="regular" aria-hidden="true" />
         </button>
       </div>
 
-      <div style={s('padding: 14px; display: flex; flex-direction: column; gap: 14px;')}>
-        <PanelField label={t('navigateur.selector_label')}>
-          <div
-            style={s(
-              'font-family: var(--font-mono); font-size: 11px; color: var(--color-plan); background: var(--color-surface-control); border: 1px solid var(--color-divider); border-radius: var(--radius-md); padding: 9px 10px; line-height: 1.6; word-break: break-all;',
-            )}
-          >
-            {picked.selector}
-          </div>
-        </PanelField>
-        <PanelField label={t('navigateur.text_label')}>
-          <div style={s('font-size: 12.5px; color: var(--color-neutral-400); line-height: 1.6;')}>{picked.text || '—'}</div>
-        </PanelField>
-        <PanelField label={t('navigateur.route_label')}>
-          <div style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-neutral-500);')}>{picked.route}</div>
-        </PanelField>
-
-        <div style={s('height: 1px; background: var(--color-divider);')} />
-
-        <div style={s('display: flex; flex-direction: column; gap: 8px;')}>
-          <button type="button" onClick={onSend} className="btn btn-primary" style={s('justify-content: center; font-size: 12px;')}>
-            {t('navigateur.paste_in_claude')}
-          </button>
-          <button type="button" onClick={onTicket} className="btn btn-secondary" style={s('justify-content: center; font-size: 12px;')}>
-            {t('navigateur.open_ticket_from_element')}
-          </button>
-        </div>
-
-        {routes.length > 0 && (
-          <>
-            <div style={s('height: 1px; background: var(--color-divider);')} />
-            <PanelField label={t('navigateur.known_routes')}>
-              <div style={s('display: flex; flex-wrap: wrap; gap: 5px;')}>
-                {routes.map(route => (
-                  <span
-                    key={route}
-                    className={route === currentRoute ? 'tag' : 'tag tag-outline'}
-                    style={s(
-                      route === currentRoute
-                        ? 'font-size: 11px; color: var(--color-plan); background: var(--color-plan-bg); border: 1px solid var(--color-plan-border);'
-                        : 'font-size: 11px;',
-                    )}
-                  >
-                    {route}
-                  </span>
-                ))}
-              </div>
-            </PanelField>
-          </>
+      <textarea
+        value={comment}
+        autoFocus
+        onChange={event => onComment(event.target.value)}
+        onKeyDown={event => {
+          // Entrée envoie, Maj+Entrée fait un retour à la ligne — la
+          // convention de toutes les zones de saisie qui parlent à quelqu'un.
+          if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault()
+            onSend()
+          }
+        }}
+        rows={3}
+        placeholder={t('navigateur.comment_placeholder')}
+        style={s(
+          'width: 100%; box-sizing: border-box; resize: none; font-family: var(--font-body); font-size: 12px; line-height: 1.5; padding: 8px 9px; border-radius: var(--radius-md); border: 1px solid var(--color-border-control); background: var(--color-surface-control); color: var(--color-text);',
         )}
-      </div>
-    </div>
-  )
-}
+      />
 
-export function PanelField({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div style={s('display: flex; flex-direction: column; gap: 6px;')}>
-      <div style={s('font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-600);')}>
-        {label}
+      <div style={s('display: flex; align-items: center; gap: 8px;')}>
+        <button
+          type="button"
+          onClick={onTicket}
+          className="btn btn-ghost"
+          style={s('flex: 1; justify-content: center; font-size: 11.5px; padding: 5px 8px;')}
+        >
+          {t('navigateur.create_ticket')}
+        </button>
+        <button
+          type="button"
+          onClick={onSend}
+          className="btn btn-primary"
+          title={t('navigateur.send_hint')}
+          aria-label={t('navigateur.send_to_claude')}
+          style={s('justify-content: center; font-size: 11.5px; padding: 5px 11px; flex: none;')}
+        >
+          <PaperPlaneRight size={13} weight="fill" aria-hidden="true" />
+        </button>
       </div>
-      {children}
     </div>
   )
 }

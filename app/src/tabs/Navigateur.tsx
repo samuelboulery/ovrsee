@@ -5,13 +5,14 @@ import { type Snapshot } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
-import { pasteToClaude } from '../pty'
+import { submitToClaude } from '../pty'
 import { Divider, useResizable } from '../useResizable'
-import { ElementPanel, HorsApplication, NavButton } from './NavigateurPanneaux'
+import { CarteElement, HorsApplication, NavButton } from './NavigateurPanneaux'
 import {
   ALLOW_POPUPS,
   CANCEL_PICK,
   DOCKS,
+  actionClavier,
   DOCK_KEY,
   MAX_LOGS,
   URL_KEY,
@@ -69,6 +70,9 @@ export function Navigateur({
   const [logsOpen, setLogsOpen] = useState(false)
   const [picking, setPicking] = useState(false)
   const [picked, setPicked] = useState<Picked | null>(null)
+  // Ce qu'on a voulu dire de l'élément. Reparti de zéro à chaque sélection :
+  // un commentaire qui survivrait au clic suivant parlerait d'autre chose.
+  const [comment, setComment] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
 
   // Les DevTools sont une vue native posée au-dessus du DOM par le processus
@@ -98,15 +102,6 @@ export function Navigateur({
     invert: true,
   })
   const pane = dock === 'side' ? paneWidth : paneHeight
-
-  const elementPanelWidth = useResizable({
-    key: 'navigateur.element-panel',
-    initial: 340,
-    min: 280,
-    max: () => window.innerWidth * 0.5,
-    axis: 'x',
-    invert: true,
-  })
 
   const moveDock = (next: Dock) => {
     setDock(next)
@@ -152,17 +147,22 @@ export function Navigateur({
     // `ovrsee/`, et rechargerait la page inspectée pour rien.
   }, [snapshot.root])
 
+  /**
+   * Le clavier, renvoyé par ref plutôt que par dépendance d'effet.
+   *
+   * L'écouteur doit voir l'état du **rendu courant** — `picking`, `picked`, et
+   * le `select()` d'aujourd'hui. Posé en dépendance, il se réabonnerait à
+   * chaque frappe ; capturé une fois pour toutes, il lirait l'état du rendu où
+   * `visible` a changé. La ref tranche : un abonnement, toujours à jour.
+   */
+  const auClavier = useRef<(event: KeyboardEvent) => void>(() => {})
+
   // ⇧⌘E bascule le sélecteur — annoncé par la barre d'état (maquette 2c).
   // Bindé seulement onglet visible : sinon un raccourci global s'active en
   // arrière-plan pendant qu'on tape ailleurs dans l'application.
   useEffect(() => {
     if (!visible) return
-    const onKey = (event: KeyboardEvent) => {
-      if (event.metaKey && event.shiftKey && event.key.toLowerCase() === 'e') {
-        event.preventDefault()
-        setPicking(p => !p)
-      }
-    }
+    const onKey = (event: KeyboardEvent) => auClavier.current(event)
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [visible])
@@ -251,9 +251,16 @@ export function Navigateur({
     }
   }, [])
 
-  /** Envoie à Claude, ou copie s'il n'y a pas de session — comme le panneau terminal. */
+  /**
+   * Envoie à Claude, ou copie s'il n'y a pas de session.
+   *
+   * Ici on **valide** : les deux boutons de cet onglet disent « envoyer », et
+   * un texte qui attend un Entrée de plus n'est pas envoyé. Ailleurs —
+   * palette, panneau d'équipement — `pasteToClaude` colle sans valider, parce
+   * qu'on y prépare une demande qu'on veut relire.
+   */
   const send = async (label: string, text: string) => {
-    if (pasteToClaude(text)) return say(t('navigateur.sent_to_claude', { label }))
+    if (submitToClaude(text)) return say(t('navigateur.sent_to_claude', { label }))
     try {
       await navigator.clipboard.writeText(text)
       say(t('navigateur.copied', { label }))
@@ -275,13 +282,20 @@ export function Navigateur({
 
     if (picking) {
       await element.executeJavaScript(CANCEL_PICK).catch(() => {})
+      // Remis à false ici aussi, et pas seulement par le `finally` de la
+      // sélection en cours : si rien n'était réellement armé dans la page,
+      // personne ne rendrait la main et le bouton resterait sur « Annuler ».
+      setPicking(false)
       return
     }
 
     setPicking(true)
     try {
       const result = (await element.executeJavaScript(`(${pickElement})()`)) as Picked | null
-      if (result) setPicked(result)
+      if (result) {
+        setComment('')
+        setPicked(result)
+      }
     } catch (err) {
       say(t('navigateur.selection_failed', { error: err instanceof Error ? err.message : String(err) }))
     } finally {
@@ -289,16 +303,55 @@ export function Navigateur({
     }
   }
 
+  /**
+   * Ferme la carte.
+   *
+   * Rien à annuler côté page : quand la carte paraît, `pickElement` a déjà
+   * rendu sa valeur et retiré ses écouteurs. `CANCEL_PICK` ne sert qu'à
+   * interrompre une sélection **en cours**, et c'est `select()` qui l'envoie.
+   */
+  const fermerCarte = () => {
+    setPicked(null)
+    setComment('')
+  }
+
+  // Réassigné à chaque rendu : c'est ce qui garde le raccourci sur l'état
+  // courant. `select()` est le même chemin que le bouton — le raccourci se
+  // contentait de retourner `picking`, sans jamais rien armer dans la page.
+  auClavier.current = (event: KeyboardEvent) => {
+    const action = actionClavier(event)
+    if (!action) return
+
+    if (action === 'basculer') {
+      event.preventDefault()
+      return void select()
+    }
+
+    // Échap : désarmer une sélection en cours, sinon refermer la carte. Un
+    // seul geste d'abandon, qui fait ce qui est en cours — et qui laisse
+    // filer la touche quand il n'y a rien à abandonner, l'onglet n'étant pas
+    // seul à l'écouter.
+    if (picking) {
+      event.preventDefault()
+      void select()
+    } else if (picked) {
+      event.preventDefault()
+      fermerCarte()
+    }
+  }
+
   const envoyerAClaude = async () => {
     if (!picked) return
-    await send('Élément', describe(picked))
+    await send('Élément', describe(picked, comment))
     setPicked(null)
+    setComment('')
   }
 
   const onTicketDepuisElement = () => {
     if (!picked) return
-    onCreerTicketDepuisElement(corpsDepuis(picked), ['navigateur'])
+    onCreerTicketDepuisElement(corpsDepuis(picked, comment), ['navigateur'])
     setPicked(null)
+    setComment('')
   }
 
   /**
@@ -366,13 +419,6 @@ export function Navigateur({
   }, [devtools, visible, dock, pane.size, placeDevtools])
 
   const errors = logs.filter(l => l.level === 'error').length
-  const currentRoute = (() => {
-    try {
-      return new URL(url).pathname
-    } catch {
-      return null
-    }
-  })()
   const host = (() => {
     try {
       return new URL(url).host
@@ -472,10 +518,9 @@ export function Navigateur({
         )}
       </div>
 
-      {/* La colonne aperçu+DevTools+journal à gauche, le panneau de
-          l'élément sélectionné à droite — ouvert seulement le temps d'une
-          sélection. */}
-      <div style={s('flex: 1; display: flex; min-height: 0; min-width: 0;')}>
+      {/* Aperçu, DevTools et journal, sur toute la largeur — la colonne de
+          droite a disparu avec le panneau de l'élément (T-0214), qui est
+          devenu une carte flottante posée sur l'aperçu. */}
       <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0;')}>
 
       {/* Aperçu et DevTools partagent cette zone : en colonne quand ils sont
@@ -517,6 +562,18 @@ export function Navigateur({
           {...ALLOW_POPUPS}
           style={s('position: absolute; inset: 0; width: 100%; height: 100%;')}
         />
+
+        {/* Au-dessus de l'aperçu, pas à côté : ce qu'on regarde c'est le site. */}
+        {picked && (
+          <CarteElement
+            picked={picked}
+            comment={comment}
+            onComment={setComment}
+            onSend={envoyerAClaude}
+            onTicket={onTicketDepuisElement}
+            onClose={fermerCarte}
+          />
+        )}
 
         {failure && (
           <div
@@ -619,22 +676,6 @@ export function Navigateur({
         >
           {notice}
         </div>
-      )}
-      </div>
-
-      {picked && (
-        <>
-          <Divider axis="x" resizable={elementPanelWidth} />
-          <ElementPanel
-            picked={picked}
-            width={elementPanelWidth.size}
-            routes={snapshot.pages?.pages?.map(page => page.route) ?? []}
-            currentRoute={currentRoute}
-            onSend={envoyerAClaude}
-            onTicket={onTicketDepuisElement}
-            onClose={() => setPicked(null)}
-          />
-        </>
       )}
       </div>
 

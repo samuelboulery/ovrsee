@@ -152,3 +152,23 @@ export function pasteTo(ptyId: string | null, text: string): boolean {
 export function pasteToClaude(text: string): boolean {
   return pasteTo(claude.id, text)
 }
+
+/**
+ * Colle un bloc dans le pty désigné **et le valide**.
+ *
+ * Une seule écriture, pas deux : le `\r` voyage dans le même morceau que la
+ * fin de collage, donc rien ne peut s'intercaler entre les deux. Il est
+ * **après** `\x1b[201~`, hors du collage — dedans, il serait du texte.
+ *
+ * `pasteTo` reste le défaut partout ailleurs : coller sans valider laisse
+ * relire, et c'est ce qu'on veut quand on prépare une demande. Celui-ci est
+ * réservé au geste qui dit explicitement « envoie ».
+ */
+export function submitTo(ptyId: string | null, text: string): boolean {
+  return injectTo(ptyId, `\x1b[200~${text}\x1b[201~\r`)
+}
+
+/** Envoie un bloc à la session Claude du projet courant, et le valide. */
+export function submitToClaude(text: string): boolean {
+  return submitTo(claude.id, text)
+}

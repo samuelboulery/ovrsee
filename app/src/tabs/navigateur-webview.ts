@@ -117,8 +117,12 @@ export function normalize(raw: string): string {
 export function pickElement(): Promise<Picked | null> {
   return new Promise(resolve => {
     const overlay = document.createElement('div')
+    // Couleur littérale, pas `var(--color-accent)` : ce style s'applique dans
+    // la page inspectée, qui n'a pas le design system de l'ovrsee. La variable
+    // n'y existant pas, la déclaration devenait invalide et la bordure ne se
+    // voyait pas — seul le fond `rgba()` survivait.
     overlay.style.cssText =
-      'position:fixed;z-index:2147483647;pointer-events:none;border:2px solid var(--color-accent);' +
+      'position:fixed;z-index:2147483647;pointer-events:none;border:2px solid #7d76f0;' +
       'background:rgba(125,118,240,.18);border-radius:2px;transition:all .05s;'
     document.body.appendChild(overlay)
 
@@ -194,6 +198,26 @@ export function pickElement(): Promise<Picked | null> {
   })
 }
 
+/** Ce qu'une touche demande à l'onglet. */
+export type ActionClavier = 'basculer' | 'annuler' | null
+
+/**
+ * La décision clavier, sortie du composant pour être testable.
+ *
+ * `⇧⌘E` bascule le sélecteur — armer *et* désarmer par le même geste, comme le
+ * bouton. Le raccourci se contentait de retourner le booléen d'affichage sans
+ * jamais armer quoi que ce soit dans la page : le bouton passait à « Annuler »
+ * et plus rien ne répondait.
+ *
+ * `event.key` vaut « E » majuscule quand Maj est enfoncée — d'où le repli en
+ * minuscules.
+ */
+export function actionClavier(event: Pick<KeyboardEvent, 'key' | 'metaKey' | 'shiftKey'>): ActionClavier {
+  if (event.metaKey && event.shiftKey && event.key.toLowerCase() === 'e') return 'basculer'
+  if (event.key === 'Escape') return 'annuler'
+  return null
+}
+
 /** Le panneau des DevTools : replié, en bas, ou sur le côté. */
 export function devtoolsStyle(open: boolean, dock: Dock, size: number): string {
   if (!open) return 'flex: none; width: 0; height: 0; overflow: hidden;'
@@ -203,9 +227,28 @@ export function devtoolsStyle(open: boolean, dock: Dock, size: number): string {
   return `height: ${size}px; flex: none; border-top: 1px solid var(--color-divider); background: #ffffff;`
 }
 
-/** Le bloc envoyé à Claude — assez précis pour qu'il retrouve le code. */
-export const describe = (picked: Picked): string =>
+/**
+ * Le commentaire, prêt à être mis en tête — ou rien.
+ *
+ * Un champ laissé vide est le cas courant : on clique souvent pour envoyer le
+ * sélecteur, sans avoir rien à dire. Il ne doit alors pas laisser de ligne
+ * blanche derrière lui, sans quoi la sortie d'avant T-0214 changerait pour
+ * tout le monde.
+ */
+const enTete = (comment?: string): string[] => {
+  const dit = comment?.trim()
+  return dit ? [dit, ''] : []
+}
+
+/**
+ * Le bloc envoyé à Claude — assez précis pour qu'il retrouve le code.
+ *
+ * Le commentaire passe **avant** le descriptif : c'est ce qu'on a voulu dire
+ * qui compte, le sélecteur n'en est que la preuve.
+ */
+export const describe = (picked: Picked, comment?: string): string =>
   [
+    ...enTete(comment),
     `Élément sélectionné dans l'aperçu (route ${picked.route}) :`,
     `sélecteur : ${picked.selector}`,
     `texte     : « ${picked.text} »`,
@@ -213,10 +256,11 @@ export const describe = (picked: Picked): string =>
   ].join('\n')
 
 /** Le corps du ticket : même contexte que `describe()`, en markdown plutôt qu'en texte pour Claude. */
-export const corpsDepuis = (picked: Picked): string =>
+export const corpsDepuis = (picked: Picked, comment?: string): string =>
   [
     '## Contexte',
     '',
+    ...enTete(comment),
     `Élément sélectionné dans l'aperçu, route \`${picked.route}\`.`,
     '',
     `Sélecteur : \`${picked.selector}\``,

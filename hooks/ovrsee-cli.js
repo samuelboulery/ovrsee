@@ -5,7 +5,7 @@
  * d'appoint.
  *
  *   node hooks/ovrsee-cli.js status
- *   node hooks/ovrsee-cli.js close
+ *   node hooks/ovrsee-cli.js close [<plan.md>] [--commit <sha>]
  *   node hooks/ovrsee-cli.js reconcile
  *   node hooks/ovrsee-cli.js capture <fichier-de-plan.md>
  *   node hooks/ovrsee-cli.js tickets
@@ -31,6 +31,7 @@ import {
   planFileName,
   writeFileNoFollow,
   closeOpenPlans,
+  attachCommitToPlan,
   registerProject,
 } from './plans.js'
 
@@ -53,6 +54,9 @@ import { reconcile as reconcileCommits } from './reconcile.js'
 
 const root = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
 const ovrseeDir = join(root, 'ovrsee')
+
+/** Un appel git dans le dépôt courant. Échoue bruyamment : c'est un outil manuel. */
+const git = args => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim()
 
 const commands = {
   status() {
@@ -79,6 +83,17 @@ const commands = {
     // Afficher les épics avec leurs enfants
     const colonnes = readBoard(ovrseeDir)
     const tickets = sortTickets(readTickets(ovrseeDir, colonnes))
+
+    // Un plan ouvert sans commit est un cul-de-sac : `closeOpenPlans` refuse de
+    // dater sa clôture, et il reste ouvert pour toujours en captant les commits
+    // de sa session. Le lister ici est ce qui aurait rendu la panne visible
+    // sans qu'on la cherche (T-0223).
+    const sansCommit = open.filter(p => (p.meta.commits ?? []).length === 0)
+    if (sansCommit.length > 0) {
+      console.log(`\n⚠ ${sansCommit.length} plan(s) ouvert(s) sans aucun commit :`)
+      for (const p of sansCommit) console.log(`  ${p.file}  ${p.meta.title}`)
+      console.log('  → ovrsee:close <plan.md> --commit <sha> si un commit les a réalisés')
+    }
 
     // Un ticket lié à un plan ouvert sans commit ne peut jamais avancer tout
     // seul : closeOpenPlans() refuse de clore un plan sans commit, et rien
@@ -108,8 +123,58 @@ const commands = {
     }
   },
 
-  close() {
-    const closed = closeOpenPlans(ovrseeDir, console.error)
+  /**
+   * Clôt les plans ouverts.
+   *
+   *   ovrsee-cli.js close                          tous les plans ouverts
+   *   ovrsee-cli.js close <plan.md>                celui-là seulement
+   *   ovrsee-cli.js close <plan.md> --commit <sha> le rattache d'abord
+   *
+   * Sans argument, la commande reste un rouleau compresseur : deux PR mergées
+   * de suite en soldent deux d'un coup. Le dire avant d'agir vaut mieux que le
+   * découvrir après.
+   *
+   * `--commit` répare le cas qui n'avait aucun geste : un plan qu'un
+   * squash-merge a laissé ouvert sans commit est inclosable — `closeOpenPlans`
+   * date la clôture d'après le dernier commit, et il n'y en a pas. C'était un
+   * script jetable à écrire ; c'est une option (T-0223).
+   *
+   * `--help` affiche cette aide **sans rien clore**. Avant, elle clôturait tout.
+   */
+  close(...rest) {
+    const usage = [
+      'usage : ovrsee-cli.js close [<plan.md>] [--commit <sha>]',
+      '',
+      '  sans argument      clôt TOUS les plans ouverts portant un commit',
+      '  <plan.md>          ne clôt que ce plan',
+      '  --commit <sha>     rattache ce commit au plan visé avant de le clore',
+    ].join('\n')
+
+    if (rest.includes('--help') || rest.includes('-h')) {
+      console.log(usage)
+      return
+    }
+
+    const drapeau = rest.indexOf('--commit')
+    const sha = drapeau === -1 ? null : rest[drapeau + 1]
+    if (drapeau !== -1 && !sha) throw new Error(usage)
+
+    const cible = rest.filter((arg, i) => !arg.startsWith('--') && i !== drapeau + 1)[0] ?? null
+    if (sha && !cible) throw new Error('--commit exige le plan à rattacher\n' + usage)
+
+    if (sha) {
+      const court = git(['rev-parse', '--short', sha])
+      const rattache = attachCommitToPlan(ovrseeDir, cible, {
+        sha: court,
+        date: git(['log', '-1', '--format=%cs', sha]),
+        files: [],
+      })
+      console.log(rattache ? `rattaché : ${court} → ${cible}` : `déjà là ou plan clos : ${court}`)
+    }
+
+    if (!cible) console.log('aucun plan visé : tous les plans ouverts vont être clos')
+
+    const closed = closeOpenPlans(ovrseeDir, console.error, cible ? { only: cible } : undefined)
     avancerTicketsClos(ovrseeDir) // les tickets liés doivent suivre la fermeture, pas seulement le hook automatique
     if (closed.length === 0) {
       console.log('aucun plan ouvert portant un commit — rien à clore')

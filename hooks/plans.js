@@ -392,20 +392,39 @@ export function setProjectAccent(root, accent) {
  *   pointe. Le plan d'une session voisine, encore en travail, n'est jamais
  *   fermé de l'extérieur. C'était le défaut le plus visible : approuver un plan
  *   soldait l'intention d'à côté, en silence.
+ * - `{ only }` — un seul plan visé, par son nom de fichier. `pnpm ovrsee:close`
+ *   sans argument reste un rouleau compresseur : deux PR mergées de suite en
+ *   soldent deux d'un coup, et personne ne l'avait demandé.
+ *
+ * **Un plan ouvert sans commit se dit.** Il ne peut pas être clos — la date de
+ * clôture se prend sur le dernier commit — et il partait en `continue`, sans un
+ * mot : le plan restait ouvert pour toujours, en captant au passage les commits
+ * de sa session. Il est désormais nommé, avec le geste qui le répare (T-0223).
+ * Le filtre de portée passe **avant** ce signalement, sans quoi la capture d'un
+ * plan crierait sur ceux des sessions voisines.
  *
  * @param {string} ovrseeDir
  * @param {(message: string) => void} [log]
- * @param {{session: string|null}} [options]
+ * @param {{session?: string|null, only?: string}} [options]
  * @returns {string[]} fichiers effectivement clos
  */
 export function closeOpenPlans(ovrseeDir, log = () => {}, options = undefined) {
-  const portee = options ? porteeDeSession(ovrseeDir, options.session) : null
+  const portee = options?.session !== undefined ? porteeDeSession(ovrseeDir, options.session) : null
   const closed = []
 
   for (const plan of readPlans(ovrseeDir)) {
     const commits = plan.meta.commits ?? []
-    if (plan.meta.status !== 'open' || commits.length === 0) continue
+    if (plan.meta.status !== 'open') continue
+    if (options?.only && plan.file !== options.only) continue
     if (portee && !portee(plan.file)) continue
+
+    if (commits.length === 0) {
+      log(
+        `${plan.file} : aucun commit, laissé ouvert — ` +
+          `« ovrsee:close ${plan.file} --commit <sha> » si un commit l'a réalisé`,
+      )
+      continue
+    }
 
     const date = commits.at(-1)?.date
     if (!date) {

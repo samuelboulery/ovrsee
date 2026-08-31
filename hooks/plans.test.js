@@ -361,6 +361,43 @@ test('closeOpenPlans laisse ouvert un plan sans commit — c’est une intention
   assert.equal(readPlans(dir)[0].meta.status, 'open')
 })
 
+// T-0223 : le `continue` était muet, et un plan sans commit pouvait rester
+// ouvert pour toujours sans que rien ne le dise.
+test('closeOpenPlans nomme le plan sans commit qu’il laisse ouvert, avec le geste', () => {
+  const dir = ovrseeWithPlans([['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [] }]])
+
+  const messages = []
+  closeOpenPlans(dir, m => messages.push(m))
+
+  assert.match(messages.join(' '), /a\.md/)
+  assert.match(messages.join(' '), /aucun commit/)
+  assert.match(messages.join(' '), /--commit/)
+})
+
+test('closeOpenPlans ne crie pas sur un plan hors de sa portée', () => {
+  const dir = ovrseeWithPlans([['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [] }]])
+  writeActive(dir, 'voisine', { plan: 'a.md' })
+
+  // Capturer un plan ne doit rien dire des plans des sessions d'à côté : c'est
+  // leur travail en cours, pas une panne.
+  const messages = []
+  closeOpenPlans(dir, m => messages.push(m), { session: 'moi' })
+
+  assert.deepEqual(messages, [])
+})
+
+test('closeOpenPlans avec `only` ne clôt que le plan visé', () => {
+  const dir = ovrseeWithPlans([
+    ['a.md', { status: 'open', title: 'A', opened: '2026-07-01', commits: [{ sha: 'aaa', date: '2026-07-02', files: [] }] }],
+    ['b.md', { status: 'open', title: 'B', opened: '2026-07-01', commits: [{ sha: 'bbb', date: '2026-07-03', files: [] }] }],
+  ])
+
+  assert.deepEqual(closeOpenPlans(dir, () => {}, { only: 'b.md' }), ['b.md'])
+  const parFichier = Object.fromEntries(readPlans(dir).map(p => [p.file, p.meta.status]))
+  assert.equal(parFichier['a.md'], 'open', 'deux PR mergées de suite n’en soldent plus deux d’un coup')
+  assert.equal(parFichier['b.md'], 'closed')
+})
+
 test('closeOpenPlans ne retouche pas un plan déjà clos', () => {
   const dir = ovrseeWithPlans([
     [

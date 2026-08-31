@@ -141,9 +141,9 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   normal quand le travail a été commité ici avant d'être squashé là-bas — lui fait
   répondre « aucun commit à rattraper », et il reste ouvert malgré tout. C'est
   `pnpm ovrsee:close` qui date la clôture, et c'est lui qu'il faut après un squash-merge
-  fait sur GitHub. Attention à sa portée : il clôt **tous** les plans ouverts, pas celui
-  qu'on vise — deux PR mergées de suite en soldent deux d'un coup. Il n'a pas non plus
-  d'aide en ligne : `close --help` n'affiche rien et exécute la commande.
+  fait sur GitHub. **Sans argument il clôt tous les plans ouverts** — deux PR mergées de
+  suite en soldent deux d'un coup ; `ovrsee:close <plan.md>` n'en vise qu'un, et
+  `--help` affiche l'usage sans rien clore (T-0223).
 - **Le rattrapage solde des tickets d'après un message écrit ailleurs.** Le `%B` d'un
   commit venu d'un remote fait foi : `reconcile()` cite le ticket, `avancerTicketsDuPlan`
   le pousse en colonne finale, à chaque `git pull`, sans confirmation. La portée est
@@ -153,11 +153,22 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   hook nomme sur stderr les tickets soldés, au moment du `pull`. Corriger se fait d'un
   `moveTicket` en arrière — l'avancée manuelle est toujours plus vraie que la règle
   automatique.
-- **Un commit dont on ne connaît pas la session ne se rattache pas toujours.**
-  L'attribution suit quatre étages (`planPourCommit`, `ovrsee-post-commit.js`) : ticket
-  `T-XXXX` cité dans le message, puis la session, puis l'unique plan actif s'il n'y en a
-  qu'un, puis rien. Un commit fait hors de Claude Code, sans ticket cité, alors que deux
-  plans sont actifs, n'est donc rattaché nulle part — et le dit sur stderr.
+- **Un commit s'inscrit dans tous les plans qu'il réalise**, pas dans un seul.
+  `plansPourCommit` (`ovrsee-post-commit.js`) additionne deux sources — les plans des
+  tickets `T-XXXX` cités dans le message, **et** le plan actif de la session — puis
+  retombe sur l'unique plan actif si les deux se taisent, sinon sur rien. S'arrêter au
+  premier étage qui répondait laissait sans commit le plan sous lequel le travail avait
+  été écrit, donc **inclosable** : `closeOpenPlans` date d'après le dernier commit
+  (T-0223). L'union ne vaut que pour la trace : seul le plan **désigné par la citation**
+  fait avancer ses tickets en colonne finale — le plan de session n'a aucun pouvoir sur
+  des tickets que personne n'a nommés. Un commit fait hors de Claude Code, sans ticket
+  cité, alors que deux plans sont actifs, n'est rattaché nulle part — et le dit sur stderr.
+- **Un plan ouvert sans commit ne se clôt pas, et il le dit maintenant.** La date de
+  clôture se prend sur le dernier commit ; sans commit, `closeOpenPlans` passait son tour
+  en silence et le plan restait ouvert pour toujours, en captant les commits de sa
+  session. Il est désormais nommé sur stderr, listé par `pnpm ovrsee:status`, et
+  réparable par `ovrsee:close <plan.md> --commit <sha>` — le geste qui demandait un
+  script jetable.
 - **Un plan actif éclipse le ticket actif de sa session, jamais l'inverse.** Capturer un
   plan efface le ticket ad hoc de cette session, et tant qu'un plan est actif le gate
   l'ignore. Un ticket ad hoc resté ouvert ne redevient pas actif tout seul — le rouvrir

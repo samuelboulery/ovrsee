@@ -2,10 +2,10 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
-import { construire, sources, traduire } from './build-site-fr.js'
+import { construire, estampiller, sources, traduire } from './build-site-fr.js'
 
-const { html, dict } = sources()
-const fr = construire(html, dict)
+const { html, dict, version } = sources()
+const fr = construire(estampiller(html, version), dict)
 
 test('la page générée se déclare française et canonique sous /fr/', () => {
   assert.match(fr, /<html lang="fr">/)
@@ -57,4 +57,16 @@ test('la bascule de langue est faite de liens, pas de gestionnaires', () => {
 test('la langue de rendu est dérivée du document', () => {
   const app = readFileSync(new URL('../site/app.js', import.meta.url), 'utf8')
   assert.match(app, /lang: document\.documentElement\.lang === 'fr' \? 'fr' : 'en'/)
+})
+
+// La version en dur avait dérivé de trois releases avant qu'on la voie : les deux
+// endroits qui l'affichent sont estampillés depuis `package.json`, pas à la main.
+test('les deux emplacements portent la version du paquet', () => {
+  const balises = html.match(/data-version>[^<]*</g) ?? []
+  assert.equal(balises.length, 2, 'un emplacement de version a perdu son data-version')
+  for (const page of [estampiller(html, version), fr]) {
+    for (const trouvé of page.match(/data-version>([^<]*)</g) ?? []) {
+      assert.equal(trouvé, `data-version>v${version}<`)
+    }
+  }
 })

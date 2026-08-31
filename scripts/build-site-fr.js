@@ -106,18 +106,41 @@ export function construire(html, dict) {
   return tête.slice(0, coupe) + traduire(tête.slice(coupe), dict)
 }
 
-/** @returns {{ html: string, dict: Record<string, string> }} */
+/**
+ * Le numéro de version écrit dans la page suit celui du paquet — donc celui du tag
+ * qui sort la release. Il n'est là que pour le premier rendu : `versionAffichée()`
+ * (`site/app.js`) le rafraîchit depuis la dernière release publiée, quand le quota
+ * de l'API anonyme le permet. Sans estampille, la valeur en dur dérivait à chaque
+ * version, silencieusement, et c'est ce qui s'est produit.
+ *
+ * L'attribut `data-version` doit rester le dernier avant le `>` : c'est ce que le
+ * motif reconnaît, et c'est aussi ce que `document.querySelectorAll` sélectionne.
+ *
+ * @param {string} html
+ * @param {string} version
+ * @returns {string}
+ */
+export function estampiller(html, version) {
+  return html.replace(/(data-version>)[^<]*(<)/g, `$1v${version}$2`)
+}
+
+/** @returns {{ html: string, dict: Record<string, string>, version: string }} */
 export function sources() {
+  const paquet = JSON.parse(readFileSync(join(SITE, '..', 'package.json'), 'utf8'))
   return {
     html: readFileSync(join(SITE, 'index.html'), 'utf8'),
     dict: JSON.parse(readFileSync(join(SITE, 'dict.json'), 'utf8')),
+    version: paquet.version,
   }
 }
 
 if (estPrincipal(import.meta.url)) {
-  const { html, dict } = sources()
+  const { html, dict, version } = sources()
+  // La source anglaise est versionnée : elle n'est réécrite que si l'estampille bouge.
+  const estampillé = estampiller(html, version)
+  if (estampillé !== html) writeFileSync(join(SITE, 'index.html'), estampillé)
   mkdirSync(join(SITE, 'fr'), { recursive: true })
-  writeFileSync(join(SITE, 'fr', 'index.html'), construire(html, dict))
+  writeFileSync(join(SITE, 'fr', 'index.html'), construire(estampillé, dict))
   // stdout reste libre : ce script tourne dans des pipelines.
   process.stderr.write(`site/fr/index.html écrit — ${Object.keys(dict).length} entrées\n`)
 }

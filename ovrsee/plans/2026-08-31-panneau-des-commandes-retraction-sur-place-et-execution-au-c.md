@@ -18,6 +18,17 @@
         "app/src/menubar.ts",
         "hooks/i18n.js"
       ]
+    },
+    {
+      "sha": "776034b",
+      "date": "2026-09-01",
+      "files": [
+        "app/src/Terminal.tsx",
+        "app/src/pty.test.ts",
+        "app/src/pty.ts",
+        "app/src/useTerminal.ts",
+        "hooks/i18n.js"
+      ]
     }
   ]
 }

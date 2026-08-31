@@ -2,7 +2,7 @@
 {
   "id": "T-0225",
   "titre": "Panneau des commandes : rétraction sur place et exécution au clic",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

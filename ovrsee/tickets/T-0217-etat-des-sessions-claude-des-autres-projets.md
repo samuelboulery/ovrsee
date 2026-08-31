@@ -2,7 +2,7 @@
 {
   "id": "T-0217",
   "titre": "État des sessions Claude des autres projets",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

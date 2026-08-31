@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { claude, pasteTo, submitTo, submitToClaude } from './pty'
+import { cibleDeCommande, claude, pasteTo, submitTo, submitToClaude } from './pty'
 
 /**
  * La séquence d'échappement est le genre de détail qui casse sans rien dire :
@@ -84,4 +84,67 @@ test('submitTo : sans passerelle — le cas navigateur — rend false', () => {
   assert.equal(submitTo('pty-1', 'salut'), false)
 
   debrancher()
+})
+
+// --- cibleDeCommande : où part une commande cliquée ---
+
+const PTYS = { '/p#claude': 'pty-1', '/p#shell-1': 'pty-2' }
+
+test('cibleDeCommande : l\'onglet sous les yeux, pas la session Claude', () => {
+  // Issue #49 : un raccourci cliqué depuis un shell nu partait chez `claude`.
+  const ou = cibleDeCommande({
+    mode: 'command',
+    actif: '/p#shell-1',
+    claudeKey: '/p#claude',
+    ptyIds: PTYS,
+    occupees: new Set(),
+  })
+
+  assert.deepEqual(ou, { cible: '/p#shell-1' })
+})
+
+test('cibleDeCommande : un onglet actif sans pty retombe sur Claude', () => {
+  // Le cas du tout premier rendu, avant que `pty:open` ait répondu.
+  const ou = cibleDeCommande({
+    mode: 'command',
+    actif: '/p#shell-2',
+    claudeKey: '/p#claude',
+    ptyIds: PTYS,
+    occupees: new Set(),
+  })
+
+  assert.deepEqual(ou, { cible: '/p#claude' })
+})
+
+test('cibleDeCommande : une commande immédiate sur une session occupée ouvre un terminal', () => {
+  const ou = cibleDeCommande({
+    mode: 'command',
+    actif: '/p#shell-1',
+    claudeKey: '/p#claude',
+    ptyIds: PTYS,
+    occupees: new Set(['/p#shell-1']),
+  })
+
+  assert.deepEqual(ou, { neuf: true })
+})
+
+test('cibleDeCommande : ce qui se colle sans valider ignore l\'occupation', () => {
+  // C'est du texte à relire, pas une commande : il va là où on regarde.
+  const ou = cibleDeCommande({
+    mode: 'context',
+    actif: '/p#shell-1',
+    claudeKey: '/p#claude',
+    ptyIds: PTYS,
+    occupees: new Set(['/p#shell-1']),
+  })
+
+  assert.deepEqual(ou, { cible: '/p#shell-1' })
+})
+
+test('cibleDeCommande : sans aucun pty, rien — l\'appelant copie', () => {
+  // Le cas du navigateur : pas de passerelle, donc pas de session.
+  assert.equal(
+    cibleDeCommande({ mode: 'command', actif: null, claudeKey: '/p#claude', ptyIds: {}, occupees: new Set() }),
+    null,
+  )
 })

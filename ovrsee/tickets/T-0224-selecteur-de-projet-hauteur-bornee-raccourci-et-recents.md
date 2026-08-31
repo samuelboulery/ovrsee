@@ -2,7 +2,7 @@
 {
   "id": "T-0224",
   "titre": "Sélecteur de projet : hauteur bornée, raccourci, récents",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui",

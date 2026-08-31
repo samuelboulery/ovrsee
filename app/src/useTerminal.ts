@@ -281,8 +281,8 @@ export function useTerminals(
   }, [projectPath, oublieId])
 
   /** Ouvre un shell nu de plus, et s'y place. */
-  const openShell = useCallback(() => {
-    if (!projectPath) return
+  const openShell = useCallback((): string | null => {
+    if (!projectPath) return null
     const n = ++counter.current
     const session: Session = {
       key: `${projectPath}#shell-${n}`,
@@ -296,6 +296,10 @@ export function useTerminals(
     setSessions(after)
     activeByProject.current.set(projectPath, session.key)
     setActive(session.key)
+    // La clé est rendue pour qui veut écrire dans ce shell : son pty n'existe
+    // pas encore — il apparaîtra dans `ptyIds` après l'aller-retour IPC — et
+    // c'est la seule prise pour l'attendre. ⌘D et le bouton « + » l'ignorent.
+    return session.key
   }, [projectPath])
 
   /**

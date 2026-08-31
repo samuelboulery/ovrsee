@@ -705,7 +705,7 @@ const translations = {
     'terminal.reload_hint': 'Relit ovrsee/. N\'exécute rien.',
     'terminal.not_equipped': 'Projet pas encore équipé',
     'terminal.not_equipped_desc': 'La session s\'ouvre normalement, mais sans ovrsee/ les plans approuvés et les commits ne sont capturés nulle part.',
-    'terminal.click_injects': 'Un clic écrit dans le terminal, sans envoyer. À toi de compléter et de valider.',
+    'terminal.click_injects': 'Une commande part au clic — dans un nouveau terminal si le tien est occupé. Le reste s\'écrit sans être envoyé.',
     'terminal.click_copies': 'Un clic copie le contexte. L\'ovrsee n\'exécute jamais.',
     // Lightbox
     'lightbox.close': 'Fermer',
@@ -1490,7 +1490,7 @@ const translations = {
     'terminal.reload_hint': 'Re-reads ovrsee/. Runs nothing.',
     'terminal.not_equipped': 'Project not equipped yet',
     'terminal.not_equipped_desc': 'The session opens normally, but without ovrsee/ approved plans and commits are captured nowhere.',
-    'terminal.click_injects': 'A click writes into the terminal without sending. You complete and submit.',
+    'terminal.click_injects': 'A command runs on click — in a new terminal if yours is busy. Anything else is written without being sent.',
     'terminal.click_copies': 'A click copies the context. Ovrsee never executes.',
     // Lightbox
     'lightbox.close': 'Close',

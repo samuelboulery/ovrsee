@@ -4,7 +4,22 @@
   "title": "Issue #47 — voir les autres projets sans dérouler",
   "opened": "2026-08-31",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "5dd23c9",
+      "date": "2026-09-01",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/CommandPalette.tsx",
+        "app/src/EtatSession.tsx",
+        "app/src/Shell.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/menubar.test.ts",
+        "app/src/menubar.ts",
+        "hooks/i18n.js"
+      ]
+    }
+  ]
 }
 ---
 

@@ -21230,8 +21230,8 @@
       "source_file": "/Users/sam/code/ovrsee/hooks/plans.js",
       "source_location": "L345",
       "weight": 1.0,
-      "_src": "plans_setprojectaccent",
-      "_tgt": "accents_valideraccent",
+      "_src": "accents_valideraccent",
+      "_tgt": "plans_setprojectaccent",
       "source": "accents_valideraccent",
       "target": "plans_setprojectaccent"
     },

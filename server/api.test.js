@@ -240,6 +240,29 @@ test('POST touch remonte un projet connu, ignore un inconnu', () => {
   assert.equal(result.json.projects[0].path, ancien)
 })
 
+test('POST accent pose la couleur du projet, et la retire sur le défaut', () => {
+  const dir = projectWithShot()
+  withRegistry()
+  post({ action: 'add', path: dir })
+
+  const pose = post({ action: 'accent', path: dir, accent: 'cyan' })
+  assert.equal(pose.json.projects[0].accent, 'cyan', 'la liste rendue porte déjà la couleur')
+
+  const retour = post({ action: 'accent', path: dir, accent: 'violet' })
+  assert.equal(retour.json.projects[0].accent, undefined)
+})
+
+test('POST accent refuse une couleur hors palette et un projet hors registre', () => {
+  const dir = projectWithShot()
+  withRegistry()
+
+  assert.equal(post({ action: 'accent', path: dir, accent: 'cyan' }).status, 404)
+
+  post({ action: 'add', path: dir })
+  assert.equal(post({ action: 'accent', path: dir, accent: 'mauve' }).status, 400)
+  assert.equal(post({ action: 'accent', path: dir }).status, 400)
+})
+
 test('POST refuse une action inconnue plutôt que de deviner', () => {
   withRegistry()
   assert.equal(post({ action: 'drop', path: '/tmp' }).status, 400)

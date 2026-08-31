@@ -128,6 +128,8 @@ export interface Project {
   name: string
   /** Dernière ouverture, en ISO. Absent des registres écrits avant le tri par usage. */
   lastOpened?: string
+  /** Identifiant de teinte (`hooks/accents.js`). Absent = le violet par défaut. */
+  accent?: string
 }
 
 export interface PackageJson {

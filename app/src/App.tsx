@@ -243,6 +243,27 @@ export function App() {
   }, [current])
 
   /**
+   * L'accent du projet ouvert (T-0215, issue #48).
+   *
+   * `--color-accent` est le seul jeton de marque de l'interface : poser
+   * l'identifiant de teinte sur `<html>` fait suivre la rampe entière et les 75
+   * usages qui la citent, en une passe de style et sans rechargement. Les blocs
+   * `[data-accent='…']` vivent dans `_ds/ovrsee/styles.css`.
+   *
+   * Le violet — et tout identifiant qu'on ne connaît pas — retire l'attribut :
+   * un projet sans accent affiche le `:root` d'origine, pas une copie.
+   */
+  const accentCourant = projects.find(p => p.path === current)?.accent
+
+  useEffect(() => {
+    if (accentCourant && accentCourant !== 'violet') {
+      document.documentElement.dataset.accent = accentCourant
+    } else {
+      delete document.documentElement.dataset.accent
+    }
+  }, [accentCourant])
+
+  /**
    * Le tableau vit dans le snapshot, pas dans l'onglet.
    *
    * Chaque onglet est démonté quand on le quitte. Tant que les tickets vivaient
@@ -744,6 +765,15 @@ export function App() {
           }}
           root={snapshot?.root}
           integrations={snapshot?.integrations}
+          accent={accentCourant}
+          onAccent={accent => {
+            if (!current) return
+            // La liste rendue par le serveur porte déjà la couleur : c'est elle
+            // qui repeint, via `accentCourant`. Rien à réécrire ici.
+            projectAction('accent', current, { accent })
+              .then(resultat => applyProjects(resultat.projects))
+              .catch(err => setError(String(err.message ?? err)))
+          }}
           initialSection={preferencesInitial?.section}
           initialProvider={preferencesInitial?.provider}
         />

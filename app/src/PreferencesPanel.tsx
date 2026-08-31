@@ -474,6 +474,8 @@ export function PreferencesModal({
   onRevoirPresentation,
   root,
   integrations = [],
+  accent,
+  onAccent,
   initialSection,
   initialProvider,
 }: {
@@ -487,6 +489,10 @@ export function PreferencesModal({
   root?: string
   /** Ses intégrations déploiements/base de données, jamais leur jeton. */
   integrations?: Integration[]
+  /** Sa couleur d'accent — préférence de poste, tenue par le registre, pas par
+      le fichier de réglages : elle ne passe donc pas par `onSaved`. */
+  accent?: string
+  onAccent?: (accent: string) => void
   /** Section ouverte au montage — sinon toujours « Profils ». */
   initialSection?: SectionId
   /** Fournisseur présélectionné dans le formulaire d'intégration de la section Projet. */
@@ -595,7 +601,14 @@ export function PreferencesModal({
       )
     if (section === 'claude') return <SectionClaude />
     return (
-      <SectionProjet {...props} root={root} integrations={integrations} initialProvider={initialProvider} />
+      <SectionProjet
+        {...props}
+        root={root}
+        integrations={integrations}
+        accent={accent}
+        onAccent={onAccent}
+        initialProvider={initialProvider}
+      />
     )
   }
 

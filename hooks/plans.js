@@ -24,6 +24,7 @@ import { homedir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 
+import { ACCENT_DEFAUT, validerAccent } from './accents.js'
 import { activePlans, allActive, clearActive, readActive, withLock } from './active.js'
 
 const FENCE = '---'
@@ -253,7 +254,7 @@ export function writeFileNoFollow(path, content) {
 export const registryPath = () =>
   process.env.OVRSEE_REGISTRY ?? join(homedir(), '.claude', 'ovrsee', 'projects.json')
 
-/** @returns {Array<{path: string, name: string, lastOpened?: string}>} */
+/** @returns {Array<{path: string, name: string, lastOpened?: string, accent?: string}>} */
 export function readRegistry() {
   try {
     const parsed = JSON.parse(readFileSync(registryPath(), 'utf8'))
@@ -319,6 +320,41 @@ export function touchProject(root, now = new Date()) {
 
   writeRegistry(
     projects.map(p => (p.path === root ? { ...p, lastOpened: now.toISOString() } : p)),
+  )
+  return true
+}
+
+/**
+ * Pose la couleur d'accent d'un projet (T-0215, issue #48).
+ *
+ * Dans le registre et pas dans `ovrsee.config.json` : une couleur est inerte —
+ * elle ne pose pas le risque d'exécution qui a fait retirer `bootstrap` des
+ * champs surchargeables (#70) — mais c'est une préférence de poste, et
+ * `ovrsee.config.json` est versionné. Deux personnes sur le même dépôt n'ont
+ * aucune raison de partager la même couleur.
+ *
+ * Le défaut **retire** la clé au lieu de l'écrire : un poste qui n'a rien
+ * personnalisé garde un registre identique à celui d'avant cette fonctionnalité.
+ *
+ * @param {string} root
+ * @param {unknown} accent un identifiant de `hooks/accents.js`
+ * @returns {boolean} vrai si le registre a été écrit — faux sur un projet
+ *   inconnu ou un accent hors palette, jamais une exception
+ */
+export function setProjectAccent(root, accent) {
+  const valide = validerAccent(accent)
+  if (!valide) return false
+
+  const projects = readRegistry()
+  if (!projects.some(p => p.path === root)) return false
+
+  writeRegistry(
+    projects.map(p => {
+      if (p.path !== root) return p
+      // Déstructurer pour retirer : `delete` muterait l'entrée lue.
+      const { accent: _, ...sansAccent } = p
+      return valide === ACCENT_DEFAUT ? sansAccent : { ...sansAccent, accent: valide }
+    }),
   )
   return true
 }

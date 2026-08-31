@@ -29,6 +29,7 @@ import {
   readRegistry,
   registerProject,
   unregisterProject,
+  setProjectAccent,
   touchProject,
 } from './plans.js'
 
@@ -607,6 +608,48 @@ test('touchProject date un projet connu, ignore un inconnu', () => {
 
   assert.equal(touchProject('/tmp/a', new Date('2026-08-08T10:00:00Z')), true)
   assert.equal(readRegistry()[0].lastOpened, '2026-08-08T10:00:00.000Z')
+})
+
+test('setProjectAccent écrit un accent de la palette, et rien d’autre', () => {
+  withRegistry()
+  registerProject('/tmp/a', new Date('2026-01-01T00:00:00Z'))
+  registerProject('/tmp/b')
+
+  assert.equal(setProjectAccent('/tmp/a', 'rose'), true)
+
+  const [a, b] = readRegistry()
+  assert.equal(a.accent, 'rose')
+  assert.equal(a.name, 'a', 'les champs voisins survivent')
+  assert.equal(a.lastOpened, '2026-01-01T00:00:00.000Z')
+  assert.equal(b.accent, undefined, 'le voisin n’est pas repeint')
+})
+
+test('setProjectAccent refuse un accent hors palette et un projet inconnu', () => {
+  withRegistry()
+  registerProject('/tmp/a')
+
+  assert.equal(setProjectAccent('/tmp/a', 'mauve'), false)
+  assert.equal(setProjectAccent('/tmp/a', undefined), false)
+  assert.equal(setProjectAccent('/tmp/inconnu', 'rose'), false)
+  assert.equal(readRegistry()[0].accent, undefined, 'un refus n’écrit rien')
+})
+
+test('setProjectAccent sur le défaut retire la clé plutôt que d’écrire « violet »', () => {
+  withRegistry()
+  registerProject('/tmp/a')
+  setProjectAccent('/tmp/a', 'cyan')
+
+  assert.equal(setProjectAccent('/tmp/a', 'violet'), true)
+  assert.equal('accent' in readRegistry()[0], false)
+})
+
+test('touchProject préserve l’accent : il tourne à chaque ouverture', () => {
+  withRegistry()
+  registerProject('/tmp/a')
+  setProjectAccent('/tmp/a', 'ambre')
+
+  touchProject('/tmp/a', new Date('2026-08-08T10:00:00Z'))
+  assert.equal(readRegistry()[0].accent, 'ambre')
 })
 
 test('projects() classe du dernier ouvert au plus ancien, les sans-date en fin', () => {

@@ -136,6 +136,17 @@ a:focus-visible {
   transition: color .15s, background-color .15s, border-color .15s;
 }
 
+/* Les sept lignes de la colonne de gauche sont cliquables : le survol est ce qui le
+   dit. La ligne active porte déjà son fond en `style` inline, d'où le `!important`
+   — et l'exclusion, sans quoi le survol l'assombrirait. */
+.view-row {
+  transition: background-color .15s;
+}
+
+.view-row:not(.view-row-active):hover {
+  background: #16181e !important;
+}
+
 /* ---------------------------------------------------------- adaptatif -- */
 
 /* La maquette est dessinée pour un écran large et porte toute sa mise en page

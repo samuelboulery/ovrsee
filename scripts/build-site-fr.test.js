@@ -70,3 +70,19 @@ test('les deux emplacements portent la version du paquet', () => {
     }
   }
 })
+
+// La régression du jour : une vue listée dans la colonne de gauche mais sans
+// maquette derrière — le clic ne faisait rien, en silence.
+test('les sept vues de la démo ont chacune leur maquette', () => {
+  for (const vue of ['Apercu', 'Navigateur', 'Produit', 'Historique', 'Tableau', 'Donnees', 'Stack']) {
+    assert.ok(html.includes(`data-if="is${vue}"`), `pas de maquette pour la vue ${vue}`)
+  }
+})
+
+// Le patron d'une répétition porte son `display` dans son `style` : le clone doit le
+// garder. L'effacer faisait retomber en `block` les colonnes du graphique d'activité,
+// dont les barres s'empilaient alors depuis le haut sans que rien n'échoue.
+test('le moteur de gabarit n’efface pas le display des clones', () => {
+  const app = readFileSync(new URL('../site/app.js', import.meta.url), 'utf8')
+  assert.ok(!/clone\.style\.display\s*=/.test(app), 'le clone se voit réassigner un display')
+})

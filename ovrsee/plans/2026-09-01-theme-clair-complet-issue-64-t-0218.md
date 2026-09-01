@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Thème clair complet — issue #64 / T-0218",
   "opened": "2026-09-01",
-  "closed": null,
+  "closed": "2026-09-01",
   "commits": [
     {
       "sha": "f44fd77",
@@ -73,6 +73,11 @@
       "files": [
         "CLAUDE.md"
       ]
+    },
+    {
+      "sha": "84436a2",
+      "date": "2026-09-01",
+      "files": []
     }
   ]
 }

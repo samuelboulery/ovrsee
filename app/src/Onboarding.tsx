@@ -23,7 +23,6 @@ import { t, type TranslationKey } from './i18n'
 import { Logo, SchemaBoucle } from './OnboardingArt'
 import { apercuReponses, appliquerReponses, reponsesInitiales, type Reponses } from './profilage'
 import {
-  IconDark,
   Row,
   SectionTitle,
   Segmented,
@@ -310,14 +309,18 @@ function EcranReglages({
         />
       </Row>
 
-      {/* Clair et Système retirés : aucune maquette claire n'existe
-          (`theme.ts`, T-0075) — proposer le choix promettait un thème qui ne
-          change rien à l'affichage. */}
-      <Row label={t('pref.theme')}>
-        <div style={s('display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--color-text);')}>
-          <IconDark />
-          {t('pref.theme_dark')}
-        </div>
+      <Row label={t('pref.theme')} hint={t('pref.theme_note')}>
+        <Segmented
+          name="onboard-theme"
+          ariaLabel={t('pref.theme')}
+          value={settings.theme ?? 'system'}
+          onChange={theme => onSettings({ ...settings, theme })}
+          options={[
+            { value: 'light', label: t('pref.theme_light') },
+            { value: 'dark', label: t('pref.theme_dark') },
+            { value: 'system', label: t('pref.theme_system') },
+          ]}
+        />
       </Row>
 
       <Row label={t('onboard.bootstrap_label')} hint={t('onboard.bootstrap_hint')}>
@@ -345,7 +348,7 @@ function EcranReglages({
           // commande plutôt qu'un bouton qui ne ferait rien.
           <code
             style={s(
-              'display: block; padding: 12px; background: var(--color-surface-card); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11.5px; color: var(--color-accent-500); word-break: break-all;',
+              'display: block; padding: 12px; background: var(--color-surface-card); border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 11.5px; color: var(--color-accent-ink); word-break: break-all;',
             )}
           >
             {t('welcome.install_command')}
@@ -408,7 +411,7 @@ export function Onboarding({ settings, etapeInitiale = 0, onFini, onAjouterProje
   return (
     <div
       style={s(
-        'position: fixed; inset: 0; z-index: 60; background: rgba(6,7,14,.88); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 24px;',
+        'position: fixed; inset: 0; z-index: 60; background: var(--color-scrim); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 24px;',
       )}
     >
       <div

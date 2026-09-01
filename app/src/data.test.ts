@@ -499,6 +499,7 @@ test('onglet masqué : rendu survit avec un seul onglet actif', () => {
 test('buildActions compose les actions livrées avec le gestionnaire pnpm', () => {
   const snap = snapshot({})
   const settings = {
+    theme: 'system',
     langue: 'fr',
     densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
     onglets: { actifs: [], ordre: [] },
@@ -520,6 +521,7 @@ test('buildActions compose les actions livrées avec le gestionnaire pnpm', () =
 test('buildActions compose les actions livrées avec le gestionnaire npm', () => {
   const snap = snapshot({})
   const settings = {
+    theme: 'system',
     langue: 'fr',
     densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
     onglets: { actifs: [], ordre: [] },
@@ -540,6 +542,7 @@ test('buildActions compose les actions livrées avec le gestionnaire npm', () =>
 
 test('deliveredActions retourne les commandes livrées, sans les personnalisées', () => {
   const settings = {
+    theme: 'system',
     langue: 'fr',
     densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
     onglets: { actifs: [], ordre: [] },
@@ -563,6 +566,7 @@ test('deliveredActions retourne les commandes livrées, sans les personnalisées
 test('buildActions inclut les actions personnalisées valides', () => {
   const snap = snapshot({})
   const settings = {
+    theme: 'system',
     langue: 'fr',
     densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
     onglets: { actifs: [], ordre: [] },
@@ -588,6 +592,7 @@ test('buildActions inclut les actions personnalisées valides', () => {
 test('buildActions rejette les actions personnalisées avec sauts de ligne', () => {
   const snap = snapshot({})
   const settings = {
+    theme: 'system',
     langue: 'fr',
     densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
     onglets: { actifs: [], ordre: [] },

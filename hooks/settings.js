@@ -7,7 +7,7 @@
  *
  * Deux niveaux : global dans `~/.claude/ovrsee/settings.json`, surcharges
  * par `ovrsee.config.json` (versionné git du projet). Les champs personnels
- * (`langue`, `densiteActivite`, `onboardingVu`) ne se surchargent pas.
+ * (`theme`, `langue`, `densiteActivite`, `onboardingVu`) ne se surchargent pas.
  */
 
 import { homedir } from 'node:os'
@@ -18,6 +18,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
  * Schéma complet des préférences, avec défauts.
  *
  * @type {{
+ *   theme: string,
  *   langue: string,
  *   densiteActivite: {granularite: string, fenetre: string},
  *   onglets: {actifs: string[], ordre: string[]},
@@ -33,6 +34,11 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
  * }}
  */
 export const DEFAULT_SETTINGS = {
+  // `system` et pas `dark` : c'est ce que demande l'issue #64, et la
+  // conséquence est assumée — un poste réglé en clair voit l'application
+  // changer d'apparence à la mise à jour. Le champ a existé puis a été retiré
+  // en T-0200 faute d'un thème clair derrière ; il en a un (T-0227).
+  theme: 'system',
   langue: 'fr',
   densiteActivite: { granularite: 'semaine', fenetre: '3mois' },
   onglets: {
@@ -152,7 +158,8 @@ function actionValide(action) {
  * c'est le défaut de ce champ uniquement, et les autres restent en place.
  *
  * Une clé inconnue est simplement ignorée : un profil écrit par une version
- * antérieure (`theme`, `claude`, retirés en T-0200/T-0201) se lit sans erreur.
+ * antérieure (`claude`, retiré en T-0201) se lit sans erreur. `theme` a fait
+ * ce chemin dans les deux sens — retiré en T-0200, revenu en T-0228.
  *
  * @param {unknown} partial données reçues
  * @param {object} [defaults] schéma de référence
@@ -163,6 +170,7 @@ export function validateSettings(partial, defaults = DEFAULT_SETTINGS) {
   if (!partial || typeof partial !== 'object' || Array.isArray(partial)) return out
 
   // Champs de premier niveau
+  validerEnum(out, 'theme', partial.theme, ['light', 'dark', 'system'])
   validerEnum(out, 'langue', partial.langue, ['fr', 'en'])
   validerEnum(out, 'packageManager', partial.packageManager, ['pnpm', 'npm', 'yarn', 'bun'])
   validerEnum(out, 'sourceGraphe', partial.sourceGraphe, ['auto', 'graphify', 'obsidian'])
@@ -235,8 +243,10 @@ export function writeSettings(settings) {
 /**
  * Fusionne le profil global avec les surcharges du projet.
  *
- * Les champs personnels (`langue`, `densiteActivite`, `onboardingVu`) ne se
- * surchargent jamais — c'est la préférence de l'utilisateur, pas du projet. Un dépôt cloné n'a surtout pas à décider qu'on a déjà vu la
+ * Les champs personnels (`theme`, `langue`, `densiteActivite`, `onboardingVu`)
+ * ne se surchargent jamais — c'est la préférence de l'utilisateur, pas du
+ * projet. Un dépôt cloné n'a pas à décider du thème de qui l'ouvre, pas plus
+ * que de sa langue. Un dépôt cloné n'a surtout pas à décider qu'on a déjà vu la
  * présentation. `bootstrap` non plus (issue #70) : envoyé au terminal Claude,
  * un dépôt cloné n'a pas à décider quelle commande s'y exécute.
  *

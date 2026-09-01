@@ -27,6 +27,7 @@ import { PreferencesModal, type SectionId } from './PreferencesPanel'
 import { Welcome } from './Welcome'
 import { EquipmentPanel } from './EquipmentPanel'
 import { s } from './style'
+import { useThemeMode } from './theme'
 import { StatusBarSlotContext } from './StatusBar'
 import { Apercu } from './tabs/Apercu'
 import { Navigateur } from './tabs/Navigateur'
@@ -262,6 +263,15 @@ export function App() {
    * Le violet — et tout identifiant qu'on ne connaît pas — retire l'attribut :
    * un projet sans accent affiche le `:root` d'origine, pas une copie.
    */
+  /**
+   * Le thème (T-0228, issue #64).
+   *
+   * Même motif que l'accent juste en dessous : un attribut sur `<html>`, une
+   * passe de style, aucun rechargement. La valeur rendue ne sert qu'au canvas
+   * xterm, qui ne lit pas le CSS.
+   */
+  const themeMode = useThemeMode(settings?.theme)
+
   const accentCourant = projects.find(p => p.path === current)?.accent
 
   useEffect(() => {
@@ -739,6 +749,7 @@ export function App() {
                         setPreferencesOuvertes(true)
                       }}
                       actions={terminalActions}
+                      themeMode={themeMode}
                     />
                   </Suspense>
                 </Garde>

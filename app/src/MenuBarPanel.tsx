@@ -22,6 +22,7 @@ import {
   type MenuBarVue,
 } from './menubar'
 import { s } from './style'
+import { useThemeMode } from './theme'
 
 /**
  * Cadence de rafraîchissement de l'horloge.
@@ -239,6 +240,14 @@ export function MenuBar() {
   // où les recevoir, et sans ce compteur il resterait figé sur la détection
   // navigateur — c'est-à-dire en anglais sur une machine en français.
   const [reglages, setReglages] = useState(0)
+  /**
+   * Le popover est une seconde racine de rendu de la même origine, pas une
+   * seconde application : il ne partage aucun état avec la fenêtre. Sans cette
+   * ligne, il resterait sombre à côté d'une interface claire — même défaut
+   * visible tout de suite que la langue juste en dessous.
+   */
+  const [themePref, setThemePref] = useState<string | undefined>(undefined)
+  useThemeMode(themePref)
 
   useEffect(() => window.ovrsee?.menubar?.listen(setVue), [])
 
@@ -249,6 +258,7 @@ export function MenuBar() {
     fetchSettings()
       .then(settings => {
         setCurrentLanguage(settings.langue)
+        setThemePref(settings.theme)
         setReglages(n => n + 1)
       })
       .catch(() => {

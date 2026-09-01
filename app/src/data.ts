@@ -221,6 +221,8 @@ export interface Action {
 }
 
 export interface SettingsType {
+  /** `light`, `dark` ou `system`. Résolu par `applyTheme` (`theme.ts`). */
+  theme: string
   langue: string
   densiteActivite: { granularite: string; fenetre: string }
   onglets: { actifs: string[]; ordre: string[] }

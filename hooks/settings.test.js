@@ -383,8 +383,11 @@ test('mergeSettings : un dépôt ne décide pas que la présentation a été vue
 })
 
 /**
- * Un profil écrit par une version antérieure porte encore `theme` et `claude`
- * (retirés en T-0200/T-0201). Il doit se lire sans erreur, clés ignorées.
+ * Un profil écrit par une version antérieure porte encore `claude` (retiré en
+ * T-0201). Il doit se lire sans erreur, clé ignorée.
+ *
+ * `theme` faisait partie du lot jusqu'à T-0228 : il est redevenu un champ, et
+ * un profil d'avant T-0200 retrouve donc le réglage qu'on lui avait pris.
  */
 test('validateSettings : une clé d’une version antérieure est ignorée', () => {
   const result = validateSettings({
@@ -393,6 +396,37 @@ test('validateSettings : une clé d’une version antérieure est ignorée', () 
     claude: { niveau: 'expert', usage: 'ide' },
   })
   assert.equal(result.langue, 'en')
-  assert.equal(result.theme, undefined)
+  assert.equal(result.theme, 'light', 'le champ est revenu en T-0228')
   assert.equal(result.claude, undefined)
+})
+
+/**
+ * Le thème (T-0228, issue #64).
+ *
+ * Le champ a déjà existé et a été retiré en T-0200 parce qu'il promettait un
+ * réglage sans effet. Il revient avec quelque chose derrière, et sur le chemin
+ * de `langue` : une préférence de poste, jamais surchargeable par le dépôt
+ * observé — un clone n'a pas à décider du thème de qui l'ouvre.
+ *
+ * Le défaut est `system`, ce que demande l'issue. Conséquence assumée : sur un
+ * poste réglé en clair, l'application change d'apparence à la mise à jour.
+ */
+test('le thème vaut « système » par défaut', () => {
+  assert.equal(DEFAULT_SETTINGS.theme, 'system')
+})
+
+test('validateSettings : les trois thèmes sont admis', () => {
+  for (const theme of ['light', 'dark', 'system']) {
+    assert.equal(validateSettings({ theme }).theme, theme)
+  }
+})
+
+test('validateSettings : un thème inconnu retombe au défaut', () => {
+  assert.equal(validateSettings({ theme: 'clair' }).theme, 'system')
+  assert.equal(validateSettings({ theme: 42 }).theme, 'system')
+})
+
+test('mergeSettings : le projet ne surcharge pas le thème', () => {
+  const global = { ...DEFAULT_SETTINGS, theme: 'light' }
+  assert.equal(mergeSettings(global, { theme: 'dark' }).theme, 'light')
 })

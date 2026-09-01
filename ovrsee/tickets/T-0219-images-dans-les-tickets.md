@@ -2,7 +2,7 @@
 {
   "id": "T-0219",
   "titre": "Images dans les tickets",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "tickets",

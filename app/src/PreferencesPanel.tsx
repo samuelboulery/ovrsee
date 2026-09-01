@@ -12,7 +12,6 @@ import { setCurrentLanguage, t, type TranslationKey } from './i18n'
 import {
   ErrorBox,
   GroupLabel,
-  IconDark,
   IconGrip,
   Row,
   SectionTitle,
@@ -151,14 +150,21 @@ export function SectionGeneral({
   return (
     <>
       <SectionTitle>{t('pref.general')}</SectionTitle>
-      {/* Clair et Système retirés : aucune maquette claire n'existe
-          (`theme.ts`, T-0075) — proposer le choix promettait un thème qui ne
-          change rien à l'affichage. */}
-      <Row label={t('pref.theme')}>
-        <div style={s('display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--color-text);')}>
-          <IconDark />
-          {t('pref.theme_dark')}
-        </div>
+      {/* Les trois crans sont revenus (T-0228, issue #64) : ils avaient été
+          retirés en T-0200 faute d'un thème clair derrière, et il y en a un
+          depuis T-0227. « Système » suit le poste sans rechargement. */}
+      <Row label={t('pref.theme')} hint={t('pref.theme_note')}>
+        <Segmented
+          name="pref-theme"
+          ariaLabel={t('pref.theme')}
+          value={settings.theme ?? 'system'}
+          onChange={theme => onSettings({ ...settings, theme })}
+          options={[
+            { value: 'light', label: t('pref.theme_light') },
+            { value: 'dark', label: t('pref.theme_dark') },
+            { value: 'system', label: t('pref.theme_system') },
+          ]}
+        />
       </Row>
       <Row label={t('pref.language')} hint={t('pref.language_note')}>
         <Segmented
@@ -642,7 +648,7 @@ export function PreferencesModal({
     <div
       onClick={onClose}
       style={s(
-        'position: fixed; inset: 0; z-index: 50; background: rgba(6,7,14,.88); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 24px;',
+        'position: fixed; inset: 0; z-index: 50; background: var(--color-scrim); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 24px;',
       )}
     >
       <div

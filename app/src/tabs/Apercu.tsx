@@ -424,7 +424,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
         {menuEditeur && (
           <div
             style={s(
-              'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 140px; padding: 4px; border-radius: 8px; border: 1px solid var(--color-border-card); background: var(--color-surface-elevated); box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
+              'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 140px; padding: 4px; border-radius: 8px; border: 1px solid var(--color-border-card); background: var(--color-surface-elevated); box-shadow: var(--shadow-menu); display: flex; flex-direction: column; gap: 2px;',
             )}
           >
             {EDITEURS.map(([valeur, nomOpt]) => (
@@ -481,7 +481,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
           {menuPlus && (
             <div
               style={s(
-                'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 160px; padding: 4px; border-radius: 8px; border: 1px solid var(--color-border-card); background: var(--color-surface-elevated); box-shadow: 0 12px 28px rgba(0,0,0,.5);',
+                'position: absolute; top: 31px; right: 0; z-index: 20; min-width: 160px; padding: 4px; border-radius: 8px; border: 1px solid var(--color-border-card); background: var(--color-surface-elevated); box-shadow: var(--shadow-menu);',
               )}
             >
               <button
@@ -625,7 +625,7 @@ function Obsidian({ root }: { root: string }) {
       {erreur && (
         <div
           style={s(
-            'margin-top: 8px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
+            'margin-top: 8px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-line); border-radius: 6px; padding: 7px 10px;',
           )}
         >
           {erreur}

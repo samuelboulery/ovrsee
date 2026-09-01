@@ -507,15 +507,17 @@ function Edges({ placed, width, height }: { placed: Placed[]; width: number; hei
       height={height}
       style={s('position: absolute; inset: 0; overflow: visible;')}
     >
-      {/* Les flèches gardent leur valeur littérale : `fill`/`stroke` sont des
-          attributs de présentation SVG, où `var(--…)` n'est pas fiable d'un
-          moteur à l'autre. Valeur de `--color-border-selected`. */}
+      {/* Le jeton passe par la PROPRIÉTÉ CSS et non par l'attribut de
+          présentation : `fill="var(--…)"` n'est pas fiable d'un moteur à
+          l'autre, `style={{ fill }}` l'est, et le filet doit suivre le thème
+          (T-0230). Le contenu d'un `<marker>` hérite des variables de la
+          racine comme n'importe quel élément. */}
       <defs>
         <marker id="na" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4d5060" />
+          <path d="M 0 0 L 10 5 L 0 10 z" style={{ fill: 'var(--color-border-selected)' }} />
         </marker>
       </defs>
-      <g fill="none" stroke="#4d5060" strokeWidth="1.25" markerEnd="url(#na)">
+      <g fill="none" style={{ stroke: 'var(--color-border-selected)' }} strokeWidth="1.25" markerEnd="url(#na)">
         {forward.map((d, i) => (
           <path key={i} d={d} />
         ))}

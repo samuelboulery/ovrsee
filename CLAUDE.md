@@ -86,10 +86,13 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
 - **`ovrsee/`** est produit par les hooks. Seuls `ovrsee/tickets/*.md` et
   `ovrsee/board.json` se saisissent — via le skill `ovrsee-tickets`. Corriger un plan,
   une page ou un scan à la main produit un état que le prochain commit écrasera.
-- **`legacy/Ovrsee-A-Nocturne.dc.html`** est la maquette : code tiers embarqué, hors
-  périmètre — ne pas relire, ne pas corriger, ne pas compter dans les métriques. Elle
-  reste la référence des valeurs portées littéralement, celles qu'autorise la liste
-  `FICHIERS_PORTES` de `hooks/couleurs.test.js`.
+- **`legacy/Ovrsee-A-Nocturne.dc.html`** est la maquette du thème sombre : code tiers
+  embarqué, hors périmètre — ne pas relire, ne pas corriger, ne pas compter dans les
+  métriques. Sa liste d'exemptions dans `hooks/couleurs.test.js` (`FICHIERS_PORTES`,
+  vingt fichiers) a disparu en T-0230 : dix-sept n'avaient plus une seule couleur
+  littérale, les trois derniers sont passés aux jetons. Le garde-fou voit désormais
+  aussi les `rgba()`, et un seul fichier reste dispensé — `navigateur-webview.ts`,
+  dont le style part dans le DOM de la page observée.
 - **`_ds/`** tient deux design systems et le nom trompe : l'application charge
   **`_ds/ovrsee/styles.css`** (`app/src/main.tsx`), pas `nocturne-*`, qui ne sert plus
   qu'à la maquette.
@@ -104,6 +107,32 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
 
 ## Pièges connus
 
+- **Le thème se pose en un attribut, et le bloc clair ne touche pas les rampes
+  d'accent.** `data-theme` porte toujours la valeur *résolue* (`light`/`dark`),
+  jamais « système » : `applyTheme` (`app/src/theme.ts`) résout d'abord, une
+  seule règle CSS suffit, et `appTheme()` du Navigateur la lit telle quelle. Le
+  piège est la spécificité : `:root[data-theme='light']` pèse 0,2,0 quand
+  `[data-accent='ambre']` pèse 0,1,0 — y redéfinir un palier `--color-accent-*`
+  écraserait les six accents de projet, **et** les pastilles de choix, dont le
+  sélecteur d'attribut est nu. Ce qui change par thème n'est donc pas la rampe
+  mais le palier qu'on y prend : quatre rôles (`--color-accent-{ink,fill,edge,line}`)
+  et un `--color-accent: var(--color-accent-800)` en clair, une ligne pour les
+  six teintes. `hooks/theme-clair.test.js` monte la garde, et mesure aussi la
+  palette — à parité avec le sombre niveau par niveau, pas « AA dans l'absolu » :
+  le sombre lui-même ne tient pas 4,5:1 sur ses trois derniers niveaux de texte.
+- **Le canvas xterm ne lit pas le CSS.** Toute la chrome du terminal suit les
+  jetons ; le contenu, non — sa palette est un objet JavaScript posé à
+  `new XTerm({…})`. `appliquerThemeTerminal` (`theme.ts`) la repose sur chaque
+  terminal vivant à la bascule ; recréer le terminal, seule autre voie, fermerait
+  les ptys (`useTerminal.ts:199-213`). Le mode descend d'`App` en prop jusqu'à
+  `useTerminals`, et `attach()` le lit dans une ref — le lire dans la fermeture
+  le figerait, et un terminal ouvert après une bascule naîtrait dans l'ancien thème.
+- **Pas de script inline dans `app/index.html`.** La CSP du protocole `ovrsee://`
+  refuse `script-src 'unsafe-inline'`, et le dev server, lui, l'exécute très bien :
+  l'anti-flash de thème est passé en CSP sans jamais broncher dans le navigateur.
+  Le fond d'avant le premier paint se peint donc en CSS (`prefers-color-scheme`,
+  qui couvre le réglage « système ») et, pour un choix explicite, par le
+  `backgroundColor` de la fenêtre Electron, qui lit le vrai réglage sur disque.
 - **`--color-accent` change par projet, `--color-brand` jamais.** L'accent d'un projet
   (T-0215) est un identifiant posé sur `<html>` par `App.tsx` ; les blocs
   `[data-accent='…']` d'`_ds/ovrsee/styles.css` redéfinissent le jeton et sa rampe, et

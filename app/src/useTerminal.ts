@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { extractAttention, type AttentionEvent } from './attention'
-import { getTerminalTheme } from './theme'
+import { appliquerThemeTerminal, getTerminalTheme, type ThemeMode } from './theme'
 // Les types de la passerelle et les fonctions de collage vivent dans `pty.ts`
 // depuis T-0133 : ce module-ci charge xterm, et il est le seul à devoir le faire.
 import { claude, terminalBridge, type SessionKind } from './pty'
@@ -72,6 +72,7 @@ export type OnSaisie = (sessionKey: string) => void
  */
 export function useTerminals(
   projectPath: string | null,
+  themeMode: ThemeMode,
   onAttention?: OnAttention,
   onSaisie?: OnSaisie,
 ) {
@@ -87,6 +88,16 @@ export function useTerminals(
   const [ptyIds, setPtyIds] = useState<Record<string, string>>({})
 
   const panes = useRef(new Map<string, Pane>())
+  /**
+   * Le thème courant, pour `attach()`.
+   *
+   * Une ref et pas la valeur directement : `attach` est mémoïsé sur rien du
+   * tout (le cycle de vie d'un xterm ne doit pas se rejouer), et le lire dans
+   * la fermeture le figerait au premier rendu — un terminal ouvert après une
+   * bascule naîtrait dans l'ancien thème.
+   */
+  const themeRef = useRef(themeMode)
+  themeRef.current = themeMode
   /** Onglets nommés au double-clic : le nom automatique ne les touche plus. */
   const nommesMain = useRef(new Set<string>())
   const counter = useRef(0)
@@ -184,6 +195,22 @@ export function useTerminals(
   }, [projectPath])
 
   /**
+   * La bascule de thème, à chaud (T-0229, issue #64).
+   *
+   * Tous les xterm vivants, y compris ceux des projets quittés qui tournent
+   * hors écran. Le pty n'est pas touché : il vit dans le processus principal
+   * et ignore les options du rendu — la session survit, et xterm réaffiche
+   * l'historique déjà écrit avec la nouvelle palette. Recréer le terminal,
+   * seule autre voie, fermerait la session.
+   */
+  useEffect(() => {
+    appliquerThemeTerminal(
+      [...panes.current.values()].map(pane => pane.xterm),
+      themeMode,
+    )
+  }, [themeMode])
+
+  /**
    * Référence d'hôte pour une session : crée le xterm au montage, ferme la
    * session au démontage. Tout le cycle de vie tient là — React appelle avec
    * `null` dès que l'onglet disparaît.
@@ -223,7 +250,7 @@ export function useTerminals(
         // se séparent en bandes.
         lineHeight: 1,
         cursorBlink: true,
-        theme: getTerminalTheme(),
+        theme: getTerminalTheme(themeRef.current),
         allowProposedApi: true,
       })
       const fit = new FitAddon()

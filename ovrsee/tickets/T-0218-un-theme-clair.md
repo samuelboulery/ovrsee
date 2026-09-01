@@ -3,16 +3,17 @@
   "id": "T-0218",
   "titre": "Un thème clair",
   "colonne": "backlog",
-  "priorite": "basse",
+  "priorite": "haute",
   "tags": [
     "ui",
     "design-system",
     "issue-64"
   ],
   "cree": "2026-08-31",
-  "maj": "2026-08-31",
-  "plan": "2026-08-31-tour-du-depot-ovrsee-backlog-priorise-et-lot-d-intendance.md",
-  "charge": "l"
+  "maj": "2026-09-01",
+  "plan": "2026-09-01-theme-clair-complet-issue-64-t-0218.md",
+  "charge": "l",
+  "type": "epic"
 }
 ---
 
@@ -45,10 +46,18 @@ Quatre fichiers portent encore un hex hors design system et devront suivre :
 `app/src/tabs/Navigateur.tsx:494`, `app/src/ActivityPanel.tsx:27` — plus les
 `rgba()` d'ombres et de voiles disséminés.
 
-## À cadrer avant d'exécuter
+## Le cadrage, fait
 
-Ce ticket **ne se prend pas tel quel** : il demande son propre plan, et une
-palette claire dessinée, pas dérivée mécaniquement de la sombre par inversion.
+Le plan existe (`2026-09-01-theme-clair-complet-issue-64-t-0218.md`) et ce
+ticket devient l'epic de ses six enfants, T-0226 à T-0231. Trois choses y ont
+été tranchées : la palette se dessine avant de se coder (T-0226), le défaut est
+`système`, et l'accent en clair dérive du palier 800 de la rampe existante
+plutôt que de six teintes neuves — une ligne pour les six accents, et les blocs
+`[data-accent]` restent intacts.
+
+Un quatrième point n'était pas dans le ticket d'origine et pèse autant : les
+quinze `rgba()` de voiles, d'ombres et — dans la lightbox — de **texte** sont
+invisibles au garde-fou, qui ne connaît que le hex (T-0230).
 
 ## Critères d'acceptation
 

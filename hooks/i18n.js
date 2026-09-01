@@ -51,6 +51,9 @@ const translations = {
     'pref.terminal_full': 'Plein écran',
     'pref.theme': 'Thème',
     'pref.theme_dark': 'Sombre',
+    'pref.theme_light': 'Clair',
+    'pref.theme_system': 'Système',
+    'pref.theme_note': 'Système suit le réglage de votre poste, terminal compris.',
     // Préférences — écran à sections
     'pref.title': 'Préférences',
     'pref.close': 'Fermer les préférences',
@@ -840,6 +843,9 @@ const translations = {
     'pref.terminal_full': 'Full screen',
     'pref.theme': 'Theme',
     'pref.theme_dark': 'Dark',
+    'pref.theme_light': 'Light',
+    'pref.theme_system': 'System',
+    'pref.theme_note': 'System follows your machine, terminal included.',
     // Preferences — sectioned screen
     'pref.title': 'Preferences',
     'pref.close': 'Close preferences',

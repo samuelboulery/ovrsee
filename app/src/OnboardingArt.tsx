@@ -185,7 +185,7 @@ export function SchemaBoucle() {
       <path
         d="M 568 52 V 82 H 70 V 60"
         fill="none"
-        stroke="var(--color-accent-600)"
+        stroke="var(--color-accent-edge)"
         strokeWidth="1.5"
         strokeDasharray="5 5"
       >
@@ -199,7 +199,7 @@ export function SchemaBoucle() {
           />
         )}
       </path>
-      <path d="M 65 62 L 70 54 L 75 62 Z" fill="var(--color-accent-600)" />
+      <path d="M 65 62 L 70 54 L 75 62 Z" fill="var(--color-accent-edge)" />
 
       <text
         x="319"

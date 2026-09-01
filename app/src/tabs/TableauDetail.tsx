@@ -488,7 +488,7 @@ function Enveloppe({
       <div
         onClick={onReduire}
         style={s(
-          'position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(6,7,14,.88); backdrop-filter: blur(3px);',
+          'position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--color-scrim); backdrop-filter: blur(3px);',
         )}
       >
         <div

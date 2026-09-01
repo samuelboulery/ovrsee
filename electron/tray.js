@@ -17,7 +17,7 @@
  * appelé. L'item s'ajoute à la fenêtre, il ne la remplace pas.
  */
 
-import { BrowserWindow, Tray, nativeImage, screen } from 'electron'
+import { BrowserWindow, Tray, nativeImage, nativeTheme, screen } from 'electron'
 
 import { signalInstalle } from '../hooks/install.js'
 import { hasSession, writeTo } from './pty.js'
@@ -127,7 +127,10 @@ function popoverWindow(origin, preload) {
     // Activer l'application, c'est basculer sur son espace. Sans `panel`, un
     // clic sur l'icône depuis une app en plein écran quitte cette app.
     type: 'panel',
-    backgroundColor: '#0e0f18',
+    // Le fond d'avant le premier paint, accordé au thème (T-0231) : le popover
+    // est une seconde racine de rendu, il ne partage rien avec la fenêtre.
+    // `nativeTheme` porte déjà le réglage — `app:theme` l'y a posé.
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#08090a' : '#eceef1',
     webPreferences: {
       preload,
       contextIsolation: true,

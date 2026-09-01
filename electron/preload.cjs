@@ -91,6 +91,15 @@ contextBridge.exposeInMainWorld('ovrsee', {
 
     /** Ferme la fenêtre émettrice. Même garde que `focus`. */
     close: () => ipcRenderer.invoke('app:close'),
+
+    /**
+     * Accorde la chrome native au thème de l'interface — menus, dialogues,
+     * ascenseurs de l'OS, DevTools (T-0231).
+     *
+     * @param {'dark'|'light'} mode thème DÉJÀ résolu ; le rendu est le seul à
+     *   savoir ce qu'il affiche. Tout le reste vaut `dark` côté principal.
+     */
+    setTheme: mode => ipcRenderer.invoke('app:theme', mode),
   },
 
   preview: {

@@ -162,7 +162,7 @@ export function CommandPalette({
     <div
       onClick={onClose}
       style={s(
-        'position: fixed; inset: 0; z-index: 60; background: rgba(6,7,14,.88); backdrop-filter: blur(3px); display: flex; align-items: flex-start; justify-content: center; padding: 14vh 24px 24px;',
+        'position: fixed; inset: 0; z-index: 60; background: var(--color-scrim); backdrop-filter: blur(3px); display: flex; align-items: flex-start; justify-content: center; padding: 14vh 24px 24px;',
       )}
     >
       <div

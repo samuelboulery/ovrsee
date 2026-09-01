@@ -5,8 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>Ovrsee</title>
+    <meta name="color-scheme" content="light dark" />
     <style>
+      /*
+        Le fond d'avant le premier paint.
+
+        Le réglage vit sur le disque et arrive par `/api/settings` : trop tard
+        pour peindre. Un script inline le lirait dans `localStorage` — et
+        serait bloqué par la CSP du protocole `ovrsee://`, en silence côté
+        navigateur où il fonctionne très bien. D'où ce CSS, qui n'a pas ce
+        problème : il suit le poste, donc le réglage `système`, qui est le
+        défaut. Le cas qui reste — un choix EXPLICITE contraire au poste —
+        est celui d'Electron, et c'est justement là que `backgroundColor`
+        (electron/main.js) lit le vrai réglage et peint juste.
+
+        Les deux valeurs de `--color-bg`, en dur : la feuille du design system
+        n'est pas encore chargée à cet instant.
+      */
       body { margin: 0; background: #08090a; }
+      @media (prefers-color-scheme: light) { body { background: #eceef1; } }
+      html[data-theme='dark'] body { background: #08090a; }
+      html[data-theme='light'] body { background: #eceef1; }
       a { color: var(--color-accent-300); text-decoration: none; }
       a:hover { color: var(--color-accent-200); }
       @keyframes blink { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }

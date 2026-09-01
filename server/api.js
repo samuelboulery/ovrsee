@@ -41,6 +41,7 @@ import {
   moveTicket,
   removeColumn,
   renameColumn,
+  saveTicketImage,
   updateTicket,
 } from '../hooks/tickets.js'
 
@@ -345,6 +346,13 @@ function ticketAction(body, root) {
 
       case 'delete':
         return deleteTicket(ovrseeDir, file) ? list() : absent()
+
+      // Une image collée dans le corps d'un ticket (T-0219, issue #54).
+      // Seule action de cette route à ne pas rendre le tableau : l'appelant a
+      // besoin du chemin pour l'insérer au curseur, et rien du ticket n'a
+      // changé — c'est l'`update` du corps qui suivra qui le fera.
+      case 'image':
+        return { json: { chemin: saveTicketImage(ovrseeDir, body?.id, body?.image) } }
 
       // Colonnes. L'identifiant n'est jamais modifiable : il est dérivé du
       // titre à la création et cité par les tickets. Renommer ne touche donc

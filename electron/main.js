@@ -178,13 +178,35 @@ function closeDevtools(hostId) {
  */
 let principale = null
 
+/**
+ * Les deux fonds de fenêtre, ceux qu'on voit AVANT le premier paint.
+ *
+ * Ce sont les `--color-bg` du design system, recopiés : le processus principal
+ * ne lit pas de CSS. Ils étaient en dur à `#0e0f18`, une valeur qui ne
+ * correspondait ni au fond de l'application ni à rien d'autre (T-0231).
+ */
+const FONDS = { dark: '#08090a', light: '#eceef1' }
+
+/**
+ * Le thème enregistré, résolu contre le poste.
+ *
+ * `nativeTheme.shouldUseDarkColors` porte déjà la préférence système, ce que
+ * le processus principal ne saurait pas autrement. Le rendu refera le même
+ * calcul de son côté — c'est lui qui a le dernier mot, via `app:theme`.
+ */
+function themeInitial() {
+  const pref = readSettings().theme
+  if (pref === 'light' || pref === 'dark') return pref
+  return nativeTheme.shouldUseDarkColors ? 'dark' : 'light'
+}
+
 function createWindow() {
   const window = new BrowserWindow({
     width: 1400,
     height: 940,
     minWidth: 1100,
     minHeight: 700,
-    backgroundColor: '#0e0f18',
+    backgroundColor: FONDS[themeInitial()],
     titleBarStyle: 'hiddenInset',
     webPreferences: {
       // `.cjs` et non `.js` : le paquet est en ESM, et un preload doit être
@@ -584,6 +606,8 @@ app.whenReady().then(() => {
     // Écarté : poser `uiTheme` dans le `localStorage` de la page DevTools.
     // C'est la recette qui circule, elle ne fait plus rien — vérifié sur deux
     // profils neufs, la page ne lit plus ce réglage là.
+    // Redondant depuis `app:theme`, gardé quand même : le rendu peut tourner
+    // sur une version antérieure du preload, qui n'a pas ce canal.
     nativeTheme.themeSource = theme === 'light' ? 'light' : 'dark'
 
     let open = devtoolsByHost.get(event.sender.id)
@@ -637,6 +661,29 @@ app.whenReady().then(() => {
   // fermer la fenêtre.
   ipcMain.handle('app:close', event => {
     BrowserWindow.fromWebContents(event.sender)?.close()
+  })
+
+  /**
+   * Accorde la chrome native au thème du rendu (T-0231).
+   *
+   * `nativeTheme.themeSource` décide les menus natifs, les dialogues, les
+   * ascenseurs de l'OS et les DevTools. Il n'était atteint qu'en ouvrant les
+   * DevTools de l'onglet Navigateur, alors que le commentaire d'à côté disait
+   * déjà que le réglage vaut pour toute l'application — une fenêtre claire
+   * gardait donc des menus sombres tant que personne n'avait ouvert les
+   * DevTools.
+   *
+   * Le rendu envoie une valeur DÉJÀ résolue : c'est lui qui sait ce qu'il
+   * affiche, `system` compris. Tout ce qui n'est pas `light` vaut `dark`,
+   * comme au-dessous — une valeur inattendue ne doit pas éclaircir la fenêtre.
+   *
+   * Le fond de fenêtre suit aussi : sans ça, une fenêtre réduite puis
+   * rétablie, ou un redimensionnement, laisse voir l'ancienne couleur.
+   */
+  ipcMain.handle('app:theme', (event, mode) => {
+    const resolu = mode === 'light' ? 'light' : 'dark'
+    nativeTheme.themeSource = resolu
+    for (const window of BrowserWindow.getAllWindows()) window.setBackgroundColor(FONDS[resolu])
   })
 
   // Choisir un dossier. Le seul geste qui ne peut pas passer par `/api` : une

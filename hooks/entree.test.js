@@ -1,10 +1,9 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, mkdirSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { realpathSync } from 'node:fs'
 
 import { repoRoot } from './entree.js'
 
@@ -12,22 +11,32 @@ import { repoRoot } from './entree.js'
 const MODULE = JSON.stringify(new URL('./entree.js', import.meta.url).href)
 
 const depotNeuf = () => {
-  const root = realpathSync(mkdtempSync(join(tmpdir(), 'ovrsee-entree-')))
+  const root = mkdtempSync(join(tmpdir(), 'ovrsee-entree-'))
   execFileSync('git', ['init', '-q'], { cwd: root })
   return root
 }
 
-test('repoRoot rend la racine du dépôt qui contient cwd', () => {
+test('repoRoot rend, depuis un sous-dossier, une racine sur laquelle on recolle', () => {
   const root = depotNeuf()
+  writeFileSync(join(root, 'marqueur.txt'), 'x', 'utf8')
   const sous = join(root, 'a', 'b')
   mkdirSync(sous, { recursive: true })
-  assert.equal(repoRoot(sous), root)
+
+  const rendu = repoRoot(sous)
+
+  // Pas d'égalité de chaînes, et ce n'est pas de la complaisance : sous Windows
+  // `git rev-parse` rend des barres avant et le nom long du dossier
+  // (`runneradmin`) là où `mkdtemp` rend le nom court 8.3 (`RUNNER~1`). Les deux
+  // désignent le même dossier. Ce dont un appelant a besoin, c'est d'un chemin
+  // sur lequel `join()` retombe sur le dépôt — c'est donc ça qu'on vérifie.
+  assert.ok(rendu, 'une racine est rendue')
+  assert.ok(existsSync(join(rendu, 'marqueur.txt')), `racine inutilisable : ${rendu}`)
+  assert.ok(existsSync(join(rendu, '.git')), `la racine ne porte pas le dépôt : ${rendu}`)
 })
 
 test('repoRoot rend null hors dépôt git', () => {
-  // `tmpdir()` lui-même : hors de tout dépôt, sur macOS comme sur Linux.
-  const dehors = realpathSync(mkdtempSync(join(tmpdir(), 'ovrsee-sans-git-')))
-  assert.equal(repoRoot(dehors), null)
+  // `tmpdir()` lui-même : hors de tout dépôt, sur les trois plateformes.
+  assert.equal(repoRoot(mkdtempSync(join(tmpdir(), 'ovrsee-sans-git-'))), null)
 })
 
 test('repoRoot rend null sur un dossier inexistant, sans lever', () => {

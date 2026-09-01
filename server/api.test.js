@@ -6,7 +6,7 @@ import { EventEmitter } from 'node:events'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { nodeMiddleware, resolve } from './api.js'
+import { fetchHandler, nodeMiddleware, resolve } from './api.js'
 import { mediaPath, shotPath } from '../hooks/snapshot.js'
 import { registerProject } from '../hooks/plans.js'
 
@@ -323,6 +323,90 @@ test('/api/tickets remonte les refus du modèle en 400', () => {
   assert.equal(postTicket({ action: 'create', path: dir, titre: 'X', colonne: 'nulle-part' }).status, 400)
   assert.equal(postTicket({ action: 'move', path: dir, file: '../plans/x.md', colonne: 'pret' }).status, 400)
   assert.equal(postTicket({ action: 'bidon', path: dir }).status, 400)
+})
+
+/** Un WebP minimal en data-URI : `RIFF`, taille, `WEBP`, puis du vide. */
+const webpDataUri = (octets = 32) => {
+  const corps = Buffer.alloc(octets)
+  const taille = Buffer.alloc(4)
+  taille.writeUInt32LE(corps.length + 4)
+  const buffer = Buffer.concat([Buffer.from('RIFF'), taille, Buffer.from('WEBP'), corps])
+  return `data:image/webp;base64,${buffer.toString('base64')}`
+}
+
+test('/api/tickets image rend un chemin depuis la racine du dépôt', () => {
+  const dir = projetEnregistre()
+  postTicket({ action: 'create', path: dir, titre: 'Avec capture' })
+
+  const rendu = postTicket({ action: 'image', path: dir, id: 'T-0001', image: webpDataUri() })
+
+  assert.match(rendu.json.chemin, /^ovrsee\/tickets\/images\/T-0001-[0-9a-f]{8}\.webp$/)
+  // Le chemin rendu doit être exactement ce que la route de lecture accepte.
+  assert.ok(resolve(url(`/api/media?path=${encodeURIComponent(dir)}&file=${encodeURIComponent(rendu.json.chemin)}`), null).file)
+})
+
+test('/api/tickets image exige l’en-tête X-Ovrsee comme toute écriture', () => {
+  const dir = projetEnregistre()
+  assert.equal(
+    postTicket({ action: 'image', path: dir, id: 'T-0001', image: webpDataUri() }, {}).status,
+    403,
+  )
+})
+
+test('/api/tickets image remonte en 400 ce que le modèle refuse', () => {
+  const dir = projetEnregistre()
+
+  // Un client qui ne ré-encode pas, un identifiant qui tente la traversée, rien.
+  const png = `data:image/png;base64,${Buffer.from('RIFF0000WEBP').toString('base64')}`
+  assert.equal(postTicket({ action: 'image', path: dir, id: 'T-0001', image: png }).status, 400)
+  assert.equal(
+    postTicket({ action: 'image', path: dir, id: '../../etc', image: webpDataUri() }).status,
+    400,
+  )
+  assert.equal(postTicket({ action: 'image', path: dir, id: 'T-0001' }).status, 400)
+})
+
+/**
+ * Le même parcours, mais par le protocole `ovrsee://` d'Electron.
+ *
+ * `CLAUDE.md` le dit : une route testée dans le navigateur n'est pas une route
+ * testée dans Electron. `fetchHandler` lit son corps autrement que le
+ * middleware Vite (`request.text()` au lieu du flux plafonné par `CORPS_MAX`),
+ * et c'est le seul des trois hôtes qui n'avait aucun test.
+ */
+const requeteElectron = body => ({
+  method: 'POST',
+  headers: new Map([['x-ovrsee', '1']]),
+  text: async () => JSON.stringify(body),
+})
+
+test('coller une image puis sauver le corps fonctionne aussi dans Electron', async () => {
+  const dir = projetEnregistre()
+  postTicket({ action: 'create', path: dir, titre: 'Vu depuis Electron' })
+
+  // 1. L'image part par le protocole custom, et rend son chemin.
+  const posee = await fetchHandler(
+    url('/api/tickets'),
+    null,
+    requeteElectron({ action: 'image', path: dir, id: 'T-0001', image: webpDataUri() }),
+  )
+  const { chemin } = await posee.json()
+  assert.match(chemin, /^ovrsee\/tickets\/images\/T-0001-[0-9a-f]{8}\.webp$/)
+
+  // 2. Le corps qui la cite est sauvé par la même voie — c'est cette seconde
+  // écriture qui manquait sur un ticket dont l'image était pourtant sur disque.
+  const file = 'T-0001-vu-depuis-electron.md'
+  const sauve = await fetchHandler(
+    url('/api/tickets'),
+    null,
+    requeteElectron({ action: 'update', path: dir, file, corps: `Un bug.\n\n![](${chemin})` }),
+  )
+  const tableau = await sauve.json()
+  assert.equal(sauve.status ?? 200, 200)
+
+  // 3. Le ticket relu cite bien l'image : l'aller-retour complet tient.
+  const ticket = tableau.tickets.find(t => t.file === file)
+  assert.ok(ticket.corps.includes(chemin), 'le corps sauvé cite l’image')
 })
 
 test('/api/tickets rend 404 sur un fichier de ticket qui n’existe pas', () => {

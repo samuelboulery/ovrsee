@@ -1,8 +1,8 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtempSync, mkdirSync, writeFileSync, readdirSync, symlinkSync, existsSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, symlinkSync, existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { basename, join } from 'node:path'
 
 import {
   avancerTicketActifEclipse,
@@ -23,6 +23,7 @@ import {
   isSafeTicketId,
   readActiveTicket,
   clearActiveTicket,
+  saveTicketImage,
 } from './tickets.js'
 
 import { writeActive } from './active.js'
@@ -695,4 +696,118 @@ test('avancerTicketActifEclipse : silencieux si le board n’a pas de colonne re
 
   const relu = readTickets(ovrseeDir).find(t => t.meta.id === meta.id)
   assert.equal(relu.meta.colonne, 'en-cours')
+})
+
+// --- saveTicketImage -------------------------------------------------------
+
+/** Un WebP minimal : `RIFF`, taille, `WEBP`, puis n'importe quoi. */
+const webp = (octets = 32) => {
+  const corps = Buffer.alloc(octets)
+  const taille = Buffer.alloc(4)
+  taille.writeUInt32LE(corps.length + 4)
+  return Buffer.concat([Buffer.from('RIFF'), taille, Buffer.from('WEBP'), corps])
+}
+
+const dataUri = buffer => `data:image/webp;base64,${buffer.toString('base64')}`
+
+test('saveTicketImage écrit sous ovrsee/tickets/images et rend un chemin depuis la racine', () => {
+  const ovrseeDir = fixture()
+  const source = webp()
+  const chemin = saveTicketImage(ovrseeDir, 'T-0042', dataUri(source))
+
+  assert.match(chemin, /^ovrsee\/tickets\/images\/T-0042-[0-9a-f]{8}\.webp$/)
+
+  // Octet pour octet : `writeFileNoFollow` passe 'utf8' à `writeFileSync`, que
+  // Node ignore pour un Buffer. Si cette écriture repassait un jour par une
+  // chaîne, l'image serait corrompue sans qu'aucun test ne tombe.
+  const ecrit = readFileSync(join(ovrseeDir, 'tickets', 'images', basename(chemin)))
+  assert.ok(source.equals(ecrit), 'les octets écrits sont ceux reçus')
+})
+
+test('saveTicketImage nomme le fichier lui-même : deux envois ne se marchent pas dessus', () => {
+  const ovrseeDir = fixture()
+  const a = saveTicketImage(ovrseeDir, 'T-0042', dataUri(webp()))
+  const b = saveTicketImage(ovrseeDir, 'T-0042', dataUri(webp()))
+
+  assert.notEqual(a, b)
+  assert.equal(readdirSync(join(ovrseeDir, 'tickets', 'images')).length, 2)
+})
+
+test('saveTicketImage refuse un data-URI qui n’est pas du WebP', () => {
+  const ovrseeDir = fixture()
+  const png = `data:image/png;base64,${webp().toString('base64')}`
+
+  assert.throws(() => saveTicketImage(ovrseeDir, 'T-0042', png), /webp/i)
+  assert.ok(!existsSync(join(ovrseeDir, 'tickets', 'images')))
+})
+
+test('saveTicketImage refuse un WebP annoncé mais absent des octets magiques', () => {
+  const ovrseeDir = fixture()
+  const menteur = dataUri(Buffer.from('<?php system($_GET[0]); ?>'))
+
+  assert.throws(() => saveTicketImage(ovrseeDir, 'T-0042', menteur), /webp/i)
+})
+
+test('saveTicketImage refuse une image au-delà du plafond', () => {
+  const ovrseeDir = fixture()
+
+  assert.throws(() => saveTicketImage(ovrseeDir, 'T-0042', dataUri(webp(800_000))), /volumineuse/i)
+})
+
+test('saveTicketImage borne le data-URI avant de le décoder', () => {
+  const ovrseeDir = fixture()
+  // Electron lit le corps entier avant d'arriver ici : le refus doit tomber
+  // sur la longueur de la chaîne, sans matérialiser les octets.
+  const enorme = `data:image/webp;base64,${'A'.repeat(5_000_000)}`
+
+  assert.throws(() => saveTicketImage(ovrseeDir, 'T-0042', enorme), /volumineuse/i)
+})
+
+test('saveTicketImage refuse une image vide', () => {
+  const ovrseeDir = fixture()
+
+  assert.throws(() => saveTicketImage(ovrseeDir, 'T-0042', 'data:image/webp;base64,'), /webp/i)
+})
+
+test('saveTicketImage ne laisse pas un identifiant de ticket sortir du dossier', () => {
+  const ovrseeDir = fixture()
+
+  for (const id of ['../../../etc/passwd', 'T-0042/../..', '', null]) {
+    assert.throws(() => saveTicketImage(ovrseeDir, id, dataUri(webp())), /identifiant/i)
+  }
+})
+
+// --- deleteTicket et ses images --------------------------------------------
+
+test('deleteTicket emporte les images de son ticket, et aucune autre', () => {
+  const ovrseeDir = fixture()
+  createTicket(ovrseeDir, { titre: 'Avec une image' }, new Date('2026-09-01'))
+  createTicket(ovrseeDir, { titre: 'Sans rapport' }, new Date('2026-09-01'))
+
+  const mien = saveTicketImage(ovrseeDir, 'T-0001', dataUri(webp()))
+  const autre = saveTicketImage(ovrseeDir, 'T-0002', dataUri(webp()))
+  const images = join(ovrseeDir, 'tickets', 'images')
+
+  updateTicket(ovrseeDir, 'T-0001-avec-une-image.md', { corps: `![](${mien})` })
+  assert.equal(deleteTicket(ovrseeDir, 'T-0001-avec-une-image.md'), true)
+
+  assert.ok(!existsSync(join(images, basename(mien))), 'son image est partie')
+  assert.ok(existsSync(join(images, basename(autre))), 'celle du voisin est restée')
+})
+
+test('deleteTicket emporte aussi une image que le corps ne cite plus', () => {
+  const ovrseeDir = fixture()
+  createTicket(ovrseeDir, { titre: 'Collée puis retirée' }, new Date('2026-09-01'))
+  const orpheline = saveTicketImage(ovrseeDir, 'T-0001', dataUri(webp()))
+
+  deleteTicket(ovrseeDir, 'T-0001-collee-puis-retiree.md')
+
+  assert.ok(!existsSync(join(ovrseeDir, 'tickets', 'images', basename(orpheline))))
+})
+
+test('deleteTicket reste vrai sur un ticket sans image', () => {
+  const ovrseeDir = fixture()
+  createTicket(ovrseeDir, { titre: 'Rien à voir' }, new Date('2026-09-01'))
+
+  assert.equal(deleteTicket(ovrseeDir, 'T-0001-rien-a-voir.md'), true)
 })

@@ -182,6 +182,25 @@ export async function ticketAction(
 }
 
 /**
+ * Écrit une image collée dans un ticket, et rend son chemin depuis la racine.
+ *
+ * Séparée de `ticketAction` : c'est la seule écriture de tickets qui ne rend
+ * pas le tableau. L'appelant a besoin du chemin pour l'insérer au curseur, et
+ * rien du ticket n'a changé tant que le corps n'est pas sauvé.
+ */
+export async function ticketImage(path: string, id: string, image: string): Promise<string> {
+  const response = await fetch('/api/tickets', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
+    body: JSON.stringify({ action: 'image', path, id, image }),
+  })
+
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result.chemin
+}
+
+/**
  * Relit colonnes et tickets seuls — pour le polling qui garde le tableau à
  * jour quand un ticket est écrit hors de l'app (skill, terminal).
  */

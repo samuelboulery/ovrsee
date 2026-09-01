@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { ArrowsIn, ArrowsOut, Check, PencilSimple, X } from '@phosphor-icons/react'
 
 import {
@@ -17,6 +17,7 @@ import {
 import { t, type TranslationKey } from '../i18n'
 import { Markdown } from '../markdown'
 import { s } from '../style'
+import { collerImage, imageDe, insererImage } from '../ticket-image'
 import { Divider, useResizable } from '../useResizable'
 
 /**
@@ -112,6 +113,46 @@ export function Detail({
   const [edition, setEdition] = useState(false)
   /** Lecture en grand : la même chose, dans une modale au lieu du rail. */
   const [agrandi, setAgrandi] = useState(false)
+  /** L'échec d'un collage d'image — trop lourde, illisible, disque plein. */
+  const [erreurImage, setErreurImage] = useState<string | null>(null)
+  const zoneCorps = useRef<HTMLTextAreaElement>(null)
+
+  /**
+   * Colle une image dans le corps (T-0219).
+   *
+   * Le corps est sauvé dans la foulée plutôt qu'au `blur` : l'image est déjà
+   * sur le disque, et un `![](…)` que l'utilisateur perdrait en fermant le
+   * panneau laisserait un fichier orphelin sans rien à l'écran.
+   */
+  const collerDansLeCorps = async (donnees: DataTransfer | null) => {
+    // Synchrone : un `DataTransfer` n'est lisible que pendant son événement.
+    const fichier = imageDe(donnees)
+    if (!fichier) return
+
+    setErreurImage(null)
+    try {
+      const chemin = await collerImage(root, ticket.id, fichier)
+
+      // Le champ fait foi, pas la fermeture : entre le collage et la fin de
+      // l'envoi, l'utilisateur a pu continuer à taper. Repartir de `corps`
+      // écraserait sa frappe, et sa position de curseur avec.
+      const champ = zoneCorps.current
+      const base = champ?.value ?? corps
+      const { texte, curseur } = insererImage(
+        base,
+        chemin,
+        champ?.selectionStart ?? base.length,
+        champ?.selectionEnd ?? base.length,
+      )
+
+      setCorps(texte)
+      onModifier({ corps: texte })
+      // Après le rendu de React, sans quoi la position serait écrasée.
+      requestAnimationFrame(() => champ?.setSelectionRange(curseur, curseur))
+    } catch (error) {
+      setErreurImage(error instanceof Error ? error.message : String(error))
+    }
+  }
 
   const colonne = colonnes.find(c => c.id === ticket.colonne)
   const parentEpic = ticket.epic ? allTickets.find(t => t.id === ticket.epic) : null
@@ -275,13 +316,36 @@ export function Detail({
           />
 
           <textarea
+            ref={zoneCorps}
             className="input"
             value={corps}
             placeholder={t('tableau.acceptance_criteria_placeholder')}
             onChange={(event) => setCorps(event.target.value)}
             onBlur={() => { if (corps !== ticket.corps) onModifier({ corps }) }}
+            // Coller ou déposer une capture l'écrit dans le dépôt et insère
+            // son `![](…)` au curseur. `preventDefault` seulement s'il y avait
+            // bien une image : un collage de texte doit rester un collage.
+            onPaste={event => {
+              if (imageDe(event.clipboardData)) event.preventDefault()
+              void collerDansLeCorps(event.clipboardData)
+            }}
+            onDragOver={event => { if (imageDe(event.dataTransfer)) event.preventDefault() }}
+            onDrop={event => {
+              if (imageDe(event.dataTransfer)) event.preventDefault()
+              void collerDansLeCorps(event.dataTransfer)
+            }}
             style={s('font-size: 12px; width: 100%; margin-top: 8px; min-height: 220px; line-height: 1.55; font-family: var(--font-mono, monospace);')}
           />
+
+          {erreurImage ? (
+            <div style={s('font-size: 11px; color: var(--color-err); margin-top: 6px;')}>
+              {t('tableau.image_echec')} {erreurImage}
+            </div>
+          ) : (
+            <div style={s('font-size: 11px; color: var(--color-neutral-500); margin-top: 6px;')}>
+              {t('tableau.image_astuce')}
+            </div>
+          )}
         </>
       ) : (
         <>

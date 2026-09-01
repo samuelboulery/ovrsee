@@ -1,10 +1,16 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Réparer le réglage « système » du thème dans Electron",
   "opened": "2026-09-01",
-  "closed": null,
-  "commits": []
+  "closed": "2026-09-01",
+  "commits": [
+    {
+      "sha": "7d809a1",
+      "date": "2026-09-01",
+      "files": []
+    }
+  ]
 }
 ---
 

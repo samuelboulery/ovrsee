@@ -2,9 +2,12 @@
 {
   "id": "T-0242",
   "titre": "Le réglage « système » du thème se fige dans Electron",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
-  "tags": ["theme", "electron"],
+  "tags": [
+    "theme",
+    "electron"
+  ],
   "cree": "2026-09-01",
   "maj": "2026-09-01",
   "plan": "2026-09-01-reparer-le-reglage-systeme-du-theme-dans-electron.md"

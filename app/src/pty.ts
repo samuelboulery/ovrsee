@@ -75,7 +75,16 @@ declare global {
        * Ramène la fenêtre au premier plan. La seule chose qu'un clic sur une
        * notification ne peut pas faire depuis le rendu.
        */
-      app: { focus: () => Promise<void>; close: () => Promise<void> }
+      app: {
+        focus: () => Promise<void>
+        close: () => Promise<void>
+        /**
+         * Accorde la chrome native au thème du rendu — menus, dialogues,
+         * ascenseurs de l'OS, DevTools. Optionnel : une version antérieure du
+         * preload ne l'expose pas, et le rendu ne doit pas s'y casser.
+         */
+        setTheme?: (mode: 'dark' | 'light') => Promise<void>
+      }
       /**
        * Barre de menu macOS — voir `electron/tray.js`.
        *

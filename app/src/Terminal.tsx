@@ -26,6 +26,7 @@ import { etiquetteDe } from './attention'
 import { DIT_ATTENTION, Etat } from './EtatSession'
 import { composer, resumeProjet, type MenuBarAttention, type MenuBarSession } from './menubar'
 import { s } from './style'
+import type { ThemeMode } from './theme'
 import { t, type TranslationKey } from './i18n'
 import { useTerminals } from './useTerminal'
 import { cibleDeCommande, pasteTo, submitTo } from './pty'
@@ -177,6 +178,7 @@ export function Terminal({
   onSessions,
   onOpenPreferences,
   actions,
+  themeMode,
 }: {
   /** La vue affichée — c'est à elle que s'épingle une taille de panneau. */
   tab: TabId
@@ -207,6 +209,14 @@ export function Terminal({
   onSessions: (sessions: MenuBarSession[]) => void
   /** Ouvre les préférences sur la section Projet, pour y créer une commande. */
   onOpenPreferences?: () => void
+  /**
+   * Le thème résolu, `light` ou `dark`.
+   *
+   * Il descend d'`App` plutôt que d'être lu ici : la chrome du panneau suit
+   * les jetons CSS toute seule, mais le canvas xterm ne lit pas le CSS, et il
+   * lui faut un rendu pour être repeint (T-0229).
+   */
+  themeMode: ThemeMode
   /**
    * Ce que le menu natif peut demander au panneau — ⌘W, ⌘D.
    *
@@ -284,7 +294,7 @@ export function Terminal({
     claudeKey,
     available,
     ptyIds,
-  } = useTerminals(snapshot?.root ?? null, (sessionKey, event) => {
+  } = useTerminals(snapshot?.root ?? null, themeMode, (sessionKey, event) => {
     const { kind, detail } = event
     const projet = sessionKey.slice(0, Math.max(0, sessionKey.lastIndexOf('#')))
     // Le nom du dossier plutôt que celui du registre : la notification peut

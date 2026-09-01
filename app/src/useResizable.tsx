@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { t } from './i18n'
 import { s } from './style'
 
 /**
@@ -197,7 +198,7 @@ export function Divider({
   return (
     <div
       {...(locked ? {} : resizable.handleProps)}
-      title={locked ? lockedTitle : 'Glisser pour redimensionner · double-clic pour réinitialiser'}
+      title={locked ? lockedTitle : t('a11y.resize')}
       style={s(
         (vertical
           ? 'flex: none; width: 9px; margin: 0 -4px; z-index: 10; display: flex; justify-content: center;'

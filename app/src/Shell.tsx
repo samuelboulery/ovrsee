@@ -648,7 +648,7 @@ function ProjectRow({
             place sans le montrer. */}
         <button
           type="button"
-          title="Retirer de la liste — aucun fichier n'est supprimé"
+          title={t('a11y.remove_from_list')}
           aria-hidden={!hover && !confirming}
           tabIndex={hover || confirming ? 0 : -1}
           onClick={event => {
@@ -667,7 +667,7 @@ function ProjectRow({
         </button>
       </div>
       <div
-        title="Dernier commit rattaché à un plan"
+        title={t('a11y.last_plan')}
         style={s('font-size: 10.5px; font-family: var(--font-mono); color: var(--color-text-faint); margin-top: 3px; padding-left: 16px;')}
       >
         {humanAge(vivant.last)}

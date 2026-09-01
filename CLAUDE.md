@@ -78,6 +78,14 @@ deux sortes — les fonctions pures de `data.ts`, et un rendu des onglets sur in
 dégradés qui vérifie seulement qu'aucun ne lève. Rien ne couvre une interaction, un état
 ou une mise en page : pour ça, il faut lancer l'app.
 
+**Le plafond de 800 lignes se mesure maintenant** (`hooks/documentation.test.js`,
+T-0241). Il était écrit dans les règles, rétabli une fois par T-0206, et repassé par
+`Terminal.tsx` dans les dix jours sans que rien ne le dise. Le test porte une liste
+d'exemptions nommées — `hooks/i18n.js` (un dictionnaire) et `app/src/App.tsx` (851 l,
+le prochain à découper) — et il échoue **dans les deux sens** : un fichier qui dépasse
+sans y figurer, et une exemption devenue inutile. La liste est la dette, elle est faite
+pour raccourcir.
+
 Les commandes sont dans `package.json`. Une seule ne s'en déduit pas : `pnpm dev` sert
 l'app **sans terminal**, seul `pnpm electron` le donne.
 
@@ -86,16 +94,15 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
 - **`ovrsee/`** est produit par les hooks. Seuls `ovrsee/tickets/*.md` et
   `ovrsee/board.json` se saisissent — via le skill `ovrsee-tickets`. Corriger un plan,
   une page ou un scan à la main produit un état que le prochain commit écrasera.
-- **`legacy/Ovrsee-A-Nocturne.dc.html`** est la maquette du thème sombre : code tiers
-  embarqué, hors périmètre — ne pas relire, ne pas corriger, ne pas compter dans les
-  métriques. Sa liste d'exemptions dans `hooks/couleurs.test.js` (`FICHIERS_PORTES`,
-  vingt fichiers) a disparu en T-0230 : dix-sept n'avaient plus une seule couleur
-  littérale, les trois derniers sont passés aux jetons. Le garde-fou voit désormais
-  aussi les `rgba()`, et un seul fichier reste dispensé — `navigateur-webview.ts`,
-  dont le style part dans le DOM de la page observée.
-- **`_ds/`** tient deux design systems et le nom trompe : l'application charge
-  **`_ds/ovrsee/styles.css`** (`app/src/main.tsx`), pas `nocturne-*`, qui ne sert plus
-  qu'à la maquette.
+- **`_ds/ovrsee/styles.css`** est le design system, et le seul : `app/src/main.tsx`
+  ne charge que lui. La maquette d'origine (`legacy/`) et le système Nocturne dont
+  elle dérivait ont été supprimés en T-0233 — plus rien ne les chargeait, et le thème
+  clair (T-0227) a été livré sans eux.
+- **`hooks/couleurs.test.js` ne dispense plus qu'un fichier.** Sa liste d'exemptions
+  (`FICHIERS_PORTES`, vingt fichiers) a disparu en T-0230 : dix-sept n'avaient plus une
+  seule couleur littérale, les trois derniers sont passés aux jetons. Le garde-fou voit
+  désormais aussi les `rgba()`, et seul `navigateur-webview.ts` reste dispensé — son
+  style part dans le DOM de la page observée.
 - **`graphify-out/graph.json`** est versionné volontairement (l'onglet Données le lit,
   et lui seul) ; `graphify-out/cache/` et `graph.html` sont ignorés. Il ne passe **pas**
   par le snapshot : 687 ko lus synchrones à chaque changement de projet pour un onglet

@@ -59,7 +59,7 @@ const ovrseeDir = join(root, 'ovrsee')
 /** Un appel git dans le dépôt courant. Échoue bruyamment : c'est un outil manuel. */
 const git = args => execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim()
 
-export const USAGE_CLOSE = [
+const USAGE_CLOSE = [
   'usage : ovrsee-cli.js close [<plan.md>] [--commit <sha>]',
   '',
   '  sans argument      clôt TOUS les plans ouverts portant un commit',

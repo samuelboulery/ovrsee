@@ -66,7 +66,7 @@ export const darkTheme = {
  * clair — et celui de `white`/`black`, qui sont des couleurs qu'un programme
  * demande, pas des synonymes du fond et de l'encre.
  */
-export const lightTheme: typeof darkTheme = {
+const lightTheme: typeof darkTheme = {
   bgPrimary: '#f4f5f7',
   bgLightbox: '#ffffff',
   xtermBg: '#f7f8fa',
@@ -104,7 +104,7 @@ export function resolveTheme(pref: string | undefined, prefereClair: boolean): T
 }
 
 /** La requête média que `system` consulte. */
-export const REQUETE_CLAIR = '(prefers-color-scheme: light)'
+const REQUETE_CLAIR = '(prefers-color-scheme: light)'
 
 /**
  * Ce qui part au processus principal : le RÉGLAGE, pas le thème résolu.
@@ -149,7 +149,7 @@ export function applyTheme(pref: string | undefined): ThemeMode {
  * Rend la fonction de désabonnement. Sur un autre réglage, il n'y a rien à
  * suivre : le choix explicite prime, et l'abonnement serait du bruit.
  */
-export function watchSystemTheme(pref: string | undefined, onChange: (mode: ThemeMode) => void): () => void {
+function watchSystemTheme(pref: string | undefined, onChange: (mode: ThemeMode) => void): () => void {
   if (pref !== 'system' && pref !== undefined) return () => {}
 
   const media = window.matchMedia(REQUETE_CLAIR)

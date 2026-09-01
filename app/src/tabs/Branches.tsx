@@ -4,6 +4,7 @@ import { GitBranch } from '@phosphor-icons/react'
 import { gitFetch, humanAge, type GitStatus } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
+import { Titre } from '../ViewBar'
 
 /**
  * Branches locales et leur avance/retard sur la remote suivie.
@@ -111,14 +112,3 @@ export function Branches({
   )
 }
 
-function Titre({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={s(
-        'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;',
-      )}
-    >
-      {children}
-    </div>
-  )
-}

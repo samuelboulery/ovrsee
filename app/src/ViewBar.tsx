@@ -3,6 +3,25 @@ import type { ReactNode } from 'react'
 import { s } from './style'
 
 /**
+ * L'intitulé d'une section dans le corps d'une vue.
+ *
+ * Trois onglets l'écrivaient à l'identique — même balise, même chaîne de style.
+ * `Sante.tsx` garde sa variante en mono, qui est un choix de cette vue-là et
+ * pas une divergence.
+ */
+export function Titre({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={s(
+        'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;',
+      )}
+    >
+      {children}
+    </div>
+  )
+}
+
+/**
  * Barre de vue — maquette `Ovrsee App.dc.html#2a`, 46px, présente sur chaque
  * onglet à la place du `<h2>` de page que chacun réinventait. Fil d'Ariane
  * (projet / vue) à gauche, méta optionnelle en mono, contrôles propres à la

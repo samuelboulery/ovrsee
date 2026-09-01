@@ -1,6 +1,7 @@
 import type { GitStatus, OvrseeConfig } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
+import { Titre } from '../ViewBar'
 
 /**
  * Environnements déclarés dans `ovrsee.config.json`.
@@ -67,14 +68,3 @@ export function Environnements({
   )
 }
 
-function Titre({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={s(
-        'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;',
-      )}
-    >
-      {children}
-    </div>
-  )
-}

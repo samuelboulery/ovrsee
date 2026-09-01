@@ -21,7 +21,6 @@
  *          plan en tickets dans le même tour, sans le bloquer.
  */
 
-import { execFileSync } from 'node:child_process'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
@@ -35,32 +34,9 @@ import {
 } from './plans.js'
 import { avancerTicketActifEclipse, clearActiveTicket, avancerTicketsClos } from './tickets.js'
 import { sessionId, writeActive } from './active.js'
+import { readStdin, repoRoot } from './entree.js'
 import { estPrincipal } from './principal.js'
 
-function readStdin() {
-  try {
-    return readFileSync(0, 'utf8')
-  } catch {
-    return ''
-  }
-}
-
-/**
- * Racine du dépôt git contenant `cwd`, ou null.
- * execFile sans shell : `cwd` vient d'un JSON externe et ne doit jamais être
- * interprété par un shell.
- */
-function repoRoot(cwd) {
-  try {
-    return execFileSync('git', ['rev-parse', '--show-toplevel'], {
-      cwd,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim()
-  } catch {
-    return null
-  }
-}
 
 /**
  * Là où Claude Code écrit le plan avant de demander son approbation.

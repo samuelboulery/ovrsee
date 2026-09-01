@@ -29,7 +29,7 @@ import { StatusBar } from '../StatusBar'
 import { ViewBar } from '../ViewBar'
 import { ConfigCrawl } from '../ConfigCrawl'
 import { crawlDisponible, useCrawl } from '../useCrawl'
-import type { Layout } from '../Terminal'
+import type { Layout } from '../terminalLayout'
 import { CompareModal, DetailPanel, Footnotes } from './ProduitDetail'
 
 /** Onglet Produit — maquette l. 85-274. */

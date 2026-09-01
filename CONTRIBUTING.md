@@ -82,10 +82,8 @@ chore: monte electron-builder en 26.16
   `ovrsee/board.json` are written by hand. Plans, pages, scans and screenshots
   write themselves: fixing one manually produces a state the next commit will
   overwrite.
-- **`legacy/Ovrsee-A-Nocturne.dc.html`** is the mockup, embedded third-party code.
-  Out of scope.
-- **`_ds/`** is a design system library. The application loads only
-  `_ds/ovrsee/styles.css`.
+- **`_ds/ovrsee/styles.css`** is the design system. It is the only stylesheet the
+  application loads.
 - **`graphify-out/graph.json`** is generated. It is versioned deliberately, but it
   regenerates — do not edit it.
 - **`site/fr/`** is the French page, generated at publish time by

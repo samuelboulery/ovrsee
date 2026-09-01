@@ -7,7 +7,7 @@
  * sont stockés nulle part.
  */
 
-import { t } from './i18n'
+import { currentLanguage, formatDate, t } from './i18n'
 import { liste } from './liste'
 import type { Plan } from './plans'
 import type { Page } from './pages'
@@ -528,18 +528,6 @@ export const lastAudit = (audits: Audit[]): Audit | null =>
  */
 export const scanFailed = (scans: Scan[]): boolean => lastScan(scans)?.ok === false
 
-/**
- * Retourne l'abréviation du mois traduit.
- */
-function getMonth(monthNumber: number): string {
-  const monthKeys = [
-    'months.jan', 'months.feb', 'months.mar', 'months.apr',
-    'months.may', 'months.jun', 'months.jul', 'months.aug',
-    'months.sep', 'months.oct', 'months.nov', 'months.dec',
-  ] as const
-  return t(monthKeys[monthNumber - 1])
-}
-
 /** « il y a 3 semaines » — une date brute ne dit pas si l'information a dérivé. */
 export function humanAge(date: string | null | undefined, now: Date = new Date()): string {
   if (!date) return t('msg.never')
@@ -559,19 +547,10 @@ export function humanAge(date: string | null | undefined, now: Date = new Date()
 }
 
 /** `2026-07-18` → `18 juil. 2026`, comme dans la maquette. */
-export function frDate(date: string | null | undefined): string {
-  if (!date) return '—'
-  const [y, m, d] = String(date).split('-').map(Number)
-  if (!y || !m || !d) return String(date)
-  return `${d} ${getMonth(m)} ${y}`
-}
+export const frDate = (date: string | null | undefined): string => formatDate(date, currentLanguage())
 
 /** `2026-07-18` → `18 juil.` — le pied des cartes du graphe est étroit. */
-export function frDateShort(date: string | null | undefined): string {
-  if (!date) return '—'
-  const [, m, d] = String(date).split('-').map(Number)
-  if (!m || !d) return String(date)
-  return `${d} ${getMonth(m)}`
-}
+export const frDateShort = (date: string | null | undefined): string =>
+  formatDate(date, currentLanguage(), false)
 
 

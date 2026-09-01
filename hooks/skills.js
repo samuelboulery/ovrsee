@@ -82,6 +82,7 @@ export function bundledPath(nom) {
 /** Le chemin d'installation d'un skill. Même liste blanche. */
 const installedPath = nom => join(skillsDir(), nom, 'SKILL.md')
 
+/** Du texte, pas du JSON : `readJson` de `json.js` ne s'applique pas ici. */
 const lire = path => {
   try {
     return readFileSync(path, 'utf8')

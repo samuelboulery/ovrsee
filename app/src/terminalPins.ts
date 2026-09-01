@@ -12,7 +12,7 @@
  * préfixe `ovrsee.size.`). La faire transiter par l'API pour un réglage qui ne
  * quitte jamais la machine coûterait un schéma, un validateur et un aller-retour.
  */
-import type { Layout } from './Terminal'
+import type { Layout } from './terminalLayout'
 import type { TabId } from './views'
 
 /** Clé `${onglet}:${disposition}` vers une taille en pixels. */

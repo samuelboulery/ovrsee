@@ -23,7 +23,7 @@ import { Sante } from './Sante'
 import { t } from '../i18n'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
-import { ViewBar } from '../ViewBar'
+import { Titre, ViewBar } from '../ViewBar'
 import type { Editeur } from '../pty'
 
 /** Crochets appelés par le gestionnaire de paquets, jamais tapés à la main. */
@@ -639,18 +639,6 @@ function Obsidian({ root }: { root: string }) {
           ))}
         </div>
       )}
-    </div>
-  )
-}
-
-function Titre({ children }: { children: React.ReactNode }) {
-  return (
-    <div
-      style={s(
-        'font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;',
-      )}
-    >
-      {children}
     </div>
   )
 }

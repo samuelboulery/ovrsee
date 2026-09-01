@@ -3,8 +3,12 @@
  *
  * La landing venait d'un export Claude Design, piloté par `support.js` — 69 ko
  * de runtime tiers, sans licence claire, pour un gabarit à quatre besoins :
- * répéter une liste, montrer une section selon l'onglet choisi, mettre à
- * l'échelle la fenêtre de démo, et basculer la langue. C'est ce fichier.
+ * répéter une liste, montrer une section selon l'onglet choisi et mettre à
+ * l'échelle la fenêtre de démo. C'est ce fichier.
+ *
+ * La langue, elle, n'est pas un besoin de runtime : `/` est anglaise, `/fr/`
+ * est engendrée par `scripts/build-site-fr.js`, et la bascule est le lien qui
+ * mène de l'une à l'autre. Ce fichier ne fait que lire laquelle il sert.
  *
  * Aucune dépendance, et aucune requête sortante hors un appel facultatif à l'API
  * GitHub pour rafraîchir le numéro de version affiché.
@@ -15,24 +19,25 @@ const ACCENT = '#7d76f0'
 
 /* ------------------------------------------------------------------ état -- */
 
-// La langue vient du document, pas d'une valeur en dur : `/fr/` est une page déjà
-// traduite (`scripts/build-site-fr.js`), et `traduire()` y appliquerait sinon la table
-// inverse — la page française repasserait en anglais au premier rendu.
+// La langue vient du document servi, jamais d'une valeur en dur : `/` porte `en`,
+// `/fr/` porte `fr`. Elle ne change pas en cours de page — changer de langue, c'est
+// suivre le lien vers l'autre page.
 const état = { view: 'apercu', scale: 1, lang: document.documentElement.lang === 'fr' ? 'fr' : 'en' }
 
 /* --------------------------------------------------------------- données -- */
 
 // Registre des sept vues, dans l'ordre de `app/src/views.ts`, mêmes pictos. Les
-// libellés sont en anglais, la langue source de la page ; `traduire()` les passe en
-// français sur `/fr/`, via les mêmes clés que le reste du texte.
+// libellés sont donnés dans les deux langues, comme `MÉTA` : ce sont les seuls
+// textes que le gabarit injecte, et le dictionnaire ne les voit pas — il ne
+// travaille que sur le HTML, au déploiement.
 const VUES = [
-  { id: 'apercu', label: 'Overview', icon: 'squares-four', key: '1' },
-  { id: 'navigateur', label: 'Browser', icon: 'browser', key: '2' },
-  { id: 'produit', label: 'Product', icon: 'tree-structure', key: '3' },
-  { id: 'historique', label: 'History', icon: 'clock-counter-clockwise', key: '4' },
-  { id: 'tableau', label: 'Board', icon: 'kanban', key: '5', count: 12 },
-  { id: 'donnees', label: 'Data', icon: 'database', key: '6' },
-  { id: 'stack', label: 'Stack', icon: 'stack', key: '7' },
+  { id: 'apercu', label: { en: 'Overview', fr: 'Aperçu' }, icon: 'squares-four', key: '1' },
+  { id: 'navigateur', label: { en: 'Browser', fr: 'Navigateur' }, icon: 'browser', key: '2' },
+  { id: 'produit', label: { en: 'Product', fr: 'Produit' }, icon: 'tree-structure', key: '3' },
+  { id: 'historique', label: { en: 'History', fr: 'Historique' }, icon: 'clock-counter-clockwise', key: '4' },
+  { id: 'tableau', label: { en: 'Board', fr: 'Tableau' }, icon: 'kanban', key: '5', count: 12 },
+  { id: 'donnees', label: { en: 'Data', fr: 'Données' }, icon: 'database', key: '6' },
+  { id: 'stack', label: { en: 'Stack', fr: 'Stack' }, icon: 'stack', key: '7' },
 ]
 
 // Le panneau Activité de l'onglet Historique, en comptes bruts par jour — commits,
@@ -81,7 +86,7 @@ function valeurs() {
   const views = VUES.map(d => {
     const actif = d.id === v
     return {
-      label: d.label,
+      label: d.label[état.lang],
       key: d.key,
       count: d.count ?? '',
       icon: (actif ? 'ph-fill ph-' : 'ph ph-') + d.icon,
@@ -253,41 +258,11 @@ function lier(racine, ctx, horsClones = false) {
   }
 }
 
-/* ------------------------------------------------------------ traduction -- */
-
-// Posée sur le DOM et non dans le gabarit : l'anglais est le texte source, il
-// s'affiche dès le premier octet et reste éditable ; le français s'applique nœud
-// de texte par nœud de texte après le rendu.
-//
-// Sur `/fr/` la page est déjà française et seuls les libellés injectés par le
-// gabarit restent anglais : la table s'y applique dans le même sens, et les nœuds
-// déjà traduits n'y trouvent simplement pas de clé.
-let DICT = {}
-
-function traduire() {
-  const table = {}
-  if (état.lang === 'fr') for (const k in DICT) table[k] = DICT[k]
-  else for (const k in DICT) table[DICT[k]] = k
-
-  const marcheur = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
-  const noeuds = []
-  while (marcheur.nextNode()) noeuds.push(marcheur.currentNode)
-  for (const n of noeuds) {
-    const brut = n.nodeValue
-    const texte = brut.trim()
-    if (!texte) continue
-    const cible = table[texte]
-    if (cible && cible !== texte) n.nodeValue = brut.replace(texte, cible)
-  }
-  document.documentElement.lang = état.lang
-}
-
 /* ---------------------------------------------------------------- rendus -- */
 
 function rendre(patch) {
   Object.assign(état, patch)
   appliquer(document.body, valeurs())
-  traduire()
 }
 
 // La fenêtre de démo est dessinée à sa taille réelle (1400×820, comme l'app)
@@ -352,11 +327,6 @@ async function versionAffichée() {
 }
 
 /* --------------------------------------------------------------- amorçage -- */
-
-fetch('/dict.json')
-  .then(r => (r.ok ? r.json() : {}))
-  .catch(() => ({}))
-  .then(d => { DICT = d; rendre({}) })
 
 document.addEventListener('DOMContentLoaded', () => {
   rendre({})

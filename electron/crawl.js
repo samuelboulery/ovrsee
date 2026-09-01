@@ -26,9 +26,10 @@
  */
 
 import { spawn } from 'node:child_process'
-import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+
+import { readJson } from '../hooks/json.js'
 
 import { DEV_DEFAUT, estApprouve } from '../crawl/confiance.js'
 
@@ -50,15 +51,11 @@ const CRAWLER = join(HERE, '..', 'crawl', 'index.js')
  * @returns {string|null}
  */
 export function devSurDisque(projectPath) {
-  try {
-    const config = JSON.parse(readFileSync(join(projectPath, 'ovrsee.config.json'), 'utf8'))
-    const dev = config?.dev
-    return typeof dev === 'string' ? dev : DEV_DEFAUT
-  } catch {
-    // Configuration absente ou cassée : rien à approuver. Le crawl échouera
-    // pour cette raison-là, et il l'écrira dans `scans.jsonl` comme avant.
-    return null
-  }
+  // Configuration absente ou cassée : rien à approuver. Le crawl échouera pour
+  // cette raison-là, et il l'écrira dans `scans.jsonl` comme avant.
+  const config = readJson(join(projectPath, 'ovrsee.config.json'))
+  if (!config) return null
+  return typeof config.dev === 'string' ? config.dev : DEV_DEFAUT
 }
 
 /**

@@ -19,38 +19,15 @@
  */
 
 import { execFileSync } from 'node:child_process'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { EN_COURS, moveTicket, readBoard, readTickets } from './tickets.js'
 import { isSafePlanFileName } from './plans.js'
 import { readActive, sessionId } from './active.js'
+import { readStdin, repoRoot } from './entree.js'
 import { estPrincipal } from './principal.js'
 
-function readStdin() {
-  try {
-    return readFileSync(0, 'utf8')
-  } catch {
-    return ''
-  }
-}
-
-/**
- * Racine du dépôt git contenant `cwd`, ou null.
- * execFile sans shell : `cwd` vient d'un JSON externe et ne doit jamais être
- * interprété par un shell.
- */
-function repoRoot(cwd) {
-  try {
-    return execFileSync('git', ['rev-parse', '--show-toplevel'], {
-      cwd,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim()
-  } catch {
-    return null
-  }
-}
 
 /**
  * Y a-t-il du code non commité, en dehors de `ovrsee/` et `graphify-out/` ?

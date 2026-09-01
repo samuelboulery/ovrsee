@@ -137,7 +137,7 @@ export const claude: { id: string | null } = { id: null }
  * Écrit dans le pty désigné. Rend false quand il n'y en a pas — c'est le cas
  * dans un navigateur, et l'appelant se rabat alors sur le presse-papier.
  */
-export function injectTo(ptyId: string | null, text: string): boolean {
+function injectTo(ptyId: string | null, text: string): boolean {
   const bridge = terminalBridge()
   if (!bridge || !ptyId) return false
   bridge.write(ptyId, text)

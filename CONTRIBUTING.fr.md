@@ -77,10 +77,7 @@ chore: monte electron-builder en 26.16
   `ovrsee/board.json` se saisissent. Les plans, les pages, les scans et les
   captures s'écrivent tout seuls : les corriger à la main produit un état que le
   prochain commit écrasera.
-- **`legacy/Ovrsee-A-Nocturne.dc.html`** est la maquette, du code tiers embarqué.
-  Hors périmètre.
-- **`_ds/`** est une bibliothèque de design systems. L'application ne charge que
-  `_ds/ovrsee/styles.css`.
+- **`_ds/ovrsee/styles.css`** est le design system. L'application ne charge que lui.
 - **`graphify-out/graph.json`** est engendré. Il est versionné volontairement,
   mais il se régénère — ne l'éditez pas.
 

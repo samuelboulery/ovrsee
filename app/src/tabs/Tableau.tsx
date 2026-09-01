@@ -271,7 +271,7 @@ export function Tableau({
           {edition ? t('tableau.edit_mode_help') : t('tableau.read_mode_help')}
         </div>
         {erreur && (
-          <div style={s('margin-top: 10px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;')}>
+          <div style={s('margin-top: 10px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-line); border-radius: 6px; padding: 7px 10px;')}>
             {erreur}
           </div>
         )}
@@ -590,7 +590,7 @@ function ColonneVue({
       {/* La confirmation prend la place des cartes plutôt que de flotter : ce
           qu'on s'apprête à vider est exactement ce qu'elle recouvre. */}
       {confirme ? (
-        <div style={s('border: 1px solid var(--color-accent-700); border-radius: 8px; padding: 10px; background: var(--color-surface-card);')}>
+        <div style={s('border: 1px solid var(--color-accent-line); border-radius: 8px; padding: 10px; background: var(--color-surface-card);')}>
           <div style={s('font-size: 11px; color: var(--color-neutral-400); line-height: 1.5;')}>
             {tickets.length > 0
               ? t(tickets.length > 1 ? 'tableau.tickets_to_relocate_plural' : 'tableau.tickets_to_relocate', { n: tickets.length })

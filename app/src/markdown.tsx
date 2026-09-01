@@ -495,7 +495,7 @@ export function Markdown({ text, root }: { text: string; root?: string }): React
         <blockquote
           key={key()}
           style={s(
-            'margin: 12px 0; padding: 2px 0 2px 14px; border-left: 2px solid var(--color-accent-700); color: var(--color-neutral-400); font-size: 12.5px; line-height: 1.6;',
+            'margin: 12px 0; padding: 2px 0 2px 14px; border-left: 2px solid var(--color-accent-line); color: var(--color-neutral-400); font-size: 12.5px; line-height: 1.6;',
           )}
         >
           {inline(body.join(' '), key(), root)}

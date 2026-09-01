@@ -154,7 +154,7 @@ function EtatVide({ titre, detail, source }: { titre: string; detail: string; so
         <div style={s('display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 6px;')}>
           <code
             style={s(
-              'font-family: var(--font-mono); font-size: 11.5px; color: var(--color-accent-500); background: var(--color-surface-control); border: 1px solid var(--color-divider); border-radius: var(--radius-md); padding: 8px 12px;',
+              'font-family: var(--font-mono); font-size: 11.5px; color: var(--color-accent-ink); background: var(--color-surface-control); border: 1px solid var(--color-divider); border-radius: var(--radius-md); padding: 8px 12px;',
             )}
           >
             {COMMANDE_GRAPHIFY}
@@ -182,7 +182,7 @@ function EtatVide({ titre, detail, source }: { titre: string; detail: string; so
 
 function confStyle(conf: 'EXTRACTED' | 'INFERRED' | 'AMBIGUOUS' | 'LIVE'): string {
   const styles = {
-    EXTRACTED: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-accent); border: 1px solid var(--color-accent-700);',
+    EXTRACTED: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-accent); border: 1px solid var(--color-accent-line);',
     INFERRED: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-300); border: 1px solid var(--color-border-control);',
     AMBIGUOUS: 'font-size: 10.5px; padding: 2px 7px; border-radius: 999px; color: var(--color-neutral-400); border: 1px dashed var(--color-border-control);',
     // Vérifiée en direct sur la base elle-même, pas déduite du code : le
@@ -347,7 +347,7 @@ export function Donnees({
         {liveErreur && (
           <div
             style={s(
-              'margin-bottom: 16px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
+              'margin-bottom: 16px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-line); border-radius: 6px; padding: 7px 10px;',
             )}
           >
             {liveErreur}
@@ -357,7 +357,7 @@ export function Donnees({
         {graphErreur && (
           <div
             style={s(
-              'margin-bottom: 16px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-700); border-radius: 6px; padding: 7px 10px;',
+              'margin-bottom: 16px; font-size: 12px; color: var(--color-accent); border: 1px solid var(--color-accent-line); border-radius: 6px; padding: 7px 10px;',
             )}
           >
             {t('donnees.load_error', { error: graphErreur })}

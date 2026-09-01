@@ -33,6 +33,17 @@
 }
 
 :root {
+  /* Le thème sombre est ce `:root` : il n'est pas un bloc parmi d'autres, il
+     est le défaut. Le clair vit plus bas, dans `:root[data-theme='light']`,
+     et ne redéfinit que ce qui change. Aucun jeton n'a jamais sa seule
+     définition dans un bloc de thème — `hooks/theme-clair.test.js` le vérifie,
+     parce qu'un jeton manquant rend `transparent` sans rien signaler.
+
+     `color-scheme` n'est pas décoratif : sans lui, les contrôles natifs,
+     l'autofill et les ascenseurs par défaut gardent l'apparence du thème
+     système, pas celle de l'application. */
+  color-scheme: dark;
+
   /* Surfaces — huit niveaux, du fond applicatif au contrôle actif.
      Valeurs de la maquette `Ovrsee App.dc.html#2a` (audit design du
      2026-08-12) — littérales, pas dérivées par color-mix. */
@@ -79,23 +90,48 @@
   --color-accent: var(--color-brand);
   --color-accent-2: #8682cf;
 
+  /* Les quatre rôles de l'accent. Les composants citent un rôle, jamais un
+     palier : un palier ne veut pas dire la même chose sur fond sombre et sur
+     fond clair, et c'est le rôle qui sait lequel prendre. Chacun garde ici
+     très exactement le palier qu'écrivaient les composants avant d'être
+     migrés — le sombre ne bouge pas. */
+  --color-accent-ink: var(--color-accent-500); /* texte accent : mono, code, puces */
+  --color-accent-fill: var(--color-accent-400); /* remplissage plein : jauge, pastille de priorité */
+  --color-accent-edge: var(--color-accent-600); /* contour d'un élément choisi, tracé d'illustration */
+  --color-accent-line: var(--color-accent-700); /* filet d'un encadré teinté, barre de citation */
+  /* Ce qui se pose SUR l'accent. Le sombre y met un presque-noir ; le clair,
+     qui prend un accent bien plus sombre, y met du blanc. */
+  --color-on-accent: #0a0a12;
+  --color-text-on-control: #d5d8dd; /* libellé d'un bouton secondaire */
+
   /* Statuts — teinte / filet / fond, valeurs de la maquette. */
   --color-ok: #4cc38a; --color-ok-border: #1c3728; --color-ok-bg: #0b1610;
   --color-warn: #e3b341; --color-warn-border: #3a3117; --color-warn-bg: #1a1608;
   --color-err: #e5677a; --color-err-border: #3d1c22; --color-err-bg: #170b0e;
   --color-info: #6ea8fe; /* sha de commit, colonne « revue » */
+  --color-chart-neutral: #3a3c47; /* série sans teinte propre — commits de la frise */
   --color-plan: #a49dfa; --color-plan-border: #2f2a66; --color-plan-bg: #14132a;
 
   --ring-selected: 0 0 0 4px rgba(255, 255, 255, 0.075); /* halo de sélection */
+  /* Le voile d'une modale. Il était recopié à l'identique dans six composants,
+     et le `.dialog-backdrop` en détournait `--color-neutral-900` faute de
+     jeton. Il en a un. */
+  --color-scrim: rgba(6, 7, 14, 0.88);
+  /* Ce qui se pose SUR le voile — les flèches d'une lightbox. Ces trois-là ne
+     changent pas par thème, et c'est voulu : une lightbox assombrit la page
+     dans les deux, donc sa propre chrome reste claire sur sombre. */
+  --color-scrim-surface: rgba(19, 20, 31, 0.8);
+  --color-on-scrim: rgba(233, 233, 237, 0.92);
+  --color-on-scrim-faint: rgba(233, 233, 237, 0.4);
 
   /* Tonal ramps — même teinte que l'accent et le neutre de base, 9 paliers
      de luminosité générés une fois (voir T-0045). Rampe neutre recolorée en
      froid (audit du 2026-08-12) pour cesser de rendre bleutée partout où
      elle est encore utilisée (29 fichiers, migration progressive au fil des
      chantiers Lot 3-7) — mêmes rôles que la hiérarchie de texte/filets
-     ci-dessus, en 9 paliers plutôt que 7+4. Le clair (theme.ts,
-     nocturneClair) réutilise les mêmes 9 couleurs par ramp, indices
-     inversés — pas une nouvelle teinte par thème. */
+     ci-dessus, en 9 paliers plutôt que 7+4. Le clair ne dérive PAS une
+     nouvelle teinte par rampe : il prend un autre palier de la même, par les
+     rôles `--color-accent-{ink,fill,edge,line}` déclarés plus haut. */
   --color-neutral-100: #f2f3f5;
   --color-neutral-200: #dcdee2;
   --color-neutral-300: #c2c6cd;
@@ -158,6 +194,12 @@
   --shadow-sm: 0 0 0 1px #323d48;
   --shadow-md: 0 0 0 1px #495969, 0 6px 18px rgba(0, 0, 0, 0.55);
   --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.5);
+  /* Les trois ombres qu'`app/src` écrivait en `rgba()` littéral, chacune à son
+     usage. Sur fond clair une ombre n'est pas la même chose que sur fond
+     sombre : moins opaque, plus teintée d'encre que de noir pur. */
+  --shadow-menu: 0 12px 28px rgba(0, 0, 0, 0.5); /* menus flottants */
+  --shadow-drawer: -22px 0 44px rgba(0, 0, 0, 0.55); /* tiroir de détail */
+  --shadow-lightbox: 0 24px 60px rgba(0, 0, 0, 0.6); /* lightbox */
 }
 
 /* Accents par projet (T-0215, issue #48) — la palette fermée.
@@ -192,7 +234,7 @@
   --color-accent-500: #ecce55;
   --color-accent-600: #e7c127;
   --color-accent-700: #c19f15;
-  --color-accent-800: #8a710f;
+  --color-accent-800: #80690e; /* assombri pour tenir 4,5:1 sur fond clair (T-0227) */
   --color-accent-900: #57480a;
 }
 
@@ -205,7 +247,7 @@
   --color-accent-500: #55ec9b;
   --color-accent-600: #27e780;
   --color-accent-700: #15c165;
-  --color-accent-800: #0f8a48;
+  --color-accent-800: #0d7c41; /* assombri pour tenir 4,5:1 sur fond clair (T-0227) */
   --color-accent-900: #0a572e;
 }
 
@@ -246,6 +288,120 @@
   --color-accent-700: #c13d15;
   --color-accent-800: #8a2c0f;
   --color-accent-900: #571c0a;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Thème clair (T-0227, issue #64)
+   ══════════════════════════════════════════════════════════════════════════
+
+   Le sélecteur porte `:root` : il pèse 0,2,0 quand les blocs `[data-accent]`
+   ci-dessus pèsent 0,1,0. C'est voulu — et c'est aussi le piège du fichier.
+   Ce bloc ne doit redéfinir AUCUN palier `--color-accent-*` : il écraserait
+   les six accents de projet, et le sélecteur d'attribut nu sert aussi les
+   pastilles de choix des préférences. `hooks/theme-clair.test.js` monte la
+   garde. Ce qui change par thème n'est pas la rampe, c'est le palier qu'on y
+   prend — les quatre rôles `--color-accent-{ink,fill,edge,line}`.
+
+   L'attribut porte toujours la valeur RÉSOLUE, `light` ou `dark`, jamais
+   « système » : `applyTheme` (app/src/theme.ts) résout d'abord. Une seule
+   règle suffit donc ici, et `appTheme()` du Navigateur la lit telle quelle.
+
+   Les valeurs viennent de la maquette claire (T-0226). La règle de mesure
+   n'est pas « AA dans l'absolu » — le sombre lui-même ne tient pas 4,5:1 sur
+   ses trois derniers niveaux de texte. Elle est à parité, niveau par niveau :
+   chaque valeur claire tient au moins ce que tient son homologue sombre, sur
+   la pire surface de son propre thème. */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  /* Surfaces — l'ordre du sombre s'inverse. En clair le fond applicatif est le
+     plus SOMBRE des trois et les cartes montent vers le blanc ; le contrôle
+     descend sous la carte, parce que posé sur du blanc il doit se voir. */
+  --color-bg: #eceef1;
+  --color-surface: #f4f5f7;
+  --color-surface-panel: #f8f9fb;
+  --color-surface-card: #ffffff;
+  --color-surface-control: #f2f3f6;
+  --color-surface-hover: #e9ebef;
+  --color-surface-active: #dfe2e8;
+  --color-surface-elevated: #ffffff;
+  --color-surface-segment: #ffffff;
+
+  /* Texte — sept niveaux, rampe froide comme en sombre. */
+  --color-text: #14161a;
+  --color-text-secondary: #3b414a;
+  --color-text-tertiary: #484e57;
+  --color-text-quaternary: #636b76;
+  --color-text-discrete: #6e7681;
+  --color-text-faint: #777f8a;
+  --color-text-ghost: #8d949e;
+
+  --color-border-chrome: #dfe2e7;
+  --color-border-card: #d4d8de;
+  --color-border-control: #c3c9d1;
+  --color-border-selected: #9aa2ad;
+
+  /* La marque ne change pas de teinte, mais l'accent DE TRAVAIL descend dans
+     la rampe : le violet de marque tient 3,6:1 sur du blanc, pas assez pour
+     du texte. Une ligne pour les six accents — `--color-accent-800` vient
+     toujours du bloc `[data-accent]` en vigueur, la teinte du projet est
+     conservée. */
+  --color-accent: var(--color-accent-800);
+  --color-accent-ink: var(--color-accent-800);
+  --color-accent-fill: var(--color-accent-800);
+  --color-accent-edge: var(--color-accent-800);
+  --color-accent-line: var(--color-accent-300);
+  --color-on-accent: #ffffff;
+  --color-text-on-control: #3b414a;
+  --color-accent-2: #4c46b4;
+
+  /* Statuts — les trois fonds `-bg` étaient des noirs teintés, ils deviennent
+     des teintes pâles ; les teintes elles-mêmes s'assombrissent. */
+  --color-ok: #1a7f4b; --color-ok-border: #b6e0c8; --color-ok-bg: #eaf6ef;
+  --color-warn: #8a6300; --color-warn-border: #ecd9a3; --color-warn-bg: #fbf4e3;
+  --color-err: #b3283f; --color-err-border: #f2c2ca; --color-err-bg: #fdeef0;
+  --color-info: #1f5fbf;
+  --color-chart-neutral: #a8afb9;
+  --color-plan: #4a3fd0; --color-plan-border: #cfcbf5; --color-plan-bg: #f0eefc;
+
+  --ring-selected: 0 0 0 4px rgba(20, 22, 26, 0.08);
+  --color-scrim: rgba(28, 31, 38, 0.55);
+
+  /* Rampe neutre — mêmes rôles, indices renversés : le 100 le plus clair du
+     sombre devient le plus sombre du clair. Le second accent la suit. */
+  --color-neutral-100: #14161a;
+  --color-neutral-200: #282d35;
+  --color-neutral-300: #3b414a;
+  --color-neutral-400: #484e57;
+  --color-neutral-500: #5a626d;
+  --color-neutral-600: #636b76;
+  --color-neutral-700: #6e7681;
+  --color-neutral-800: #8d949e;
+  --color-neutral-900: #c3c9d1;
+
+  --color-accent-2-100: #2a2663;
+  --color-accent-2-200: #3b368c;
+  --color-accent-2-300: #4c46b4;
+  --color-accent-2-400: #6a65c3;
+  --color-accent-2-500: #8682cf;
+  --color-accent-2-600: #a39fda;
+  --color-accent-2-700: #4c46b4;
+  --color-accent-2-800: #dfdef2;
+  --color-accent-2-900: #f1f0f9;
+
+  --color-section: #c9cbe6;
+  --color-section-glow: #a9adde;
+  --color-section-ghost: #7f86c0;
+
+  /* Élévation — sur fond clair, une ombre est moins opaque et teintée d'encre
+     plutôt que de noir pur ; et les deux premières, qui étaient des FILETS
+     clairs (technique fond sombre), deviennent des filets sombres. */
+  --shadow-sm: 0 0 0 1px #dfe2e7;
+  --shadow-md: 0 0 0 1px #d4d8de, 0 6px 18px rgba(23, 26, 33, 0.10);
+  --shadow-lg: 0 12px 28px rgba(23, 26, 33, 0.14);
+  --shadow-menu: 0 12px 28px rgba(23, 26, 33, 0.14);
+  --shadow-drawer: -22px 0 44px rgba(23, 26, 33, 0.12);
+  --shadow-lightbox: 0 24px 60px rgba(23, 26, 33, 0.22);
 }
 
 body {
@@ -312,10 +468,10 @@ figcaption {
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 /* Primaire = fond plein, jamais un filet/texte accent — l'accent ne sert pas
    de couleur de libellé (audit §5, règle d'or n°2). */
-.btn-primary { background: var(--color-accent); color: #0a0a12; }
-.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 90%, white); }
-.btn-primary:active { background: color-mix(in srgb, var(--color-accent) 85%, black); }
-.btn-secondary { background: var(--color-surface-control); border-color: var(--color-border-control); color: #d5d8dd; }
+.btn-primary { background: var(--color-accent); color: var(--color-on-accent); }
+.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 90%, var(--color-text)); }
+.btn-primary:active { background: color-mix(in srgb, var(--color-accent) 85%, var(--color-bg)); }
+.btn-secondary { background: var(--color-surface-control); border-color: var(--color-border-control); color: var(--color-text-on-control); }
 .btn-secondary:hover { background: var(--color-surface-hover); }
 .btn-secondary:active { background: var(--color-surface-active); }
 /* Fantôme = texte tertiaire neutre, jamais violet. */
@@ -384,7 +540,7 @@ textarea.input { height: auto; min-height: 90px; padding-top: 6px; padding-botto
   transition: transform 0.15s ease, background 0.15s ease;
 }
 .switch:has(input:checked) { background: var(--color-accent); }
-.switch:has(input:checked) .thumb { transform: translateX(12px); background: #0a0a12; }
+.switch:has(input:checked) .thumb { transform: translateX(12px); background: var(--color-on-accent); }
 .switch:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 
 /* — touche clavier — police système, jamais mono (audit §5.4). */
@@ -486,7 +642,9 @@ textarea.input { height: auto; min-height: 90px; padding-top: 6px; padding-botto
 .dialog-backdrop {
   position: fixed; inset: 0; display: grid; place-items: center;
   padding: var(--space-4);
-  background: color-mix(in srgb, var(--color-neutral-900) 50%, transparent);
+  /* Il détournait `--color-neutral-900` faute d'un jeton de voile. Il en a
+     un, et le même que les six modales d'`app/src`. */
+  background: var(--color-scrim);
 }
 .dialog {
   width: min(440px, 100%); display: flex; flex-direction: column; gap: var(--space-3);

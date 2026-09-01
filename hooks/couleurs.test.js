@@ -5,19 +5,26 @@ import { fileURLToPath } from 'node:url'
 import test from 'node:test'
 
 /**
- * Le garde-fou des couleurs hors du chantier de portage littéral.
+ * Le garde-fou des couleurs écrites en dur.
  *
- * Ce test interdisait toute couleur en dur pour qu'un thème clair puisse
- * exister à côté du sombre — raison retirée par T-0075 (thème clair supprimé,
- * pas de maquette claire). T-0074 a ensuite tranché : plutôt que de corriger
- * les jetons `--color-accent-800/900` un par un (la cause du bug de contraste
- * violet signalé sur 8 captures), le châssis et l'Aperçu portent désormais
- * littéralement les valeurs hex de `Ovrsee App.dc.html`, comme la maquette
- * elle-même le fait — sans variable CSS.
+ * Il avait été posé pour qu'un thème clair puisse exister à côté du sombre,
+ * raison retirée par T-0075 quand le clair a été supprimé. Elle est revenue
+ * (T-0227) : c'est de nouveau ce test qui empêche le travail de se défaire un
+ * composant à la fois.
  *
- * Le garde-fou reste utile ailleurs : `app/src` a des onglets qui partagent le
- * même bug de jetons et n'ont pas encore été portés (chantier 2). Sans lui, une
- * couleur en dur qui n'est pas un portage délibéré y passerait inaperçue.
+ * Deux choses ont changé avec lui en T-0230.
+ *
+ * Il ne connaissait que le hex, et laissait passer les quinze `rgba()` du
+ * dossier — six voiles de modale recopiés à l'identique, cinq ombres, et les
+ * seules couleurs de TEXTE en dur d'`app/src`, dans la lightbox. Toutes
+ * fausses en clair, aucune vue par un test.
+ *
+ * Et sa liste d'exemptions a disparu. Elle nommait vingt fichiers « portés
+ * littéralement depuis la maquette » (T-0074, T-0076, T-0079) ; à la fin du
+ * chantier, dix-sept n'avaient plus une seule couleur littérale et restaient
+ * dispensés du contrôle pour rien. Les trois derniers sont passés aux jetons.
+ * Un portage littéral qui se représenterait rouvrirait la liste — mais il
+ * faudra l'assumer, pas en hériter.
  *
  * Il vit dans `hooks/` et non dans `app/src` parce que `app/src` est compilé
  * sans les types Node : y lire des fichiers demanderait une dépendance de types
@@ -31,31 +38,23 @@ const EXCEPTIONS = new Set([
   '#000', // mask-image
 ])
 
-// Fichiers portés littéralement depuis la maquette (T-0074, T-0076, T-0079) :
-// leurs couleurs sont un choix délibéré, pas une dérive — jamais pour
-// contourner le garde-fou ailleurs.
-const FICHIERS_PORTES = new Set([
-  'App.tsx',
-  'Terminal.tsx',
-  'Apercu.tsx',
-  'Sante.tsx',
-  'Deploiements.tsx',
-  'Branches.tsx',
-  'Illisibles.tsx',
-  'Produit.tsx',
-  'Historique.tsx',
-  'Navigateur.tsx',
-  'Onboarding.tsx',
-  'OnboardingArt.tsx',
-  'PreferencesControls.tsx',
-  'SkillsPanel.tsx',
-  'Environnements.tsx',
-  'Donnees.tsx',
-  'ActivityPanel.tsx',
-  'Tableau.tsx',
-  'ViewBar.tsx',
-  'StatusBar.tsx',
-])
+/**
+ * Le seul fichier encore dispensé, et pour une raison qui n'est pas la
+ * couleur : son style part dans le DOM de la PAGE OBSERVÉE, qui n'a pas notre
+ * design system et ne lira jamais nos jetons. Une valeur littérale y est la
+ * seule possible — choisie lisible sur une page claire comme sombre.
+ */
+const HORS_OVRSEE = new Set(['navigateur-webview.ts'])
+
+/**
+ * Ce qui compte comme une couleur écrite en dur.
+ *
+ * Le hex seul ne suffisait pas : `app/src` portait quinze `rgba()` — six
+ * voiles de modale recopiés à l'identique, cinq ombres, et les seules couleurs
+ * de texte en dur du dossier — qu'aucun test ne voyait passer. Un thème clair
+ * les rendait toutes fausses (T-0230).
+ */
+const COULEUR = /#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?)\([^)]*\)/g
 
 const racine = join(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -67,26 +66,26 @@ const sources = dir =>
     return [chemin]
   })
 
-test('aucune couleur en dur dans app/src, hors exceptions et fichiers portés', () => {
+test('aucune couleur en dur dans app/src, hors exceptions', () => {
   const fautifs = []
 
   for (const fichier of sources(join(racine, 'app', 'src'))) {
     // `theme.ts` est le seul endroit où les couleurs s'écrivent.
     if (fichier.endsWith('theme.ts')) continue
     // `basename` et non `split('/')` : sous Windows `join` rend des `\`, et le
-    // découpage ne trouvait alors aucun fichier porté — tout le lot passait
+    // découpage ne trouvait alors aucun fichier dispensé — tout le lot passait
     // pour fautif.
-    if (FICHIERS_PORTES.has(basename(fichier))) continue
+    if (HORS_OVRSEE.has(basename(fichier))) continue
 
     readFileSync(fichier, 'utf8')
       .split('\n')
       .forEach((ligne, i) => {
-        for (const trouve of ligne.match(/#[0-9a-fA-F]{3,8}\b/g) ?? []) {
+        for (const trouve of ligne.match(COULEUR) ?? []) {
           if (EXCEPTIONS.has(trouve.toLowerCase())) continue
           fautifs.push(`${fichier.slice(racine.length + 1)}:${i + 1} ${trouve}`)
         }
       })
   }
 
-  assert.deepEqual(fautifs, [], 'ces couleurs doivent passer par un jeton de theme.ts')
+  assert.deepEqual(fautifs, [], 'ces couleurs doivent passer par un jeton du design system')
 })

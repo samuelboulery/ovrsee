@@ -143,7 +143,7 @@ function CarteProfil({
         'flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 9px; padding: 10px;' +
           ' border-radius: 8px; text-align: left; cursor: pointer; font: inherit; color: inherit;' +
           (courant
-            ? ' border: 1px solid var(--color-accent-600); background: var(--color-surface-active);'
+            ? ' border: 1px solid var(--color-accent-edge); background: var(--color-surface-active);'
             : ' border: 1px solid var(--color-divider); background: var(--color-surface-card);'),
       )}
     >

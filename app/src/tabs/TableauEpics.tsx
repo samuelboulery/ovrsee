@@ -70,7 +70,7 @@ export function TableauEpics({
               <>
                 <div style={s('display: flex; align-items: center; gap: 8px; margin: 6px 0 4px 30px; font-size: 11px;')}>
                   <div style={s('flex: 1; max-width: 260px; height: 4px; border-radius: 2px; background: var(--color-neutral-800); overflow: hidden;')}>
-                    <div style={s(`height: 100%; background: var(--color-accent-400); width: ${progression.percent}%;`)} />
+                    <div style={s(`height: 100%; background: var(--color-accent-fill); width: ${progression.percent}%;`)} />
                   </div>
                   <span style={s('color: var(--color-neutral-600); white-space: nowrap; font-variant-numeric: tabular-nums;')}>
                     {progression.done}/{progression.total}

@@ -52,7 +52,7 @@ export function DetailPanel({
     <div
       style={s(
         side
-          ? `position: absolute; top: 0; right: 0; bottom: 0; width: ${width}px; border-left: 1px solid var(--color-divider); background: var(--color-surface-panel); padding: 20px; overflow: auto; box-shadow: -22px 0 44px rgba(0,0,0,0.55); z-index: 5;`
+          ? `position: absolute; top: 0; right: 0; bottom: 0; width: ${width}px; border-left: 1px solid var(--color-divider); background: var(--color-surface-panel); padding: 20px; overflow: auto; box-shadow: var(--shadow-drawer); z-index: 5;`
           : `width: ${width}px; flex: none; border-left: 1px solid var(--color-divider); background: var(--color-surface-panel); padding: 20px; overflow: auto;`,
       )}
     >
@@ -106,7 +106,7 @@ export function DetailPanel({
       )}
 
       <div style={s('display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--color-neutral-500); margin-top: 8px;')}>
-        <span style={s('width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent-500); display: block;')} />
+        <span style={s('width: 6px; height: 6px; border-radius: 50%; background: var(--color-accent-ink); display: block;')} />
         {shots[0]
           ? `capture du ${frDate(shotDate(shots[0]))} — ${humanAge(shotDate(shots[0]))}`
           : t('produit.never_captured')}
@@ -169,7 +169,7 @@ export function DetailPanel({
         {plans.length > 0 ? (
           <div style={s('display: flex; flex-direction: column; gap: 8px;')}>
             {plans.map(plan => (
-              <div key={plan.file} style={s('border-left: 2px solid var(--color-accent-700); padding-left: 10px;')}>
+              <div key={plan.file} style={s('border-left: 2px solid var(--color-accent-line); padding-left: 10px;')}>
                 <div style={s('font-size: 12px;')}>{plan.title}</div>
                 <div style={s('font-size: 10.5px; color: var(--color-neutral-600); margin-top: 2px;')}>
                   {frDate(plan.closed)}
@@ -224,7 +224,7 @@ export function CompareModal({
     <div
       onClick={onClose}
       style={s(
-        'position: fixed; inset: 0; z-index: 50; background: rgba(6,7,14,.88); backdrop-filter: blur(3px); display: flex; flex-direction: column; padding: 16px 20px 14px;',
+        'position: fixed; inset: 0; z-index: 50; background: var(--color-scrim); backdrop-filter: blur(3px); display: flex; flex-direction: column; padding: 16px 20px 14px;',
       )}
     >
       <div style={s('display: flex; align-items: center; gap: 12px; flex: none;')}>

@@ -16,7 +16,7 @@ import { TYPE_CARTE } from './TableauDnd'
 
 /** Une pastille par priorité — c'est ce qui se lit avant le titre. */
 export const COULEUR_PRIORITE: Record<Priorite, string> = {
-  haute: 'var(--color-accent-400)',
+  haute: 'var(--color-accent-fill)',
   moyenne: 'var(--color-neutral-500)',
   basse: 'var(--color-neutral-700)',
 }

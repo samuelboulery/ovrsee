@@ -63,7 +63,7 @@ export function Lightbox({
     <div
       onClick={onClose}
       style={s(
-        'position: fixed; inset: 0; z-index: 50; background: rgba(6,7,14,.88); backdrop-filter: blur(3px); display: flex; flex-direction: column; padding: 16px 20px 14px;',
+        'position: fixed; inset: 0; z-index: 50; background: var(--color-scrim); backdrop-filter: blur(3px); display: flex; flex-direction: column; padding: 16px 20px 14px;',
       )}
     >
       <div style={s('display: flex; align-items: center; gap: 12px; flex: none;')}>
@@ -94,7 +94,7 @@ export function Lightbox({
           src={shotUrl(root, `shots/${slug}/${file}`)}
           alt={`${label} — ${frDate(shotDate(file))}`}
           style={s(
-            'max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; border: 1px solid var(--color-border-card); box-shadow: 0 24px 60px rgba(0,0,0,.6); background: var(--theme-bg-lightbox);',
+            'max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; border: 1px solid var(--color-border-card); box-shadow: var(--shadow-lightbox); background: var(--theme-bg-lightbox);',
           )}
         />
         <Arrow label="›" title={t('a11y.newer_shot')} disabled={at <= 0} onClick={() => step(1)} />
@@ -163,10 +163,10 @@ function Arrow({
       disabled={disabled}
       onClick={onClick}
       style={s(
-        'flex: none; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--color-border-card); background: rgba(19,20,31,.8); font-size: 19px; line-height: 1; ' +
+        'flex: none; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--color-border-card); background: var(--color-scrim-surface); font-size: 19px; line-height: 1; ' +
           (disabled
-            ? 'color: rgba(233,233,237,.4); cursor: default;'
-            : 'color: rgba(233,233,237,.92); cursor: pointer;'),
+            ? 'color: var(--color-on-scrim-faint); cursor: default;'
+            : 'color: var(--color-on-scrim); cursor: pointer;'),
       )}
     >
       {label}

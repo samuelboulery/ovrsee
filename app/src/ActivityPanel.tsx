@@ -24,7 +24,7 @@ const plur = (n: number, mot: string) => `${n} ${mot}${n > 1 ? 's' : ''}`
 const COULEUR_SERIE = {
   plans: 'var(--color-accent)',
   tickets: 'var(--color-accent-2-700)',
-  commits: '#3a3c47',
+  commits: 'var(--color-chart-neutral)',
 } as const
 
 /**

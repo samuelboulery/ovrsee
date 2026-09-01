@@ -366,7 +366,7 @@ export function ProjectSwitcher({
       {open && (
         <div
           style={s(
-            'position: absolute; top: 30px; left: 0; width: 260px; z-index: 20; padding: 6px; border-radius: 8px; border: 1px solid var(--color-border-card); background: var(--color-surface-elevated); box-shadow: 0 12px 28px rgba(0,0,0,.5); display: flex; flex-direction: column; gap: 2px;',
+            'position: absolute; top: 30px; left: 0; width: 260px; z-index: 20; padding: 6px; border-radius: 8px; border: 1px solid var(--color-border-card); background: var(--color-surface-elevated); box-shadow: var(--shadow-menu); display: flex; flex-direction: column; gap: 2px;',
           )}
         >
           {/* Hauteur bornée et défilement interne : onze projets au registre

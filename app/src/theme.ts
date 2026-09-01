@@ -107,11 +107,28 @@ export function resolveTheme(pref: string | undefined, prefereClair: boolean): T
 export const REQUETE_CLAIR = '(prefers-color-scheme: light)'
 
 /**
+ * Ce qui part au processus principal : le RÉGLAGE, pas le thème résolu.
+ *
+ * `app:theme` (`electron/main.js`) en fait un `nativeTheme.themeSource`, et un
+ * `themeSource` forcé surcharge `prefers-color-scheme` dans tous les rendus.
+ * Envoyer la valeur résolue de « système » figeait donc la requête média sur ce
+ * que le rendu venait d'y écrire : `watchSystemTheme` n'était plus jamais
+ * réveillé, et basculer l'apparence du poste ne faisait plus rien (T-0242).
+ *
+ * C'est le principal qui a le dernier mot sur « système » — lui seul voit le
+ * poste sans passer par une requête média qu'il surcharge lui-même. Une valeur
+ * inconnue vaut `system`, comme dans `resolveTheme`.
+ */
+export function themeSourcePour(pref: string | undefined): ThemePref {
+  return pref === 'light' || pref === 'dark' ? pref : 'system'
+}
+
+/**
  * Applique un réglage à l'élément racine, et rend le thème retenu.
  *
  * `data-theme` porte toujours la valeur RÉSOLUE, jamais « système » : une
- * seule règle CSS suffit alors — et `appTheme()` (`tabs/navigateur-webview.ts`),
- * qui accorde les DevTools à l'interface, la lit telle quelle.
+ * seule règle CSS suffit alors. Ce qui part à Electron, à l'inverse, est le
+ * réglage tel quel — voir `themeSourcePour`.
  *
  * Rien n'est mis en cache côté rendu : le disque est la seule source, via
  * `/api/settings`. Le fond d'avant le premier paint est peint autrement — par
@@ -122,7 +139,7 @@ export const REQUETE_CLAIR = '(prefers-color-scheme: light)'
 export function applyTheme(pref: string | undefined): ThemeMode {
   const mode = resolveTheme(pref, window.matchMedia(REQUETE_CLAIR).matches)
   document.documentElement.dataset.theme = mode
-  window.ovrsee?.app?.setTheme?.(mode)
+  window.ovrsee?.app?.setTheme?.(themeSourcePour(pref))
   return mode
 }
 
@@ -157,7 +174,10 @@ export function useThemeMode(pref: string | undefined): ThemeMode {
     setMode(applyTheme(pref))
     return watchSystemTheme(pref, suivant => {
       document.documentElement.dataset.theme = suivant
-      window.ovrsee?.app?.setTheme?.(suivant)
+      // Le réglage n'a pas changé, `themeSource` non plus : ce rappel sert à
+      // faire repeindre le `backgroundColor` de la fenêtre, que le principal
+      // recalcule sur le poste à chaque `app:theme`.
+      window.ovrsee?.app?.setTheme?.(themeSourcePour(pref))
       setMode(suivant)
     })
   }, [pref])

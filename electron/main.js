@@ -586,7 +586,7 @@ app.whenReady().then(() => {
    * *cette* fenêtre a attaché, sinon n'importe quel entier ouvrirait les
    * DevTools d'un contenu quelconque.
    */
-  ipcMain.handle('preview:devtools', (event, targetId, bounds, theme) => {
+  ipcMain.handle('preview:devtools', (event, targetId, bounds) => {
     const guests = guestsByHost.get(event.sender.id)
     const target = webContents.fromId(targetId)
     if (!guests || !target || !guests.has(target)) return false
@@ -594,21 +594,14 @@ app.whenReady().then(() => {
     const window = BrowserWindow.fromWebContents(event.sender)
     if (!window) return false
 
-    // Les DevTools suivent le thème du système, et s'ouvrent donc en clair sur
-    // un Mac en clair — éblouissant à côté d'une interface sombre. Leur thème
-    // n'est pas une option de l'API : `themeSource` est ce qui le décide.
-    //
-    // Le réglage vaut pour toute l'application, pas seulement pour les
-    // DevTools. C'est cohérent : l'ovrsee est sombre, et ses menus natifs,
-    // ses ascenseurs et ses dialogues doivent l'être aussi. Le thème vient du
-    // rendu parce qu'il est le seul à savoir ce qu'il affiche.
+    // Le thème des DevTools n'est pas une option de l'API : `themeSource` est
+    // ce qui le décide, et `app:theme` l'a déjà posé pour toute l'application.
+    // Le reposer ici — ce qui se faisait, avec la valeur résolue du rendu —
+    // refigeait le suivi du poste sous « système » (T-0242).
     //
     // Écarté : poser `uiTheme` dans le `localStorage` de la page DevTools.
     // C'est la recette qui circule, elle ne fait plus rien — vérifié sur deux
     // profils neufs, la page ne lit plus ce réglage là.
-    // Redondant depuis `app:theme`, gardé quand même : le rendu peut tourner
-    // sur une version antérieure du preload, qui n'a pas ce canal.
-    nativeTheme.themeSource = theme === 'light' ? 'light' : 'dark'
 
     let open = devtoolsByHost.get(event.sender.id)
     if (!open) {
@@ -673,17 +666,24 @@ app.whenReady().then(() => {
    * gardait donc des menus sombres tant que personne n'avait ouvert les
    * DevTools.
    *
-   * Le rendu envoie une valeur DÉJÀ résolue : c'est lui qui sait ce qu'il
-   * affiche, `system` compris. Tout ce qui n'est pas `light` vaut `dark`,
-   * comme au-dessous — une valeur inattendue ne doit pas éclaircir la fenêtre.
+   * Le rendu envoie le RÉGLAGE, pas le thème résolu — `system` compris. Un
+   * `themeSource` forcé surcharge `prefers-color-scheme` dans tous les rendus :
+   * recevoir la valeur résolue de « système » figeait la requête média du rendu
+   * sur ce qu'il venait d'y écrire, son écouteur ne se réveillait plus, et
+   * basculer l'apparence du poste ne faisait plus rien (T-0242). C'est donc ici
+   * qu'on tranche, `nativeTheme` étant le seul à voir le poste sans passer par
+   * une requête média qu'il surcharge lui-même. Une valeur inattendue vaut
+   * `system`, le défaut de `hooks/settings.js`.
    *
    * Le fond de fenêtre suit aussi : sans ça, une fenêtre réduite puis
-   * rétablie, ou un redimensionnement, laisse voir l'ancienne couleur.
+   * rétablie, ou un redimensionnement, laisse voir l'ancienne couleur. Il se
+   * lit APRÈS l'affectation — `shouldUseDarkColors` rend alors le poste sous
+   * « système », et le choix sous un choix explicite.
    */
-  ipcMain.handle('app:theme', (event, mode) => {
-    const resolu = mode === 'light' ? 'light' : 'dark'
-    nativeTheme.themeSource = resolu
-    for (const window of BrowserWindow.getAllWindows()) window.setBackgroundColor(FONDS[resolu])
+  ipcMain.handle('app:theme', (event, pref) => {
+    nativeTheme.themeSource = pref === 'light' || pref === 'dark' ? pref : 'system'
+    const fond = FONDS[nativeTheme.shouldUseDarkColors ? 'dark' : 'light']
+    for (const window of BrowserWindow.getAllWindows()) window.setBackgroundColor(fond)
   })
 
   // Choisir un dossier. Le seul geste qui ne peut pas passer par `/api` : une

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { appliquerThemeTerminal, darkTheme, getTerminalTheme, resolveTheme } from './theme'
+import { appliquerThemeTerminal, darkTheme, getTerminalTheme, resolveTheme, themeSourcePour } from './theme'
 
 /**
  * `_ds/ovrsee/styles.css` EST le thème sombre (système Ovrsee, T-0045) : le
@@ -20,8 +20,8 @@ test('la palette sombre garde les valeurs de la maquette', () => {
 
 /**
  * La résolution du réglage (T-0228). L'attribut `data-theme` porte toujours la
- * valeur résolue, jamais « système » : une seule règle CSS suffit alors, et
- * `appTheme()` du Navigateur la lit telle quelle.
+ * valeur résolue, jamais « système » : une seule règle CSS suffit alors. Ce qui
+ * part à Electron, à l'inverse, est le réglage — voir `themeSourcePour`.
  */
 test('resolveTheme : un choix explicite ignore le système', () => {
   assert.equal(resolveTheme('light', false), 'light')
@@ -38,6 +38,26 @@ test('resolveTheme : une valeur inconnue ou absente retombe sur le système', ()
   // profil abîmé ne doit pas laisser l'interface sans thème du tout.
   assert.equal(resolveTheme(undefined, true), 'light')
   assert.equal(resolveTheme('clair', false), 'dark')
+})
+
+/**
+ * Ce qui part au processus principal (T-0242).
+ *
+ * `app:theme` en fait un `nativeTheme.themeSource`, et un `themeSource` forcé
+ * surcharge `prefers-color-scheme` DANS LE RENDU. Envoyer le thème résolu de
+ * « système » figeait donc la requête média sur ce que le rendu venait d'y
+ * écrire : `watchSystemTheme` ne recevait plus aucun `change`, et basculer
+ * l'apparence du poste ne faisait plus rien tant que l'app tournait.
+ */
+test('themeSourcePour : « système » part tel quel, sinon Electron fige le suivi', () => {
+  assert.equal(themeSourcePour('system'), 'system')
+  assert.equal(themeSourcePour(undefined), 'system')
+  assert.equal(themeSourcePour('clair'), 'system')
+})
+
+test('themeSourcePour : un choix explicite part tel quel', () => {
+  assert.equal(themeSourcePour('light'), 'light')
+  assert.equal(themeSourcePour('dark'), 'dark')
 })
 
 /**

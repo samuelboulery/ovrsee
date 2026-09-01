@@ -83,7 +83,7 @@ declare global {
          * ascenseurs de l'OS, DevTools. Optionnel : une version antérieure du
          * preload ne l'expose pas, et le rendu ne doit pas s'y casser.
          */
-        setTheme?: (mode: 'dark' | 'light') => Promise<void>
+        setTheme?: (pref: 'dark' | 'light' | 'system') => Promise<void>
       }
       /**
        * Barre de menu macOS — voir `electron/tray.js`.
@@ -111,7 +111,6 @@ declare global {
         devtools: (
           targetId: number,
           bounds: { x: number; y: number; width: number; height: number },
-          theme: 'dark' | 'light',
         ) => Promise<boolean>
         devtoolsClose: () => Promise<boolean>
       }

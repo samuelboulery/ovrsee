@@ -16,7 +16,6 @@ import {
   DOCK_KEY,
   MAX_LOGS,
   URL_KEY,
-  appTheme,
   corpsDepuis,
   describe,
   devtoolsStyle,
@@ -371,7 +370,6 @@ export function Navigateur({
       const ok = await window.ovrsee?.preview.devtools(
         element.getWebContentsId(),
         { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
-        appTheme(),
       )
       if (ok === false) {
         setDevtools(false)

@@ -115,8 +115,7 @@ contextBridge.exposeInMainWorld('ovrsee', {
      * @param {'dark'|'light'} theme thème de l'interface ; tout le reste vaut `dark`
      * @returns {Promise<boolean>}
      */
-    devtools: (targetId, bounds, theme) =>
-      ipcRenderer.invoke('preview:devtools', targetId, bounds, theme),
+    devtools: (targetId, bounds) => ipcRenderer.invoke('preview:devtools', targetId, bounds),
 
     /** Referme le panneau et rend la place. */
     devtoolsClose: () => ipcRenderer.invoke('preview:devtools-close'),

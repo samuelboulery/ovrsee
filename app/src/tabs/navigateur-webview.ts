@@ -79,15 +79,6 @@ export const DOCKS: Array<[Dock, string]> = [
 ]
 
 /**
- * Thème de l'interface, pour que les DevTools s'y accordent.
- *
- * L'ovrsee n'est aujourd'hui que sombre — d'où le repli. Le jour où il pose
- * un `data-theme` sur la racine, les DevTools suivront sans qu'on y revienne.
- */
-export const appTheme = (): 'dark' | 'light' =>
-  document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'
-
-/**
  * URL de départ pour un projet.
  *
  * Ce que l'utilisateur a tapé la dernière fois d'abord, sinon le `baseUrl` que

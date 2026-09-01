@@ -109,9 +109,8 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
 
 - **Le thème se pose en un attribut, et le bloc clair ne touche pas les rampes
   d'accent.** `data-theme` porte toujours la valeur *résolue* (`light`/`dark`),
-  jamais « système » : `applyTheme` (`app/src/theme.ts`) résout d'abord, une
-  seule règle CSS suffit, et `appTheme()` du Navigateur la lit telle quelle. Le
-  piège est la spécificité : `:root[data-theme='light']` pèse 0,2,0 quand
+  jamais « système » : `applyTheme` (`app/src/theme.ts`) résout d'abord, et une
+  seule règle CSS suffit. Le piège est la spécificité : `:root[data-theme='light']` pèse 0,2,0 quand
   `[data-accent='ambre']` pèse 0,1,0 — y redéfinir un palier `--color-accent-*`
   écraserait les six accents de projet, **et** les pastilles de choix, dont le
   sélecteur d'attribut est nu. Ce qui change par thème n'est donc pas la rampe
@@ -120,6 +119,18 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   six teintes. `hooks/theme-clair.test.js` monte la garde, et mesure aussi la
   palette — à parité avec le sombre niveau par niveau, pas « AA dans l'absolu » :
   le sombre lui-même ne tient pas 4,5:1 sur ses trois derniers niveaux de texte.
+- **Ce qui part à Electron est le RÉGLAGE, pas le thème résolu.** Le rendu
+  résout pour lui-même mais envoie `light`/`dark`/`system` tel quel à
+  `app:theme`, qui en fait un `nativeTheme.themeSource`. La raison est un
+  aller-retour : un `themeSource` forcé **surcharge `prefers-color-scheme` dans
+  tous les rendus**. Envoyer la valeur résolue de « système » figeait donc la
+  requête média du rendu sur ce qu'il venait d'y écrire — l'écouteur de
+  `watchSystemTheme` ne recevait plus rien, et basculer l'apparence du poste ne
+  faisait plus rien tant que l'app tournait (T-0242). Le principal est
+  l'autorité sur « système », et il relit `shouldUseDarkColors` **après**
+  l'affectation pour repeindre le fond de fenêtre. Corollaire : rien d'autre ne
+  touche `themeSource` — `preview:devtools` le faisait, ce qui refigeait le
+  suivi dès qu'on ouvrait les DevTools de l'onglet Navigateur.
 - **Le canvas xterm ne lit pas le CSS.** Toute la chrome du terminal suit les
   jetons ; le contenu, non — sa palette est un objet JavaScript posé à
   `new XTerm({…})`. `appliquerThemeTerminal` (`theme.ts`) la repose sur chaque

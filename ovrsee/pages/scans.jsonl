@@ -196,3 +196,4 @@
 {"date":"2026-09-02","commit":"c3a21aa","ok":false,"error":"commande dev non approuvée pour ce dépôt — cliquez sur « Crawler » pour l'autoriser"}
 {"date":"2026-09-02","commit":"d07748d","ok":false,"error":"commande dev non approuvée pour ce dépôt — cliquez sur « Crawler » pour l'autoriser"}
 {"date":"2026-09-02","commit":"de18b7c","ok":true,"pages":7}
+{"date":"2026-09-02","commit":"dec5fd5","ok":false,"error":"http://localhost:5180 répond déjà — un autre serveur occupe le port. Arrêtez-le, ou donnez un baseUrl libre dans ovrsee.config.json."}

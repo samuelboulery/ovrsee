@@ -9,6 +9,33 @@
       "sha": "de18b7c",
       "date": "2026-09-02",
       "files": []
+    },
+    {
+      "sha": "dec5fd5",
+      "date": "2026-09-02",
+      "files": [
+        "CHANGELOG.fr.md",
+        "CHANGELOG.md",
+        "README.fr.md",
+        "README.md",
+        "docs/screenshots/apercu.png",
+        "docs/screenshots/apercu.webp",
+        "docs/screenshots/donnees.png",
+        "docs/screenshots/donnees.webp",
+        "docs/screenshots/historique.png",
+        "docs/screenshots/historique.webp",
+        "docs/screenshots/navigateur.png",
+        "docs/screenshots/navigateur.webp",
+        "docs/screenshots/produit.png",
+        "docs/screenshots/produit.webp",
+        "docs/screenshots/stack.png",
+        "docs/screenshots/stack.webp",
+        "docs/screenshots/tableau.png",
+        "docs/screenshots/tableau.webp",
+        "package.json",
+        "scripts/screenshots.js",
+        "scripts/screenshots.test.js"
+      ]
     }
   ]
 }

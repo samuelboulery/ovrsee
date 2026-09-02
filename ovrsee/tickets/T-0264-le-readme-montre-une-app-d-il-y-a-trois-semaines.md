@@ -2,9 +2,11 @@
 {
   "id": "T-0264",
   "titre": "Le README montre une app d'il y a trois semaines",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
-  "tags": ["docs"],
+  "tags": [
+    "docs"
+  ],
   "cree": "2026-09-02",
   "maj": "2026-09-02",
   "plan": "2026-09-02-merge-104-puis-repasse-readme-captures.md"

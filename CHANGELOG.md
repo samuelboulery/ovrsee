@@ -284,7 +284,8 @@ Windows warn about it on first launch.
 - The `ovrsee/` format may still move before 1.0. Everything in it being markdown
   and images, a migration will be readable with the naked eye.
 
-[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.1.2-beta...HEAD
+[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/samuelboulery/ovrsee/compare/v1.1.2-beta...v1.2.0
 [1.1.2-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.1-beta...v1.1.2-beta
 [1.1.1-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.0-beta...v1.1.1-beta
 [1.1.0-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.0.0-beta...v1.1.0-beta

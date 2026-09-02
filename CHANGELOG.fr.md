@@ -301,7 +301,8 @@ Windows en avertissent au premier lancement.
 - Le format de `ovrsee/` peut encore bouger d'ici la 1.0. Tout y étant en
   markdown et en images, une migration se lira à l'œil nu.
 
-[Non publié]: https://github.com/samuelboulery/ovrsee/compare/v1.1.2-beta...HEAD
+[Non publié]: https://github.com/samuelboulery/ovrsee/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/samuelboulery/ovrsee/compare/v1.1.2-beta...v1.2.0
 [1.1.2-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.1-beta...v1.1.2-beta
 [1.1.1-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.0-beta...v1.1.1-beta
 [1.1.0-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.0.0-beta...v1.1.0-beta

@@ -104,17 +104,23 @@ test('le premier commit précède la pose du hook, et ne contient pas ovrsee/', 
 // L'invariant du cadrage : l'ovrsee lit, il n'exécute que le terminal qu'on lui
 // demande. Un dépôt reçu d'ailleurs livre ses propres `.git/hooks`, et `git
 // commit` les lance — c'est du code du projet observé, exécuté par l'équipement.
-test('le premier commit n’exécute pas les hooks git du dépôt observé', () => {
-  const dir = depot()
-  const temoin = join(dir, '..', `temoin-${Date.now()}.txt`)
-  const hook = join(dir, '.git', 'hooks', 'pre-commit')
-  writeFileSync(hook, `#!/bin/sh\necho execute > ${temoin}\nexit 0\n`)
-  chmodSync(hook, 0o755)
+// Même raison que `hooks/git.test.js` : le hook piégé est un script `#!/bin/sh`
+// que Windows n'exécute pas. Le test y passerait sans rien prouver.
+test(
+  'le premier commit n’exécute pas les hooks git du dépôt observé',
+  { skip: process.platform === 'win32' ? 'hook en /bin/sh, non portable' : false },
+  () => {
+    const dir = depot()
+    const temoin = join(dir, '..', `temoin-${Date.now()}.txt`)
+    const hook = join(dir, '.git', 'hooks', 'pre-commit')
+    writeFileSync(hook, `#!/bin/sh\necho execute > ${temoin}\nexit 0\n`)
+    chmodSync(hook, 0o755)
 
-  install(dir, { commit: true })
+    install(dir, { commit: true })
 
-  assert.equal(existsSync(temoin), false, 'le hook du dépôt observé a été exécuté')
-})
+    assert.equal(existsSync(temoin), false, 'le hook du dépôt observé a été exécuté')
+  },
+)
 
 test("un commit impossible n'empêche pas l'équipement", () => {
   const dir = mkdtempSync(join(tmpdir(), 'ovrsee-opt-'))

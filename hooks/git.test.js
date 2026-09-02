@@ -18,6 +18,18 @@ import { snapshot } from './snapshot.js'
 const sh = (cwd, args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: 'pipe' })
 
 /**
+ * Le piège est un script `#!/bin/sh` : Windows ne l'exécute pas, et le bit
+ * d'exécution n'y veut rien dire. Ces tests y passeraient sans rien prouver —
+ * ils vérifient l'ABSENCE d'un fichier témoin, ce qui est vrai d'office sur un
+ * système qui n'aurait de toute façon rien lancé. Mieux vaut les sauter en le
+ * disant que les laisser mentir en vert.
+ *
+ * La garde elle-même n'est pas propre à un système : les `-c` sont posés de la
+ * même façon partout, et c'est git qui les honore.
+ */
+const PIEGE_SH = { skip: process.platform === 'win32' ? 'piège en /bin/sh, non portable' : false }
+
+/**
  * Dépôt dont le `.git/config` nomme un script à exécuter, comme le ferait une
  * archive reçue d'ailleurs. Le script écrit `TEMOIN` puis échoue : git le
  * traite alors comme un moniteur indisponible et poursuit normalement, ce qui
@@ -46,7 +58,7 @@ function depotPiege() {
 // Le piège doit mordre : un test qui ne peut pas échouer ne prouve rien. Si
 // une version de git cessait d'honorer `core.fsmonitor`, les tests suivants
 // passeraient sans rien garantir — celui-ci le dirait.
-test('le piège est réel : git sans garde exécute le script du dépôt', () => {
+test('le piège est réel : git sans garde exécute le script du dépôt', PIEGE_SH, () => {
   const { dir, dehors, temoin } = depotPiege()
   try {
     execFileSync('git', ['status', '--porcelain=v1'], { cwd: dir, stdio: 'ignore' })
@@ -58,7 +70,7 @@ test('le piège est réel : git sans garde exécute le script du dépôt', () =>
   rmSync(dehors, { recursive: true, force: true })
 })
 
-test('git() n’exécute pas le programme nommé par le dépôt', () => {
+test('git() n’exécute pas le programme nommé par le dépôt', PIEGE_SH, () => {
   const { dir, dehors, temoin } = depotPiege()
   const sortie = git(dir, ['status', '--porcelain=v1'], { encoding: 'utf8', stdio: 'pipe' })
   assert.equal(existsSync(temoin), false, 'le script du dépôt a été exécuté')
@@ -67,7 +79,7 @@ test('git() n’exécute pas le programme nommé par le dépôt', () => {
   rmSync(dehors, { recursive: true, force: true })
 })
 
-test('gitStatus n’exécute pas le programme nommé par le dépôt', () => {
+test('gitStatus n’exécute pas le programme nommé par le dépôt', PIEGE_SH, () => {
   const { dir, dehors, temoin } = depotPiege()
   const etat = gitStatus(dir)
   assert.equal(existsSync(temoin), false, 'le script du dépôt a été exécuté')
@@ -78,7 +90,7 @@ test('gitStatus n’exécute pas le programme nommé par le dépôt', () => {
 
 // C'est le chemin réel de l'attaque : inscrire un projet au registre suffit à
 // déclencher `snapshot()`, qui lit l'historique et l'état de travail.
-test('snapshot() n’exécute pas le programme nommé par le dépôt', () => {
+test('snapshot() n’exécute pas le programme nommé par le dépôt', PIEGE_SH, () => {
   const { dir, dehors, temoin } = depotPiege()
   const vue = snapshot(dir)
   assert.equal(existsSync(temoin), false, 'le script du dépôt a été exécuté')
@@ -103,7 +115,7 @@ test('snapshot() n’exécute pas le programme nommé par le dépôt', () => {
  * `GIT_CONFIG_GLOBAL` fournit une configuration « de poste » jetable : le test
  * ne touche pas à celle de la machine, et dit la même chose partout.
  */
-test('la garde réseau efface le helper du dépôt et garde celui du poste', () => {
+test('la garde réseau efface le helper du dépôt et garde celui du poste', PIEGE_SH, () => {
   const { dir, dehors, temoin, script } = depotPiege()
   const temoinPoste = join(dehors, 'TEMOIN-POSTE')
   const scriptPoste = join(dehors, 'poste.sh')

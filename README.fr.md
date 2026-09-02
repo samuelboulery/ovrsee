@@ -46,50 +46,56 @@ backlog, ouvre et déplace les tickets. Il n'exécute aucun code — vous restez
 - Tient un tableau de tickets et une chronologie du travail, reliés aux plans qui les expliquent.
 - Tout est stocké en markdown et en images versionnés — rien ne dépend de l'application
   elle-même pour rester lisible.
+- Thème clair, sombre ou celui du poste — et une couleur d'accent par projet, pour ne
+  jamais confondre deux fenêtres ouvertes côte à côte.
 
 ## En images
 
 ### Aperçu — l'état du projet en un coup d'œil
-![Onglet Aperçu](./docs/screenshots/apercu.png)
+![Onglet Aperçu](./docs/screenshots/apercu.webp)
 
 Compteurs (pages, plans, tickets, dépendances), santé du dépôt, plans ouverts, statut des
-branches, commandes du projet, et le terminal intégré avec ses raccourcis (crawl, graphe,
-export Obsidian). À droite, le panneau des déploiements et le sommaire du `README.md`.
+branches, et le terminal intégré avec, à côté, le panneau des commandes — crawl, graphe,
+export Obsidian, plus celles qu'on y ajoute. À droite, le panneau des déploiements et le
+sommaire du `README.md`. Le sélecteur de projet, en haut, montre quels dépôts ont une
+session Claude en cours.
 
 ### Navigateur — parcourir l'application observée sans quitter l'ovrsee
-![Onglet Navigateur](./docs/screenshots/navigateur.png)
+![Onglet Navigateur](./docs/screenshots/navigateur.webp)
 
 Un navigateur intégré (barre d'adresse, DevTools, sélecteur d'élément) pour inspecter
-l'application observée directement depuis l'interface.
+l'application observée directement depuis l'interface. Un élément se commente sur
+place : le commentaire et le descriptif partent à Claude, ou directement dans un ticket.
 
 ### Produit — le graphe de navigation
-![Onglet Produit](./docs/screenshots/produit.png)
+![Onglet Produit](./docs/screenshots/produit.webp)
 
 La carte des pages du projet crawlé, miniatures de captures à l'appui, avec un panneau de
 détail par page et l'historique de ses captures précédentes. Deux dates se comparent.
 
 ### Historique — chaque commit et le plan qui l'explique
-![Onglet Historique](./docs/screenshots/historique.png)
+![Onglet Historique](./docs/screenshots/historique.webp)
 
 La chronologie du projet : un plan est clos par le commit qui l'exécute, chaque ticket lié
 apparaît avec son statut. Filtrable par plans, tickets et commits hors plan.
 
 ### Tableau — le kanban des tickets
-![Onglet Tableau](./docs/screenshots/tableau.png)
+![Onglet Tableau](./docs/screenshots/tableau.webp)
 
 Un fichier par ticket dans `ovrsee/tickets/`, colonnes réglées dans `ovrsee/board.json`.
-Écrit ici comme depuis le terminal intégré. Les epics affichent leur avancement et leurs
-tickets enfants.
+Écrit ici comme depuis le terminal intégré — une image collée dans un ticket est rangée
+à côté de lui. Les epics affichent leur avancement et leurs tickets enfants dans leur
+propre vue ; le kanban ne contient que des tickets.
 
 ### Données — les tables du projet
-![Onglet Données](./docs/screenshots/donnees.png)
+![Onglet Données](./docs/screenshots/donnees.webp)
 
 L'introspection reconstruite à chaque commit, lue depuis Graphify ou un coffre Obsidian :
 tables, colonnes, qui s'en sert, et le niveau de confiance de l'extraction. L'ovrsee ne
 recalcule rien.
 
 ### Stack — les dépendances et leur raison d'être
-![Onglet Stack](./docs/screenshots/stack.png)
+![Onglet Stack](./docs/screenshots/stack.webp)
 
 Production et développement séparés, chacune avec sa version et la raison écrite en
 commentaire `WHY:` au-dessus de son import. Ce qui n'en a pas est signalé.
@@ -104,7 +110,9 @@ rejoue depuis *Préférences → Général → Revoir la présentation*.
 
 Les réponses ne sont pas décoratives : elles choisissent les onglets affichés, la
 place du terminal et la commande proposée à l'ouverture d'un projet neuf. Tout
-reste modifiable ensuite dans les préférences.
+reste modifiable ensuite dans les préférences — y compris le thème (clair, sombre ou
+celui du poste) et la couleur d'accent de chaque projet, qui est une préférence de
+poste et ne s'écrit jamais dans le dépôt observé.
 
 ## Installation
 
@@ -128,8 +136,16 @@ commande. Tout se fait dans l'interface :
    Claude Code, et propose les deux skills.
 2. Remplir deux champs — la commande qui démarre l'application, et l'URL où elle répond.
    C'est ce qui écrit `ovrsee.config.json`.
-3. Cliquer sur **Crawler** dans l'onglet Produit. L'application parcourt les écrans et
-   les photographie.
+3. Cliquer sur **Crawler** dans l'onglet Produit. L'application demande une fois
+   d'approuver la commande `dev` — voir ci-dessous — puis parcourt les écrans et les
+   photographie.
+
+`ovrsee.config.json` est versionné : sa ligne `dev` est donc fournie par l'auteur du
+dépôt observé, et le crawl la passe à un shell. Elle exige un accord explicite, gardé
+dans `~/.claude/ovrsee/trust.json`, **hors du dépôt observé** — un clone hostile ne doit
+pas livrer sa propre approbation. Ce qui est retenu est la chaîne exacte : changer `dev`
+redemande l'accord. Sans humain (hook `post-commit`, stdin non TTY), le crawl refuse au
+lieu de demander, et consigne le scan échoué.
 
 Le crawl pilote le **Google Chrome déjà installé sur la machine** — rien ne se télécharge
 au premier lancement. Sans Chrome, tous les autres onglets marchent ; seule la carte
@@ -168,7 +184,9 @@ Quand un plan est approuvé dans Claude Code, il est capturé automatiquement da
 Le hook post-commit rattache ensuite chaque commit au plan actif. Clore le plan quand son travail est fini :
 
 ```bash
-pnpm ovrsee:close     # rend le plan actif
+pnpm ovrsee:close                          # clôt tous les plans ouverts
+pnpm ovrsee:close <plan.md>                # seulement celui-là
+pnpm ovrsee:close <plan.md> --commit <sha> # un plan resté ouvert sans commit
 ```
 
 Tant qu'un plan est actif, le hook post-commit lui rattache **tout** commit — même ceux
@@ -274,7 +292,8 @@ celui d'un autre projet produirait des captures datées d'aujourd'hui montrant l
 | `mcp/` | Serveur MCP stdio (JSON-RPC 2.0), même interface que `/api/*` |
 | `app/src/` | Interface React, 7 onglets (aperçu, navigateur, produit, historique, tableau, données, stack) |
 | `electron/` | Processus principal, preload, pty (terminal intégré) |
-| `scripts/` | Utilitaires de build et test |
+| `scripts/` | Utilitaires de build et test, captures du README |
+| `site/` | La vitrine publique (ovrsee.app), écrite à la main, en anglais |
 
 ## Dépendances
 
@@ -297,14 +316,19 @@ Sobriété délibérée : **5 dépendances de production**, le reste est du Node
 | `react` | ^19.2.8 |
 | `react-dom` | ^19.2.8 |
 | `typescript` | ^7.0.2 |
-| `vite` | ^8.2.1 |
-| `electron` | 43.3.0 |
+| `vite` | ^8.2.2 |
+| `electron` | 43.4.1 |
 | `electron-builder` | ^26.15.3 |
-| `@vitejs/plugin-react` | ^6.0.5 |
+| `oxlint` | ^1.80.0 |
+| `@vitejs/plugin-react` | ^6.1.0 |
 | `@types/react` | ^19.2.18 |
-| `@types/react-dom` | ^19.2.4 |
+| `@types/react-dom` | ^19.2.5 |
 
-Gestionnaire de paquets : `pnpm@10.34.5`, épinglé dans `package.json` et fait respecter par Corepack.
+Gestionnaire de paquets : `pnpm@11.22.0`, épinglé dans `package.json` et fait respecter
+par Corepack. Depuis la version 11, `.npmrc` ne porte plus que l'authentification et le
+registre :
+tout autre réglage — la quarantaine `minimumReleaseAge`, la liste des paquets autorisés à
+builder — vit dans `pnpm-workspace.yaml`, en camelCase.
 
 ## Pièges connus
 
@@ -320,6 +344,14 @@ L'attribution suit quatre étages : un ticket `T-XXXX` cité dans le message, pu
 session (`CLAUDE_CODE_SESSION_ID`, hérité par le hook git), puis l'unique plan actif s'il
 n'y en a qu'un, puis rien. Un commit fait hors de Claude Code, sans ticket cité, alors que
 deux plans sont actifs, n'est rattaché nulle part — et le dit sur stderr.
+
+**La commande `dev` exige un accord, et il vit hors du dépôt.**
+`ovrsee.config.json` est versionné : sa ligne `dev` vient de l'auteur du dépôt observé,
+pas de vous, et le crawl la passe à un shell. Ce qui est retenu — dans
+`~/.claude/ovrsee/trust.json` — est la chaîne exacte : un `dev` modifié redemande
+l'accord. Ce n'est pas une revue de commande : `pnpm dev` est inoffensif à l'œil, ce
+qu'il exécute vit dans le `package.json` de ce dépôt. On accorde une confiance à une
+provenance.
 
 **Le crawl refuse de démarrer si `baseUrl` répond déjà.**
 C'est voulu. Rien dans une réponse HTTP ne distingue son propre serveur de celui d'un
@@ -346,10 +378,18 @@ de mots de passe et dans un `ACCESS.md` non versionné.
 Ovrsee expose un serveur MCP (Model Context Protocol) en stdio. C'est le moyen pour
 Claude Code de lire et modifier les tickets sans quitter son interface.
 
+Onze outils : `listProjects`, `getProjectSummary`, `getBrief`, `getBoard`,
+`listTickets`, `getPlans`, `getTimeline`, `getGraph` en lecture ; `createTicket`,
+`updateTicket`, `moveTicket` en écriture.
+
 Capacités :
 - Lecture complète de `ovrsee/`
 - Écriture sur `ovrsee/tickets/` et `ovrsee/board.json` uniquement
 - Aucune exécution de code
+
+Les réponses en lecture sont **projetées** : `getPlans`, `listTickets` et `getGraph`
+rendent un résumé et omettent les corps, `full: true` donne l'entier. C'est une garde,
+pas une commodité — le graphe complet pèse quelque 177 000 jetons.
 
 Il ne lit que les projets du registre — celui qu'alimente `pnpm ovrsee:install`.
 Un chemin qui n'y figure pas est refusé, même s'il existe sur le disque.
@@ -429,14 +469,19 @@ un `ACCESS.md` non versionné.
 ## Tests
 
 ```bash
-pnpm test       # node --test sur hooks/ crawl/ server/ mcp/, puis app/src compilé
+pnpm test       # node --test sur hooks/ crawl/ server/ mcp/ electron/ scripts/, puis app/src compilé
 pnpm typecheck  # tsc, ne couvre que app/src
+pnpm lint       # oxlint sur tous les dossiers de source
 ```
 
 Aucun framework de test : `node:test` et `node:assert` seuls, dans tout le dépôt.
+La CI lance lint, typecheck et le build de l'interface sur Ubuntu, puis la suite sur
+**macOS et Windows** : cinq tests de portabilité cassaient sous Windows depuis des
+semaines avant qu'elle existe.
 
 ## Voir aussi
 
 - [`README.md`](./README.md) — version anglaise
+- [`CHANGELOG.fr.md`](./CHANGELOG.fr.md) — ce qui a changé, version par version
 - [`cadrage-ovrsee.md`](./cadrage-ovrsee.md) — problème, alternatives écartées, périmètre
 - [`CLAUDE.md`](./CLAUDE.md) — référence technique du projet

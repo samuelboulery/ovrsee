@@ -4,7 +4,13 @@
   "title": "Merge #104, puis repasse README + captures",
   "opened": "2026-09-02",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "de18b7c",
+      "date": "2026-09-02",
+      "files": []
+    }
+  ]
 }
 ---
 

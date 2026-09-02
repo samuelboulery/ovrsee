@@ -39,7 +39,8 @@
     "postinstall": "node scripts/fix-pty-permissions.js",
     "icon": "node scripts/make-icon.js",
     "package:mac": "pnpm build:ui && electron-builder --mac",
-    "package:win": "pnpm build:ui && electron-builder --win"
+    "package:win": "pnpm build:ui && electron-builder --win",
+    "screenshots": "node scripts/screenshots.js"
   },
   "devDependencies": {
     "@types/react": "^19.2.18",

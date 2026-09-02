@@ -37,12 +37,60 @@ import { execFileSync } from 'node:child_process'
 export const SANS_PROGRAMME = [
   '-c', 'core.fsmonitor=false',
   '-c', 'core.pager=cat',
-  '-c', 'core.sshCommand=ssh',
   '-c', 'diff.external=',
-  '-c', 'credential.helper=',
-  '-c', 'core.askPass=',
   '-c', 'protocol.ext.allow=never',
 ]
+
+/**
+ * Ce qui ne concerne que les commandes qui parlent au réseau.
+ *
+ * `credential.helper` et `core.sshCommand` ne sont lus que par `fetch`, `push`
+ * et `clone` : les poser sur un `git status` ne protégerait de rien. Et les
+ * poser bêtement casse le cas normal — un `-c credential.helper=` réinitialise
+ * la liste **entière**, y compris le trousseau du poste, et `git fetch` sur un
+ * dépôt privé en HTTPS échoue faute de savoir qui demander.
+ *
+ * D'où la réinjection : on efface ce que le dépôt a pu écrire, puis on remet
+ * ce que l'utilisateur a réglé pour lui-même. L'ordre compte — la valeur vide
+ * remet la liste à zéro, celles d'après la reconstruisent.
+ */
+const RESEAU_SANS_PROGRAMME = [
+  '-c', 'credential.helper=',
+  '-c', 'core.askPass=',
+  '-c', 'core.sshCommand=ssh',
+]
+
+/**
+ * Valeurs réglées par l'utilisateur pour lui-même, à réinjecter après le reset.
+ *
+ * Lues avec l'environnement de l'appelant, et non mémoïsées : `GIT_CONFIG_GLOBAL`
+ * décide de quel fichier est « le global », et un cache rendrait la réponse du
+ * premier appelant à tous les suivants. Deux `git config` locaux ne pèsent rien
+ * devant l'opération réseau qui suit.
+ *
+ * `--global` et jamais la portée du dépôt : c'est la configuration du poste
+ * qu'on veut : celle du dépôt observé est exactement ce dont on se protège.
+ */
+const reglagesDuPoste = env => {
+  const lire = cle => {
+    try {
+      return execFileSync('git', ['config', '--global', '--get-all', cle], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+        ...(env ? { env } : {}),
+      })
+        .split('\n')
+        .filter(Boolean)
+    } catch {
+      // Réglage absent : git sort en 1. Ce n'est pas une panne.
+      return []
+    }
+  }
+  return [
+    ...lire('credential.helper').flatMap(v => ['-c', `credential.helper=${v}`]),
+    ...lire('core.sshCommand').flatMap(v => ['-c', `core.sshCommand=${v}`]),
+  ]
+}
 
 /**
  * Lance `git` sur un dépôt dont on ne contrôle pas la configuration.
@@ -58,3 +106,21 @@ export const SANS_PROGRAMME = [
  */
 export const git = (root, args, options = {}) =>
   execFileSync('git', [...SANS_PROGRAMME, ...args], { cwd: root, ...options })
+
+/**
+ * Lance une commande git qui parle au réseau, sur un dépôt observé.
+ *
+ * Même garde que `git()`, plus celle des programmes d'authentification — mais
+ * en rendant à l'utilisateur les siens, sans quoi un `fetch` sur son propre
+ * dépôt privé échouerait.
+ *
+ * @param {string} root racine du dépôt observé
+ * @param {string[]} args arguments de git, sous-commande comprise
+ * @param {import('node:child_process').ExecFileSyncOptions} [options]
+ */
+export const gitReseau = (root, args, options = {}) =>
+  execFileSync(
+    'git',
+    [...SANS_PROGRAMME, ...RESEAU_SANS_PROGRAMME, ...reglagesDuPoste(options.env), ...args],
+    { cwd: root, ...options },
+  )

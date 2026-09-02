@@ -31,7 +31,7 @@ import { readSettings, writeSettings, validateSettings, mergeSettings } from '..
 import { installSkills, readSkills } from '../hooks/skills.js'
 import { projects, snapshot, shotPath, mediaPath, tableau, readGraph } from '../hooks/snapshot.js'
 import { readJson } from '../hooks/json.js'
-import { git } from '../hooks/git.js'
+import { git, gitReseau } from '../hooks/git.js'
 import { gitStatus } from '../hooks/git-status.js'
 import {
   addColumn,
@@ -262,9 +262,19 @@ function projectAction(body) {
     case 'git-fetch': {
       if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
       try {
-        git(path, ['fetch'], { stdio: 'ignore' })
+        // `gitReseau` et pas `git` : un `fetch` a besoin du trousseau et de la
+        // commande ssh du poste, que la garde efface d'abord — c'est le dépôt
+        // observé qu'on neutralise, pas l'utilisateur.
+        gitReseau(path, ['fetch'], { stdio: ['ignore', 'ignore', 'pipe'] })
       } catch (err) {
-        return { status: 400, json: { error: String(err.message ?? err) } }
+        // stderr retenu, pas jeté : sans lui, l'interface affichait « Command
+        // failed » et rien d'autre — un échec sans cause envoie chercher le
+        // problème là où il n'est pas.
+        const dit = String(err?.stderr ?? '').trim()
+        return {
+          status: 400,
+          json: { error: dit || String(err.message ?? err) },
+        }
       }
       return { json: { gitStatus: gitStatus(path) } }
     }

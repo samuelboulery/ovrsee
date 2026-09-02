@@ -93,7 +93,11 @@ export function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
 
 export function Message({ text }: { text: string }) {
   return (
+    // `role="status"` : c'est ici, et nulle part ailleurs, qu'une région vivante
+    // a sa place. `<main>` en portait une qui couvrait tout l'onglet, et les
+    // deux polls la faisaient parler toutes les quatre secondes.
     <div
+      role="status"
       style={s(
         'flex: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--color-neutral-500);',
       )}

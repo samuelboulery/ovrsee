@@ -303,11 +303,22 @@ export function App() {
    */
   useEffect(() => {
     if (!current) return
+    const rafraichir = () => fetchTableau(current).then(setTableau).catch(() => {})
     const timer = setInterval(() => {
       if (document.hidden) return
-      fetchTableau(current).then(setTableau).catch(() => {})
+      rafraichir()
     }, 4000)
-    return () => clearInterval(timer)
+
+    // Même rattrapage que pour le snapshot : au retour, l'écran doit être à
+    // jour tout de suite, pas au prochain tour.
+    const auRetour = () => {
+      if (!document.hidden) rafraichir()
+    }
+    document.addEventListener('visibilitychange', auRetour)
+    return () => {
+      clearInterval(timer)
+      document.removeEventListener('visibilitychange', auRetour)
+    }
   }, [current])
 
   /**

@@ -157,6 +157,18 @@ async function assertPortFree(baseUrl) {
   )
 }
 
+/**
+ * Le serveur de dev en cours, s'il y en a un.
+ *
+ * Au niveau du module, et pas seulement dans `run()`, parce qu'un signal
+ * n'arrive pas dans une portée : annuler un crawl depuis l'application tue le
+ * groupe du crawler, et sans cette référence le `finally` de `run()` n'a pas
+ * le temps de s'exécuter. Le serveur de dev, lui, est `detached` — il est donc
+ * dans son propre groupe et survit. Le port restait pris, et tous les crawls
+ * suivants se refusaient d'eux-mêmes.
+ */
+let appEnCours = null
+
 /** Ce que la commande `dev` a écrit, borné : c'est un message d'erreur, pas un journal. */
 const DERNIERS_OCTETS = 2000
 
@@ -189,6 +201,13 @@ async function startApp(config) {
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: true,
   })
+
+  // Retenu ici, et pas au retour de `startApp` : entre ce `spawn` et le moment
+  // où le serveur répond, il peut s'écouler jusqu'à `readyTimeoutMs` — soit une
+  // minute. C'est précisément là qu'on annule, puisque c'est là que le crawl
+  // paraît bloqué. Affecté plus tard, le gestionnaire de signal lisait `null`
+  // et laissait le serveur derrière lui, port compris.
+  appEnCours = child
 
   // Sans cet écouteur, un shell introuvable lève un événement `error` que
   // personne n'attrape, et le crawl meurt sans rien consigner — l'échec
@@ -230,18 +249,6 @@ async function startApp(config) {
   }
   return child
 }
-
-/**
- * Le serveur de dev en cours, s'il y en a un.
- *
- * Au niveau du module, et pas seulement dans `run()`, parce qu'un signal
- * n'arrive pas dans une portée : annuler un crawl depuis l'application tue le
- * groupe du crawler, et sans cette référence le `finally` de `run()` n'a pas
- * le temps de s'exécuter. Le serveur de dev, lui, est `detached` — il est donc
- * dans son propre groupe et survit. Le port restait pris, et tous les crawls
- * suivants se refusaient d'eux-mêmes.
- */
-let appEnCours = null
 
 function stopApp(child) {
   if (!child?.pid) return
@@ -454,7 +461,6 @@ async function run() {
 
   log(`démarrage de « ${config.dev} »…`)
   const app = await startApp(config)
-  appEnCours = app
 
   let browser
   try {

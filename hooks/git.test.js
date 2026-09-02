@@ -11,7 +11,7 @@ import test from 'node:test'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { git } from './git.js'
+import { git, gitReseau } from './git.js'
 import { gitStatus } from './git-status.js'
 import { snapshot } from './snapshot.js'
 
@@ -85,6 +85,50 @@ test('snapshot() n’exécute pas le programme nommé par le dépôt', () => {
   // La frise porte les commits ; le premier est celui posé par `depotPiege`.
   assert.equal(vue.timeline.length, 1, 'la lecture doit rester juste')
   assert.equal(vue.gitStatus.branch, 'main', 'l’état git doit rester juste')
+  rmSync(dir, { recursive: true, force: true })
+  rmSync(dehors, { recursive: true, force: true })
+})
+
+/**
+ * La garde réseau doit tenir les deux bouts : effacer ce que le dépôt a écrit,
+ * et rendre à l'utilisateur ce qu'il a réglé pour lui-même. Effacer sans rendre
+ * cassait `git fetch` sur tout dépôt privé en HTTPS — c'est-à-dire le cas
+ * normal, pas le cas hostile.
+ *
+ * Le test passe par `git credential fill`, qui invoque réellement les helpers :
+ * `git config --get-all` ne dirait rien de juste ici, il liste l'historique des
+ * portées, valeur vide comprise, là où git, à l'usage, traite cette valeur vide
+ * comme une remise à zéro de la liste.
+ *
+ * `GIT_CONFIG_GLOBAL` fournit une configuration « de poste » jetable : le test
+ * ne touche pas à celle de la machine, et dit la même chose partout.
+ */
+test('la garde réseau efface le helper du dépôt et garde celui du poste', () => {
+  const { dir, dehors, temoin, script } = depotPiege()
+  const temoinPoste = join(dehors, 'TEMOIN-POSTE')
+  const scriptPoste = join(dehors, 'poste.sh')
+  writeFileSync(scriptPoste, `#!/bin/sh\necho execute > ${temoinPoste}\nexit 0\n`)
+  chmodSync(scriptPoste, 0o755)
+
+  const configPoste = join(dehors, 'gitconfig-poste')
+  writeFileSync(configPoste, `[credential]\n\thelper = !${scriptPoste}\n`)
+  sh(dir, ['config', 'credential.helper', `!${script}`])
+
+  const env = { ...process.env, GIT_CONFIG_GLOBAL: configPoste, GIT_TERMINAL_PROMPT: '0' }
+  try {
+    gitReseau(dir, ['credential', 'fill'], {
+      input: 'protocol=https\nhost=exemple.invalid\n\n',
+      env,
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'ignore'],
+    })
+  } catch {
+    // Sans identifiant à rendre, git sort en erreur : seuls les témoins comptent.
+  }
+
+  assert.equal(existsSync(temoin), false, 'le helper du dépôt ne doit pas s’exécuter')
+  assert.equal(existsSync(temoinPoste), true, 'le helper du poste doit rester actif')
+
   rmSync(dir, { recursive: true, force: true })
   rmSync(dehors, { recursive: true, force: true })
 })

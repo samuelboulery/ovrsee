@@ -203,7 +203,7 @@ export function CommandPalette({
             placeholder={t('palette.placeholder')}
             aria-label={t('palette.placeholder')}
             style={s(
-              'flex: 1; border: 0;  background: transparent; color: var(--color-text); font-family: var(--font-mono); font-size: 12px;',
+              'flex: 1; border: 0; background: transparent; color: var(--color-text); font-family: var(--font-mono); font-size: 12px;',
             )}
           />
         </div>

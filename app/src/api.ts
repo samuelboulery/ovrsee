@@ -14,6 +14,31 @@ const json = async <T,>(url: string, signal?: AbortSignal): Promise<T> => {
   return response.json() as Promise<T>
 }
 
+/**
+ * Le pendant en écriture de `json()`.
+ *
+ * `X-Ovrsee` n'est pas une authentification : c'est ce qui empêche une page
+ * quelconque ouverte dans le navigateur de poster vers le dev server local.
+ * Il est posé ici, au seul endroit où une requête d'écriture se construit —
+ * huit copies, c'étaient huit endroits où l'oublier en ajoutant une neuvième
+ * route, et l'oubli ne se serait pas vu en développement, où l'origine est la
+ * bonne.
+ *
+ * Le message d'erreur rendu par le serveur prime sur le code HTTP : c'est lui
+ * que l'interface montre.
+ */
+const post = async <T,>(url: string, body: unknown): Promise<T> => {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
+    body: JSON.stringify(body),
+  })
+
+  const result = await response.json()
+  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
+  return result as T
+}
+
 /** Une requête abandonnée n'est pas une panne : elle n'a plus de destinataire. */
 export const estAbandon = (err: unknown): boolean =>
   err instanceof DOMException && err.name === 'AbortError'
@@ -28,14 +53,7 @@ export const fetchUsername = () => json<{ username: string | null }>('/api/usern
  * Rend les fichiers de plan effectivement clos (vide si aucun n'avait de commit).
  */
 export async function closeActivePlans(path: string): Promise<{ closed: string[] }> {
-  const response = await fetch('/api/plans/close-active', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
-    body: JSON.stringify({ path }),
-  })
-  const result = await response.json()
-  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
-  return result
+  return post('/api/plans/close-active', { path })
 }
 
 export type ProjectAction = 'accent' | 'add' | 'remove' | 'touch' | 'init' | 'export-obsidian'
@@ -48,24 +66,13 @@ export type ProjectAction = 'accent' | 'add' | 'remove' | 'touch' | 'init' | 'ex
  * `payload` porte ce qui est propre à un geste — les skills à installer pour
  * `init`, la teinte pour `accent`. Les autres n'en ont pas besoin, d'où le paramètre optionnel plutôt
  * qu'une seconde fonction par action.
- *
- * `X-Ovrsee` n'est pas une authentification : c'est ce qui empêche une page
- * quelconque ouverte dans le navigateur de poster vers le dev server local.
  */
 export async function projectAction(
   action: ProjectAction,
   path: string,
   payload: Record<string, unknown> = {},
 ): Promise<{ projects: Project[]; done?: string[] }> {
-  const response = await fetch('/api/projects', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
-    body: JSON.stringify({ ...payload, action, path }),
-  })
-
-  const result = await response.json()
-  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
-  return result
+  return post('/api/projects', { ...payload, action, path })
 }
 
 /**
@@ -76,15 +83,7 @@ export async function projectAction(
  * avec un champ qui, pour eux, ne manque jamais.
  */
 export async function gitFetch(path: string): Promise<{ gitStatus: GitStatus }> {
-  const response = await fetch('/api/projects', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
-    body: JSON.stringify({ action: 'git-fetch', path }),
-  })
-
-  const result = await response.json()
-  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
-  return result
+  return post('/api/projects', { action: 'git-fetch', path })
 }
 
 export interface FolderState {
@@ -98,15 +97,7 @@ export interface FolderState {
 }
 
 export async function getFolderState(path: string): Promise<FolderState> {
-  const response = await fetch('/api/projects', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
-    body: JSON.stringify({ action: 'state', path }),
-  })
-
-  const result = await response.json()
-  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
-  return result
+  return post('/api/projects', { action: 'state', path })
 }
 
 /**
@@ -132,15 +123,7 @@ export const fetchSkills = () => json<SkillEntry[]>('/api/skills')
 export async function installSkills(
   noms: string[],
 ): Promise<{ done: string[]; skills: SkillEntry[] }> {
-  const response = await fetch('/api/skills', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
-    body: JSON.stringify({ noms }),
-  })
-
-  const result = await response.json()
-  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
-  return result
+  return post('/api/skills', { noms })
 }
 
 export type TicketAction =
@@ -170,15 +153,7 @@ export async function ticketAction(
   path: string,
   payload: Record<string, unknown> = {},
 ): Promise<Tableau> {
-  const response = await fetch('/api/tickets', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
-    body: JSON.stringify({ ...payload, action, path }),
-  })
-
-  const result = await response.json()
-  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
-  return result
+  return post('/api/tickets', { ...payload, action, path })
 }
 
 /**
@@ -189,15 +164,8 @@ export async function ticketAction(
  * rien du ticket n'a changé tant que le corps n'est pas sauvé.
  */
 export async function ticketImage(path: string, id: string, image: string): Promise<string> {
-  const response = await fetch('/api/tickets', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
-    body: JSON.stringify({ action: 'image', path, id, image }),
-  })
-
-  const result = await response.json()
-  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
-  return result.chemin
+  const { chemin } = await post<{ chemin: string }>('/api/tickets', { action: 'image', path, id, image })
+  return chemin
 }
 
 /**
@@ -248,15 +216,7 @@ export const fetchSettings = (projectPath?: string): Promise<SettingsType> =>
  * Rend les préférences écrites pour la confirmation.
  */
 export async function updateSettings(settings: Partial<SettingsType>): Promise<SettingsType> {
-  const response = await fetch('/api/settings', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
-    body: JSON.stringify(settings),
-  })
-
-  const result = await response.json()
-  if (!response.ok) throw new Error(result?.error ?? `HTTP ${response.status}`)
-  return result
+  return post('/api/settings', settings)
 }
 
 export type IntegrationProvider = 'vercel' | 'netlify' | 'supabase' | 'autre'

@@ -21,14 +21,7 @@ import { timeline, ticketTimeline } from './timeline.js'
 import { readSettings, mergeSettings } from './settings.js'
 import { gitStatus } from './git-status.js'
 import { readIntegrations } from './integrations.js'
-
-export const readJson = path => {
-  try {
-    return JSON.parse(readFileSync(path, 'utf8'))
-  } catch {
-    return null
-  }
-}
+import { readJson } from './json.js'
 
 /**
  * Un fichier texte du dépôt, ou null.

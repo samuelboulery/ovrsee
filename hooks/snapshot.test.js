@@ -4,7 +4,8 @@ import { mkdirSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { readGraph, readJson, snapshot, vaultPath } from './snapshot.js'
+import { readGraph, snapshot, vaultPath } from './snapshot.js'
+import { readJson } from './json.js'
 import { DEFAULT_SETTINGS, writeSettings } from './settings.js'
 import { writeIntegrations } from './integrations.js'
 

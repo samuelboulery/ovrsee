@@ -64,8 +64,6 @@ const translations = {
     'pref.profiles': 'Profils',
     'pref.profiles_desc':
       'Des bases prêtes à l’emploi : les onglets et le terminal rangés pour un usage. Appliquez-en une, puis retouchez ce que vous voulez.',
-    'pref.profile_apply': 'Appliquer',
-    'pref.profile_current': 'Profil courant',
     'pref.profile_complet': 'Complet',
     'pref.profile_complet_desc': 'Les sept onglets et le terminal en bas. Le réglage d’usine.',
     'pref.profile_sobre': 'Sobre',
@@ -103,7 +101,6 @@ const translations = {
     'pref.saved': 'Enregistré',
     'pref.saving': 'Enregistrement…',
     'pref.loading': 'Chargement…',
-    'pref.preview': 'Aperçu',
     'pref.tabs_desc': 'Glissez pour réordonner, basculez pour masquer.',
     'pref.tabs_visible': '${n} visible sur ${total}',
     'pref.tabs_visible_plural': '${n} visibles sur ${total}',
@@ -180,8 +177,6 @@ const translations = {
     'msg.month_ago': 'il y a 1 mois',
     'msg.months_ago': 'il y a ${n} mois',
     'msg.no_intention': 'Aucune intention écrite dans ce plan.',
-    'msg.plan': 'plan',
-    'msg.plans': 'plans',
     'msg.loading': 'Lecture de ovrsee/…',
     'msg.read_error': 'Lecture impossible',
     // Welcome
@@ -205,7 +200,6 @@ const translations = {
     'onboard.prev': 'Précédent',
     'onboard.next': 'Suivant',
     'onboard.done': 'Terminer',
-    'onboard.step': 'Écran ${n} sur ${total}',
     'onboard.what_title': 'Ce que fait l\'ovrsee',
     'onboard.what_desc':
       'Il tient le suivi de ce que vous construisez avec Claude Code : les décisions que vous avez approuvées, les commits qui les réalisent, les tickets à faire, l\'architecture de l\'app et son évolution. De quoi savoir où vous en êtes quand on code au rythme de l\'agent, et quoi faire ensuite.',
@@ -254,11 +248,7 @@ const translations = {
     'equipment.description': 'L\'initialiser crée ovrsee/plans/ et pose le hook post-commit qui rattache les commits au plan actif.',
     'equipment.skills_title': 'Skills Claude Code',
     'equipment.not_git': 'Ce dossier n\'est pas encore un dépôt git',
-    'equipment.bootstrap_title': 'Avant d\'initialiser',
-    'equipment.bootstrap_desc': 'Créer un dépôt git et committer les fichiers existants :',
     'equipment.send_to_terminal': 'Envoyer les commandes au terminal Claude',
-    'equipment.prerequisites_title': 'Prérequis',
-    'equipment.missing_git': 'git — installer avec : brew install git (macOS) ou apt install git (Linux)',
     'equipment.missing_lockfile': 'Lockfile — installer les dépendances avec : pnpm install (ou npm install)',
     'equipment.missing_config': 'ovrsee.config.json — à créer dans la racine du projet',
     'equipment.initialize_btn': 'Initialiser ovrsee ici',
@@ -294,15 +284,11 @@ const translations = {
     'months.nov': 'nov.',
     'months.dec': 'déc.',
     // Accessibilité
-    'a11y.tabs': 'Onglets du projet',
-    'a11y.projects': 'Projets',
-    'a11y.open_project': 'Ouvrir un projet (⌘O)',
     'a11y.older_shot': 'Capture plus ancienne',
     'a11y.newer_shot': 'Capture plus récente',
     'a11y.skill_installed': 'déjà en place',
     'a11y.skill_to_install': 'à installer vous-même',
     'a11y.edit': 'Éditer',
-    'a11y.delete': 'Supprimer',
     'a11y.resize': 'Glisser pour redimensionner · double-clic pour réinitialiser',
     'a11y.remove_from_list': 'Retirer de la liste — aucun fichier n\'est supprimé',
     'a11y.last_plan': 'Dernier commit rattaché à un plan',
@@ -313,11 +299,9 @@ const translations = {
     'apercu.no_scan': 'aucun scan',
     'apercu.how_to_launch': 'Comment on le lance',
     'apercu.take_away': 'Emporter ailleurs',
-    'apercu.actions': 'Actions rapides',
     'apercu.open_editor': 'Ouvrir dans l\'éditeur',
     'apercu.editor': 'Éditeur',
     'apercu.reveal': 'Révéler dans le Finder',
-    'apercu.terminal_claude': 'Terminal Claude',
     'apercu.terminal_shell': 'Terminal',
     'apercu.more_actions': 'Plus d’actions',
     'apercu.copy_path': 'Copier le chemin',
@@ -387,8 +371,6 @@ const translations = {
     'deploiements.checking': 'Vérification…',
     'deploiements.empty_desc':
       "Suivez l'état de vos déploiements (Vercel, Netlify…) et de votre base de données (Supabase) directement depuis l'app.",
-    'deploiements.add_deploy': 'Ajouter un service de déploiement',
-    'deploiements.add_db': 'Ajouter une base de données',
     'deploiements.add_integration': 'Ajouter Netlify, Railway…',
     'deploiements.configure': 'Configurer',
     'deploiements.hide': 'Masquer',
@@ -400,7 +382,6 @@ const translations = {
     'deploiements.never_checked': 'jamais vérifié',
     // Historique
     'historique.title': 'Chronologie du projet',
-    'historique.subtitle': 'Chaque commit, dans l\'ordre, et les plans qui les expliquent. Un plan est clos par le commit qui l\'exécute.',
     'historique.plan_label': 'Plan',
     'historique.closed': 'clos',
     'historique.open': 'ouvert',
@@ -414,7 +395,6 @@ const translations = {
     'historique.view_commits': 'Par commits',
     'historique.view_graph': 'Activité',
     'historique.ticket_label': 'Ticket',
-    'historique.no_tickets': 'Aucun ticket ne cite ce plan.',
     'historique.graph_stacked': 'Empilée · 14 jours',
     'historique.graph_density': 'Densité · 12 semaines',
     'historique.graph_by_type': 'Par type · 30 jours',
@@ -434,7 +414,6 @@ const translations = {
     'historique.commits_label': 'Commits',
     // Stack
     'stack.no_dependencies': 'Aucune dépendance déclarée dans package.json.',
-    'stack.why_subtitle': 'Ce qui est utilisé, et pourquoi. Une raison est un commentaire WHY: posé juste au-dessus de l\'import du paquet — rien d\'autre n\'est lu, pour qu\'aucune ligne ne dise du faux.',
     'stack.of_stack_prefix': 'sur',
     'stack.of_stack': 'en ont une.',
     'stack.no_why': 'Aucune raison écrite. Un commentaire WHY: … au-dessus de son import apparaîtra ici.',
@@ -462,7 +441,6 @@ const translations = {
     'donnees.obsidian_unconfigured': 'Ajoute le champ obsidianVault a ovrsee.config.json pour designer le chemin du coffre.',
     'donnees.obsidian_unreadable_title': 'Coffre Obsidian illisible',
     'donnees.obsidian_unreadable': 'Le chemin n\'existe pas ou n\'est pas accessible. Verifie l\'existence du dossier et les permissions.',
-    'donnees.no_tables': 'Aucune table détectée.',
     'donnees.vault_ignored': 'Un coffre Obsidian est déclaré dans ovrsee.config.json, mais il n\'est pas lu : Graphify a produit un graphe, et il vient du code plutôt que d\'une saisie. Retirer graphify-out/ pour lire le coffre à la place.',
     'donnees.col_header': 'Colonnes',
     'donnees.used_header': 'Utilisée par',
@@ -484,7 +462,6 @@ const translations = {
     'tableau.title': 'Tableau',
     'tableau.finish_editing': 'Terminer',
     'tableau.edit_columns': 'Éditer les colonnes',
-    'tableau.edit_ticket': 'Modifier',
     'tableau.no_description': 'Aucune description.',
     'tableau.uncommitted': 'Non commité',
     'tableau.view_kanban': 'Kanban',
@@ -583,7 +560,6 @@ const translations = {
     'produit.screenshot_count': '${n} capture',
     'produit.screenshot_count_plural': '${n} captures',
     'produit.without_page': 'sans page',
-    'produit.screenshot_count_label': 'sans page',
     'produit.compare_dates': 'Comparer deux dates',
     'produit.compare_title': 'Comparer deux captures',
     'produit.compare_left': 'Première date',
@@ -760,13 +736,6 @@ const translations = {
     'menu.zoom': 'Ajuster',
     'menu.bring_all_front': 'Tout ramener au premier plan',
     'sidebar.preferences': 'Préférences',
-    'sidebar.activity': "Densité d'activité",
-    'sidebar.today': "aujourd'hui",
-    'density.window_day': '24 heures',
-    'density.window_week': '7 jours',
-    'density.window_month': '30 jours',
-    'density.window_3months': '13 semaines',
-    'density.window_year': '12 mois',
     'garde.tab': "l'onglet ${name}",
     'garde.terminal': 'le panneau terminal',
     'garde.terminal_hint': "Le reste de l'ovrsee fonctionne. Rouvrir l'application recharge le panneau.",
@@ -790,7 +759,6 @@ const translations = {
     'sidebar.projects': 'Projets',
     'sidebar.views': 'Vues',
     'sidebar.toggle': 'Réduire ou déployer la barre latérale',
-    'sidebar.toggle_terminal': 'Afficher ou masquer le terminal',
     'sidebar.switch_project': 'Changer de projet',
     'sidebar.open_project': 'Ouvrir un projet (⌘O)',
     'sidebar.rejected_plans': 'Plans rejetés · ${n}',
@@ -856,8 +824,6 @@ const translations = {
     'pref.profiles': 'Profiles',
     'pref.profiles_desc':
       'Ready-made layouts: tabs and terminal arranged for one kind of work. Apply one, then change whatever you like.',
-    'pref.profile_apply': 'Apply',
-    'pref.profile_current': 'Current profile',
     'pref.profile_complet': 'Full',
     'pref.profile_complet_desc': 'All seven tabs, terminal at the bottom. The factory setting.',
     'pref.profile_sobre': 'Plain',
@@ -893,7 +859,6 @@ const translations = {
     'pref.saved': 'Saved',
     'pref.saving': 'Saving…',
     'pref.loading': 'Loading…',
-    'pref.preview': 'Preview',
     'pref.tabs_desc': 'Drag to reorder, toggle to hide.',
     'pref.tabs_visible': '${n} of ${total} visible',
     'pref.tabs_visible_plural': '${n} of ${total} visible',
@@ -970,8 +935,6 @@ const translations = {
     'msg.month_ago': '1 month ago',
     'msg.months_ago': '${n} months ago',
     'msg.no_intention': 'No intention written in this plan.',
-    'msg.plan': 'plan',
-    'msg.plans': 'plans',
     'msg.loading': 'Reading ovrsee/…',
     'msg.read_error': 'Unable to read',
     // Welcome
@@ -995,7 +958,6 @@ const translations = {
     'onboard.prev': 'Back',
     'onboard.next': 'Next',
     'onboard.done': 'Finish',
-    'onboard.step': 'Screen ${n} of ${total}',
     'onboard.what_title': 'What Ovrsee does',
     'onboard.what_desc':
       'It keeps track of what you build with Claude Code: the plans you approved, the commits that carry them out, the tickets left to do, the app architecture and how it changes. Enough to know where you stand when you code at the agent\'s pace, and what to do next.',
@@ -1044,11 +1006,7 @@ const translations = {
     'equipment.description': 'Initializing it creates ovrsee/plans/ and sets the post-commit hook that attaches commits to the active plan.',
     'equipment.skills_title': 'Claude Code Skills',
     'equipment.not_git': 'This folder is not yet a git repository',
-    'equipment.bootstrap_title': 'Before initializing',
-    'equipment.bootstrap_desc': 'Create a git repository and commit existing files:',
     'equipment.send_to_terminal': 'Send commands to Claude terminal',
-    'equipment.prerequisites_title': 'Prerequisites',
-    'equipment.missing_git': 'git — install with: brew install git (macOS) or apt install git (Linux)',
     'equipment.missing_lockfile': 'Lockfile — install dependencies with: pnpm install (or npm install)',
     'equipment.missing_config': 'ovrsee.config.json — create at the project root',
     'equipment.initialize_btn': 'Initialize ovrsee here',
@@ -1084,15 +1042,11 @@ const translations = {
     'months.nov': 'Nov.',
     'months.dec': 'Dec.',
     // Accessibility
-    'a11y.tabs': 'Project tabs',
-    'a11y.projects': 'Projects',
-    'a11y.open_project': 'Open a project (⌘O)',
     'a11y.older_shot': 'Older screenshot',
     'a11y.newer_shot': 'Newer screenshot',
     'a11y.skill_installed': 'already installed',
     'a11y.skill_to_install': 'to install yourself',
     'a11y.edit': 'Edit',
-    'a11y.delete': 'Delete',
     'a11y.resize': 'Drag to resize · double-click to reset',
     'a11y.remove_from_list': 'Remove from list — no file is deleted',
     'a11y.last_plan': 'Last commit attached to a plan',
@@ -1103,11 +1057,9 @@ const translations = {
     'apercu.no_scan': 'no scan',
     'apercu.how_to_launch': 'How to run it',
     'apercu.take_away': 'Take it with you',
-    'apercu.actions': 'Quick actions',
     'apercu.open_editor': 'Open in editor',
     'apercu.editor': 'Editor',
     'apercu.reveal': 'Reveal in Finder',
-    'apercu.terminal_claude': 'Claude terminal',
     'apercu.terminal_shell': 'Terminal',
     'apercu.more_actions': 'More actions',
     'apercu.copy_path': 'Copy path',
@@ -1177,8 +1129,6 @@ const translations = {
     'deploiements.checking': 'Checking…',
     'deploiements.empty_desc':
       'Track the state of your deployments (Vercel, Netlify…) and your database (Supabase) right from the app.',
-    'deploiements.add_deploy': 'Add a deployment service',
-    'deploiements.add_db': 'Add a database',
     'deploiements.add_integration': 'Add Netlify, Railway…',
     'deploiements.configure': 'Configure',
     'deploiements.hide': 'Hide',
@@ -1190,7 +1140,6 @@ const translations = {
     'deploiements.never_checked': 'never checked',
     // Historique
     'historique.title': 'Project timeline',
-    'historique.subtitle': 'Each commit, in order, and the plans that explain them. A plan is closed by the commit that executes it.',
     'historique.plan_label': 'Plan',
     'historique.closed': 'closed',
     'historique.open': 'open',
@@ -1204,7 +1153,6 @@ const translations = {
     'historique.view_commits': 'By commits',
     'historique.view_graph': 'Activity',
     'historique.ticket_label': 'Ticket',
-    'historique.no_tickets': 'No ticket cites this plan.',
     'historique.graph_stacked': 'Stacked · 14 days',
     'historique.graph_density': 'Density · 12 weeks',
     'historique.graph_by_type': 'By type · 30 days',
@@ -1224,7 +1172,6 @@ const translations = {
     'historique.commits_label': 'Commits',
     // Stack
     'stack.no_dependencies': 'No dependencies declared in package.json.',
-    'stack.why_subtitle': 'What\'s used and why. A reason is a WHY: comment placed just above the package import — nothing else is read, so no line says anything false.',
     'stack.of_stack_prefix': 'of',
     'stack.of_stack': 'have one.',
     'stack.no_why': 'No reason written. A WHY: … comment above its import will appear here.',
@@ -1252,7 +1199,6 @@ const translations = {
     'donnees.obsidian_unconfigured': 'Add the obsidianVault field to ovrsee.config.json to designate the path to the vault.',
     'donnees.obsidian_unreadable_title': 'Obsidian vault unreadable',
     'donnees.obsidian_unreadable': 'The path does not exist or is not accessible. Check the folder exists and has permissions.',
-    'donnees.no_tables': 'No tables detected.',
     'donnees.vault_ignored': 'An Obsidian vault is declared in ovrsee.config.json, but it\'s not being read — Graphify has produced a graph, and it comes from code rather than manual entry. Remove graphify-out/ to read the vault instead.',
     'donnees.col_header': 'Columns',
     'donnees.used_header': 'Used by',
@@ -1274,7 +1220,6 @@ const translations = {
     'tableau.title': 'Board',
     'tableau.finish_editing': 'Done',
     'tableau.edit_columns': 'Edit columns',
-    'tableau.edit_ticket': 'Edit',
     'tableau.no_description': 'No description.',
     'tableau.uncommitted': 'Uncommitted',
     'tableau.view_kanban': 'Kanban',
@@ -1373,7 +1318,6 @@ const translations = {
     'produit.screenshot_count': '${n} screenshot',
     'produit.screenshot_count_plural': '${n} screenshots',
     'produit.without_page': 'without a page',
-    'produit.screenshot_count_label': 'without page',
     'produit.compare_dates': 'Compare two dates',
     'produit.compare_title': 'Compare two screenshots',
     'produit.compare_left': 'First date',
@@ -1550,13 +1494,6 @@ const translations = {
     'menu.zoom': 'Zoom',
     'menu.bring_all_front': 'Bring All to Front',
     'sidebar.preferences': 'Preferences',
-    'sidebar.activity': 'Activity density',
-    'sidebar.today': 'today',
-    'density.window_day': '24 hours',
-    'density.window_week': '7 days',
-    'density.window_month': '30 days',
-    'density.window_3months': '13 weeks',
-    'density.window_year': '12 months',
     'garde.tab': 'the ${name} tab',
     'garde.terminal': 'the terminal panel',
     'garde.terminal_hint': 'The rest of ovrsee still works. Reopening the app reloads the panel.',
@@ -1580,7 +1517,6 @@ const translations = {
     'sidebar.projects': 'Projects',
     'sidebar.views': 'Views',
     'sidebar.toggle': 'Collapse or expand the sidebar',
-    'sidebar.toggle_terminal': 'Show or hide the terminal',
     'sidebar.switch_project': 'Switch project',
     'sidebar.open_project': 'Open a project (⌘O)',
     'sidebar.rejected_plans': 'Rejected plans · ${n}',
@@ -1640,4 +1576,34 @@ function t(key, lang, params) {
   })
 }
 
-export { t, translations }
+/** Les douze clés de mois, dans l'ordre du calendrier. */
+const MOIS = [
+  'months.jan', 'months.feb', 'months.mar', 'months.apr',
+  'months.may', 'months.jun', 'months.jul', 'months.aug',
+  'months.sep', 'months.oct', 'months.nov', 'months.dec',
+]
+
+/**
+ * `2026-07-18` → `18 juil. 2026`. Le mois se lit dans le dictionnaire.
+ *
+ * Ici plutôt que dans l'interface : le brief de session (`hooks/brief.js`) en
+ * a besoin aussi, et il tournait avec sa propre table de mois — deux tables
+ * pour un seul format.
+ *
+ * Une date illisible se rend telle quelle : c'est une donnée du disque, pas
+ * une entrée validée, et l'afficher brute en dit plus qu'un tiret.
+ *
+ * @param {string|null|undefined} date au format `YYYY-MM-DD`
+ * @param {'fr'|'en'} lang
+ * @param {boolean} [avecAnnee=true] faux pour `18 juil.` — le pied des cartes est étroit
+ * @returns {string}
+ */
+function formatDate(date, lang, avecAnnee = true) {
+  if (!date) return '—'
+  const [y, m, d] = String(date).split('-').map(Number)
+  if (!y || !m || !d) return String(date)
+  const mois = t(MOIS[m - 1], lang)
+  return avecAnnee ? `${d} ${mois} ${y}` : `${d} ${mois}`
+}
+
+export { formatDate, t, translations }

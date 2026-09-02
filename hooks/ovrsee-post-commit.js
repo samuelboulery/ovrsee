@@ -20,7 +20,7 @@ import { activePlans, readActive, sessionId } from './active.js'
 import { avancerTicketsClos, colonneFinale, EN_COURS, readBoard, readTickets, moveTicket } from './tickets.js'
 import { readSettings, mergeSettings } from './settings.js'
 import { syncGitignore } from './gitignore-sync.js'
-import { readJson } from './snapshot.js'
+import { readJson } from './json.js'
 import { estPrincipal } from './principal.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))

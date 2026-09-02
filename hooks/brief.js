@@ -16,7 +16,8 @@ import { basename, join } from 'node:path'
 
 import { readPlans } from './plans.js'
 import { colonneFinale, readBoard, readTickets, sortTickets } from './tickets.js'
-import { readJson } from './snapshot.js'
+import { readJson } from './json.js'
+import { formatDate } from './i18n.js'
 
 // Les plans manipulés ici sont APLATIS (`{status, title, …}`), pas emboîtés
 // dans `meta` comme ceux que rend readPlans : un brief se lit mieux ainsi.
@@ -78,16 +79,8 @@ export function readOvrsee(root) {
   }
 }
 
-const MONTHS = [
-  'janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin',
-  'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.',
-]
-
-function frDate(date) {
-  if (!date) return '—'
-  const [y, m, d] = String(date).split('-').map(Number)
-  return y && m && d ? `${d} ${MONTHS[m - 1]} ${y}` : String(date)
-}
+/** Le brief est en français, quelle que soit la langue de l'interface. */
+const frDate = date => formatDate(date, 'fr')
 
 function age(date, now) {
   const at = Date.parse(date)

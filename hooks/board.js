@@ -9,8 +9,9 @@
  * que les tickets citent. Renommer ne porte que sur le titre.
  */
 
-import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+
+import { readJson } from './json.js'
 
 import { slugify, writeFileNoFollow } from './plans.js'
 
@@ -40,14 +41,7 @@ export const DEFAULT_COLUMNS = [
  * @returns {Array<{id: string, titre: string, wip?: number}>}
  */
 export function readBoard(ovrseeDir) {
-  let parsed
-  try {
-    parsed = JSON.parse(readFileSync(join(ovrseeDir, 'board.json'), 'utf8'))
-  } catch {
-    return DEFAULT_COLUMNS
-  }
-
-  const colonnes = parsed?.colonnes
+  const colonnes = readJson(join(ovrseeDir, 'board.json'))?.colonnes
   if (!Array.isArray(colonnes) || colonnes.length === 0) return DEFAULT_COLUMNS
 
   const ids = new Set()

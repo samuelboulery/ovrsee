@@ -4,7 +4,6 @@
     "app/dist",
     "app/.test-build",
     "_ds",
-    "legacy",
     "graphify-out",
     "release"
   ]

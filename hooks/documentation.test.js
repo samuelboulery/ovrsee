@@ -9,7 +9,7 @@
  */
 
 import { strict as assert } from 'node:assert'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
@@ -188,4 +188,58 @@ test('le badge des dépendances de production annonce le bon compte', () => {
       `${nom} annonce ${badge[1]} dépendances de production, package.json en déclare ${attendu}`
     )
   }
+})
+
+/**
+ * Le plafond de 800 lignes, mesuré au lieu d'être raconté.
+ *
+ * `rules/common/coding-style.md` le fixe, T-0206 l'a rétabli sur quatre
+ * fichiers — et `Terminal.tsx` l'avait repassé dans les dix jours sans que
+ * rien ne le dise (T-0241). Une règle qu'aucun test ne tient dérive dès qu'on
+ * regarde ailleurs.
+ *
+ * Les tests ne sont pas comptés : un fichier de cas est une liste, et la
+ * couper en deux ne rend rien plus lisible.
+ */
+const PLAFOND = 800
+
+/**
+ * Ce qui dépasse aujourd'hui, nommément — la liste *est* la dette, et elle est
+ * faite pour raccourcir. Y ajouter une ligne est un choix qu'on écrit ; ne rien
+ * pouvoir y ajouter sans le remarquer est tout l'intérêt.
+ */
+const AU_DESSUS = new Map([
+  ['hooks/i18n.js', 'un dictionnaire : de la donnée, pas de la logique — le couper ne range rien'],
+  ['app/src/App.tsx', 'le prochain sur la liste (851 l) — même découpage que T-0241, pas encore fait'],
+])
+
+test('aucun fichier source ne dépasse 800 lignes, hors exemptions nommées', () => {
+  const dossiers = ['hooks', 'crawl', 'server', 'mcp', 'electron', 'app/src', 'scripts', 'site']
+  const fichiers = []
+
+  const parcourir = dir => {
+    for (const entree of readdirSync(join(root, dir), { withFileTypes: true })) {
+      const relatif = `${dir}/${entree.name}`
+      if (entree.isDirectory()) {
+        if (entree.name !== 'assets' && entree.name !== 'fr') parcourir(relatif)
+      } else if (/\.(js|cjs|ts|tsx)$/.test(entree.name) && !entree.name.includes('.test.')) {
+        fichiers.push(relatif)
+      }
+    }
+  }
+  dossiers.forEach(parcourir)
+
+  const trop = []
+  for (const f of fichiers) {
+    const lignes = readFileSync(join(root, f), 'utf8').split('\n').length
+    if (lignes > PLAFOND && !AU_DESSUS.has(f)) trop.push(`${f} (${lignes} l)`)
+  }
+  assert.deepEqual(trop, [], `Au-dessus de ${PLAFOND} lignes sans exemption : ${trop.join(', ')}`)
+
+  // L'inverse compte autant : une exemption dont le fichier est repassé sous le
+  // plafond doit être retirée, sinon la liste ment sur ce qui reste à faire.
+  const inutiles = [...AU_DESSUS.keys()].filter(
+    f => readFileSync(join(root, f), 'utf8').split('\n').length <= PLAFOND,
+  )
+  assert.deepEqual(inutiles, [], `Exemptions devenues inutiles, à retirer : ${inutiles.join(', ')}`)
 })

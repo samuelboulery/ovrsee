@@ -6,10 +6,10 @@
  */
 
 import type { Language, TranslationKey } from '../../hooks/i18n'
-import { t as tBase, translations } from '../../hooks/i18n'
+import { formatDate, t as tBase, translations } from '../../hooks/i18n'
 
 export type { Language, TranslationKey }
-export { translations }
+export { formatDate, translations }
 
 /** Stockage interne de la langue courante */
 let storedLanguage: Language | null = null

@@ -36,6 +36,8 @@ import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { readJson } from './json.js'
+
 import { writeFileNoFollow } from './plans.js'
 import { installSkills } from './skills.js'
 import { DEFAULT_COLUMNS } from './tickets.js'
@@ -174,18 +176,9 @@ const isOvrsee = (entry, script) => JSON.stringify(entry).includes(script)
  * @returns {boolean} faux aussi quand le fichier manque ou ne se lit pas
  */
 export function signalInstalle(settingsPath = SETTINGS) {
-  if (!existsSync(settingsPath)) return false
-
-  let settings
-  try {
-    settings = JSON.parse(readFileSync(settingsPath, 'utf8'))
-  } catch {
-    // Un fichier illisible n'installe rien : le dire manquant est la réponse
-    // utile, et lever depuis le processus principal serait pire.
-    return false
-  }
-
-  const hooks = settings?.hooks ?? {}
+  // Un fichier absent ou illisible n'installe rien : le dire manquant est la
+  // réponse utile, et lever depuis le processus principal serait pire.
+  const hooks = readJson(settingsPath)?.hooks ?? {}
   return SIGNAL_EVENTS.every(event => {
     const entries = hooks[event]
     return Array.isArray(entries) && entries.some(e => isOvrsee(e, 'ovrsee-notify'))
@@ -338,7 +331,8 @@ export function installClaudeHooks(done, settingsPath = SETTINGS) {
   writeFileSync(settingsPath, updated, 'utf8')
 
   // Relecture : mieux vaut restaurer tout de suite qu'aller découvrir demain
-  // une configuration cassée.
+  // une configuration cassée. Pas `readJson` — c'est le message de `JSON.parse`
+  // qu'on rapporte, et lui seul dit ce qui est cassé.
   try {
     JSON.parse(readFileSync(settingsPath, 'utf8'))
   } catch (err) {

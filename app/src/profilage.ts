@@ -33,7 +33,7 @@ export type Reponses = {
  * `/project-setup` sert à qui découvre ; l'écran 3 laisse ensuite un switch
  * explicite pour qui n'en veut pas.
  */
-export const BOOTSTRAP_DEFAUT = ['/project-setup']
+const BOOTSTRAP_DEFAUT = ['/project-setup']
 
 /**
  * Les préférences telles qu'elles seront après la présentation.

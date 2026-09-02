@@ -24,6 +24,8 @@ import { homedir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 
+import { readJson } from './json.js'
+
 import { ACCENT_DEFAUT, validerAccent } from './accents.js'
 import { activePlans, allActive, clearActive, readActive, withLock } from './active.js'
 
@@ -256,14 +258,10 @@ export const registryPath = () =>
 
 /** @returns {Array<{path: string, name: string, lastOpened?: string, accent?: string}>} */
 export function readRegistry() {
-  try {
-    const parsed = JSON.parse(readFileSync(registryPath(), 'utf8'))
-    // Registre absent, corrompu, ou entrées sans chemin : on garde ce qui est
-    // exploitable plutôt que d'abandonner l'opération en cours.
-    return Array.isArray(parsed) ? parsed.filter(p => p?.path) : []
-  } catch {
-    return []
-  }
+  // Registre absent, corrompu, ou entrées sans chemin : on garde ce qui est
+  // exploitable plutôt que d'abandonner l'opération en cours.
+  const parsed = readJson(registryPath())
+  return Array.isArray(parsed) ? parsed.filter(p => p?.path) : []
 }
 
 const writeRegistry = projects =>

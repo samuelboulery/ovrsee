@@ -30,7 +30,8 @@ import {
 } from '../hooks/plans.js'
 import { readSettings, writeSettings, validateSettings, mergeSettings } from '../hooks/settings.js'
 import { installSkills, readSkills } from '../hooks/skills.js'
-import { projects, snapshot, shotPath, mediaPath, tableau, readJson, readGraph } from '../hooks/snapshot.js'
+import { projects, snapshot, shotPath, mediaPath, tableau, readGraph } from '../hooks/snapshot.js'
+import { readJson } from '../hooks/json.js'
 import { gitStatus } from '../hooks/git-status.js'
 import {
   addColumn,
@@ -456,7 +457,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
         const root = projects().find(p => p.path === askedPath)?.path ?? null
         if (!root) return { status: 404, json: { error: 'inconnu' } }
 
-        // Fusionner global + projet — réutilise readJson de snapshot.js
+        // Fusionner global + projet.
         const projectConfig = readJson(join(root, 'ovrsee.config.json')) ?? {}
         return { json: mergeSettings(readSettings(), projectConfig) }
       }

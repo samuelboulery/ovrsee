@@ -25,6 +25,8 @@
 import { mkdirSync, readdirSync, readFileSync, rmdirSync, statSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 
+import { readJson } from './json.js'
+
 import { writeFileNoFollow, isSafePlanFileName } from './plans.js'
 
 const DOSSIER = '.active'
@@ -90,19 +92,7 @@ const cheminEntree = (ovrseeDir, nom) => join(dossierActif(ovrseeDir), `${nom}.j
 
 /** Lit une entrée, ou null — absente, illisible et corrompue se valent ici. */
 function lireEntree(path) {
-  let brut
-  try {
-    brut = readFileSync(path, 'utf8')
-  } catch {
-    return null
-  }
-
-  let parse
-  try {
-    parse = JSON.parse(brut)
-  } catch {
-    return null
-  }
+  const parse = readJson(path)
   if (parse === null || typeof parse !== 'object' || Array.isArray(parse)) return null
 
   // Les deux valeurs sont relues du disque puis réinjectées dans un chemin ou

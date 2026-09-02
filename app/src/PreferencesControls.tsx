@@ -14,7 +14,7 @@
 
 import type { ReactNode } from 'react'
 
-import { DotsSixVertical, Moon } from '@phosphor-icons/react'
+import { DotsSixVertical } from '@phosphor-icons/react'
 
 import { s } from './style'
 
@@ -229,7 +229,6 @@ export function ErrorBox({ children }: { children: ReactNode }) {
  */
 
 /** Lune — thème sombre. */
-export const IconDark = () => <Moon size={16} aria-hidden="true" />
 
 /** Poignée de préhension — six points, la convention du glisser-déposer. */
 export const IconGrip = () => <DotsSixVertical size={14} aria-hidden="true" />

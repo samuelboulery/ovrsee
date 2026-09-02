@@ -24,9 +24,12 @@
  *          Silencieux (aucune sortie) si rien à faire pour cet event.
  */
 
-import { execFileSync } from 'node:child_process'
-import { appendFileSync, existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
+import { appendFileSync, existsSync, unlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+
+import { readJson } from './json.js'
+
+import { readStdin, repoRoot } from './entree.js'
 import { estPrincipal } from './principal.js'
 
 /**
@@ -63,30 +66,6 @@ export function skillFromSlashCommand(prompt) {
   return AUDIT_SKILL_ALIASES.get(name) ?? null
 }
 
-function readStdin() {
-  try {
-    return readFileSync(0, 'utf8')
-  } catch {
-    return ''
-  }
-}
-
-/**
- * Racine du dépôt git contenant `cwd`, ou null.
- * execFile sans shell : `cwd` vient d'un JSON externe et ne doit jamais être
- * interprété par un shell.
- */
-function repoRoot(cwd) {
-  try {
-    return execFileSync('git', ['rev-parse', '--show-toplevel'], {
-      cwd,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim()
-  } catch {
-    return null
-  }
-}
 
 /**
  * Trace un audit dans `ovrsee/audits.jsonl`, seulement si le projet est déjà
@@ -171,12 +150,7 @@ function main() {
   if (eventName === 'Stop') {
     const markerPath = pendingAuditPath(root)
     if (!existsSync(markerPath)) return
-    let skill
-    try {
-      skill = JSON.parse(readFileSync(markerPath, 'utf8'))?.skill
-    } catch {
-      skill = null
-    }
+    const skill = readJson(markerPath)?.skill ?? null
     try {
       unlinkSync(markerPath)
     } catch {

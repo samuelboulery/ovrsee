@@ -36,7 +36,8 @@ import { Historique } from './tabs/Historique'
 import { Tableau } from './tabs/Tableau'
 import { Donnees, oublierGraphe } from './tabs/Donnees'
 import { Stack } from './tabs/Stack'
-import type { Layout, TerminalActions } from './Terminal'
+import type { TerminalActions } from './Terminal'
+import type { Layout } from './terminalLayout'
 
 /**
  * Le panneau terminal en morceau séparé — T-0133.

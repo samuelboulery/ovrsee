@@ -28,10 +28,12 @@
  * toute la question.
  */
 
-import { chmodSync, readFileSync, realpathSync } from 'node:fs'
+import { chmodSync, realpathSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { createInterface } from 'node:readline/promises'
+
+import { readJson } from '../hooks/json.js'
 
 import { writeFileNoFollow } from '../hooks/plans.js'
 
@@ -80,14 +82,10 @@ export function cleProjet(root) {
  */
 export function lireConfiance() {
   const vide = { version: 1, projets: {} }
-  try {
-    const parsed = JSON.parse(readFileSync(trustPath(), 'utf8'))
-    const projets = parsed?.projets
-    if (!projets || typeof projets !== 'object' || Array.isArray(projets)) return vide
-    return { version: parsed.version ?? 1, projets }
-  } catch {
-    return vide
-  }
+  const parsed = readJson(trustPath())
+  const projets = parsed?.projets
+  if (!projets || typeof projets !== 'object' || Array.isArray(projets)) return vide
+  return { version: parsed.version ?? 1, projets }
 }
 
 /**
@@ -157,7 +155,7 @@ export function decision({ approuve, tty }) {
  * toute façon dans `ovrsee.config.json` deux dossiers plus haut, et une seconde
  * copie serait une seconde vérité à tenir d'accord.
  */
-export const MESSAGE_REFUS =
+const MESSAGE_REFUS =
   "commande dev non approuvée pour ce dépôt — ouvrez Ovrsee et lancez le crawl pour l'autoriser"
 
 /** Question `y/N` sur le terminal, défaut non. */

@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Audit complet pré-release 1.2.0 — plan d'exécution",
   "opened": "2026-09-02",
-  "closed": null,
+  "closed": "2026-09-02",
   "commits": [
     {
       "sha": "f22dd88",
@@ -75,6 +75,11 @@
         "package.json",
         "server/api.js"
       ]
+    },
+    {
+      "sha": "671e996",
+      "date": "2026-09-02",
+      "files": []
     }
   ]
 }

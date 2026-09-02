@@ -40,6 +40,11 @@ versionnage [SemVer](https://semver.org/lang/fr/).
   pour raccourcir.
 - Le badge de version du README se lit dans `package.json` plutôt qu'un chiffre
   en dur (#95).
+- **Les sept captures du README se régénèrent par une commande** (`pnpm screenshots`,
+  T-0264) au lieu d'être prises à la main : l'app est pilotée pour de vrai dans
+  Electron, screenmat pose le cadre, et un test échoue quand un onglet n'a pas
+  d'image — ou une image pas d'onglet. Les anciennes précédaient le thème clair et
+  montraient encore des défauts corrigés depuis.
 
 ### Corrigé
 

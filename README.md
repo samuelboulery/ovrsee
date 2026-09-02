@@ -45,49 +45,55 @@ your backlog, opens and moves tickets. It runs no code — you stay in charge of
 - Keeps a ticket board and a work timeline, linked back to the plans that explain them.
 - Everything is stored as versioned markdown and images — nothing depends on the app
   itself to stay readable.
+- Light theme, dark theme, or whatever the OS says — and a per-project accent colour,
+  so two windows side by side are never mistaken for each other.
 
 ## Screenshots
 
 ### Overview — project state at a glance
-![Overview tab](./docs/screenshots/apercu.png)
+![Overview tab](./docs/screenshots/apercu.webp)
 
 Counters (pages, plans, tickets, dependencies), repo health, open plans, branch status,
-project commands, and the integrated terminal with its shortcuts (crawl, graph, Obsidian
-export). On the right, the deployments panel and the `README.md` outline.
+and the integrated terminal, with the commands panel beside it — crawl, graph, Obsidian
+export, plus whatever you add. On the right, the deployments panel and the `README.md`
+outline. The project picker at the top shows which repositories have a Claude session
+running.
 
 ### Navigator — browse the observed app without leaving Ovrsee
-![Navigator tab](./docs/screenshots/navigateur.png)
+![Navigator tab](./docs/screenshots/navigateur.webp)
 
 An embedded browser (address bar, DevTools, element picker) to inspect the
-observed application directly from the interface.
+observed application directly from the interface. Pick an element and comment on it:
+the comment and the element's description go to Claude, or straight into a ticket.
 
 ### Product — the navigation graph
-![Product tab](./docs/screenshots/produit.png)
+![Product tab](./docs/screenshots/produit.webp)
 
 A map of the crawled project's pages, with screenshot thumbnails, a detail panel
 per page, and its capture history. Two dates can be compared.
 
 ### History — every commit and the plan behind it
-![History tab](./docs/screenshots/historique.png)
+![History tab](./docs/screenshots/historique.webp)
 
 The project timeline: a plan is closed by the commit that executes it, each linked
 ticket shows up with its status. Filterable by plans, tickets, and off-plan commits.
 
 ### Board — ticket kanban
-![Board tab](./docs/screenshots/tableau.png)
+![Board tab](./docs/screenshots/tableau.webp)
 
 One file per ticket in `ovrsee/tickets/`, columns set in `ovrsee/board.json`.
-Written here just like from the integrated terminal. Epics show their progress and
-their child tickets.
+Written here just like from the integrated terminal — an image pasted into a ticket
+is stored next to it. Epics show their progress and their child tickets in their own
+view; the kanban holds tickets only.
 
 ### Data — the project's tables
-![Data tab](./docs/screenshots/donnees.png)
+![Data tab](./docs/screenshots/donnees.webp)
 
 Introspection rebuilt on every commit, read from Graphify or an Obsidian vault: tables,
 columns, who uses them, and how confident the extraction is. Ovrsee recomputes nothing.
 
 ### Stack — dependencies and why they are there
-![Stack tab](./docs/screenshots/stack.png)
+![Stack tab](./docs/screenshots/stack.webp)
 
 Production and development split apart, each with its version and the reason written as a
 `WHY:` comment above its import. Anything missing one is flagged.
@@ -102,7 +108,9 @@ General → Replay the walkthrough*.
 
 The answers are not decorative: they pick which tabs show, where the terminal sits,
 and which command is offered when a fresh project opens. Everything stays editable
-in Preferences afterwards.
+in Preferences afterwards — including the theme (light, dark, or the OS setting) and
+the accent colour of each project, which is a workstation preference and is never
+written to the observed repository.
 
 ## Install
 
@@ -126,7 +134,15 @@ happens in the interface:
    Claude Code hooks, and offers the two skills.
 2. Fill in two fields — the command that starts your app, and the URL it answers on.
    That writes `ovrsee.config.json`.
-3. Click **Crawl** on the Product tab. The app maps your screens and photographs them.
+3. Click **Crawl** on the Product tab. The app asks you to approve the `dev` command
+   once — see below — then maps your screens and photographs them.
+
+`ovrsee.config.json` is versioned, so its `dev` line comes from whoever wrote the
+observed repository, and crawling hands that line to a shell. It therefore takes an
+explicit agreement, kept in `~/.claude/ovrsee/trust.json`, **outside the observed
+repository** — a hostile clone must not ship its own approval. Changing `dev` asks
+again. With no human around (the `post-commit` hook, a non-TTY stdin) the crawl
+refuses rather than asks, and records the failed scan.
 
 Crawling drives the **Google Chrome already installed on your machine** — nothing is
 downloaded on first run. Without Chrome, every other tab still works; only the map stays
@@ -165,7 +181,9 @@ When a plan is approved in Claude Code, it is captured automatically in `ovrsee/
 The post-commit hook then attaches each commit to the active plan. Close the plan when work is done:
 
 ```bash
-pnpm ovrsee:close     # releases the active plan
+pnpm ovrsee:close                          # closes every open plan
+pnpm ovrsee:close <plan.md>                # just that one
+pnpm ovrsee:close <plan.md> --commit <sha> # a plan left open without a commit
 ```
 
 While a plan is active, every commit gets attached to it — even unrelated fixes.
@@ -268,7 +286,8 @@ crawling the wrong app would produce backdated screenshots of the wrong project.
 | `mcp/` | MCP server (stdio, JSON-RPC 2.0), same interface as `/api/*` |
 | `app/src/` | React interface, 7 tabs (overview, navigator, product, history, board, data, stack) |
 | `electron/` | Main process, preload, pty (integrated terminal) |
-| `scripts/` | Build and test utilities |
+| `scripts/` | Build and test utilities, README screenshots |
+| `site/` | The public showcase (ovrsee.app), written by hand, in English |
 
 ## Dependencies
 
@@ -291,14 +310,18 @@ Deliberately minimal: **5 production dependencies**, everything else is plain No
 | `react` | ^19.2.8 |
 | `react-dom` | ^19.2.8 |
 | `typescript` | ^7.0.2 |
-| `vite` | ^8.2.1 |
-| `electron` | 43.3.0 |
+| `vite` | ^8.2.2 |
+| `electron` | 43.4.1 |
 | `electron-builder` | ^26.15.3 |
-| `@vitejs/plugin-react` | ^6.0.5 |
+| `oxlint` | ^1.80.0 |
+| `@vitejs/plugin-react` | ^6.1.0 |
 | `@types/react` | ^19.2.18 |
-| `@types/react-dom` | ^19.2.4 |
+| `@types/react-dom` | ^19.2.5 |
 
-Package manager: `pnpm@10.34.5`, pinned in `package.json` and enforced by Corepack.
+Package manager: `pnpm@11.22.0`, pinned in `package.json` and enforced by Corepack.
+Since version 11, `.npmrc` only carries authentication and the registry: every other
+setting — the `minimumReleaseAge` quarantine, the build allowlist — lives in
+`pnpm-workspace.yaml`, in camelCase.
 
 ## Known Traps
 
@@ -307,6 +330,13 @@ The active plan belongs to a Claude session, not to the repository: it lives in 
 
 **A commit whose session is unknown may end up attached to nothing.**
 Attribution goes through four stages: a `T-XXXX` ticket quoted in the commit message, then the session (`CLAUDE_CODE_SESSION_ID`, inherited by the git hook), then the single active plan if there is only one, then nothing. A commit made outside Claude Code, with no ticket quoted, while two plans are active, is attached nowhere — and says so on stderr.
+
+**The `dev` command needs an agreement, and it lives outside the repository.**
+`ovrsee.config.json` is versioned: its `dev` line is supplied by the observed
+repository, not by you, and the crawl hands it to a shell. What is remembered — in
+`~/.claude/ovrsee/trust.json` — is the exact string, so a changed `dev` asks again.
+This is not a command review: `pnpm dev` looks harmless, what it runs lives in that
+repository's `package.json`. You are trusting a provenance.
 
 **The crawler refuses to start if `baseUrl` already responds.**
 This is intentional. There is no way to distinguish your own server from another's in an HTTP response, and crawling the wrong app would produce backdated screenshots.
@@ -329,10 +359,18 @@ The fix is upstream — don't paste it. Credentials live in a password manager a
 Ovrsee exposes an MCP (Model Context Protocol) server over stdio. It's how Claude
 Code reads and edits tickets without leaving its interface.
 
+Eleven tools: `listProjects`, `getProjectSummary`, `getBrief`, `getBoard`,
+`listTickets`, `getPlans`, `getTimeline`, `getGraph` on the reading side;
+`createTicket`, `updateTicket`, `moveTicket` on the writing side.
+
 Capabilities:
 - Full read access to `ovrsee/`
 - Write access to `ovrsee/tickets/` and `ovrsee/board.json` only
 - No code execution
+
+Read answers are **projected**: `getPlans`, `listTickets` and `getGraph` return a
+summary and omit the bodies, `full: true` returns the whole thing. That is a guard,
+not a convenience — the complete graph weighs some 177,000 tokens.
 
 It only reads projects from the registry — the one `pnpm ovrsee:install` populates.
 A path not listed there is refused, even if it exists on disk.
@@ -409,14 +447,18 @@ live in a password manager and in an unversioned `ACCESS.md`.
 ## Running Tests
 
 ```bash
-pnpm test       # Node tests (hooks, crawl, server, mcp) + UI tests (app/src)
+pnpm test       # Node tests (hooks, crawl, server, mcp, electron, scripts) + UI tests
 pnpm typecheck  # TypeScript check (app/src only)
+pnpm lint       # oxlint over every source directory
 ```
 
 The project uses Node's built-in `test` module only — no test frameworks, anywhere.
+CI runs lint, typecheck and the UI build on Ubuntu, then the test suite on **macOS and
+Windows**: five portability tests had been broken on Windows for weeks before it existed.
 
 ## See also
 
 - [`README.fr.md`](./README.fr.md) — French version
+- [`CHANGELOG.md`](./CHANGELOG.md) — what changed, release by release
 - [`CLAUDE.md`](./CLAUDE.md) — technical reference (French)
 - [`cadrage-ovrsee.md`](./cadrage-ovrsee.md) — design rationale (French)

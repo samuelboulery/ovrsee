@@ -319,3 +319,61 @@ test('barre de menu — le popover vide ne lève pas', () => {
   const html = renderToStaticMarkup(<MenuBar />)
   assert.match(html, /Aucune session|No open session/)
 })
+
+/**
+ * Un instantané où un scan a réussi : une page, une capture datée.
+ *
+ * `pages.json` ne porte aucun champ `shot` — le chemin d'une capture se
+ * reconstruit du slug de la page et du nom de fichier trouvé dans `shots`.
+ * L'onglet Produit lisait un champ inexistant, et affichait sept vignettes
+ * cassées ; les tests de rendu ne le voyaient pas, ne regardant que l'absence
+ * d'exception.
+ */
+const avecCapture = snapshot({
+  pages: {
+    pages: [
+      { route: '/', slug: 'accueil', title: 'Accueil', sample: '/', excerpt: 'un extrait', links: [] },
+    ],
+    orphanShots: [],
+  },
+  shots: { accueil: ['2026-09-02T10-00-00.png'] },
+  plans: [],
+})
+
+test('Produit — la vignette pointe la capture réelle, pas un champ absent', () => {
+  const html = renderToStaticMarkup(
+    <Produit
+      snapshot={avecCapture}
+      layout="bottom"
+      packageManager="pnpm"
+      onOuvrirDansNavigateur={() => {}}
+      onReload={() => {}}
+    />,
+  )
+
+  // `shotUrl` encode le chemin : la capture apparaît sous sa forme percent-encodée.
+  assert.match(html, /shots%2Faccueil%2F2026-09-02T10-00-00\.png/, 'la vignette doit citer la capture')
+  assert.doesNotMatch(html, /src="[^"]*undefined/, 'aucune source ne doit contenir « undefined »')
+})
+
+test('Produit — le nombre de plans n’est écrit qu’une fois', () => {
+  const deuxPlans = snapshot({
+    ...avecCapture,
+    plans: [
+      { file: 'a.md', title: 'A', status: 'closed', pages: ['/'], opened: '2026-09-01', commits: [] },
+      { file: 'b.md', title: 'B', status: 'closed', pages: ['/'], opened: '2026-09-01', commits: [] },
+    ],
+  })
+
+  const html = renderToStaticMarkup(
+    <Produit
+      snapshot={deuxPlans}
+      layout="bottom"
+      packageManager="pnpm"
+      onOuvrirDansNavigateur={() => {}}
+      onReload={() => {}}
+    />,
+  )
+
+  assert.doesNotMatch(html, /2\s+2\s+plans/, 'le compte était interpolé deux fois')
+})

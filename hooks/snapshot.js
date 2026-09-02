@@ -7,7 +7,6 @@
  * du backlog ou sur la fraîcheur d'un scan.
  */
 
-import { execFileSync } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { extname, isAbsolute, join, normalize, sep } from 'node:path'
@@ -19,6 +18,7 @@ import { readVault } from './vault.js'
 import { readWhys } from './whys.js'
 import { timeline, ticketTimeline } from './timeline.js'
 import { readSettings, mergeSettings } from './settings.js'
+import { git } from './git.js'
 import { gitStatus } from './git-status.js'
 import { readIntegrations } from './integrations.js'
 import { readJson } from './json.js'
@@ -172,8 +172,7 @@ function audits(root, illisibles = []) {
  */
 function commits(root, limit = 300) {
   try {
-    return execFileSync('git', ['log', `-n${limit}`, '--pretty=format:%h\x1f%aI\x1f%s'], {
-      cwd: root,
+    return git(root, ['log', `-n${limit}`, '--pretty=format:%h\x1f%aI\x1f%s'], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     })

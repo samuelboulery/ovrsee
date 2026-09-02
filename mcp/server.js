@@ -15,6 +15,22 @@
 
 import { dispatch } from './dispatch.js'
 import { createInterface } from 'node:readline'
+import { readFileSync } from 'node:fs'
+
+/**
+ * La version du paquet, lue une fois au démarrage.
+ *
+ * `import ... with { type: 'json' }` reste expérimental sous Node 22 et
+ * imprime un avertissement — sur stdout d'un serveur stdio, il couperait la
+ * conversation JSON-RPC.
+ */
+const VERSION = (() => {
+  try {
+    return JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')).version
+  } catch {
+    return '0.0.0'
+  }
+})()
 
 const rl = createInterface({
   input: process.stdin,
@@ -204,16 +220,25 @@ rl.on('line', (line) => {
   try {
     request = JSON.parse(line)
   } catch {
-    console.log(JSON.stringify({
-      jsonrpc: '2.0',
-      error: { code: -32700, message: 'JSON invalide' },
-    }))
+    // JSON-RPC 2.0 : une réponse d'erreur porte toujours un `id`. Faute de
+    // demande lisible, c'est `null` — l'omettre fait rejeter la trame par un
+    // client strict.
+    sendError(null, -32700, 'JSON invalide')
+    return
+  }
+
+  // `JSON.parse` rend aussi bien `null`, un nombre ou un tableau : rien de tout
+  // cela ne se déstructure. Cette ligne a coûté un serveur MCP entier — une
+  // seule ligne `null` sur stdin le tuait, et la session perdait tous ses outils
+  // sans un message.
+  if (request === null || typeof request !== 'object' || Array.isArray(request)) {
+    sendError(null, -32600, 'Requête invalide')
     return
   }
 
   const { jsonrpc, id, method, params } = request
   if (jsonrpc !== '2.0' || !method) {
-    sendError(id, -32600, 'Requête invalide')
+    sendError(id ?? null, -32600, 'Requête invalide')
     return
   }
 
@@ -228,7 +253,10 @@ rl.on('line', (line) => {
         // que si le serveur annonce cette capacité. Un objet vide suffit —
         // aucune option (comme `listChanged`) n'est proposée.
         capabilities: { tools: {} },
-        serverInfo: { name: 'ovrsee-mcp', version: '1.0.0' },
+        // Lue dans `package.json` : figée en dur, elle a annoncé « 1.0.0 »
+        // pendant toute la vie de la 1.1.x. Un client qui affiche cette valeur
+        // mentait sur ce qu'il parlait.
+        serverInfo: { name: 'ovrsee-mcp', version: VERSION },
       })
     } else if (method === 'tools/list') {
       sendResult(id, { tools: TOOLS })

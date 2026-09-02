@@ -49,7 +49,7 @@ rien d'autre. N'introduisez ni vitest, ni jest, ni mocha — écrivez dans le st
 existant. `app/src` ne fait pas exception : `scripts/test-ui.js` le compile dans
 un dossier jetable et lance le même `node --test` dessus.
 
-**Demandez avant d'ajouter une dépendance.** Le projet en a quatre en
+**Demandez avant d'ajouter une dépendance.** Le projet en a cinq en
 production, et c'est un choix — de sécurité autant que de maintenance. Ouvrez
 une issue qui explique pourquoi la bibliothèque standard ou une dépendance déjà
 présente ne suffit pas.

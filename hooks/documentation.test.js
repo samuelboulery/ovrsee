@@ -243,3 +243,61 @@ test('aucun fichier source ne dépasse 800 lignes, hors exemptions nommées', ()
   )
   assert.deepEqual(inutiles, [], `Exemptions devenues inutiles, à retirer : ${inutiles.join(', ')}`)
 })
+
+/**
+ * Une garde ne vaut que si on ne peut pas l'oublier.
+ *
+ * `hooks/git.js` neutralise les réglages du `.git/config` d'un dépôt observé
+ * qui font exécuter un programme — `core.fsmonitor` en nomme un, et `git status`
+ * le lance. Appeler `execFileSync('git', …)` ailleurs contourne cette garde en
+ * silence : le code marche, les tests passent, et l'exécution revient.
+ *
+ * Les exemptions sont nommées, et pour une seule raison : ces appelants tournent
+ * dans le dépôt courant — celui où l'utilisateur est déjà en train de committer —
+ * et jamais sur un chemin venu du registre. La liste est la dette, pas la règle.
+ */
+const GIT_DIRECT_TOLERE = new Map([
+  ['hooks/git.js', 'le module qui porte la garde : c’est lui qui appelle git'],
+  ['hooks/entree.js', 'le dépôt courant du hook, jamais un chemin du registre'],
+  ['hooks/ovrsee-cli.js', 'idem — la CLI tourne dans le dépôt où on l’invoque'],
+  ['hooks/ovrsee-post-commit.js', 'idem — hook git, donc déjà dans le dépôt'],
+  ['hooks/ovrsee-post-merge.js', 'idem'],
+  ['hooks/ovrsee-session-start.js', 'idem'],
+  ['hooks/ovrsee-tool-stop.js', 'idem'],
+  ['hooks/reconcile.js', 'idem'],
+])
+
+test('aucune commande git ne contourne la garde de hooks/git.js', () => {
+  const dossiers = ['hooks', 'crawl', 'server', 'mcp', 'electron', 'scripts']
+  const coupables = []
+
+  const parcourir = dir => {
+    for (const entree of readdirSync(join(root, dir), { withFileTypes: true })) {
+      const relatif = `${dir}/${entree.name}`
+      if (entree.isDirectory()) {
+        parcourir(relatif)
+      } else if (/\.(js|cjs)$/.test(entree.name) && !entree.name.includes('.test.')) {
+        const source = readFileSync(join(root, relatif), 'utf8')
+        if (/execFileSync\(\s*'git'/.test(source) && !GIT_DIRECT_TOLERE.has(relatif)) {
+          coupables.push(relatif)
+        }
+      }
+    }
+  }
+  dossiers.forEach(parcourir)
+
+  assert.deepEqual(
+    coupables,
+    [],
+    `ces fichiers appellent git sans passer par hooks/git.js :\n  ${coupables.join('\n  ')}\n` +
+      'Utiliser `git()` ou `gitReseau()`, ou nommer l’exemption et dire pourquoi.',
+  )
+
+  // La liste raccourcit ou elle ment : une exemption devenue inutile doit se
+  // voir, comme pour le plafond de lignes.
+  const inutiles = [...GIT_DIRECT_TOLERE.keys()].filter(f => {
+    if (!existsSync(join(root, f))) return true
+    return !/execFileSync\(\s*'git'/.test(readFileSync(join(root, f), 'utf8'))
+  })
+  assert.deepEqual(inutiles, [], `exemptions devenues inutiles : ${inutiles.join(', ')}`)
+})

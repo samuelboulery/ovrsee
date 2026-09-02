@@ -41,8 +41,9 @@ asar: true
 asarUnpack:
   - node_modules/node-pty/**
 
-# Publie sur l'onglet Releases du dépôt (privé) — la CI y attache les
-# installeurs à chaque tag `v*`, voir .github/workflows/release.yml.
+# Publie sur l'onglet Releases du dépôt — public : le binaire est
+# téléchargeable par n'importe qui, sans compte. La CI y attache les installeurs
+# à chaque tag `v*`, voir .github/workflows/release.yml.
 publish:
   provider: github
   owner: samuelboulery
@@ -54,9 +55,12 @@ mac:
     - target: dmg
       arch: [arm64]
   darkModeSupport: true
-  # Pas de signature ni de notarisation pour l'instant : usage personnel, et
-  # Gatekeeper se contourne au premier lancement. Elles deviendront
-  # obligatoires le jour d'une distribution publique.
+  # Pas de signature ni de notarisation, et le dépôt est public depuis la
+  # 1.0.0-beta : ce n'est donc plus « en attendant la distribution publique »,
+  # c'est une dette assumée, suivie par T-0192. Ce qui la rend tenable est
+  # l'absence d'auto-updater — le jour où l'un des deux change, l'autre doit
+  # changer avec. Gatekeeper se contourne au premier lancement (clic droit >
+  # Ouvrir), et SECURITY.md dit comment vérifier l'empreinte.
   identity: null
   # Sans version dans le nom : un lien /releases/latest/download/… reste
   # valable d'une sortie à l'autre.

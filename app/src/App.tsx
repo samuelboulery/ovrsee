@@ -303,10 +303,22 @@ export function App() {
    */
   useEffect(() => {
     if (!current) return
+    const rafraichir = () => fetchTableau(current).then(setTableau).catch(() => {})
     const timer = setInterval(() => {
-      fetchTableau(current).then(setTableau).catch(() => {})
+      if (document.hidden) return
+      rafraichir()
     }, 4000)
-    return () => clearInterval(timer)
+
+    // Même rattrapage que pour le snapshot : au retour, l'écran doit être à
+    // jour tout de suite, pas au prochain tour.
+    const auRetour = () => {
+      if (!document.hidden) rafraichir()
+    }
+    document.addEventListener('visibilitychange', auRetour)
+    return () => {
+      clearInterval(timer)
+      document.removeEventListener('visibilitychange', auRetour)
+    }
   }, [current])
 
   /**
@@ -318,9 +330,24 @@ export function App() {
   useEffect(() => {
     if (!current) return
     const timer = setInterval(() => {
+      // Fenêtre masquée : rien à rafraîchir, et ce tour coûte cher. Le snapshot
+      // est calculé sur le fil principal d'Electron — cinq `git` synchrones et
+      // un `stat` par capture, mesurés à 72 ms — et pendant ce temps l'écho du
+      // terminal et les menus attendent. Le payer alors que personne ne regarde
+      // était le plus mauvais des marchés. Au retour, `visibilitychange`
+      // rattrape tout de suite.
+      if (document.hidden) return
       fetchSnapshot(current).then(setSnapshot).catch(() => {})
     }, 15000)
-    return () => clearInterval(timer)
+
+    const auRetour = () => {
+      if (!document.hidden) fetchSnapshot(current).then(setSnapshot).catch(() => {})
+    }
+    document.addEventListener('visibilitychange', auRetour)
+    return () => {
+      clearInterval(timer)
+      document.removeEventListener('visibilitychange', auRetour)
+    }
   }, [current])
 
   /** Incrémenté par `reload`. Seul l'onglet Données l'écoute — voir plus bas. */
@@ -615,8 +642,12 @@ export function App() {
               )}
             >
               {contentVisible && (
+                // Pas d'`aria-live` sur ce `main` : la région couvrait tout
+                // l'onglet, et les deux polls (4 s et 15 s) faisaient relire au
+                // lecteur d'écran chaque texte qui changeait — un bavardage
+                // continu qui rend l'application inutilisable à l'oreille. Une
+                // région vivante doit être étroite et dédiée.
                 <main
-                  aria-live="polite"
                   style={s('flex: 1; overflow: hidden; display: flex; min-height: 0; min-width: 0;')}
                 >
                   {error && <Message text={`${t('msg.read_error')}: ${error}`} />}

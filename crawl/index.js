@@ -15,7 +15,9 @@
  *   node crawl/index.js [chemin-du-dépôt]
  */
 
-import { execFileSync, spawn } from 'node:child_process'
+import { spawn } from 'node:child_process'
+
+import { git } from '../hooks/git.js'
 import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
@@ -80,7 +82,7 @@ function useStorageState(config) {
   if (!relative || !existsSync(join(root, relative))) return false
 
   try {
-    execFileSync('git', ['check-ignore', '-q', relative], { cwd: root, stdio: 'ignore' })
+    git(root, ['check-ignore', '-q', relative], { stdio: 'ignore' })
     return true
   } catch {
     log(`${relative} n'est pas ignoré par git — session non rejouée, pages protégées ignorées`)
@@ -90,8 +92,7 @@ function useStorageState(config) {
 
 const shortSha = () => {
   try {
-    return execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
-      cwd: root,
+    return git(root, ['rev-parse', '--short', 'HEAD'], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim()
@@ -156,6 +157,18 @@ async function assertPortFree(baseUrl) {
   )
 }
 
+/**
+ * Le serveur de dev en cours, s'il y en a un.
+ *
+ * Au niveau du module, et pas seulement dans `run()`, parce qu'un signal
+ * n'arrive pas dans une portée : annuler un crawl depuis l'application tue le
+ * groupe du crawler, et sans cette référence le `finally` de `run()` n'a pas
+ * le temps de s'exécuter. Le serveur de dev, lui, est `detached` — il est donc
+ * dans son propre groupe et survit. Le port restait pris, et tous les crawls
+ * suivants se refusaient d'eux-mêmes.
+ */
+let appEnCours = null
+
 /** Ce que la commande `dev` a écrit, borné : c'est un message d'erreur, pas un journal. */
 const DERNIERS_OCTETS = 2000
 
@@ -188,6 +201,13 @@ async function startApp(config) {
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: true,
   })
+
+  // Retenu ici, et pas au retour de `startApp` : entre ce `spawn` et le moment
+  // où le serveur répond, il peut s'écouler jusqu'à `readyTimeoutMs` — soit une
+  // minute. C'est précisément là qu'on annule, puisque c'est là que le crawl
+  // paraît bloqué. Affecté plus tard, le gestionnaire de signal lisait `null`
+  // et laissait le serveur derrière lui, port compris.
+  appEnCours = child
 
   // Sans cet écouteur, un shell introuvable lève un événement `error` que
   // personne n'attrape, et le crawl meurt sans rien consigner — l'échec
@@ -521,6 +541,16 @@ async function run() {
 // Exécuté seulement en invocation directe : les tests importent `retainable`
 // sans vouloir démarrer un navigateur.
 if (estPrincipal(import.meta.url)) {
+  // Annuler un crawl envoie un signal au groupe du crawler. Sans ces deux
+  // écouteurs, le processus meurt avant son `finally` et laisse derrière lui le
+  // serveur de dev du projet observé, qui garde le port.
+  for (const signal of ['SIGTERM', 'SIGINT']) {
+    process.on(signal, () => {
+      stopApp(appEnCours)
+      process.exit(0)
+    })
+  }
+
   run().catch(err => {
     const message = String(err?.message ?? err)
     // L'échec est une information, pas un silence. Sans cette ligne, l'ovrsee

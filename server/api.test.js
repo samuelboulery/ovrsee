@@ -6,6 +6,8 @@ import { EventEmitter } from 'node:events'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { PassThrough } from 'node:stream'
+
 import { fetchHandler, nodeMiddleware, resolve } from './api.js'
 import { mediaPath, shotPath } from '../hooks/snapshot.js'
 import { registerProject } from '../hooks/plans.js'
@@ -124,6 +126,36 @@ test('/api/media sert une image du dépôt, avec son type', () => {
 
   assert.ok('file' in result)
   assert.equal(result.type, 'image/png')
+})
+
+// Un SVG est un document : il porte des scripts. Servi sous l'origine de
+// l'interface, il s'exécuterait avec elle — donc avec `window.ovrsee`, donc
+// avec le terminal. Le fichier vient du dépôt observé, qui n'est pas de
+// confiance. `sandbox` le prive d'origine et de scripts ; l'en-tête de
+// disposition empêche qu'il devienne une page à part entière.
+test('un fichier servi est neutralisé, dans Electron comme dans le navigateur', async () => {
+  const dir = projectWithShot()
+  mkdirSync(join(dir, 'docs'), { recursive: true })
+  writeFileSync(join(dir, 'docs', 'piege.svg'), '<svg xmlns="http://www.w3.org/2000/svg"><script>1</script></svg>')
+  const chemin = `/api/media?path=${encodeURIComponent(dir)}&file=docs/piege.svg`
+
+  // Hôte Electron : protocole custom, sans CORS ni Origin.
+  const parElectron = await fetchHandler(url(chemin), null, null)
+  assert.equal(parElectron.headers.get('Content-Security-Policy'), 'sandbox')
+  assert.match(parElectron.headers.get('Content-Disposition') ?? '', /^inline/)
+
+  // Hôte navigateur : le middleware du dev server, autre code, mêmes en-têtes.
+  // Un vrai flux inscriptible, parce que le middleware y déverse le fichier.
+  const entetes = {}
+  const res = new PassThrough()
+  res.setHeader = (k, v) => { entetes[k] = v }
+  await nodeMiddleware(dir)(
+    { url: chemin, method: 'GET', headers: { origin: 'http://localhost:5180' } },
+    res,
+    () => {},
+  )
+  assert.equal(entetes['Content-Security-Policy'], 'sandbox')
+  assert.equal(entetes['Content-Type'], 'image/svg+xml')
 })
 
 test('/api/media ne sert que des images et des vidéos', () => {

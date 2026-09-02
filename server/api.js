@@ -13,8 +13,7 @@
  */
 
 import { createReadStream, existsSync, lstatSync, readFileSync } from 'node:fs'
-import { isAbsolute, join } from 'node:path'
-import { execFileSync } from 'node:child_process'
+import { basename, isAbsolute, join } from 'node:path'
 import { userInfo } from 'node:os'
 
 import { sessionId } from '../hooks/active.js'
@@ -32,6 +31,7 @@ import { readSettings, writeSettings, validateSettings, mergeSettings } from '..
 import { installSkills, readSkills } from '../hooks/skills.js'
 import { projects, snapshot, shotPath, mediaPath, tableau, readGraph } from '../hooks/snapshot.js'
 import { readJson } from '../hooks/json.js'
+import { git, gitReseau } from '../hooks/git.js'
 import { gitStatus } from '../hooks/git-status.js'
 import {
   addColumn,
@@ -129,7 +129,7 @@ function detectDefaults(root) {
 function getFolderState(root) {
   const hasGit = (() => {
     try {
-      execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: root, stdio: 'ignore' })
+      git(root, ['rev-parse', '--show-toplevel'], { stdio: 'ignore' })
       return true
     } catch {
       return false
@@ -262,9 +262,19 @@ function projectAction(body) {
     case 'git-fetch': {
       if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
       try {
-        execFileSync('git', ['fetch'], { cwd: path, stdio: 'ignore' })
+        // `gitReseau` et pas `git` : un `fetch` a besoin du trousseau et de la
+        // commande ssh du poste, que la garde efface d'abord — c'est le dépôt
+        // observé qu'on neutralise, pas l'utilisateur.
+        gitReseau(path, ['fetch'], { stdio: ['ignore', 'ignore', 'pipe'] })
       } catch (err) {
-        return { status: 400, json: { error: String(err.message ?? err) } }
+        // stderr retenu, pas jeté : sans lui, l'interface affichait « Command
+        // failed » et rien d'autre — un échec sans cause envoie chercher le
+        // problème là où il n'est pas.
+        const dit = String(err?.stderr ?? '').trim()
+        return {
+          status: 400,
+          json: { error: dit || String(err.message ?? err) },
+        }
       }
       return { json: { gitStatus: gitStatus(path) } }
     }
@@ -587,6 +597,30 @@ const readBody = req =>
   })
 
 /** Adaptateur pour le dev server Vite (connect). */
+/**
+ * En-têtes d'une réponse qui sert un fichier du dépôt observé.
+ *
+ * Ces fichiers ne sont pas de confiance : ils viennent du projet regardé. Un
+ * `.svg` est un document, pas une image inerte — il porte des scripts, et
+ * servi sous `ovrsee://app` il s'exécuterait dans l'origine de l'interface,
+ * donc avec `window.ovrsee`, donc avec le terminal.
+ *
+ * `sandbox` sans jeton retire tout : origine unique, aucun script. C'est une
+ * CSP posée sur la réponse elle-même, pas sur la fenêtre — celle
+ * d'`electron/main.js` ne couvre que l'interface, jamais `/api/*`.
+ * `Content-Disposition: inline` empêche en plus que la ressource se présente
+ * comme une page à part entière.
+ *
+ * Les deux hôtes la posent, et un test le vérifie des deux côtés : une route
+ * vérifiée dans le navigateur n'est pas une route vérifiée dans Electron.
+ */
+const ENTETES_FICHIER = result => ({
+  'Content-Type': result.type ?? 'image/png',
+  'Content-Security-Policy': 'sandbox',
+  'X-Content-Type-Options': 'nosniff',
+  'Content-Disposition': `inline; filename="${basename(result.file).replace(/[^\w.-]/g, '_')}"`,
+})
+
 export function nodeMiddleware(cwd = process.cwd()) {
   return async (req, res, next) => {
     const url = new URL(req.url ?? '/', 'http://localhost')
@@ -597,7 +631,7 @@ export function nodeMiddleware(cwd = process.cwd()) {
     if (!result) return next()
 
     if ('file' in result) {
-      res.setHeader('Content-Type', result.type ?? 'image/png')
+      for (const [cle, valeur] of Object.entries(ENTETES_FICHIER(result))) res.setHeader(cle, valeur)
       return createReadStream(result.file).pipe(res)
     }
 
@@ -620,9 +654,7 @@ export async function fetchHandler(url, cwd = process.cwd(), request = null) {
   if (!result) return null
 
   if ('file' in result) {
-    return new Response(readFileSync(result.file), {
-      headers: { 'Content-Type': result.type ?? 'image/png' },
-    })
+    return new Response(readFileSync(result.file), { headers: ENTETES_FICHIER(result) })
   }
 
   return new Response(JSON.stringify(result.json), {

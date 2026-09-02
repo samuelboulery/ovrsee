@@ -96,8 +96,11 @@ contextBridge.exposeInMainWorld('ovrsee', {
      * Accorde la chrome native au thème de l'interface — menus, dialogues,
      * ascenseurs de l'OS, DevTools (T-0231).
      *
-     * @param {'dark'|'light'} mode thème DÉJÀ résolu ; le rendu est le seul à
-     *   savoir ce qu'il affiche. Tout le reste vaut `dark` côté principal.
+     * @param {'dark'|'light'|'system'} mode le RÉGLAGE, pas le thème résolu.
+     *   Le principal en fait un `nativeTheme.themeSource`, et il est l'autorité
+     *   sur « système » : lui envoyer la valeur résolue figeait
+     *   `prefers-color-scheme` dans tous les rendus, et basculer l'apparence du
+     *   poste ne faisait plus rien tant que l'application tournait (T-0242).
      */
     setTheme: mode => ipcRenderer.invoke('app:theme', mode),
   },
@@ -112,7 +115,6 @@ contextBridge.exposeInMainWorld('ovrsee', {
      *
      * @param {number} targetId contenu inspecté ; doit être un invité de cette fenêtre
      * @param {{x: number, y: number, width: number, height: number}} bounds place réservée
-     * @param {'dark'|'light'} theme thème de l'interface ; tout le reste vaut `dark`
      * @returns {Promise<boolean>}
      */
     devtools: (targetId, bounds) => ipcRenderer.invoke('preview:devtools', targetId, bounds),

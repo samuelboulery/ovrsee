@@ -67,16 +67,22 @@ Les DMG et installeurs publiés ne sont **ni signés ni notariés**. macOS et
 Windows vous en avertiront au premier lancement. Si cela vous gêne, construisez
 depuis les sources : `pnpm install && pnpm package:mac` (ou `package:win`).
 
-Vérifiez que le fichier téléchargé correspond bien à l'empreinte publiée sur la
-page de la release.
+Chaque release publie `latest-mac.yml` et `latest.yml` à côté des binaires : les
+deux portent l'empreinte sha512 de chaque fichier. Comparez avant d'ouvrir :
+`shasum -a 512 Ovrsee-mac-arm64.dmg`.
 
 ## Dépendances
 
-Le projet compte quatre dépendances de production — `@phosphor-icons/react`,
-`@xterm/xterm`, `@xterm/addon-fit` et `node-pty` — et cette sobriété est un
-choix de sécurité autant que de maintenance.
+Le projet compte cinq dépendances de production — `@phosphor-icons/react`,
+`@xterm/xterm`, `@xterm/addon-fit`, `node-pty` et `playwright-core`, qui pilote
+le navigateur du crawl — et cette sobriété est un choix de sécurité autant que
+de maintenance.
 
-Deux défenses sont en place contre les publications empoisonnées : pnpm bloque
-par défaut les scripts d'installation des dépendances (`onlyBuiltDependencies`
-n'autorise que `node-pty`, qui doit compiler), et `.npmrc` impose une
-quarantaine de 24 h sur les versions fraîchement publiées.
+Deux défenses sont en place contre les publications empoisonnées, toutes deux
+déclarées dans `pnpm-workspace.yaml` : pnpm bloque par défaut les scripts
+d'installation des dépendances (`allowBuilds` n'autorise que `node-pty`, qui
+doit compiler), et `minimumReleaseAge` impose une quarantaine de 24 h sur les
+versions fraîchement publiées. En pnpm 11, aucun de ces deux réglages n'est
+plus lu depuis `.npmrc`, et l'ancienne clé `onlyBuiltDependencies` est encore
+analysée mais n'autorise plus rien — en silence. `pnpm config list` est le
+moyen de vérifier qu'ils sont réellement actifs.

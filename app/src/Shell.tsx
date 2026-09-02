@@ -93,7 +93,11 @@ export function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
 
 export function Message({ text }: { text: string }) {
   return (
+    // `role="status"` : c'est ici, et nulle part ailleurs, qu'une région vivante
+    // a sa place. `<main>` en portait une qui couvrait tout l'onglet, et les
+    // deux polls la faisaient parler toutes les quatre secondes.
     <div
+      role="status"
       style={s(
         'flex: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--color-neutral-500);',
       )}
@@ -583,6 +587,18 @@ function ProjectRow({
       onClick={() => onPick(project.path)}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => {
+        setHover(false)
+        setConfirming(false)
+      }}
+      // Le bouton de retrait ne se montre qu'au survol : sans ces deux-là, il
+      // restait `aria-hidden` et hors du parcours de tabulation tant que la
+      // souris n'était pas passée — retirer un projet était donc impossible au
+      // clavier seul. `onFocus`/`onBlur` remontent depuis le bouton (ils
+      // bouillonnent, contrairement à `focus`), et rendent au clavier ce que la
+      // souris avait déjà.
+      onFocus={() => setHover(true)}
+      onBlur={event => {
+        if (event.currentTarget.contains(event.relatedTarget as Node | null)) return
         setHover(false)
         setConfirming(false)
       }}

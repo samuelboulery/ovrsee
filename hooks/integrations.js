@@ -12,7 +12,9 @@
 
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
+
+import { writeFileNoFollow } from './plans.js'
 
 /** Les fournisseurs pris en charge en v1. */
 export const PROVIDERS = ['vercel', 'netlify', 'supabase', 'autre']
@@ -94,7 +96,9 @@ export function readIntegrations(root) {
 export function writeIntegrations(root, list) {
   const all = readAll()
   const next = { ...all, [root]: validateIntegrationList(list) }
-  const dir = join(integrationsPath(), '..')
-  mkdirSync(dir, { recursive: true })
-  writeFileSync(integrationsPath(), JSON.stringify(next, null, 2) + '\n', 'utf8')
+  // Indivisible, et sans suivre un lien : ce fichier porte les jetons de TOUS
+  // les projets, et `readAll()` rend `{}` quand il est illisible. Une écriture
+  // coupée effacerait donc les jetons des autres projets à la sauvegarde
+  // suivante, en silence.
+  writeFileNoFollow(integrationsPath(), JSON.stringify(next, null, 2) + '\n')
 }

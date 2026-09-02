@@ -110,7 +110,10 @@ export function Historique({
 
       <StatusBar
         left={[
-          t('statusbar.plans_summary', { total: plans.length, open: plansOuverts(plans).length }),
+          t(
+            plansOuverts(plans).length > 1 ? 'statusbar.plans_summary' : 'statusbar.plans_summary_one',
+            { total: plans.length, open: plansOuverts(plans).length },
+          ),
           ...(dernierCommit ? [t('statusbar.last_commit', { age: humanAge(dernierCommit) })] : []),
         ]}
       />
@@ -313,7 +316,13 @@ function PlanBand({
       status={entry.status}
       actif={actif}
       closingSha={plan?.commits.at(-1)?.sha ?? null}
-      meta={entry.commits.length > 0 ? t('historique.commits_count', { n: entry.commits.length }) : undefined}
+      meta={
+        entry.commits.length > 0
+          ? t(entry.commits.length > 1 ? 'historique.commits_count' : 'historique.commit_count', {
+              n: entry.commits.length,
+            })
+          : undefined
+      }
     >
       {open && plan !== null && <PlanDetail plan={plan} />}
 
@@ -360,7 +369,13 @@ function PlanBandTickets({
       status={entry.status}
       actif={actif}
       closingSha={plan?.commits.at(-1)?.sha ?? null}
-      meta={entry.tickets.length > 0 ? t('historique.tickets_count', { n: entry.tickets.length }) : undefined}
+      meta={
+        entry.tickets.length > 0
+          ? t(entry.tickets.length > 1 ? 'historique.tickets_count' : 'historique.ticket_count', {
+              n: entry.tickets.length,
+            })
+          : undefined
+      }
     >
       {open && plan !== null && <PlanDetail plan={plan} />}
       {open && plan === null && (

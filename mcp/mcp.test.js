@@ -437,6 +437,48 @@ test('le serveur ne répond pas à une notification', () => {
   assert.equal(reps[0].id, 2)
 })
 
+// Le stdin d'un serveur stdio est du texte venu d'ailleurs : il ne prouve rien.
+// Une seule ligne mal formée tuait le processus, et la session perdait tous ses
+// outils sans un mot — la panne la plus coûteuse à diagnostiquer.
+test('une ligne JSON valide mais non-objet ne tue pas le serveur', () => {
+  withRegistry()
+
+  const reps = parLeFil(['null', '42', '"texte"', '[]', demande(7, 'tools/list')], process.env.OVRSEE_REGISTRY)
+
+  const derniere = reps.at(-1)
+  assert.equal(derniere.id, 7, 'le serveur doit avoir survécu aux quatre lignes')
+  assert.ok(Array.isArray(derniere.result.tools))
+})
+
+// JSON-RPC 2.0 : une réponse d'erreur porte toujours un `id`, `null` quand la
+// demande n'en donnait pas d'exploitable. Un client strict rejette une trame
+// qui n'en a pas.
+test('une réponse d\'erreur porte toujours un id', () => {
+  withRegistry()
+
+  const reps = parLeFil(['{ pas du json', 'null'], process.env.OVRSEE_REGISTRY)
+
+  assert.equal(reps.length, 2)
+  for (const rep of reps) {
+    assert.ok('id' in rep, 'la réponse d’erreur doit porter un id')
+    assert.equal(rep.id, null)
+    assert.ok(rep.error.code === -32700 || rep.error.code === -32600)
+  }
+})
+
+// `OUTILS` est un objet littéral : il hérite de `Object.prototype`, donc
+// `OUTILS['constructor']` répond quelque chose. Sans `hasOwn`, un nom emprunté
+// au prototype passait la garde et rendait un faux succès vide.
+test('un nom hérité d’Object n’est pas un outil', () => {
+  withRegistry()
+
+  for (const nom of ['constructor', 'toString', 'hasOwnProperty', '__proto__', 'valueOf']) {
+    const rep = dispatch(nom, {})
+    assert.equal(rep.isError, true, `${nom} devrait être inconnu`)
+    assert.match(rep.message, /Outil inconnu/)
+  }
+})
+
 test('tools/list annonce des outils avec un schéma d\'entrée', () => {
   withRegistry()
 

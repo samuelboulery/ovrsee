@@ -204,16 +204,25 @@ rl.on('line', (line) => {
   try {
     request = JSON.parse(line)
   } catch {
-    console.log(JSON.stringify({
-      jsonrpc: '2.0',
-      error: { code: -32700, message: 'JSON invalide' },
-    }))
+    // JSON-RPC 2.0 : une réponse d'erreur porte toujours un `id`. Faute de
+    // demande lisible, c'est `null` — l'omettre fait rejeter la trame par un
+    // client strict.
+    sendError(null, -32700, 'JSON invalide')
+    return
+  }
+
+  // `JSON.parse` rend aussi bien `null`, un nombre ou un tableau : rien de tout
+  // cela ne se déstructure. Cette ligne a coûté un serveur MCP entier — une
+  // seule ligne `null` sur stdin le tuait, et la session perdait tous ses outils
+  // sans un message.
+  if (request === null || typeof request !== 'object' || Array.isArray(request)) {
+    sendError(null, -32600, 'Requête invalide')
     return
   }
 
   const { jsonrpc, id, method, params } = request
   if (jsonrpc !== '2.0' || !method) {
-    sendError(id, -32600, 'Requête invalide')
+    sendError(id ?? null, -32600, 'Requête invalide')
     return
   }
 

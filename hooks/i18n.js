@@ -344,7 +344,9 @@ const translations = {
     'sante.unpushed_plural': '${n} commits non poussés',
     'sante.unpushed_none': 'tout est poussé',
     'sante.no_branch': 'hors dépôt git',
-    'sante.last_audit': 'dernier audit il y a ${age} (${skill})',
+    // `humanAge` porte déjà « il y a » : le répéter ici donnait « il y a il y a
+    // deux jours », et « il y a aujourd'hui » pour le jour même.
+    'sante.last_audit': 'dernier audit ${age} (${skill})',
     'sante.no_audit': 'aucun audit tracé',
     'sante.open_plans': 'plans ouverts',
     'sante.no_open_plans': 'aucun plan ouvert',
@@ -386,7 +388,9 @@ const translations = {
     'historique.closed': 'clos',
     'historique.open': 'ouvert',
     'historique.closed_by': 'clos par ${sha}',
+    'historique.commit_count': '${n} commit',
     'historique.commits_count': '${n} commits',
+    'historique.ticket_count': '${n} ticket',
     'historique.tickets_count': '${n} tickets',
     'historique.rejected': 'Écarté',
     'historique.no_commits': 'Aucun commit — ce plan n\'a pas encore été commencé.',
@@ -770,6 +774,7 @@ const translations = {
     'statusbar.graph_rebuilt': 'graphe reconstruit ${age}',
     'statusbar.canvas_hint': 'glisser · ⌥ molette pour zoomer',
     'statusbar.plans_summary': '${total} plans · ${open} ouverts',
+    'statusbar.plans_summary_one': '${total} plans · ${open} ouvert',
     'statusbar.last_commit': 'dernier commit ${age}',
     // Palette ⌘K
     'palette.placeholder': 'Rechercher, aller à…',
@@ -1102,7 +1107,8 @@ const translations = {
     'sante.unpushed_plural': '${n} unpushed commits',
     'sante.unpushed_none': 'everything is pushed',
     'sante.no_branch': 'outside a git repo',
-    'sante.last_audit': 'last audit ${age} ago (${skill})',
+    // `humanAge` already carries "ago": repeating it gave "2 days ago ago".
+    'sante.last_audit': 'last audit ${age} (${skill})',
     'sante.no_audit': 'no audit tracked',
     'sante.open_plans': 'open plans',
     'sante.no_open_plans': 'no open plan',
@@ -1144,7 +1150,9 @@ const translations = {
     'historique.closed': 'closed',
     'historique.open': 'open',
     'historique.closed_by': 'closed by ${sha}',
+    'historique.commit_count': '${n} commit',
     'historique.commits_count': '${n} commits',
+    'historique.ticket_count': '${n} ticket',
     'historique.tickets_count': '${n} tickets',
     'historique.rejected': 'Rejected',
     'historique.no_commits': 'No commits — this plan has not yet been started.',
@@ -1528,6 +1536,7 @@ const translations = {
     'statusbar.graph_rebuilt': 'graph rebuilt ${age}',
     'statusbar.canvas_hint': 'drag · ⌥ scroll to zoom',
     'statusbar.plans_summary': '${total} plans · ${open} open',
+    'statusbar.plans_summary_one': '${total} plans · ${open} open',
     'statusbar.last_commit': 'last commit ${age}',
     // Command palette
     'palette.placeholder': 'Search, jump to…',

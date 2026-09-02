@@ -12,7 +12,9 @@
 
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
+
+import { writeFileNoFollow } from './plans.js'
 
 /**
  * Schéma complet des préférences, avec défauts.
@@ -235,9 +237,11 @@ export function validateSettings(partial, defaults = DEFAULT_SETTINGS) {
  * @param {object} settings préférences à écrire
  */
 export function writeSettings(settings) {
-  const dir = join(settingsPath(), '..')
-  mkdirSync(dir, { recursive: true })
-  writeFileSync(settingsPath(), JSON.stringify(settings, null, 2) + '\n', 'utf8')
+  // `writeFileNoFollow` plutôt qu'un `writeFileSync` : ce fichier se relit avec
+  // un `catch` qui retombe sur les défauts, donc une écriture coupée ne se
+  // signale pas — elle se traduit en « l'utilisateur n'avait rien réglé », et
+  // l'onboarding rejoue. Le renommage rend l'écriture indivisible.
+  writeFileNoFollow(settingsPath(), JSON.stringify(settings, null, 2) + '\n')
 }
 
 /**

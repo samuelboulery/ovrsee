@@ -9,16 +9,16 @@
  * nécessairement à jour. `lastFetch` sert à le dire honnêtement.
  */
 
-import { execFileSync } from 'node:child_process'
 import { existsSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
+import { git as gitSur } from './git.js'
+
+// Le dépôt lu vient du dehors : sa configuration nomme des programmes que git
+// exécuterait pour son compte. `hooks/git.js` les neutralise, et c'est la
+// seule raison pour laquelle ce module ne passe pas par `execFileSync`.
 const git = (root, args) =>
-  execFileSync('git', args, {
-    cwd: root,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'ignore'],
-  })
+  gitSur(root, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
 
 /**
  * Fichiers modifiés/indexés/non suivis, comptés depuis `--porcelain=v1`.

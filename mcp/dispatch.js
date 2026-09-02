@@ -274,7 +274,10 @@ const tropLong = valeur => {
 }
 
 export function dispatch(outil, args = {}) {
-  const fn = OUTILS[outil]
+  // `hasOwn` et pas seulement la vérité de `fn` : `OUTILS` hérite d'`Object`,
+  // donc `constructor`, `toString` ou `valueOf` y répondent quelque chose.
+  // Même garde que `electron/pty.js` sur ses commandes de démarrage.
+  const fn = Object.hasOwn(OUTILS, outil) ? OUTILS[outil] : null
   if (!fn) return { isError: true, code: 400, message: `Outil inconnu : ${outil}` }
 
   const enorme = Object.entries(args ?? {}).find(([, valeur]) => tropLong(valeur))

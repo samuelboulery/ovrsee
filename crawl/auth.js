@@ -13,7 +13,9 @@
  * exige de voir ignoré par git avant de l'utiliser.
  */
 
-import { execFileSync, spawn } from 'node:child_process'
+import { spawn } from 'node:child_process'
+
+import { git } from '../hooks/git.js'
 import { createInterface } from 'node:readline/promises'
 import { chmodSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -39,7 +41,7 @@ if (!statePath) {
  */
 function assertIgnored() {
   try {
-    execFileSync('git', ['check-ignore', '-q', statePath], { cwd: root, stdio: 'ignore' })
+    git(root, ['check-ignore', '-q', statePath], { stdio: 'ignore' })
   } catch {
     console.error(
       `\n${statePath} n'est pas ignoré par git.\n` +

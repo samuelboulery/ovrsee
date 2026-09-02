@@ -587,7 +587,10 @@ function PageCard({
         // ne montrait qu'une bande du haut de l'écran, identique d'une page à
         // l'autre.
         <img
-          src={shotUrl(snapshot.root, page.shot)}
+          // `pages.json` ne porte aucun champ `shot` : le chemin se reconstruit
+          // du slug et du nom de fichier, comme le fait déjà le panneau de
+          // détail. Lire `page.shot` rendait sept vignettes cassées.
+          src={shotUrl(snapshot.root, `shots/${page.slug}/${shots[0]}`)}
           alt=""
           // Le canevas rend toutes les pages d'un coup, la plupart hors écran :
           // sans ça, ouvrir l'onglet demandait cinquante captures de 100 ko à la
@@ -616,7 +619,8 @@ function PageCard({
           'display: flex; gap: 8px; margin-top: 9px; font-size: 10px; color: var(--color-neutral-600); white-space: nowrap;',
         )}
       >
-        <span>{plans.length > 0 ? `${plans.length} ${plans.length > 1 ? t('produit.plan_count_plural', { n: plans.length }) : t('produit.plan_count', { n: 1 })}` : t('produit.no_plans')}</span>
+        {/* Le gabarit interpole déjà le nombre : le préfixer donnait « 14 14 plans ». */}
+        <span>{plans.length > 0 ? (plans.length > 1 ? t('produit.plan_count_plural', { n: plans.length }) : t('produit.plan_count', { n: 1 })) : t('produit.no_plans')}</span>
         <span style={s('flex: 1;')} />
         <span>{shots[0] ? frDateShort(shotDate(shots[0])) : '—'}</span>
       </div>

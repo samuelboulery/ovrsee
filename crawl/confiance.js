@@ -156,7 +156,7 @@ export function decision({ approuve, tty }) {
  * copie serait une seconde vérité à tenir d'accord.
  */
 const MESSAGE_REFUS =
-  "commande dev non approuvée pour ce dépôt — ouvrez Ovrsee et lancez le crawl pour l'autoriser"
+  "commande dev non approuvée pour ce dépôt — cliquez sur « Crawler » pour l'autoriser"
 
 /** Question `y/N` sur le terminal, défaut non. */
 async function demanderEnTerminal(root, dev) {

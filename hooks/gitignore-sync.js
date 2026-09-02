@@ -12,8 +12,10 @@
  * et le versionner n'est jamais un choix légitime.
  */
 
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+
+import { writeFileNoFollow } from './plans.js'
 
 const BLOC_SHOTS =
   `\n# Captures d'écran ovrsee : régénérées à chaque commit, purge auto côté\n` +
@@ -56,5 +58,7 @@ export function syncGitignore(root, settings) {
   if (settings?.gitignorePlans) next += BLOC_PLANS
   next += BLOC_ACTIF
 
-  if (next !== original) writeFileSync(path, next, 'utf8')
+  // Le `.gitignore` du dépôt observé : versionné, donc rattrapable, mais une
+  // écriture coupée dé-ignorerait `ovrsee/pages/shots/` au commit suivant.
+  if (next !== original) writeFileNoFollow(path, next)
 }

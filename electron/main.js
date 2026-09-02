@@ -298,9 +298,11 @@ function createWindow() {
     if (ouvrable(url)) shell.openExternal(url)
     return { action: 'deny' }
   })
-  window.webContents.on('will-navigate', (event, url) => {
-    if (!url.startsWith(ORIGIN)) event.preventDefault()
-  })
+  // Aucune navigation de premier plan, pas même vers notre propre origine :
+  // l'interface change d'onglet par `history.pushState`, jamais en naviguant.
+  // Autoriser `ovrsee://app` laissait passer `/api/media?file=…`, c'est-à-dire
+  // un fichier du dépôt observé promu page, dans l'origine de l'interface.
+  window.webContents.on('will-navigate', event => event.preventDefault())
 
   // `OVRSEE_ROUTE=/navigateur` ouvre la fenêtre sur un autre onglet : sans
   // cela, la capture automatique ci-dessous ne peut vérifier que la page

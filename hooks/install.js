@@ -23,7 +23,6 @@
  * de l'installation finirait par diverger de celle-ci.
  */
 
-import { execFileSync } from 'node:child_process'
 import {
   chmodSync,
   copyFileSync,
@@ -36,6 +35,7 @@ import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { git } from './git.js'
 import { readJson } from './json.js'
 
 import { writeFileNoFollow } from './plans.js'
@@ -400,22 +400,23 @@ export function install(target, { skills = [], gitInit = false, commit = false, 
   const cwd = resolve(target)
 
   if (gitInit) {
-    execFileSync('git', ['init'], { cwd, stdio: 'ignore' })
+    git(cwd, ['init'], { stdio: 'ignore' })
     done.push('dépôt git créé')
   }
 
-  const root = execFileSync('git', ['rev-parse', '--show-toplevel'], {
-    cwd,
-    encoding: 'utf8',
-  }).trim()
+  const root = git(cwd, ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
 
   // Un échec ici — identité git absente, rien à committer — n'a pas à faire
   // échouer l'équipement : le commit est un confort, `ovrsee/` est le sujet.
+  //
+  // `--no-verify` n'est pas une commodité : un dépôt reçu d'ailleurs apporte
+  // ses propres `.git/hooks`, et `git commit` les exécute. Sans cette option,
+  // équiper un projet lançait donc du code de ce projet — ce que l'invariant du
+  // cadrage interdit, et bien avant que quiconque ait accordé quoi que ce soit.
   if (commit) {
     try {
-      execFileSync('git', ['add', '-A'], { cwd: root, stdio: 'ignore' })
-      execFileSync('git', ['commit', '-m', 'chore: point de départ de l\'ovrsee'], {
-        cwd: root,
+      git(root, ['add', '-A'], { stdio: 'ignore' })
+      git(root, ['commit', '--no-verify', '-m', 'chore: point de départ de l\'ovrsee'], {
         stdio: 'ignore',
       })
       done.push('premier commit créé')

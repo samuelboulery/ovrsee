@@ -2,7 +2,7 @@
 {
   "id": "T-0252",
   "titre": "Le fil principal bloquait 72 ms toutes les quinze secondes",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "perf"

@@ -2,7 +2,7 @@
 {
   "id": "T-0253",
   "titre": "Deux défauts d'accessibilité bloquants",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "a11y"

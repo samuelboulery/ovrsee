@@ -4,7 +4,79 @@
   "title": "Audit complet pré-release 1.2.0 — plan d'exécution",
   "opened": "2026-09-02",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "f22dd88",
+      "date": "2026-09-02",
+      "files": [
+        "app/src/render.test.tsx",
+        "app/src/tabs/Historique.tsx",
+        "app/src/tabs/Produit.tsx",
+        "crawl/auth.js",
+        "crawl/confiance.js",
+        "crawl/index.js",
+        "electron/main.js",
+        "hooks/ecriture-atomique.test.js",
+        "hooks/git-status.js",
+        "hooks/git.js",
+        "hooks/git.test.js",
+        "hooks/gitignore-sync.js",
+        "hooks/i18n.js",
+        "hooks/install-options.test.js",
+        "hooks/install.js",
+        "hooks/integrations.js",
+        "hooks/settings.js",
+        "hooks/snapshot.js",
+        "mcp/dispatch.js",
+        "mcp/mcp.test.js",
+        "mcp/server.js",
+        "server/api.js",
+        "server/api.test.js"
+      ]
+    },
+    {
+      "sha": "38ca99f",
+      "date": "2026-09-02",
+      "files": [
+        "CHANGELOG.fr.md",
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "CONTRIBUTING.fr.md",
+        "CONTRIBUTING.md",
+        "SECURITY.fr.md",
+        "SECURITY.md",
+        "electron-builder.yml",
+        "electron/main.js",
+        "electron/preload.cjs",
+        "mcp/server.js"
+      ]
+    },
+    {
+      "sha": "c3a21aa",
+      "date": "2026-09-02",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/CommandPalette.tsx",
+        "app/src/Shell.tsx",
+        "electron/pty.js"
+      ]
+    },
+    {
+      "sha": "d07748d",
+      "date": "2026-09-02",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/CommandPalette.tsx",
+        "app/src/Shell.tsx",
+        "crawl/index.js",
+        "hooks/documentation.test.js",
+        "hooks/git.js",
+        "hooks/git.test.js",
+        "package.json",
+        "server/api.js"
+      ]
+    }
+  ]
 }
 ---
 

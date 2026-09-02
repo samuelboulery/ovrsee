@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Merge #104, puis repasse README + captures",
   "opened": "2026-09-02",
-  "closed": null,
+  "closed": "2026-09-02",
   "commits": [
     {
       "sha": "de18b7c",
@@ -36,6 +36,11 @@
         "scripts/screenshots.js",
         "scripts/screenshots.test.js"
       ]
+    },
+    {
+      "sha": "f3ac25a",
+      "date": "2026-09-02",
+      "files": []
     }
   ]
 }

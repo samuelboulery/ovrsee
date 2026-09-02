@@ -2,7 +2,7 @@
 {
   "id": "T-0246",
   "titre": "Un fichier du dépôt servi par l'app pouvait s'exécuter avec elle",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "securite"

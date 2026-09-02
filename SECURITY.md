@@ -65,15 +65,21 @@ Published DMGs and installers are **neither signed nor notarised**. macOS and
 Windows will warn you on first launch. If that bothers you, build from source:
 `pnpm install && pnpm package:mac` (or `package:win`).
 
-Check that the downloaded file matches the checksum published on the release page.
+Each release ships `latest-mac.yml` and `latest.yml` next to the binaries; both
+carry the sha512 of every file. Compare before you open:
+`shasum -a 512 Ovrsee-mac-arm64.dmg`.
 
 ## Dependencies
 
-The project has four production dependencies — `@phosphor-icons/react`,
-`@xterm/xterm`, `@xterm/addon-fit` and `node-pty` — and that restraint is a
-security choice as much as a maintenance one.
+The project has five production dependencies — `@phosphor-icons/react`,
+`@xterm/xterm`, `@xterm/addon-fit`, `node-pty` and `playwright-core`, which
+drives the browser used by the crawl — and that restraint is a security choice
+as much as a maintenance one.
 
-Two defences are in place against poisoned publishes: pnpm blocks dependency
-install scripts by default (`onlyBuiltDependencies` allows only `node-pty`, which
-has to compile), and `.npmrc` imposes a 24 h quarantine on freshly published
-versions.
+Two defences are in place against poisoned publishes, both declared in
+`pnpm-workspace.yaml`: pnpm blocks dependency install scripts by default
+(`allowBuilds` permits only `node-pty`, which has to compile), and
+`minimumReleaseAge` imposes a 24 h quarantine on freshly published versions.
+Under pnpm 11 neither setting is read from `.npmrc` any more, and the older
+`onlyBuiltDependencies` key is still parsed but permits nothing — silently.
+`pnpm config list` is the way to check they are actually in force.

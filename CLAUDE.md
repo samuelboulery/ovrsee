@@ -15,9 +15,28 @@ La vérité vit dans `<repo>/ovrsee/`, en markdown et en images, versionnée par
 L'application n'est qu'une vue : si elle disparaît, rien n'est perdu.
 
 C'est la règle qui doit faire refuser une fonctionnalité. Toute proposition qui fait
-écrire l'application ailleurs que dans `ovrsee/tickets/` et `ovrsee/board.json`, ou
-qui lui fait exécuter du code du projet observé, contredit le cadrage — le dire avant
-de l'implémenter.
+exécuter du code du projet observé contredit le cadrage — le dire avant de
+l'implémenter. Y compris quand ce n'est pas un programme qu'on lance : `git status`
+honore le `.git/config` du dépôt, et `core.fsmonitor` y nomme un exécutable. D'où
+`hooks/git.js`, par où passe **toute** commande git visant un dépôt observé, et le
+`--no-verify` du commit d'amorçage (T-0244, T-0245).
+
+L'écriture, elle, se lit en trois classes — « seulement `tickets/` et `board.json` »
+était faux, et une règle fausse ne fait rien refuser :
+
+1. **Sur un geste de l'utilisateur, dans le dépôt observé** : `ovrsee/tickets/*.md`
+   et leurs images, `ovrsee/board.json`, `ovrsee/plans/*.md` à la clôture,
+   `ovrsee/obsidian/` à l'export, `ovrsee.config.json` et `.git/hooks/post-*` à
+   l'équipement. Toujours du markdown ou du JSON relisible sans l'application.
+2. **Hors du dépôt observé**, parce que c'est une préférence de poste ou un secret :
+   `~/.claude/ovrsee/{projects,settings,integrations,trust}.json`,
+   `~/.claude/settings.json`, `~/.claude/skills/`. Un dépôt cloné ne livre jamais sa
+   propre approbation.
+3. **Par les hooks, jamais par l'interface** : `ovrsee/pages/` au crawl,
+   `ovrsee/plans/` à la capture, `.gitignore` à chaque commit.
+
+Une proposition qui écrit ailleurs, ou qui déplace une écriture de la classe 2 vers
+la 1, contredit le cadrage.
 
 Corollaire déjà arbitré : le terminal passe par IPC Electron et **pas** par une socket
 locale. Une socket l'ouvrirait à tout processus tournant sous le même compte.
@@ -232,6 +251,19 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   de liste blanche aux routes : rien d'implicite dedans.
 - **Le crawl refuse de démarrer si `baseUrl` répond déjà.** Voulu : rien dans une
   réponse HTTP ne distingue son propre serveur de celui d'un autre projet.
+- **Le stdin du serveur MCP est du texte venu d'ailleurs.** `JSON.parse` rend aussi
+  bien `null`, un nombre ou un tableau : la déstructuration qui suivait était hors du
+  `try`, et une seule ligne `null` tuait le processus. La session perdait tous ses
+  outils **sans un message**, et la requête suivante restait sans réponse — la panne
+  la plus coûteuse à diagnostiquer, parce qu'elle ne ressemble pas à une panne.
+  `mcp/mcp.test.js` l'exerce par le fil, pas par `dispatch()`. Même famille :
+  `OUTILS` est un objet littéral, donc `OUTILS['constructor']` répond quelque chose —
+  d'où le `Object.hasOwn`, que `electron/pty.js` faisait déjà de son côté (T-0247).
+- **`graphify-out/graph.json` bouge tout seul, et ce n'est pas l'ovrsee.** Un hook
+  git `post-checkout` installé sur le poste (`graphify`, hors dépôt, jamais versionné)
+  le réécrit à chaque changement de branche. Un `git status` sale après un simple
+  `checkout` vient de là, pas d'un bug d'ici. Une machine sans cet outil ne verra
+  jamais ce fichier changer.
 - **Le stdout du serveur MCP est le transport, pas un journal.** Un `console.log` dans
   n'importe quel module de `hooks/` ou `server/` atterrit au milieu d'un flux JSON-RPC
   et coupe la conversation — les traces vont sur stderr. Et tester `dispatch()` ne teste

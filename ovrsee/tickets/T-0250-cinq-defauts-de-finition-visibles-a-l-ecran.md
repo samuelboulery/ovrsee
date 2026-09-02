@@ -2,7 +2,7 @@
 {
   "id": "T-0250",
   "titre": "Cinq défauts de finition visibles à l'écran",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ui"

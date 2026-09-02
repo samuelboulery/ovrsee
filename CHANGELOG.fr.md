@@ -10,6 +10,76 @@ versionnage [SemVer](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.2.0] — 2026-09-02
+
+### Ajouté
+
+- **Thème clair complet, terminal compris** (issue #64, epic T-0218). Le canvas
+  xterm ne lit pas le CSS : sa palette est reposée sur chaque terminal vivant à
+  la bascule.
+- **Couleur d'accent par projet** (#48, T-0215). L'accent vit dans le registre —
+  c'est une préférence de poste, pas un choix du dépôt observé.
+- **Coller une image directement dans un ticket** (T-0219, #54).
+- **État des sessions dans le sélecteur de projet, et panneau de commandes**
+  (T-0217, T-0224, T-0225, #47).
+- **Prompts par projet, une seule liste de commandes, bande rétractable**
+  (T-0216, #79).
+- **Commenter une zone depuis l'onglet Navigateur** (#65, T-0214).
+- La vitrine montre les sept vrais onglets au lieu d'une maquette (#91).
+- La barre des onglets terminal passe en icônes, et la taille choisie pour une
+  page est épinglée (T-0220).
+- Un plan resté ouvert sans commit se clôt à la main :
+  `ovrsee:close <plan.md> --commit <sha>`.
+
+### Modifié
+
+- **Un second dégraissage a rendu 1 311 lignes** dans tout l'arbre, et retrouvé
+  au passage trois libellés mal orthographiés (T-0232).
+- Le plafond de 800 lignes se mesure désormais par un test au lieu d'être écrit
+  dans une règle (T-0241). Sa liste d'exemptions est la dette, elle est faite
+  pour raccourcir.
+- Le badge de version du README se lit dans `package.json` plutôt qu'un chiffre
+  en dur (#95).
+
+### Corrigé
+
+- **Le réglage « système » du thème ne suivait plus le poste dans Electron**
+  (T-0242). Ouvrir les DevTools de l'onglet Navigateur reforçait `themeSource`,
+  ce qui figeait la requête média du rendu et coupait le suivi.
+- **Un commit s'inscrit dans tous les plans qu'il réalise**, pas un seul
+  (T-0223). Un plan sous lequel du travail avait réellement été écrit pouvait
+  sinon rester inclosable, la date de clôture se prenant sur le dernier commit.
+- `close <plan.md>` visait tous les plans ouverts au lieu du seul nommé, quand
+  `--commit` était absent (T-0223).
+- `reconcile` ne voyait pas les commits faits le jour même (T-0222).
+- **Sept vignettes cassées sur l'onglet Produit**, et un compte écrit deux fois
+  (« 14 14 plans ») (T-0250). Également : « dernier audit il y a aujourd'hui »,
+  « 1 tickets », et un bandeau qui disait d'ouvrir Ovrsee alors qu'on l'avait
+  sous les yeux.
+
+### Sécurité
+
+- **Un dépôt observé exécutait du code dès son inscription** (T-0244).
+  `git status` honore le `.git/config` du dépôt sur lequel il tourne, et
+  `core.fsmonitor` y nomme un programme. Inscrire un projet lit son état : un
+  dépôt reçu en archive exécutait donc son propre code, bien avant que l'accord
+  sur la commande `dev` (T-0190) ait son mot à dire. Toute commande git visant
+  un dépôt observé passe désormais par une garde unique.
+- **Équiper un projet exécutait ses hooks git** (T-0245). Le commit d'amorçage
+  passe `--no-verify`.
+- **Un fichier servi par l'application pouvait s'exécuter avec elle** (T-0246).
+  `/api/media` servait les `.svg` du dépôt sans en-tête qui les neutralise, et
+  une navigation de premier plan pouvait le promouvoir en page dans l'origine
+  de l'interface — donc avec `window.ovrsee`, donc avec le terminal. Les
+  réponses fichier portent désormais `Content-Security-Policy: sandbox` aux deux
+  hôtes, et la fenêtre principale ne navigue plus du tout.
+- **Une seule ligne malformée tuait le serveur MCP** (T-0247), et la session
+  perdait tous ses outils sans un message.
+- **Trois écritures pouvaient effacer réglages et jetons d'intégration**
+  (T-0248). Elles passent par une écriture indivisible, qui refuse en outre un
+  lien symbolique.
+
+
 ## [1.1.2-beta] — 2026-08-31
 
 ### Sécurité

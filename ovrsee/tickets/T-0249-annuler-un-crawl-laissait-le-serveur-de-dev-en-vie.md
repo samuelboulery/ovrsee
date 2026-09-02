@@ -2,7 +2,7 @@
 {
   "id": "T-0249",
   "titre": "Annuler un crawl laissait le serveur de dev en vie",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "robustesse"

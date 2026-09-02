@@ -1,7 +1,7 @@
 /**
  * Processus principal.
  *
- * Rien n'écoute sur le réseau. L'interface et les trois routes `/api` sont
+ * Rien n'écoute sur le réseau. L'interface et les routes `/api` sont
  * servies par `protocol.handle` sur un schéma privilégié.
  *
  * Pourquoi pas un serveur HTTP sur 127.0.0.1 : lier une socket à la boucle

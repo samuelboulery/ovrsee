@@ -49,7 +49,7 @@ not bring in vitest, jest or mocha — write in the existing style. `app/src` is
 exception: `scripts/test-ui.js` compiles it into a throwaway folder and runs the
 same `node --test` on it.
 
-**Ask before adding a dependency.** The project has four in production, and that
+**Ask before adding a dependency.** The project has five in production, and that
 is a choice — of security as much as of maintenance. Open an issue explaining why
 the standard library or a dependency already present is not enough.
 

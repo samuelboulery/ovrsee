@@ -10,6 +10,72 @@ versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-09-02
+
+### Added
+
+- **A complete light theme, terminal included** (issue #64, epic T-0218). The
+  xterm canvas does not read CSS, so its palette is reapplied on every live
+  terminal when you switch.
+- **Per-project accent colour** (#48, T-0215). A project carries a hue, kept in
+  the registry — a workstation preference, not something the observed
+  repository gets to choose.
+- **Pasting an image straight into a ticket** (T-0219, #54).
+- **Session status in the project picker, and a commands panel**
+  (T-0217, T-0224, T-0225, #47).
+- **Per-project prompts, one command list, and a collapsible band** (T-0216, #79).
+- **Commenting on an area from the Browser tab** (#65, T-0214).
+- The showcase site now shows the seven real tabs instead of a mockup (#91).
+- The terminal tab bar moved to icons, and a page's chosen size is pinned (T-0220).
+- A plan left open without a commit can be closed by hand:
+  `ovrsee:close <plan.md> --commit <sha>`.
+
+### Changed
+
+- **A second slimming pass removed 1,311 lines** across the tree, and recovered
+  three mislabeled strings on the way (T-0232).
+- The 800-line ceiling is now measured by a test rather than written in a rule
+  (T-0241). Its exemption list is the debt, and it is meant to shrink.
+- The README version badge reads from `package.json` instead of a hardcoded
+  number (#95).
+
+### Fixed
+
+- **The "system" theme setting stopped following the OS in Electron** (T-0242).
+  Opening the Browser tab's DevTools re-forced `themeSource`, which froze the
+  render's media query and silenced the system-theme listener.
+- **A commit now attaches to every plan it completes, not just one** (T-0223).
+  A plan under which work had actually been written could otherwise never be
+  closed, since the closing date is taken from the last commit.
+- `close <plan.md>` closed every open plan instead of the one named, whenever
+  `--commit` was absent (T-0223).
+- `reconcile` missed commits made on the same day (T-0222).
+- **Seven broken thumbnails on the Product tab**, and a count printed twice
+  ("14 14 plans") (T-0250). Also: "last audit ago today", "1 tickets", and a
+  banner telling you to open Ovrsee while you are looking at it.
+
+### Security
+
+- **An observed repository could run code the moment you registered it**
+  (T-0244). `git status` honours the repository's own `.git/config`, and
+  `core.fsmonitor` there names a program. Registering a project reads its
+  status — so a repository received as an archive ran its own code, long before
+  the crawl's `dev` agreement (T-0190) had any say. Every git command aimed at
+  an observed repository now goes through one guard.
+- **Equipping a project ran its git hooks** (T-0245). The bootstrap commit now
+  passes `--no-verify`.
+- **A file served by the app could execute inside it** (T-0246). `/api/media`
+  served the repository's `.svg` without a neutralising header, and a top-level
+  navigation could promote it to a page in the interface's own origin — with
+  `window.ovrsee`, and therefore the terminal. File responses now carry
+  `Content-Security-Policy: sandbox` on both hosts, and the main window no
+  longer navigates at all.
+- **A single malformed line killed the MCP server** (T-0247), and the session
+  lost every tool without a message.
+- **Three writes could wipe settings and integration tokens** (T-0248). They
+  now go through an atomic write that also refuses a symlink.
+
+
 ## [1.1.2-beta] — 2026-08-31
 
 ### Security

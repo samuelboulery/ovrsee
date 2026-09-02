@@ -2,7 +2,7 @@
 {
   "id": "T-0245",
   "titre": "Équiper un projet exécute ses hooks git",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "securite"

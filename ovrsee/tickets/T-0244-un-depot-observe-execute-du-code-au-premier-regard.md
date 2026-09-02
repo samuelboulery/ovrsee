@@ -2,7 +2,7 @@
 {
   "id": "T-0244",
   "titre": "Un dépôt observé exécute du code au premier regard",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "securite"

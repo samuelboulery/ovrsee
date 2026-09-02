@@ -2,7 +2,7 @@
 {
   "id": "T-0248",
   "titre": "Trois écritures pouvaient effacer réglages et jetons",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "robustesse"

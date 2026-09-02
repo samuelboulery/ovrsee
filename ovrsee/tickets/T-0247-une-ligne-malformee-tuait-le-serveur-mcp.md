@@ -2,7 +2,7 @@
 {
   "id": "T-0247",
   "titre": "Une ligne malformée tuait le serveur MCP",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "robustesse"

@@ -586,6 +586,18 @@ function ProjectRow({
         setHover(false)
         setConfirming(false)
       }}
+      // Le bouton de retrait ne se montre qu'au survol : sans ces deux-là, il
+      // restait `aria-hidden` et hors du parcours de tabulation tant que la
+      // souris n'était pas passée — retirer un projet était donc impossible au
+      // clavier seul. `onFocus`/`onBlur` remontent depuis le bouton (ils
+      // bouillonnent, contrairement à `focus`), et rendent au clavier ce que la
+      // souris avait déjà.
+      onFocus={() => setHover(true)}
+      onBlur={event => {
+        if (event.currentTarget.contains(event.relatedTarget as Node | null)) return
+        setHover(false)
+        setConfirming(false)
+      }}
       style={s(
         'padding: 6px 8px; margin: 0 10px; border-radius: 6px; cursor: pointer; ' +
           (active ? 'background: var(--color-surface-active);' : ''),

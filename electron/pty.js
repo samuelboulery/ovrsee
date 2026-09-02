@@ -125,14 +125,37 @@ export function openSession(sender, projectPath, kind = 'claude') {
   // tôt, un prompt élaboré (instant prompt, autosuggestions) avale la ligne.
   let primed = !startup
 
+  // Un pty rend de très petits morceaux : un `cat` de 4 Mo en produit plus de
+  // quatre mille, un kilo-octet chacun. Un message IPC par morceau réveillait le
+  // rendu autant de fois, chacun suivi d'un scan d'attention et d'une écriture
+  // xterm. On accumule donc jusqu'au tour de boucle suivant. `setImmediate` et
+  // pas un délai : rien n'est retardé d'un temps perceptible, le clavier garde
+  // son écho immédiat — seule une rafale se regroupe.
+  let tampon = ''
+  let programme = false
+  const vider = () => {
+    programme = false
+    if (tampon === '') return
+    const morceau = tampon
+    tampon = ''
+    if (!sender.isDestroyed()) sender.send('pty:data', id, morceau)
+  }
+
   pty.onData(data => {
     if (!primed) {
       primed = true
       pty.write(startup)
     }
-    if (!sender.isDestroyed()) sender.send('pty:data', id, data)
+    tampon += data
+    if (!programme) {
+      programme = true
+      setImmediate(vider)
+    }
   })
   pty.onExit(({ exitCode }) => {
+    // Vider avant de signaler la fin : sinon les derniers octets du programme
+    // — souvent sa ligne de résultat — se perdent.
+    vider()
     sessions.delete(id)
     if (!sender.isDestroyed()) sender.send('pty:exit', id, exitCode)
   })

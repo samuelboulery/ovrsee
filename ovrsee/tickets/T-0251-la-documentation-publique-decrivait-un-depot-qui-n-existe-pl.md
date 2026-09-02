@@ -2,7 +2,7 @@
 {
   "id": "T-0251",
   "titre": "La documentation publique décrivait un dépôt qui n'existe plus",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "doc",

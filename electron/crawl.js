@@ -30,6 +30,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { readJson } from '../hooks/json.js'
+import { killTree } from '../hooks/shell.js'
 
 import { DEV_DEFAUT, estApprouve } from '../crawl/confiance.js'
 
@@ -186,10 +187,14 @@ export function startCrawl(projectPath) {
 /**
  * Arrête le crawl d'un projet.
  *
- * Le signe moins n'est pas une coquille : c'est le **groupe** qu'on vise. Le
- * crawl a démarré le serveur de dev du projet (`dev` de sa configuration), et
- * tuer le seul processus fils le laisserait tourner — port occupé, et le crawl
- * suivant refuserait de démarrer.
+ * Ce n'est pas le seul processus fils qu'on vise, mais toute sa descendance :
+ * le crawl a démarré le serveur de dev du projet (`dev` de sa configuration),
+ * et le laisser derrière soi occuperait le port — le crawl suivant refuserait
+ * alors de démarrer. `killTree` sait par où le prendre sur chaque plateforme :
+ * le groupe de processus sur POSIX, `taskkill /T` sous Windows, qui n'a pas de
+ * groupes. Le repli d'avant n'y arrêtait que le crawler, et le `stopApp` de
+ * `crawl/index.js` sur lequel il comptait ne tournait jamais : sous Windows,
+ * `child.kill()` appelle `TerminateProcess`, qui n'exécute aucun gestionnaire.
  *
  * @param {string} projectPath
  */
@@ -197,20 +202,7 @@ export function stopCrawl(projectPath) {
   const session = running.get(projectPath)
   if (!session) return crawlState()
 
-  try {
-    process.kill(-session.child.pid, 'SIGTERM')
-  } catch {
-    // Deux cas tombent ici : le processus est mort entre la lecture et le
-    // signal — `exit` a fait le ménage — ou bien on est sous Windows, qui ne
-    // connaît pas les groupes de processus. Le repli n'arrête alors que le
-    // crawler ; le serveur de dev qu'il a lancé, lui, reçoit son `SIGTERM` du
-    // `stopApp` de `crawl/index.js`.
-    try {
-      session.child.kill('SIGTERM')
-    } catch {
-      /* déjà mort */
-    }
-  }
+  killTree(session.child)
   return crawlState()
 }
 

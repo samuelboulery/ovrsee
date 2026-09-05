@@ -10,21 +10,7 @@ versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
-### Fixed
-
-- **Displayed keyboard shortcuts now follow the platform.** The interface wrote
-  them as hardcoded Apple glyphs — `⌘K` in every tab's status bar, `⌘,` on the
-  gear, `⇧⌘E` for the picker, `⇧⌘1-9` on projects — right into the Windows
-  build, where ⌘ names no key on the keyboard. A new `app/src/raccourcis.ts`
-  writes them for the current platform: `Ctrl+K`, `Ctrl+Shift+E`. The native
-  menus were already correct: `electron/menu.js` declares its accelerators with
-  `CmdOrCtrl`.
-- **Two gestures did nothing at all on Windows.** "Copy path" (`⌘⇧C`, Overview
-  tab) and the element picker (`⇧⌘E`, Browser tab) tested `event.metaKey`
-  **alone**, without its `ctrlKey` counterpart.
-- **The canvas zoom hint named a key that does nothing.** The Product tab read
-  "⌥ scroll to zoom" while the code tests `ctrlKey || metaKey`: Alt has never
-  zoomed, on any platform. The label now follows the code.
+## [1.2.1] — 2026-09-05
 
 ### Fixed
 
@@ -45,6 +31,19 @@ versioning follows [SemVer](https://semver.org/).
   throws `ESRCH` there, and the `child.kill()` fallback only took down the
   `cmd.exe`. All three stop sites now go through a shared `killTree()`, which
   walks the tree with `taskkill /T`.
+- **Displayed keyboard shortcuts now follow the platform.** The interface wrote
+  them as hardcoded Apple glyphs — `⌘K` in every tab's status bar, `⌘,` on the
+  gear, `⇧⌘E` for the picker, `⇧⌘1-9` on projects — right into the Windows
+  build, where ⌘ names no key on the keyboard. A new `app/src/raccourcis.ts`
+  writes them for the current platform: `Ctrl+K`, `Ctrl+Shift+E`. The native
+  menus were already correct: `electron/menu.js` declares its accelerators with
+  `CmdOrCtrl`.
+- **Two gestures did nothing at all on Windows.** "Copy path" (`⌘⇧C`, Overview
+  tab) and the element picker (`⇧⌘E`, Browser tab) tested `event.metaKey`
+  **alone**, without its `ctrlKey` counterpart.
+- **The canvas zoom hint named a key that does nothing.** The Product tab read
+  "⌥ scroll to zoom" while the code tests `ctrlKey || metaKey`: Alt has never
+  zoomed, on any platform. The label now follows the code.
 
 ## [1.2.0] — 2026-09-02
 
@@ -320,7 +319,8 @@ Windows warn about it on first launch.
 - The `ovrsee/` format may still move before 1.0. Everything in it being markdown
   and images, a migration will be readable with the naked eye.
 
-[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/samuelboulery/ovrsee/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/samuelboulery/ovrsee/compare/v1.1.2-beta...v1.2.0
 [1.1.2-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.1-beta...v1.1.2-beta
 [1.1.1-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.0-beta...v1.1.1-beta

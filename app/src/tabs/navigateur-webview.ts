@@ -195,16 +195,23 @@ export type ActionClavier = 'basculer' | 'annuler' | null
 /**
  * La décision clavier, sortie du composant pour être testable.
  *
- * `⇧⌘E` bascule le sélecteur — armer *et* désarmer par le même geste, comme le
- * bouton. Le raccourci se contentait de retourner le booléen d'affichage sans
+ * Le raccourci du sélecteur bascule — armer *et* désarmer par le même geste,
+ * comme le bouton. Il se contentait de retourner le booléen d'affichage sans
  * jamais armer quoi que ce soit dans la page : le bouton passait à « Annuler »
  * et plus rien ne répondait.
  *
  * `event.key` vaut « E » majuscule quand Maj est enfoncée — d'où le repli en
  * minuscules.
+ *
+ * `metaKey || ctrlKey` : c'est la même touche selon la plateforme. `metaKey`
+ * seul laissait le geste sans effet sous Windows, où la barre d'état en
+ * annonce pourtant le raccourci.
  */
-export function actionClavier(event: Pick<KeyboardEvent, 'key' | 'metaKey' | 'shiftKey'>): ActionClavier {
-  if (event.metaKey && event.shiftKey && event.key.toLowerCase() === 'e') return 'basculer'
+export function actionClavier(
+  event: Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey' | 'shiftKey'>,
+): ActionClavier {
+  if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'e')
+    return 'basculer'
   if (event.key === 'Escape') return 'annuler'
   return null
 }

@@ -12,6 +12,22 @@ versioning follows [SemVer](https://semver.org/).
 
 ### Fixed
 
+- **Displayed keyboard shortcuts now follow the platform.** The interface wrote
+  them as hardcoded Apple glyphs — `⌘K` in every tab's status bar, `⌘,` on the
+  gear, `⇧⌘E` for the picker, `⇧⌘1-9` on projects — right into the Windows
+  build, where ⌘ names no key on the keyboard. A new `app/src/raccourcis.ts`
+  writes them for the current platform: `Ctrl+K`, `Ctrl+Shift+E`. The native
+  menus were already correct: `electron/menu.js` declares its accelerators with
+  `CmdOrCtrl`.
+- **Two gestures did nothing at all on Windows.** "Copy path" (`⌘⇧C`, Overview
+  tab) and the element picker (`⇧⌘E`, Browser tab) tested `event.metaKey`
+  **alone**, without its `ctrlKey` counterpart.
+- **The canvas zoom hint named a key that does nothing.** The Product tab read
+  "⌥ scroll to zoom" while the code tests `ctrlKey || metaKey`: Alt has never
+  zoomed, on any platform. The label now follows the code.
+
+### Fixed
+
 - **The integrated terminal would not open on Windows.** The panel reported
   `impossible d'ouvrir un shell (/bin/zsh) : File not found`. `loginShell()`
   had no Windows branch — `SHELL` does not exist there, so the zsh fallback was

@@ -3,6 +3,7 @@ import { Cursor } from '@phosphor-icons/react'
 
 import { type Snapshot } from '../data'
 import { t } from '../i18n'
+import { raccourci } from '../raccourcis'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
 import { submitToClaude } from '../pty'
@@ -684,7 +685,7 @@ export function Navigateur({
           failure ? `${host} — ${failure}` : t('statusbar.responds', { host }),
           ...(!failure && loadMs !== null ? [t('statusbar.loaded_in', { ms: loadMs })] : []),
         ]}
-        right={[t('statusbar.selector_shortcut')]}
+        right={[t('statusbar.selector_shortcut', { raccourci: raccourci('shift', 'E') })]}
       />
       )}
     </div>

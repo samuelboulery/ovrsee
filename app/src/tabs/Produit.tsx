@@ -22,6 +22,7 @@ import {
   type Snapshot,
 } from '../data'
 import { t } from '../i18n'
+import { toucheMod } from '../raccourcis'
 import { s, useHover } from '../style'
 import { Divider, useResizable } from '../useResizable'
 import { usePanZoom } from '../usePanZoom'
@@ -266,7 +267,7 @@ export function Produit({
           pages.length > 1 ? t('produit.pages_count_plural', { n: pages.length }) : t('produit.pages_count', { n: 1 }),
           linkCount > 1 ? t('produit.links_count_plural', { n: linkCount }) : t('produit.links_count', { n: 1 }),
         ]}
-        right={[t('statusbar.canvas_hint')]}
+        right={[t('statusbar.canvas_hint', { mod: toucheMod() })]}
       />
     </div>
   )

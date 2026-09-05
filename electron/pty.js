@@ -16,6 +16,9 @@
  * échouaient sur `/bin/sh: node: command not found`. Le shell source
  * `~/.zprofile` / `~/.zshrc` et reconstruit le vrai environnement.
  *
+ * Lequel, et avec quels arguments, se décide dans `hooks/shell.js` : Windows
+ * n'a ni `/bin/zsh` ni `-l`, et les deux y étaient codés en dur ici.
+ *
  * La surface exposée dans `preload.cjs` n'accepte toujours aucun nom de
  * programme : elle prend un chemin de projet, et c'est ici que le shell est
  * choisi. Ce que l'utilisateur tape ensuite dans le terminal le regarde — comme
@@ -29,7 +32,7 @@
 import { spawn } from 'node-pty'
 import { existsSync } from 'node:fs'
 
-import { loginShell } from '../hooks/shell.js'
+import { loginShell, loginShellArgs } from '../hooks/shell.js'
 
 /**
  * Ce qui est tapé une fois dans le shell qui vient de s'ouvrir, par genre de
@@ -107,7 +110,7 @@ export function openSession(sender, projectPath, kind = 'claude') {
 
   let pty
   try {
-    pty = spawn(shell, ['-l'], {
+    pty = spawn(shell, loginShellArgs(), {
       // C'est `name` qui pose `TERM`, pas l'environnement : le laisser à
       // `xterm-color` limiterait le terminal à huit couleurs.
       name: 'xterm-256color',

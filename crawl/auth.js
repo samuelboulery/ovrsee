@@ -22,7 +22,7 @@ import { join, resolve } from 'node:path'
 
 import { chromium } from 'playwright-core'
 
-import { cleanEnv, shellRun } from '../hooks/shell.js'
+import { cleanEnv, killTree, shellRun } from '../hooks/shell.js'
 import { assurerConfiance, DEV_DEFAUT } from './confiance.js'
 
 const root = resolve(process.argv[2] ?? process.cwd())
@@ -72,7 +72,9 @@ async function main() {
     cwd: root,
     env: cleanEnv(),
     stdio: ['ignore', 'inherit', 'inherit'],
-    detached: true,
+    // `detached` est déjà dans `options` : `shellRun` le décide par plateforme,
+    // et le forcer ici renvoyait sous Windows la sortie de `dev` dans une
+    // console à part — invisible pour l'humain qui attend devant celle-ci.
   })
   app.on('error', err => console.error(`commande dev : ${err?.message ?? err}`))
   const browser = await chromium.launch({ channel: 'chrome', headless: false })
@@ -100,13 +102,7 @@ async function main() {
     console.log('Le prochain crawl atteindra les pages protégées.')
   } finally {
     await browser.close().catch(() => {})
-    if (app.pid) {
-      try {
-        process.kill(-app.pid, 'SIGTERM')
-      } catch {
-        app.kill('SIGTERM')
-      }
-    }
+    killTree(app)
   }
 }
 

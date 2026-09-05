@@ -10,6 +10,26 @@ versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The integrated terminal would not open on Windows.** The panel reported
+  `impossible d'ouvrir un shell (/bin/zsh) : File not found`. `loginShell()`
+  had no Windows branch — `SHELL` does not exist there, so the zsh fallback was
+  returned as-is — and `-l`, a POSIX flag, was hardcoded in `electron/pty.js`.
+  The shell is now `COMSPEC`, with no arguments.
+- **The crawl swallowed the reason for its failures on Windows.** `shell: true`
+  makes the child a `cmd.exe`; detached, it gets its own console, and whatever
+  the `dev` command writes goes there instead of into the pipes the crawl
+  reads. Every failure — a missing `pnpm`, a missing `package.json` — was
+  recorded in `scans.jsonl` as "(la commande dev s'est arrêtée d'elle-même)"
+  and nothing more. `detached` is now decided per platform, in `shellRun()`,
+  alongside the shell it goes with.
+- **The dev server outlived the crawl on Windows**, port included, so the next
+  crawl refused to start. Windows has no process groups: `process.kill(-pid)`
+  throws `ESRCH` there, and the `child.kill()` fallback only took down the
+  `cmd.exe`. All three stop sites now go through a shared `killTree()`, which
+  walks the tree with `taskkill /T`.
+
 ## [1.2.0] — 2026-09-02
 
 ### Added

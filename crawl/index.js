@@ -30,7 +30,7 @@ import { chromium } from 'playwright-core'
 import { normalizeRoutes, pageSlug, sameOrigin } from './routes.js'
 import { assurerConfiance, DEV_DEFAUT } from './confiance.js'
 import { redige } from '../hooks/redaction.js'
-import { cleanEnv, shellRun } from '../hooks/shell.js'
+import { cleanEnv, killTree, shellRun } from '../hooks/shell.js'
 import { writeFileNoFollow } from '../hooks/plans.js'
 import { estPrincipal } from '../hooks/principal.js'
 
@@ -199,7 +199,10 @@ async function startApp(config) {
     cwd: root,
     env: cleanEnv(),
     stdio: ['ignore', 'pipe', 'pipe'],
-    detached: true,
+    // `detached` vient de `shellRun` avec le reste : il ne se décide pas sans
+    // savoir quel shell a été choisi — voir `hooks/shell.js`. Le poser ici
+    // écrasait la réponse, et sous Windows le `cmd.exe` détaché emportait dans
+    // sa console tout ce que les deux tuyaux ci-dessus devaient lire.
   })
 
   // Retenu ici, et pas au retour de `startApp` : entre ce `spawn` et le moment
@@ -250,19 +253,10 @@ async function startApp(config) {
   return child
 }
 
-function stopApp(child) {
-  if (!child?.pid) return
-  try {
-    // Le groupe entier : `pnpm dev` laisse un enfant vite derrière lui.
-    process.kill(-child.pid, 'SIGTERM')
-  } catch {
-    try {
-      child.kill('SIGTERM')
-    } catch {
-      /* déjà mort */
-    }
-  }
-}
+// Le groupe entier, ou l'arbre entier sous Windows : `pnpm dev` laisse un
+// enfant vite derrière lui, et ne tuer que le fils direct laisserait le port
+// pris — le crawl suivant refuserait alors de démarrer.
+const stopApp = killTree
 
 // --- parcours --------------------------------------------------------------
 

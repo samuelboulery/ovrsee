@@ -113,8 +113,10 @@ test('CarteElement : porte la saisie et les deux actions', () => {
  * n'armait rien dans la page, et laissait le bouton coincé sur « Annuler ».
  */
 
-const touche = (key: string, mods: { metaKey?: boolean; shiftKey?: boolean } = {}) =>
-  actionClavier({ key, metaKey: false, shiftKey: false, ...mods })
+const touche = (
+  key: string,
+  mods: { metaKey?: boolean; ctrlKey?: boolean; shiftKey?: boolean } = {},
+) => actionClavier({ key, metaKey: false, ctrlKey: false, shiftKey: false, ...mods })
 
 test('actionClavier : ⇧⌘E bascule la sélection', () => {
   assert.equal(touche('e', { metaKey: true, shiftKey: true }), 'basculer')
@@ -122,8 +124,16 @@ test('actionClavier : ⇧⌘E bascule la sélection', () => {
   assert.equal(touche('E', { metaKey: true, shiftKey: true }), 'basculer')
 })
 
+// La même touche, l'autre plateforme. `metaKey` seul laissait le geste sans
+// effet sous Windows, où la barre d'état en annonce pourtant le raccourci.
+test('actionClavier : Ctrl+Shift+E bascule aussi', () => {
+  assert.equal(touche('e', { ctrlKey: true, shiftKey: true }), 'basculer')
+  assert.equal(touche('E', { ctrlKey: true, shiftKey: true }), 'basculer')
+})
+
 test('actionClavier : ⌘E ou ⇧E seuls ne basculent rien', () => {
   assert.equal(touche('e', { metaKey: true }), null)
+  assert.equal(touche('e', { ctrlKey: true }), null)
   assert.equal(touche('e', { shiftKey: true }), null)
   assert.equal(touche('e'), null)
 })

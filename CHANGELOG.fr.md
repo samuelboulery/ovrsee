@@ -12,6 +12,24 @@ versionnage [SemVer](https://semver.org/lang/fr/).
 
 ### Corrigé
 
+- **Les raccourcis affichés suivent la plateforme.** L'interface écrivait ses
+  raccourcis en glyphes Apple codés en dur — `⌘K` dans la barre d'état de
+  chaque onglet, `⌘,` sur l'engrenage, `⇧⌘E` pour le sélecteur, `⇧⌘1-9` sur les
+  projets — jusque dans l'application Windows, où ⌘ ne désigne aucune touche du
+  clavier. Un module `app/src/raccourcis.ts` les écrit maintenant pour la
+  plateforme courante : `Ctrl+K`, `Ctrl+Shift+E`. Les menus natifs, eux,
+  étaient déjà justes : `electron/menu.js` déclare ses accélérateurs en
+  `CmdOrCtrl`.
+- **Deux gestes ne répondaient pas du tout sous Windows.** « Copier le chemin »
+  (`⌘⇧C`, onglet Aperçu) et le sélecteur d'élément (`⇧⌘E`, onglet Navigateur)
+  testaient `event.metaKey` **seul**, sans son équivalent `ctrlKey`.
+- **L'indice de zoom du canevas nommait une touche sans effet.** L'onglet
+  Produit annonçait « ⌥ molette pour zoomer » alors que le code teste
+  `ctrlKey || metaKey` : Alt n'a jamais zoomé, sur aucune plateforme. Le
+  libellé suit désormais le code.
+
+### Corrigé
+
 - **Le terminal intégré ne s'ouvrait pas sous Windows.** Le panneau rendait
   « impossible d'ouvrir un shell (/bin/zsh) : File not found ». `loginShell()`
   n'avait pas de branche Windows — `SHELL` n'y existe pas, et le repli zsh

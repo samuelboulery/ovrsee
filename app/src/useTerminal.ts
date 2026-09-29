@@ -307,15 +307,18 @@ export function useTerminals(
     return ref
   }, [projectPath, oublieId])
 
-  /** Ouvre un shell nu de plus, et s'y place. */
-  const openShell = useCallback((): string | null => {
+  /**
+   * Ouvre un shell de plus, et s'y place. `dev` y fait taper la commande `dev`
+   * du projet par le processus principal, après accord — le rendu ne la connaît pas.
+   */
+  const openShell = useCallback((kind: 'shell' | 'dev' = 'shell'): string | null => {
     if (!projectPath) return null
     const n = ++counter.current
     const session: Session = {
-      key: `${projectPath}#shell-${n}`,
-      kind: 'shell',
-      label: `shell ${n}`,
-      defaut: `shell ${n}`,
+      key: `${projectPath}#${kind}-${n}`,
+      kind,
+      label: `${kind} ${n}`,
+      defaut: `${kind} ${n}`,
     }
     const before = sessionsByProject.current.get(projectPath) ?? []
     const after = [...before, session]

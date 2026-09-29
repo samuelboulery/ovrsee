@@ -21,6 +21,7 @@ import {
   plansOuverts,
   restant,
   shotDate,
+  sortFaits,
   sortTickets,
   stackFrom,
   stripMarkdown,
@@ -176,6 +177,19 @@ test('sortTickets trie par priorité, puis du plus récent au plus ancien', () =
     t('T-1', 'haute', '2026-08-02'),
   ]).map(x => x.id)
   assert.deepEqual(ordre, ['T-1', 'T-2', 'T-3'])
+})
+
+test('sortFaits met le dernier soldé en haut, avec maj puis l’id en repli', () => {
+  const t = (id: string, maj: string, fait?: string): Ticket =>
+    ({ id, maj, fait, priorite: 'haute', cree: '2026-08-01', titre: id, colonne: 'fait', file: `${id}.md` }) as unknown as Ticket
+  const ordre = sortFaits([
+    t('T-0178', '2026-09-01'),
+    t('T-0179', '2026-09-01'),
+    t('T-0100', '2026-08-01'),
+    t('T-0050', '2026-09-01', '2026-09-02T08:00:00.000Z'),
+    t('T-0060', '2026-09-02', '2026-09-02T07:00:00.000Z'),
+  ]).map(x => x.id)
+  assert.deepEqual(ordre, ['T-0050', 'T-0060', 'T-0179', 'T-0178', 'T-0100'])
 })
 
 test('restant compte les tickets hors de la dernière colonne', () => {

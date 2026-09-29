@@ -12,6 +12,16 @@ test('notify : une fin de tour signale « stop »', () => {
   assert.equal(genrePour({ hook_event_name: 'Stop' }), 'stop')
 })
 
+test('notify : une fin de tour avec du travail de fond en vol reste « busy »', () => {
+  const tache = { id: 'a1', type: 'workflow', status: 'running', description: 'revue' }
+  assert.equal(genrePour({ hook_event_name: 'Stop', background_tasks: [tache] }), 'busy')
+  // Liste vide, ou absente (Claude Code d'avant ce champ) : la session a fini.
+  assert.equal(genrePour({ hook_event_name: 'Stop', background_tasks: [] }), 'stop')
+  assert.equal(genrePour({ hook_event_name: 'Stop', background_tasks: 'n/a' }), 'stop')
+  // Et le « busy » d'une fin de tour ne renomme pas l'onglet : pas de détail.
+  assert.equal(detailPour({ hook_event_name: 'Stop', background_tasks: [tache] }), null)
+})
+
 test('notify : seules les notifications qui attendent une réponse signalent', () => {
   const attendues = ['permission_prompt', 'agent_needs_input']
   for (const notification_type of attendues) {

@@ -79,14 +79,16 @@ Pourquoi ce ticket existe. Ce qui ne va pas aujourd'hui.
 | `tags` | Liste de chaînes, éventuellement vide. |
 | `cree` / `maj` | `YYYY-MM-DD`. `maj` change à chaque modification, `cree` jamais. |
 | `plan` | Nom de fichier d'un plan de `ovrsee/plans/`, ou `null`. |
+| `fait` | Date ISO complète du passage en colonne finale. Posé et retiré par `moveTicket` ; en écrivant le fichier à la main, le poser en déplaçant vers la colonne finale et l'enlever en en sortant. |
 
 Le nom du fichier est `T-0012-<slug du titre>.md` : le titre en minuscules sans
 accents, tout ce qui n'est pas `[a-z0-9]` devenant un tiret, coupé à 60
 caractères. Renommer le titre ne renomme pas le fichier — le fichier est
 l'identité, le titre est un champ.
 
-Il n'y a **pas de rang manuel** : le tri est priorité puis date de création. Ne
-pas inventer de champ d'ordre.
+Il n'y a **pas de rang manuel** : le tri est priorité puis date de création,
+sauf en colonne finale, rangée du dernier soldé au premier (`fait`, puis `maj`).
+Ne pas inventer de champ d'ordre.
 
 ## Les gestes
 

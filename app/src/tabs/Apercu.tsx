@@ -21,6 +21,7 @@ import { Illisibles } from '../Illisibles'
 import { Markdown, headings } from '../markdown'
 import { Sante } from './Sante'
 import { t } from '../i18n'
+import { raccourci } from '../raccourcis'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
 import { Titre, ViewBar } from '../ViewBar'
@@ -370,7 +371,10 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.metaKey && event.shiftKey && event.key.toLowerCase() === 'c') {
+      // `metaKey || ctrlKey` : c'est la même touche selon la plateforme, et
+      // `metaKey` seul laissait le geste sans effet sous Windows — alors que
+      // le bouton en affiche le raccourci juste à côté.
+      if ((event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === 'c') {
         event.preventDefault()
         copier()
       }
@@ -462,7 +466,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
 
       <button type="button" className="btn btn-secondary" style={s(BOUTON + ' gap: 8px;')} onClick={copier}>
         {copie ? t('apercu.copied') : t('apercu.copy_path')}
-        <span className="kbd">⌘⇧C</span>
+        <span className="kbd">{raccourci('shift', 'C')}</span>
       </button>
 
       {onTerminal && (

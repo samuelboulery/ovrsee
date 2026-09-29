@@ -3,6 +3,7 @@ import test from 'node:test'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import type { SettingsType } from './data'
+import { setPlateforme } from './raccourcis'
 import { Sidebar } from './Shell'
 
 /**
@@ -10,6 +11,13 @@ import { Sidebar } from './Shell'
  * absent côté ouvert. Rendu statique des deux états, sans DOM — assez pour
  * vérifier la présence/absence d'un contrôle sans monter une vraie fenêtre.
  */
+
+// La plateforme, épinglée : les raccourcis affichés en dépendent, et la
+// détection lit `navigator.platform` — un global que Node ≥ 21 définit avec
+// l'OS de la machine. Sans ça, ces assertions passeraient sur un Mac et
+// échoueraient sur un poste Windows. Même piège que la langue dans
+// `prefs.test.tsx`.
+setPlateforme('mac')
 
 const ORDRE = ['apercu', 'navigateur', 'produit', 'historique', 'tableau', 'donnees', 'stack']
 
@@ -48,6 +56,19 @@ function renderSidebar(collapsed: boolean): string {
 test('la recherche reste accessible repliée (issue #50)', () => {
   assert.match(renderSidebar(false), /⌘K/)
   assert.match(renderSidebar(true), /⌘K/)
+})
+
+// Le même contrôle, écrit pour l'autre clavier : sous Windows, ⌘ ne désigne
+// aucune touche.
+test('hors macOS, la recherche annonce Ctrl+K', () => {
+  setPlateforme('autre')
+  try {
+    assert.match(renderSidebar(false), /Ctrl\+K/)
+    assert.match(renderSidebar(true), /Ctrl\+K/)
+    assert.doesNotMatch(renderSidebar(false), /⌘/)
+  } finally {
+    setPlateforme('mac')
+  }
 })
 
 test('aucune icône propre au rail replié sans équivalent ouvert (issue #50)', () => {

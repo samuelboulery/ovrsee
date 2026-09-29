@@ -31,6 +31,7 @@ import {
 } from './data'
 import { DIT_ATTENTION, Etat } from './EtatSession'
 import { agregerEtat, type EtatSession, type MenuBarSession } from './menubar'
+import { raccourci } from './raccourcis'
 import { s } from './style'
 import { TAB_ICONS, activeTabsInOrder, type TabId } from './views'
 
@@ -163,7 +164,7 @@ export function Sidebar({
       >
         <button
           type="button"
-          title={`${t('palette.placeholder')} (⌘K)`}
+          title={`${t('palette.placeholder')} (${raccourci('K')})`}
           onClick={onOpenPalette}
           style={s(
             'width: 36px; height: 36px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: transparent; border: none; color: var(--color-text-quaternary); cursor: pointer;',
@@ -177,7 +178,7 @@ export function Sidebar({
         <div style={s('flex: 1;')} />
         <button
           type="button"
-          title={`${t('sidebar.preferences')} (⌘,)`}
+          title={`${t('sidebar.preferences')} (${raccourci(',')})`}
           onClick={onOpenPreferences}
           style={s(
             'width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 6px; background: transparent; border: none; color: var(--color-text-quaternary); cursor: pointer;',
@@ -211,7 +212,7 @@ export function Sidebar({
               "box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 17px; padding: 0 5px; border-radius: 4px; background: var(--color-border-chrome); font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif; font-size: 10.5px; line-height: 1; color: var(--color-text-tertiary);",
             )}
           >
-            ⌘K
+            {raccourci('K')}
           </span>
         </button>
       </div>
@@ -262,7 +263,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={onOpenPreferences}
-          title={`${t('sidebar.preferences')} (⌘,)`}
+          title={`${t('sidebar.preferences')} (${raccourci(',')})`}
           style={s(
             'width: 100%; height: 32px; display: flex; align-items: center; gap: 9px; padding: 0 8px; border-radius: 6px; border: 0; background: transparent; cursor: pointer; text-align: left;',
           )}
@@ -385,7 +386,7 @@ export function ProjectSwitcher({
               active={project.path === current}
               snapshot={project.path === current ? snapshot : null}
               etat={agregerEtat(sessions.filter(session => session.projet === project.path))}
-              raccourci={index < 9 ? index + 1 : undefined}
+              rang={index < 9 ? index + 1 : undefined}
               onPick={path => {
                 onPick(path)
                 setOpen(false)
@@ -401,7 +402,7 @@ export function ProjectSwitcher({
           {picker && (
             <button
               type="button"
-              title={t('sidebar.open_project')}
+              title={t('sidebar.open_project', { raccourci: raccourci('O') })}
               onClick={() => {
                 setOpen(false)
                 openProject(onProjects, onError)
@@ -410,7 +411,7 @@ export function ProjectSwitcher({
                 'margin-top: 4px; padding-top: 6px; border-top: 1px solid var(--color-border-chrome); display: flex; align-items: center; gap: 8px; height: 28px; padding-left: 8px; border-radius: 6px; border: 0; background: transparent; color: var(--color-text-quaternary); font-size: 12.5px; cursor: pointer; text-align: left;',
               )}
             >
-              +&nbsp;&nbsp;{t('sidebar.open_project')}
+              +&nbsp;&nbsp;{t('sidebar.open_project', { raccourci: raccourci('O') })}
             </button>
           )}
         </div>
@@ -447,7 +448,7 @@ function RailLink({
   path: string
   active: boolean
   compact?: boolean
-  /** Numéro de raccourci ⌘N, affiché à droite de la ligne (maquette 2b). */
+  /** Rang de la vue, affiché nu à droite de la ligne (maquette 2b) : le modificateur est implicite. */
   shortcut?: number
   /** Pastille de compte à droite, quand la vue en a un (ex. Tableau). */
   count?: number
@@ -516,7 +517,7 @@ function ProjectRow({
   active,
   snapshot,
   etat,
-  raccourci,
+  rang,
   onPick,
   onRemove,
 }: {
@@ -530,8 +531,8 @@ function ProjectRow({
    * projet sans session n'est pas un projet au repos (T-0217).
    */
   etat: EtatSession | null
-  /** Numéro du raccourci ⇧⌘N, pour les neuf premiers projets. */
-  raccourci?: number
+  /** Rang du projet dans la liste, pour les neuf premiers : ce qu'écrit son raccourci. */
+  rang?: number
   onPick: (path: string) => void
   onRemove: () => void
 }) {
@@ -628,12 +629,12 @@ function ProjectRow({
           {project.name}
         </div>
 
-        {!confirming && typeof raccourci === 'number' && (
+        {!confirming && typeof rang === 'number' && (
           <span
             aria-hidden="true"
             style={s('font-family: var(--font-mono); font-size: 10px; color: var(--color-text-faint); flex: none;')}
           >
-            ⇧⌘{raccourci}
+            {raccourci('shift', rang)}
           </span>
         )}
 

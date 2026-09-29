@@ -9,6 +9,7 @@ import {
   SectionGeneral,
   SectionInterface,
 } from './PreferencesPanel'
+import { setCurrentLanguage } from './i18n'
 import { PreferencesPreview, ongletsVisibles } from './PreferencesPreview'
 import { appliquerProfil, PROFILS, profilCourant, SectionProfils } from './PreferencesProfils'
 import { SectionProjet } from './PreferencesProjet'
@@ -23,6 +24,18 @@ import { SectionProjet } from './PreferencesProjet'
  * préférences vient d'un disque qu'on ne contrôle pas : chaque champ peut
  * manquer, et un rendu qui lève emporterait la fenêtre entière.
  */
+
+/**
+ * La langue, épinglée — sans quoi ces tests dépendent de la locale du poste.
+ *
+ * `t()` ne lit pas le `langue` des paramètres rendus : il lit l'état de module
+ * de `i18n`, dont le repli est `navigator.language`. Ce global n'existait pas
+ * dans Node ; depuis la 21 il existe et porte la locale du système. Les deux
+ * tests qui attendent un libellé anglais passaient donc sur les runners de la
+ * CI et échouaient sur un poste français, sur une assertion qui ne parlait pas
+ * de langue.
+ */
+setCurrentLanguage('en')
 
 const ORDRE = ['apercu', 'navigateur', 'produit', 'historique', 'tableau', 'donnees', 'stack']
 

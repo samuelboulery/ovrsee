@@ -20,6 +20,7 @@ import {
 } from './data'
 import { pasteToClaude } from './pty'
 import { t } from './i18n'
+import { raccourci } from './raccourcis'
 import { s } from './style'
 
 type Item =
@@ -326,7 +327,7 @@ function PaletteRow({
       )}
       {item.kind === 'view' && item.shortcut !== null && item.shortcut > 0 && item.shortcut <= 9 && (
         <span style={s('font-family: var(--font-mono); font-size: 11px; color: var(--color-text-quaternary);')}>
-          ⌘{item.shortcut}
+          {raccourci(item.shortcut)}
         </span>
       )}
     </button>

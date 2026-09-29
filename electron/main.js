@@ -39,6 +39,7 @@ import { openSession, writeTo, resize, closeSession, closeAll } from './pty.js'
 import {
   accordRequis,
   crawlState,
+  devALancer,
   devSurDisque,
   startCrawl,
   stopAllCrawls,
@@ -368,11 +369,19 @@ app.whenReady().then(() => {
   // Ce qui doit rester impossible, c'est qu'un rendu compromis lance un shell
   // dans un dossier que l'utilisateur n'a jamais désigné : même garde que
   // `projects:reveal`.
-  ipcMain.handle('pty:open', (event, projectPath, kind) => {
+  //
+  // `dev` est le bouton « Lancer le serveur » du Navigateur : un shell où
+  // l'ovrsee tape la commande `dev` du projet. Le rendu ne la fournit pas —
+  // `devALancer` la relit sur le disque et exige le même accord que le crawl.
+  ipcMain.handle('pty:open', async (event, projectPath, kind) => {
     if (typeof projectPath !== 'string' || !projects().some(p => p.path === projectPath)) {
       return { error: "ce dossier n'est pas dans la liste des projets de l'ovrsee" }
     }
-    return openSession(event.sender, projectPath, kind)
+    if (kind !== 'dev') return openSession(event.sender, projectPath, kind)
+
+    const dev = await devALancer(projectPath, d => demanderAccord(event.sender, projectPath, d))
+    if (dev === null) return { error: 'serveur de dev non lancé : pas de commande dev approuvée' }
+    return openSession(event.sender, projectPath, 'shell', dev)
   })
 
   // Crawl. Même garde que `pty:open`, et pour la même raison : le registre est

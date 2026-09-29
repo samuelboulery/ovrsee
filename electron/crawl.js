@@ -31,7 +31,7 @@ import { fileURLToPath } from 'node:url'
 
 import { readJson } from '../hooks/json.js'
 
-import { DEV_DEFAUT, estApprouve } from '../crawl/confiance.js'
+import { approuver, DEV_DEFAUT, estApprouve } from '../crawl/confiance.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const CRAWLER = join(HERE, '..', 'crawl', 'index.js')
@@ -67,6 +67,30 @@ export function devSurDisque(projectPath) {
 export function accordRequis(projectPath) {
   const dev = devSurDisque(projectPath)
   return dev !== null && !estApprouve(projectPath, dev)
+}
+
+/**
+ * La commande `dev` à taper dans un terminal neuf, depuis le bouton « Lancer le
+ * serveur » du Navigateur — ou `null` s'il n'y a rien à lancer ou que
+ * l'utilisateur refuse.
+ *
+ * Même accord que le crawl, et pour la même raison : la ligne vient du dépôt
+ * observé, pas de l'utilisateur. Elle est relue sur le disque, jamais reçue du
+ * rendu ; `demander` pose la question (la modale native de `main.js`) avec
+ * cette chaîne-là, et c'est elle qu'on approuve.
+ *
+ * @param {string} projectPath
+ * @param {(dev: string) => Promise<boolean>} demander
+ * @returns {Promise<string|null>}
+ */
+export async function devALancer(projectPath, demander) {
+  const dev = devSurDisque(projectPath)
+  if (dev === null) return null
+  if (!estApprouve(projectPath, dev)) {
+    if (!(await demander(dev))) return null
+    approuver(projectPath, dev)
+  }
+  return dev
 }
 
 /**

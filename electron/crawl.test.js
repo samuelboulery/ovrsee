@@ -19,7 +19,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { setTimeout as attendre } from 'node:timers/promises'
 
-import { accordRequis, decoupe, devSurDisque, progression, crawlState, startCrawl, stopCrawl } from './crawl.js'
+import { accordRequis, decoupe, devALancer, devSurDisque, progression, crawlState, startCrawl, stopCrawl } from './crawl.js'
 import { approuver } from '../crawl/confiance.js'
 
 /** Magasin de confiance jetable — jamais le profil réel de la machine. */
@@ -141,4 +141,35 @@ test('une configuration sans dev porte sur le même défaut que le crawler', () 
   assert.equal(devSurDisque(dir), 'pnpm dev')
   approuver(dir, 'pnpm dev')
   assert.equal(accordRequis(dir), false)
+})
+
+// --- le serveur de dev lancé dans un terminal (issue 120) -------------------
+
+test('devALancer rend la commande du disque sans question si elle est approuvée', async () => {
+  magasinNeuf()
+  const dir = projetAvecDev('pnpm start')
+  approuver(dir, 'pnpm start')
+
+  const demande = () => assert.fail('aucune question attendue')
+  assert.equal(await devALancer(dir, demande), 'pnpm start')
+})
+
+test('devALancer demande l’accord, et le retient seulement sur un oui', async () => {
+  magasinNeuf()
+  const dir = projetAvecDev('pnpm start')
+
+  const vues = []
+  assert.equal(await devALancer(dir, async dev => (vues.push(dev), false)), null)
+  assert.equal(accordRequis(dir), true)
+
+  assert.equal(await devALancer(dir, async dev => (vues.push(dev), true)), 'pnpm start')
+  assert.equal(accordRequis(dir), false)
+  // La question porte sur la chaîne relue sur le disque, rien d'autre.
+  assert.deepEqual(vues, ['pnpm start', 'pnpm start'])
+})
+
+test('devALancer ne lance rien sans configuration lisible', async () => {
+  magasinNeuf()
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-sans-config-'))
+  assert.equal(await devALancer(dir, async () => true), null)
 })

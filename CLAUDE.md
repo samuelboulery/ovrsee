@@ -47,6 +47,11 @@ local non authentifié. La surface exposée ne reçoit qu'un chemin de projet, v
 contre le registre : ni nom de programme, ni commande, ni même la ligne `dev` de la
 configuration, que le crawler lit lui-même sur le disque.
 
+**« Lancer le serveur » (Navigateur) aussi.** Le rendu demande un pty de genre `dev`,
+rien de plus : `pty:open` relit la ligne `dev` sur le disque (`devALancer`,
+`electron/crawl.js`), exige le même accord que le crawl — `trust.json`, modale native
+sinon — et c'est le principal qui la tape dans le shell. Le rendu ne la transmet jamais.
+
 Même corollaire pour les secrets d'intégration (Vercel/Netlify/Supabase, onglet
 Aperçu) : ils vivent dans `~/.claude/ovrsee/integrations.json`, **hors du dépôt
 observé** — ni `ovrsee/tickets/`, ni `ovrsee/board.json`, ni aucun autre fichier

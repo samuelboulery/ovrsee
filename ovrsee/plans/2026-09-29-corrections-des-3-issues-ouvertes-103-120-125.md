@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Corrections des 3 issues ouvertes (#103, #120, #125)",
   "opened": "2026-09-29",
-  "closed": null,
+  "closed": "2026-09-29",
   "commits": [
     {
       "sha": "05098bc",
@@ -12,6 +12,11 @@
         "hooks/notify.test.js",
         "hooks/ovrsee-notify.js"
       ]
+    },
+    {
+      "sha": "17abc00",
+      "date": "2026-09-29",
+      "files": []
     }
   ]
 }

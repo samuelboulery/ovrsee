@@ -176,6 +176,8 @@ export interface Ticket {
   tags: string[]
   cree: string
   maj: string
+  /** Passage en colonne finale, ISO à la seconde. Absent ailleurs, et sur les tickets soldés avant lui. */
+  fait?: string
   /** Plan lié, s'il existe. Les deux stocks restent indépendants. */
   plan: string | null
   /** Type du ticket : "epic" pour les epics, absent pour les tickets ordinaires. */
@@ -355,6 +357,16 @@ export const sortTickets = (tickets: Ticket[]): Ticket[] =>
     (a, b) =>
       PRIORITES.indexOf(a.priorite) - PRIORITES.indexOf(b.priorite) ||
       (b.cree ?? '').localeCompare(a.cree ?? ''),
+  )
+
+/**
+ * La colonne finale, du dernier soldé au premier (issue 103) : la priorité n'y dit
+ * plus rien. Un ticket soldé avant `fait` retombe sur `maj`, date seule, puis
+ * sur l'identifiant — le plus haut a le plus de chances d'être le plus récent.
+ */
+export const sortFaits = (tickets: Ticket[]): Ticket[] =>
+  [...liste(tickets)].sort(
+    (a, b) => (b.fait ?? b.maj ?? '').localeCompare(a.fait ?? a.maj ?? '') || b.id.localeCompare(a.id),
   )
 
 /**

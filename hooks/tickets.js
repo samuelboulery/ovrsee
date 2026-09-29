@@ -246,6 +246,8 @@ function creerTicket(ovrseeDir, champs, now, session) {
     meta.charge = requireCharge(champs.charge)
   }
 
+  if (colonne === colonneFinale(colonnes)) meta.fait = now.toISOString()
+
   const body = String(champs?.corps ?? '').trim() + '\n'
   const file = ticketFileName(meta.id, titre)
 
@@ -299,6 +301,18 @@ function rewrite(ovrseeDir, file, transform, now) {
 }
 
 /**
+ * `fait` date le passage en colonne finale, à la seconde : `maj` n'a que le jour
+ * et bouge à chaque édition, il ne peut pas ordonner la colonne « fait » (issue 103).
+ * Un ticket redéposé dans la colonne finale garde sa date ; il la perd en sortant.
+ */
+function avecDateDeFait(meta, avant, colonnes, now) {
+  const { fait: _ancien, ...reste } = meta
+  if (meta.colonne !== colonneFinale(colonnes)) return reste
+  const garde = avant?.colonne === meta.colonne && typeof avant.fait === 'string'
+  return { ...reste, fait: garde ? avant.fait : now.toISOString() }
+}
+
+/**
  * Déplace un ticket d'une colonne à l'autre. Ne touche à rien d'autre — sauf
  * le ticket actif, dont ce déplacement est le seul chemin d'écriture commun
  * à tous les appelants (route UI, MCP, hooks) :
@@ -323,7 +337,7 @@ export function moveTicket(ovrseeDir, file, colonne, now = new Date(), session =
     file,
     ticket => {
       planDuTicket = ticket.meta.plan
-      return { meta: { ...ticket.meta, colonne }, body: ticket.body }
+      return { meta: avecDateDeFait({ ...ticket.meta, colonne }, ticket.meta, colonnes, now), body: ticket.body }
     },
     now,
   )

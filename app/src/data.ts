@@ -194,7 +194,7 @@ export interface Ticket {
  * d'autres, et les recopier ici en ferait une deuxième définition à tenir.
  */
 export interface OvrseeConfig {
-  /** Commande qui démarre l'application. Affichée, jamais exécutée. */
+  /** Commande qui démarre l'application. Affichée ici ; seul le processus principal l'exécute, relue sur le disque. */
   dev?: string
   /** Où l'application s'affiche une fois démarrée. */
   baseUrl?: string

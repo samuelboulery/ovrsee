@@ -2,7 +2,7 @@
 {
   "id": "T-0267",
   "titre": "Le navigateur propose de lancer le serveur de dev",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "navigateur",
@@ -13,7 +13,8 @@
   "cree": "2026-09-29",
   "maj": "2026-09-29",
   "plan": "2026-09-29-corrections-des-3-issues-ouvertes-103-120-125.md",
-  "charge": "m"
+  "charge": "m",
+  "fait": "2026-09-29T14:17:03.836Z"
 }
 ---
 

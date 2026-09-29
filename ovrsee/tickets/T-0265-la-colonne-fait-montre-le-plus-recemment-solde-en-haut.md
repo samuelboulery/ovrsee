@@ -2,7 +2,7 @@
 {
   "id": "T-0265",
   "titre": "La colonne « fait » montre le plus récemment soldé en haut",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "tableau",
@@ -11,7 +11,8 @@
   "cree": "2026-09-29",
   "maj": "2026-09-29",
   "plan": "2026-09-29-corrections-des-3-issues-ouvertes-103-120-125.md",
-  "charge": "s"
+  "charge": "s",
+  "fait": "2026-09-29T14:12:42.218Z"
 }
 ---
 

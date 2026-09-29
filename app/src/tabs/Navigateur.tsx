@@ -32,8 +32,10 @@ import {
 /**
  * Onglet Navigateur — l'application en cours de développement, dans l'ovrsee.
  *
- * L'ovrsee ne lance pas le serveur : il s'y branche. La commande se tape dans
- * un shell du panneau du bas, par l'utilisateur ou par Claude. Ce qu'on gagne
+ * L'ovrsee se branche sur le serveur, il ne le lance pas de lui-même. Quand
+ * rien ne répond, « Lancer le serveur » ouvre un shell du panneau du bas où le
+ * processus principal tape la commande `dev` — relue sur le disque, après le
+ * même accord que le crawl (`devALancer`, `electron/crawl.js`). Ce qu'on gagne
  * ici, c'est la boucle courte : cliquer l'élément qui cloche et que Claude en
  * reçoive le sélecteur, le texte et le HTML sans un copier-coller.
  */
@@ -43,6 +45,7 @@ export function Navigateur({
   focusRoute,
   onFocusHandled,
   onCreerTicketDepuisElement,
+  onLancerServeur,
 }: {
   snapshot: Snapshot
   visible: boolean
@@ -51,6 +54,8 @@ export function Navigateur({
   onFocusHandled?: () => void
   /** Bascule sur Tableau et attache le contexte de l'élément au prochain ticket créé — voir `App.tsx`. */
   onCreerTicketDepuisElement: (corps: string, tags: string[]) => void
+  /** Ouvre le shell `dev` du panneau du bas — voir `App.tsx`. */
+  onLancerServeur?: () => void
 }) {
   const view = useRef<Webview | null>(null)
   const [url, setUrl] = useState(() => startUrl(snapshot))
@@ -63,6 +68,14 @@ export function Navigateur({
   const pending = useRef<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [failure, setFailure] = useState<string | null>(null)
+  // -102, ERR_CONNECTION_REFUSED : rien n'écoute. Seul cas où lancer le serveur a un sens.
+  const [refusee, setRefusee] = useState(false)
+  // Après « Lancer le serveur », recharger jusqu'à ce qu'il réponde.
+  const relance = useRef<ReturnType<typeof setInterval> | null>(null)
+  const arreterRelance = () => {
+    if (relance.current) clearInterval(relance.current)
+    relance.current = null
+  }
   const [loadMs, setLoadMs] = useState<number | null>(null)
   const loadStarted = useRef<number | null>(null)
   const [logs, setLogs] = useState<Log[]>([])
@@ -197,6 +210,7 @@ export function Navigateur({
     const navigated = () => {
       setLogs([])
       setFailure(null)
+      arreterRelance()
       setUrl(element.getURL())
     }
 
@@ -208,6 +222,7 @@ export function Navigateur({
       // -3 : navigation abandonnée par la page elle-même, pas une panne.
       if (detail.errorCode === -3) return
       setFailure(detail.errorDescription || t('navigateur.loading_failed'))
+      setRefusee(detail.errorCode === -102)
       setLoading(false)
       setLoadMs(null)
       loadStarted.current = null
@@ -338,6 +353,18 @@ export function Navigateur({
       fermerCarte()
     }
   }
+
+  // Plafond de 60 s, comme l'attente du crawl : au-delà, le ⟳ reste à la main.
+  const lancerServeur = () => {
+    onLancerServeur?.()
+    arreterRelance()
+    const debut = Date.now()
+    relance.current = setInterval(() => {
+      if (Date.now() - debut > 60_000) return arreterRelance()
+      view.current?.reload()
+    }, 2000)
+  }
+  useEffect(() => arreterRelance, [])
 
   const envoyerAClaude = async () => {
     if (!picked) return
@@ -584,7 +611,7 @@ export function Navigateur({
               {t('navigateur.no_server')}
               {snapshot.config?.dev ? (
                 <>
-                  {' '}et lancez{' '}
+                  {' '}{t('navigateur.no_server_run')}{' '}
                   <span style={s('font-family: var(--font-mono); color: var(--color-accent);')}>
                     {snapshot.config.dev}
                   </span>
@@ -592,6 +619,11 @@ export function Navigateur({
               ) : null}
               .
             </div>
+            {refusee && onLancerServeur && (
+              <button type="button" onClick={lancerServeur} className="btn btn-primary" style={s('font-size: 12px; margin-top: 8px;')}>
+                {t('navigateur.launch_server')}
+              </button>
+            )}
           </div>
         )}
       </div>

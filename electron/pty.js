@@ -88,9 +88,12 @@ let counter = 0
  * @param {Electron.WebContents} sender destinataire des octets du terminal
  * @param {string} projectPath dossier du projet, déjà reconnu par `main.js`
  * @param {'claude'|'shell'} [kind] genre de session ; tout autre valeur vaut `claude`
+ * @param {string} [commande] ligne tapée au démarrage à la place de celle du
+ *   genre. Seul `main.js` la passe : c'est la commande `dev` relue sur le disque
+ *   et approuvée (`devALancer`), jamais une chaîne venue du rendu.
  * @returns {{id: string} | {error: string}}
  */
-export function openSession(sender, projectPath, kind = 'claude') {
+export function openSession(sender, projectPath, kind = 'claude', commande) {
   // Reste après la garde du registre : un projet enregistré puis déplacé sur le
   // disque échouerait sinon dans `spawn`, avec un message autrement moins clair.
   if (typeof projectPath !== 'string' || !existsSync(projectPath)) {
@@ -100,7 +103,8 @@ export function openSession(sender, projectPath, kind = 'claude') {
   // Le genre vient du rendu : `hasOwn` et pas une simple indexation, sinon
   // `constructor` ou `toString` désigneraient une valeur héritée du prototype.
   const known = typeof kind === 'string' && Object.hasOwn(STARTUP_COMMAND, kind)
-  const startup = known ? STARTUP_COMMAND[kind] : STARTUP_COMMAND.claude
+  const startup =
+    typeof commande === 'string' ? `${commande}\n` : known ? STARTUP_COMMAND[kind] : STARTUP_COMMAND.claude
 
   const shell = loginShell()
   const id = `pty-${++counter}`

@@ -133,7 +133,15 @@ export function genrePour(payload) {
 
   // Fin de tour : « Claude a fini, c'est à toi ». Claude Code n'a pas
   // d'événement de fin de session — c'est bien ce moment-là qui est utile.
-  if (payload.hook_event_name === 'Stop') return 'stop'
+  //
+  // Sauf si du travail de fond est encore en vol — sous-agents, workflow,
+  // shell en arrière-plan (issue 125) : la session n'a pas fini, elle attend
+  // d'être réveillée, et le réveil ne passe pas par `UserPromptSubmit`. Elle
+  // reste donc « busy » jusqu'au `Stop` qui trouve `background_tasks` vide.
+  if (payload.hook_event_name === 'Stop') {
+    const enVol = Array.isArray(payload.background_tasks) && payload.background_tasks.length > 0
+    return enVol ? 'busy' : 'stop'
+  }
 
   // Départ de tour : la session se met au travail. C'est l'état où elle passe
   // l'essentiel de son temps, et le seul moment où la demande est connue — d'où

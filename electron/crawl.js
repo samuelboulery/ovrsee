@@ -79,13 +79,18 @@ export function accordRequis(projectPath) {
  * rendu ; `demander` pose la question (la modale native de `main.js`) avec
  * cette chaîne-là, et c'est elle qu'on approuve.
  *
+ * Une ligne à caractère de contrôle est refusée d'office : tapée dans un pty,
+ * chaque saut de ligne lancerait une commande de plus, que la modale native
+ * peut tronquer. Le crawl n'a pas ce souci — il passe la chaîne en argument.
+ *
  * @param {string} projectPath
  * @param {(dev: string) => Promise<boolean>} demander
  * @returns {Promise<string|null>}
  */
 export async function devALancer(projectPath, demander) {
   const dev = devSurDisque(projectPath)
-  if (dev === null) return null
+  // eslint-disable-next-line no-control-regex
+  if (dev === null || /[\x00-\x1f\x7f]/.test(dev)) return null
   if (!estApprouve(projectPath, dev)) {
     if (!(await demander(dev))) return null
     approuver(projectPath, dev)

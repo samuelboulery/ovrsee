@@ -51,6 +51,8 @@ configuration, que le crawler lit lui-même sur le disque.
 rien de plus : `pty:open` relit la ligne `dev` sur le disque (`devALancer`,
 `electron/crawl.js`), exige le même accord que le crawl — `trust.json`, modale native
 sinon — et c'est le principal qui la tape dans le shell. Le rendu ne la transmet jamais.
+L'accord porte sur la provenance du dépôt, pas sur le rendu : un shell nu reste ouvert à
+ce que le rendu y écrit (`pty:write`), comme avant — c'est le terminal qu'on demande.
 
 Même corollaire pour les secrets d'intégration (Vercel/Netlify/Supabase, onglet
 Aperçu) : ils vivent dans `~/.claude/ovrsee/integrations.json`, **hors du dépôt

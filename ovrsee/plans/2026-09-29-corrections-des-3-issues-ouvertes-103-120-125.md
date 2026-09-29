@@ -4,7 +4,38 @@
   "title": "Corrections des 3 issues ouvertes (#103, #120, #125)",
   "opened": "2026-09-29",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "2474d6e",
+      "date": "2026-09-29",
+      "files": [
+        "app/src/data.test.ts",
+        "app/src/data.ts",
+        "app/src/tabs/Tableau.tsx",
+        "hooks/tickets.js",
+        "hooks/tickets.test.js",
+        "skills/ovrsee-tickets/SKILL.md"
+      ]
+    },
+    {
+      "sha": "373e6ac",
+      "date": "2026-09-29",
+      "files": [
+        "CLAUDE.md",
+        "app/src/App.tsx",
+        "app/src/Terminal.tsx",
+        "app/src/data.ts",
+        "app/src/pty.ts",
+        "app/src/tabs/Navigateur.tsx",
+        "app/src/useTerminal.ts",
+        "electron/crawl.js",
+        "electron/crawl.test.js",
+        "electron/main.js",
+        "electron/pty.js",
+        "hooks/i18n.js"
+      ]
+    }
+  ]
 }
 ---
 

@@ -4,7 +4,16 @@
   "title": "Corrections des 3 issues ouvertes (#103, #120, #125)",
   "opened": "2026-09-29",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "05098bc",
+      "date": "2026-09-29",
+      "files": [
+        "hooks/notify.test.js",
+        "hooks/ovrsee-notify.js"
+      ]
+    }
+  ]
 }
 ---
 

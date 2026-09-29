@@ -2,7 +2,7 @@
 {
   "id": "T-0266",
   "titre": "Le statut de session attend la fin des agents d'arrière-plan",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "terminal",
@@ -12,7 +12,8 @@
   "cree": "2026-09-29",
   "maj": "2026-09-29",
   "plan": "2026-09-29-corrections-des-3-issues-ouvertes-103-120-125.md",
-  "charge": "m"
+  "charge": "m",
+  "fait": "2026-09-29T14:20:40.536Z"
 }
 ---
 

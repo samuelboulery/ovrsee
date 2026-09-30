@@ -159,7 +159,7 @@ export function ticketTimeline(tickets, plans) {
   // premier. L'identifiant croît avec la création, jamais réutilisé ; à
   // égalité de jour, le plus grand est la meilleure approximation de « touché
   // en dernier » qu'on puisse tirer d'une date sans heure.
-  const idNum = ticket => Number(/^T-(\d+)$/.exec(ticket?.id ?? '')?.[1] ?? 0)
+  const idNum = ticket => Number(/^[TE]-(\d+)$/.exec(ticket?.id ?? '')?.[1] ?? 0)
 
   for (const band of byPlan.values()) {
     band.tickets.sort((a, b) => b.maj.localeCompare(a.maj) || idNum(b) - idNum(a))

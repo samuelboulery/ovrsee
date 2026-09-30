@@ -2,7 +2,7 @@
 {
   "id": "T-0149",
   "titre": "Abaisser le seuil d'autocompact du contexte",
-  "epic": "T-0148",
+  "epic": "E-0148",
   "colonne": "fait",
   "priorite": "haute",
   "charge": "xs",
@@ -11,7 +11,7 @@
     "config"
   ],
   "cree": "2026-08-16",
-  "maj": "2026-08-16",
+  "maj": "2026-09-30",
   "plan": "2026-08-16-audit-de-consommation-de-tokens-constats-et-correctifs.md"
 }
 ---

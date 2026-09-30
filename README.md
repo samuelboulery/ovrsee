@@ -84,7 +84,9 @@ ticket shows up with its status. Filterable by plans, tickets, and off-plan comm
 One file per ticket in `ovrsee/tickets/`, columns set in `ovrsee/board.json`.
 Written here just like from the integrated terminal — an image pasted into a ticket
 is stored next to it. Epics show their progress and their child tickets in their own
-view; the kanban holds tickets only.
+view; the kanban holds tickets only. Tickets are numbered `T-0012`, epics `E-0012`,
+on a single counter: ticking “epic” swaps the prefix and keeps the number. Epics
+created before that prefix move over with `pnpm ovrsee:migrate-epics`.
 
 ### Data — the project's tables
 ![Data tab](./docs/screenshots/donnees.webp)
@@ -329,7 +331,7 @@ setting — the `minimumReleaseAge` quarantine, the build allowlist — lives in
 The active plan belongs to a Claude session, not to the repository: it lives in `ovrsee/.active/<session>.json`, which git ignores. Several sessions can therefore work side by side on the same repository without stealing each other's plan. Within one session, though, every commit is attached — including unrelated fixes. Run `pnpm ovrsee:close` before switching tasks.
 
 **A commit whose session is unknown may end up attached to nothing.**
-Attribution goes through four stages: a `T-XXXX` ticket quoted in the commit message, then the session (`CLAUDE_CODE_SESSION_ID`, inherited by the git hook), then the single active plan if there is only one, then nothing. A commit made outside Claude Code, with no ticket quoted, while two plans are active, is attached nowhere — and says so on stderr.
+Attribution goes through four stages: a `T-XXXX` ticket (or `E-XXXX` epic) quoted in the commit message, then the session (`CLAUDE_CODE_SESSION_ID`, inherited by the git hook), then the single active plan if there is only one, then nothing. A commit made outside Claude Code, with no ticket quoted, while two plans are active, is attached nowhere — and says so on stderr.
 
 **The `dev` command needs an agreement, and it lives outside the repository.**
 `ovrsee.config.json` is versioned: its `dev` line is supplied by the observed

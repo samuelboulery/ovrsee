@@ -5,11 +5,14 @@
   "colonne": "fait",
   "priorite": "moyenne",
   "charge": "l",
-  "tags": ["frontend", "apercu"],
+  "tags": [
+    "frontend",
+    "apercu"
+  ],
   "cree": "2026-08-10",
-  "maj": "2026-08-10",
+  "maj": "2026-09-30",
   "plan": "2026-08-10-dashboard-pour-l-onglet-apercu.md",
-  "epic": "T-0017"
+  "epic": "E-0017"
 }
 ---
 

@@ -5,11 +5,14 @@
   "colonne": "fait",
   "priorite": "haute",
   "charge": "s",
-  "tags": ["packaging", "electron"],
+  "tags": [
+    "packaging",
+    "electron"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-20",
+  "maj": "2026-09-30",
   "plan": "2026-08-19-rendre-l-ovrsee-utilisable-sans-cloner-le-depot.md",
-  "epic": "T-0180"
+  "epic": "E-0180"
 }
 ---
 

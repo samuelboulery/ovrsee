@@ -1,6 +1,6 @@
 ---
 {
-  "id": "T-0218",
+  "id": "E-0218",
   "titre": "Un thème clair",
   "colonne": "backlog",
   "priorite": "haute",
@@ -10,7 +10,7 @@
     "issue-64"
   ],
   "cree": "2026-08-31",
-  "maj": "2026-09-01",
+  "maj": "2026-09-30",
   "plan": "2026-09-01-theme-clair-complet-issue-64-t-0218.md",
   "charge": "l",
   "type": "epic"

@@ -106,7 +106,7 @@ export function plansPourCommit(ovrseeDir, message, session, tickets) {
     trouves.push({ file, source })
   }
 
-  const cites = new Set(String(message ?? '').match(/T-\d{4}/g) ?? [])
+  const cites = new Set(String(message ?? '').match(/\b[TE]-\d{4}\b/g) ?? [])
   for (const ticket of tickets) {
     if (cites.has(ticket.meta.id)) ajoute(ticket.meta.plan, 'ticket')
   }
@@ -128,7 +128,7 @@ function attachCommit(ovrseeDir, root, sources, message, session, tickets) {
     if (actifs.length > 1) {
       process.stderr.write(
         `[ovrsee] commit non rattaché : ${actifs.length} plans actifs et aucun ticket cité ` +
-          `dans le message. Citer « T-XXXX » dans le message pour trancher.\n`,
+          `dans le message. Citer « T-XXXX » ou « E-XXXX » dans le message pour trancher.\n`,
       )
     }
     return []
@@ -197,7 +197,7 @@ export function avancerTicketsDuPlan(ovrseeDir, planFile, message = '', devine =
     t => t.meta.colonne !== finale && (rangDe.get(t.meta.colonne) ?? -1) >= iEnCours,
   )
 
-  const cites = new Set(message.match(/T-\d{4}/g) ?? [])
+  const cites = new Set(message.match(/\b[TE]-\d{4}\b/g) ?? [])
 
   // L'attribution, dans l'ordre de fiabilité. Citer le ticket dans le message
   // tranche — c'est la convention déjà suivie par ce dépôt. À défaut, on ne

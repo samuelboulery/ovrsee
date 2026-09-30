@@ -11,9 +11,9 @@
     "charge-xl"
   ],
   "cree": "2026-08-10",
-  "maj": "2026-08-10",
+  "maj": "2026-09-30",
   "plan": "2026-08-10-integrations-deploiements-base-de-donnees-apercu-donnees.md",
-  "epic": "T-0021"
+  "epic": "E-0021"
 }
 ---
 

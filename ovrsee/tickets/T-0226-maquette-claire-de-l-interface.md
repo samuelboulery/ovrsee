@@ -4,11 +4,15 @@
   "titre": "Maquette claire de l'interface",
   "colonne": "fait",
   "priorite": "haute",
-  "tags": ["ui", "design-system", "issue-64"],
+  "tags": [
+    "ui",
+    "design-system",
+    "issue-64"
+  ],
   "cree": "2026-09-01",
-  "maj": "2026-09-01",
+  "maj": "2026-09-30",
   "plan": "2026-09-01-theme-clair-complet-issue-64-t-0218.md",
-  "epic": "T-0218",
+  "epic": "E-0218",
   "charge": "m"
 }
 ---

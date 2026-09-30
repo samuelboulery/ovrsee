@@ -9,9 +9,9 @@
     "onboarding"
   ],
   "cree": "2026-08-12",
-  "maj": "2026-08-12",
+  "maj": "2026-09-30",
   "plan": "2026-08-12-repasse-ui-ovrsee-ecarts-de-structure-pas-seulement-de-style.md",
-  "epic": "T-0062"
+  "epic": "E-0062"
 }
 ---
 

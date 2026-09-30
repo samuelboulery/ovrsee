@@ -1,6 +1,6 @@
 ---
 {
-  "id": "T-0232",
+  "id": "E-0232",
   "titre": "Second dégraissage ponytail : l’audit du 1er septembre 2026",
   "type": "epic",
   "colonne": "backlog",
@@ -10,7 +10,7 @@
     "audit"
   ],
   "cree": "2026-09-01",
-  "maj": "2026-09-01",
+  "maj": "2026-09-30",
   "plan": null
 }
 ---

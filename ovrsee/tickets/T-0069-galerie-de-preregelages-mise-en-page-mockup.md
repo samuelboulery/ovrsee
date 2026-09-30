@@ -9,9 +9,9 @@
     "onboarding"
   ],
   "cree": "2026-08-12",
-  "maj": "2026-08-12",
+  "maj": "2026-09-30",
   "plan": "2026-08-12-audit-design-pixel-perfect-vs-ovrsee-app-dc-html.md",
-  "epic": "T-0070",
+  "epic": "E-0070",
   "charge": "s"
 }
 ---

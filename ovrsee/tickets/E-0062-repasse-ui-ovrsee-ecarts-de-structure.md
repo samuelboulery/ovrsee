@@ -1,6 +1,6 @@
 ---
 {
-  "id": "T-0062",
+  "id": "E-0062",
   "titre": "Repasse UI ovrsee — écarts de structure, pas seulement de style",
   "colonne": "fait",
   "priorite": "haute",
@@ -9,7 +9,7 @@
     "design-system"
   ],
   "cree": "2026-08-12",
-  "maj": "2026-08-12",
+  "maj": "2026-09-30",
   "plan": "2026-08-12-repasse-ui-ovrsee-ecarts-de-structure-pas-seulement-de-style.md",
   "type": "epic"
 }

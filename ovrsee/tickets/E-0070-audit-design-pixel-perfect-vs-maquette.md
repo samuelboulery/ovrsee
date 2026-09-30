@@ -1,6 +1,6 @@
 ---
 {
-  "id": "T-0070",
+  "id": "E-0070",
   "titre": "Audit design pixel-perfect vs Ovrsee App.dc.html",
   "colonne": "fait",
   "priorite": "haute",
@@ -9,7 +9,7 @@
     "design-system"
   ],
   "cree": "2026-08-12",
-  "maj": "2026-08-12",
+  "maj": "2026-09-30",
   "plan": "2026-08-12-audit-design-pixel-perfect-vs-ovrsee-app-dc-html.md",
   "type": "epic",
   "charge": "xl"

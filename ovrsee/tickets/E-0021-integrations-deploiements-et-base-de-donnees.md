@@ -1,6 +1,6 @@
 ---
 {
-  "id": "T-0021",
+  "id": "E-0021",
   "titre": "Intégrations déploiements et base de données",
   "colonne": "fait",
   "priorite": "haute",
@@ -9,7 +9,7 @@
     "epic"
   ],
   "cree": "2026-08-10",
-  "maj": "2026-08-10",
+  "maj": "2026-09-30",
   "plan": "2026-08-10-integrations-deploiements-base-de-donnees-apercu-donnees.md",
   "type": "epic"
 }

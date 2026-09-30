@@ -8,9 +8,9 @@
     "ui"
   ],
   "cree": "2026-08-11",
-  "maj": "2026-08-11",
+  "maj": "2026-09-30",
   "plan": "2026-08-11-refonte-ui-ovrsee-mise-en-uvre-des-maquettes.md",
-  "epic": "T-0044"
+  "epic": "E-0044"
 }
 ---
 

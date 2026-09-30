@@ -49,13 +49,19 @@ const git = (args, cwd) =>
  */
 export function ticketsCites(message) {
   const texte = String(message ?? '')
-  const cites = new Set(texte.match(/T-\d{4}/g) ?? [])
+  const cites = new Set(texte.match(/\b[TE]-\d{4}\b/g) ?? [])
 
-  for (const [, a, b] of texte.matchAll(/T-(\d{4})\s*(?:→|->|…|\.\.\.)\s*T-(\d{4})/g)) {
+  // Les deux préfixes pour chaque numéro : tickets et epics partagent le
+  // compteur, un epic né au milieu d'un lot porte un numéro de l'intervalle. Un
+  // identifiant qui n'existe pas ne désigne rien.
+  for (const [, a, b] of texte.matchAll(/\b[TE]-(\d{4})\s*(?:→|->|…|\.\.\.)\s*[TE]-(\d{4})\b/g)) {
     const debut = Number(a)
     const fin = Number(b)
     if (fin <= debut || fin - debut > 100) continue
-    for (let n = debut; n <= fin; n++) cites.add(`T-${String(n).padStart(4, '0')}`)
+    for (let n = debut; n <= fin; n++) {
+      const numero = String(n).padStart(4, '0')
+      cites.add(`T-${numero}`).add(`E-${numero}`)
+    }
   }
 
   return cites

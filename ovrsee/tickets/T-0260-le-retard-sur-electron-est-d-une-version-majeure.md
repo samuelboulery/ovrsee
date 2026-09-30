@@ -8,9 +8,9 @@
     "dependances"
   ],
   "cree": "2026-09-02",
-  "maj": "2026-09-02",
+  "maj": "2026-09-30",
   "plan": "2026-09-02-audit-complet-pre-release-1-2-0-plan-d-execution.md",
-  "epic": "T-0243"
+  "epic": "E-0243"
 }
 ---
 

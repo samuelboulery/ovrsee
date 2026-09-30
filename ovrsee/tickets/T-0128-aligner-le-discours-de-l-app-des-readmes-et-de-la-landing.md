@@ -5,13 +5,13 @@
   "colonne": "fait",
   "priorite": "haute",
   "charge": "l",
-  "epic": "T-0123",
+  "epic": "E-0123",
   "tags": [
     "contenu",
     "i18n"
   ],
   "cree": "2026-08-13",
-  "maj": "2026-08-13",
+  "maj": "2026-09-30",
   "plan": "2026-08-13-professionnaliser-le-depot-avant-le-passage-en-public.md"
 }
 ---

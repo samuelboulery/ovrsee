@@ -1,6 +1,6 @@
 ---
 {
-  "id": "T-0058",
+  "id": "E-0058",
   "titre": "Repasse UI ovrsee — coller à la maquette Ovrsee App.dc.html",
   "colonne": "fait",
   "priorite": "haute",
@@ -9,7 +9,7 @@
     "design-system"
   ],
   "cree": "2026-08-12",
-  "maj": "2026-08-12",
+  "maj": "2026-09-30",
   "plan": "2026-08-11-repasse-ui-ovrsee-coller-a-la-maquette-ovrsee-app-dc-html.md",
   "type": "epic"
 }

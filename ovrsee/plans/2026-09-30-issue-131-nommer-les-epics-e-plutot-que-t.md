@@ -4,7 +4,33 @@
   "title": "Issue #131 — nommer les epics `E-` plutôt que `T-`",
   "opened": "2026-09-30",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "81c2a45",
+      "date": "2026-09-30",
+      "files": [
+        "CLAUDE.md",
+        "README.fr.md",
+        "README.md",
+        "app/src/tabs/Tableau.tsx",
+        "hooks/active.js",
+        "hooks/ovrsee-cli.js",
+        "hooks/ovrsee-post-commit.js",
+        "hooks/ovrsee-post-commit.test.js",
+        "hooks/reconcile.js",
+        "hooks/reconcile.test.js",
+        "hooks/ticket-id.js",
+        "hooks/ticket-images.js",
+        "hooks/tickets.js",
+        "hooks/tickets.test.js",
+        "hooks/timeline.js",
+        "mcp/server.js",
+        "package.json",
+        "skills/ovrsee-tickets/SKILL.md",
+        "skills/ovrsee/SKILL.md"
+      ]
+    }
+  ]
 }
 ---
 

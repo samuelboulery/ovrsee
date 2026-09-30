@@ -5,11 +5,15 @@
   "colonne": "fait",
   "priorite": "moyenne",
   "charge": "xs",
-  "tags": ["i18n", "test", "dette"],
+  "tags": [
+    "i18n",
+    "test",
+    "dette"
+  ],
   "cree": "2026-08-22",
-  "maj": "2026-08-22",
+  "maj": "2026-09-30",
   "plan": null,
-  "epic": "T-0197"
+  "epic": "E-0197"
 }
 ---
 

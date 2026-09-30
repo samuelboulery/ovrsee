@@ -2,7 +2,7 @@
 {
   "id": "T-0154",
   "titre": "Densifier le CLAUDE.md du projet",
-  "epic": "T-0148",
+  "epic": "E-0148",
   "colonne": "fait",
   "priorite": "basse",
   "charge": "s",
@@ -11,7 +11,7 @@
     "docs"
   ],
   "cree": "2026-08-16",
-  "maj": "2026-08-16",
+  "maj": "2026-09-30",
   "plan": "2026-08-16-audit-de-consommation-de-tokens-constats-et-correctifs.md"
 }
 ---

@@ -2,7 +2,7 @@
 {
   "id": "T-0268",
   "titre": "Nommer les epics E- plutôt que T-",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "charge": "m",
   "tags": [
@@ -11,7 +11,8 @@
   ],
   "cree": "2026-09-30",
   "maj": "2026-09-30",
-  "plan": "2026-09-30-issue-131-nommer-les-epics-e-plutot-que-t.md"
+  "plan": "2026-09-30-issue-131-nommer-les-epics-e-plutot-que-t.md",
+  "fait": "2026-09-30T21:21:41.794Z"
 }
 ---
 

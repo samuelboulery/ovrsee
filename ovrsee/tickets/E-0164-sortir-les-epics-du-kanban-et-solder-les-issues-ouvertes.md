@@ -1,6 +1,6 @@
 ---
 {
-  "id": "T-0164",
+  "id": "E-0164",
   "titre": "Sortir les epics du Kanban et solder les issues ouvertes",
   "colonne": "fait",
   "priorite": "haute",
@@ -11,7 +11,7 @@
     "terminal"
   ],
   "cree": "2026-08-19",
-  "maj": "2026-08-20",
+  "maj": "2026-09-30",
   "plan": "2026-08-19-sortir-les-epics-du-kanban-et-solder-les-4-issues-ouvertes.md",
   "type": "epic"
 }

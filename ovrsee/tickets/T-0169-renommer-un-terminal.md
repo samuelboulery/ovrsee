@@ -10,9 +10,9 @@
     "terminal"
   ],
   "cree": "2026-08-19",
-  "maj": "2026-08-20",
+  "maj": "2026-09-30",
   "plan": "2026-08-19-sortir-les-epics-du-kanban-et-solder-les-4-issues-ouvertes.md",
-  "epic": "T-0164"
+  "epic": "E-0164"
 }
 ---
 

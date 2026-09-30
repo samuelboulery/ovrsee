@@ -1,6 +1,6 @@
 ---
 {
-  "id": "T-0156",
+  "id": "E-0156",
   "titre": "État plan/ticket propre à chaque session Claude",
   "colonne": "fait",
   "priorite": "haute",
@@ -9,7 +9,7 @@
     "multi-session"
   ],
   "cree": "2026-08-16",
-  "maj": "2026-08-16",
+  "maj": "2026-09-30",
   "plan": "2026-08-16-rendre-l-etat-plan-actif-ticket-actif-propre-a-chaque-sessio.md",
   "type": "epic",
   "charge": "l"

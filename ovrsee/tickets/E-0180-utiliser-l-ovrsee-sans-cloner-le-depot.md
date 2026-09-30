@@ -1,13 +1,18 @@
 ---
 {
-  "id": "T-0180",
+  "id": "E-0180",
   "titre": "Utiliser l'ovrsee sans cloner le dépôt",
   "colonne": "fait",
   "priorite": "haute",
   "charge": "xl",
-  "tags": ["electron", "crawl", "packaging", "docs"],
+  "tags": [
+    "electron",
+    "crawl",
+    "packaging",
+    "docs"
+  ],
   "cree": "2026-08-19",
-  "maj": "2026-08-20",
+  "maj": "2026-09-30",
   "plan": "2026-08-19-rendre-l-ovrsee-utilisable-sans-cloner-le-depot.md",
   "type": "epic"
 }

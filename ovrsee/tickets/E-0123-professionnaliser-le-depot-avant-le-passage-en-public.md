@@ -1,6 +1,6 @@
 ---
 {
-  "id": "T-0123",
+  "id": "E-0123",
   "titre": "Professionnaliser le dépôt avant le passage en public",
   "colonne": "fait",
   "priorite": "haute",
@@ -11,7 +11,7 @@
     "release"
   ],
   "cree": "2026-08-13",
-  "maj": "2026-08-13",
+  "maj": "2026-09-30",
   "plan": "2026-08-13-professionnaliser-le-depot-avant-le-passage-en-public.md"
 }
 ---

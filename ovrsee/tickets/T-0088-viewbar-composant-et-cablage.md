@@ -4,13 +4,13 @@
   "titre": "ViewBar — nouveau composant, câblage breadcrumb+méta, suppression des h2 de page",
   "colonne": "fait",
   "priorite": "moyenne",
-  "epic": "T-0084",
+  "epic": "E-0084",
   "tags": [
     "design",
     "chassis"
   ],
   "cree": "2026-08-12",
-  "maj": "2026-08-12",
+  "maj": "2026-09-30",
   "plan": "2026-08-12-fondations-chassis-aligner-ovrsee-sur-l-audit-design-lots-1.md"
 }
 ---

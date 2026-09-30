@@ -1,13 +1,16 @@
 ---
 {
-  "id": "T-0243",
+  "id": "E-0243",
   "titre": "Audit pré-release 1.2.0",
   "type": "epic",
   "colonne": "backlog",
   "priorite": "haute",
-  "tags": ["audit", "release"],
+  "tags": [
+    "audit",
+    "release"
+  ],
   "cree": "2026-09-02",
-  "maj": "2026-09-02",
+  "maj": "2026-09-30",
   "plan": "2026-09-02-audit-complet-pre-release-1-2-0-plan-d-execution.md"
 }
 ---

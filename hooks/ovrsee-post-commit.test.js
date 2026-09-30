@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { crawlUtile, avancerTicketsDuPlan, plansPourCommit } from './ovrsee-post-commit.js'
+import { crawlUtile, avancerTicketsCites, avancerTicketsDuPlan, plansPourCommit } from './ovrsee-post-commit.js'
 import { createTicket, readTickets } from './tickets.js'
 import { writeActive } from './active.js'
 
@@ -332,3 +332,46 @@ test('un plan seulement deviné ne solde pas un ticket que personne n’a cité'
   // Deviner le plan puis le ticket enchaînerait deux paris.
   assert.equal(readTickets(ovrseeDir).find(t => t.file === seul.file).meta.colonne, 'en-cours')
 })
+
+// --- avancerTicketsCites : les tickets sans plan ------------------------------
+//
+// Un ticket ad hoc — celui que le gate hors-plan exige avant une édition — n'a
+// pas de `plan`. `plansPourCommit` ne trouve alors aucun plan à rattacher, et
+// `avancerTicketsDuPlan` ne le voit jamais : cité ou pas, il restait en vol
+// jusqu'à ce qu'on le déplace à la main.
+
+test('un commit qui cite un ticket sans plan en vol le solde', () => {
+  const ovrseeDir = fixture()
+  const enCours = createTicket(ovrseeDir, { titre: 'En cours', colonne: 'en-cours', plan: null })
+  const enRevue = createTicket(ovrseeDir, { titre: 'En revue', colonne: 'revue', plan: null })
+
+  const soldes = avancerTicketsCites(ovrseeDir, `perf: x (${enCours.meta.id}, ${enRevue.meta.id})`)
+
+  const colonne = f => readTickets(ovrseeDir).find(t => t.file === f).meta.colonne
+  assert.equal(colonne(enCours.file), 'fait')
+  assert.equal(colonne(enRevue.file), 'fait')
+  assert.deepEqual(soldes.sort(), [enCours.meta.id, enRevue.meta.id].sort())
+})
+
+test('avancerTicketsCites ne touche ni un ticket non cité ni un ticket jamais commencé', () => {
+  const ovrseeDir = fixture()
+  const autre = createTicket(ovrseeDir, { titre: 'Autre', colonne: 'en-cours', plan: null })
+  const dormant = createTicket(ovrseeDir, { titre: 'Dormant', colonne: 'pret', plan: null })
+
+  avancerTicketsCites(ovrseeDir, `fix: y (${dormant.meta.id})`)
+
+  const colonne = f => readTickets(ovrseeDir).find(t => t.file === f).meta.colonne
+  assert.equal(colonne(autre.file), 'en-cours')
+  assert.equal(colonne(dormant.file), 'pret')
+})
+
+test('avancerTicketsCites laisse les tickets liés à un plan à la règle du plan', () => {
+  const ovrseeDir = fixture()
+  const lie = createTicket(ovrseeDir, { titre: 'Lié', colonne: 'en-cours', plan: '2026-08-10-x.md' })
+
+  avancerTicketsCites(ovrseeDir, `fix: z (${lie.meta.id})`)
+
+  // Le plan décide pour ses tickets — `decident` dans le corps du hook.
+  assert.equal(readTickets(ovrseeDir).find(t => t.file === lie.file).meta.colonne, 'en-cours')
+})
+

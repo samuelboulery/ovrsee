@@ -224,6 +224,44 @@ export function avancerTicketsDuPlan(ovrseeDir, planFile, message = '', devine =
 }
 
 /**
+ * Avance vers la colonne finale les tickets SANS PLAN que le message cite.
+ *
+ * Un ticket ad hoc — celui que le gate hors-plan exige avant une édition — n'a
+ * pas de `plan` : `plansPourCommit` ne trouve rien à rattacher, et
+ * `avancerTicketsDuPlan` ne le voit jamais. Cité ou non, il restait en vol
+ * jusqu'à ce qu'on le déplace à la main.
+ *
+ * La citation suffit ici parce qu'elle est la seule attribution possible : pas
+ * de plan, donc pas de repli à deviner. Mêmes gardes qu'ailleurs — seul un
+ * ticket en vol est soldé, et un ticket lié à un plan reste à la règle du plan.
+ *
+ * @returns {string[]} identifiants des tickets passés en colonne finale
+ */
+export function avancerTicketsCites(ovrseeDir, message = '') {
+  const cites = new Set(String(message).match(/T-\d{4}/g) ?? [])
+  if (cites.size === 0) return []
+
+  const colonnes = readBoard(ovrseeDir)
+  const finale = colonneFinale(colonnes)
+  const iEnCours = colonnes.findIndex(c => c.id === EN_COURS)
+  if (!finale || iEnCours === -1) return []
+  const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
+
+  const soldes = []
+  for (const ticket of readTickets(ovrseeDir, colonnes)) {
+    if (!cites.has(ticket.meta.id) || ticket.meta.plan) continue
+    if (ticket.meta.colonne === finale || (rangDe.get(ticket.meta.colonne) ?? -1) < iEnCours) continue
+    try {
+      moveTicket(ovrseeDir, ticket.file, finale)
+      soldes.push(ticket.meta.id)
+    } catch {
+      // Un ticket qui ne peut pas être déplacé ne doit jamais faire échouer le commit.
+    }
+  }
+  return soldes
+}
+
+/**
  * Lance le crawl détaché : un commit ne doit jamais attendre le démarrage
  * d'une application et d'un navigateur.
  */
@@ -290,6 +328,7 @@ if (estPrincipal(import.meta.url)) {
       for (const plan of decident) {
         avancerTicketsDuPlan(ovrseeDir, plan.file, message, plan.source === 'unique')
       }
+      avancerTicketsCites(ovrseeDir, message)
       // Filet à chaque commit : rattrape un ticket resté en retard, quelle
       // que soit la raison (CLI qui aurait oublié d'avancer, dérive passée).
       avancerTicketsClos(ovrseeDir)

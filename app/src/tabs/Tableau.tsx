@@ -160,12 +160,30 @@ export function Tableau({
     return suivant
   }
 
-  const modifier = (file: string, patch: TicketPatch) =>
+  const modifier = (file: string, patch: TicketPatch) => {
+    // Devenir epic, ou cesser de l'être, change le préfixe de l'id — donc le
+    // fichier (`T-0250` ↔ `E-0250`, issue 131). Pas d'aperçu optimiste : le
+    // nouveau nom vient du serveur, et le panneau ouvert le suit par le numéro,
+    // qui ne bouge pas. Sans ça, il se refermerait à la promotion.
+    if (patch.type !== undefined) {
+      const numero = tickets.find(t => t.file === file)?.id.slice(2)
+      setErreur(null)
+      ticketAction('update', root, { file, ...patch })
+        .then(suivant => {
+          onChange(suivant)
+          const renomme = suivant.tickets.find(t => t.id.slice(2) === numero)
+          if (renomme) setOuverte(o => (o === file ? renomme.file : o))
+        })
+        .catch(err => setErreur(String(err.message ?? err)))
+      return
+    }
+
     ecrire(
       { board, tickets: tickets.map(t => (t.file === file ? fusionnerPatch(t, patch) : t)) },
       'update',
       { file, ...patch },
     )
+  }
 
   const supprimer = (file: string) => {
     setOuverte(null)

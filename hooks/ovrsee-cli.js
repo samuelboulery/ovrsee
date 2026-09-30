@@ -11,9 +11,10 @@
  *   node hooks/ovrsee-cli.js tickets
  *   node hooks/ovrsee-cli.js ticket new "<titre>" [--colonne pret] [--epic]
  *   node hooks/ovrsee-cli.js ticket move <fichier.md> <colonne>
- *   node hooks/ovrsee-cli.js ticket link <fichier.md> --epic <T-XXXX>
+ *   node hooks/ovrsee-cli.js ticket link <fichier.md> --epic <E-XXXX>
  *   node hooks/ovrsee-cli.js ticket unlink <fichier.md>
  *   node hooks/ovrsee-cli.js ticket import-plans
+ *   node hooks/ovrsee-cli.js ticket migrate-epics
  *
  * Contrairement aux hooks, cet outil est invoqué explicitement : il a le droit
  * d'échouer bruyamment.
@@ -44,6 +45,7 @@ import {
   colonneFinale,
   createTicket,
   importOpenPlans,
+  migrerEpics,
   moveTicket,
   readBoard,
   readTickets,
@@ -274,9 +276,10 @@ const commands = {
    *
    *   ticket new "<titre>" [--colonne pret] [--priorite haute] [--corps "..."] [--epic]
    *   ticket move <fichier.md> <colonne>
-   *   ticket link <fichier.md> --epic <T-XXXX>
+   *   ticket link <fichier.md> --epic <E-XXXX>
    *   ticket unlink <fichier.md>
    *   ticket import-plans
+   *   ticket migrate-epics
    */
   ticket(sub, ...rest) {
     const flags = {}
@@ -315,7 +318,7 @@ const commands = {
       }
 
       case 'link': {
-        if (!args[0] || !flags.epic) throw new Error('usage : ticket link <fichier.md> --epic <T-XXXX>')
+        if (!args[0] || !flags.epic) throw new Error('usage : ticket link <fichier.md> --epic <E-XXXX>')
         if (!updateTicket(ovrseeDir, args[0], { epic: flags.epic })) {
           throw new Error(`ticket introuvable : ${args[0]}`)
         }
@@ -342,8 +345,24 @@ const commands = {
         return
       }
 
+      // Les epics nés avant le préfixe E- (issue #131) : même numéro, fichier,
+      // images et enfants renommés. Un second passage ne fait rien.
+      case 'migrate-epics': {
+        const faits = migrerEpics(ovrseeDir)
+        if (faits.length === 0) {
+          console.log('aucun epic en T- — rien à faire')
+          return
+        }
+        for (const { avant, apres, erreur } of faits) {
+          if (erreur) console.error(`échec : ${avant} → ${apres} — ${erreur}`)
+          else console.log(`migré : ${avant} → ${apres}`)
+        }
+        if (faits.some(f => f.erreur)) process.exitCode = 1
+        return
+      }
+
       default:
-        throw new Error('sous-commandes : new, move, link, unlink, import-plans')
+        throw new Error('sous-commandes : new, move, link, unlink, import-plans, migrate-epics')
     }
   },
 

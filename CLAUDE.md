@@ -186,6 +186,13 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   application peinte en cyan. Un projet sans accent ne porte pas l'attribut du tout.
   La couleur vit dans le registre (`setProjectAccent`, `hooks/plans.js`), **pas** dans
   `ovrsee.config.json` : c'est une préférence de poste, et ce fichier est versionné.
+- **`T-` et `E-` partagent un seul compteur, et c'est ce qui autorise le seul
+  renommage de fichier permis.** Un epic porte `E-0250`, un ticket `T-0250` (issue #131).
+  Cocher « epic » échange le préfixe en gardant le numéro : fichier, images, chemins
+  du corps, champ `epic` des enfants et ticket actif suivent (`changerPrefixe`,
+  `hooks/tickets.js`). Les plans et les commits qui citent l'ancien préfixe ne sont
+  pas réécrits — le numéro, unique, suffit à les relire. Un epic resté en `T-` (né
+  avant) fonctionne toujours ; `pnpm ovrsee:migrate-epics` le passe en `E-`.
 - **Le `colonne` d'un epic est inerte.** Le champ reste écrit dans le fichier — le
   format n'a pas bougé — mais l'interface ne le lit plus : l'état d'un epic se déduit
   de ses enfants (`epicEtat`, `app/src/data.ts`), et un epic ne se glisse plus. Le
@@ -228,7 +235,7 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   automatique.
 - **Un commit s'inscrit dans tous les plans qu'il réalise**, pas dans un seul.
   `plansPourCommit` (`ovrsee-post-commit.js`) additionne deux sources — les plans des
-  tickets `T-XXXX` cités dans le message, **et** le plan actif de la session — puis
+  tickets `T-XXXX` / `E-XXXX` cités dans le message, **et** le plan actif de la session — puis
   retombe sur l'unique plan actif si les deux se taisent, sinon sur rien. S'arrêter au
   premier étage qui répondait laissait sans commit le plan sous lequel le travail avait
   été écrit, donc **inclosable** : `closeOpenPlans` date d'après le dernier commit

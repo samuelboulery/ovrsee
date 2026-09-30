@@ -240,6 +240,16 @@ test('plansPourCommit rend le plan du ticket cité ET celui de la session', () =
   ])
 })
 
+test('plansPourCommit suit un epic cité en E-', () => {
+  const ovrseeDir = fixture()
+  const { meta } = createTicket(ovrseeDir, { titre: 'Epic', type: 'epic', plan: PLAN_A })
+
+  const trouves = plansPourCommit(ovrseeDir, `feat: tout le lot (${meta.id})`, null, readTickets(ovrseeDir))
+
+  assert.equal(meta.id, 'E-0001')
+  assert.deepEqual(trouves, [{ file: PLAN_A, source: 'ticket' }])
+})
+
 test('plansPourCommit ne rend qu’une fois un plan que le ticket et la session désignent', () => {
   const ovrseeDir = fixture()
   const { meta } = createTicket(ovrseeDir, { titre: 'Sous A', colonne: 'en-cours', plan: PLAN_A })

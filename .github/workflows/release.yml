@@ -6,20 +6,17 @@ on:
       - 'v*'
   workflow_dispatch:
 
-# Pas de permissions au niveau du workflow : seul le job qui crée la release en
-# a besoin. Déclarées ici, elles seraient accordées aussi aux jobs de build, qui
-# n'écrivent rien — sauf electron-builder, qui reçoit le jeton par `env`.
+# Pas de permissions au niveau du workflow : chaque job déclare les siennes, et
+# seuls `draft` et `publish` écrivent.
 permissions: {}
 
 # Pas de `concurrency` avec annulation ici, contrairement à la CI : annuler un
 # build à mi-envoi laisse une release à moitié remplie. C'est arrivé.
 
 jobs:
-  # `electron-builder --publish` crée la release brouillon à la volée, au
-  # premier envoi d'asset — et ses envois sont parallèles. Deux d'entre eux ont
-  # déjà trouvé « pas de release » au même instant et en ont créé une chacun,
-  # les assets répartis entre les deux. La créer ici, une fois, avant que le
-  # moindre runner ne démarre, supprime la course.
+  # La release brouillon se crée ici, une fois, avant tout build. Quand
+  # electron-builder publiait lui-même, ses envois parallèles ont déjà créé
+  # deux releases au même instant, les assets répartis entre les deux.
   draft:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -39,6 +36,11 @@ jobs:
           gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
             --draft --title "${TAG#v}" --generate-notes
 
+  # Le build ne reçoit aucun droit d'écriture : il exécute `pnpm install`, des
+  # tests et electron-builder — tout le code tiers du projet. Un jeton
+  # `contents: write` à cet endroit laissait n'importe quelle dépendance
+  # réécrire la release, ou les tags (T-0277). Il dépose ses binaires en
+  # artefacts ; seul `publish`, qui n'exécute rien du dépôt, écrit.
   build:
     needs: draft
     strategy:
@@ -49,12 +51,14 @@ jobs:
         include:
           - os: macos-latest
             target: --mac
+            nom: mac
           - os: windows-latest
             target: --win
+            nom: win
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     permissions:
-      contents: write
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -73,6 +77,51 @@ jobs:
 
       - run: pnpm build:ui
 
-      - run: pnpm exec electron-builder ${{ matrix.target }} --publish always
+      - run: pnpm exec electron-builder ${{ matrix.target }} --publish never
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: binaires-${{ matrix.nom }}
+          path: |
+            release/*.dmg
+            release/*.exe
+            release/*.blockmap
+            release/latest*.yml
+          if-no-files-found: error
+
+  # Seul job à écrire, et seulement pour un tag : un `workflow_dispatch` lancé
+  # depuis une branche construit pour vérifier, il ne publie rien.
+  publish:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: binaires-*
+          path: release
+          merge-multiple: true
+
+      # En hexadécimal : c'est ce qu'affiche `shasum -a 256`. Les `latest*.yml`
+      # portent un sha512 en base64, qu'aucun outil du poste ne rend tel quel.
+      - name: Empreintes SHA-256
+        working-directory: release
+        run: sha256sum Ovrsee-* > SHA256SUMS && cat SHA256SUMS
+
+      # Provenance signée par GitHub : `gh attestation verify <fichier> -R
+      # samuelboulery/ovrsee` prouve que le binaire sort de ce workflow, sur ce
+      # dépôt, à ce commit — ce que la signature Apple ne dit pas encore (T-0192).
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: release/Ovrsee-*
+
+      - name: Joindre à la release brouillon
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: gh release upload "$TAG" release/* --repo "$GITHUB_REPOSITORY" --clobber

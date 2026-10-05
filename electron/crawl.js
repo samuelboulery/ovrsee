@@ -32,7 +32,7 @@ import { fileURLToPath } from 'node:url'
 import { readJson } from '../hooks/json.js'
 import { killTree } from '../hooks/shell.js'
 
-import { approuver, DEV_DEFAUT, estApprouve } from '../crawl/confiance.js'
+import { approuver, commandeAffichable, DEV_DEFAUT, estApprouve } from '../crawl/confiance.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const CRAWLER = join(HERE, '..', 'crawl', 'index.js')
@@ -48,10 +48,10 @@ const CRAWLER = join(HERE, '..', 'crawl', 'index.js')
  * Le repli sur `DEV_DEFAUT` reproduit celui du crawler : sans lui, l'accord
  * porterait sur une chaîne que le crawler n'exécutera pas.
  *
- * Une ligne à caractère invisible rend `null` — rien à approuver, donc rien
- * ne s'exécute : le crawler, qui relit lui-même, ne trouvera aucun accord. La
- * modale native tronque un saut de ligne et rend un U+202E à l'envers ; ce
- * qu'elle montre doit être exactement ce qui part au shell (T-0273).
+ * Une commande qui n'est pas `commandeAffichable` rend `null` — rien à
+ * approuver, et le crawler la refuse de son côté. La modale native tronque un
+ * saut de ligne, rend un U+202E à l'envers, et n'affiche pas un caractère de
+ * largeur nulle ; ce qu'elle montre doit être ce qui part au shell (T-0273).
  *
  * @param {string} projectPath
  * @returns {string|null}
@@ -62,12 +62,8 @@ export function devSurDisque(projectPath) {
   const config = readJson(join(projectPath, 'ovrsee.config.json'))
   if (!config) return null
   if (typeof config.dev !== 'string') return DEV_DEFAUT
-  return INVISIBLE.test(config.dev) ? null : config.dev
+  return commandeAffichable(config.dev) ? config.dev : null
 }
-
-/** Contrôles C0 et C1, DEL, séparateurs de ligne Unicode, marques bidirectionnelles. */
-// eslint-disable-next-line no-control-regex
-const INVISIBLE = /[\x00-\x1f\x7f-\x9f\u2028\u2029\u202a-\u202e\u2066-\u2069]/
 
 /**
  * Faut-il demander l'accord avant de lancer ce crawl ?

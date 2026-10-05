@@ -49,7 +49,7 @@ import {
 } from './crawl.js'
 import { approuver, devApprouve } from '../crawl/confiance.js'
 import { ouvrable } from './lien-externe.js'
-import { durcirWebview, poserPermissions } from './permissions.js'
+import { durcirWebview, garderInvite, poserPermissions } from './permissions.js'
 import {
   answer as menubarAnswer,
   createTray,
@@ -255,13 +255,7 @@ function createWindow() {
   window.webContents.on('did-attach-webview', (_event, guest) => {
     guests.add(guest)
     guest.once('destroyed', () => guests.delete(guest))
-    guest.setWindowOpenHandler(({ url }) => {
-      // L'URL vient d'une page qu'on n'a pas écrite : `openExternal` la
-      // remettrait au système, qui lancerait l'application enregistrée pour
-      // son schéma. Seuls http et https sortent (`lien-externe.js`).
-      if (ouvrable(url)) shell.openExternal(url)
-      return { action: 'deny' }
-    })
+    garderInvite(guest, url => shell.openExternal(url))
   })
 
   const hostId = window.webContents.id

@@ -4,7 +4,7 @@ import { extractAttention, type AttentionEvent } from './attention'
 import { appliquerThemeTerminal, getTerminalTheme, type ThemeMode } from './theme'
 // Les types de la passerelle et les fonctions de collage vivent dans `pty.ts`
 // depuis T-0133 : ce module-ci charge xterm, et il est le seul à devoir le faire.
-import { claude, terminalBridge, type SessionKind } from './pty'
+import { claude, nettoyerCollage, terminalBridge, type SessionKind } from './pty'
 // WHY: xterm est le terminal de VS Code, pas une imitation. Un rendu maison
 // devrait réimplémenter les séquences ANSI, le défilement et la sélection —
 // et `claude` s'afficherait de travers au premier cas non couvert.
@@ -257,6 +257,22 @@ export function useTerminals(
       xterm.loadAddon(fit)
       xterm.open(host)
       fit.fit()
+
+      // Le collage natif (Cmd+V, menu) encadre sans filtrer : un `\x1b[201~`
+      // glissé dans le presse-papier par une page fermait le collage, et la
+      // suite partait comme des touches (T-0273). Capturé avant xterm, nettoyé,
+      // puis rendu à `paste()`, qui garde l'encadrement.
+      host.addEventListener(
+        'paste',
+        event => {
+          const texte = event.clipboardData?.getData('text/plain')
+          if (texte === undefined) return
+          event.preventDefault()
+          event.stopPropagation()
+          xterm.paste(nettoyerCollage(texte))
+        },
+        true,
+      )
 
       const pane: Pane = {
         xterm,

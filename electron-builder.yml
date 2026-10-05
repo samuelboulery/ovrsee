@@ -56,6 +56,9 @@ electronFuses:
   enableEmbeddedAsarIntegrityValidation: true
   onlyLoadAppFromAsar: true
   grantFileProtocolExtraPrivileges: false
+  # Les cookies de la session du Navigateur — ceux de l'app observée — chiffrés
+  # sur disque par le trousseau, comme les secrets d'intégration.
+  enableCookieEncryption: true
   resetAdHocDarwinSignature: true
 
 # Publie sur l'onglet Releases du dépôt — public : le binaire est

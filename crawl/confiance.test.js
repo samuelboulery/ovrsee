@@ -196,3 +196,11 @@ test('avec accord, la garde laisse passer et le crawl échoue plus loin', () => 
   assert.equal(scan.ok, false)
   assert.doesNotMatch(scan.error, /non approuvée/)
 })
+
+test('le crawler refuse une commande dev illisible, même déjà approuvée (T-0273)', async () => {
+  const { assurerConfiance } = await import('./confiance.js')
+  const root = mkdtempSync(join(tmpdir(), 'confiance-'))
+  const dev = 'pnpm\u200b dev'
+  approuver(root, dev)
+  await assert.rejects(() => assurerConfiance(root, dev), /ASCII/)
+})

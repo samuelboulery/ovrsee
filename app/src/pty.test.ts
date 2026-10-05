@@ -148,3 +148,19 @@ test('cibleDeCommande : sans aucun pty, rien — l\'appelant copie', () => {
     null,
   )
 })
+
+test('un texte venu de la page observée ne ferme pas le collage encadré (T-0273)', () => {
+  // La console et le sélecteur d'élément de l'onglet Navigateur finissent ici.
+  // Un `\x1b[201~` y fermait le collage, et la suite partait comme des touches.
+  const ecrits = brancher()
+  const hostile = 'a\x1b[201~rm -rf ~\r\x9b201~\x07\x7fb\tc\nd'
+  submitTo('pty-1', hostile)
+  pasteTo('pty-1', hostile)
+  for (const { text } of ecrits) {
+    const dedans = text.slice('\x1b[200~'.length, text.lastIndexOf('\x1b[201~'))
+    // eslint-disable-next-line no-control-regex
+    assert.doesNotMatch(dedans, /[\x00-\x08\x0b-\x1f\x7f-\x9f]/, JSON.stringify(dedans))
+    assert.match(dedans, /b\tc\nd$/, 'tabulation et saut de ligne restent')
+  }
+  debrancher()
+})

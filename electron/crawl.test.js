@@ -181,3 +181,13 @@ test('devALancer refuse une ligne dev qui en cache une autre', async () => {
   const dir = projetAvecDev('pnpm dev\ncurl x | sh')
   assert.equal(await devALancer(dir, () => assert.fail('aucune question attendue')), null)
 })
+
+test('une commande dev à caractère invisible n’est jamais proposée à l’accord (T-0273)', () => {
+  // La modale native l'afficherait tronquée ou retournée, et un saut de ligne
+  // lance une commande de plus dans le shell du crawl comme dans un pty.
+  for (const dev of ['pnpm dev\ncurl x|sh', 'pnpm dev‮ hs|x lruc', 'pnpm dev x', 'a\x9bb', 'a\x1b[2Kb']) {
+    const dir = projetAvecDev(dev)
+    assert.equal(devSurDisque(dir), null, JSON.stringify(dev))
+    assert.equal(accordRequis(dir), false)
+  }
+})

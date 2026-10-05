@@ -20,6 +20,7 @@ import {
   nativeTheme,
   protocol,
   safeStorage,
+  session,
   shell,
   webContents,
   WebContentsView,
@@ -48,6 +49,7 @@ import {
 } from './crawl.js'
 import { approuver, devApprouve } from '../crawl/confiance.js'
 import { ouvrable } from './lien-externe.js'
+import { durcirWebview, poserPermissions } from './permissions.js'
 import {
   answer as menubarAnswer,
   createTray,
@@ -235,22 +237,9 @@ function createWindow() {
     destroyPopover()
   })
 
-  // L'invité est attaché par le rendu : c'est ici qu'on décide de ses
-  // privilèges, pas dans les attributs de la balise. Sans cela, un rendu
-  // compromis attacherait une page distante avec `nodeIntegration`.
-  window.webContents.on('will-attach-webview', (_event, webPreferences) => {
-    delete webPreferences.preload
-    webPreferences.nodeIntegration = false
-    webPreferences.contextIsolation = true
-    // Le reste de l'objet vient aussi de l'attribut `webpreferences` de la
-    // balise, donc du rendu : ne remettre que les trois clés ci-dessus
-    // laissait un rendu compromis lever `webSecurity` et faire lire le disque
-    // à une page distante. On repose donc tout ce qui compte, pas trois clés.
-    webPreferences.sandbox = true
-    webPreferences.webSecurity = true
-    webPreferences.allowRunningInsecureContent = false
-    webPreferences.nodeIntegrationInSubFrames = false
-    webPreferences.experimentalFeatures = false
+  // Privilèges reposés, session et adresse vérifiées : `permissions.js`.
+  window.webContents.on('will-attach-webview', (event, webPreferences, params) => {
+    if (!durcirWebview(webPreferences, params)) event.preventDefault()
   })
 
   // Les invités de cette fenêtre. Sert de liste blanche à `preview:devtools` :
@@ -333,6 +322,8 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  poserPermissions(session)
+
   // Le panneau natif n'affiche par défaut que le nom et la version. Le
   // copyright vient de `NSHumanReadableCopyright` dans l'application empaquetée,
   // et de nulle part en développement — le poser ici rend les deux identiques.
@@ -454,7 +445,13 @@ app.whenReady().then(() => {
     // se garde parce que c'est lui qui exécute.
     const dev = devSurDisque(projectPath)
     if (accordRequis(projectPath)) {
-      if (!(await demanderAccord(event.sender, projectPath, dev))) return crawlState()
+      if (devEnQuestion.has(projectPath)) return crawlState()
+      devEnQuestion.add(projectPath)
+      try {
+        if (!(await demanderAccord(event.sender, projectPath, dev))) return crawlState()
+      } finally {
+        devEnQuestion.delete(projectPath)
+      }
       approuver(projectPath, dev)
     }
 
@@ -465,26 +462,33 @@ app.whenReady().then(() => {
   /**
    * L'accord donné au formulaire d'équipement.
    *
-   * Le rendu n'envoie qu'un chemin de projet et la commande qu'il vient de
-   * SAISIR — jamais celle à approuver. Ce qui est approuvé est toujours ce qui
+   * Le rendu n'envoie qu'un chemin de projet, jamais la commande à approuver.
+   * Ce qui est approuvé est toujours ce qui
    * a atterri sur le disque : `writeOvrseeConfig()` CONSERVE un
    * `ovrsee.config.json` déjà présent, et un dépôt reçu qui embarque le sien
    * ferait sinon approuver une commande qui n'est pas celle qui s'exécutera —
    * un contrôle qui approuve la mauvaise chaîne est pire que pas de contrôle,
    * il rassure.
    *
-   * D'où la comparaison : accord tacite seulement si le disque dit exactement
-   * ce que l'utilisateur a tapé ; sinon la modale, avec la vraie valeur.
+   * Plus d'accord tacite quand le disque disait ce que le rendu affirmait avoir
+   * saisi : un rendu compromis — il affiche du markdown du dépôt — écrivait la
+   * config par `/api/init` puis envoyait la même chaîne, et la commande passait
+   * sans qu'aucune modale paraisse (T-0273). La saisie du formulaire ne prouve
+   * rien que le principal puisse vérifier : l'accord se donne dans la modale.
    */
-  ipcMain.handle('crawl:approve', async (event, projectPath, devSaisi) => {
+  ipcMain.handle('crawl:approve', async (event, projectPath) => {
     if (!projetConnu(projectPath)) return false
 
     const dev = devSurDisque(projectPath)
     if (dev === null) return false
     if (!accordRequis(projectPath)) return true
 
-    if (typeof devSaisi !== 'string' || devSaisi !== dev) {
+    if (devEnQuestion.has(projectPath)) return false
+    devEnQuestion.add(projectPath)
+    try {
       if (!(await demanderAccord(event.sender, projectPath, dev))) return false
+    } finally {
+      devEnQuestion.delete(projectPath)
     }
     approuver(projectPath, dev)
     return true

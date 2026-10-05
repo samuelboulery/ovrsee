@@ -48,6 +48,11 @@ const CRAWLER = join(HERE, '..', 'crawl', 'index.js')
  * Le repli sur `DEV_DEFAUT` reproduit celui du crawler : sans lui, l'accord
  * porterait sur une chaîne que le crawler n'exécutera pas.
  *
+ * Une ligne à caractère invisible rend `null` — rien à approuver, donc rien
+ * ne s'exécute : le crawler, qui relit lui-même, ne trouvera aucun accord. La
+ * modale native tronque un saut de ligne et rend un U+202E à l'envers ; ce
+ * qu'elle montre doit être exactement ce qui part au shell (T-0273).
+ *
  * @param {string} projectPath
  * @returns {string|null}
  */
@@ -56,8 +61,13 @@ export function devSurDisque(projectPath) {
   // cette raison-là, et il l'écrira dans `scans.jsonl` comme avant.
   const config = readJson(join(projectPath, 'ovrsee.config.json'))
   if (!config) return null
-  return typeof config.dev === 'string' ? config.dev : DEV_DEFAUT
+  if (typeof config.dev !== 'string') return DEV_DEFAUT
+  return INVISIBLE.test(config.dev) ? null : config.dev
 }
+
+/** Contrôles C0 et C1, DEL, séparateurs de ligne Unicode, marques bidirectionnelles. */
+// eslint-disable-next-line no-control-regex
+const INVISIBLE = /[\x00-\x1f\x7f-\x9f\u2028\u2029\u202a-\u202e\u2066-\u2069]/
 
 /**
  * Faut-il demander l'accord avant de lancer ce crawl ?
@@ -80,9 +90,8 @@ export function accordRequis(projectPath) {
  * rendu ; `demander` pose la question (la modale native de `main.js`) avec
  * cette chaîne-là, et c'est elle qu'on approuve.
  *
- * Une ligne à caractère de contrôle est refusée d'office : tapée dans un pty,
- * chaque saut de ligne lancerait une commande de plus, que la modale native
- * peut tronquer. Le crawl n'a pas ce souci — il passe la chaîne en argument.
+ * Une ligne à caractère de contrôle n'arrive pas jusqu'ici (`devSurDisque`) :
+ * tapée dans un pty, chaque saut de ligne lancerait une commande de plus.
  *
  * @param {string} projectPath
  * @param {(dev: string) => Promise<boolean>} demander
@@ -90,8 +99,7 @@ export function accordRequis(projectPath) {
  */
 export async function devALancer(projectPath, demander) {
   const dev = devSurDisque(projectPath)
-  // eslint-disable-next-line no-control-regex
-  if (dev === null || /[\x00-\x1f\x7f]/.test(dev)) return null
+  if (dev === null) return null
   if (!estApprouve(projectPath, dev)) {
     if (!(await demander(dev))) return null
     approuver(projectPath, dev)

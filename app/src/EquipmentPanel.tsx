@@ -185,14 +185,12 @@ export function EquipmentPanel({
       // la déclenche, quand l'utilisateur a fini de lire.
       .then(result => {
         setDone(result.done ?? [])
-        // La confiance d'espace de travail s'accorde ici, au seul moment où un
-        // humain a composé la commande lui-même. Elle ne passe pas par
-        // `/api/*` — cette surface est aussi servie par le dev server Vite, en
-        // HTTP local non authentifié — mais par IPC, comme le terminal et les
-        // secrets d'intégration. On envoie la commande saisie pour comparaison
-        // seulement : c'est celle qui est sur le disque qui sera approuvée, et
-        // si le dépôt avait déjà la sienne, la question est posée.
-        approuverCrawl(root, form.ecrireConfig ? form.dev : null)
+        // La confiance d'espace de travail se demande ici, juste après que
+        // l'humain a composé la commande. Elle ne passe pas par `/api/*` — cette
+        // surface est aussi servie par le dev server Vite, en HTTP local non
+        // authentifié — mais par IPC, comme le terminal et les secrets
+        // d'intégration. Le principal relit le disque et pose la question.
+        approuverCrawl(root)
       })
       .catch(err => onError(String(err.message ?? err)))
       .finally(() => setBusy(false))

@@ -145,6 +145,20 @@ function injectTo(ptyId: string | null, text: string): boolean {
 }
 
 /**
+ * Contrôles C0 (sauf tabulation et saut de ligne), DEL et C1.
+ *
+ * Le texte collé vient souvent de la page observée — sa console, le sélecteur
+ * d'élément. Un `\x1b[201~` dedans fermait le collage encadré, et la suite
+ * partait comme des touches dans la session Claude ; `\x9b` est le même CSI
+ * sur un octet. Aucun de ces caractères n'a de sens dans une demande.
+ */
+// eslint-disable-next-line no-control-regex
+const CONTROLE = /[\x00-\x08\x0b-\x1f\x7f-\x9f]/g
+
+/** Un bloc encadré dont rien ne peut sortir. Les fins de ligne `\r\n` deviennent `\n`. */
+const encadrer = (text: string): string => `\x1b[200~${text.replace(/\r\n?/g, '\n').replace(CONTROLE, '')}\x1b[201~`
+
+/**
  * Colle un bloc dans le pty désigné sans le valider.
  *
  * Le mode « bracketed paste » du terminal est indispensable pour un texte
@@ -153,7 +167,7 @@ function injectTo(ptyId: string | null, text: string): boolean {
  * envoyé — l'utilisateur relit et appuie sur Entrée.
  */
 export function pasteTo(ptyId: string | null, text: string): boolean {
-  return injectTo(ptyId, `\x1b[200~${text}\x1b[201~`)
+  return injectTo(ptyId, encadrer(text))
 }
 
 /** Colle un bloc dans la session Claude du projet courant — voir `pasteTo`. */
@@ -173,7 +187,7 @@ export function pasteToClaude(text: string): boolean {
  * réservé au geste qui dit explicitement « envoie ».
  */
 export function submitTo(ptyId: string | null, text: string): boolean {
-  return injectTo(ptyId, `\x1b[200~${text}\x1b[201~\r`)
+  return injectTo(ptyId, `${encadrer(text)}\r`)
 }
 
 /** Envoie un bloc à la session Claude du projet courant, et le valide. */

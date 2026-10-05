@@ -256,6 +256,9 @@ test('aucun fichier source ne dépasse 800 lignes, hors exemptions nommées', ()
  * dans le dépôt courant — celui où l'utilisateur est déjà en train de committer —
  * et jamais sur un chemin venu du registre. La liste est la dette, pas la règle.
  */
+/** Tout lanceur de processus qui vise `git`, quelle que soit la fonction ou la citation. */
+const LANCE_GIT = /\b(?:execFileSync|execFile|execSync|exec|spawnSync|spawn)\(\s*['"`]git['"`]/
+
 const GIT_DIRECT_TOLERE = new Map([
   ['hooks/git.js', 'le module qui porte la garde : c’est lui qui appelle git'],
   ['hooks/entree.js', 'le dépôt courant du hook, jamais un chemin du registre'],
@@ -263,7 +266,6 @@ const GIT_DIRECT_TOLERE = new Map([
   ['hooks/ovrsee-post-commit.js', 'idem — hook git, donc déjà dans le dépôt'],
   ['hooks/ovrsee-post-merge.js', 'idem'],
   ['hooks/ovrsee-session-start.js', 'idem'],
-  ['hooks/ovrsee-tool-stop.js', 'idem'],
   ['hooks/reconcile.js', 'idem'],
 ])
 
@@ -278,7 +280,7 @@ test('aucune commande git ne contourne la garde de hooks/git.js', () => {
         parcourir(relatif)
       } else if (/\.(js|cjs)$/.test(entree.name) && !entree.name.includes('.test.')) {
         const source = readFileSync(join(root, relatif), 'utf8')
-        if (/execFileSync\(\s*'git'/.test(source) && !GIT_DIRECT_TOLERE.has(relatif)) {
+        if (LANCE_GIT.test(source) && !GIT_DIRECT_TOLERE.has(relatif)) {
           coupables.push(relatif)
         }
       }
@@ -297,7 +299,7 @@ test('aucune commande git ne contourne la garde de hooks/git.js', () => {
   // voir, comme pour le plafond de lignes.
   const inutiles = [...GIT_DIRECT_TOLERE.keys()].filter(f => {
     if (!existsSync(join(root, f))) return true
-    return !/execFileSync\(\s*'git'/.test(readFileSync(join(root, f), 'utf8'))
+    return !LANCE_GIT.test(readFileSync(join(root, f), 'utf8'))
   })
   assert.deepEqual(inutiles, [], `exemptions devenues inutiles : ${inutiles.join(', ')}`)
 })

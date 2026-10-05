@@ -38,7 +38,7 @@
 
 import { execFileSync, spawn } from 'node:child_process'
 import { existsSync, mkdtempSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
+import { homedir, tmpdir, userInfo } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -69,6 +69,53 @@ const CADRE = [
   '--ratio', 'auto', '--padding', '0.05',
   '--seed', '7', '--scale', '2', '--format', 'webp',
 ]
+
+/**
+ * Ce que les captures ne montrent pas : le dossier personnel (chemin d'Aperçu,
+ * bannière de `claude`), le nom du compte (pied de la barre latérale) et son
+ * forfait Claude (bannière). Des sources de RegExp — elles traversent la
+ * frontière vers le rendu, où une fonction ne passe pas.
+ */
+const echapper = texte => texte.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+export const neutre = ({ home, user }) => [
+  [echapper(home), '~'],
+  [`\\b${echapper(user)}\\b(?!\\.)`, 'demo'],
+  ['\\bClaude (Max|Pro|Team|Enterprise)\\b', 'Claude'],
+]
+
+/**
+ * Réécrit le texte du rendu tant qu'il vit, et pas une fois : xterm repeint ses
+ * lignes à chaque octet, et un remplacement unique serait défait avant la
+ * capture. Le rendu xterm est le DOM (aucun addon webgl), donc atteignable.
+ * Le nom est aussi menti à `/api/username`, sans quoi l'avatar garde l'initiale.
+ */
+function neutraliser(regles) {
+  if (window.__neutre) return
+  window.__neutre = true
+  const res = regles.map(([source, par]) => [new RegExp(source, 'gi'), par])
+  const propre = texte => res.reduce((t, [re, par]) => t.replace(re, par), texte)
+  const nettoyer = racine => {
+    const marche = document.createTreeWalker(racine, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT)
+    for (let n = racine; n; n = marche.nextNode()) {
+      if (n.nodeType === Node.TEXT_NODE) {
+        if (propre(n.data) !== n.data) n.data = propre(n.data)
+        continue
+      }
+      for (const nom of ['title', 'placeholder', 'aria-label', 'value']) {
+        const v = n.getAttribute?.(nom)
+        if (v != null && propre(v) !== v) n.setAttribute(nom, propre(v))
+      }
+      if (n instanceof HTMLInputElement && propre(n.value) !== n.value) n.value = propre(n.value)
+    }
+  }
+  const fetchOrigine = window.fetch
+  window.fetch = (url, ...reste) =>
+    String(url).endsWith('/api/username') ? Promise.resolve(Response.json({ username: 'demo' })) : fetchOrigine(url, ...reste)
+  nettoyer(document)
+  new MutationObserver(mutations => mutations.forEach(m => nettoyer(m.target))).observe(document, {
+    subtree: true, childList: true, characterData: true, attributes: true,
+  })
+}
 
 /** Le temps que l'onglet finisse de peindre : graphe, vignettes, terminal. */
 const attendre = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -101,6 +148,9 @@ async function photographier(brut, env) {
   // texte du README est illisible dès qu'on les regarde en grand.
   const app = await electron.launch({ args: ['.', '--force-device-scale-factor=2'], cwd: RACINE, env })
   const page = await app.firstWindow()
+  const regles = neutre({ home: homedir(), user: userInfo().username })
+  // Avant le `reload` plus bas : le script ne vaut qu'aux documents suivants.
+  await page.addInitScript(neutraliser, regles)
 
   // Le thème du README est le sombre. Le réglage du poste n'est pas touché :
   // `emulateMedia` ment à la requête média du rendu, que `watchSystemTheme`
@@ -141,6 +191,12 @@ async function photographier(brut, env) {
   for (const [id, route] of ONGLETS) {
     await page.click(`a[href="${route}"]`)
     await attendre(3000)
+    // Le `<webview>` du Navigateur est un rendu à part, chargé après le clic :
+    // l'init script ne l'atteint pas. Son avatar, chargé avant, sort du cadre.
+    await app.evaluate(({ webContents }, source) => Promise.all(
+      webContents.getAllWebContents().filter(w => w.getType() === 'webview').map(w => w.executeJavaScript(source)),
+    ), `(${neutraliser})(${JSON.stringify(regles)})`)
+    await attendre(300)
     const fichier = join(brut, `${id}.png`)
     await page.screenshot({ path: fichier })
     faites.push([id, fichier])

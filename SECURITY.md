@@ -65,9 +65,14 @@ Published DMGs and installers are **neither signed nor notarised**. macOS and
 Windows will warn you on first launch. If that bothers you, build from source:
 `pnpm install && pnpm package:mac` (or `package:win`).
 
-Each release ships `latest-mac.yml` and `latest.yml` next to the binaries; both
-carry the sha512 of every file. Compare before you open:
-`shasum -a 512 Ovrsee-mac-arm64.dmg`.
+Each release ships a `SHA256SUMS` file, in hexadecimal like `shasum` prints it.
+Compare before you open:
+`shasum -a 256 Ovrsee-mac-arm64.dmg` and find the same line in `SHA256SUMS`.
+
+Each binary also carries a build provenance attestation, signed by GitHub. It
+proves the file came out of this repository's release workflow, at the tagged
+commit:
+`gh attestation verify Ovrsee-mac-arm64.dmg -R samuelboulery/ovrsee`.
 
 ## Dependencies
 

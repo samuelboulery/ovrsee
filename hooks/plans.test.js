@@ -720,3 +720,18 @@ test('projects() ignore le dépôt courant : un clone frais s’ouvre vide', () 
   registerProject(dir, new Date('2020-01-01T00:00:00Z'))
   assert.deepEqual(projects().map(p => p.path), [dir], 'inscrit, il apparaît comme les autres')
 })
+
+test('writeFileNoFollow refuse d’écrire quand ovrsee/ lui-même est un lien symbolique', () => {
+  // Le dossier immédiat (`tickets/`) est un vrai dossier — mais dans la cible du lien.
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-'))
+  const victime = join(dir, 'victime')
+  mkdirSync(join(victime, 'tickets'), { recursive: true })
+  mkdirSync(join(dir, 'depot', '.git'), { recursive: true })
+  symlinkSync(victime, join(dir, 'depot', 'ovrsee'))
+
+  assert.throws(
+    () => writeFileNoFollow(join(dir, 'depot', 'ovrsee', 'tickets', 'T-0001-x.md'), 'charge'),
+    /lien symbolique/,
+  )
+  assert.deepEqual(readdirSync(join(victime, 'tickets')), [])
+})

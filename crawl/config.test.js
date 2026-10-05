@@ -15,7 +15,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -92,4 +92,39 @@ test("une commande dev introuvable dit laquelle, pas seulement qu'on a attendu",
   // chercher le problème dans le projet observé.
   assert.match(scan.error, /n'a pas répondu/)
   assert.match(scan.error, new RegExp(dev))
+})
+
+test('un scans.jsonl lié hors du dépôt ne reçoit rien, et l’erreur ne cite pas baseUrl', () => {
+  // La chaîne de l'audit : le dépôt versionne `scans.jsonl -> .git/hooks/post-commit`
+  // et un `baseUrl` porteur de `$(…)`. La config est refusée avant l'accord, et le
+  // message d'erreur finissait, valeur comprise, dans un script exécuté au commit.
+  const magasin = magasinNeuf()
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-crawl-lien-'))
+  const victime = join(dir, 'post-commit')
+  writeFileSync(victime, '#!/bin/sh\n')
+  mkdirSync(join(dir, 'ovrsee', 'pages'), { recursive: true })
+  symlinkSync(victime, join(dir, 'ovrsee', 'pages', 'scans.jsonl'))
+  writeFileSync(join(dir, 'ovrsee.config.json'), JSON.stringify({ baseUrl: 'x $(touch PWNED)', entryRoutes: ['/'] }))
+
+  execFileSync(process.execPath, [join(HERE, 'index.js'), dir], {
+    stdio: 'ignore',
+    env: { ...process.env, OVRSEE_TRUST: magasin },
+  })
+
+  assert.equal(readFileSync(victime, 'utf8'), '#!/bin/sh\n')
+})
+
+test('baseUrl invalide : le scan échoué ne recopie pas la valeur fournie par le dépôt', () => {
+  const magasin = magasinNeuf()
+  const dir = mkdtempSync(join(tmpdir(), 'ovrsee-crawl-baseurl-'))
+  writeFileSync(join(dir, 'ovrsee.config.json'), JSON.stringify({ baseUrl: 'x $(touch PWNED)', entryRoutes: ['/'] }))
+
+  execFileSync(process.execPath, [join(HERE, 'index.js'), dir], {
+    stdio: 'ignore',
+    env: { ...process.env, OVRSEE_TRUST: magasin },
+  })
+
+  const ligne = readFileSync(join(dir, 'ovrsee', 'pages', 'scans.jsonl'), 'utf8')
+  assert.match(ligne, /baseUrl invalide/)
+  assert.doesNotMatch(ligne, /touch PWNED/)
 })

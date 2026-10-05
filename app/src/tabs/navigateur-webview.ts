@@ -86,7 +86,10 @@ export const DOCKS: Array<[Dock, string]> = [
  */
 export function startUrl(snapshot: Snapshot): string {
   const stored = localStorage.getItem(URL_KEY(snapshot.root))
-  return stored || snapshot.config?.baseUrl || 'http://localhost:3000'
+  // `baseUrl` vient du dépôt : le principal refuse d'attacher un webview hors
+  // http(s), et un refus à l'attache bloquait aussi la barre d'adresse.
+  const declare = snapshot.config?.baseUrl
+  return stored || (declare && /^https?:\/\//i.test(declare) ? declare : 'http://localhost:3000')
 }
 
 /** `localhost:5180` → `http://localhost:5180`. Une barre d'adresse tolère les deux. */

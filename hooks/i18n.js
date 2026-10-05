@@ -577,7 +577,7 @@ const translations = {
     'produit.config_writing': 'Écriture…',
     // Navigateur
     'navigateur.loading_failed': 'chargement impossible',
-    'navigateur.sent_to_claude': '${label} — envoyé à la session Claude',
+    'navigateur.sent_to_claude': '${label} — collé dans la session Claude, à valider',
     'navigateur.copied': '${label} — copié',
     'navigateur.copy_failed': 'copie refusée par le navigateur',
     'navigateur.selection_failed': 'sélection impossible : ${error}',
@@ -1341,7 +1341,7 @@ const translations = {
     'produit.config_writing': 'Writing…',
     // Navigator
     'navigateur.loading_failed': 'loading failed',
-    'navigateur.sent_to_claude': '${label} — sent to Claude session',
+    'navigateur.sent_to_claude': '${label} — pasted into Claude session, press Enter to send',
     'navigateur.copied': '${label} — copied',
     'navigateur.copy_failed': 'copy refused by browser',
     'navigateur.selection_failed': 'selection failed: ${error}',

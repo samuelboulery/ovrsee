@@ -6,7 +6,7 @@
 
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
-import { chmodSync, existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import test from 'node:test'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -143,4 +143,303 @@ test('la garde réseau efface le helper du dépôt et garde celui du poste', PIE
 
   rmSync(dir, { recursive: true, force: true })
   rmSync(dehors, { recursive: true, force: true })
+})
+
+// --- au-delà de fsmonitor : hooks, filtres, gpg, transport local -----------
+//
+// Chaque vecteur a son couple de tests : le piège mord sans garde, et la garde
+// le désarme. Un dépôt reçu en archive apporte son `.git/` entier — hooks
+// exécutables, `.git/config` — et `--no-verify` ne coupe que `pre-commit` et
+// `commit-msg`.
+
+/** Un dépôt propre et un script témoin hors de l'arbre. `sortie` : ce que le script imprime. */
+function depotEtTemoin(sortie = '') {
+  const dir = mkdtempSync(join(tmpdir(), 'git-piege-'))
+  const dehors = mkdtempSync(join(tmpdir(), 'git-piege-hors-'))
+  const temoin = join(dehors, 'TEMOIN')
+  const script = join(dehors, 'piege.sh')
+  writeFileSync(script, `#!/bin/sh\necho execute >> ${temoin}\n${sortie}\nexit 0\n`)
+  chmodSync(script, 0o755)
+  sh(dir, ['init', '-b', 'main', '-q'])
+  sh(dir, ['config', 'user.email', 'test@example.com'])
+  sh(dir, ['config', 'user.name', 'Test'])
+  writeFileSync(join(dir, 'a.txt'), 'contenu\n')
+  sh(dir, ['add', 'a.txt'])
+  sh(dir, ['commit', '-q', '-m', 'premier commit'])
+  const nettoyer = () => {
+    rmSync(dir, { recursive: true, force: true })
+    rmSync(dehors, { recursive: true, force: true })
+  }
+  return { dir, dehors, temoin, script, nettoyer }
+}
+
+const HOOKS = ['pre-commit', 'prepare-commit-msg', 'commit-msg', 'post-commit', 'post-index-change', 'reference-transaction']
+
+/** L'équipement d'un projet : `add -A` puis `commit --no-verify` (`install.js`). */
+const equiper = (lancer, dir) => {
+  writeFileSync(join(dir, 'b.txt'), 'neuf\n')
+  lancer(dir, ['add', '-A'])
+  lancer(dir, ['commit', '--no-verify', '-q', '-m', 'chore: point de départ'])
+}
+const sansGarde = (dir, args) => execFileSync('git', args, { cwd: dir, stdio: 'ignore' })
+const avecGarde = (dir, args) => git(dir, args, { stdio: 'ignore' })
+
+for (const ou of ['.git/hooks', 'core.hooksPath']) {
+  const poser = (dir, script, dehors) => {
+    let dossier = join(dir, '.git', 'hooks')
+    if (ou === 'core.hooksPath') {
+      dossier = join(dehors, 'hooks')
+      sh(dir, ['config', 'core.hooksPath', dossier])
+    }
+    mkdirSync(dossier, { recursive: true })
+    for (const h of HOOKS) copyFileSync(script, join(dossier, h))
+  }
+
+  test(`le piège est réel : commit --no-verify exécute des hooks (${ou})`, PIEGE_SH, () => {
+    const { dir, dehors, temoin, script, nettoyer } = depotEtTemoin()
+    poser(dir, script, dehors)
+    equiper(sansGarde, dir)
+    assert.equal(existsSync(temoin), true)
+    nettoyer()
+  })
+
+  test(`git() n’exécute aucun hook du dépôt (${ou})`, PIEGE_SH, () => {
+    const { dir, dehors, temoin, script, nettoyer } = depotEtTemoin()
+    poser(dir, script, dehors)
+    equiper(avecGarde, dir)
+    assert.equal(existsSync(temoin), false, 'un hook du dépôt a été exécuté')
+    assert.equal(sh(dir, ['log', '-1', '--format=%s']).trim(), 'chore: point de départ')
+    nettoyer()
+  })
+}
+
+for (const cle of ['clean', 'process']) {
+  // Un filtre `.gitattributes` passe chaque fichier dans un programme du dépôt.
+  const poser = (dir, script) => {
+    writeFileSync(join(dir, '.gitattributes'), '*.txt filter=piege\n')
+    sh(dir, ['config', `filter.piege.${cle}`, script])
+    sh(dir, ['config', 'filter.piege.required', 'true'])
+  }
+
+  test(`le piège est réel : un filtre ${cle} s’exécute au add`, PIEGE_SH, () => {
+    const { dir, temoin, script, nettoyer } = depotEtTemoin('cat')
+    poser(dir, script)
+    try {
+      equiper(sansGarde, dir)
+    } catch {
+      // `process` attend un protocole : le script échoue, mais il a tourné.
+    }
+    assert.equal(existsSync(temoin), true)
+    nettoyer()
+  })
+
+  test(`git() n’exécute pas un filtre ${cle} du dépôt, ni au status ni au add`, PIEGE_SH, () => {
+    const { dir, temoin, script, nettoyer } = depotEtTemoin('cat')
+    poser(dir, script)
+    writeFileSync(join(dir, 'a.txt'), 'modifié\n')
+    git(dir, ['status', '--porcelain=v1'], { stdio: 'ignore' })
+    equiper(avecGarde, dir)
+    assert.equal(existsSync(temoin), false, 'le filtre du dépôt a été exécuté')
+    nettoyer()
+  })
+}
+
+/** Un commit signé par un faux programme gpg, pour que `git log` ait une signature à vérifier. */
+function signer(dir, dehors) {
+  const signeur = join(dehors, 'signe.sh')
+  writeFileSync(
+    signeur,
+    '#!/bin/sh\ncat >/dev/null\necho "[GNUPG:] SIG_CREATED " >&2\n' +
+      'printf -- "-----BEGIN PGP SIGNATURE-----\\n\\nAA==\\n-----END PGP SIGNATURE-----\\n"\n',
+  )
+  chmodSync(signeur, 0o755)
+  writeFileSync(join(dir, 'c.txt'), 'signé\n')
+  sh(dir, ['add', 'c.txt'])
+  sh(dir, ['-c', `gpg.program=${signeur}`, 'commit', '-q', '-S', '-m', 'signé'])
+}
+
+test('le piège est réel : log.showSignature lance gpg.program', PIEGE_SH, () => {
+  const { dir, dehors, temoin, script, nettoyer } = depotEtTemoin()
+  signer(dir, dehors)
+  sh(dir, ['config', 'gpg.program', script])
+  sh(dir, ['config', 'log.showSignature', 'true'])
+  sansGarde(dir, ['log', '-n5', '--pretty=format:%h'])
+  assert.equal(existsSync(temoin), true)
+  nettoyer()
+})
+
+test('git() ne lance aucun programme gpg du dépôt, ni au log ni au commit', PIEGE_SH, () => {
+  const { dir, dehors, temoin, script, nettoyer } = depotEtTemoin()
+  signer(dir, dehors)
+  sh(dir, ['config', 'gpg.program', script])
+  sh(dir, ['config', 'log.showSignature', 'true'])
+  sh(dir, ['config', 'commit.gpgSign', 'true'])
+  avecGarde(dir, ['log', '-n5', '--pretty=format:%h'])
+  equiper(avecGarde, dir)
+  assert.equal(existsSync(temoin), false, 'un programme gpg du dépôt a été lancé')
+  nettoyer()
+})
+
+test('le piège est réel : un fetch local lance remote.<n>.uploadpack', PIEGE_SH, () => {
+  const { dir, temoin, script, nettoyer } = depotEtTemoin()
+  const source = depotEtTemoin()
+  sh(dir, ['remote', 'add', 'origin', source.dir])
+  sh(dir, ['config', 'remote.origin.uploadpack', script])
+  try {
+    sansGarde(dir, ['fetch', 'origin'])
+  } catch {
+    // Le script n'est pas un upload-pack : le fetch échoue, mais il a tourné.
+  }
+  assert.equal(existsSync(temoin), true)
+  nettoyer()
+  source.nettoyer()
+})
+
+test('gitReseau ne lance pas l’uploadpack du dépôt', PIEGE_SH, () => {
+  const { dir, temoin, script, nettoyer } = depotEtTemoin()
+  const source = depotEtTemoin()
+  sh(dir, ['remote', 'add', 'origin', source.dir])
+  sh(dir, ['config', 'remote.origin.uploadpack', script])
+  try {
+    gitReseau(dir, ['fetch', 'origin'], { stdio: 'ignore' })
+  } catch {
+    // Le transport local est refusé : c'est l'effet voulu.
+  }
+  assert.equal(existsSync(temoin), false, 'l’uploadpack du dépôt a été lancé')
+  nettoyer()
+  source.nettoyer()
+})
+
+test('un filtre réglé par l’utilisateur (git-lfs) survit à la garde, celui du dépôt non', PIEGE_SH, () => {
+  // Le dépôt redéfinit en local le pilote que le poste déclare en global : on
+  // rend au poste le sien, et seulement le sien.
+  const { dir, dehors, temoin, script, nettoyer } = depotEtTemoin('cat')
+  const temoinPoste = join(dehors, 'TEMOIN-POSTE')
+  const scriptPoste = join(dehors, 'poste.sh')
+  writeFileSync(scriptPoste, `#!/bin/sh\necho execute >> ${temoinPoste}\ncat\n`)
+  chmodSync(scriptPoste, 0o755)
+  const configPoste = join(dehors, 'gitconfig-poste')
+  writeFileSync(configPoste, `[filter "lfs"]\n\tclean = ${scriptPoste}\n`)
+
+  writeFileSync(join(dir, '.gitattributes'), '*.txt filter=lfs\n')
+  sh(dir, ['config', 'filter.lfs.clean', script])
+  writeFileSync(join(dir, 'a.txt'), 'modifié\n')
+
+  // Sans configuration système : celle des runners macOS de GitHub déclare
+  // `filter.lfs.process`, que git préfère au `clean` posé ici — le filtre du
+  // poste tournait, mais pas celui-ci, et le test échouait sans rien prouver.
+  const env = { ...process.env, GIT_CONFIG_GLOBAL: configPoste, GIT_CONFIG_NOSYSTEM: '1' }
+  git(dir, ['add', '-A'], { stdio: 'ignore', env })
+
+  assert.equal(existsSync(temoin), false, 'le filtre du dépôt a été exécuté')
+  assert.equal(existsSync(temoinPoste), true, 'le filtre du poste doit rester actif')
+  nettoyer()
+})
+
+test('git() n’exécute pas un filtre déclaré par un [include] du .git/config', PIEGE_SH, () => {
+  // `git config --local` ne suit pas les inclusions par défaut, git à l'usage si :
+  // le pilote vivait dans un fichier versionné, invisible à la lecture.
+  const { dir, temoin, script, nettoyer } = depotEtTemoin('cat')
+  writeFileSync(join(dir, 'reglages.cfg'), `[filter "piege"]\n\tclean = ${script}\n\trequired = true\n`)
+  sh(dir, ['config', 'include.path', '../reglages.cfg'])
+  writeFileSync(join(dir, '.gitattributes'), '*.txt filter=piege\n')
+  writeFileSync(join(dir, 'a.txt'), 'modifié\n')
+
+  equiper(avecGarde, dir)
+
+  assert.equal(existsSync(temoin), false, 'le filtre inclus a été exécuté')
+  nettoyer()
+})
+
+// --- seconde relecture : ce que `--local` et `-c` ne voyaient pas ------------
+
+/** Un sous-module dont le `.git/config` déclare un filtre, et un fichier modifié à taille égale. */
+function sousModulePiege() {
+  const parent = depotEtTemoin('cat')
+  const enfant = depotEtTemoin()
+  sh(parent.dir, ['-c', 'protocol.file.allow=always', 'submodule', '-q', 'add', enfant.dir, 'sub'])
+  sh(parent.dir, ['commit', '-q', '-m', 'sous-module'])
+  const sub = join(parent.dir, 'sub')
+  sh(sub, ['config', 'filter.p.clean', parent.script])
+  writeFileSync(join(sub, '.gitattributes'), '*.txt filter=p\n')
+  // Même taille que l'index : seul le contenu dit si le fichier a changé, donc le filtre.
+  writeFileSync(join(sub, 'a.txt'), 'CONTENU\n')
+  return { parent, enfant }
+}
+
+test('le piège est réel : git status lance le filtre d’un sous-module', PIEGE_SH, () => {
+  const { parent, enfant } = sousModulePiege()
+  sansGarde(parent.dir, ['status', '--porcelain=v1'])
+  assert.equal(existsSync(parent.temoin), true)
+  parent.nettoyer()
+  enfant.nettoyer()
+})
+
+test('gitStatus ne descend pas dans les sous-modules', PIEGE_SH, () => {
+  const { parent, enfant } = sousModulePiege()
+  gitStatus(parent.dir)
+  assert.equal(existsSync(parent.temoin), false, 'le filtre du sous-module a été exécuté')
+  parent.nettoyer()
+  enfant.nettoyer()
+})
+
+/** `.git/config.worktree`, que `--local` ne lit pas. */
+const filtreEnWorktree = (dir, script) => {
+  sh(dir, ['config', 'extensions.worktreeConfig', 'true'])
+  sh(dir, ['config', '--worktree', 'filter.p.clean', script])
+  writeFileSync(join(dir, '.gitattributes'), '*.txt filter=p\n')
+}
+
+test('le piège est réel : un filtre de config.worktree s’exécute au add', PIEGE_SH, () => {
+  const { dir, temoin, script, nettoyer } = depotEtTemoin('cat')
+  filtreEnWorktree(dir, script)
+  equiper(sansGarde, dir)
+  assert.equal(existsSync(temoin), true)
+  nettoyer()
+})
+
+test('git() n’exécute pas un filtre déclaré dans config.worktree', PIEGE_SH, () => {
+  const { dir, temoin, script, nettoyer } = depotEtTemoin('cat')
+  filtreEnWorktree(dir, script)
+  equiper(avecGarde, dir)
+  assert.equal(existsSync(temoin), false, 'le filtre de config.worktree a été exécuté')
+  nettoyer()
+})
+
+test('un pilote dont le nom contient « = » est refusé, pas exécuté', PIEGE_SH, () => {
+  // `-c filter.a=b.clean=` se coupe au premier `=` : la clé visée devenait `filter.a`.
+  const { dir, temoin, script, nettoyer } = depotEtTemoin('cat')
+  sh(dir, ['config', 'filter.a=b.clean', script])
+  writeFileSync(join(dir, '.gitattributes'), '*.txt filter=a=b\n')
+  assert.throws(() => equiper(avecGarde, dir), /=/)
+  assert.equal(existsSync(temoin), false, 'le pilote « a=b » a été exécuté')
+  nettoyer()
+})
+
+test('un http.<url>.cookieFile du dépôt ne survit pas à la garde réseau', () => {
+  // Avec `saveCookies`, libcurl réécrit ce fichier au fetch — `~/.zshrc` compris.
+  // Une clé propre à une URL l'emporte sur un `-c http.cookieFile=` générique :
+  // c'est la clé exacte qu'il faut vider. Vérifié par git lui-même, sans réseau.
+  const { dir, nettoyer } = depotEtTemoin()
+  sh(dir, ['config', 'http.http://evil.example/.cookieFile', join(dir, 'cible')])
+  sh(dir, ['config', 'http.http://evil.example/.saveCookies', 'true'])
+  const resolu = cle => {
+    try {
+      return gitReseau(dir, ['config', '--get-urlmatch', cle, 'http://evil.example/x'], { encoding: 'utf8' }).trim()
+    } catch {
+      return '' // Absente : git sort en 1.
+    }
+  }
+  assert.equal(resolu('http.cookieFile'), '')
+  assert.notEqual(resolu('http.saveCookies'), 'true')
+  nettoyer()
+})
+
+test('un core.worktree posé par le dépôt est refusé', () => {
+  // `-c core.worktree=` n'y peut rien : git le lit avant la ligne de commande,
+  // et l'équipement écrirait `ovrsee/` dans le dossier choisi par le dépôt.
+  const { dir, dehors, nettoyer } = depotEtTemoin()
+  sh(dir, ['config', 'core.worktree', dehors])
+  assert.throws(() => git(dir, ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }), /core\.worktree/)
+  nettoyer()
 })

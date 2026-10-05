@@ -37,3 +37,20 @@ minimumReleaseAge: 1440
 # du paquet. Casse `pnpm test` (app/.test-build compilé en CommonJS) sinon.
 patchedDependencies:
   '@phosphor-icons/react': patches/@phosphor-icons__react.patch
+
+# Correctifs de sécurité de l'outillage d'empaquetage (alertes Dependabot,
+# T-0276). Tout vient d'electron-builder et d'@electron/get, déjà en dernière
+# version : leurs plages bloquent encore la version corrigée, on la force ici.
+# Rien de ceci n'est livré dans l'application (`pnpm audit --prod` était vide).
+# Une entrée par branche majeure : forcer une autre majeure casserait l'appelant.
+# À retirer quand electron-builder aura suivi — `pnpm audit` le dira.
+overrides:
+  '@xmldom/xmldom@<0.8.15': 0.8.15
+  'fast-uri@<3.1.8': 3.1.8
+  'js-yaml@>=4 <4.3.2': 4.3.2
+  'undici@>=6 <6.29.0': 6.29.0
+  'undici@>=7 <7.30.0': 7.30.0
+  'brace-expansion@<1.1.21': 1.1.21
+  'brace-expansion@>=2 <2.1.7': 2.1.7
+  'brace-expansion@>=5 <5.0.12': 5.0.12
+  'http-cache-semantics@<4.3.0': 4.3.0

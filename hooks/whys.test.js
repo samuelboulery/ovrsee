@@ -108,3 +108,31 @@ test('readWhys sur un dossier vide ou absent rend un objet vide', () => {
   assert.deepEqual(readWhys(projet()), {})
   assert.deepEqual(readWhys(join(projet(), 'nexiste-pas')), {})
 })
+
+// --- ReDoS (audit de sécurité, T-0274) -------------------------------------
+//
+// Ces lignes viennent du dépôt observé, et `readWhys` tourne à chaque
+// ouverture de projet, dans le processus principal : 2 000 espaces après un
+// `WHY:` le figeaient 4 s, et l'app rouvrant le dernier projet au lancement,
+// à chaque lancement. 250 ms laisse de la marge aux runners de CI.
+const vite = (f, limite = 250) => {
+  const debut = performance.now()
+  f()
+  return performance.now() - debut < limite
+}
+
+test('une ligne WHY pathologique ne fige pas la lecture', () => {
+  assert.ok(vite(() => whysInSource('// WHY: a' + ' '.repeat(5000) + 'b\nimport x from "y"')))
+})
+
+test('un import pathologique ne fige pas la lecture', () => {
+  assert.ok(vite(() => whysInSource('// WHY: a\nimport' + ' '.repeat(50000) + 'x')))
+})
+
+test('les raisons ordinaires se lisent toujours, commentaire de bloc compris', () => {
+  const raisons = whysInSource(
+    ['/* WHY: le parseur maison  */', "import a from 'a'", '// WHY: deux', '// lignes', "import b from 'b'"].join('\n'),
+  )
+  assert.equal(raisons.get('a'), 'le parseur maison')
+  assert.equal(raisons.get('b'), 'deux lignes')
+})

@@ -141,3 +141,14 @@ test('sameOrigin résout un href malformé comme le ferait un navigateur', () =>
 test('sameOrigin ne plante pas quand la base elle-même est invalide', () => {
   assert.equal(sameOrigin('/settings', 'pas-une-url'), false)
 })
+
+test('un motif ignore est un glob, pas une regex (T-0274)', async () => {
+  const { isIgnored } = await import('./index.js')
+  assert.equal(isIgnored('/admin/x', ['/admin/*']), true)
+  assert.equal(isIgnored('/a.b', ['/a.b']), true)
+  assert.equal(isIgnored('/axb', ['/a.b']), false, 'le point est littéral')
+  assert.equal(isIgnored('/x', ['(']), false, 'une parenthèse ne lève pas')
+  const debut = performance.now()
+  isIgnored('/' + 'a'.repeat(5000), ['/' + '*a'.repeat(30) + 'b'])
+  assert.ok(performance.now() - debut < 250)
+})

@@ -12,7 +12,6 @@
  */
 
 import {
-  lstatSync,
   mkdirSync,
   readdirSync,
   readFileSync,
@@ -25,6 +24,7 @@ import { basename, dirname, join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 
 import { readJson } from './json.js'
+import { assurerSansLien } from './sans-lien.js'
 
 import { ACCENT_DEFAUT, validerAccent } from './accents.js'
 import { activePlans, allActive, clearActive, readActive, withLock } from './active.js'
@@ -197,33 +197,22 @@ export function planFileName(title, date = new Date()) {
 }
 
 /**
- * Écriture refusant les liens symboliques sur la cible et sur son dossier.
+ * Écriture refusant les liens symboliques sur la cible et sur ses dossiers,
+ * jusqu'à `ovrsee/` compris (`assurerSansLien`).
  *
  * Sécurité : git sait versionner un lien symbolique. Un dépôt hostile peut
- * livrer `ovrsee/plans -> ~/.ssh`, et le lien est en place dès le `git clone`,
- * avant toute action de l'utilisateur. Une écriture naïve suivrait le lien.
- * On refuse d'écrire, on ne « répare » pas : un lien à cet endroit n'a aucune
- * raison légitime d'exister.
+ * livrer `ovrsee/plans -> ~/.ssh`, ou `ovrsee -> ~`, et le lien est en place
+ * dès le `git clone`, avant toute action de l'utilisateur. Une écriture naïve
+ * suivrait le lien. On refuse d'écrire, on ne « répare » pas : un lien à cet
+ * endroit n'a aucune raison légitime d'exister.
  *
  * L'écriture passe par un fichier temporaire puis un renommage, pour qu'une
  * interruption ne laisse jamais un plan à moitié écrit.
  */
 export function writeFileNoFollow(path, content) {
-  const dir = dirname(path)
-
-  mkdirSync(dir, { recursive: true })
-  if (lstatSync(dir).isSymbolicLink()) {
-    throw new Error(`refus d'écrire : ${dir} est un lien symbolique`)
-  }
-  let target
-  try {
-    target = lstatSync(path)
-  } catch {
-    target = null
-  }
-  if (target?.isSymbolicLink()) {
-    throw new Error(`refus d'écrire : ${path} est un lien symbolique`)
-  }
+  assurerSansLien(path)
+  mkdirSync(dirname(path), { recursive: true })
+  assurerSansLien(path)
 
   // Nom temporaire unique : pid + uuid pour éviter les collisions entre
   // écritures concurrentes du même processus vers le même chemin.

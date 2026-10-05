@@ -121,3 +121,13 @@ test('redige laisse lisible ce qui n’est pas un secret', () => {
   assert.equal(redige('npm_config_registry vide'), 'npm_config_registry vide')
   assert.equal(redige('pnpm: command not found'), 'pnpm: command not found')
 })
+
+test('un long mot ne fige pas le filtre (ReDoS, T-0274)', () => {
+  // Le texte entier d'une page crawlée passe ici : un blob base64 ou un jeton
+  // long rebalayait tout le mot depuis chaque position — 8 s pour 50 000 « a ».
+  const debut = performance.now()
+  for (const motif of ['a', 'KEY', 'a.', 'AUTH']) redige(motif.repeat(60000 / motif.length))
+  assert.ok(performance.now() - debut < 250, `${Math.round(performance.now() - debut)} ms`)
+  assert.equal(redige('apiKey=abc'), 'apiKey=***')
+  assert.equal(redige('X_AUTH_HEADER: Bearer x y'), 'X_AUTH_HEADER: ***')
+})

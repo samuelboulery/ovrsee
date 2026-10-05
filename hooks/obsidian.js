@@ -22,10 +22,11 @@
  * que cet export ne touche jamais — ni en écriture, ni en nettoyage.
  */
 
-import { copyFileSync, existsSync, lstatSync, mkdirSync, rmSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, rmSync } from 'node:fs'
 import { basename, join } from 'node:path'
 
 import { writeFileNoFollow, isSafeSlug } from './plans.js'
+import { assurerSansLien } from './sans-lien.js'
 import { shotPath, snapshot } from './snapshot.js'
 import { colonneFinale } from './tickets.js'
 
@@ -112,10 +113,11 @@ export function exportVault(root, dir = join(root, 'ovrsee', 'obsidian')) {
   const snap = snapshot(root)
   const done = []
 
+  // Avant et après le `mkdir` : le `rmSync` récursif qui suit effacerait dans
+  // la cible d'un lien posé sur `obsidian/` comme sur `ovrsee/`.
+  assurerSansLien(dir)
   mkdirSync(dir, { recursive: true })
-  if (lstatSync(dir).isSymbolicLink()) {
-    throw new Error(`refus d'écrire : ${dir} est un lien symbolique`)
-  }
+  assurerSansLien(dir)
 
   // Nettoyage nommé, jamais récursif sur le coffre : `graphe/` appartient à
   // Graphify, et le coffre peut aussi contenir des notes écrites à la main.
@@ -216,8 +218,13 @@ function ecrirePages(dir, snap, root) {
 
     const source = page.shot ? shotPath(root, page.shot) : null
     if (source) {
+      const cible = join(dir, 'shots', `${page.slug}.png`)
+      // La source aussi : `pages.json` vient du dépôt, et une capture liée vers
+      // `~/.ssh/id_ed25519` finissait copiée dans le coffre, donc commitable.
+      assurerSansLien(source)
       mkdirSync(join(dir, 'shots'), { recursive: true })
-      copyFileSync(source, join(dir, 'shots', `${page.slug}.png`))
+      assurerSansLien(cible)
+      copyFileSync(source, cible)
       captures += 1
     }
 

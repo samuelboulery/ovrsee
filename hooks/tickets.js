@@ -18,7 +18,8 @@
 import { mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync } from 'node:fs'
 import { basename, join } from 'node:path'
 
-import { parsePlan, readPlans, serializePlan, slugify, writeFileNoFollow } from './plans.js'
+import { isSafePlanFileName, parsePlan, readPlans, serializePlan, slugify, writeFileNoFollow } from './plans.js'
+import { assurerSansLien } from './sans-lien.js'
 import { allActive, clearActive, readActive, withLock, writeActive } from './active.js'
 import { ID_TICKET, idFromFile, idPourType, isSafeTicketId, nextTicketId } from './ticket-id.js'
 import { IMAGES_DIR, imagesDuTicket } from './ticket-images.js'
@@ -149,6 +150,15 @@ const requireColonne = (colonnes, colonne) => {
   return colonne
 }
 
+/**
+ * `plan` est un nom de fichier sous `ovrsee/plans/`, que d'autres lisent en le
+ * joignant à ce dossier : un `../` venu de `/api` ou du MCP en sortirait (T-0274).
+ */
+const requirePlan = plan => {
+  if (plan === null || isSafePlanFileName(plan)) return plan
+  throw new Error('plan doit être un nom de fichier de ovrsee/plans/ ou null')
+}
+
 const requirePriorite = priorite => {
   if (!PRIORITES.includes(priorite)) {
     throw new Error(`priorité inconnue : ${priorite}`)
@@ -210,7 +220,7 @@ function creerTicket(ovrseeDir, champs, now, session) {
     tags: Array.isArray(champs?.tags) ? champs.tags.map(String) : [],
     cree: date,
     maj: date,
-    plan: champs?.plan ?? null,
+    plan: requirePlan(champs?.plan ?? null),
   }
 
   if (type) meta.type = type
@@ -233,6 +243,7 @@ function creerTicket(ovrseeDir, champs, now, session) {
   const body = String(champs?.corps ?? '').trim() + '\n'
   const file = ticketFileName(meta.id, titre)
 
+  assurerSansLien(ticketPath(ovrseeDir, file))
   mkdirSync(join(ovrseeDir, 'tickets'), { recursive: true })
   writeFileNoFollow(ticketPath(ovrseeDir, file), serializePlan(meta, body))
 
@@ -394,7 +405,7 @@ function modifier(ticket, patch) {
   }
   if (patch?.priorite !== undefined) meta.priorite = patch.priorite
   if (patch?.tags !== undefined) meta.tags = Array.isArray(patch.tags) ? patch.tags.map(String) : []
-  if (patch?.plan !== undefined) meta.plan = patch.plan ?? null
+  if (patch?.plan !== undefined) meta.plan = requirePlan(patch.plan ?? null)
 
   // Gérer type
   if (patch?.type !== undefined && patch.type !== null) {
@@ -468,8 +479,10 @@ function prefixeAChanger(ovrseeDir, file, meta) {
  * suffit à les relire.
  */
 function changerPrefixe(ovrseeDir, file, { avant, apres, nouveau }, now) {
+  assurerSansLien(ticketPath(ovrseeDir, file))
   renameSync(ticketPath(ovrseeDir, file), ticketPath(ovrseeDir, nouveau))
   for (const image of imagesDuTicket(ovrseeDir, avant)) {
+    assurerSansLien(image)
     renameSync(image, join(ovrseeDir, 'tickets', 'images', apres + basename(image).slice(avant.length)))
   }
 
@@ -538,6 +551,8 @@ export function removeColumn(ovrseeDir, id, vers) {
 
 export function deleteTicket(ovrseeDir, file) {
   const id = idFromFile(file)
+  // Supprimer à travers `tickets/` ou `ovrsee/` liés effacerait chez l'utilisateur.
+  assurerSansLien(ticketPath(ovrseeDir, file))
   try {
     unlinkSync(ticketPath(ovrseeDir, file))
   } catch {
@@ -550,6 +565,7 @@ export function deleteTicket(ovrseeDir, file) {
   if (id) {
     for (const image of imagesDuTicket(ovrseeDir, id)) {
       try {
+        assurerSansLien(image)
         unlinkSync(image)
       } catch {
         // Déjà partie, ou illisible : la suppression du ticket a réussi.

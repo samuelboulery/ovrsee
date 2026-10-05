@@ -18,19 +18,35 @@ import { spawn } from 'node:child_process'
 import { git } from '../hooks/git.js'
 import { createInterface } from 'node:readline/promises'
 import { chmodSync, readFileSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { isAbsolute, join, relative, resolve } from 'node:path'
 
 import { chromium } from 'playwright-core'
 
 import { cleanEnv, killTree, shellRun } from '../hooks/shell.js'
 import { assurerConfiance, DEV_DEFAUT } from './confiance.js'
+import { writeFileNoFollow } from '../hooks/plans.js'
 
 const root = resolve(process.argv[2] ?? process.cwd())
-const config = JSON.parse(readFileSync(join(root, 'ovrsee.config.json'), 'utf8'))
+let config
+try {
+  config = JSON.parse(readFileSync(join(root, 'ovrsee.config.json'), 'utf8'))
+} catch {
+  console.error('ovrsee.config.json absent ou illisible.')
+  process.exit(1)
+}
 
 const statePath = config.auth?.storageState
-if (!statePath) {
+if (typeof statePath !== 'string' || !statePath) {
   console.error('ovrsee.config.json ne déclare pas auth.storageState — rien à enregistrer.')
+  process.exit(1)
+}
+
+// `storageState` vient du dépôt observé : un chemin absolu ou en `../` y
+// ferait écrire le jeton de session ailleurs que dans le dépôt.
+const cible = resolve(root, statePath)
+const relatif = relative(root, cible)
+if (!relatif || relatif.startsWith('..') || isAbsolute(relatif)) {
+  console.error('auth.storageState doit désigner un fichier à l’intérieur du dépôt.')
   process.exit(1)
 }
 
@@ -41,12 +57,13 @@ if (!statePath) {
  */
 function assertIgnored() {
   try {
-    git(root, ['check-ignore', '-q', statePath], { stdio: 'ignore' })
+    git(root, ['check-ignore', '-q', '--', statePath], { stdio: 'ignore' })
   } catch {
     console.error(
       `\n${statePath} n'est pas ignoré par git.\n` +
-        `Il contiendra un jeton de session valide. Ajoutez-le au .gitignore avant de continuer :\n\n` +
-        `  echo '${statePath}' >> ${join(root, '.gitignore')}\n`,
+        // Le chemin seul, pas une commande à coller : la valeur vient du dépôt
+        // observé, et une apostrophe y fermait la citation du `echo`.
+        `Il contiendra un jeton de session valide. Ajoutez-le au .gitignore avant de continuer.\n`,
     )
     process.exit(1)
   }
@@ -92,11 +109,12 @@ async function main() {
     await rl.question('Une fois connecté, appuyez sur Entrée pour enregistrer la session… ')
     rl.close()
 
-    const cible = join(root, statePath)
-    await context.storageState({ path: cible })
-    // Playwright écrit sous l'umask courant, soit 0644 en général. Le fichier
-    // porte un jeton de session valide : le refuser à git ne suffit pas s'il
-    // reste lisible par un autre compte de la machine.
+    // Écrit par nous, pas par Playwright : son `path` suivrait un lien posé par
+    // le dépôt (`.auth.json -> ~/.zshrc`), et le `chmod` après lui.
+    writeFileNoFollow(cible, JSON.stringify(await context.storageState(), null, 2))
+    // Écrit sous l'umask courant, soit 0644 en général. Le fichier porte un
+    // jeton de session valide : le refuser à git ne suffit pas s'il reste
+    // lisible par un autre compte de la machine.
     chmodSync(cible, 0o600)
     console.log(`session enregistrée dans ${statePath}`)
     console.log('Le prochain crawl atteindra les pages protégées.')

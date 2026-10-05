@@ -277,8 +277,39 @@ const pathOf = url => {
   return pathname === '/' ? '/' : pathname.replace(/\/+$/, '')
 }
 
-const isIgnored = (path, patterns) =>
-  patterns.some(pattern => new RegExp('^' + pattern.replace(/\*/g, '.*') + '$').test(path))
+/**
+ * Un chemin correspond-il à l'un des globs `ignore` ? Seul `*` est spécial.
+ *
+ * Pas de `RegExp` : le motif vient d'`ovrsee.config.json`, versionné, et le
+ * chemin d'un lien de la page observée. `(` faisait lever, et `*a*a*…b` sur un
+ * long chemin ne finissait pas (T-0274). Ici, au pire chemin × motif.
+ */
+export const isIgnored = (path, patterns) => patterns.some(pattern => globCorrespond(String(pattern), path))
+
+function globCorrespond(motif, texte) {
+  let m = 0
+  let t = 0
+  let etoile = -1
+  let reprise = 0
+  while (t < texte.length) {
+    if (m < motif.length && motif[m] !== '*' && motif[m] === texte[t]) {
+      m += 1
+      t += 1
+    } else if (m < motif.length && motif[m] === '*') {
+      etoile = m
+      reprise = t
+      m += 1
+    } else if (etoile !== -1) {
+      m = etoile + 1
+      reprise += 1
+      t = reprise
+    } else {
+      return false
+    }
+  }
+  while (motif[m] === '*') m += 1
+  return m === motif.length
+}
 
 /**
  * Filtre le titre et l'extrait captés dans le DOM de l'application observée,
@@ -290,7 +321,9 @@ const isIgnored = (path, patterns) =>
  * d'abord aurait pu couper un jeton en deux et le laisser passer à moitié.
  */
 export function sanitizePageCapture(title, text) {
-  return { title: redige(title), text: redige(text).slice(0, 400) }
+  // Borné avant le filtre : seuls 400 caractères restent, et le texte d'une
+  // page n'a pas de taille maximale.
+  return { title: redige(String(title ?? '').slice(0, 2000)), text: redige(String(text ?? '').slice(0, 20000)).slice(0, 400) }
 }
 
 /**

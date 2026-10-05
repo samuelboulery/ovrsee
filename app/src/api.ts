@@ -27,10 +27,20 @@ const json = async <T,>(url: string, signal?: AbortSignal): Promise<T> => {
  * Le message d'erreur rendu par le serveur prime sur le code HTTP : c'est lui
  * que l'interface montre.
  */
+/**
+ * La valeur de `X-Ovrsee` : le jeton que le dev server a posé dans la page, ou
+ * `'1'` sous Electron, dont le build n'en porte pas. Lu à l'appel : les tests
+ * compilent ce module sous Node, sans `document`.
+ */
+const jeton = (): string =>
+  typeof document === 'undefined'
+    ? '1'
+    : (document.querySelector<HTMLMetaElement>('meta[name="ovrsee-jeton"]')?.content ?? '1')
+
 const post = async <T,>(url: string, body: unknown): Promise<T> => {
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': '1' },
+    headers: { 'Content-Type': 'application/json', 'X-Ovrsee': jeton() },
     body: JSON.stringify(body),
   })
 

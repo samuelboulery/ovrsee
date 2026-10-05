@@ -16,7 +16,7 @@ import { basename, join } from 'node:path'
 
 import { readPlans } from './plans.js'
 import { colonneFinale, readBoard, readTickets, sortTickets } from './tickets.js'
-import { readJson } from './json.js'
+import { fichierDuDepot, readJsonDuDepot } from './json.js'
 import { formatDate } from './i18n.js'
 
 // Les plans manipulés ici sont APLATIS (`{status, title, …}`), pas emboîtés
@@ -49,11 +49,12 @@ export function readOvrsee(root) {
   if (!existsSync(ovrseeDir)) return null
 
   const plans = readPlans(ovrseeDir)
-  const pages = readJson(join(ovrseeDir, 'pages', 'pages.json'))
+  const pages = readJsonDuDepot(root, join(ovrseeDir, 'pages', 'pages.json'))
 
   let scans = []
   try {
-    scans = readFileSync(join(ovrseeDir, 'pages', 'scans.jsonl'), 'utf8')
+    const journal = fichierDuDepot(root, join(ovrseeDir, 'pages', 'scans.jsonl'))
+    scans = (journal ? readFileSync(journal, 'utf8') : '')
       .split('\n')
       .filter(Boolean)
       .flatMap(line => {

@@ -18,7 +18,7 @@
 import { mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync } from 'node:fs'
 import { basename, join } from 'node:path'
 
-import { parsePlan, readPlans, serializePlan, slugify, writeFileNoFollow } from './plans.js'
+import { isSafePlanFileName, parsePlan, readPlans, serializePlan, slugify, writeFileNoFollow } from './plans.js'
 import { assurerSansLien } from './sans-lien.js'
 import { allActive, clearActive, readActive, withLock, writeActive } from './active.js'
 import { ID_TICKET, idFromFile, idPourType, isSafeTicketId, nextTicketId } from './ticket-id.js'
@@ -150,6 +150,15 @@ const requireColonne = (colonnes, colonne) => {
   return colonne
 }
 
+/**
+ * `plan` est un nom de fichier sous `ovrsee/plans/`, que d'autres lisent en le
+ * joignant à ce dossier : un `../` venu de `/api` ou du MCP en sortirait (T-0274).
+ */
+const requirePlan = plan => {
+  if (plan === null || isSafePlanFileName(plan)) return plan
+  throw new Error('plan doit être un nom de fichier de ovrsee/plans/ ou null')
+}
+
 const requirePriorite = priorite => {
   if (!PRIORITES.includes(priorite)) {
     throw new Error(`priorité inconnue : ${priorite}`)
@@ -211,7 +220,7 @@ function creerTicket(ovrseeDir, champs, now, session) {
     tags: Array.isArray(champs?.tags) ? champs.tags.map(String) : [],
     cree: date,
     maj: date,
-    plan: champs?.plan ?? null,
+    plan: requirePlan(champs?.plan ?? null),
   }
 
   if (type) meta.type = type
@@ -396,7 +405,7 @@ function modifier(ticket, patch) {
   }
   if (patch?.priorite !== undefined) meta.priorite = patch.priorite
   if (patch?.tags !== undefined) meta.tags = Array.isArray(patch.tags) ? patch.tags.map(String) : []
-  if (patch?.plan !== undefined) meta.plan = patch.plan ?? null
+  if (patch?.plan !== undefined) meta.plan = requirePlan(patch.plan ?? null)
 
   // Gérer type
   if (patch?.type !== undefined && patch.type !== null) {

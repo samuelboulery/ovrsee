@@ -110,3 +110,21 @@ test('markdown : le texte non reconnu n’est jamais avalé', () => {
   const html = rendu('<section>bizarre</section>', ROOT)
   assert.match(html, /bizarre/)
 })
+
+test('markdown : un README pathologique ne fige pas le rendu (ReDoS, T-0274)', () => {
+  // Le README vient du dépôt observé, plafonné à 200 000 caractères : des
+  // motifs quadratiques y figeaient l'onglet Aperçu plusieurs secondes.
+  const debut = performance.now()
+  for (const motif of ['[a](', '![a](x', '[', '`a', '**a']) rendu(motif.repeat(Math.floor(20000 / motif.length)))
+  rendu('<details>\n' + '<summary>'.repeat(2000))
+  rendu('<img ' + 'src="a '.repeat(3000))
+  assert.ok(performance.now() - debut < 500, `${Math.round(performance.now() - debut)} ms`)
+})
+
+test('markdown : liens, images et pliage ordinaires se rendent toujours', () => {
+  const html = rendu('[site](https://ex.com/a_(b)) ![x](docs/a.png) **gras** `code`', ROOT)
+  assert.match(html, /href="https:\/\/ex.com\/a_\(b/)
+  assert.match(html, /<strong[^>]*>gras<\/strong>/)
+  assert.match(rendu('<img src="docs/a.png" width="300">', ROOT), /<img/)
+  assert.match(rendu('<details>\n<summary>Plus</summary>\ncorps\n</details>'), /<summary[^>]*>Plus/)
+})

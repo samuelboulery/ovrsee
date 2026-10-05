@@ -964,3 +964,13 @@ test('predicatEnVol est null sans colonne en-cours', () => {
   ])
   assert.equal(predicatEnVol(readBoard(ovrseeDir)), null)
 })
+
+test('le champ plan n’accepte qu’un nom de plan sûr, ou null (T-0274)', () => {
+  const dir = fixture()
+  for (const plan of ['../../.git/config', 'plans/x.md', { x: 1 }, 'x.txt']) {
+    assert.throws(() => createTicket(dir, { titre: 'a', plan }), /plan/, String(plan))
+  }
+  const { file } = createTicket(dir, { titre: 'b', plan: '2026-10-05-x.md' })
+  assert.throws(() => updateTicket(dir, file, { plan: '../x.md' }), /plan/)
+  updateTicket(dir, file, { plan: null })
+})

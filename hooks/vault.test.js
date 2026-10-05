@@ -234,3 +234,11 @@ test('le parcours est borné à MAX_FILES', () => {
 
   rmSync(root, { recursive: true, force: true })
 })
+
+test('une suite de crochets ne fige pas la lecture des wikilinks (ReDoS)', () => {
+  const debut = performance.now()
+  for (const motif of ['[', '[[a#', '[[a|', '[[a^b']) wikilinks(motif.repeat(80000 / motif.length))
+  assert.ok(performance.now() - debut < 250)
+  assert.deepEqual(wikilinks('[[a]] [[b|c]] [[d#e]] [[f^g|h]]'), ['a', 'b', 'd', 'f'])
+  assert.deepEqual(wikilinks('voir [[[[Note]]'), ['Note'])
+})

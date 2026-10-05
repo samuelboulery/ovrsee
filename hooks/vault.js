@@ -169,8 +169,14 @@ export function frontmatterOf(src) {
   return parseYaml(src.slice(FENCE.length + 1, end))
 }
 
-/** `[[...]]`, avec ou sans libellé, avec ou sans ancre. */
-const WIKILINK = /\[\[([^\]|#^]+)(?:[#^][^\]|]*)?(?:\|[^\]]*)?\]\]/g
+/**
+ * `[[...]]`, avec ou sans libellé, avec ou sans ancre.
+ *
+ * Aucune classe n'admet `[` : sans quoi chaque `[[`, `[[a#` ou `[[a|` d'une
+ * suite relançait un balayage jusqu'au bout du texte — quadratique, 16 s pour
+ * 200 ko (T-0274). Un lien ne contient pas de crochet ouvrant.
+ */
+const WIKILINK = /\[\[([^\][|#^]+)(?:[#^][^\][|]*)?(?:\|[^\][]*)?\]\]/g
 
 /** Les blocs de code, qui citent des crochets sans les vouloir comme liens. */
 const CODE = /```[\s\S]*?```|`[^`\n]*`/g

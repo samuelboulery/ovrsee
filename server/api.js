@@ -30,7 +30,7 @@ import {
 import { readSettings, writeSettings, validateSettings, mergeSettings } from '../hooks/settings.js'
 import { installSkills, readSkills } from '../hooks/skills.js'
 import { projects, snapshot, shotPath, mediaPath, tableau, readGraph } from '../hooks/snapshot.js'
-import { readJson } from '../hooks/json.js'
+import { readJsonDuDepot } from '../hooks/json.js'
 import { git, gitReseau } from '../hooks/git.js'
 import { gitStatus } from '../hooks/git-status.js'
 import {
@@ -78,6 +78,20 @@ const origineAutorisee = headers => {
 }
 
 /**
+ * Un GET sans `Origin` passait toujours : une page tierce chargeait
+ * `<img src="http://localhost:5180/api/…">` et lisait la réponse au `load` ou à
+ * l'`error` — savoir si un chemin est inscrit, déclencher un `snapshot()`. Le
+ * navigateur dit d'où vient la requête dans `Sec-Fetch-Site` : on n'accepte que
+ * `same-origin` et `none` (barre d'adresse). `same-site` aussi est refusé :
+ * `localhost:3000` → `localhost:5180` l'est, et c'est l'app observée.
+ * Absent (curl, Electron, test), l'en-tête ne dit rien : on s'en remet au reste.
+ */
+const memeSite = headers => {
+  const site = headers['sec-fetch-site']
+  return site === undefined || site === 'same-origin' || site === 'none'
+}
+
+/**
  * Un dossier réel, désigné par un chemin absolu, qui n'est pas un lien.
  *
  * Le chemin vient du rendu. Il n'ouvre qu'une lecture du `ovrsee/` qui s'y
@@ -110,7 +124,7 @@ export const usableDirectory = path =>
  * serait une faute qu'on lui ferait corriger à chaque projet.
  */
 function detectDefaults(root) {
-  const scripts = readJson(join(root, 'package.json'))?.scripts ?? {}
+  const scripts = readJsonDuDepot(root, join(root, 'package.json'))?.scripts ?? {}
   const nom = ['dev', 'start'].find(cle => typeof scripts[cle] === 'string') ?? 'dev'
   const script = scripts[nom] ?? ''
   const port =
@@ -402,13 +416,17 @@ function ticketAction(body, root) {
  *   null quand la route n'est pas à nous : l'appelant passe la main.
  */
 export function resolve(url, cwd = process.cwd(), request = {}) {
-  const { method = 'GET', headers = {}, body = null } = request
+  const { method = 'GET', headers = {}, body = null, jeton = '1' } = request
 
   // Avant tout le reste, et seulement sur nos routes : hors de `/api/`, rendre
   // 403 volerait la requête à l'hôte, qui a ses propres chemins à servir.
-  if (url.pathname.startsWith('/api/') && !origineAutorisee(headers)) {
+  if (url.pathname.startsWith('/api/') && (!origineAutorisee(headers) || !memeSite(headers))) {
     return { status: 403, json: { error: 'origine refusée' } }
   }
+
+  // Sous Vite, le jeton tiré au démarrage du serveur ; sous Electron, `'1'` —
+  // le protocole `ovrsee://` n'est joignable que par l'interface elle-même.
+  const enteteOk = headers['x-ovrsee'] === jeton
 
   const known = () => projects()
   const asked = () => known().find(p => p.path === url.searchParams.get('path'))?.path ?? null
@@ -420,7 +438,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
       // Au dev server, n'importe quelle page ouverte dans le navigateur peut
       // poster vers localhost. Un en-tête personnalisé impose un préflight
       // CORS, que le rendu de l'ovrsee passe et qu'un formulaire distant non.
-      if (headers['x-ovrsee'] !== '1') {
+      if (!enteteOk) {
         return { status: 403, json: { error: 'en-tête X-Ovrsee manquant' } }
       }
       return projectAction(body)
@@ -430,7 +448,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
     // registre des projets mais le catalogue, appliqué dans `installSkills`.
     case '/api/skills': {
       if (method !== 'POST') return { json: readSkills() }
-      if (headers['x-ovrsee'] !== '1') {
+      if (!enteteOk) {
         return { status: 403, json: { error: 'en-tête X-Ovrsee manquant' } }
       }
       try {
@@ -453,7 +471,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
 
     case '/api/settings': {
       // L'en-tête vérification d'abord pour les écritures
-      if (method === 'POST' && headers['x-ovrsee'] !== '1') {
+      if (method === 'POST' && !enteteOk) {
         return { status: 403, json: { error: 'en-tête X-Ovrsee manquant' } }
       }
 
@@ -468,7 +486,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
         if (!root) return { status: 404, json: { error: 'inconnu' } }
 
         // Fusionner global + projet.
-        const projectConfig = readJson(join(root, 'ovrsee.config.json')) ?? {}
+        const projectConfig = readJsonDuDepot(root, join(root, 'ovrsee.config.json')) ?? {}
         return { json: mergeSettings(readSettings(), projectConfig) }
       }
 
@@ -483,7 +501,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
     case '/api/tickets': {
       // L'en-tête d'abord : rien de ce qui suit ne doit tourner pour une
       // requête qu'on refuse de toute façon, pas même une lecture du registre.
-      if (method === 'POST' && headers['x-ovrsee'] !== '1') {
+      if (method === 'POST' && !enteteOk) {
         return { status: 403, json: { error: 'en-tête X-Ovrsee manquant' } }
       }
 
@@ -509,7 +527,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
     case '/api/graph': {
       const root = asked()
       if (!root) return { status: 404, json: { error: 'projet inconnu' } }
-      return { json: readGraph(root, readJson(join(root, 'ovrsee.config.json'))) }
+      return { json: readGraph(root, readJsonDuDepot(root, join(root, 'ovrsee.config.json'))) }
     }
 
     case '/api/shot': {
@@ -544,7 +562,7 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
     // comme le CLI le fait déjà (hooks/ovrsee-cli.js).
     case '/api/plans/close-active': {
       if (method !== 'POST') return { status: 405, json: { error: 'méthode non permise' } }
-      if (headers['x-ovrsee'] !== '1') {
+      if (!enteteOk) {
         return { status: 403, json: { error: 'en-tête X-Ovrsee manquant' } }
       }
       const root = projects().find(p => p.path === body?.path)?.path ?? null
@@ -580,6 +598,9 @@ const CORPS_MAX = 1_000_000
 
 const readBody = req =>
   new Promise(resolve => {
+    // Décodé par le flux, pas morceau par morceau : un caractère coupé entre
+    // deux paquets devenait U+FFFD, et un ticket long se corrompait en silence.
+    req.setEncoding?.('utf8')
     let text = ''
     req.on('data', chunk => {
       if (text.length > CORPS_MAX) return
@@ -621,18 +642,46 @@ const ENTETES_FICHIER = result => ({
   'Content-Disposition': `inline; filename="${basename(result.file).replace(/[^\w.-]/g, '_')}"`,
 })
 
-export function nodeMiddleware(cwd = process.cwd()) {
-  return async (req, res, next) => {
-    const url = new URL(req.url ?? '/', 'http://localhost')
-    const method = req.method ?? 'GET'
-    const body = method === 'POST' ? await readBody(req) : null
+/**
+ * Une exception de `resolve()` ne doit jamais atteindre l'hôte : Vite n'a pas
+ * de gestionnaire de promesse rejetée, et le dev server tombait — sur un simple
+ * GET d'une page tierce. Le détail part sur stderr, la réponse n'en dit rien.
+ */
+const ERREUR_INTERNE = { status: 500, json: { error: 'erreur interne' } }
 
-    const result = resolve(url, cwd, { method, headers: req.headers, body })
+const resoudreSansLever = (url, cwd, request) => {
+  try {
+    return resolve(url, cwd, request)
+  } catch (err) {
+    process.stderr.write(`[ovrsee] ${url.pathname} : ${err?.stack ?? err}\n`)
+    return ERREUR_INTERNE
+  }
+}
+
+export function nodeMiddleware(cwd = process.cwd(), { jeton = '1' } = {}) {
+  return async (req, res, next) => {
+    // Un middleware async ne rejette jamais : personne n'attend sa promesse, et
+    // `GET //` — `new URL` refuse — tuait le dev server depuis n'importe quelle page.
+    let url, method, body
+    try {
+      url = new URL(req.url ?? '/', 'http://localhost')
+      method = req.method ?? 'GET'
+      body = method === 'POST' ? await readBody(req) : null
+    } catch {
+      res.statusCode = 400
+      return res.end()
+    }
+
+    const result = resoudreSansLever(url, cwd, { method, headers: req.headers, body, jeton })
     if (!result) return next()
 
     if ('file' in result) {
       for (const [cle, valeur] of Object.entries(ENTETES_FICHIER(result))) res.setHeader(cle, valeur)
-      return createReadStream(result.file).pipe(res)
+      // Sans écouteur, une erreur du flux (fichier disparu, devenu dossier) est
+      // une exception non gérée : le processus du dev server meurt.
+      return createReadStream(result.file)
+        .on('error', () => res.destroy())
+        .pipe(res)
     }
 
     res.statusCode = result.status ?? 200
@@ -644,9 +693,22 @@ export function nodeMiddleware(cwd = process.cwd()) {
 /** Adaptateur pour `protocol.handle` d'Electron. Rend null si hors périmètre. */
 export async function fetchHandler(url, cwd = process.cwd(), request = null) {
   const method = request?.method ?? 'GET'
-  const body = method === 'POST' ? parseBody(await request.text()) : null
+  let body = null
+  if (method === 'POST') {
+    // Même plafond que sous Vite : une route vérifiée d'un côté ne l'est pas de
+    // l'autre. L'en-tête d'abord, pour ne pas lire en mémoire ce qu'on refuse.
+    const annonce = Number(request.headers?.get?.('content-length') ?? 0)
+    const texte = annonce > CORPS_MAX ? '' : await request.text()
+    if (annonce > CORPS_MAX || Buffer.byteLength(texte) > CORPS_MAX) {
+      return new Response(JSON.stringify({ error: 'corps trop volumineux' }), {
+        status: 413,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+    body = parseBody(texte)
+  }
 
-  const result = resolve(url, cwd, {
+  const result = resoudreSansLever(url, cwd, {
     method,
     headers: Object.fromEntries(request?.headers ?? []),
     body,
@@ -654,7 +716,14 @@ export async function fetchHandler(url, cwd = process.cwd(), request = null) {
   if (!result) return null
 
   if ('file' in result) {
-    return new Response(readFileSync(result.file), { headers: ENTETES_FICHIER(result) })
+    try {
+      return new Response(readFileSync(result.file), { headers: ENTETES_FICHIER(result) })
+    } catch {
+      return new Response(JSON.stringify({ error: 'fichier illisible' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
   }
 
   return new Response(JSON.stringify(result.json), {

@@ -19,6 +19,7 @@ import { mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync } from 'no
 import { basename, join } from 'node:path'
 
 import { isSafePlanFileName, parsePlan, readPlans, serializePlan, slugify, writeFileNoFollow } from './plans.js'
+import { assurerSansLien } from './sans-lien.js'
 import { allActive, clearActive, readActive, withLock, writeActive } from './active.js'
 import { ID_TICKET, idFromFile, idPourType, isSafeTicketId, nextTicketId } from './ticket-id.js'
 import { IMAGES_DIR, imagesDuTicket } from './ticket-images.js'
@@ -242,6 +243,7 @@ function creerTicket(ovrseeDir, champs, now, session) {
   const body = String(champs?.corps ?? '').trim() + '\n'
   const file = ticketFileName(meta.id, titre)
 
+  assurerSansLien(ticketPath(ovrseeDir, file))
   mkdirSync(join(ovrseeDir, 'tickets'), { recursive: true })
   writeFileNoFollow(ticketPath(ovrseeDir, file), serializePlan(meta, body))
 
@@ -477,8 +479,10 @@ function prefixeAChanger(ovrseeDir, file, meta) {
  * suffit à les relire.
  */
 function changerPrefixe(ovrseeDir, file, { avant, apres, nouveau }, now) {
+  assurerSansLien(ticketPath(ovrseeDir, file))
   renameSync(ticketPath(ovrseeDir, file), ticketPath(ovrseeDir, nouveau))
   for (const image of imagesDuTicket(ovrseeDir, avant)) {
+    assurerSansLien(image)
     renameSync(image, join(ovrseeDir, 'tickets', 'images', apres + basename(image).slice(avant.length)))
   }
 
@@ -547,6 +551,8 @@ export function removeColumn(ovrseeDir, id, vers) {
 
 export function deleteTicket(ovrseeDir, file) {
   const id = idFromFile(file)
+  // Supprimer à travers `tickets/` ou `ovrsee/` liés effacerait chez l'utilisateur.
+  assurerSansLien(ticketPath(ovrseeDir, file))
   try {
     unlinkSync(ticketPath(ovrseeDir, file))
   } catch {
@@ -559,6 +565,7 @@ export function deleteTicket(ovrseeDir, file) {
   if (id) {
     for (const image of imagesDuTicket(ovrseeDir, id)) {
       try {
+        assurerSansLien(image)
         unlinkSync(image)
       } catch {
         // Déjà partie, ou illisible : la suppression du ticket a réussi.

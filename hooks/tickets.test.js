@@ -974,3 +974,15 @@ test('le champ plan n’accepte qu’un nom de plan sûr, ou null (T-0274)', () 
   assert.throws(() => updateTicket(dir, file, { plan: '../x.md' }), /plan/)
   updateTicket(dir, file, { plan: null })
 })
+
+test('deleteTicket refuse de supprimer à travers un ovrsee/ lié hors du dépôt', () => {
+  const root = mkdtempSync(join(tmpdir(), 'ovrsee-tickets-lien-'))
+  const ailleurs = join(root, 'ailleurs')
+  mkdirSync(join(ailleurs, 'tickets'), { recursive: true })
+  writeFileSync(join(ailleurs, 'tickets', 'T-0001-precieux.md'), 'à garder')
+  mkdirSync(join(root, 'depot', '.git'), { recursive: true })
+  symlinkSync(ailleurs, join(root, 'depot', 'ovrsee'))
+
+  assert.throws(() => deleteTicket(join(root, 'depot', 'ovrsee'), 'T-0001-precieux.md'), /lien symbolique/)
+  assert.equal(readFileSync(join(ailleurs, 'tickets', 'T-0001-precieux.md'), 'utf8'), 'à garder')
+})

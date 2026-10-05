@@ -24,10 +24,12 @@
  *          Silencieux (aucune sortie) si rien à faire pour cet event.
  */
 
-import { appendFileSync, existsSync, unlinkSync, writeFileSync } from 'node:fs'
+import { existsSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { readJson } from './json.js'
+import { writeFileNoFollow } from './plans.js'
+import { appendFileNoFollow } from './sans-lien.js'
 
 import { readStdin, repoRoot } from './entree.js'
 import { estPrincipal } from './principal.js'
@@ -76,7 +78,7 @@ export function logAudit(root, skill) {
   const ovrseeDir = join(root, 'ovrsee')
   if (!existsSync(ovrseeDir)) return false
   try {
-    appendFileSync(
+    appendFileNoFollow(
       join(ovrseeDir, 'audits.jsonl'),
       `${JSON.stringify({ date: new Date().toISOString(), skill })}\n`,
     )
@@ -134,7 +136,7 @@ function main() {
     const skill = skillFromSlashCommand(payload.prompt || '')
     if (!skill) return
     try {
-      writeFileSync(pendingAuditPath(root), JSON.stringify({ skill, date: new Date().toISOString() }))
+      writeFileNoFollow(pendingAuditPath(root), JSON.stringify({ skill, date: new Date().toISOString() }))
     } catch {
       // Pas de marqueur, pas de nudge au Stop — tant pis, silencieux.
     }

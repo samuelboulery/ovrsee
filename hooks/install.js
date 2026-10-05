@@ -29,6 +29,7 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  statSync,
   writeFileSync,
 } from 'node:fs'
 import { homedir } from 'node:os'
@@ -39,6 +40,7 @@ import { git } from './git.js'
 import { readJson } from './json.js'
 
 import { writeFileNoFollow } from './plans.js'
+import { assurerSansLien } from './sans-lien.js'
 import { installSkills } from './skills.js'
 import { DEFAULT_COLUMNS } from './tickets.js'
 import { estPrincipal } from './principal.js'
@@ -117,6 +119,17 @@ function installGitHook(root, hookName, scriptName, description, done) {
     `${commandFor(scriptName)} || true`,
     END,
   ].join('\n')
+
+  // Un hook présent mais non exécutable est inerte : git l'ignore. Y ajouter
+  // notre bloc puis le `chmod 755` armerait son contenu — celui d'un dépôt reçu
+  // en archive, par exemple. On ne touche pas à un fichier qu'on n'a pas activé.
+  if (existsSync(hookPath) && process.platform !== 'win32' && (statSync(hookPath).mode & 0o111) === 0) {
+    done.push(
+      `${hookName} : ${hookPath} existe mais n'est pas exécutable — non modifié, ` +
+        'pour ne pas activer un contenu qui ne vient pas d’ovrsee. Le vérifier, puis le rendre exécutable ou le supprimer.',
+    )
+    return
+  }
 
   let existing = existsSync(hookPath) ? readFileSync(hookPath, 'utf8') : '#!/bin/sh\n'
 
@@ -409,10 +422,12 @@ export function install(target, { skills = [], gitInit = false, commit = false, 
   // Un échec ici — identité git absente, rien à committer — n'a pas à faire
   // échouer l'équipement : le commit est un confort, `ovrsee/` est le sujet.
   //
-  // `--no-verify` n'est pas une commodité : un dépôt reçu d'ailleurs apporte
-  // ses propres `.git/hooks`, et `git commit` les exécute. Sans cette option,
-  // équiper un projet lançait donc du code de ce projet — ce que l'invariant du
-  // cadrage interdit, et bien avant que quiconque ait accordé quoi que ce soit.
+  // Les hooks du dépôt : un dépôt reçu d'ailleurs apporte ses `.git/hooks`.
+  // `--no-verify` ne coupe que `pre-commit` et `commit-msg` — `git add` lance
+  // `post-index-change`, `git commit` `prepare-commit-msg`, `post-commit` et
+  // `reference-transaction`. C'est `git()` qui les coupe tous, par
+  // `core.hooksPath` (`hooks/git.js`) ; `--no-verify` reste, par défense en
+  // profondeur.
   if (commit) {
     try {
       git(root, ['add', '-A'], { stdio: 'ignore' })
@@ -425,6 +440,9 @@ export function install(target, { skills = [], gitInit = false, commit = false, 
     }
   }
 
+  // Avant tout `mkdir` : un `ovrsee -> ~` livré par le dépôt y créerait les dossiers.
+  assurerSansLien(join(root, 'ovrsee', 'plans'))
+  assurerSansLien(join(root, 'ovrsee', 'tickets'))
   mkdirSync(join(root, 'ovrsee', 'plans'), { recursive: true })
   done.push(`ovrsee/plans/ prêt dans ${root}`)
 

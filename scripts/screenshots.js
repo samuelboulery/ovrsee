@@ -11,20 +11,35 @@
  * navigateur : hors d'Electron, `Navigateur.tsx` rend `<HorsApplication />` et
  * le terminal intégré n'existe pas. Ce sont justement deux des sept captures.
  *
- * Chaque PNG brut passe ensuite par screenmat, qui pose le cadre arrondi et le
+ * Chaque PNG brut passe ensuite par screenmat
+ * (https://github.com/samuelboulery/screenmat), qui pose le cadre arrondi et le
  * fond. Son `--seed` est fixe : sans lui, le fond changerait à chaque passage et
- * les sept images seraient à recommiter pour rien.
+ * les sept images seraient à recommiter pour rien. `SCREENMAT` désigne le clone
+ * de screenmat, comme dans img-creator — pas de chemin de poste en dur :
+ *
+ *   SCREENMAT=../screenmat pnpm screenshots
+ *
+ * Sans elle, seules les captures brutes sont écrites (dossier temporaire).
  *
  * Prérequis :
  *   pnpm build:ui              — l'app chargée est celle d'`app/dist/`
- *   pnpm dev                   — l'onglet Navigateur pointe sur localhost:5180
- *   le projet ovrsee ouvert en dernier (registre `~/.claude/ovrsee/projects.json`)
+ *   le port 5180 libre         — le script lance lui-même `pnpm dev`, que
+ *                                l'onglet Navigateur affiche
+ *   un dernier crawl réussi    — sinon Produit n'a que des vignettes « scan
+ *                                échoué ». Le lancer sous le même registre
+ *                                jetable, sans quoi les résumés de pages citent
+ *                                le projet que le dev server ouvre en premier.
+ *
+ * Le projet photographié est ce dépôt, dans son état versionné, et lui seul :
+ * app et dev server lisent un registre jetable (`OVRSEE_REGISTRY`) qui ne
+ * contient que lui. Le registre du poste ouvrait le dernier projet ouvert —
+ * privé le cas échéant — et un crawl non commité pouvait citer d'autres dépôts.
  */
 
-import { execFileSync } from 'node:child_process'
-import { existsSync, mkdtempSync } from 'node:fs'
+import { execFileSync, spawn } from 'node:child_process'
+import { existsSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { dirname, join } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { _electron as electron } from 'playwright-core'
@@ -49,7 +64,6 @@ export const ONGLETS = [
 const LARGEUR = 1440
 const HAUTEUR = 940
 
-const SCREENMAT = process.env.SCREENMAT ?? '/Users/sam/code/screenmat/cli/main.ts'
 const CADRE = [
   '--frame', 'browser', '--no-title-bar',
   '--ratio', 'auto', '--padding', '0.05',
@@ -63,12 +77,29 @@ async function capturer() {
   if (!existsSync(join(RACINE, 'app', 'dist', 'index.html'))) {
     throw new Error('app/dist absent — lancer `pnpm build:ui` avant')
   }
+  if (await fetch('http://localhost:5180').then(() => true, () => false)) {
+    throw new Error('le port 5180 répond déjà — arrêter le `pnpm dev` en cours')
+  }
 
   const brut = mkdtempSync(join(tmpdir(), 'ovrsee-shots-'))
+  const registre = join(brut, 'projects.json')
+  writeFileSync(registre, JSON.stringify([{ path: RACINE, name: 'ovrsee' }]))
+  const env = { ...process.env, OVRSEE_REGISTRY: registre }
+
+  // `detached` puis `-pid` : tuer `pnpm` seul laisserait vite tenir le port.
+  const dev = spawn('pnpm', ['dev'], { cwd: RACINE, env, stdio: 'ignore', detached: true })
+  try {
+    return await photographier(brut, env)
+  } finally {
+    process.kill(-dev.pid)
+  }
+}
+
+async function photographier(brut, env) {
   // `--force-device-scale-factor=2` : la fenêtre reste à 1440×940 points et se
   // photographie en 2880×1880 pixels. Sans lui, les captures sont à 1× et le
   // texte du README est illisible dès qu'on les regarde en grand.
-  const app = await electron.launch({ args: ['.', '--force-device-scale-factor=2'], cwd: RACINE })
+  const app = await electron.launch({ args: ['.', '--force-device-scale-factor=2'], cwd: RACINE, env })
   const page = await app.firstWindow()
 
   // Le thème du README est le sombre. Le réglage du poste n'est pas touché :
@@ -121,12 +152,14 @@ async function capturer() {
 }
 
 function habiller(faites) {
-  if (!existsSync(SCREENMAT)) {
-    console.error(`screenmat introuvable (${SCREENMAT}) — captures brutes laissées dans ${dirname(faites[0][1])}`)
+  const screenmat = process.env.SCREENMAT && resolve(process.env.SCREENMAT)
+  if (!screenmat || !existsSync(join(screenmat, 'cli', 'main.ts'))) {
+    console.error(`SCREENMAT ne désigne pas un clone de screenmat — captures brutes laissées dans ${dirname(faites[0][1])}`)
     return
   }
   for (const [id, fichier] of faites) {
-    execFileSync('node', [SCREENMAT, fichier, ...CADRE, '--out', join(SORTIE, `${id}.webp`)], {
+    execFileSync('pnpm', ['-s', 'cli', fichier, ...CADRE, '--out', join(SORTIE, `${id}.webp`)], {
+      cwd: screenmat,
       stdio: ['ignore', 'ignore', 'inherit'],
     })
     console.error(`habillé : docs/screenshots/${id}.webp`)

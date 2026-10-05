@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Issue #131 — nommer les epics `E-` plutôt que `T-`",
   "opened": "2026-09-30",
-  "closed": null,
+  "closed": "2026-10-05",
   "commits": [
     {
       "sha": "81c2a45",
@@ -29,6 +29,11 @@
         "skills/ovrsee-tickets/SKILL.md",
         "skills/ovrsee/SKILL.md"
       ]
+    },
+    {
+      "sha": "e22be79",
+      "date": "2026-10-05",
+      "files": []
     }
   ]
 }

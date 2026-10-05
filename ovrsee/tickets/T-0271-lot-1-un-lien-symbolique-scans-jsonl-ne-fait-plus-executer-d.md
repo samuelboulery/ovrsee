@@ -2,7 +2,7 @@
 {
   "id": "T-0271",
   "titre": "Lot 1 — un lien symbolique scans.jsonl ne fait plus exécuter de code",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "securite"
@@ -11,7 +11,8 @@
   "maj": "2026-10-05",
   "plan": "2026-10-05-audit-de-securite-ovrsee-1-3-0-plan-de-correction.md",
   "epic": "E-0270",
-  "charge": "m"
+  "charge": "m",
+  "fait": "2026-10-05T12:22:06.747Z"
 }
 ---
 

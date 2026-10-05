@@ -275,11 +275,16 @@ Exemple complet :
   "dev": "pnpm dev --port 8099 --strictPort",
   "baseUrl": "http://localhost:8099",
   "entryRoutes": ["/", "/login"],
-  "auth": { "storageState": ".ovrsee-auth.json" },
-  "ignore": ["/auth/callback"],
-  "obsidianVault": "~/Coffres/mon-projet"
+  "ignore": ["/auth/callback"]
 }
 ```
+
+`baseUrl` et chaque route d'entrée restent sur ce poste (`localhost`, `127.0.0.1`,
+`::1`) : le fichier est versionné, et un dépôt cloné ne décide pas où va le crawl. Pour
+la même raison, deux réglages vivent sur le poste plutôt qu'ici : le coffre Obsidian
+(Préférences → Projet) et l'exclusion des captures de git (Préférences → Projet). La
+session enregistrée par `node crawl/auth.js` est rangée dans `~/.claude/ovrsee/auth/`,
+jamais dans le dépôt.
 
 Donnez au dev un port dédié. Le crawl refuse de démarrer si `baseUrl` répond déjà —
 rien dans une réponse HTTP ne permet de reconnaître son propre serveur, et photographier

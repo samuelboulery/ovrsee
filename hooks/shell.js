@@ -119,7 +119,7 @@ export function shellRun(commande) {
 /**
  * L'environnement à donner à un programme tiers qu'on lance.
  *
- * Trois nettoyages, tous pour la même raison — ce qui traîne dans
+ * Quatre nettoyages, tous pour la même raison — ce qui traîne dans
  * l'environnement de l'ovrsee n'a rien à faire dans le processus qu'il démarre :
  *
  * - `ELECTRON_RUN_AS_NODE` et `NODE_OPTIONS` : posés par Electron, ils cassent
@@ -129,10 +129,25 @@ export function shellRun(commande) {
  * - `CLAUDE*` : si l'ovrsee a été lancé depuis une session Claude Code, il en
  *   hérite les marqueurs de session. Ce qu'il démarre se croirait fils d'une
  *   autre session.
+ * - Les jetons du poste (`JETONS_DU_POSTE`) : la commande `dev` est fournie
+ *   par le dépôt observé, pas par la personne qui le regarde (T-0275). Liste
+ *   nommée, pas un motif : un `dev` qui lit une variable légitime ne doit pas
+ *   casser.
  * - `LANG` manque souvent aux applications graphiques.
  */
+const JETONS_DU_POSTE = new Set([
+  'GITHUB_TOKEN',
+  'GH_TOKEN',
+  'NPM_TOKEN',
+  'ANTHROPIC_API_KEY',
+  'AWS_SECRET_ACCESS_KEY',
+  'AWS_SESSION_TOKEN',
+])
+
 export function cleanEnv() {
   const { ELECTRON_RUN_AS_NODE: _run, NODE_OPTIONS: _opts, ...rest } = process.env
-  const env = Object.fromEntries(Object.entries(rest).filter(([key]) => !key.startsWith('CLAUDE')))
+  const env = Object.fromEntries(
+    Object.entries(rest).filter(([key]) => !key.startsWith('CLAUDE') && !JETONS_DU_POSTE.has(key.toUpperCase())),
+  )
   return { ...env, LANG: process.env.LANG ?? 'fr_FR.UTF-8' }
 }

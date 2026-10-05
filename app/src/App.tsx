@@ -762,8 +762,6 @@ export function App() {
                         <Donnees
                           projet={projectDisplayName(snapshot)}
                           relectures={relectures}
-                          vaultDeclared={Boolean(snapshot.config?.obsidianVault)}
-                          config={snapshot.config}
                           root={snapshot.root}
                           integrations={snapshot.integrations ?? []}
                         />

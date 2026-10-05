@@ -122,12 +122,40 @@ test('redige laisse lisible ce qui n’est pas un secret', () => {
   assert.equal(redige('pnpm: command not found'), 'pnpm: command not found')
 })
 
+test('un jeton passé en option est masqué en entier, quelle que soit sa longueur (T-0275)', () => {
+  const long = 'a'.repeat(600)
+  assert.equal(redige(`x --token ${long}`), 'x --token ***')
+  assert.equal(redige(`curl -u bob:${long}`), 'curl -u bob:***')
+})
+
 test('un long mot ne fige pas le filtre (ReDoS, T-0274)', () => {
   // Le texte entier d'une page crawlée passe ici : un blob base64 ou un jeton
   // long rebalayait tout le mot depuis chaque position — 8 s pour 50 000 « a ».
   const debut = performance.now()
-  for (const motif of ['a', 'KEY', 'a.', 'AUTH']) redige(motif.repeat(60000 / motif.length))
+  for (const motif of ['a', 'KEY', 'a.', 'AUTH', '-----BEGIN PGP PRIVATE KEY BLOCK-----', 'Bearer ', ' -u a:']) redige(motif.repeat(60000 / motif.length))
   assert.ok(performance.now() - debut < 250, `${Math.round(performance.now() - debut)} ms`)
   assert.equal(redige('apiKey=abc'), 'apiKey=***')
   assert.equal(redige('X_AUTH_HEADER: Bearer x y'), 'X_AUTH_HEADER: ***')
+})
+
+test('redige masque les formes ajoutées par l’audit 1.3 (T-0275)', () => {
+  const cas = [
+    // Assemblées à l'exécution : la protection de push de GitHub prend ces
+    // formes littérales pour de vrais jetons.
+    ['github', 'pat', '11ABCDEFG0123456789_abcdefghijklmnopqrstuvwxyz0123456789'].join('_'),
+    ['xapp', '1', 'A0123456789', '0123456789012', 'abcdef0123456789'].join('-'),
+    'https://hooks.slack.com/services/T000/B000/XXXXXXXXXXXXXXXX',
+    ['SG', 'abcdefghijklmnopqrstuv', 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG'].join('.'),
+    'Bearer eyQ0aGlzLWlzLWEtb3BhcXVlLXRva2Vu',
+    'curl -u alice:s3cr3tpass https://api.x',
+    'mysql --password hunter2 -h db',
+    'cli --token abcdef0123456789 run',
+    'Cookie: session=abc123; theme=dark',
+    '-----BEGIN PGP PRIVATE KEY BLOCK-----\nlQOYBF\n-----END PGP PRIVATE KEY BLOCK-----',
+  ]
+  const secrets = ['abcdefghijklmnopqrstuvwxyz0123456789', 'A0123456789-0123456789012', 'XXXXXXXXXXXXXXXX',
+    'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG', 'eyQ0aGlzLWlzLWEtb3BhcXVlLXRva2Vu', 's3cr3tpass', 'hunter2',
+    'abcdef0123456789', 'session=abc123', 'lQOYBF']
+  cas.forEach((texte, i) => assert.doesNotMatch(redige(texte), new RegExp(secrets[i]), texte))
+  assert.match(redige('curl -u alice:s3cr3tpass https://api.x'), /https:\/\/api\.x/, 'le reste reste lisible')
 })

@@ -130,6 +130,8 @@ export interface Project {
   lastOpened?: string
   /** Identifiant de teinte (`hooks/accents.js`). Absent = le violet par défaut. */
   accent?: string
+  /** Coffre Obsidian choisi sur ce poste (T-0275). Jamais lu dans le dépôt. */
+  obsidianVault?: string
 }
 
 export interface PackageJson {

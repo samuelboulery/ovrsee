@@ -54,7 +54,9 @@ network call to the provider all go through Electron IPC and never through
 `/api/*` — that route is also served by the Vite dev server, over unauthenticated
 local HTTP.
 
-The crawl's session cookies (`.ovrsee-auth.json`) are ignored by git.
+The crawl's session cookies live in `~/.claude/ovrsee/auth/`, **outside the
+repository**, readable by their owner only. A session left in the repository by an
+earlier version is moved there on the next crawl; the old file can be deleted.
 
 A secret pasted into an approved plan, on the other hand, goes into git in the
 clear: the defence is upstream — do not paste one.

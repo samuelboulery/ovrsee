@@ -5,9 +5,13 @@ import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { readGraph, snapshot, vaultPath } from './snapshot.js'
+import { registerProject, setProjectVault } from './plans.js'
 import { readJson } from './json.js'
 import { DEFAULT_SETTINGS, writeSettings } from './settings.js'
 import { writeIntegrations } from './integrations.js'
+
+// Le coffre vit dans le registre : jamais celui du poste qui lance les tests.
+process.env.OVRSEE_REGISTRY = join(mkdtempSync(join(tmpdir(), 'ovrsee-snap-reg-')), 'projects.json')
 
 const project = () => {
   const dir = mkdtempSync(join(tmpdir(), 'ovrsee-snap-'))
@@ -165,14 +169,15 @@ const poserGraphify = dir => {
   )
 }
 
-/** Un coffre à une note de table, et le champ de config qui le désigne. */
+/** Un coffre à une note de table, désigné dans le registre du poste. */
 const poserCoffre = (dir, chemin = 'coffre') => {
   mkdirSync(join(dir, chemin), { recursive: true })
   writeFileSync(
     join(dir, chemin, 'commandes.md'),
     '---\ntype: table\ntitre: Commandes\n---\n\nLes commandes.\n',
   )
-  writeFileSync(join(dir, 'ovrsee.config.json'), JSON.stringify({ obsidianVault: chemin }))
+  registerProject(dir)
+  setProjectVault(dir, chemin)
 }
 
 test('sans coffre déclaré, le graphe vient de Graphify', () => {
@@ -208,10 +213,8 @@ test("le coffre sert quand Graphify n’a rien produit", () => {
 
 test('un coffre déclaré mais illisible rend null, sans Graphify pour le sauver', () => {
   const dir = project()
-  writeFileSync(
-    join(dir, 'ovrsee.config.json'),
-    JSON.stringify({ obsidianVault: 'coffre-absent' }),
-  )
+  registerProject(dir)
+  setProjectVault(dir, 'coffre-absent')
 
   const snap = graphe(dir)
   assert.equal(snap.graph, null)
@@ -331,4 +334,24 @@ test("choix explicite d'Obsidian avec sourceMissing quand absent", () => {
     delete process.env.OVRSEE_SETTINGS
     rmSync(tempDir, { recursive: true })
   }
+})
+
+test('un coffre déclaré par ovrsee.config.json est ignoré, et nommé (T-0275)', () => {
+  // Le fichier est versionné : `obsidianVault: "~"` faisait lire au dépôt tous
+  // les .md du dossier personnel, titres et chemins absolus rendus au MCP.
+  const dir = project()
+  mkdirSync(join(dir, 'coffre'))
+  writeFileSync(join(dir, 'coffre', 'n.md'), '---\ntitre: SECRET\n---\n')
+  writeFileSync(join(dir, 'ovrsee.config.json'), JSON.stringify({ obsidianVault: 'coffre' }))
+
+  const snap = graphe(dir)
+  assert.equal(snap.graph, null)
+  assert.equal(snap.vault, null)
+  assert.equal(snap.vaultDepot, 'coffre', 'l’onglet dit pourquoi le champ ne sert plus')
+})
+
+test('le coffre du registre est rendu avec le graphe', () => {
+  const dir = project()
+  poserCoffre(dir, 'mon-coffre')
+  assert.equal(graphe(dir).vault, 'mon-coffre')
 })

@@ -12,7 +12,7 @@ import { existsSync } from 'node:fs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 
-import { loginShell, loginShellArgs, shellRun } from './shell.js'
+import { cleanEnv, loginShell, loginShellArgs, shellRun } from './shell.js'
 
 test('la commande dev passe par un shell interactif de connexion', { skip: process.platform === 'win32' }, () => {
   const [fichier, args, options] = shellRun('pnpm dev')
@@ -97,4 +97,26 @@ test("la sortie de la commande dev est lisible par l'appelant", async () => {
   await once(enfant, 'close')
 
   assert.match(trace, /^v\d+\./)
+})
+
+test('les jetons du poste ne passent pas au serveur de dev du dépôt (T-0275)', () => {
+  // Le `dev` est fourni par le dépôt observé : il n'a pas à lire le jeton
+  // GitHub ou la clé Anthropic de la personne qui le regarde.
+  const noms = ['GITHUB_TOKEN', 'GH_TOKEN', 'NPM_TOKEN', 'ANTHROPIC_API_KEY', 'AWS_SECRET_ACCESS_KEY', 'AWS_SESSION_TOKEN']
+  const avant = { ...process.env }
+  try {
+    for (const nom of noms) process.env[nom] = 'secret'
+    process.env.DATABASE_URL = 'postgres://localhost/dev'
+    const env = cleanEnv()
+    for (const nom of noms) assert.equal(env[nom], undefined, nom)
+    // Windows ne distingue pas la casse des noms de variables.
+    process.env.Github_Token = 'secret'
+    assert.equal(cleanEnv().Github_Token, undefined, 'casse indifférente')
+    assert.equal(env.DATABASE_URL, 'postgres://localhost/dev', 'une variable du projet reste')
+  } finally {
+    for (const nom of [...noms, 'DATABASE_URL', 'Github_Token']) {
+      if (nom in avant) process.env[nom] = avant[nom]
+      else delete process.env[nom]
+    }
+  }
 })

@@ -277,9 +277,9 @@ export function mergeSettings(global, project = {}) {
   validerEnum(out, 'packageManager', project.packageManager, ['pnpm', 'npm', 'yarn', 'bun'])
   validerEnum(out, 'sourceGraphe', project.sourceGraphe, ['auto', 'graphify', 'obsidian'])
 
-  if (typeof project.gitignoreShots === 'boolean') {
-    out.gitignoreShots = project.gitignoreShots
-  }
+  // `gitignoreShots` n'est plus surchargeable (T-0275) : un dépôt qui pose
+  // `false` faisait versionner les captures d'un crawl authentifié — des pages
+  // privées de l'utilisateur, prêtes à partir au prochain push.
   if (typeof project.gitignorePlans === 'boolean') {
     out.gitignorePlans = project.gitignorePlans
   }

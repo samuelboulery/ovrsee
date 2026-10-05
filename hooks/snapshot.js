@@ -14,7 +14,7 @@ import { extname, isAbsolute, join, normalize } from 'node:path'
 import { isSafePlanFileName, readPlans, readRegistry } from './plans.js'
 import { activePlans } from './active.js'
 import { readBoard, readTickets } from './tickets.js'
-import { readVault } from './vault.js'
+import { IGNORES, MAX_ENTREES, MAX_FILES, readVault } from './vault.js'
 import { readWhys } from './whys.js'
 import { timeline, ticketTimeline } from './timeline.js'
 import { readSettings, mergeSettings } from './settings.js'
@@ -284,61 +284,67 @@ export function readGraph(root, config) {
   const graphifyGraph = lireDuDepot(root, join('graphify-out', 'graph.json'), readJson)
   const graphifyDate = graphifyGraph ? fileDate(graphifyPath) : null
 
-  const declare = config?.obsidianVault
-  const obsidianPath = typeof declare === 'string' && declare.trim().length > 0 ? vaultPath(root, declare.trim()) : null
+  // Le coffre vient du registre du poste, jamais du dépôt (T-0275). Une valeur
+  // trouvée dans `ovrsee.config.json` est seulement rendue, pour que l'onglet
+  // dise pourquoi elle ne sert plus.
+  const vault = readRegistry().find(p => p.path === root)?.obsidianVault ?? null
+  const vaultDepot = typeof config?.obsidianVault === 'string' ? config.obsidianVault : null
+  const obsidianPath = vault ? vaultPath(root, vault) : null
   const obsidianGraph = obsidianPath ? readVault(obsidianPath) : null
   const obsidianDate = obsidianGraph ? getVaultDate(obsidianPath) : null
 
+  const avecCoffre = r => ({ ...r, vault, vaultDepot })
+
   // Cas 1 : source explicite demandée
   if (sourceChoice === 'graphify') {
-    return {
+    return avecCoffre({
       graph: graphifyGraph,
       graphSource: graphifyGraph ? 'graphify' : null,
       sourceRequested: 'graphify',
       sourceMissing: !graphifyGraph,
       sourceDate: graphifyDate,
-    }
+    })
   }
 
   if (sourceChoice === 'obsidian') {
-    return {
+    return avecCoffre({
       graph: obsidianGraph,
       graphSource: obsidianGraph ? 'obsidian' : null,
       sourceRequested: 'obsidian',
       sourceMissing: !obsidianGraph,
       sourceDate: obsidianDate,
-    }
+    })
   }
 
   // Cas 2 : 'auto' — Graphify l'emporte, Obsidian en repli
   if (graphifyGraph) {
-    return {
+    return avecCoffre({
       graph: graphifyGraph,
       graphSource: 'graphify',
       sourceRequested: 'auto',
       sourceMissing: false,
       sourceDate: graphifyDate,
-    }
+    })
   }
 
   if (obsidianGraph) {
-    return {
+    return avecCoffre({
       graph: obsidianGraph,
       graphSource: 'obsidian',
       sourceRequested: 'auto',
       sourceMissing: false,
       sourceDate: obsidianDate,
-    }
+    })
   }
 
   // Cas 3 : rien n'est disponible
-  return {
+  return avecCoffre({
     graph: null,
     graphSource: null,
     sourceRequested: 'auto',
     sourceMissing: false,
     sourceDate: null,
-  }
+  })
 }
 
 /**
@@ -351,16 +357,22 @@ function getVaultDate(vaultRoot) {
   try {
     if (!existsSync(vaultRoot) || !statSync(vaultRoot).isDirectory()) return null
 
+    // Mêmes bornes que `readVault` : sans elles, un coffre posé sur `~`
+    // parcourait tout le dossier personnel, en synchrone (T-0275).
     let maxMtime = 0
+    let restant = MAX_FILES
+    let entrees = MAX_ENTREES
     const parcourir = dir => {
       try {
         const entries = readdirSync(dir, { withFileTypes: true })
         for (const entry of entries) {
-          if (entry.name.startsWith('.')) continue
+          if (restant <= 0 || (entrees -= 1) < 0) return
+          if (entry.name.startsWith('.') || IGNORES.has(entry.name)) continue
           const full = join(dir, entry.name)
           if (entry.isDirectory()) {
             parcourir(full)
           } else if (entry.isFile() && entry.name.endsWith('.md')) {
+            restant -= 1
             const stat = statSync(full)
             maxMtime = Math.max(maxMtime, stat.mtimeMs)
           }

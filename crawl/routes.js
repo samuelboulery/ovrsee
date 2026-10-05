@@ -108,3 +108,30 @@ export function sameOrigin(href, baseUrl) {
     return false
   }
 }
+
+/**
+ * L'adresse désigne-t-elle ce poste ? http(s) vers `localhost`, `127.x.x.x`
+ * ou `[::1]`. Pas `*.localhost` : Chrome le garde en boucle locale, mais le
+ * `fetch` de Node qui sonde le port passe par le résolveur du système.
+ *
+ * `baseUrl` vient d'`ovrsee.config.json`, versionné : sans cette borne, un
+ * dépôt envoyait le crawl — et le Chrome du poste — sur le réseau local ou
+ * sur Internet (T-0275). Le crawl cartographie l'application qu'on développe,
+ * et elle tourne ici.
+ *
+ * @param {unknown} url
+ */
+export function urlLocale(url) {
+  let u
+  try {
+    u = new URL(String(url))
+  } catch {
+    return false
+  }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') return false
+  const h = u.hostname
+  return h === 'localhost' || h === '[::1]' || /^127(\.\d{1,3}){3}$/.test(h)
+}
+
+/** Une route d'entrée reste-t-elle sur l'origine de `baseUrl` ? */
+export const routeDansBase = (route, baseUrl) => typeof route === 'string' && sameOrigin(route, baseUrl)

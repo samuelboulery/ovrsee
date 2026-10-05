@@ -30,6 +30,7 @@ import {
   registerProject,
   unregisterProject,
   setProjectAccent,
+  setProjectVault,
   touchProject,
 } from './plans.js'
 
@@ -734,4 +735,27 @@ test('writeFileNoFollow refuse d’écrire quand ovrsee/ lui-même est un lien s
     /lien symbolique/,
   )
   assert.deepEqual(readdirSync(join(victime, 'tickets')), [])
+})
+
+test('setProjectVault pose le coffre d’un projet dans le registre, et l’efface (T-0275)', () => {
+  withRegistry()
+  registerProject('/tmp/a')
+  registerProject('/tmp/b')
+
+  assert.equal(setProjectVault('/tmp/a', '~/Coffres/projet'), true)
+  assert.equal(readRegistry()[0].obsidianVault, '~/Coffres/projet')
+  assert.equal(readRegistry()[1].obsidianVault, undefined)
+
+  assert.equal(setProjectVault('/tmp/a', ''), true)
+  assert.equal('obsidianVault' in readRegistry()[0], false, 'vide efface')
+})
+
+test('setProjectVault refuse un projet inconnu, un type faux ou un caractère de contrôle', () => {
+  withRegistry()
+  registerProject('/tmp/a')
+  assert.equal(setProjectVault('/tmp/inconnu', '/x'), false)
+  assert.equal(setProjectVault('/tmp/a', 42), false)
+  assert.equal(setProjectVault('/tmp/a', '/x\n/y'), false)
+  assert.equal(setProjectVault('/tmp/a', 'x'.repeat(2000)), false)
+  assert.equal('obsidianVault' in readRegistry()[0], false)
 })

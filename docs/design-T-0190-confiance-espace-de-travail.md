@@ -153,7 +153,7 @@ Forme du fichier, plate et relisible à l'œil :
 
 - **Pas tout `ovrsee.config.json`.** `baseUrl`, `entryRoutes`, `maxPages`, `ignore`, `viewport` n'atteignent aucun shell. Redemander l'accord parce qu'on a ajouté une route d'entrée, c'est fabriquer une invite qui se déclenche pour rien — et une invite qui se déclenche pour rien s'acquitte sans lecture au bout de trois fois. On ne dépense la question de l'utilisateur que là où quelque chose s'exécute.
 - **Le `cwd` compte, mais comme clé.** La commande tourne avec `cwd = root` : `pnpm dev` n'est pas la même chose dans deux dépôts. L'accord est donc indexé par chemin de projet, et le chemin est réinscrit *dans* l'enregistrement — un magasin recopié ou un projet déplacé se voit alors, au lieu de transporter silencieusement une approbation.
-- **`auth.storageState` reste dehors.** C'est un chemin de fichier lu, pas exécuté, et il est déjà gardé par l'exigence `git check-ignore` (`crawl/index.js:75-84`, `crawl/auth.js:39-52`).
+- **`auth.storageState` reste dehors.** C'est un chemin de fichier lu, pas exécuté, et il est déjà gardé par l'exigence `git check-ignore` (`crawl/index.js:75-84`, `crawl/auth.js:39-52`). *Dépassé depuis T-0275 : la session vit hors du dépôt, dans `~/.claude/ovrsee/auth/`, et ce champ ne sert plus qu'à migrer l'ancien fichier une fois (`crawl/session.js`).*
 - **Aucune normalisation avant comparaison.** Ni `trim()`, ni collapse d'espaces, ni casse. On empreint l'octet exact qui part au shell. Normaliser ouvrirait l'écart classique : approuver une forme canonique et exécuter une forme brute qui s'y réduit. Un espace en trop redemandera l'accord — c'est rare, et c'est le bon côté sur lequel se tromper.
 
 ### 2.3 Quelle forme de hash

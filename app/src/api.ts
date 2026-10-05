@@ -66,7 +66,7 @@ export async function closeActivePlans(path: string): Promise<{ closed: string[]
   return post('/api/plans/close-active', { path })
 }
 
-export type ProjectAction = 'accent' | 'add' | 'remove' | 'touch' | 'init' | 'export-obsidian'
+export type ProjectAction = 'accent' | 'vault' | 'add' | 'remove' | 'touch' | 'init' | 'export-obsidian'
 
 /**
  * Ajoute, retire, remonte en tête, équipe un projet ou en exporte le coffre.

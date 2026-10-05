@@ -6,72 +6,40 @@
  *
  * Ouvre un navigateur VISIBLE sur l'application, laisse l'utilisateur se
  * connecter à la main, puis enregistre l'état de session (cookies et
- * localStorage) dans le fichier déclaré par `auth.storageState`.
+ * localStorage) hors du dépôt, dans `~/.claude/ovrsee/auth/` (T-0275).
  *
  * Aucun identifiant ne transite par ce script et aucun n'est stocké en clair :
- * seul le jeton de session résultant est écrit, dans un fichier que le crawl
- * exige de voir ignoré par git avant de l'utiliser.
+ * seul le jeton de session résultant est écrit, lisible par son seul
+ * propriétaire. Le dépôt n'en contient jamais un octet — ni `.gitignore` à
+ * tenir, ni `git add -f` à craindre.
  */
 
 import { spawn } from 'node:child_process'
 
-import { git } from '../hooks/git.js'
 import { createInterface } from 'node:readline/promises'
-import { chmodSync, readFileSync } from 'node:fs'
-import { isAbsolute, join, relative, resolve } from 'node:path'
+import { join, resolve } from 'node:path'
 
 import { chromium } from 'playwright-core'
 
 import { cleanEnv, killTree, shellRun } from '../hooks/shell.js'
 import { assurerConfiance, DEV_DEFAUT } from './confiance.js'
-import { writeFileNoFollow } from '../hooks/plans.js'
+import { ecrireSession, sessionPath } from './session.js'
+import { urlLocale } from './routes.js'
+import { readJsonDuDepot } from '../hooks/json.js'
 
 const root = resolve(process.argv[2] ?? process.cwd())
-let config
-try {
-  config = JSON.parse(readFileSync(join(root, 'ovrsee.config.json'), 'utf8'))
-} catch {
+const config = readJsonDuDepot(root, join(root, 'ovrsee.config.json'))
+if (!config || typeof config !== 'object') {
   console.error('ovrsee.config.json absent ou illisible.')
   process.exit(1)
 }
-
-const statePath = config.auth?.storageState
-if (typeof statePath !== 'string' || !statePath) {
-  console.error('ovrsee.config.json ne déclare pas auth.storageState — rien à enregistrer.')
+// Même borne que le crawl : le navigateur ne s'ouvre que sur ce poste.
+if (!urlLocale(config.baseUrl)) {
+  console.error('baseUrl refusé : le crawl ne vise que ce poste (localhost, 127.0.0.1, ::1).')
   process.exit(1)
-}
-
-// `storageState` vient du dépôt observé : un chemin absolu ou en `../` y
-// ferait écrire le jeton de session ailleurs que dans le dépôt.
-const cible = resolve(root, statePath)
-const relatif = relative(root, cible)
-if (!relatif || relatif.startsWith('..') || isAbsolute(relatif)) {
-  console.error('auth.storageState doit désigner un fichier à l’intérieur du dépôt.')
-  process.exit(1)
-}
-
-/**
- * Sécurité : ce fichier contient un jeton de session valide. Refuser de le
- * créer tant qu'il n'est pas ignoré par git est la seule protection efficace —
- * une fois committé, il est dans l'historique pour de bon.
- */
-function assertIgnored() {
-  try {
-    git(root, ['check-ignore', '-q', '--', statePath], { stdio: 'ignore' })
-  } catch {
-    console.error(
-      `\n${statePath} n'est pas ignoré par git.\n` +
-        // Le chemin seul, pas une commande à coller : la valeur vient du dépôt
-        // observé, et une apostrophe y fermait la citation du `echo`.
-        `Il contiendra un jeton de session valide. Ajoutez-le au .gitignore avant de continuer.\n`,
-    )
-    process.exit(1)
-  }
 }
 
 async function main() {
-  assertIgnored()
-
   // Deuxième site d'exécution de la commande `dev`, et celui qu'aucune
   // interface n'appelle — donc celui qu'on oublie. La garde y est la même que
   // dans `crawl/index.js`, et porte sur la chaîne exacte passée à `shellRun`.
@@ -109,14 +77,10 @@ async function main() {
     await rl.question('Une fois connecté, appuyez sur Entrée pour enregistrer la session… ')
     rl.close()
 
-    // Écrit par nous, pas par Playwright : son `path` suivrait un lien posé par
-    // le dépôt (`.auth.json -> ~/.zshrc`), et le `chmod` après lui.
-    writeFileNoFollow(cible, JSON.stringify(await context.storageState(), null, 2))
-    // Écrit sous l'umask courant, soit 0644 en général. Le fichier porte un
-    // jeton de session valide : le refuser à git ne suffit pas s'il reste
-    // lisible par un autre compte de la machine.
-    chmodSync(cible, 0o600)
-    console.log(`session enregistrée dans ${statePath}`)
+    // Écrit par nous, pas par Playwright : son `path` suivrait un lien, et le
+    // fichier naîtrait sous l'umask courant — lisible par les autres comptes.
+    ecrireSession(root, JSON.stringify(await context.storageState(), null, 2))
+    console.log(`session enregistrée dans ${sessionPath(root)}`)
     console.log('Le prochain crawl atteindra les pages protégées.')
   } finally {
     await browser.close().catch(() => {})

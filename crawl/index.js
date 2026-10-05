@@ -27,8 +27,9 @@ import { join, resolve } from 'node:path'
 // `playwright-core` utilise celui du système.
 import { chromium } from 'playwright-core'
 
-import { normalizeRoutes, pageSlug, sameOrigin } from './routes.js'
+import { normalizeRoutes, pageSlug, routeDansBase, sameOrigin, urlLocale } from './routes.js'
 import { assurerConfiance, DEV_DEFAUT } from './confiance.js'
+import { migrerSession, sessionPath } from './session.js'
 import { redige } from '../hooks/redaction.js'
 import { cleanEnv, killTree, shellRun } from '../hooks/shell.js'
 import { writeFileNoFollow } from '../hooks/plans.js'
@@ -74,31 +75,32 @@ function loadConfig() {
     // dans `scans.jsonl` — avant que l'accord n'ait été vérifié.
     throw new Error('baseUrl invalide : une URL http(s) est attendue')
   }
+  if (!urlLocale(config.baseUrl)) {
+    throw new Error('baseUrl refusé : le crawl ne vise que ce poste (localhost, 127.0.0.1, ::1)')
+  }
   if (!Array.isArray(config.entryRoutes) || config.entryRoutes.length === 0) {
     throw new Error('entryRoutes doit contenir au moins une route')
+  }
+  if (!config.entryRoutes.every(route => routeDansBase(route, config.baseUrl))) {
+    throw new Error('entryRoutes refusé : chaque route doit rester sur l’origine de baseUrl')
   }
   return config
 }
 
 /**
- * Faut-il rejouer une session enregistrée ?
+ * La session enregistrée à rejouer, ou null.
  *
- * Refus si le fichier n'est pas ignoré par git : il contient un jeton valide,
- * et une fois committé il est dans l'historique pour de bon. Le crawl continue
- * sans session plutôt que d'encourager la fuite — les pages publiques restent
- * cartographiées, et la trace du scan dira que les pages protégées manquent.
+ * Elle vit hors du dépôt (`crawl/session.js`, T-0275). Une session laissée
+ * dans le dépôt par une version antérieure y est déplacée au passage.
  */
-function useStorageState(config) {
-  const relative = config.auth?.storageState
-  if (!relative || !existsSync(join(root, relative))) return false
-
+function sessionARejouer(config) {
   try {
-    git(root, ['check-ignore', '-q', '--', relative], { stdio: 'ignore' })
-    return true
-  } catch {
-    log(`${relative} n'est pas ignoré par git — session non rejouée, pages protégées ignorées`)
-    return false
+    if (migrerSession(root, config)) log('session déplacée hors du dépôt — l’ancien fichier peut être supprimé')
+  } catch (err) {
+    log(`session non déplacée : ${err?.message ?? err}`)
   }
+  const chemin = sessionPath(root)
+  return existsSync(chemin) ? chemin : null
 }
 
 const shortSha = () => {
@@ -184,6 +186,26 @@ let appEnCours = null
 /** Ce que la commande `dev` a écrit, borné : c'est un message d'erreur, pas un journal. */
 const DERNIERS_OCTETS = 2000
 
+/**
+ * Les derniers mots de la commande `dev`, filtrés **avant** d'être tronqués.
+ *
+ * Coupée d'abord, une affectation perdait son nom — `…KEY=` hors de la
+ * fenêtre — et sa valeur restait, nue, qu'aucune règle ne reconnaissait
+ * (T-0275). On garde quatre fois la fenêtre, on filtre, puis on coupe : ce
+ * qu'une coupure de tête abîme n'atteint jamais la fin conservée.
+ *
+ * @param {number} [taille]
+ */
+export function garderSortie(taille = DERNIERS_OCTETS) {
+  let brut = ''
+  return {
+    retiens: morceau => {
+      brut = (brut + morceau).slice(-4 * taille)
+    },
+    lire: () => redige(brut).slice(-taille),
+  }
+}
+
 async function startApp(config) {
   await assertPortFree(config.baseUrl)
 
@@ -234,10 +256,7 @@ async function startApp(config) {
 
   // Gardée pour l'échec, jetée en cas de succès. Non lue, elle remplirait le
   // tuyau et finirait par bloquer le serveur de dev.
-  let trace = ''
-  const retiens = morceau => {
-    trace = (trace + morceau).slice(-DERNIERS_OCTETS)
-  }
+  const { retiens, lire } = garderSortie()
   child.stdout.setEncoding('utf8')
   child.stderr.setEncoding('utf8')
   child.stdout.on('data', retiens)
@@ -255,6 +274,7 @@ async function startApp(config) {
   log(`attente de ${config.baseUrl}…`)
   try {
     await waitForServer(config.baseUrl, config.readyTimeoutMs, () => {
+      const trace = lire()
       if (panne) return `${trace}\n(la commande dev n'a pas pu être lancée : ${panne})`
       return partie ? `${trace}\n(la commande dev s'est arrêtée d'elle-même)` : trace
     })
@@ -351,6 +371,14 @@ async function visitAll(page, config) {
       }
     } catch (err) {
       log(`${requested} → injoignable (${err.message.split('\n')[0]})`)
+      continue
+    }
+
+    // Le serveur local peut rediriger ailleurs : la page d'un autre hôte
+    // n'entre pas dans la carte (T-0275). La requête, elle, est partie — la
+    // bloquer demanderait d'intercepter chaque navigation (`page.route`).
+    if (!sameOrigin(page.url(), config.baseUrl)) {
+      log(`${requested} → redirige hors de baseUrl, ignorée`)
       continue
     }
 
@@ -510,6 +538,7 @@ async function run() {
   const date = new Date().toISOString().slice(0, 10)
 
   log(`démarrage de « ${config.dev} »…`)
+  const session = sessionARejouer(config)
   const app = await startApp(config)
 
   let browser
@@ -517,7 +546,7 @@ async function run() {
     browser = await chromium.launch({ channel: 'chrome', headless: true })
     const context = await browser.newContext({
       viewport: config.viewport,
-      ...(useStorageState(config) ? { storageState: join(root, config.auth.storageState) } : {}),
+      ...(session ? { storageState: session } : {}),
     })
     const page = await context.newPage()
 

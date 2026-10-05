@@ -25,7 +25,9 @@ import { useEffect, useRef, useState } from 'react'
 import { ACCENTS } from '../../hooks/accents'
 import type { Action, Integration, IntegrationProvider, SettingsType } from './data'
 import { t, type TranslationKey } from './i18n'
+import { fetchProjects, projectAction } from './api'
 import { BlocIntegrations } from './PreferencesIntegrations'
+import { oublierGraphe } from './tabs/Donnees'
 import { ErrorBox, Field, GroupLabel, Row, SectionTitle, Switch } from './PreferencesControls'
 import { s } from './style'
 
@@ -304,6 +306,62 @@ export function BlocAvance({ settings, onSettings }: SectionProps) {
   )
 }
 
+/**
+ * Le coffre Obsidian du projet (T-0275).
+ *
+ * Dans le registre du poste, comme l'accent — plus dans `ovrsee.config.json`,
+ * versionné : un dépôt cloné y posait `~` et faisait lire tout le dossier
+ * personnel. Lu et écrit ici sans passer par `App` : rien d'autre que l'onglet
+ * Données ne s'en sert, et il relit le graphe dès que son cache est oublié.
+ */
+function BlocCoffre({ root }: { root: string }) {
+  const [valeur, setValeur] = useState('')
+  const [etat, setEtat] = useState<'repos' | 'enregistre' | 'erreur'>('repos')
+
+  useEffect(() => {
+    let vivant = true
+    fetchProjects()
+      .then(liste => vivant && setValeur(liste.find(p => p.path === root)?.obsidianVault ?? ''))
+      .catch(() => vivant && setEtat('erreur'))
+    return () => {
+      vivant = false
+    }
+  }, [root])
+
+  const enregistrer = () =>
+    projectAction('vault', root, { vault: valeur })
+      .then(() => {
+        oublierGraphe(root)
+        setEtat('enregistre')
+      })
+      .catch(() => setEtat('erreur'))
+
+  return (
+    <Row label={t('pref.vault_title')} hint={t('pref.vault_hint')} stacked last>
+      <div style={s('display: flex; gap: 8px;')}>
+        <input
+          className="input"
+          type="text"
+          value={valeur}
+          onChange={event => {
+            setValeur(event.target.value)
+            setEtat('repos')
+          }}
+          onKeyDown={event => event.key === 'Enter' && enregistrer()}
+          placeholder="~/Coffres/projet"
+          maxLength={1024}
+          aria-label={t('pref.vault_title')}
+          style={s('flex: 1; font-size: 13px; min-height: 32px; font-family: var(--font-mono);')}
+        />
+        <button type="button" className="btn btn-ghost" onClick={enregistrer}>
+          {etat === 'enregistre' ? t('pref.vault_saved') : t('pref.vault_save')}
+        </button>
+      </div>
+      {etat === 'erreur' && <ErrorBox>{t('pref.vault_error')}</ErrorBox>}
+    </Row>
+  )
+}
+
 /** Ce qui doit rester hors du suivi git du projet. */
 export function BlocGitignore({ settings, onSettings }: SectionProps) {
   return (
@@ -445,6 +503,7 @@ export function SectionProjet({
       )}
       <GroupLabel>{t('pref.gitignore_title')}</GroupLabel>
       <BlocGitignore settings={settings} onSettings={onSettings} />
+      {root && <BlocCoffre root={root} />}
       <div ref={integrationsRef}>
         <GroupLabel>{t('pref.integrations_title')}</GroupLabel>
         <BlocIntegrations root={root} integrations={integrations} initialProvider={initialProvider} />

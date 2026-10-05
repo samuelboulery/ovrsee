@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, statSy
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { installClaudeHooks, installPostCommit, signalInstalle } from './install.js'
+import { emplacementEphemere, installClaudeHooks, installPostCommit, signalInstalle } from './install.js'
 
 const START = '# ovrsee-hook-start'
 const END = '# ovrsee-hook-end'
@@ -333,4 +333,26 @@ test('un post-commit présent mais inerte n’est ni modifié ni rendu exécutab
   assert.equal(readFileSync(hookPath, 'utf8'), piege)
   assert.equal(statSync(hookPath).mode & 0o111, 0, 'le hook ne doit pas devenir exécutable')
   assert.ok(done.some(l => /pas exécutable/.test(l)), 'le refus est dit')
+})
+
+test('un binaire lancé depuis le DMG ou une translocation n’est pas inscrit dans les hooks (T-0275)', () => {
+  // Le chemin écrit dans `post-commit` et `settings.json` meurt au démontage,
+  // et une autre image montée au même endroit serait exécutée à sa place.
+  for (const chemin of [
+    '/Volumes/Ovrsee/Ovrsee.app/Contents/MacOS/Ovrsee',
+    '/private/var/folders/x/AppTranslocation/ABCD/d/Ovrsee.app/Contents/MacOS/Ovrsee',
+  ]) {
+    assert.equal(emplacementEphemere(chemin), true, chemin)
+  }
+  // Un disque externe n'est pas une image disque : le dev qui y travaille
+  // (`pnpm electron`, Node du système) installe comme ailleurs.
+  for (const chemin of [
+    '/Applications/Ovrsee.app/Contents/MacOS/Ovrsee',
+    '/usr/local/bin/node',
+    'C:\\Volumes\\x',
+    '/Volumes/Dev/bin/node',
+    '/Volumes/Dev/ovrsee/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron',
+  ]) {
+    assert.equal(emplacementEphemere(chemin), false, chemin)
+  }
 })

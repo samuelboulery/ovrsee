@@ -208,17 +208,24 @@ export function planFileName(title, date = new Date()) {
  *
  * L'écriture passe par un fichier temporaire puis un renommage, pour qu'une
  * interruption ne laisse jamais un plan à moitié écrit.
+ *
+ * `mode` vaut pour le temporaire **dès sa création** : un `chmod` après coup
+ * laissait un secret lisible par tous le temps du renommage (T-0275).
+ *
+ * @param {string} path
+ * @param {string} content
+ * @param {{mode?: number}} [options]
  */
-export function writeFileNoFollow(path, content) {
+export function writeFileNoFollow(path, content, { mode } = {}) {
   assurerSansLien(path)
-  mkdirSync(dirname(path), { recursive: true })
+  mkdirSync(dirname(path), { recursive: true, ...(mode === undefined ? {} : { mode: 0o700 }) })
   assurerSansLien(path)
 
   // Nom temporaire unique : pid + uuid pour éviter les collisions entre
   // écritures concurrentes du même processus vers le même chemin.
   const tmp = `${path}.tmp-${process.pid}-${randomUUID()}`
   try {
-    writeFileSync(tmp, content, 'utf8')
+    writeFileSync(tmp, content, { encoding: 'utf8', ...(mode === undefined ? {} : { mode }) })
     renameSync(tmp, path)
   } catch (error) {
     // Nettoie le fichier temporaire avant de relancer l'erreur
@@ -341,6 +348,35 @@ export function setProjectAccent(root, accent) {
       // Déstructurer pour retirer : `delete` muterait l'entrée lue.
       const { accent: _, ...sansAccent } = p
       return valide === ACCENT_DEFAUT ? sansAccent : { ...sansAccent, accent: valide }
+    }),
+  )
+  return true
+}
+
+/**
+ * Pose le coffre Obsidian d'un projet, ou l'efface sur une chaîne vide (T-0275).
+ *
+ * Dans le registre, comme l'accent, et plus dans `ovrsee.config.json` : le
+ * fichier est versionné, et `obsidianVault: "~"` faisait lire à un dépôt cloné
+ * tous les `.md` du dossier personnel. Le coffre est choisi par l'utilisateur,
+ * sur son poste — il peut vivre où il veut, y compris hors du dépôt.
+ *
+ * @param {string} root
+ * @param {unknown} vault chemin absolu, en `~/`, ou relatif au dépôt ; '' efface
+ * @returns {boolean} faux sur un projet inconnu ou un chemin refusé
+ */
+export function setProjectVault(root, vault) {
+  // eslint-disable-next-line no-control-regex
+  if (typeof vault !== 'string' || vault.length > 1024 || /[\x00-\x1f\x7f]/.test(vault)) return false
+  const projects = readRegistry()
+  if (!projects.some(p => p.path === root)) return false
+
+  const chemin = vault.trim()
+  writeRegistry(
+    projects.map(p => {
+      if (p.path !== root) return p
+      const { obsidianVault: _, ...sansCoffre } = p
+      return chemin ? { ...sansCoffre, obsidianVault: chemin } : sansCoffre
     }),
   )
   return true

@@ -24,7 +24,7 @@ import type { TabId } from './views'
 export interface TerminalActions {
   /** Un terminal a-t-il le focus ? Lu au moment du geste, jamais rendu. */
   focus: () => boolean
-  ouvrirShell: () => void
+  ouvrirShell: (kind?: 'shell' | 'dev') => void
   /** Ferme l'onglet actif, ou `null` s'il n'est pas fermable (session Claude). */
   fermerActif: (() => void) | null
 }
@@ -647,7 +647,7 @@ export function Terminal({
           })}
           <button
             type="button"
-            onClick={openShell}
+            onClick={() => openShell()}
             title={t('terminal.open_shell')}
             aria-label={t('terminal.open_shell')}
             disabled={!available}

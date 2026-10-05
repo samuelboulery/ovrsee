@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
 import {
+  colonneFinale,
+  sortFaits,
   sortTickets,
   ticketAction,
   type Colonne,
@@ -104,7 +106,16 @@ export function Tableau({
     if (!ticket || ticket.colonne === colonne) return
 
     ecrire(
-      { board, tickets: tickets.map(t => (t.file === file ? { ...t, colonne } : t)) },
+      {
+        board,
+        // `fait` posé ici aussi : sans lui, la carte déposée irait se ranger d'après `maj`
+        // jusqu'au prochain instantané, puis sauterait en tête.
+        tickets: tickets.map(t =>
+          t.file === file
+            ? { ...t, colonne, fait: colonne === colonneFinale(board) ? new Date().toISOString() : undefined }
+            : t,
+        ),
+      },
       'move',
       { file, colonne },
     )
@@ -293,7 +304,9 @@ export function Tableau({
               colonne={colonne}
               index={index}
               colonnes={board}
-              tickets={sortTickets(tickets.filter(t => t.colonne === colonne.id && t.type !== 'epic'))}
+              tickets={(colonne.id === colonneFinale(board) ? sortFaits : sortTickets)(
+                tickets.filter(t => t.colonne === colonne.id && t.type !== 'epic'),
+              )}
               edition={edition}
               finale={index === board.length - 1 && board.length > 1}
               survolee={survolee === colonne.id}

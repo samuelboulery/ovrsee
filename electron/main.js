@@ -39,6 +39,7 @@ import { openSession, writeTo, resize, closeSession, closeAll } from './pty.js'
 import {
   accordRequis,
   crawlState,
+  devALancer,
   devSurDisque,
   startCrawl,
   stopAllCrawls,
@@ -368,11 +369,28 @@ app.whenReady().then(() => {
   // Ce qui doit rester impossible, c'est qu'un rendu compromis lance un shell
   // dans un dossier que l'utilisateur n'a jamais désigné : même garde que
   // `projects:reveal`.
-  ipcMain.handle('pty:open', (event, projectPath, kind) => {
+  //
+  // `dev` est le bouton « Lancer le serveur » du Navigateur : un shell où
+  // l'ovrsee tape la commande `dev` du projet. Le rendu ne la fournit pas —
+  // `devALancer` la relit sur le disque et exige le même accord que le crawl.
+  const devEnQuestion = new Set()
+  ipcMain.handle('pty:open', async (event, projectPath, kind) => {
     if (typeof projectPath !== 'string' || !projects().some(p => p.path === projectPath)) {
       return { error: "ce dossier n'est pas dans la liste des projets de l'ovrsee" }
     }
-    return openSession(event.sender, projectPath, kind)
+    if (kind !== 'dev') return openSession(event.sender, projectPath, kind)
+
+    // Une question à la fois par projet : des clics répétés empileraient les
+    // modales, et l'accord arraché à l'usure n'en est pas un.
+    if (devEnQuestion.has(projectPath)) return { error: 'une demande de lancement est déjà en cours' }
+    devEnQuestion.add(projectPath)
+    try {
+      const dev = await devALancer(projectPath, d => demanderAccord(event.sender, projectPath, d))
+      if (dev === null) return { error: 'serveur de dev non lancé : pas de commande dev approuvée' }
+      return openSession(event.sender, projectPath, 'shell', dev)
+    } finally {
+      devEnQuestion.delete(projectPath)
+    }
   })
 
   // Crawl. Même garde que `pty:open`, et pour la même raison : le registre est

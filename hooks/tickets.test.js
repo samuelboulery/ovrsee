@@ -195,6 +195,29 @@ test('moveTicket ne change que la colonne et la date de mise à jour', () => {
   assert.equal(ticket.meta.cree, meta.cree)
 })
 
+test('moveTicket date le passage en colonne finale, et le retire en sortant', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'À solder' })
+  const t1 = new Date('2026-09-29T10:00:00.000Z')
+
+  moveTicket(ovrseeDir, file, 'fait', t1)
+  assert.equal(readTickets(ovrseeDir)[0].meta.fait, t1.toISOString())
+
+  // Redéposé dans la même colonne : la date d'origine tient.
+  moveTicket(ovrseeDir, file, 'fait', new Date('2026-09-30T10:00:00.000Z'))
+  assert.equal(readTickets(ovrseeDir)[0].meta.fait, t1.toISOString())
+
+  moveTicket(ovrseeDir, file, 'revue')
+  assert.equal('fait' in readTickets(ovrseeDir)[0].meta, false)
+})
+
+test('createTicket date un ticket créé directement en colonne finale', () => {
+  const ovrseeDir = fixture()
+  const now = new Date('2026-09-29T10:00:00.000Z')
+  assert.equal(createTicket(ovrseeDir, { titre: 'Déjà fait', colonne: 'fait' }, now).meta.fait, now.toISOString())
+  assert.equal('fait' in createTicket(ovrseeDir, { titre: 'À faire' }, now).meta, false)
+})
+
 test('moveTicket refuse une colonne inconnue', () => {
   const ovrseeDir = fixture()
   const { file } = createTicket(ovrseeDir, { titre: 'À déplacer' })

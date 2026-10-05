@@ -12,7 +12,7 @@ import type { Integration, IntegrationProvider, IntegrationStatus, SchemaTable }
 import type { MenuBarDecision, MenuBarEtat, MenuBarVue } from './menubar'
 
 /** Genre de session. Le rendu ne nomme jamais de programme — voir `electron/pty.js`. */
-export type SessionKind = 'claude' | 'shell'
+export type SessionKind = 'claude' | 'shell' | 'dev'
 
 /**
  * Passerelle exposée par `electron/preload.cjs`.

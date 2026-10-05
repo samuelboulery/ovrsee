@@ -121,6 +121,9 @@ export function App() {
   // Ce que le panneau terminal sait faire, quand il est monté. Vide sinon —
   // c'est ce qui laisse ⌘W retomber sur la fermeture de fenêtre.
   const terminalActions = useRef<TerminalActions | null>(null)
+  // « Lancer le serveur » (Navigateur) demandé panneau replié : le shell `dev`
+  // s'ouvre une fois le panneau monté — il est en `lazy()`, d'où l'attente.
+  const devEnAttente = useRef(false)
   // Pied de page réel de `StatusBar` (T-0111) : sous le terminal, pas coincée
   // entre le contenu de l'onglet et lui — voir StatusBarSlotContext.
   const [statusBarSlot, setStatusBarSlot] = useState<HTMLDivElement | null>(null)
@@ -529,6 +532,22 @@ export function App() {
   }
 
   /** Ouvrir la création de ticket dans Tableau, contexte d'élément joint — depuis Navigateur. */
+  const lancerServeur = () => {
+    if (terminalActions.current) return terminalActions.current.ouvrirShell('dev')
+    devEnAttente.current = true
+    setTerminal(true)
+  }
+  useEffect(() => {
+    if (!terminal || !devEnAttente.current) return
+    const id = setInterval(() => {
+      if (!terminalActions.current) return
+      clearInterval(id)
+      devEnAttente.current = false
+      terminalActions.current.ouvrirShell('dev')
+    }, 50)
+    return () => clearInterval(id)
+  }, [terminal])
+
   const onCreerTicketDepuisElement = (corps: string, tags: string[]) => {
     setTab('tableau')
     setLayout(l => (l === 'full' ? 'bottom' : l))
@@ -701,6 +720,7 @@ export function App() {
                           focusRoute={focusRoute}
                           onFocusHandled={() => setFocusRoute(null)}
                           onCreerTicketDepuisElement={onCreerTicketDepuisElement}
+                          onLancerServeur={lancerServeur}
                         />
                       </div>
 

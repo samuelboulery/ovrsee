@@ -2,7 +2,7 @@
 {
   "id": "T-0274",
   "titre": "Lot 4 — /api, MCP et Vite : plantage, ReDoS, liens, oracle cross-site",
-  "colonne": "pret",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "securite"
@@ -11,7 +11,8 @@
   "maj": "2026-10-05",
   "plan": "2026-10-05-audit-de-securite-ovrsee-1-3-0-plan-de-correction.md",
   "epic": "E-0270",
-  "charge": "l"
+  "charge": "l",
+  "fait": "2026-10-05T12:22:59.198Z"
 }
 ---
 

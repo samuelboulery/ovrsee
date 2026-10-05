@@ -145,6 +145,29 @@ function injectTo(ptyId: string | null, text: string): boolean {
 }
 
 /**
+ * Contrôles C0 (sauf tabulation et saut de ligne), DEL et C1.
+ *
+ * Le texte collé vient souvent de la page observée — sa console, le sélecteur
+ * d'élément. Un `\x1b[201~` dedans fermait le collage encadré, et la suite
+ * partait comme des touches dans la session Claude ; `\x9b` est le même CSI
+ * sur un octet. Les invisibles suivent — largeur nulle, bidi, séparateurs
+ * Unicode, étiquettes U+E0000 : une consigne cachée dans un texte que
+ * l'utilisateur croit relire. Aucun n'a de sens dans une demande.
+ */
+// eslint-disable-next-line no-control-regex
+const CONTROLE = /[\x00-\x08\x0b-\x1f\x7f-\x9f\u200b-\u200f\u2028-\u202e\u2060-\u2064\u2066-\u2069\ufeff\u{e0000}-\u{e007f}]/gu
+
+/**
+ * Le texte qu'on peut coller sans risque : fins de ligne en `\n`, contrôles et
+ * invisibles retirés. Partagé avec le collage natif de xterm (`useTerminal.ts`),
+ * qui n'encadre qu'à moitié : il ne retire ni ESC ni `\x1b[201~`.
+ */
+export const nettoyerCollage = (text: string): string => text.replace(/\r\n?/g, '\n').replace(CONTROLE, '')
+
+/** Un bloc encadré dont rien ne peut sortir. */
+const encadrer = (text: string): string => `\x1b[200~${nettoyerCollage(text)}\x1b[201~`
+
+/**
  * Colle un bloc dans le pty désigné sans le valider.
  *
  * Le mode « bracketed paste » du terminal est indispensable pour un texte
@@ -153,7 +176,7 @@ function injectTo(ptyId: string | null, text: string): boolean {
  * envoyé — l'utilisateur relit et appuie sur Entrée.
  */
 export function pasteTo(ptyId: string | null, text: string): boolean {
-  return injectTo(ptyId, `\x1b[200~${text}\x1b[201~`)
+  return injectTo(ptyId, encadrer(text))
 }
 
 /** Colle un bloc dans la session Claude du projet courant — voir `pasteTo`. */
@@ -168,17 +191,12 @@ export function pasteToClaude(text: string): boolean {
  * fin de collage, donc rien ne peut s'intercaler entre les deux. Il est
  * **après** `\x1b[201~`, hors du collage — dedans, il serait du texte.
  *
- * `pasteTo` reste le défaut partout ailleurs : coller sans valider laisse
- * relire, et c'est ce qu'on veut quand on prépare une demande. Celui-ci est
- * réservé au geste qui dit explicitement « envoie ».
+ * Réservé au texte que l'utilisateur a écrit lui-même — ses commandes
+ * enregistrées. Jamais à ce qui vient de la page observée : si le pty est
+ * revenu au shell, l'Entrée l'exécuterait (T-0273).
  */
 export function submitTo(ptyId: string | null, text: string): boolean {
-  return injectTo(ptyId, `\x1b[200~${text}\x1b[201~\r`)
-}
-
-/** Envoie un bloc à la session Claude du projet courant, et le valide. */
-export function submitToClaude(text: string): boolean {
-  return submitTo(claude.id, text)
+  return injectTo(ptyId, `${encadrer(text)}\r`)
 }
 
 /** Ce qu'un clic sur une commande a trouvé comme destination. */

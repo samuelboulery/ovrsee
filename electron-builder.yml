@@ -41,6 +41,26 @@ asar: true
 asarUnpack:
   - node_modules/node-pty/**
 
+# Fuses : ce que le binaire refuse avant même de lire le code (T-0273). Sans
+# eux, `NODE_OPTIONS=--require …` ou `--inspect` faisaient exécuter n'importe
+# quoi à l'application signée, et l'asar se remplaçait sans que rien ne le voie.
+# `runAsNode` reste ouvert : le crawl et les hooks de `~/.claude/settings.json`
+# tournent avec ce binaire en mode Node. Le fermer demande de passer le crawl en
+# `utilityProcess` et les hooks sur un Node externe — chantier à part.
+# `resetAdHocDarwinSignature` : basculer un fuse casse la signature ad hoc, et
+# un binaire arm64 non signé ne démarre plus.
+electronFuses:
+  runAsNode: true
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+  grantFileProtocolExtraPrivileges: false
+  # Les cookies de la session du Navigateur — ceux de l'app observée — chiffrés
+  # sur disque par le trousseau, comme les secrets d'intégration.
+  enableCookieEncryption: true
+  resetAdHocDarwinSignature: true
+
 # Publie sur l'onglet Releases du dépôt — public : le binaire est
 # téléchargeable par n'importe qui, sans compte. La CI y attache les installeurs
 # à chaque tag `v*`, voir .github/workflows/release.yml.

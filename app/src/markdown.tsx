@@ -33,8 +33,11 @@ const SEPARATOR = /^\|[\s:|-]+\|\s*$/
 const TASK = /^\[([ xX])\]\s+(.*)$/
 const DETAILS = /^<details\b/i
 const DETAILS_END = /<\/details>/i
-const SUMMARY = /<summary[^>]*>([\s\S]*?)<\/summary>/i
-const HTML_IMG = /^<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>$/i
+// Les classes sont bornées, et l'adresse s'arrête à l'espace : le README vient
+// du dépôt observé, et `src="a ` répété faisait rebalayer toute la ligne
+// depuis chaque `src=` — l'onglet Aperçu figé des secondes (ReDoS, T-0274).
+const SUMMARY = /<summary[^>]{0,200}>([\s\S]*?)<\/summary>/i
+const HTML_IMG = /^<img\b[^>]*\bsrc=["']([^"'>\s]+)["'][^>]*>$/i
 const VIDEO = /\.(mp4|webm|mov)$/i
 // La même liste que `MEDIA_TYPES` côté serveur (hooks/snapshot.js). La tenir
 // des deux côtés évite l'icône d'image cassée : ce que le serveur refuserait
@@ -60,7 +63,7 @@ const isExternal = (href: string) => /^https?:\/\//i.test(href)
  * repartirait alors du début et ne s'arrêterait jamais.
  */
 const inlinePattern = () =>
-  /(`[^`]+`)|(!\[[^\]]*\]\([^)\s]+\))|(\*\*[^*]+\*\*)|(\*[^*\n]+\*)|(\[[^\]]*\]\([^)\s]+\))/g
+  /(`[^`]+`)|(!\[[^[\]\n]{0,500}\]\([^)[\]\s]+\))|(\*\*[^*]+\*\*)|(\*[^*\n]+\*)|(\[[^[\]\n]{0,500}\]\([^)[\]\s]+\))/g
 
 // `--color-surface-control`, pas `--color-neutral-900` : ce dernier vaut
 // exactement `--color-bg` en thème clair (T-0045, rampe inversée) — un code
@@ -386,7 +389,8 @@ export function Markdown({ text, root }: { text: string; root?: string }): React
       i += 1 // la ligne de clôture
 
       const brut = body.join('\n')
-      const resume = SUMMARY.exec(brut)
+      // Sans clôture, `exec` repartait de chaque `<summary` jusqu'au bout.
+      const resume = /<\/summary>/i.test(brut) ? SUMMARY.exec(brut) : null
       blocks.push(
         <details
           key={key()}

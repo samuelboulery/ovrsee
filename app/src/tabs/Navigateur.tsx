@@ -6,7 +6,7 @@ import { t } from '../i18n'
 import { raccourci } from '../raccourcis'
 import { s } from '../style'
 import { StatusBar } from '../StatusBar'
-import { submitToClaude } from '../pty'
+import { pasteToClaude } from '../pty'
 import { Divider, useResizable } from '../useResizable'
 import { CarteElement, HorsApplication, NavButton } from './NavigateurPanneaux'
 import {
@@ -267,15 +267,16 @@ export function Navigateur({
   }, [])
 
   /**
-   * Envoie à Claude, ou copie s'il n'y a pas de session.
+   * Colle dans la session Claude, ou copie s'il n'y a pas de session.
    *
-   * Ici on **valide** : les deux boutons de cet onglet disent « envoyer », et
-   * un texte qui attend un Entrée de plus n'est pas envoyé. Ailleurs —
-   * palette, panneau d'équipement — `pasteToClaude` colle sans valider, parce
-   * qu'on y prépare une demande qu'on veut relire.
+   * Collé, **jamais validé** : le texte vient de la page observée — sa
+   * console, son HTML. Si l'utilisateur a quitté `claude`, le pty de la
+   * session est revenu au shell, et un Entrée envoyé d'office y exécutait ce
+   * texte : une apostrophe de la page suffisait à en faire une commande
+   * (T-0273). L'Entrée reste à l'humain, qui voit d'abord où il tape.
    */
   const send = async (label: string, text: string) => {
-    if (submitToClaude(text)) return say(t('navigateur.sent_to_claude', { label }))
+    if (pasteToClaude(text)) return say(t('navigateur.sent_to_claude', { label }))
     try {
       await navigator.clipboard.writeText(text)
       say(t('navigateur.copied', { label }))

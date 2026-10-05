@@ -18,7 +18,7 @@
 import { spawn } from 'node:child_process'
 
 import { git } from '../hooks/git.js'
-import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 // WHY: photographier une application exige de la faire tourner. Playwright
@@ -32,6 +32,7 @@ import { assurerConfiance, DEV_DEFAUT } from './confiance.js'
 import { redige } from '../hooks/redaction.js'
 import { cleanEnv, killTree, shellRun } from '../hooks/shell.js'
 import { writeFileNoFollow } from '../hooks/plans.js'
+import { appendFileNoFollow, assurerSansLien } from '../hooks/sans-lien.js'
 import { estPrincipal } from '../hooks/principal.js'
 
 const DEFAULTS = {
@@ -59,9 +60,19 @@ function loadConfig() {
   const path = join(root, 'ovrsee.config.json')
   if (!existsSync(path)) throw new Error(`configuration absente : ${path}`)
 
-  const config = { ...DEFAULTS, ...JSON.parse(readFileSync(path, 'utf8')) }
+  let lu
+  try {
+    lu = JSON.parse(readFileSync(path, 'utf8'))
+  } catch {
+    // Le message de `JSON.parse` cite le texte fautif : il vient du dépôt, et
+    // part dans `scans.jsonl` avant l'accord.
+    throw new Error('ovrsee.config.json illisible : JSON invalide')
+  }
+  const config = { ...DEFAULTS, ...lu }
   if (typeof config.baseUrl !== 'string' || !config.baseUrl.startsWith('http')) {
-    throw new Error(`baseUrl invalide : ${config.baseUrl}`)
+    // Sans la valeur : elle vient du dépôt observé, et ce message est écrit
+    // dans `scans.jsonl` — avant que l'accord n'ait été vérifié.
+    throw new Error('baseUrl invalide : une URL http(s) est attendue')
   }
   if (!Array.isArray(config.entryRoutes) || config.entryRoutes.length === 0) {
     throw new Error('entryRoutes doit contenir au moins une route')
@@ -82,7 +93,7 @@ function useStorageState(config) {
   if (!relative || !existsSync(join(root, relative))) return false
 
   try {
-    git(root, ['check-ignore', '-q', relative], { stdio: 'ignore' })
+    git(root, ['check-ignore', '-q', '--', relative], { stdio: 'ignore' })
     return true
   } catch {
     log(`${relative} n'est pas ignoré par git — session non rejouée, pages protégées ignorées`)
@@ -103,11 +114,12 @@ const shortSha = () => {
 
 /** Trace le scan, réussi ou non. C'est la seule écriture qui n'est jamais sautée. */
 function recordScan(entry) {
-  mkdirSync(pagesDir, { recursive: true })
   // Rédigé ici plutôt qu'à la capture : c'est le seul point d'écriture, donc le
   // seul endroit qu'un futur chemin d'échec ne pourra pas contourner.
   const propre = entry.error ? { ...entry, error: redige(entry.error) } : entry
-  appendFileSync(join(pagesDir, 'scans.jsonl'), JSON.stringify(propre) + '\n', 'utf8')
+  // Jamais à travers un lien : `scans.jsonl -> .git/hooks/post-commit` faisait
+  // ajouter ce texte à un script exécuté au commit suivant.
+  appendFileNoFollow(join(pagesDir, 'scans.jsonl'), JSON.stringify(propre) + '\n')
 }
 
 // --- démarrage de l'application -------------------------------------------
@@ -265,8 +277,39 @@ const pathOf = url => {
   return pathname === '/' ? '/' : pathname.replace(/\/+$/, '')
 }
 
-const isIgnored = (path, patterns) =>
-  patterns.some(pattern => new RegExp('^' + pattern.replace(/\*/g, '.*') + '$').test(path))
+/**
+ * Un chemin correspond-il à l'un des globs `ignore` ? Seul `*` est spécial.
+ *
+ * Pas de `RegExp` : le motif vient d'`ovrsee.config.json`, versionné, et le
+ * chemin d'un lien de la page observée. `(` faisait lever, et `*a*a*…b` sur un
+ * long chemin ne finissait pas (T-0274). Ici, au pire chemin × motif.
+ */
+export const isIgnored = (path, patterns) => patterns.some(pattern => globCorrespond(String(pattern), path))
+
+function globCorrespond(motif, texte) {
+  let m = 0
+  let t = 0
+  let etoile = -1
+  let reprise = 0
+  while (t < texte.length) {
+    if (m < motif.length && motif[m] !== '*' && motif[m] === texte[t]) {
+      m += 1
+      t += 1
+    } else if (m < motif.length && motif[m] === '*') {
+      etoile = m
+      reprise = t
+      m += 1
+    } else if (etoile !== -1) {
+      m = etoile + 1
+      reprise += 1
+      t = reprise
+    } else {
+      return false
+    }
+  }
+  while (motif[m] === '*') m += 1
+  return m === motif.length
+}
 
 /**
  * Filtre le titre et l'extrait captés dans le DOM de l'application observée,
@@ -278,7 +321,9 @@ const isIgnored = (path, patterns) =>
  * d'abord aurait pu couper un jeton en deux et le laisser passer à moitié.
  */
 export function sanitizePageCapture(title, text) {
-  return { title: redige(title), text: redige(text).slice(0, 400) }
+  // Borné avant le filtre : seuls 400 caractères restent, et le texte d'une
+  // page n'a pas de taille maximale.
+  return { title: redige(String(title ?? '').slice(0, 2000)), text: redige(String(text ?? '').slice(0, 20000)).slice(0, 400) }
 }
 
 /**
@@ -430,12 +475,23 @@ function orphanShots(knownSlugs) {
   }
 }
 
+/** Le nom exact qu'écrit le crawl : `YYYY-MM-DD-<sha>.png`, ou `sans-commit` (`shortSha`). */
+const NOM_CAPTURE = /^\d{4}-\d{2}-\d{2}-(?:[0-9a-f]+|sans-commit)\.png$/
+
+/**
+ * Les captures à effacer : seulement celles dont le nom est celui que le crawl
+ * écrit, et que `retainable` ne garde pas. Un autre fichier — ou un dossier de
+ * l'utilisateur derrière un lien — n'est jamais touché.
+ */
+export function capturesASupprimer(files, now = new Date()) {
+  const captures = files.filter(f => NOM_CAPTURE.test(f))
+  const keep = retainable(captures, now)
+  return captures.filter(f => !keep.has(f))
+}
+
 function pruneShots(dir) {
-  const files = readdirSync(dir).filter(f => f.endsWith('.png'))
-  const keep = retainable(files)
-  for (const file of files) {
-    if (!keep.has(file)) rmSync(join(dir, file))
-  }
+  assurerSansLien(dir)
+  for (const file of capturesASupprimer(readdirSync(dir))) rmSync(join(dir, file))
 }
 
 // --- orchestration ---------------------------------------------------------
@@ -479,10 +535,13 @@ async function run() {
 
       const slug = pageSlug(route)
       const dir = join(shotsDir, slug)
+      const capture = join(dir, `${date}-${commit}.png`)
+      assurerSansLien(capture)
       mkdirSync(dir, { recursive: true })
+      assurerSansLien(capture)
 
       await page.goto(new URL(entry.path, config.baseUrl).href, { waitUntil: 'networkidle' })
-      await page.screenshot({ path: join(dir, `${date}-${commit}.png`), fullPage: false })
+      await page.screenshot({ path: capture, fullPage: false })
       pruneShots(dir)
 
       pages.set(route, {
@@ -549,12 +608,17 @@ if (estPrincipal(import.meta.url)) {
     const message = String(err?.message ?? err)
     // L'échec est une information, pas un silence. Sans cette ligne, l'ovrsee
     // continuerait d'afficher la capture d'avant comme si elle datait d'aujourd'hui.
-    recordScan({
-      date: new Date().toISOString().slice(0, 10),
-      commit: shortSha(),
-      ok: false,
-      error: message,
-    })
+    try {
+      recordScan({
+        date: new Date().toISOString().slice(0, 10),
+        commit: shortSha(),
+        ok: false,
+        error: message,
+      })
+    } catch (trace) {
+      // `scans.jsonl` refusé (lien symbolique) : l'échec se dit au moins ici.
+      process.stderr.write(`[crawl] trace impossible : ${trace?.message ?? trace}\n`)
+    }
     process.stderr.write(`[crawl] scan échoué : ${message}\n`)
     process.exit(0)
   })

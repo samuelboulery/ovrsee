@@ -46,6 +46,16 @@ import { writeFileNoFollow } from '../hooks/plans.js'
  */
 export const DEV_DEFAUT = 'pnpm dev'
 
+/**
+ * Une commande qu'on peut montrer telle qu'elle s'exécutera : ASCII imprimable,
+ * 200 caractères au plus. Une liste noire laissait passer largeur nulle,
+ * remplissages Unicode, ou 2 000 espaces poussant `; curl …|sh` hors de la
+ * modale — ce qu'on approuve doit être ce qu'on lit (T-0273).
+ *
+ * @param {string} dev
+ */
+export const commandeAffichable = dev => /^[\x20-\x7e]{1,200}$/.test(dev)
+
 /** `OVRSEE_TRUST` pour les tests — même convention que `OVRSEE_INTEGRATIONS`. */
 export const trustPath = () =>
   process.env.OVRSEE_TRUST ?? join(homedir(), '.claude', 'ovrsee', 'trust.json')
@@ -194,6 +204,8 @@ async function demanderEnTerminal(root, dev) {
  * @param {string} dev la chaîne exacte qui partira à `shellRun()`
  */
 export async function assurerConfiance(root, dev) {
+  // Même pour une commande déjà approuvée : elle l'a été avant cette règle.
+  if (!commandeAffichable(dev)) throw new Error('commande dev refusée : ASCII imprimable, 200 caractères au plus')
   // `undefined` sous `spawn`, pas `false` : c'est la valeur de vérité qu'on
   // teste. Et `stdin`, pas `stdout` — Electron redirige stdout en `pipe` alors
   // même qu'un humain regarde l'écran.

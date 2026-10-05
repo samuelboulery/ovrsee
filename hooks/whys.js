@@ -51,11 +51,26 @@ const MAX_BYTES = 512 * 1024
 /** Garde-fou : un dépôt monstrueux ne doit pas bloquer l'ouverture d'un projet. */
 const MAX_FILES = 4000
 
-/** `WHY:` en commentaire de ligne (`//`, `#`) ou de bloc (`*`). */
-const WHY = /^\s*(?:\/\/|#|\*|\/\*)\s*WHY:\s*(.+?)\s*(?:\*\/)?\s*$/
+/**
+ * `WHY:` en commentaire de ligne (`//`, `#`) ou de bloc (`*`).
+ *
+ * La capture va jusqu'au bout de la ligne, et `texte()` retire la fermeture de bloc finale :
+ * un `(.+?)\s*(?:\*\/)?\s*$` paresseux revenait en arrière sur chaque espace,
+ * et 2 000 espaces figeaient l'ouverture du projet 4 s (ReDoS, T-0274).
+ */
+const WHY = /^\s*(?:\/\/|#|\*|\/\*)\s*WHY:(.*)$/
 
 /** La continuation d'un commentaire, pour les raisons qui tiennent sur deux lignes. */
-const SUITE = /^\s*(?:\/\/|#|\*)\s*(.+?)\s*(?:\*\/)?\s*$/
+const SUITE = /^\s*(?:\/\/|#|\*)(.*)$/
+
+/** Au-delà, une ligne n'est ni un import ni un commentaire écrit par un humain. */
+const LIGNE_MAX = 1000
+
+/** Le texte d'un commentaire, sans espaces de bord ni fermeture de bloc. */
+const texte = brut => {
+  const t = brut.trim()
+  return (t.endsWith('*/') ? t.slice(0, -2) : t).trim()
+}
 
 /**
  * Le spécificateur importé par une ligne, s'il y en a un.
@@ -97,7 +112,7 @@ export function whysInSource(source) {
   const out = new Map()
 
   for (let i = 0; i < lignes.length; i += 1) {
-    const spec = lignes[i].match(SPEC)
+    const spec = lignes[i].length <= LIGNE_MAX && lignes[i].match(SPEC)
     if (!spec) continue
     const paquet = packageOf(spec[1])
     if (!paquet || out.has(paquet)) continue
@@ -108,16 +123,17 @@ export function whysInSource(source) {
     for (let j = i - 1; j >= 0 && i - j <= 6; j -= 1) {
       const ligne = lignes[j]
       if (ligne.trim() === '' && suites.length === 0) continue
+      if (ligne.length > LIGNE_MAX) break
 
       const why = ligne.match(WHY)
       if (why) {
-        out.set(paquet, [why[1], ...suites.reverse()].join(' ').trim())
+        if (texte(why[1])) out.set(paquet, [texte(why[1]), ...suites.reverse()].join(' ').trim())
         break
       }
 
       const suite = ligne.match(SUITE)
-      if (!suite) break
-      suites.push(suite[1])
+      if (!suite || !texte(suite[1])) break
+      suites.push(texte(suite[1]))
     }
   }
 

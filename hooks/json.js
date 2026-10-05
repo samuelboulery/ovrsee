@@ -9,7 +9,8 @@
  * `crawl/` et `electron/` de l'importer sans traîner le reste derrière.
  */
 
-import { readFileSync } from 'node:fs'
+import { readFileSync, realpathSync, statSync } from 'node:fs'
+import { sep } from 'node:path'
 
 /**
  * Le contenu JSON du fichier, ou le défaut.
@@ -33,4 +34,47 @@ export function readJson(path, defaut = null) {
   } catch {
     return structuredClone(defaut)
   }
+}
+
+/**
+ * Un chemin est-il sous un dossier ?
+ *
+ * Le `sep` final n'est pas une coquetterie : `/a/b-secret` commence par `/a/b`,
+ * et `join('/a/b', '../b-secret/x.png')` produit exactement ce chemin-là. Sans
+ * le séparateur, la garde laisse passer le dossier voisin.
+ */
+export const inside = (base, file) => file.startsWith(base.endsWith(sep) ? base : base + sep)
+
+/**
+ * Le chemin réel de `file` s'il désigne un fichier ordinaire sous `base`, sinon null.
+ *
+ * Le contrôle de préfixe porte sur le texte du chemin ; un lien symbolique
+ * versionné par le dépôt (`shots/x.png -> ~/.ssh/id_ed25519`, `README.md ->
+ * ~/.aws/credentials`) le passe et mène dehors. On compare donc les chemins
+ * réels. Et un dossier n'est pas un fichier : `createReadStream` levait EISDIR,
+ * sans écouteur, et le dev server tombait sur un simple GET.
+ */
+export function fichierDuDepot(base, file) {
+  try {
+    const reel = realpathSync(file)
+    if (!inside(realpathSync(base), reel) || !statSync(reel).isFile()) return null
+    return reel
+  } catch {
+    return null // Absent, ou illisible : rien à servir.
+  }
+}
+
+
+/**
+ * `readJson`, mais jamais à travers un lien qui sort de `base` — la racine du
+ * dépôt observé. `ovrsee/board.json` lié vers un fichier du poste en rendait
+ * le contenu à l'interface et au MCP (T-0274).
+ *
+ * @param {string} base
+ * @param {string} file chemin absolu sous `base`
+ * @param {unknown} [defaut]
+ */
+export function readJsonDuDepot(base, file, defaut = null) {
+  const reel = fichierDuDepot(base, file)
+  return reel ? readJson(reel, defaut) : structuredClone(defaut)
 }

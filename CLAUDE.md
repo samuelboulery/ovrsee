@@ -18,8 +18,17 @@ C'est la règle qui doit faire refuser une fonctionnalité. Toute proposition qu
 exécuter du code du projet observé contredit le cadrage — le dire avant de
 l'implémenter. Y compris quand ce n'est pas un programme qu'on lance : `git status`
 honore le `.git/config` du dépôt, et `core.fsmonitor` y nomme un exécutable. D'où
-`hooks/git.js`, par où passe **toute** commande git visant un dépôt observé, et le
-`--no-verify` du commit d'amorçage (T-0244, T-0245).
+`hooks/git.js`, par où passe **toute** commande git visant un dépôt observé (T-0244,
+T-0245). `--no-verify` n'y suffit pas : il ne coupe que `pre-commit` et `commit-msg`.
+La garde coupe tous les hooks (`core.hooksPath`), les filtres `.gitattributes` déclarés
+par le dépôt — inclusions et `config.worktree` comprises —, les programmes gpg, le
+`cookieFile` de libcurl, et au `fetch` tout transport autre que https/http/ssh (T-0272).
+Un distant local ou `git://` ne se fetch donc plus : coût accepté, et le message le dit.
+Ce qu'un `-c` ne surcharge pas se refuse — `core.worktree`, une clé contenant `=` —, et
+un `status` ne descend jamais dans les sous-modules (`--ignore-submodules=all`), dont le
+`.git/config` échappe à la lecture. Chaque vecteur a son dépôt piégé dans `git.test.js`,
+avec le test qui prouve que le piège mord sans garde : un vecteur ajouté sans ce
+couple n'est pas couvert. Windows n'y est pas prouvé (pièges en `/bin/sh`).
 
 L'écriture, elle, se lit en trois classes — « seulement `tickets/` et `board.json` »
 était faux, et une règle fausse ne fait rien refuser :

@@ -152,12 +152,11 @@ function popoverWindow(origin, preload) {
   // dessous, le popover s'afficherait derrière.
   popover.setAlwaysOnTop(true, 'pop-up-menu')
 
-  // Même garde que la fenêtre principale : ce rendu ne navigue jamais ailleurs
-  // que sur son propre schéma.
+  // Même garde que la fenêtre principale : aucune navigation, pas même vers
+  // notre propre origine — `ovrsee://app/api/media?file=…` y promouvrait un
+  // fichier du dépôt observé en page (T-0273).
   popover.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
-  popover.webContents.on('will-navigate', (event, url) => {
-    if (!url.startsWith(origin)) event.preventDefault()
-  })
+  popover.webContents.on('will-navigate', event => event.preventDefault())
 
   // Se referme dès qu'on clique ailleurs, comme tous les popovers du système.
   popover.on('blur', () => {

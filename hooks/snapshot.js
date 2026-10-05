@@ -9,7 +9,7 @@
 
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { extname, isAbsolute, join, normalize, sep } from 'node:path'
+import { extname, isAbsolute, join, normalize } from 'node:path'
 
 import { isSafePlanFileName, readPlans, readRegistry } from './plans.js'
 import { activePlans } from './active.js'
@@ -21,7 +21,7 @@ import { readSettings, mergeSettings } from './settings.js'
 import { git } from './git.js'
 import { gitStatus } from './git-status.js'
 import { readIntegrations } from './integrations.js'
-import { readJson } from './json.js'
+import { fichierDuDepot, inside, readJson } from './json.js'
 
 /**
  * Un fichier texte du dépôt, ou null.
@@ -109,7 +109,7 @@ function scans(root, illisibles = []) {
   let cassees = 0
   let lignes = []
   try {
-    lignes = readFileSync(join(root, 'ovrsee', 'pages', 'scans.jsonl'), 'utf8')
+    lignes = texteDuDepot(root, join('ovrsee', 'pages', 'scans.jsonl'))
       .split('\n')
       .filter(Boolean)
       .flatMap(line => {
@@ -138,7 +138,7 @@ function audits(root, illisibles = []) {
   let cassees = 0
   let lignes = []
   try {
-    lignes = readFileSync(join(root, 'ovrsee', 'audits.jsonl'), 'utf8')
+    lignes = texteDuDepot(root, join('ovrsee', 'audits.jsonl'))
       .split('\n')
       .filter(Boolean)
       .flatMap(line => {
@@ -279,7 +279,9 @@ export function readGraph(root, config) {
   const sourceChoice = merged?.sourceGraphe ?? 'auto'
 
   const graphifyPath = join(root, 'graphify-out', 'graph.json')
-  const graphifyGraph = readJson(graphifyPath)
+  // `getGraph full:true` du MCP le rend entier : un `graph.json` lié vers
+  // `~/.claude/settings.json` en sortait les `env` en clair.
+  const graphifyGraph = lireDuDepot(root, join('graphify-out', 'graph.json'), readJson)
   const graphifyDate = graphifyGraph ? fileDate(graphifyPath) : null
 
   const declare = config?.obsidianVault
@@ -397,7 +399,7 @@ export function snapshot(root) {
   // comme un fait.
   const actifs = activePlans(join(root, 'ovrsee'))
 
-  const config = readJson(join(root, 'ovrsee.config.json'))
+  const config = lireDuDepot(root, 'ovrsee.config.json', readJson)
 
   const tableauData = tableau(root, illisibles)
 
@@ -410,7 +412,7 @@ export function snapshot(root) {
     equipped: existsSync(join(root, 'ovrsee')),
     plans,
     activePlans: actifs.filter(isSafePlanFileName),
-    packageJson: readJson(join(root, 'package.json')),
+    packageJson: lireDuDepot(root, 'package.json', readJson),
     // Le crawler y lit déjà `dev` et `baseUrl`. L'onglet Navigateur s'en sert
     // comme URL par défaut : le projet a déjà déclaré où il s'affiche, le
     // redemander à l'utilisateur serait une deuxième vérité à tenir à jour.
@@ -419,8 +421,8 @@ export function snapshot(root) {
     // raison : c'est le seul endroit du dépôt où quelqu'un a déjà écrit ce que
     // le projet fait. Le recopier dans `ovrsee/` en ferait une deuxième
     // version à maintenir, donc une version fausse en trois semaines.
-    readme: readText(join(root, 'README.md')),
-    pages: readJson(join(root, 'ovrsee', 'pages', 'pages.json')),
+    readme: lireDuDepot(root, 'README.md', readText),
+    pages: lireDuDepot(root, join('ovrsee', 'pages', 'pages.json'), readJson),
     scans: scans(root, illisibles),
     // Les raisons d'être des dépendances, lues dans le code : un commentaire
     // `WHY:` posé au-dessus d'un import. L'onglet Stack les affichait comme
@@ -455,18 +457,21 @@ export function shotPath(root, relative) {
   const base = join(root, 'ovrsee', 'pages')
   const file = normalize(join(base, relative ?? ''))
 
-  if (!inside(base, file) || !existsSync(file)) return null
-  return file
+  if (!inside(base, file) || extname(file).toLowerCase() !== '.png') return null
+  // La racine du dépôt, pas `ovrsee/pages` : liée vers `~/Pictures`, celle-ci
+  // devenait la base réelle, et tout ce qui s'y trouve était servi.
+  return fichierDuDepot(root, file)
 }
 
-/**
- * Un chemin est-il sous un dossier ?
- *
- * Le `sep` final n'est pas une coquetterie : `/a/b-secret` commence par `/a/b`,
- * et `join('/a/b', '../b-secret/x.png')` produit exactement ce chemin-là. Sans
- * le séparateur, la garde laisse passer le dossier voisin.
- */
-const inside = (base, file) => file.startsWith(base.endsWith(sep) ? base : base + sep)
+/** Lit `rel` sous la racine du dépôt, jamais à travers un lien qui en sort. */
+const lireDuDepot = (root, rel, lire) => {
+  const f = fichierDuDepot(root, join(root, rel))
+  return f ? lire(f) : null
+}
+
+/** Le texte de `rel` sous la racine, ou '' : absent et lié hors du dépôt se valent. */
+const texteDuDepot = (root, rel) => lireDuDepot(root, rel, f => readFileSync(f, 'utf8')) ?? ''
+
 
 /**
  * Types servis par `/api/media`, et rien d'autre.
@@ -500,6 +505,7 @@ export function mediaPath(root, relative) {
   const file = normalize(join(base, relative ?? ''))
   const type = MEDIA_TYPES[extname(file).toLowerCase()]
 
-  if (!type || !inside(base, file) || !existsSync(file)) return null
-  return { file, type }
+  if (!type || !inside(base, file)) return null
+  const reel = fichierDuDepot(base, file)
+  return reel ? { file: reel, type } : null
 }

@@ -39,6 +39,7 @@ import { git } from './git.js'
 import { readJson } from './json.js'
 
 import { writeFileNoFollow } from './plans.js'
+import { assurerSansLien } from './sans-lien.js'
 import { installSkills } from './skills.js'
 import { DEFAULT_COLUMNS } from './tickets.js'
 import { estPrincipal } from './principal.js'
@@ -425,6 +426,9 @@ export function install(target, { skills = [], gitInit = false, commit = false, 
     }
   }
 
+  // Avant tout `mkdir` : un `ovrsee -> ~` livré par le dépôt y créerait les dossiers.
+  assurerSansLien(join(root, 'ovrsee', 'plans'))
+  assurerSansLien(join(root, 'ovrsee', 'tickets'))
   mkdirSync(join(root, 'ovrsee', 'plans'), { recursive: true })
   done.push(`ovrsee/plans/ prêt dans ${root}`)
 

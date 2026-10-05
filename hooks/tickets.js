@@ -59,6 +59,27 @@ export {
  */
 export const EN_COURS = 'en-cours'
 
+/**
+ * Un ticket cité dans un message de commit. `\d{4,}` : `T-\d{4}` lisait
+ * `T-10000` comme `T-1000`. Globale — pour `match`/`matchAll`, jamais `test`/`exec`.
+ */
+export const CITATION_TICKET = /\bT-\d{4,}/g
+
+/**
+ * « En vol » : `en-cours` ou au-delà, hors colonne finale. Un commit clôt ce
+ * qu'on a fait, pas ce qu'on a prévu. `null` sans finale ou sans `en-cours` :
+ * rien ne distingue alors un ticket en vol d'un ticket jamais commencé, et ne
+ * rien fermer est le défaut sûr — un tableau vidé tout seul ne se remarque pas.
+ */
+export function predicatEnVol(colonnes) {
+  const finale = colonneFinale(colonnes)
+  const iEnCours = colonnes.findIndex(c => c.id === EN_COURS)
+  if (!finale || iEnCours === -1) return null
+
+  const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
+  return t => t.meta.colonne !== finale && (rangDe.get(t.meta.colonne) ?? -1) >= iEnCours
+}
+
 export const PRIORITES = ['haute', 'moyenne', 'basse']
 
 const DEFAULT_PRIORITE = 'moyenne'
@@ -660,14 +681,12 @@ export function avancerTicketsClos(ovrseeDir) {
   // Même règle qu'au commit : on ne solde que ce qui était en vol. Un ticket
   // jamais commencé n'est pas « fait », et clore le plan ne le rend pas vrai —
   // il reste visible, et rattachable à un autre plan.
-  const iEnCours = colonnes.findIndex(c => c.id === EN_COURS)
-  if (iEnCours === -1) return []
-  const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
+  const enVol = predicatEnVol(colonnes)
+  if (!enVol) return []
 
   const avances = []
   for (const ticket of readTickets(ovrseeDir, colonnes)) {
-    if (!plansFermes.has(ticket.meta.plan) || ticket.meta.colonne === finale) continue
-    if ((rangDe.get(ticket.meta.colonne) ?? -1) < iEnCours) continue
+    if (!plansFermes.has(ticket.meta.plan) || !enVol(ticket)) continue
 
     try {
       moveTicket(ovrseeDir, ticket.file, finale)

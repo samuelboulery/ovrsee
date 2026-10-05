@@ -110,9 +110,11 @@ clôt ce qu'on a fait, pas ce qu'on a prévu. Sans cette distinction, un plan qu
 produit neuf tickets les soldait tous les neuf au premier commit, et le tableau
 se vidait tout seul.
 
-N'utiliser `moveTicket`/`updateTicket` à la main que pour corriger un
-déplacement, ou pour un ticket sans `plan` renseigné — ces hooks ne suivent que
-les tickets liés au plan actif.
+Un ticket sans `plan` (ou dont le plan n'existe plus) n'est soldé par un commit
+que si le message le **cite** (`T-XXXX`) et qu'il est en vol — sans plan, la
+citation est la seule attribution possible. N'utiliser `moveTicket`/`updateTicket`
+à la main que pour corriger un déplacement, ou pour clore un ticket sans plan
+qu'aucun commit n'a cité.
 
 **Le ticket actif hors-plan (`ovrsee/.active/<session>.json`).** Sans plan
 actif, `ovrsee-tool-edit-gate.js` exige quand même un ticket avant la première
@@ -125,6 +127,12 @@ déjà capturé. Ce ticket actif se pose sans geste supplémentaire :
   aussi, s'il n'a pas de `plan` — pour reprendre un constat d'audit déjà
   ticketé sans en recréer un.
 - Déplacer le ticket actif vers la colonne finale l'efface.
+
+**Citer un ticket ad hoc le clôt.** Le commit qui cite le ticket actif le passe
+en colonne finale, et l'édition suivante est bloquée par le gate. Pour un commit
+intermédiaire (`wip:`, étape d'un travail qui continue), ne pas citer le ticket ;
+le citer dans le commit qui termine. S'il a été soldé trop tôt, le rouvrir
+(`moveTicket` vers « en cours »).
 
 **Tout ceci a la portée d'une session Claude, pas du dépôt.** Plan actif comme
 ticket actif vivent dans `ovrsee/.active/<session>.json` : deux sessions

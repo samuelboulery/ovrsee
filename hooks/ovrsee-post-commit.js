@@ -17,7 +17,15 @@ import { fileURLToPath } from 'node:url'
 
 import { attachCommitToPlan, isSafePlanFileName } from './plans.js'
 import { activePlans, readActive, sessionId } from './active.js'
-import { avancerTicketsClos, colonneFinale, EN_COURS, readBoard, readTickets, moveTicket } from './tickets.js'
+import {
+  avancerTicketsClos,
+  CITATION_TICKET,
+  colonneFinale,
+  moveTicket,
+  predicatEnVol,
+  readBoard,
+  readTickets,
+} from './tickets.js'
 import { readSettings, mergeSettings } from './settings.js'
 import { syncGitignore } from './gitignore-sync.js'
 import { readJson } from './json.js'
@@ -106,7 +114,7 @@ export function plansPourCommit(ovrseeDir, message, session, tickets) {
     trouves.push({ file, source })
   }
 
-  const cites = new Set(String(message ?? '').match(/T-\d{4}/g) ?? [])
+  const cites = new Set(String(message ?? '').match(CITATION_TICKET) ?? [])
   for (const ticket of tickets) {
     if (cites.has(ticket.meta.id)) ajoute(ticket.meta.plan, 'ticket')
   }
@@ -179,25 +187,11 @@ function attachCommit(ovrseeDir, root, sources, message, session, tickets) {
 export function avancerTicketsDuPlan(ovrseeDir, planFile, message = '', devine = false) {
   const colonnes = readBoard(ovrseeDir)
   const finale = colonneFinale(colonnes)
-  if (!finale) return []
+  const estEnVol = predicatEnVol(colonnes)
+  if (!estEnVol) return []
 
-  // Sans colonne `en-cours`, rien ne distingue un ticket en vol d'un ticket
-  // jamais commencé. Ne rien fermer est alors le défaut sûr : un tableau qui
-  // garde un ticket de trop se corrige d'un geste, un tableau vidé tout seul
-  // ne se remarque pas.
-  const iEnCours = colonnes.findIndex(c => c.id === EN_COURS)
-  if (iEnCours === -1) return []
-
-  const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
-  const liesAuPlan = readTickets(ovrseeDir, colonnes).filter(t => t.meta.plan === planFile)
-
-  // « En vol » : le travail a commencé. Un commit clôt ce qu'on a fait, pas ce
-  // qu'on a prévu — un ticket resté en backlog ou en prêt n'est jamais soldé.
-  const enVol = liesAuPlan.filter(
-    t => t.meta.colonne !== finale && (rangDe.get(t.meta.colonne) ?? -1) >= iEnCours,
-  )
-
-  const cites = new Set(message.match(/T-\d{4}/g) ?? [])
+  const enVol = readTickets(ovrseeDir, colonnes).filter(t => t.meta.plan === planFile && estEnVol(t))
+  const cites = new Set(String(message).match(CITATION_TICKET) ?? [])
 
   // L'attribution, dans l'ordre de fiabilité. Citer le ticket dans le message
   // tranche — c'est la convention déjà suivie par ce dépôt. À défaut, on ne
@@ -233,24 +227,26 @@ export function avancerTicketsDuPlan(ovrseeDir, planFile, message = '', devine =
  *
  * La citation suffit ici parce qu'elle est la seule attribution possible : pas
  * de plan, donc pas de repli à deviner. Mêmes gardes qu'ailleurs — seul un
- * ticket en vol est soldé, et un ticket lié à un plan reste à la règle du plan.
+ * ticket en vol est soldé, et un ticket dont le plan existe reste à la règle du
+ * plan (`decident`, dans le corps du hook). Un ticket dont le `plan` ne désigne
+ * aucun fichier de `ovrsee/plans/` compte comme sans plan : aucune règle de plan
+ * ne le verrait jamais.
  *
  * @returns {string[]} identifiants des tickets passés en colonne finale
  */
 export function avancerTicketsCites(ovrseeDir, message = '') {
-  const cites = new Set(String(message).match(/T-\d{4}/g) ?? [])
+  const cites = new Set(String(message).match(CITATION_TICKET) ?? [])
   if (cites.size === 0) return []
 
   const colonnes = readBoard(ovrseeDir)
   const finale = colonneFinale(colonnes)
-  const iEnCours = colonnes.findIndex(c => c.id === EN_COURS)
-  if (!finale || iEnCours === -1) return []
-  const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
+  const estEnVol = predicatEnVol(colonnes)
+  if (!estEnVol) return []
+  const planExiste = plan => isSafePlanFileName(plan) && existsSync(join(ovrseeDir, 'plans', plan))
 
   const soldes = []
   for (const ticket of readTickets(ovrseeDir, colonnes)) {
-    if (!cites.has(ticket.meta.id) || ticket.meta.plan) continue
-    if (ticket.meta.colonne === finale || (rangDe.get(ticket.meta.colonne) ?? -1) < iEnCours) continue
+    if (!cites.has(ticket.meta.id) || !estEnVol(ticket) || planExiste(ticket.meta.plan)) continue
     try {
       moveTicket(ovrseeDir, ticket.file, finale)
       soldes.push(ticket.meta.id)
@@ -325,10 +321,12 @@ if (estPrincipal(import.meta.url)) {
       const decident = rattaches.some(p => p.source === 'ticket')
         ? rattaches.filter(p => p.source === 'ticket')
         : rattaches
-      for (const plan of decident) {
-        avancerTicketsDuPlan(ovrseeDir, plan.file, message, plan.source === 'unique')
-      }
-      avancerTicketsCites(ovrseeDir, message)
+      const soldes = decident.flatMap(plan =>
+        avancerTicketsDuPlan(ovrseeDir, plan.file, message, plan.source === 'unique'),
+      )
+      soldes.push(...avancerTicketsCites(ovrseeDir, message))
+      // Un tableau qui bouge tout seul doit au moins le dire — comme `reconcile`.
+      for (const id of soldes) process.stderr.write(`[ovrsee] ticket soldé : ${id}\n`)
       // Filet à chaque commit : rattrape un ticket resté en retard, quelle
       // que soit la raison (CLI qui aurait oublié d'avancer, dérive passée).
       avancerTicketsClos(ovrseeDir)

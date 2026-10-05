@@ -32,13 +32,19 @@ import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { basename, extname, join, relative, sep } from 'node:path'
 
 /** Dossiers d'un coffre qu'on ne parcourt jamais. */
-const IGNORES = new Set(['.obsidian', '.trash', '.git', 'node_modules'])
+export const IGNORES = new Set(['.obsidian', '.trash', '.git', 'node_modules'])
 
 /** Au-delà, ce n'est plus une note : c'est un export collé dans le coffre. */
 const MAX_BYTES = 512 * 1024
 
 /** Garde-fou : un coffre de dix mille notes ne doit pas bloquer l'ouverture. */
 export const MAX_FILES = 4000
+
+/**
+ * Entrées lues au plus, notes ou non : `MAX_FILES` ne compte que les `.md`, et
+ * un coffre posé sur `~` en a peu pour des millions d'autres fichiers (T-0275).
+ */
+export const MAX_ENTREES = 10 * MAX_FILES
 
 const FENCE = '---'
 
@@ -232,9 +238,10 @@ function notes(root) {
   /** @type {Map<string, {front: Record<string, string|string[]>|null, liens: string[], file: string}>} */
   const out = new Map()
   let restant = MAX_FILES
+  let entrees = MAX_ENTREES
 
   const parcourir = dir => {
-    if (restant <= 0) return
+    if (restant <= 0 || entrees <= 0) return
     let entries
     try {
       entries = readdirSync(dir, { withFileTypes: true }).sort((a, b) =>
@@ -245,7 +252,7 @@ function notes(root) {
     }
 
     for (const entry of entries) {
-      if (restant <= 0) return
+      if (restant <= 0 || (entrees -= 1) < 0) return
       if (entry.name.startsWith('.') || IGNORES.has(entry.name)) continue
 
       const full = join(dir, entry.name)

@@ -24,6 +24,7 @@ import {
   closeOpenPlans,
   registerProject,
   setProjectAccent,
+  setProjectVault,
   touchProject,
   unregisterProject,
 } from '../hooks/plans.js'
@@ -33,6 +34,7 @@ import { projects, snapshot, shotPath, mediaPath, tableau, readGraph } from '../
 import { readJsonDuDepot } from '../hooks/json.js'
 import { git, gitReseau } from '../hooks/git.js'
 import { gitStatus } from '../hooks/git-status.js'
+import { urlLocale } from '../crawl/routes.js'
 import {
   addColumn,
   avancerTicketsClos,
@@ -207,7 +209,7 @@ function validateCrawlConfig(config) {
   const baseUrl = typeof config.baseUrl === 'string' ? config.baseUrl.trim() : ''
 
   if (!dev || dev.length > 300 || /[\r\n]/.test(dev)) return INVALID
-  if (baseUrl.length > 300 || !/^https?:\/\/\S+$/.test(baseUrl)) return INVALID
+  if (baseUrl.length > 300 || !/^https?:\/\/\S+$/.test(baseUrl) || !urlLocale(baseUrl)) return INVALID
 
   return { dev, baseUrl }
 }
@@ -252,6 +254,15 @@ function projectAction(body) {
       if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
       if (!setProjectAccent(path, body?.accent)) {
         return { status: 400, json: { error: 'accent inconnu' } }
+      }
+      return list()
+    }
+
+    // Le coffre Obsidian : une préférence de poste, comme l'accent (T-0275).
+    case 'vault': {
+      if (!known()) return { status: 404, json: { error: 'projet inconnu' } }
+      if (!setProjectVault(path, body?.vault)) {
+        return { status: 400, json: { error: 'chemin de coffre refusé' } }
       }
       return list()
     }

@@ -266,4 +266,8 @@ export interface GraphPayload {
    * Affichée dans le badge de provenance.
    */
   sourceDate: string | null
+  /** Le coffre du registre du poste, tel que saisi — `null` s'il n'y en a pas. */
+  vault?: string | null
+  /** Le coffre que déclare `ovrsee.config.json`, ignoré (T-0275) — pour le dire. */
+  vaultDepot?: string | null
 }

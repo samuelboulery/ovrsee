@@ -128,3 +128,32 @@ test('baseUrl invalide : le scan échoué ne recopie pas la valeur fournie par l
   assert.match(ligne, /baseUrl invalide/)
   assert.doesNotMatch(ligne, /touch PWNED/)
 })
+
+test('un baseUrl hors du poste est refusé avant toute exécution (T-0275)', () => {
+  const magasin = magasinNeuf()
+  for (const [config, motif] of [
+    [{ baseUrl: 'http://192.168.1.1:5173', entryRoutes: ['/'] }, /baseUrl refusé/],
+    [{ baseUrl: 'http://localhost:5173', entryRoutes: ['http://10.0.0.1/admin'] }, /entryRoutes refusé/],
+  ]) {
+    const dir = mkdtempSync(join(tmpdir(), 'ovrsee-crawl-local-'))
+    writeFileSync(join(dir, 'ovrsee.config.json'), JSON.stringify(config))
+    execFileSync(process.execPath, [join(HERE, 'index.js'), dir], {
+      stdio: 'ignore',
+      env: { ...process.env, OVRSEE_TRUST: magasin },
+    })
+    assert.match(readFileSync(join(dir, 'ovrsee', 'pages', 'scans.jsonl'), 'utf8'), motif)
+  }
+})
+
+test('la sortie de dev est filtrée avant d’être tronquée (T-0275)', async () => {
+  // Coupée d'abord, une affectation perdait son nom : `…KEY=` hors de la
+  // fenêtre, la valeur restait, nue, et aucune règle ne la reconnaissait.
+  const { garderSortie } = await import('./index.js')
+  // Fenêtre de 32 : tronquée d'abord, la ligne perdait `API_KE` et le secret
+  // restait sans nom qu'une règle reconnaisse.
+  const sortie = garderSortie(32)
+  sortie.retiens('x'.repeat(100) + '\nAPI_KEY=supersecretvalue0123456789 fin')
+  assert.doesNotMatch(sortie.lire(), /supersecretvalue/)
+  assert.match(sortie.lire(), /fin$/)
+  assert.ok(sortie.lire().length <= 32)
+})

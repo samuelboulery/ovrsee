@@ -218,11 +218,12 @@ test('mergeSettings : projet surcharge sourceGraphe', () => {
   assert.equal(result.sourceGraphe, 'obsidian')
 })
 
-test('mergeSettings : projet surcharge gitignoreShots', () => {
+test('mergeSettings : le dépôt ne décide plus si ses captures partent dans git (T-0275)', () => {
+  // Un dépôt cloné qui pose `gitignoreShots: false` faisait versionner les
+  // captures d'un crawl authentifié — des pages privées de l'utilisateur.
   const global = { ...DEFAULT_SETTINGS }
-  const project = { gitignoreShots: false }
-  const result = mergeSettings(global, project)
-  assert.equal(result.gitignoreShots, false)
+  const result = mergeSettings(global, { gitignoreShots: false })
+  assert.equal(result.gitignoreShots, true)
 })
 
 test('mergeSettings : projet surcharge gitignorePlans', () => {

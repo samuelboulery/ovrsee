@@ -23,6 +23,20 @@ import { formatDate } from './i18n.js'
 // dans `meta` comme ceux que rend readPlans : un brief se lit mieux ainsi.
 // Les filtres sont donc locaux plutôt qu'empruntés à plans.js, qui travaille
 // sur l'autre forme.
+/**
+ * Un champ lu dans le dépôt, réduit à une ligne courte et visible.
+ *
+ * Le brief entre dans le contexte de Claude à chaque session : un titre de
+ * ticket qui porte un saut de ligne y posait une consigne sur sa propre ligne,
+ * et un caractère bidi, de contrôle, zéro-largeur ou « tag » (U+E0000) la
+ * cachait à l'humain qui relit — le modèle, lui, les lit (T-0275).
+ */
+const INVISIBLES = /[\p{Cc}\p{Cf}\p{Zl}\p{Zp}\p{Co}\p{Cn}\p{Variation_Selector}]+/gu
+const champ = (valeur, max = 200) => {
+  const plat = String(valeur ?? '').replace(INVISIBLES, ' ').replace(/\s+/g, ' ').trim()
+  return plat.length > max ? plat.slice(0, max - 1) + '…' : plat
+}
+
 const openPlans = plans =>
   plans
     .filter(p => p?.status === 'open')
@@ -81,7 +95,7 @@ export function readOvrsee(root) {
 }
 
 /** Le brief est en français, quelle que soit la langue de l'interface. */
-const frDate = date => formatDate(date, 'fr')
+const frDate = date => champ(formatDate(date, 'fr'), 40)
 
 function age(date, now) {
   const at = Date.parse(date)
@@ -133,34 +147,34 @@ export function buildBrief(state, now = new Date()) {
     return '' // Un ovrsee vide : mieux vaut se taire que produire un brief creux.
   }
 
-  lines.push(`[ovrsee] ${state.name} — état lu depuis ovrsee/, sans ouvrir le code.`)
+  lines.push(`[ovrsee] ${champ(state.name)} — état lu depuis ovrsee/, sans ouvrir le code.`)
 
   if (state.pageCount > 0) {
     lines.push(`${state.pageCount} page(s) cartographiée(s).`)
   }
 
   if (state.scan?.ok) {
-    lines.push(`Dernier scan réussi le ${frDate(state.scan.date)} (commit ${state.scan.commit}).`)
+    lines.push(`Dernier scan réussi le ${frDate(state.scan.date)} (commit ${champ(state.scan.commit, 40)}).`)
   } else if (state.scan) {
     // L'avertissement sur la fraîcheur ne vaut que s'il existe des captures à
     // périmer. Sur un projet jamais cartographié, il ferait croire à une carte
     // dépassée là où il n'y a simplement pas de carte.
     const stale = state.pageCount > 0 ? ' Les captures sont plus anciennes que le code.' : ''
     lines.push(
-      `Dernier scan ÉCHOUÉ le ${frDate(state.scan.date)} : ${state.scan.error ?? 'raison non enregistrée'}.${stale}`,
+      `Dernier scan ÉCHOUÉ le ${frDate(state.scan.date)} : ${champ(state.scan.error, 300) || 'raison non enregistrée'}.${stale}`,
     )
   }
 
   const last = closed[0]
   if (last) {
-    const why = intention(last)
-    lines.push(`Dernier travail : « ${last.title} » (${frDate(last.closed)}).${why ? ` ${why}` : ''}`)
+    const why = champ(intention(last))
+    lines.push(`Dernier travail : « ${champ(last.title)} » (${frDate(last.closed)}).${why ? ` ${why}` : ''}`)
   }
 
   if (open.length > 0) {
     lines.push(`${open.length} plan(s) ouvert(s) — ce qui restait à faire :`)
     for (const plan of open.slice(0, MAX_LISTED)) {
-      lines.push(`  - ${plan.title} (${age(plan.opened, now)})`)
+      lines.push(`  - ${champ(plan.title)} (${age(plan.opened, now)})`)
     }
     if (open.length > MAX_LISTED) {
       lines.push(`  … et ${open.length - MAX_LISTED} autre(s), dans ovrsee/plans/.`)
@@ -178,7 +192,7 @@ export function buildBrief(state, now = new Date()) {
     lines.push(`${restants.length} ticket(s) à faire — tableau dans ovrsee/tickets/ :`)
     for (const ticket of restants.slice(0, MAX_LISTED)) {
       lines.push(
-        `  - ${ticket.id} [${ticket.priorite}] ${ticket.titre} — ${titres.get(ticket.colonne) ?? ticket.colonne}`,
+        `  - ${champ(ticket.id, 12)} [${champ(ticket.priorite, 12)}] ${champ(ticket.titre)} — ${champ(titres.get(ticket.colonne) ?? ticket.colonne, 40)}`,
       )
     }
     if (restants.length > MAX_LISTED) {

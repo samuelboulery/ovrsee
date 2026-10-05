@@ -56,10 +56,22 @@ export function redige(texte) {
       /-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----[\s\S]*?-----END (?:[A-Z0-9 ]+ )?PRIVATE KEY-----/g,
       '***',
     )
+    // Un bloc sans fin court jusqu'au bout du texte : sans l'alternative `$`,
+    // chaque début non fermé reparcourait tout le reste (quadratique).
+    .replace(/-----BEGIN PGP PRIVATE KEY BLOCK-----[\s\S]*?(?:-----END PGP PRIVATE KEY BLOCK-----|$)/g, '***')
+    // Formes ajoutées par l'audit 1.3 (T-0275) : un jeton sans nom de variable,
+    // passé en argument ou en en-tête, que les règles d'affectation ne voient pas.
+    .replace(/\b(Bearer\s+)[A-Za-z0-9._~+/=-]{8,}/gi, '$1***')
+    .replace(/\b((?:Set-)?Cookie:\s*)[^\r\n]+/gi, '$1***')
+    .replace(/(\s-u\s+[^\s:]{1,256}:)\S+/g, '$1***')
+    .replace(/(--(?:password|passwd|token|secret|api-key)(?:=|\s+))\S+/gi, '$1***')
+    .replace(/\bgithub_pat_[A-Za-z0-9_]{20,}/g, '***')
+    .replace(/\bSG\.[A-Za-z0-9_-]{16,}\.[A-Za-z0-9_-]{16,}/g, '***')
+    .replace(/(hooks\.slack\.com\/services\/)[A-Za-z0-9/]+/g, '$1***')
     .replace(/\b(?:sk|rk|pk)[-_][A-Za-z0-9_-]{8,}/g, '***')
     .replace(/\bnpm_[A-Za-z0-9]{16,}/g, '***')
     .replace(/\bglpat-[A-Za-z0-9_-]{16,}/g, '***')
-    .replace(/\bxox[abprs]-[A-Za-z0-9-]{10,}/g, '***')
+    .replace(/\b(?:xox[abprs]|xapp)-[A-Za-z0-9-]{10,}/g, '***')
     // Identifiants de clé AWS : le message d'erreur du SDK les cite en clair.
     .replace(/\b(?:AKIA|ASIA|AIDA|AROA|AGPA|ANPA|APKA|ABIA|ACCA)[A-Z0-9]{16}\b/g, '***')
     .replace(/\bAIza[A-Za-z0-9_-]{20,}/g, '***')

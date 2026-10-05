@@ -268,11 +268,16 @@ Full example:
   "dev": "pnpm dev --port 8099 --strictPort",
   "baseUrl": "http://localhost:8099",
   "entryRoutes": ["/", "/login"],
-  "auth": { "storageState": ".ovrsee-auth.json" },
-  "ignore": ["/auth/callback"],
-  "obsidianVault": "~/Vaults/my-project"
+  "ignore": ["/auth/callback"]
 }
 ```
+
+`baseUrl` and every entry route must stay on this machine (`localhost`, `127.0.0.1`,
+`::1`): the file is versioned, and a cloned repository does not get to point the crawl
+elsewhere. For the same reason, two settings live on your machine rather than here: the
+Obsidian vault (Preferences → Project) and whether screenshots are ignored by git
+(Preferences → Project). The session recorded by `node crawl/auth.js` is stored in
+`~/.claude/ovrsee/auth/`, never in the repository.
 
 Give dev a dedicated port. The crawler refuses to start if `baseUrl` already responds —
 there is no way to distinguish your own server from another's in an HTTP response, and

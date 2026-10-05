@@ -152,3 +152,24 @@ test('un motif ignore est un glob, pas une regex (T-0274)', async () => {
   isIgnored('/' + 'a'.repeat(5000), ['/' + '*a'.repeat(30) + 'b'])
   assert.ok(performance.now() - debut < 250)
 })
+
+test('le crawl ne vise que le poste : baseUrl en localhost (T-0275)', async () => {
+  // `ovrsee.config.json` est versionné : un dépôt pointait le crawl, et le
+  // Chrome du poste, sur une adresse du réseau local ou d'Internet.
+  const { urlLocale } = await import('./routes.js')
+  for (const url of ['http://localhost:5173', 'https://localhost', 'http://127.0.0.1:3000/x', 'http://[::1]:8080']) {
+    assert.equal(urlLocale(url), true, url)
+  }
+  for (const url of ['http://192.168.1.1', 'https://example.com', 'http://localhost.evil.com', 'http://app.localhost:5173', 'file:///etc/passwd', 'http://10.0.0.1:5173', 'ftp://localhost', 'pas une url', 42]) {
+    assert.equal(urlLocale(url), false, String(url))
+  }
+})
+
+test('une route d’entrée ne sort pas de baseUrl', async () => {
+  const { routeDansBase } = await import('./routes.js')
+  assert.equal(routeDansBase('/a/b', 'http://localhost:5173'), true)
+  assert.equal(routeDansBase('?q=1', 'http://localhost:5173/x'), true)
+  for (const route of ['http://192.168.1.1/admin', '//evil.com/x', 'file:///etc/passwd', 'http://localhost:9999/']) {
+    assert.equal(routeDansBase(route, 'http://localhost:5173'), false, route)
+  }
+})

@@ -78,6 +78,19 @@ function commandFor(scriptName) {
     : `${runtime} ${script}`
 }
 
+/**
+ * Un chemin qui ne survivra pas : l'image disque montée, ou la copie que
+ * Gatekeeper fait d'une app lancée sans avoir été déplacée.
+ *
+ * `commandFor` écrit `process.execPath` en dur dans `post-commit` et dans
+ * `~/.claude/settings.json`. Lancé depuis le DMG, ce chemin meurt au démontage
+ * — et une autre image montée sous le même nom serait exécutée à sa place à
+ * chaque commit et chaque session (T-0275).
+ */
+export const emplacementEphemere = chemin =>
+  chemin.includes('/AppTranslocation/') ||
+  (chemin.startsWith('/Volumes/') && chemin.includes('.app/Contents/') && !chemin.includes('/node_modules/'))
+
 /** Le bloc ovrsee du `post-commit`, installé ou remplacé sans toucher au reste. */
 export function installPostCommit(root, done) {
   return installGitHook(
@@ -409,6 +422,11 @@ function writeOvrseeConfig(root, { dev, baseUrl }, done) {
  *   sens, et le dire vaut mieux qu'installer à moitié.
  */
 export function install(target, { skills = [], gitInit = false, commit = false, config = null } = {}) {
+  if (process.versions.electron && emplacementEphemere(process.execPath)) {
+    throw new Error(
+      'installation refusée : Ovrsee tourne depuis l’image disque. Glissez-le dans Applications, puis relancez-le.',
+    )
+  }
   const done = []
   const cwd = resolve(target)
 

@@ -178,7 +178,7 @@ const RENDUS: Array<[string, (snap: Snapshot) => ReactElement]> = [
   // Le graphe ne vient plus du snapshot (T-0134) : l'onglet le demande lui-même
   // au montage, et `useEffect` ne tourne pas sous `renderToStaticMarkup`. Ce
   // rendu-ci est donc celui de l'état « en cours de lecture ».
-  ['Données', snap => <Donnees projet="ovrsee" root={snap.root} vaultDeclared={false} />],
+  ['Données', snap => <Donnees projet="ovrsee" root={snap.root} />],
   ['Stack', snap => <Stack snapshot={snap} />],
 ]
 

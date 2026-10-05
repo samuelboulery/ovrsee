@@ -56,7 +56,9 @@ Aucun secret ne vit dans le dépôt observé. Les jetons d'intégration
 fournisseur passent par IPC Electron et jamais par `/api/*` — cette route est
 aussi servie par le dev server Vite, en HTTP local non authentifié.
 
-Les cookies de session du crawl (`.ovrsee-auth.json`) sont ignorés par git.
+Les cookies de session du crawl vivent dans `~/.claude/ovrsee/auth/`, **hors du
+dépôt**, lisibles par leur seul propriétaire. Une session laissée dans le dépôt par une
+version antérieure y est déplacée au crawl suivant ; l'ancien fichier peut être supprimé.
 
 Un secret collé dans un plan approuvé, en revanche, part dans git en clair : la
 parade est en amont, ne pas en coller.

@@ -51,13 +51,7 @@ function vide(source: Source): { titre: string; detail: string } {
 /**
  * Alerte quand la source demandee manque.
  */
-function SourceAlert({
-  sourceRequested,
-  config,
-}: {
-  sourceRequested?: string
-  config: { obsidianVault?: string } | null
-}) {
+function SourceAlert({ sourceRequested, vault }: { sourceRequested?: string; vault: string | null }) {
   if (!sourceRequested || sourceRequested === 'auto') return null
 
   if (sourceRequested === 'graphify') {
@@ -76,7 +70,7 @@ function SourceAlert({
   }
 
   if (sourceRequested === 'obsidian') {
-    if (!config?.obsidianVault) {
+    if (!vault) {
       return (
         <div
           style={s(
@@ -99,7 +93,7 @@ function SourceAlert({
       >
         <div style={s('font-weight: 500; margin-bottom: 6px;')}>{t('donnees.obsidian_unreadable_title')}</div>
         <div style={s('color: var(--color-warn);')}>
-          {t('donnees.obsidian_unreadable')} <code>{config.obsidianVault}</code>
+          {t('donnees.obsidian_unreadable')} <code>{vault}</code>
         </div>
       </div>
     )
@@ -119,6 +113,19 @@ const NON_DATE =
  * la fait mieux et à jour à chaque commit ; un coffre écrit à la main ne peut
  * donc pas primer sur lui. Reste à ne pas laisser le champ sans effet visible.
  */
+/** `ovrsee.config.json` désigne un coffre que l'ovrsee ne lit plus : le dire (T-0275). */
+function CoffreDuDepot({ chemin }: { chemin: string }) {
+  return (
+    <div
+      style={s(
+        'font-size: 11px; color: var(--color-neutral-500); margin-bottom: 18px; padding-left: 10px; border-left: 1px solid var(--color-border-control);',
+      )}
+    >
+      {t('donnees.vault_depot_ignored', { chemin })}
+    </div>
+  )
+}
+
 function CoffreIgnore() {
   return (
     <div
@@ -212,8 +219,6 @@ export const oublierGraphe = (root: string): void => {
 export function Donnees({
   projet,
   relectures = 0,
-  vaultDeclared = false,
-  config = null,
   root,
   integrations = [],
 }: {
@@ -225,8 +230,6 @@ export function Donnees({
    * l'écran garderait son graphe périmé jusqu'au prochain montage.
    */
   relectures?: number
-  vaultDeclared?: boolean
-  config?: { obsidianVault?: string } | null
   /**
    * Racine du projet. Obligatoire depuis T-0209 : l'onglet va chercher son
    * graphe lui-même, et un `root` absent le laissait sur « Lecture… » à vie.
@@ -283,7 +286,9 @@ export function Donnees({
   const rien = vide(source)
   // Un champ de config sans effet visible se lit comme une panne. On dit
   // pourquoi il ne sert pas plutôt que de laisser chercher.
-  const coffreIgnore = vaultDeclared && source === 'graphify'
+  const vault = payload?.vault ?? null
+  const vaultDepot = payload?.vaultDepot ?? null
+  const coffreIgnore = Boolean(vault) && source === 'graphify'
 
   // Une seule intégration Supabase suffit à activer le bouton : le schéma
   // n'a pas de sens pour plusieurs bases à la fois, et v1 ne cherche pas à
@@ -342,7 +347,8 @@ export function Donnees({
         )}
       </ViewBar>
       <div style={s('flex: 1; padding: 20px 22px; overflow: auto;')}>
-        {sourceMissing && <SourceAlert sourceRequested={sourceRequested} config={config} />}
+        {sourceMissing && <SourceAlert sourceRequested={sourceRequested} vault={vault} />}
+        {vaultDepot && !vault && <CoffreDuDepot chemin={vaultDepot} />}
 
         {liveErreur && (
           <div

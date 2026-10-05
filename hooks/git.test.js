@@ -325,7 +325,11 @@ test('un filtre réglé par l’utilisateur (git-lfs) survit à la garde, celui 
   sh(dir, ['config', 'filter.lfs.clean', script])
   writeFileSync(join(dir, 'a.txt'), 'modifié\n')
 
-  git(dir, ['add', '-A'], { stdio: 'ignore', env: { ...process.env, GIT_CONFIG_GLOBAL: configPoste } })
+  // Sans configuration système : celle des runners macOS de GitHub déclare
+  // `filter.lfs.process`, que git préfère au `clean` posé ici — le filtre du
+  // poste tournait, mais pas celui-ci, et le test échouait sans rien prouver.
+  const env = { ...process.env, GIT_CONFIG_GLOBAL: configPoste, GIT_CONFIG_NOSYSTEM: '1' }
+  git(dir, ['add', '-A'], { stdio: 'ignore', env })
 
   assert.equal(existsSync(temoin), false, 'le filtre du dépôt a été exécuté')
   assert.equal(existsSync(temoinPoste), true, 'le filtre du poste doit rester actif')

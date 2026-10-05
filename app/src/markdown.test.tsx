@@ -118,7 +118,9 @@ test('markdown : un README pathologique ne fige pas le rendu (ReDoS, T-0274)', (
   for (const motif of ['[a](', '![a](x', '[', '`a', '**a']) rendu(motif.repeat(Math.floor(20000 / motif.length)))
   rendu('<details>\n' + '<summary>'.repeat(2000))
   rendu('<img ' + 'src="a '.repeat(3000))
-  assert.ok(performance.now() - debut < 500, `${Math.round(performance.now() - debut)} ms`)
+  // Sept documents de 20 000 caractères : ~200 ms ici, ~560 ms sur un runner
+  // Windows. La faille se comptait en secondes par document.
+  assert.ok(performance.now() - debut < 2000, `${Math.round(performance.now() - debut)} ms`)
 })
 
 test('markdown : liens, images et pliage ordinaires se rendent toujours', () => {

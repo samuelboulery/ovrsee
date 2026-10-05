@@ -2,14 +2,15 @@
 {
   "id": "T-0279",
   "titre": "Les captures du README montrent des données personnelles",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "docs"
   ],
   "cree": "2026-10-05",
   "maj": "2026-10-05",
-  "plan": null
+  "plan": null,
+  "fait": "2026-10-05T14:45:22.455Z"
 }
 ---
 

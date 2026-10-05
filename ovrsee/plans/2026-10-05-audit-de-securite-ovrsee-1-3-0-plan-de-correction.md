@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Audit de sécurité ovrsee 1.3.0 — plan de correction",
   "opened": "2026-10-05",
-  "closed": null,
+  "closed": "2026-10-05",
   "commits": [
     {
       "sha": "4c62d6b",
@@ -39,6 +39,25 @@
       "sha": "72e1a3f",
       "date": "2026-10-05",
       "files": []
+    },
+    {
+      "sha": "d336c13",
+      "date": "2026-10-05",
+      "files": []
+    },
+    {
+      "sha": "1bcf871",
+      "date": "2026-10-05",
+      "files": []
+    },
+    {
+      "sha": "25bb9b6",
+      "date": "2026-10-05",
+      "files": [
+        "CHANGELOG.fr.md",
+        "CHANGELOG.md",
+        "package.json"
+      ]
     }
   ]
 }

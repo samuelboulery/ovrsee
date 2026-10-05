@@ -10,6 +10,76 @@ versionnage [SemVer](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.3.1] — 2026-10-05
+
+Une version de sécurité. Elle suit un audit complet de la 1.3.0, mené contre
+deux attaquants : un dépôt observé hostile (un clone, une archive, une clé USB)
+et une page web tierce visitée pendant que `pnpm dev` tourne.
+
+### Modifié
+
+- **Le coffre Obsidian et la règle `.gitignore` des captures deviennent des
+  préférences de poste** (T-0275). Ils quittent `ovrsee.config.json`, versionné
+  par le dépôt, pour le registre des projets. Le coffre se règle dans les
+  préférences du projet. Une valeur encore trouvée dans le dépôt est ignorée, et
+  l'onglet Données le dit.
+- **Le crawl ne vise que ce poste** (T-0275). `baseUrl` doit être `localhost`,
+  `127.x.x.x` ou `[::1]`, les `entryRoutes` restent sur son origine, et une
+  redirection vers un autre hôte reste hors de la carte.
+- **La session de connexion du crawl vit hors du dépôt** (T-0275), dans
+  `~/.claude/ovrsee/auth/`, créée en `0600`. Un fichier `auth.storageState`
+  existant y est déplacé une fois, seulement s'il est un fichier ordinaire
+  ignoré par git.
+- **Un distant local ou `git://` ne se fetch plus** (T-0272). Le fetch
+  n'accepte que https, http et ssh, et le message le dit.
+
+### Sécurité
+
+- **Un `scans.jsonl` lié pouvait faire exécuter du code sans accord** (T-0271).
+  Un dépôt pouvait faire pointer `ovrsee/pages/scans.jsonl` sur
+  `.git/hooks/post-commit` et glisser une charge shell dans `baseUrl` : le scan
+  échoué s'ajoutait à travers le lien, et le commit suivant l'exécutait. Aucune
+  écriture sous `ovrsee/` ne suit plus un lien symbolique, ni sur la cible ni
+  sur un dossier parent, et l'élagage des captures ne supprime que les noms que
+  le crawl écrit.
+- **La garde git laissait passer plusieurs façons de lancer un programme**
+  (T-0272). Les hooks autres que `pre-commit` et `commit-msg`, les filtres
+  `.gitattributes`, les programmes gpg, le `cookieFile` de libcurl et les
+  transports hors réseau sont tous neutralisés, chacun avec son dépôt piégé
+  dans les tests.
+- **Le texte de la page observée pouvait taper dans le terminal** (T-0273). Un
+  message de console ou un élément sélectionné contenant `ESC[201~` fermait le
+  collage encadré. Les caractères de contrôle sont retirés au seul point qui
+  colle, et le contenu de la page est collé sans être envoyé.
+- **Durcissement d'Electron** (T-0273). Le navigateur intégré se voit refuser
+  toute permission (presse-papiers, notifications, médias, liens externes),
+  `<webview>` est limité à http(s) et à sa propre partition, l'accord sur la
+  commande `dev` passe toujours par la modale native (plus d'accord tacite), et l'app empaquetée part avec ses fuses (`NODE_OPTIONS` et
+  `--inspect` coupés, intégrité de l'asar vérifiée, app chargée depuis l'asar
+  seulement).
+- **`/api/*` face à une page tierce et à un dépôt hostile** (T-0274). Les
+  requêtes cross-site sont refusées, même en GET sans préflight, le jeton
+  d'écriture est tiré au hasard à chaque dev server au lieu d'être une
+  constante, un dossier ou un fichier disparu ne fait plus tomber `pnpm dev`,
+  les lectures ne suivent plus un lien qui sort du dépôt, et deux expressions
+  régulières qui figeaient un projet plusieurs secondes (ReDoS) sont linéaires.
+- **Ce que le dépôt contrôle** (T-0275). Le masquage des secrets connaît plus
+  de formes (`github_pat_`, `xapp-`, webhooks Slack, `SG.`, `Bearer` seul,
+  `-u user:pass`, `--password`, `--token`, `Cookie:`, blocs PGP) et passe avant
+  la troncature de la sortie de `dev`. Le brief de session garde chaque champ
+  sur une ligne bornée, sans caractère de contrôle, bidi, zéro-largeur ou
+  « tag ». Six jetons de poste nommés (`GITHUB_TOKEN`, `GH_TOKEN`, `NPM_TOKEN`,
+  `ANTHROPIC_API_KEY`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`)
+  n'atteignent plus la commande `dev`. L'installation depuis l'image disque est
+  refusée.
+- **Dépendances d'empaquetage** (T-0276). Les 25 alertes Dependabot, toutes
+  dans des dépendances transitives de build, sont fermées par des overrides de
+  version. Rien de ce qui part dans l'app n'était touché.
+- **Provenance des versions** (T-0277). Le job de build ne détient plus de
+  jeton d'écriture, les binaires portent une attestation de provenance
+  (`gh attestation verify`), et un `SHA256SUMS` hexadécimal accompagne chaque
+  version.
+
 ## [1.3.0] — 2026-10-05
 
 ### Ajouté
@@ -380,7 +450,8 @@ Windows en avertissent au premier lancement.
 - Le format de `ovrsee/` peut encore bouger d'ici la 1.0. Tout y étant en
   markdown et en images, une migration se lira à l'œil nu.
 
-[Non publié]: https://github.com/samuelboulery/ovrsee/compare/v1.3.0...HEAD
+[Non publié]: https://github.com/samuelboulery/ovrsee/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/samuelboulery/ovrsee/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/samuelboulery/ovrsee/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/samuelboulery/ovrsee/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/samuelboulery/ovrsee/compare/v1.1.2-beta...v1.2.0

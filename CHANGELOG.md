@@ -10,6 +10,71 @@ versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.1] — 2026-10-05
+
+A security release. It follows a full audit of 1.3.0 that assumed two
+attackers: a hostile observed repository (a clone, a zip, a USB key) and a
+third-party web page visited while `pnpm dev` runs.
+
+### Changed
+
+- **The Obsidian vault and the screenshot `.gitignore` rule are now
+  workstation preferences** (T-0275). They moved from `ovrsee.config.json`,
+  which the repository versions, to the project registry. Set the vault in the
+  project preferences. A value still found in the repository is ignored, and
+  the Data tab says so.
+- **The crawl only targets this machine** (T-0275). `baseUrl` must be
+  `localhost`, `127.x.x.x` or `[::1]`, `entryRoutes` stay on its origin, and a
+  redirect to another host is left out of the map.
+- **The crawl login session lives outside the repository** (T-0275), in
+  `~/.claude/ovrsee/auth/`, created `0600`. An existing `auth.storageState`
+  file is moved there once, only if it is a regular file that git ignores.
+- **A local or `git://` remote can no longer be fetched** (T-0272). The fetch
+  only accepts https, http and ssh, and the message says so.
+
+### Security
+
+- **A symlinked `scans.jsonl` could run code without approval** (T-0271). A
+  repository could point `ovrsee/pages/scans.jsonl` at `.git/hooks/post-commit`
+  and plant a shell payload in `baseUrl`: the failed scan was appended through
+  the link, and the next commit ran it. No write under `ovrsee/` follows a
+  symbolic link anymore, at the target or at any parent directory, and
+  screenshot pruning only deletes the names the crawl writes.
+- **The git guard missed several ways to run a program** (T-0272). Hooks other
+  than `pre-commit` and `commit-msg`, `.gitattributes` filters, gpg programs,
+  libcurl's `cookieFile` and non-network transports are now all neutralised,
+  each with a booby-trapped repository in the tests.
+- **Text from the observed page could type into the terminal** (T-0273). A
+  console message or a picked element containing `ESC[201~` closed the
+  bracketed paste. Control characters are stripped at the single point that
+  pastes, and page content is pasted without being sent.
+- **Electron hardening** (T-0273). The embedded browser is denied every
+  permission (clipboard, notifications, media, external links), `<webview>`
+  is pinned to http(s) and its own partition, approving the `dev` command
+  always goes through the native dialog (no more tacit approval), and
+  the packaged app ships with fuses (`NODE_OPTIONS` and `--inspect` disabled,
+  asar integrity checked, app loaded from asar only).
+- **`/api/*` against a third-party page and a hostile repository** (T-0274).
+  Cross-site requests are refused even as preflight-free GETs, the write token
+  is random per dev server instead of a constant, a folder or a vanished file
+  no longer crashes `pnpm dev`, reads no longer follow links out of the
+  repository, and two regular expressions that froze a project for seconds
+  (ReDoS) are linear.
+- **What the repository controls** (T-0275). Secret redaction knows more forms
+  (`github_pat_`, `xapp-`, Slack webhooks, `SG.`, a bare `Bearer`, `-u
+  user:pass`, `--password`, `--token`, `Cookie:`, PGP blocks) and runs before
+  the dev output is truncated. The session brief keeps each field on one
+  bounded line, without control, bidi, zero-width or tag characters. Six named
+  workstation tokens (`GITHUB_TOKEN`, `GH_TOKEN`, `NPM_TOKEN`,
+  `ANTHROPIC_API_KEY`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`) no longer
+  reach the dev command. Installing from the disk image is refused.
+- **Packaging dependencies** (T-0276). The 25 Dependabot alerts, all in
+  build-time transitive dependencies, are closed by version overrides. Nothing
+  shipped in the app was affected.
+- **Release provenance** (T-0277). The build job no longer holds a write
+  token, binaries carry a build provenance attestation (`gh attestation
+  verify`), and a hexadecimal `SHA256SUMS` is published with each release.
+
 ## [1.3.0] — 2026-10-05
 
 ### Added
@@ -359,7 +424,8 @@ Windows warn about it on first launch.
 - The `ovrsee/` format may still move before 1.0. Everything in it being markdown
   and images, a migration will be readable with the naked eye.
 
-[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/samuelboulery/ovrsee/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/samuelboulery/ovrsee/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/samuelboulery/ovrsee/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/samuelboulery/ovrsee/compare/v1.1.2-beta...v1.2.0

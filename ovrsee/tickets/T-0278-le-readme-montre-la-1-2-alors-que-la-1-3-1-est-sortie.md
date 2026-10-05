@@ -2,14 +2,15 @@
 {
   "id": "T-0278",
   "titre": "Le README montre la 1.2 alors que la 1.3.1 est sortie",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "docs"
   ],
   "cree": "2026-10-05",
   "maj": "2026-10-05",
-  "plan": null
+  "plan": null,
+  "fait": "2026-10-05T14:29:18.051Z"
 }
 ---
 
@@ -26,11 +27,11 @@ dépendances citent `electron 43.4.1`, `playwright-core ^1.62.1`, `oxlint ^1.80.
 
 ## Critères d'acceptation
 
-- [ ] `pnpm screenshots` a régénéré les sept captures, encadrées par screenmat, en
+- [x] `pnpm screenshots` a régénéré les sept captures, encadrées par screenmat, en
       webp ; aucune n'est vide, aucune ne montre de donnée personnelle.
-- [ ] Le script n'embarque plus de chemin propre à un poste : screenmat se désigne
+- [x] Le script n'embarque plus de chemin propre à un poste : screenmat se désigne
       par la variable `SCREENMAT` (dossier du dépôt screenmat), comme dans img-creator.
-- [ ] `README.md` et `README.fr.md` ne citent plus `obsidianVault` dans
+- [x] `README.md` et `README.fr.md` ne citent plus `obsidianVault` dans
       `ovrsee.config.json`, leurs versions de dépendances suivent `package.json`, et
       les nouveautés visibles de la 1.3.0 y sont nommées.
-- [ ] `pnpm test` passe (`scripts/screenshots.test.js` compris).
+- [x] `pnpm test` passe (`scripts/screenshots.test.js` compris).

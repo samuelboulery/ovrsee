@@ -64,6 +64,26 @@ export function ticketActifManquant(ovrseeDir, session = null) {
   return !ticket || ticket.meta.colonne === finale
 }
 
+/**
+ * L'id du ticket actif s'il existe mais est en colonne finale, sinon `null`.
+ *
+ * Le cas typique : un commit l'a cité, et le post-commit l'a soldé — sans
+ * session, donc sans effacer le pointeur de celle-ci. « Ni plan actif ni ticket
+ * actif » enverrait chercher ailleurs ; nommer le ticket dit quoi rouvrir.
+ *
+ * @param {string} ovrseeDir
+ * @param {string|null} [session]
+ * @returns {string|null}
+ */
+export function ticketActifSolde(ovrseeDir, session = null) {
+  const id = readActiveTicket(ovrseeDir, session)
+  if (!id) return null
+
+  const colonnes = readBoard(ovrseeDir)
+  const ticket = readTickets(ovrseeDir, colonnes).find(t => t.meta.id === id)
+  return ticket?.meta.colonne === colonneFinale(colonnes) ? id : null
+}
+
 function main() {
   const raw = readStdin()
   if (!raw.trim()) return
@@ -105,9 +125,13 @@ function main() {
   // Pas de plan actif dans cette session : un ticket actif hors-plan doit
   // couvrir cette édition, sinon rien ne trace ce travail.
   if (ticketActifManquant(ovrseeDir, session)) {
+    const solde = ticketActifSolde(ovrseeDir, session)
     process.stderr.write(
-      `Bloqué : ni plan actif ni ticket actif.\n` +
-        `Crée un ticket — skill ovrsee-tickets, ou MCP createTicket — avant d'éditer du code.\n`,
+      solde
+        ? `Bloqué : le ticket actif ${solde} est en colonne finale — soldé, sans doute par un commit qui le citait.\n` +
+            `Rouvre-le (moveTicket vers en-cours) ou crée un ticket avant d'éditer du code.\n`
+        : `Bloqué : ni plan actif ni ticket actif.\n` +
+            `Crée un ticket — skill ovrsee-tickets, ou MCP createTicket — avant d'éditer du code.\n`,
     )
     process.exit(2)
   }

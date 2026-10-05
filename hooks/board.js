@@ -187,3 +187,29 @@ export function reorderColumn(ovrseeDir, id, index) {
 export function colonneFinale(colonnes) {
   return colonnes.length > 1 ? (colonnes.at(-1)?.id ?? null) : null
 }
+
+/**
+ * La colonne qui marque le travail commencé.
+ *
+ * Trois hooks s'en servent pour distinguer un ticket en vol d'un ticket que
+ * personne n'a ouvert — `ovrsee-tool-edit` l'y met, `ovrsee-tool-stop` le
+ * pousse plus loin, `ovrsee-post-commit` refuse de clore en deçà. Elle était
+ * écrite en dur dans chacun, dont deux constantes locales identiques : trois
+ * définitions d'une même chaîne finissent par diverger.
+ */
+export const EN_COURS = 'en-cours'
+
+/**
+ * « En vol » : `en-cours` ou au-delà, hors colonne finale. Un commit clôt ce
+ * qu'on a fait, pas ce qu'on a prévu. `null` sans finale ou sans `en-cours` :
+ * rien ne distingue alors un ticket en vol d'un ticket jamais commencé, et ne
+ * rien fermer est le défaut sûr — un tableau vidé tout seul ne se remarque pas.
+ */
+export function predicatEnVol(colonnes) {
+  const finale = colonneFinale(colonnes)
+  const iEnCours = colonnes.findIndex(c => c.id === EN_COURS)
+  if (!finale || iEnCours === -1) return null
+
+  const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
+  return t => t.meta.colonne !== finale && (rangDe.get(t.meta.colonne) ?? -1) >= iEnCours
+}

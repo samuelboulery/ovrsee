@@ -24,6 +24,8 @@ import {
   readActiveTicket,
   clearActiveTicket,
   saveTicketImage,
+  predicatEnVol,
+  readBoard,
 } from './tickets.js'
 
 import { writeActive } from './active.js'
@@ -833,4 +835,25 @@ test('deleteTicket reste vrai sur un ticket sans image', () => {
   createTicket(ovrseeDir, { titre: 'Rien à voir' }, new Date('2026-09-01'))
 
   assert.equal(deleteTicket(ovrseeDir, 'T-0001-rien-a-voir.md'), true)
+})
+
+// --- predicatEnVol ---------------------------------------------------------
+
+test('predicatEnVol retient en-cours et au-delà, sauf la colonne finale', () => {
+  const enVol = predicatEnVol(readBoard(fixture()))
+  const t = colonne => ({ meta: { colonne } })
+
+  assert.deepEqual(
+    ['backlog', 'a-specifier', 'pret', 'en-cours', 'revue', 'fait', 'inconnue'].filter(c => enVol(t(c))),
+    ['en-cours', 'revue'],
+  )
+})
+
+test('predicatEnVol est null sans colonne en-cours', () => {
+  const ovrseeDir = fixture()
+  writeBoard(ovrseeDir, [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'fait', titre: 'Fait' },
+  ])
+  assert.equal(predicatEnVol(readBoard(ovrseeDir)), null)
 })

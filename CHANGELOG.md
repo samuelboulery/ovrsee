@@ -10,6 +10,46 @@ versioning follows [SemVer](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.0] — 2026-10-05
+
+### Added
+
+- **Epics get their own `E-` prefix** (#131). Tickets keep `T-NNNN`, epics
+  take `E-NNNN`, on a single counter: one number names one thing, and old
+  citations stay readable. Ticking "epic" swaps the prefix and keeps the
+  number — the file, its images, the children's `epic` field and the active
+  ticket follow. Commit messages may cite `E-NNNN`. Existing epics move over
+  with `pnpm ovrsee:migrate-epics`; a repository that never runs it keeps
+  working with its `T-` epics.
+- **The Browser tab offers to start the dev server** (#120). When the
+  connection is refused, the error screen shows a "start the server" button.
+  The renderer only asks for a `dev` pty: the main process re-reads the `dev`
+  line from disk, requires the same approval as the crawl (`trust.json`, or a
+  native dialog) and types it itself. The page reloads every 2 s until the
+  server answers, for at most 60 s.
+
+### Changed
+
+- **The final column shows the most recently finished ticket first** (#103).
+  A ticket entering it records the exact moment; older tickets without that
+  field fall back on their last update.
+- Electron 43.7.5, Playwright 1.63.0.
+
+### Fixed
+
+- **A commit that cites a ticket with no plan now closes it** (#132). The ad
+  hoc ticket the edit gate asks for was never closed by the post-commit hook,
+  cited or not. Citing it now moves it to the final column when it is in
+  flight — so an intermediate commit should not cite it. Tickets closed at
+  commit time are named on stderr, and the gate names an active ticket that a
+  commit already closed instead of reporting "no active plan, no active
+  ticket".
+- **Ticket citations read five-digit numbers whole.** `T-10000` was read as
+  `T-1000`, a different ticket.
+- **The session status no longer reports "done" while work is still running**
+  (#125). A `Stop` with background tasks still alive — subagents, workflows,
+  background shells — now reports `busy` instead of `stop`.
+
 ## [1.2.1] — 2026-09-05
 
 ### Fixed
@@ -319,7 +359,8 @@ Windows warn about it on first launch.
 - The `ovrsee/` format may still move before 1.0. Everything in it being markdown
   and images, a migration will be readable with the naked eye.
 
-[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/samuelboulery/ovrsee/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/samuelboulery/ovrsee/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/samuelboulery/ovrsee/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/samuelboulery/ovrsee/compare/v1.1.2-beta...v1.2.0
 [1.1.2-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.1-beta...v1.1.2-beta

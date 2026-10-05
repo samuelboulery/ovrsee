@@ -10,6 +10,48 @@ versionnage [SemVer](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.3.0] — 2026-10-05
+
+### Ajouté
+
+- **Les epics ont leur préfixe `E-`** (#131). Les tickets gardent `T-NNNN`,
+  les epics prennent `E-NNNN`, sur un seul compteur : un numéro ne désigne
+  qu'une chose, et les citations anciennes restent lisibles. Cocher « epic »
+  échange le préfixe en gardant le numéro — le fichier, ses images, le champ
+  `epic` des enfants et le ticket actif suivent. Un message de commit peut
+  citer `E-NNNN`. Les epics existants passent en `E-` avec
+  `pnpm ovrsee:migrate-epics` ; un dépôt qui ne la lance jamais continue de
+  fonctionner avec ses epics `T-`.
+- **Le Navigateur propose de lancer le serveur de dev** (#120). Quand la
+  connexion est refusée, l'écran d'erreur montre « Lancer le serveur ». Le
+  rendu ne demande qu'un pty `dev` : le processus principal relit la ligne
+  `dev` sur le disque, exige le même accord que le crawl (`trust.json`, sinon
+  une modale native) et la tape lui-même. La page se recharge toutes les 2 s
+  jusqu'à ce que le serveur réponde, au plus 60 s.
+
+### Modifié
+
+- **La colonne finale montre en haut le ticket soldé le plus récemment**
+  (#103). Un ticket qui y entre enregistre le moment exact ; les plus anciens,
+  sans ce champ, retombent sur leur dernière mise à jour.
+- Electron 43.7.5, Playwright 1.63.0.
+
+### Corrigé
+
+- **Un commit qui cite un ticket sans plan le solde désormais** (#132). Le
+  ticket ad hoc qu'exige le gate d'édition n'était jamais soldé par le hook
+  post-commit, cité ou non. Le citer le passe maintenant en colonne finale
+  s'il est en vol — un commit intermédiaire ne doit donc pas le citer. Les
+  tickets soldés au commit sont nommés sur stderr, et le gate nomme le ticket
+  actif qu'un commit a déjà soldé au lieu de répondre « ni plan actif ni
+  ticket actif ».
+- **Une citation de ticket lit un numéro à cinq chiffres en entier.**
+  `T-10000` était lu comme `T-1000`, un autre ticket.
+- **Le statut de session n'annonce plus « terminé » pendant que du travail
+  tourne encore** (#125). Un `Stop` alors que des tâches de fond vivent encore
+  — sous-agents, workflows, shells en arrière-plan — émet `busy` au lieu de
+  `stop`.
+
 ## [1.2.1] — 2026-09-05
 
 ### Corrigé
@@ -338,7 +380,8 @@ Windows en avertissent au premier lancement.
 - Le format de `ovrsee/` peut encore bouger d'ici la 1.0. Tout y étant en
   markdown et en images, une migration se lira à l'œil nu.
 
-[Non publié]: https://github.com/samuelboulery/ovrsee/compare/v1.2.1...HEAD
+[Non publié]: https://github.com/samuelboulery/ovrsee/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/samuelboulery/ovrsee/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/samuelboulery/ovrsee/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/samuelboulery/ovrsee/compare/v1.1.2-beta...v1.2.0
 [1.1.2-beta]: https://github.com/samuelboulery/ovrsee/compare/v1.1.1-beta...v1.1.2-beta

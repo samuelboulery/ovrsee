@@ -66,6 +66,8 @@ session Claude en cours.
 Un navigateur intégré (barre d'adresse, DevTools, sélecteur d'élément) pour inspecter
 l'application observée directement depuis l'interface. Un élément se commente sur
 place : le commentaire et le descriptif partent à Claude, ou directement dans un ticket.
+Quand le serveur de dev de l'application observée ne tourne pas, l'écran d'erreur
+propose de le lancer, après le même accord que le crawl.
 
 ### Produit — le graphe de navigation
 ![Onglet Produit](./docs/screenshots/produit.webp)
@@ -85,7 +87,8 @@ apparaît avec son statut. Filtrable par plans, tickets et commits hors plan.
 Un fichier par ticket dans `ovrsee/tickets/`, colonnes réglées dans `ovrsee/board.json`.
 Écrit ici comme depuis le terminal intégré — une image collée dans un ticket est rangée
 à côté de lui. Les epics affichent leur avancement et leurs tickets enfants dans leur
-propre vue ; le kanban ne contient que des tickets. Les tickets se numérotent `T-0012`,
+propre vue ; le kanban ne contient que des tickets, le dernier fini en tête de la
+colonne finale. Les tickets se numérotent `T-0012`,
 les epics `E-0012`, sur un seul compteur : cocher « epic » change le préfixe et garde
 le numéro. Les epics nés avant ce préfixe passent en `E-` par
 `pnpm ovrsee:migrate-epics`.
@@ -125,7 +128,9 @@ Prendre la version de sa plateforme sur l'onglet
 [Releases](https://github.com/samuelboulery/ovrsee/releases). Les binaires ne sont **ni
 signés ni notariés** : macOS refuse le premier lancement — clic droit sur l'application,
 puis *Ouvrir* — et Windows affiche un avertissement SmartScreen, qu'on passe par
-*Informations complémentaires* puis *Exécuter quand même*.
+*Informations complémentaires* puis *Exécuter quand même*. Sur macOS, glisser
+d'abord l'application dans Applications : équiper un dépôt depuis l'image disque montée
+est refusé.
 
 | Plateforme | Format |
 |---|---|
@@ -244,9 +249,10 @@ C'est ce que fait le bouton « ◈ Graphe → coffre Obsidian » du terminal int
 
 ### Coffre comme source de l'onglet Données
 
-Si vous documentez dans Obsidian plutôt qu'avec Graphify, le champ `obsidianVault`
-dans `ovrsee.config.json` désigne un coffre, et l'onglet Données le lit **quand Graphify
-n'a rien produit**.
+Si vous documentez dans Obsidian plutôt qu'avec Graphify, désignez un coffre dans
+Préférences → Projet, et l'onglet Données le lit **quand Graphify n'a rien produit**.
+C'est un réglage du poste : un champ `obsidianVault` encore présent dans
+`ovrsee.config.json` est ignoré, et l'onglet Données le signale.
 
 Une note est une table quand son frontmatter porte `type: table`. `columns` en donne
 les colonnes, `maj` la date de dernière mise à jour :
@@ -315,22 +321,22 @@ Sobriété délibérée : **5 dépendances de production**, le reste est du Node
 | `@xterm/xterm` | 6.0.0 | le terminal intégré |
 | `@xterm/addon-fit` | ^0.11.0 | il suit la taille du panneau |
 | `node-pty` | 1.1.0 | un vrai pty derrière ce terminal |
-| `playwright-core` | ^1.62.1 | pilote le crawl, y compris dans l'app livrée |
+| `playwright-core` | ^1.63.0 | pilote le crawl, y compris dans l'app livrée |
 
 **Développement**
 
 | Paquet | Version |
 |---|---|
-| `react` | ^19.2.8 |
-| `react-dom` | ^19.2.8 |
+| `react` | ^19.3.0 |
+| `react-dom` | ^19.3.0 |
 | `typescript` | ^7.0.2 |
-| `vite` | ^8.2.2 |
-| `electron` | 43.4.1 |
+| `vite` | ^8.3.1 |
+| `electron` | 43.7.5 |
 | `electron-builder` | ^26.15.3 |
-| `oxlint` | ^1.80.0 |
+| `oxlint` | ^1.86.0 |
 | `@vitejs/plugin-react` | ^6.1.0 |
-| `@types/react` | ^19.2.18 |
-| `@types/react-dom` | ^19.2.5 |
+| `@types/react` | ^19.3.0 |
+| `@types/react-dom` | ^19.3.0 |
 
 Gestionnaire de paquets : `pnpm@11.22.0`, épinglé dans `package.json` et fait respecter
 par Corepack. Depuis la version 11, `.npmrc` ne porte plus que l'authentification et le
@@ -355,7 +361,8 @@ deux plans sont actifs, n'est rattaché nulle part — et le dit sur stderr.
 
 **La commande `dev` exige un accord, et il vit hors du dépôt.**
 `ovrsee.config.json` est versionné : sa ligne `dev` vient de l'auteur du dépôt observé,
-pas de vous, et le crawl la passe à un shell. Ce qui est retenu — dans
+pas de vous, et le crawl — comme « Lancer le serveur » dans l'onglet Navigateur — la
+passe à un shell. Ce qui est retenu — dans
 `~/.claude/ovrsee/trust.json` — est la chaîne exacte : un `dev` modifié redemande
 l'accord. Ce n'est pas une revue de commande : `pnpm dev` est inoffensif à l'œil, ce
 qu'il exécute vit dans le `package.json` de ce dépôt. On accorde une confiance à une

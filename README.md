@@ -65,6 +65,8 @@ running.
 An embedded browser (address bar, DevTools, element picker) to inspect the
 observed application directly from the interface. Pick an element and comment on it:
 the comment and the element's description go to Claude, or straight into a ticket.
+When the observed app's dev server is not running, the error screen offers to start
+it, after the same approval as the crawl.
 
 ### Product — the navigation graph
 ![Product tab](./docs/screenshots/produit.webp)
@@ -84,7 +86,8 @@ ticket shows up with its status. Filterable by plans, tickets, and off-plan comm
 One file per ticket in `ovrsee/tickets/`, columns set in `ovrsee/board.json`.
 Written here just like from the integrated terminal — an image pasted into a ticket
 is stored next to it. Epics show their progress and their child tickets in their own
-view; the kanban holds tickets only. Tickets are numbered `T-0012`, epics `E-0012`,
+view; the kanban holds tickets only, with the most recently finished first in the
+final column. Tickets are numbered `T-0012`, epics `E-0012`,
 on a single counter: ticking “epic” swaps the prefix and keeps the number. Epics
 created before that prefix move over with `pnpm ovrsee:migrate-epics`.
 
@@ -122,7 +125,8 @@ Download the build for your platform from the
 [Releases](https://github.com/samuelboulery/ovrsee/releases) tab. They are **neither
 signed nor notarised**: macOS refuses the first launch — right-click the app, then
 *Open* — and Windows shows a SmartScreen warning, which you get past with *More info*
-then *Run anyway*.
+then *Run anyway*. On macOS, drag the app into Applications first: equipping a
+repository from the mounted disk image is refused.
 
 | Platform | Format |
 |---|---|
@@ -237,9 +241,10 @@ That's what the "◈ Graph → Obsidian vault" button in the integrated terminal
 
 ### Vault as the Data tab's source
 
-If you document in Obsidian instead of Graphify, the `obsidianVault` field in
-`ovrsee.config.json` points at a vault, and the Data tab reads it **only when
-Graphify produced nothing**.
+If you document in Obsidian instead of Graphify, point at a vault in Preferences →
+Project, and the Data tab reads it **only when Graphify produced nothing**. It is a
+setting of this machine: an `obsidianVault` field still found in `ovrsee.config.json`
+is ignored, and the Data tab says so.
 
 A note is a table when its frontmatter carries `type: table`. `columns` gives the
 columns, `maj` the last-updated date:
@@ -308,22 +313,22 @@ Deliberately minimal: **5 production dependencies**, everything else is plain No
 | `@xterm/xterm` | 6.0.0 | the integrated terminal |
 | `@xterm/addon-fit` | ^0.11.0 | it follows the panel's size |
 | `node-pty` | 1.1.0 | a real pty behind that terminal |
-| `playwright-core` | ^1.62.1 | drives the crawl, in the packaged app too |
+| `playwright-core` | ^1.63.0 | drives the crawl, in the packaged app too |
 
 **Development**
 
 | Package | Version |
 |---|---|
-| `react` | ^19.2.8 |
-| `react-dom` | ^19.2.8 |
+| `react` | ^19.3.0 |
+| `react-dom` | ^19.3.0 |
 | `typescript` | ^7.0.2 |
-| `vite` | ^8.2.2 |
-| `electron` | 43.4.1 |
+| `vite` | ^8.3.1 |
+| `electron` | 43.7.5 |
 | `electron-builder` | ^26.15.3 |
-| `oxlint` | ^1.80.0 |
+| `oxlint` | ^1.86.0 |
 | `@vitejs/plugin-react` | ^6.1.0 |
-| `@types/react` | ^19.2.18 |
-| `@types/react-dom` | ^19.2.5 |
+| `@types/react` | ^19.3.0 |
+| `@types/react-dom` | ^19.3.0 |
 
 Package manager: `pnpm@11.22.0`, pinned in `package.json` and enforced by Corepack.
 Since version 11, `.npmrc` only carries authentication and the registry: every other
@@ -340,7 +345,8 @@ Attribution goes through four stages: a `T-XXXX` ticket (or `E-XXXX` epic) quote
 
 **The `dev` command needs an agreement, and it lives outside the repository.**
 `ovrsee.config.json` is versioned: its `dev` line is supplied by the observed
-repository, not by you, and the crawl hands it to a shell. What is remembered — in
+repository, not by you, and the crawl — like the Browser tab's *Start the server* —
+hands it to a shell. What is remembered — in
 `~/.claude/ovrsee/trust.json` — is the exact string, so a changed `dev` asks again.
 This is not a command review: `pnpm dev` looks harmless, what it runs lives in that
 repository's `package.json`. You are trusting a provenance.

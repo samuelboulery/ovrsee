@@ -15,12 +15,13 @@
  * `serializePlan` sont réutilisés tels quels plutôt que redéfinis ici.
  */
 
-import { mkdirSync, readdirSync, readFileSync, unlinkSync } from 'node:fs'
-import { randomBytes } from 'node:crypto'
-import { join } from 'node:path'
+import { mkdirSync, readdirSync, readFileSync, renameSync, unlinkSync } from 'node:fs'
+import { basename, join } from 'node:path'
 
 import { parsePlan, readPlans, serializePlan, slugify, writeFileNoFollow } from './plans.js'
-import { clearActive, readActive, withLock, writeActive } from './active.js'
+import { allActive, clearActive, readActive, withLock, writeActive } from './active.js'
+import { ID_TICKET, idFromFile, idPourType, isSafeTicketId, nextTicketId } from './ticket-id.js'
+import { IMAGES_DIR, imagesDuTicket } from './ticket-images.js'
 import {
   DEFAULT_COLUMNS,
   EN_COURS,
@@ -32,6 +33,9 @@ import {
   reorderColumn,
   writeBoard,
 } from './board.js'
+
+export { CITATION_TICKET, isSafeTicketId, nextTicketId } from './ticket-id.js'
+export { saveTicketImage } from './ticket-images.js'
 
 /**
  * Les colonnes vivent dans `board.js` — re-exportées ici parce que dix-huit
@@ -52,12 +56,6 @@ export {
 
 
 /** De la plus urgente à la moins urgente. L'ordre du tableau est l'ordre du tri. */
-/**
- * Un ticket cité dans un message de commit. `\d{4,}` : `T-\d{4}` lisait
- * `T-10000` comme `T-1000`. Globale — pour `match`/`matchAll`, jamais `test`/`exec`.
- */
-export const CITATION_TICKET = /\bT-\d{4,}/g
-
 export const PRIORITES = ['haute', 'moyenne', 'basse']
 
 const DEFAULT_PRIORITE = 'moyenne'
@@ -120,21 +118,6 @@ export function readTickets(ovrseeDir, colonnes = readBoard(ovrseeDir), illisibl
   return tickets
 }
 
-/**
- * Le prochain identifiant libre.
- *
- * Le maximum plus un, jamais le nombre de tickets : supprimer un ticket ne doit
- * pas faire réapparaître son numéro sur un autre. Un identifiant réutilisé
- * rendrait faux tout ce qui le cite — un commit, un plan, une conversation.
- */
-export function nextTicketId(tickets) {
-  const max = tickets.reduce((haut, t) => {
-    const found = /^T-(\d+)$/.exec(String(t?.meta?.id ?? ''))
-    return found ? Math.max(haut, Number(found[1])) : haut
-  }, 0)
-
-  return `T-${String(max + 1).padStart(4, '0')}`
-}
 
 /** L'identifiant porte le tri du dossier ; le titre n'est là que pour l'œil. */
 export function ticketFileName(id, titre) {
@@ -215,8 +198,12 @@ function creerTicket(ovrseeDir, champs, now, session) {
   const priorite = requirePriorite(champs?.priorite ?? DEFAULT_PRIORITE)
   const date = today(now)
 
+  // Avant l'identifiant, qui en dépend.
+  const type = champs?.type ?? null
+  if (type !== null && type !== 'epic') throw new Error('type doit valoir "epic" ou être absent')
+
   const meta = {
-    id: nextTicketId(readTickets(ovrseeDir, colonnes)),
+    id: nextTicketId(readTickets(ovrseeDir, colonnes), type),
     titre,
     colonne,
     priorite,
@@ -226,16 +213,12 @@ function creerTicket(ovrseeDir, champs, now, session) {
     plan: champs?.plan ?? null,
   }
 
-  // Valider et ajouter type si présent
-  if (champs?.type !== undefined && champs.type !== null) {
-    if (champs.type !== 'epic') throw new Error('type doit valoir "epic" ou être absent')
-    meta.type = champs.type
-  }
+  if (type) meta.type = type
 
   // Valider et ajouter epic si présent
   if (champs?.epic !== undefined && champs.epic !== null) {
-    if (typeof champs.epic !== 'string' || !/^T-\d+$/.test(champs.epic)) {
-      throw new Error('epic doit être un ID T-XXXX ou être absent')
+    if (typeof champs.epic !== 'string' || !ID_TICKET.test(champs.epic)) {
+      throw new Error('epic doit être un ID E-XXXX ou être absent')
     }
     meta.epic = champs.epic
   }
@@ -364,55 +347,164 @@ export function moveTicket(ovrseeDir, file, colonne, now = new Date(), session =
  * Le fichier n'est jamais renommé quand le titre change : l'identifiant est la
  * clé, et renommer casserait toute référence déjà écrite ailleurs.
  *
+ * Seule exception : devenir epic, ou cesser de l'être, change le préfixe de
+ * l'identifiant (`T-0250` ↔ `E-0250`, issue #131) — et donc le nom du fichier.
+ * Le numéro, lui, ne bouge pas : une référence ancienne reste lisible.
+ *
  * @param {{titre?: string, priorite?: string, charge?: string|null, tags?: string[], plan?: string|null, corps?: string, type?: string|null, epic?: string|null}} patch
  */
 export function updateTicket(ovrseeDir, file, patch, now = new Date()) {
   requireFile(file)
   if (patch?.priorite !== undefined) requirePriorite(patch.priorite)
 
-  return rewrite(
-    ovrseeDir,
-    file,
-    ticket => {
-      const meta = { ...ticket.meta }
-      if (patch?.titre !== undefined) {
-        const titre = String(patch.titre).trim()
-        if (!titre) throw new Error('titre vide')
-        meta.titre = titre
-      }
-      if (patch?.priorite !== undefined) meta.priorite = patch.priorite
-      if (patch?.tags !== undefined) meta.tags = Array.isArray(patch.tags) ? patch.tags.map(String) : []
-      if (patch?.plan !== undefined) meta.plan = patch.plan ?? null
-
-      // Gérer type
-      if (patch?.type !== undefined && patch.type !== null) {
-        if (patch.type !== 'epic') throw new Error('type doit valoir "epic" ou être absent')
-        meta.type = patch.type
-      } else if (patch?.type === null) {
-        delete meta.type
-      }
-
-      // Gérer epic
-      if (patch?.epic !== undefined && patch.epic !== null) {
-        if (typeof patch.epic !== 'string' || !/^T-\d+$/.test(patch.epic)) {
-          throw new Error('epic doit être un ID T-XXXX ou être absent')
+  // Un seul verrou pour la réécriture et le renommage : entre les deux, un
+  // fichier portant déjà son nouvel id sous son ancien nom serait visible.
+  return withLock(ovrseeDir, () => {
+    let renommage = null
+    const ok = rewrite(
+      ovrseeDir,
+      file,
+      ticket => {
+        const suivant = modifier(ticket, patch)
+        // Seul un changement de type renomme : éditer le titre d'un epic hérité
+        // en `T-` ne doit pas le migrer en silence. Tout ce qui peut refuser le
+        // renommage lève ici, avant la moindre écriture.
+        if (patch?.type !== undefined) renommage = prefixeAChanger(ovrseeDir, file, suivant.meta)
+        if (!renommage) return suivant
+        const { avant, apres } = renommage
+        return {
+          meta: { ...suivant.meta, id: apres },
+          body: suivant.body.replaceAll(`${IMAGES_DIR}/${avant}-`, `${IMAGES_DIR}/${apres}-`),
         }
-        meta.epic = patch.epic
-      } else if (patch?.epic === null) {
-        delete meta.epic
-      }
+      },
+      now,
+    )
+    if (ok && renommage) changerPrefixe(ovrseeDir, file, renommage, now)
+    return ok
+  })
+}
 
-      // Gérer charge
-      if (patch?.charge !== undefined && patch.charge !== null) {
-        meta.charge = requireCharge(patch.charge)
-      } else if (patch?.charge === null) {
-        delete meta.charge
-      }
+/** Applique un patch à un ticket lu. */
+function modifier(ticket, patch) {
+  const meta = { ...ticket.meta }
+  if (patch?.titre !== undefined) {
+    const titre = String(patch.titre).trim()
+    if (!titre) throw new Error('titre vide')
+    meta.titre = titre
+  }
+  if (patch?.priorite !== undefined) meta.priorite = patch.priorite
+  if (patch?.tags !== undefined) meta.tags = Array.isArray(patch.tags) ? patch.tags.map(String) : []
+  if (patch?.plan !== undefined) meta.plan = patch.plan ?? null
 
-      const body = patch?.corps === undefined ? ticket.body : String(patch.corps).trim() + '\n'
-      return { meta, body }
-    },
-    now,
+  // Gérer type
+  if (patch?.type !== undefined && patch.type !== null) {
+    if (patch.type !== 'epic') throw new Error('type doit valoir "epic" ou être absent')
+    meta.type = patch.type
+  } else if (patch?.type === null) {
+    delete meta.type
+  }
+
+  // Gérer epic
+  if (patch?.epic !== undefined && patch.epic !== null) {
+    if (typeof patch.epic !== 'string' || !ID_TICKET.test(patch.epic)) {
+      throw new Error('epic doit être un ID E-XXXX ou être absent')
+    }
+    meta.epic = patch.epic
+  } else if (patch?.epic === null) {
+    delete meta.epic
+  }
+
+  // Gérer charge
+  if (patch?.charge !== undefined && patch.charge !== null) {
+    meta.charge = requireCharge(patch.charge)
+  } else if (patch?.charge === null) {
+    delete meta.charge
+  }
+
+  const body = patch?.corps === undefined ? ticket.body : String(patch.corps).trim() + '\n'
+  return { meta, body }
+}
+
+/**
+ * Le renommage qu'impose le type d'un ticket, ou `null` s'il porte déjà le bon
+ * préfixe.
+ *
+ * L'ancien identifiant se lit dans le **nom du fichier**, pas dans le
+ * frontmatter : un renommage interrompu entre la réécriture et le `renameSync`
+ * laisse `T-0250-slug.md` porter `E-0250`, et c'est le nom qui dit qu'il reste à
+ * faire — le repasser répare. Un fichier dont le nom ne commence pas par un
+ * identifiant (écrit à la main) n'est pas renommé.
+ *
+ * Refuse un identifiant ou un nom déjà pris : un doublon écrit à la main ne doit
+ * jamais être écrasé.
+ */
+function prefixeAChanger(ovrseeDir, file, meta) {
+  const avant = idFromFile(file)
+  if (!avant) return null
+  const apres = idPourType(avant, meta.type)
+  if (apres === avant) return null
+
+  const dossier = join(ovrseeDir, 'tickets')
+  const pris =
+    readdirSync(dossier).some(nom => idFromFile(nom) === apres) ||
+    readTickets(ovrseeDir).some(t => t.file !== file && t.meta.id === apres) ||
+    imagesDuTicket(ovrseeDir, apres).length > 0
+  if (pris) throw new Error(`l'identifiant ${apres} est déjà pris`)
+
+  return { avant, apres, nouveau: requireFile(apres + file.slice(avant.length)) }
+}
+
+/**
+ * Tout ce qui porte l'ancien identifiant suit le nouveau : le fichier (même
+ * slug), les images, le champ `epic` des enfants, le ticket actif des sessions.
+ * Le frontmatter et les chemins d'images du corps sont déjà réécrits, et tous
+ * les refus déjà passés (`prefixeAChanger`) : il ne reste que des renommages.
+ *
+ * Rétrograder un epic laisse ses enfants citer un `T-` qui n'est plus un epic —
+ * ils deviennent orphelins, comme avant ce préfixe.
+ *
+ * Les plans et les commits qui citent l'ancien identifiant ne sont pas touchés :
+ * les uns sont produits par les hooks, les autres immuables. Le numéro partagé
+ * suffit à les relire.
+ */
+function changerPrefixe(ovrseeDir, file, { avant, apres, nouveau }, now) {
+  renameSync(ticketPath(ovrseeDir, file), ticketPath(ovrseeDir, nouveau))
+  for (const image of imagesDuTicket(ovrseeDir, avant)) {
+    renameSync(image, join(ovrseeDir, 'tickets', 'images', apres + basename(image).slice(avant.length)))
+  }
+
+  for (const enfant of readTickets(ovrseeDir).filter(t => t.meta.epic === avant)) {
+    rewrite(ovrseeDir, enfant.file, t => ({ meta: { ...t.meta, epic: apres }, body: t.body }), now)
+  }
+
+  for (const { session } of allActive(ovrseeDir).filter(e => e.ticket === avant)) {
+    writeActive(ovrseeDir, session, { ticket: apres })
+  }
+}
+
+/**
+ * Passe en `E-` les epics nés avant ce préfixe. Un second passage ne fait rien.
+ *
+ * Un epic qui refuse (identifiant déjà pris, fichier illisible) n'arrête pas les
+ * autres : son erreur est rendue avec lui.
+ *
+ * @returns {Array<{avant: string, apres: string, erreur?: string}>}
+ */
+export function migrerEpics(ovrseeDir, now = new Date()) {
+  return withLock(ovrseeDir, () =>
+    readTickets(ovrseeDir)
+      .filter(t => t.meta.type === 'epic' && idFromFile(t.file)?.startsWith('T-'))
+      .map(t => {
+        const avant = idFromFile(t.file)
+        const renommage = { avant, apres: idPourType(avant, 'epic') }
+        try {
+          return updateTicket(ovrseeDir, t.file, { type: 'epic' }, now)
+            ? renommage
+            : { ...renommage, erreur: 'ticket illisible' }
+        } catch (err) {
+          return { ...renommage, erreur: String(err.message ?? err) }
+        }
+      }),
   )
 }
 
@@ -443,99 +535,6 @@ export function removeColumn(ovrseeDir, id, vers) {
   return writeBoard(ovrseeDir, colonnes.filter(c => c.id !== id))
 }
 
-/** Le dossier des images de tickets, relatif à la racine du dépôt. */
-const IMAGES_DIR = 'ovrsee/tickets/images'
-
-/**
- * Plafond d'une image de ticket, en octets bruts.
- *
- * `CORPS_MAX` (server/api.js) plafonne le corps de requête à 1 Mo, et le base64
- * gonfle de 33 % : au-delà d'environ 750 ko l'envoi serait coupé côté serveur
- * sans qu'on sache dire pourquoi. Le client ré-encode bien en dessous — 1600 px
- * de côté en WebP q0.85 tient dans 100 à 300 ko pour une capture d'écran — donc
- * ce plafond n'est pas une gêne, c'est le refus qui reste lisible.
- */
-const IMAGE_MAX_OCTETS = 700_000
-
-const PREFIXE_WEBP = 'data:image/webp;base64,'
-
-/**
- * Écrit une image collée dans un ticket, et rend son chemin depuis la racine.
- *
- * **Une image de ticket est une donnée du dépôt** (T-0219, issue #54) : elle vit
- * sous `ovrsee/tickets/`, donc elle suit le réglage `gitignorePlans` sans qu'un
- * bloc `.gitignore` de plus existe. Le chemin rendu est relatif à la racine du
- * dépôt, pas à `ovrsee/`, parce que c'est ce que `mediaUrl()` → `/api/media`
- * attend d'un `![](…)` — voir `app/src/pages.ts`.
- *
- * `dataUri` vient du rendu, donc du dehors : il est traité comme hostile.
- * Le client a beau ré-encoder en WebP par `<canvas>` avant l'envoi, rien ne
- * force un appelant à passer par lui. D'où la triple vérification ici — type
- * annoncé, octets magiques, taille — et le nom de fichier **généré par le
- * serveur** : l'appelant ne choisit jamais où sa donnée atterrit.
- *
- * @param {string} ovrseeDir
- * @param {string} ticketId identifiant du ticket propriétaire (`T-0042`)
- * @param {unknown} dataUri `data:image/webp;base64,…`
- * @returns {string} `ovrsee/tickets/images/T-0042-a1b2c3d4.webp`
- */
-export function saveTicketImage(ovrseeDir, ticketId, dataUri) {
-  // L'identifiant devient un morceau de nom de fichier : le valider est ce qui
-  // rend une traversée de chemin impossible, avant même toute vérification de
-  // contenu.
-  if (!isSafeTicketId(ticketId)) {
-    throw new Error(`identifiant de ticket invalide : ${ticketId}`)
-  }
-  if (typeof dataUri !== 'string' || !dataUri.startsWith(PREFIXE_WEBP)) {
-    throw new Error('seule une image WebP en data-URI est acceptée')
-  }
-
-  // Avant de décoder, pas après : `CORPS_MAX` borne le corps de requête du dev
-  // server, mais `fetchHandler` (Electron) lit le sien en entier avant d'appeler
-  // ici. Sans cette borne, un data-URI de 500 Mo serait mis en mémoire pour être
-  // rejeté ensuite. Le base64 gonfle de 4/3, d'où la marge.
-  if (dataUri.length > IMAGE_MAX_OCTETS * 2) {
-    throw new Error('image trop volumineuse')
-  }
-
-  // Node décode le base64 sans broncher, y compris du charabia : ce sont les
-  // octets magiques plus bas qui font foi, jamais le type annoncé.
-  const octets = Buffer.from(dataUri.slice(PREFIXE_WEBP.length), 'base64')
-
-  if (octets.length > IMAGE_MAX_OCTETS) {
-    throw new Error(`image trop volumineuse : ${octets.length} octets`)
-  }
-  // `RIFF` puis, quatre octets de taille plus loin, `WEBP`.
-  const entete = octets.subarray(0, 4).toString('latin1')
-  const format = octets.subarray(8, 12).toString('latin1')
-  if (entete !== 'RIFF' || format !== 'WEBP') {
-    throw new Error('ces octets ne sont pas une image WebP')
-  }
-
-  const nom = `${ticketId}-${randomBytes(4).toString('hex')}.webp`
-  writeFileNoFollow(join(ovrseeDir, 'tickets', 'images', nom), octets)
-  return `${IMAGES_DIR}/${nom}`
-}
-
-/**
- * Les images d'un ticket : celles dont le nom porte son identifiant.
- *
- * Le lien se fait par le nom du fichier, pas par les `![](…)` du corps. Deux
- * raisons : une image collée puis retirée du texte resterait sinon sur le
- * disque pour toujours, et un corps qui cite l'image d'un autre ticket — un
- * copier-coller suffit — ne doit pas pouvoir la faire supprimer.
- */
-function imagesDuTicket(ovrseeDir, id) {
-  const dir = join(ovrseeDir, 'tickets', 'images')
-  const attendu = new RegExp(`^${id}-[0-9a-f]{8}\\.webp$`)
-  try {
-    return readdirSync(dir)
-      .filter(nom => attendu.test(nom))
-      .map(nom => join(dir, nom))
-  } catch {
-    return []
-  }
-}
 
 export function deleteTicket(ovrseeDir, file) {
   const id = idFromFile(file)
@@ -560,16 +559,6 @@ export function deleteTicket(ovrseeDir, file) {
   return true
 }
 
-
-/**
- * Un id de ticket est-il sûr à recoller à une comparaison ?
- *
- * Le ticket actif est la seule valeur relue du disque puis réinjectée dans une
- * comparaison d'id — même regex que la validation d'`epic` plus haut.
- */
-export function isSafeTicketId(id) {
-  return typeof id === 'string' && /^T-\d+$/.test(id)
-}
 
 /**
  * L'id du ticket actif d'une session, ou `null`.
@@ -646,8 +635,6 @@ export function avancerTicketActifEclipse(ovrseeDir, session = null) {
   }
 }
 
-/** L'id porté par un nom de fichier de ticket (`T-0012-slug.md` → `T-0012`), ou `null`. */
-const idFromFile = file => /^(T-\d+)-/.exec(file)?.[1] ?? null
 
 /**
  * Avance vers la colonne finale les tickets dont le plan lié est déjà fermé.

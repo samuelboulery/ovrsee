@@ -85,7 +85,10 @@ apparaît avec son statut. Filtrable par plans, tickets et commits hors plan.
 Un fichier par ticket dans `ovrsee/tickets/`, colonnes réglées dans `ovrsee/board.json`.
 Écrit ici comme depuis le terminal intégré — une image collée dans un ticket est rangée
 à côté de lui. Les epics affichent leur avancement et leurs tickets enfants dans leur
-propre vue ; le kanban ne contient que des tickets.
+propre vue ; le kanban ne contient que des tickets. Les tickets se numérotent `T-0012`,
+les epics `E-0012`, sur un seul compteur : cocher « epic » change le préfixe et garde
+le numéro. Les epics nés avant ce préfixe passent en `E-` par
+`pnpm ovrsee:migrate-epics`.
 
 ### Données — les tables du projet
 ![Onglet Données](./docs/screenshots/donnees.webp)
@@ -340,7 +343,7 @@ chaque commit est rattaché — y compris un correctif sans rapport. `pnpm ovrse
 avant de changer de sujet.
 
 **Un commit dont la session est inconnue peut n'être rattaché à rien.**
-L'attribution suit quatre étages : un ticket `T-XXXX` cité dans le message, puis la
+L'attribution suit quatre étages : un ticket `T-XXXX` (ou un epic `E-XXXX`) cité dans le message, puis la
 session (`CLAUDE_CODE_SESSION_ID`, hérité par le hook git), puis l'unique plan actif s'il
 n'y en a qu'un, puis rien. Un commit fait hors de Claude Code, sans ticket cité, alors que
 deux plans sont actifs, n'est rattaché nulle part — et le dit sur stderr.

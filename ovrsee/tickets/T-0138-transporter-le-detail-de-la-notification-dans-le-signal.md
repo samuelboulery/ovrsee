@@ -4,13 +4,13 @@
   "titre": "Transporter le détail de la notification dans le signal",
   "colonne": "fait",
   "priorite": "haute",
-  "epic": "T-0137",
+  "epic": "E-0137",
   "tags": [
     "hooks",
     "terminal"
   ],
   "cree": "2026-08-14",
-  "maj": "2026-08-16",
+  "maj": "2026-09-30",
   "plan": "2026-08-14-extension-barre-de-menu-macos-pour-les-sessions-claude-d-ovr.md"
 }
 ---

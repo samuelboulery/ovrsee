@@ -9,9 +9,9 @@
     "qa"
   ],
   "cree": "2026-08-12",
-  "maj": "2026-08-12",
+  "maj": "2026-09-30",
   "plan": "2026-08-11-repasse-ui-ovrsee-coller-a-la-maquette-ovrsee-app-dc-html.md",
-  "epic": "T-0058"
+  "epic": "E-0058"
 }
 ---
 

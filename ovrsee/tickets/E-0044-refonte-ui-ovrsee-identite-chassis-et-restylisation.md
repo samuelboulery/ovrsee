@@ -1,6 +1,6 @@
 ---
 {
-  "id": "T-0044",
+  "id": "E-0044",
   "titre": "Refonte UI Ovrsee — identité, châssis et restylisation",
   "colonne": "fait",
   "priorite": "haute",
@@ -10,7 +10,7 @@
     "design-system"
   ],
   "cree": "2026-08-11",
-  "maj": "2026-08-11",
+  "maj": "2026-09-30",
   "plan": "2026-08-11-refonte-ui-ovrsee-mise-en-uvre-des-maquettes.md",
   "type": "epic"
 }

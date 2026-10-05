@@ -1,6 +1,6 @@
 ---
 {
-  "id": "T-0148",
+  "id": "E-0148",
   "titre": "Réduire la consommation de tokens par session",
   "type": "epic",
   "colonne": "fait",
@@ -11,7 +11,7 @@
     "config"
   ],
   "cree": "2026-08-16",
-  "maj": "2026-08-16",
+  "maj": "2026-09-30",
   "plan": "2026-08-16-audit-de-consommation-de-tokens-constats-et-correctifs.md"
 }
 ---

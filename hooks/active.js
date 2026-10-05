@@ -100,7 +100,7 @@ function lireEntree(path) {
   // appelant qui finirait par l'oublier.
   return {
     plan: isSafePlanFileName(parse.plan) ? parse.plan : null,
-    ticket: /^T-\d+$/.test(String(parse.ticket ?? '')) ? parse.ticket : null,
+    ticket: /^[TE]-\d+$/.test(String(parse.ticket ?? '')) ? parse.ticket : null,
   }
 }
 
@@ -149,7 +149,7 @@ function migrerAnciensPointeurs(ovrseeDir) {
   const actuel = lireEntree(path) ?? VIDE
   ecrire(path, {
     plan: actuel.plan ?? (isSafePlanFileName(plan) ? plan : null),
-    ticket: actuel.ticket ?? (/^T-\d+$/.test(String(ticket)) ? ticket : null),
+    ticket: actuel.ticket ?? (/^[TE]-\d+$/.test(String(ticket)) ? ticket : null),
   })
 
   oublier(ancienPlan)

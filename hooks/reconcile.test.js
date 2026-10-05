@@ -21,14 +21,28 @@ test('un intervalle désigne tous les tickets, pas ses deux bornes', () => {
   // La forme exacte des titres de fusion de ce dépôt.
   const cites = ticketsCites('feat: sortir les epics du Kanban (T-0164 → T-0179) (#22)')
 
-  assert.equal(cites.size, 16)
+  assert.equal([...cites].filter(id => id.startsWith('T-')).length, 16)
   assert.ok(cites.has('T-0164'))
   assert.ok(cites.has('T-0171'), 'le milieu de l’intervalle compte autant que ses bornes')
   assert.ok(cites.has('T-0179'))
 })
 
+test('un epic cité, ou pris dans un intervalle, compte comme un ticket', () => {
+  assert.ok(ticketsCites('feat: le lot (E-0243)').has('E-0243'))
+  // Un préfixe d'une lettre se prend facilement dans un autre mot.
+  assert.equal(ticketsCites('fix: CVE-2024-1234, NODE-2024').size, 0)
+
+  // Compteur partagé : un epic né au milieu d'un lot porte un numéro de l'intervalle.
+  const cites = ticketsCites('feat: le lot (T-0243 → T-0246)')
+  assert.ok(cites.has('E-0244'))
+  assert.ok(cites.has('T-0245'))
+})
+
 test('la flèche ASCII vaut la flèche typographique', () => {
-  assert.deepEqual([...ticketsCites('fix: (T-0001 -> T-0003)')], ['T-0001', 'T-0003', 'T-0002'])
+  assert.deepEqual(
+    [...ticketsCites('fix: (T-0001 -> T-0003)')].filter(id => id.startsWith('T-')),
+    ['T-0001', 'T-0003', 'T-0002'],
+  )
 })
 
 test('un intervalle absurde retombe sur ses bornes', () => {
@@ -215,7 +229,11 @@ test('plansPourMessage ignore les plans clos et les tickets sans plan', () => {
 test('ticketsCites lit un numéro à cinq chiffres en entier', () => {
   // `T-\d{4}` lisait `T-10000` comme `T-1000` : un autre ticket, soldé à tort.
   assert.deepEqual([...ticketsCites('fix: x (T-10000)')], ['T-10000'])
-  assert.deepEqual([...ticketsCites('fix: (T-9999 → T-10001)')], ['T-9999', 'T-10001', 'T-10000'])
+  // L'intervalle couvre aussi les epics nés au milieu : chaque numéro, deux préfixes.
+  assert.deepEqual(
+    [...ticketsCites('fix: (T-9999 → T-10001)')].sort(),
+    ['E-10000', 'E-10001', 'E-9999', 'T-10000', 'T-10001', 'T-9999'],
+  )
 })
 
 test('ticketsCites lit une citation collée à un suffixe', () => {

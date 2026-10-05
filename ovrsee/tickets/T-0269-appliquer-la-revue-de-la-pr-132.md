@@ -2,12 +2,16 @@
 {
   "id": "T-0269",
   "titre": "Appliquer la revue de la PR #132",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "haute",
-  "tags": ["hooks", "doc"],
+  "tags": [
+    "hooks",
+    "doc"
+  ],
   "cree": "2026-10-05",
   "maj": "2026-10-05",
-  "plan": "2026-10-05-pr-132-appliquer-la-revue-bloquants-suggestions.md"
+  "plan": "2026-10-05-pr-132-appliquer-la-revue-bloquants-suggestions.md",
+  "fait": "2026-10-05T10:17:06.267Z"
 }
 ---
 

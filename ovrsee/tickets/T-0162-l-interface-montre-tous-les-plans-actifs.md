@@ -8,9 +8,9 @@
     "ui"
   ],
   "cree": "2026-08-16",
-  "maj": "2026-08-16",
+  "maj": "2026-09-30",
   "plan": "2026-08-16-rendre-l-etat-plan-actif-ticket-actif-propre-a-chaque-sessio.md",
-  "epic": "T-0156",
+  "epic": "E-0156",
   "charge": "m"
 }
 ---

@@ -42,7 +42,8 @@ les scans restent capturés par des hooks et ne s'éditent pas à la main.
 ## Tickets
 
 Le tableau du projet. Un fichier par ticket dans `ovrsee/tickets/`, nommé
-`T-0012-un-slug.md`. Frontmatter JSON entre deux `---`, corps en markdown :
+`T-0012-un-slug.md` — `E-0012-un-slug.md` pour un epic. Frontmatter JSON entre
+deux `---`, corps en markdown :
 
 ```markdown
 ---
@@ -75,8 +76,9 @@ Pourquoi ce ticket existe.
   réécrire leur `colonne`, pas seulement supprimer l'entrée du board.
 - `priorite` vaut `haute`, `moyenne` ou `basse`. Le tri est priorité puis date ;
   il n'y a pas de rang manuel.
-- `id` : le maximum existant plus un, jamais un numéro repris à un ticket
-  supprimé.
+- `id` : `T-` pour un ticket, `E-` pour un epic (`"type": "epic"`), sur un seul
+  compteur — le maximum existant des deux préfixes plus un, jamais un numéro
+  repris à un ticket supprimé.
 - `plan` lie un ticket à un plan de `ovrsee/plans/`, ou vaut `null`. Les deux
   stocks sont indépendants : un ticket n'est pas un plan, un plan n'est pas une
   tâche.

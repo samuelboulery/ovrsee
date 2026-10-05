@@ -2,7 +2,7 @@
 {
   "id": "T-0151",
   "titre": "Dégraisser les règles globales",
-  "epic": "T-0148",
+  "epic": "E-0148",
   "colonne": "fait",
   "priorite": "moyenne",
   "charge": "m",
@@ -11,7 +11,7 @@
     "config"
   ],
   "cree": "2026-08-16",
-  "maj": "2026-08-16",
+  "maj": "2026-09-30",
   "plan": "2026-08-16-audit-de-consommation-de-tokens-constats-et-correctifs.md"
 }
 ---

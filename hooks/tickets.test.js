@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, symlinkSync, existsSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync, symlinkSync, existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { basename, join } from 'node:path'
 
@@ -24,11 +24,12 @@ import {
   readActiveTicket,
   clearActiveTicket,
   saveTicketImage,
+  migrerEpics,
   predicatEnVol,
   readBoard,
 } from './tickets.js'
 
-import { writeActive } from './active.js'
+import { readActive, writeActive } from './active.js'
 
 /** Un dossier `ovrsee/` jetable. */
 const fixture = () => {
@@ -56,6 +57,14 @@ test('nextTicketId prend le maximum, pas le nombre de tickets', () => {
 test('nextTicketId ignore les id non conformes', () => {
   const tickets = [{ meta: { id: 'bidon' } }, { meta: {} }, { meta: { id: 'T-0003' } }]
   assert.equal(nextTicketId(tickets), 'T-0004')
+})
+
+// Un seul compteur pour T- et E- : un numéro ne désigne qu'une chose, et une
+// citation ancienne reste juste quand un ticket devient epic (issue #131).
+test('nextTicketId partage le compteur entre tickets et epics', () => {
+  const tickets = [{ meta: { id: 'T-0003' } }, { meta: { id: 'E-0009' } }]
+  assert.equal(nextTicketId(tickets), 'T-0010')
+  assert.equal(nextTicketId(tickets, 'epic'), 'E-0010')
 })
 
 // --- noms de fichiers ------------------------------------------------------
@@ -346,20 +355,116 @@ test('createTicket refuse un epic invalide', () => {
   assert.throws(() => createTicket(ovrseeDir, { titre: 'X', epic: 'T-999-trop-long' }), /epic/)
 })
 
-test('updateTicket peut changer type et epic', () => {
+test("createTicket préfixe un epic par E-", () => {
   const ovrseeDir = fixture()
-  const { file } = createTicket(ovrseeDir, { titre: 'Avant' })
+  createTicket(ovrseeDir, { titre: 'Un ticket' })
+  const epic = createTicket(ovrseeDir, { titre: 'Mon epic', type: 'epic' })
 
-  updateTicket(ovrseeDir, file, { type: 'epic' })
+  assert.equal(epic.meta.id, 'E-0002')
+  assert.equal(epic.file, 'E-0002-mon-epic.md')
+})
 
-  let [ticket] = readTickets(ovrseeDir)
-  assert.equal(ticket.meta.type, 'epic')
-
+test('updateTicket peut rattacher un ticket à un epic', () => {
+  const ovrseeDir = fixture()
+  const { file, meta } = createTicket(ovrseeDir, { titre: 'Enfant' })
   const epic = createTicket(ovrseeDir, { titre: 'Parent', type: 'epic' })
+
   updateTicket(ovrseeDir, file, { epic: epic.meta.id })
 
-  ticket = readTickets(ovrseeDir).find(t => t.meta.id === ticket.meta.id)
-  assert.equal(ticket.meta.epic, epic.meta.id)
+  assert.equal(readTickets(ovrseeDir).find(t => t.meta.id === meta.id).meta.epic, 'E-0002')
+})
+
+test('promouvoir un ticket en epic change son préfixe, pas son numéro', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'Grossit' })
+  const chemin = saveTicketImage(ovrseeDir, 'T-0001', dataUri(webp()))
+  updateTicket(ovrseeDir, file, { corps: `![capture](${chemin})` })
+  // Un enfant peut déjà le citer : le skill écrit les fichiers à la main.
+  const enfant = createTicket(ovrseeDir, { titre: 'Enfant', epic: 'T-0001' })
+  writeActive(ovrseeDir, 'session-a', { ticket: 'T-0001' })
+
+  assert.equal(updateTicket(ovrseeDir, file, { type: 'epic' }), true)
+
+  const tickets = readTickets(ovrseeDir)
+  const epic = tickets.find(t => t.meta.type === 'epic')
+  assert.equal(epic.meta.id, 'E-0001')
+  assert.equal(epic.file, 'E-0001-grossit.md')
+  assert.ok(!existsSync(join(ovrseeDir, 'tickets', file)), "l'ancien fichier est parti")
+
+  const images = readdirSync(join(ovrseeDir, 'tickets', 'images'))
+  assert.equal(images.length, 1)
+  assert.match(images[0], /^E-0001-[0-9a-f]{8}\.webp$/)
+  assert.ok(epic.body.includes(`ovrsee/tickets/images/${images[0]}`), 'le corps suit l’image')
+
+  assert.equal(tickets.find(t => t.meta.id === enfant.meta.id).meta.epic, 'E-0001')
+  assert.equal(readActive(ovrseeDir, 'session-a').ticket, 'E-0001')
+})
+
+test('rétrograder un epic lui rend le préfixe T-', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'Était epic', type: 'epic' })
+
+  updateTicket(ovrseeDir, file, { type: null })
+
+  const [ticket] = readTickets(ovrseeDir)
+  assert.equal(ticket.meta.type, undefined)
+  assert.equal(ticket.meta.id, 'T-0001')
+  assert.equal(ticket.file, 'T-0001-etait-epic.md')
+})
+
+test('une promotion ne prend jamais un identifiant déjà porté', () => {
+  const ovrseeDir = fixture()
+  const { file } = createTicket(ovrseeDir, { titre: 'Ticket' })
+  // Un doublon écrit à la main : rien ne doit l'écraser.
+  writeFileSync(
+    join(ovrseeDir, 'tickets', 'E-0001-intrus.md'),
+    '---\n{"id": "E-0001", "titre": "Intrus", "colonne": "backlog", "priorite": "moyenne", "tags": [], "cree": "2026-01-01", "maj": "2026-01-01", "plan": null, "type": "epic"}\n---\n',
+  )
+
+  assert.throws(() => updateTicket(ovrseeDir, file, { type: 'epic' }), /E-0001/)
+  // Refusé avant toute écriture : rien de l'état epic n'a filé dans le fichier.
+  const ticket = readTickets(ovrseeDir).find(t => t.file === file)
+  assert.equal(ticket.meta.id, 'T-0001')
+  assert.equal(ticket.meta.type, undefined)
+})
+
+test('un renommage interrompu se répare en repassant la promotion', () => {
+  const ovrseeDir = fixture()
+  // Frontmatter déjà réécrit, fichier pas encore renommé.
+  writeFileSync(
+    join(ovrseeDir, 'tickets', 'T-0001-coupe.md'),
+    '---\n{"id": "E-0001", "titre": "Coupé", "colonne": "backlog", "priorite": "moyenne", "tags": [], "cree": "2026-01-01", "maj": "2026-01-01", "plan": null, "type": "epic"}\n---\n',
+  )
+
+  updateTicket(ovrseeDir, 'T-0001-coupe.md', { type: 'epic' })
+
+  assert.deepEqual(readdirSync(join(ovrseeDir, 'tickets')), ['E-0001-coupe.md'])
+})
+
+test('migrerEpics passe les epics hérités en E-, et un second passage ne fait rien', () => {
+  const ovrseeDir = fixture()
+  const ecrire = (nom, meta) =>
+    writeFileSync(
+      join(ovrseeDir, 'tickets', nom),
+      `---\n${JSON.stringify({ titre: 'x', colonne: 'backlog', priorite: 'moyenne', tags: [], cree: '2026-01-01', maj: '2026-01-01', plan: null, ...meta })}\n---\n`,
+    )
+  ecrire('T-0001-vieil-epic.md', { id: 'T-0001', type: 'epic' })
+  ecrire('T-0002-enfant.md', { id: 'T-0002', epic: 'T-0001' })
+  ecrire('T-0003-ordinaire.md', { id: 'T-0003' })
+  // Un doublon bloque cet epic-ci, pas les autres.
+  ecrire('T-0004-bloque.md', { id: 'T-0004', type: 'epic' })
+  ecrire('E-0004-intrus.md', { id: 'E-0004' })
+
+  const faits = migrerEpics(ovrseeDir)
+  assert.deepEqual(faits[0], { avant: 'T-0001', apres: 'E-0001' })
+  assert.match(faits[1].erreur, /E-0004/)
+  rmSync(join(ovrseeDir, 'tickets', 'T-0004-bloque.md'))
+
+  assert.deepEqual(migrerEpics(ovrseeDir), [])
+
+  const ids = readTickets(ovrseeDir).map(t => t.meta.id).sort()
+  assert.deepEqual(ids, ['E-0001', 'E-0004', 'T-0002', 'T-0003'])
+  assert.equal(readTickets(ovrseeDir).find(t => t.meta.id === 'T-0002').meta.epic, 'E-0001')
 })
 
 test('updateTicket peut détacher un enfant en mettant epic à null', () => {
@@ -501,9 +606,11 @@ test('avancerTicketsClos ne fait rien sur un board à une seule colonne', () => 
 
 // --- .active-ticket ----------------------------------------------------------
 
-test('isSafeTicketId accepte un id T-XXXX', () => {
+test('isSafeTicketId accepte un id T-XXXX ou E-XXXX', () => {
   assert.equal(isSafeTicketId('T-0001'), true)
   assert.equal(isSafeTicketId('T-12345'), true)
+  assert.equal(isSafeTicketId('E-0001'), true)
+  assert.equal(isSafeTicketId('X-0001'), false)
 })
 
 test('isSafeTicketId refuse un format invalide', () => {

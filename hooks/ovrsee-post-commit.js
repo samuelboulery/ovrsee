@@ -136,7 +136,7 @@ function attachCommit(ovrseeDir, root, sources, message, session, tickets) {
     if (actifs.length > 1) {
       process.stderr.write(
         `[ovrsee] commit non rattaché : ${actifs.length} plans actifs et aucun ticket cité ` +
-          `dans le message. Citer « T-XXXX » dans le message pour trancher.\n`,
+          `dans le message. Citer « T-XXXX » ou « E-XXXX » dans le message pour trancher.\n`,
       )
     }
     return []

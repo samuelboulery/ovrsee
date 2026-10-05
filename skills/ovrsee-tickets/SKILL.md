@@ -72,7 +72,7 @@ Pourquoi ce ticket existe. Ce qui ne va pas aujourd'hui.
 
 | Champ | Règle |
 |---|---|
-| `id` | `T-` puis quatre chiffres. **Le maximum existant plus un**, jamais un numéro repris à un ticket supprimé. |
+| `id` | `T-` puis quatre chiffres pour un ticket, `E-` pour un epic. **Le maximum existant plus un, sur les deux préfixes à la fois** — un seul compteur : après `T-0012` et `E-0013`, le suivant est `0014`. Jamais un numéro repris à un ticket supprimé. |
 | `titre` | Non vide. Ce qui apparaît sur la carte. |
 | `colonne` | Un `id` lu dans `board.json`. |
 | `priorite` | `haute`, `moyenne` ou `basse`. Rien d'autre. |
@@ -81,10 +81,10 @@ Pourquoi ce ticket existe. Ce qui ne va pas aujourd'hui.
 | `plan` | Nom de fichier d'un plan de `ovrsee/plans/`, ou `null`. |
 | `fait` | Date ISO complète du passage en colonne finale. Posé et retiré par `moveTicket` ; en écrivant le fichier à la main, le poser en déplaçant vers la colonne finale et l'enlever en en sortant. |
 
-Le nom du fichier est `T-0012-<slug du titre>.md` : le titre en minuscules sans
-accents, tout ce qui n'est pas `[a-z0-9]` devenant un tiret, coupé à 60
-caractères. Renommer le titre ne renomme pas le fichier — le fichier est
-l'identité, le titre est un champ.
+Le nom du fichier est `T-0012-<slug du titre>.md` (`E-0012-…` pour un epic) : le
+titre en minuscules sans accents, tout ce qui n'est pas `[a-z0-9]` devenant un
+tiret, coupé à 60 caractères. Renommer le titre ne renomme pas le fichier — le
+fichier est l'identité, le titre est un champ.
 
 Il n'y a **pas de rang manuel** : le tri est priorité puis date de création,
 sauf en colonne finale, rangée du dernier soldé au premier (`fait`, puis `maj`).
@@ -185,11 +185,13 @@ Il signale à Claude qu'il faut penser en grappes, pas en tickets à plat.
 
 **Créer un epic.** Lorsque plusieurs tickets relèvent d'un même domaine — ou quand
 tu proposes 3+ tâches liées et qu'on demande de les regrouper — écris un ticket
-avec `"type": "epic"` dans le frontmatter. Exemple concret : l'epic « Robustesse
+avec `"type": "epic"` dans le frontmatter, et un `id` préfixé `E-` : fichier
+`E-0015-<slug>.md`, `"id": "E-0015"`. Le préfixe dit ce que c'est : parler de
+« E-0015 », c'est parler d'un epic, jamais d'un ticket. Exemple concret : l'epic « Robustesse
 du rendu » regroupe « malformé vide tout », « aucun garde-fou », « ticket
 corrompu ». Un epic a un titre et des critères d'acceptation comme les autres.
 
-**Rattacher un enfant.** Dans un ticket enfant, ajoute `"epic": "T-0015"` (l'`id`
+**Rattacher un enfant.** Dans un ticket enfant, ajoute `"epic": "E-0015"` (l'`id`
 de l'epic). Le ticket s'affiche alors au tableau sous son epic, sans indentation,
 juste marqué du numéro parent. Les enfants héritent du tri global (priorité, date).
 
@@ -203,5 +205,14 @@ Chaque enfant redevient un ticket autonome dans le flux normal.
 |---|---|
 | `type` | `"epic"` pour un regroupement, absent sinon. |
 | `epic` | L'`id` d'un epic auquel ce ticket appartient, ou absent. |
+
+**Promouvoir un ticket en epic, ou l'inverse**, change son préfixe et garde son
+numéro : `T-0250` devient `E-0250`. Le fichier, ses images
+(`ovrsee/tickets/images/T-0250-…`) et le champ `epic` de ses enfants suivent.
+C'est le seul renommage de fichier permis — le faire par l'interface ou par
+`updateTicket`, qui s'en chargent, plutôt qu'à la main.
+
+**Un epic encore en `T-`** date d'avant ce préfixe. Il fonctionne, mais entretient
+la confusion : `pnpm ovrsee:migrate-epics` (dépôt ovrsee) les passe tous en `E-`.
 
 L'interface affiche les épics en premier, puis leurs enfants, puis les orphelins.

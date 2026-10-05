@@ -4,7 +4,38 @@
   "title": "Audit de sécurité ovrsee 1.3.0 — plan de correction",
   "opened": "2026-10-05",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "4c62d6b",
+      "date": "2026-10-05",
+      "files": []
+    },
+    {
+      "sha": "aa40d8c",
+      "date": "2026-10-05",
+      "files": []
+    },
+    {
+      "sha": "ac74ddd",
+      "date": "2026-10-05",
+      "files": []
+    },
+    {
+      "sha": "7efbf80",
+      "date": "2026-10-05",
+      "files": []
+    },
+    {
+      "sha": "1b536b6",
+      "date": "2026-10-05",
+      "files": []
+    },
+    {
+      "sha": "d9994c3",
+      "date": "2026-10-05",
+      "files": []
+    }
+  ]
 }
 ---
 

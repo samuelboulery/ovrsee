@@ -2,7 +2,7 @@
 {
   "id": "E-0270",
   "titre": "Audit sécurité 1.3 — corriger les failles relevées",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "securite"
@@ -10,7 +10,8 @@
   "cree": "2026-10-05",
   "maj": "2026-10-05",
   "plan": "2026-10-05-audit-de-securite-ovrsee-1-3-0-plan-de-correction.md",
-  "type": "epic"
+  "type": "epic",
+  "fait": "2026-10-05T12:22:06.740Z"
 }
 ---
 

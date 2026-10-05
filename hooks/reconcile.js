@@ -29,7 +29,7 @@
 import { execFileSync } from 'node:child_process'
 
 import { attachCommitToPlan, readPlans } from './plans.js'
-import { readTickets } from './tickets.js'
+import { CITATION_TICKET, readTickets } from './tickets.js'
 import { avancerTicketsDuPlan } from './ovrsee-post-commit.js'
 
 const git = (args, cwd) =>
@@ -49,12 +49,12 @@ const git = (args, cwd) =>
  */
 export function ticketsCites(message) {
   const texte = String(message ?? '')
-  const cites = new Set(texte.match(/\b[TE]-\d{4}\b/g) ?? [])
+  const cites = new Set(texte.match(CITATION_TICKET) ?? [])
 
   // Les deux préfixes pour chaque numéro : tickets et epics partagent le
   // compteur, un epic né au milieu d'un lot porte un numéro de l'intervalle. Un
   // identifiant qui n'existe pas ne désigne rien.
-  for (const [, a, b] of texte.matchAll(/\b[TE]-(\d{4})\s*(?:→|->|…|\.\.\.)\s*[TE]-(\d{4})\b/g)) {
+  for (const [, a, b] of texte.matchAll(/\b[TE]-(\d{4,})\s*(?:→|->|…|\.\.\.)\s*[TE]-(\d{4,})/g)) {
     const debut = Number(a)
     const fin = Number(b)
     if (fin <= debut || fin - debut > 100) continue

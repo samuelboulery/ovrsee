@@ -4,8 +4,9 @@ import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { ticketManquant, ticketActifManquant } from './ovrsee-tool-edit-gate.js'
+import { ticketManquant, ticketActifManquant, ticketActifSolde } from './ovrsee-tool-edit-gate.js'
 import { createTicket, moveTicket } from './tickets.js'
+import { writeActive } from './active.js'
 
 /** Un dossier `ovrsee/` jetable avec un board par défaut (colonnes standard). */
 const fixture = () => {
@@ -116,4 +117,27 @@ test('deux sessions ont chacune leur ticket actif, sans se gêner', () => {
 
   assert.equal(ticketActifManquant(ovrseeDir, 'session-a'), false)
   assert.equal(ticketActifManquant(ovrseeDir, 'session-b'), true)
+})
+
+// --- ticketActifSolde : nommer le ticket qu'un commit a soldé --------------
+
+test('ticketActifSolde nomme le ticket actif qu’un commit a passé en colonne finale', () => {
+  const ovrseeDir = fixture()
+  const { file, meta } = createTicket(ovrseeDir, { titre: 'Ad hoc', colonne: 'en-cours' })
+  writeActive(ovrseeDir, 'S1', { ticket: meta.id })
+
+  // Le post-commit déplace sans session : le pointeur de la session reste.
+  moveTicket(ovrseeDir, file, 'fait')
+
+  assert.equal(ticketActifManquant(ovrseeDir, 'S1'), true)
+  assert.equal(ticketActifSolde(ovrseeDir, 'S1'), meta.id)
+})
+
+test('ticketActifSolde est null pour un ticket actif ouvert ou absent', () => {
+  const ovrseeDir = fixture()
+  assert.equal(ticketActifSolde(ovrseeDir, 'S1'), null)
+
+  const { meta } = createTicket(ovrseeDir, { titre: 'Ouvert', colonne: 'en-cours' })
+  writeActive(ovrseeDir, 'S1', { ticket: meta.id })
+  assert.equal(ticketActifSolde(ovrseeDir, 'S1'), null)
 })

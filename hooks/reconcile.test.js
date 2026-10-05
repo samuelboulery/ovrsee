@@ -225,3 +225,17 @@ test('plansPourMessage ignore les plans clos et les tickets sans plan', () => {
   assert.deepEqual(plansPourMessage(ovrseeDir, 'T-0003'), [], 'T-0003 pointe un plan clos')
   assert.deepEqual(plansPourMessage(ovrseeDir, 'rien à citer'), [])
 })
+
+test('ticketsCites lit un numéro à cinq chiffres en entier', () => {
+  // `T-\d{4}` lisait `T-10000` comme `T-1000` : un autre ticket, soldé à tort.
+  assert.deepEqual([...ticketsCites('fix: x (T-10000)')], ['T-10000'])
+  // L'intervalle couvre aussi les epics nés au milieu : chaque numéro, deux préfixes.
+  assert.deepEqual(
+    [...ticketsCites('fix: (T-9999 → T-10001)')].sort(),
+    ['E-10000', 'E-10001', 'E-9999', 'T-10000', 'T-10001', 'T-9999'],
+  )
+})
+
+test('ticketsCites lit une citation collée à un suffixe', () => {
+  assert.deepEqual([...ticketsCites('fix: x (T-0268a, T-0269_b)')], ['T-0268', 'T-0269'])
+})

@@ -24,15 +24,17 @@ import { ID_TICKET, idFromFile, idPourType, isSafeTicketId, nextTicketId } from 
 import { IMAGES_DIR, imagesDuTicket } from './ticket-images.js'
 import {
   DEFAULT_COLUMNS,
+  EN_COURS,
   addColumn,
   colonneFinale,
+  predicatEnVol,
   readBoard,
   renameColumn,
   reorderColumn,
   writeBoard,
 } from './board.js'
 
-export { isSafeTicketId, nextTicketId } from './ticket-id.js'
+export { CITATION_TICKET, isSafeTicketId, nextTicketId } from './ticket-id.js'
 export { saveTicketImage } from './ticket-images.js'
 
 /**
@@ -42,8 +44,10 @@ export { saveTicketImage } from './ticket-images.js'
  */
 export {
   DEFAULT_COLUMNS,
+  EN_COURS,
   addColumn,
   colonneFinale,
+  predicatEnVol,
   readBoard,
   renameColumn,
   reorderColumn,
@@ -52,17 +56,6 @@ export {
 
 
 /** De la plus urgente à la moins urgente. L'ordre du tableau est l'ordre du tri. */
-/**
- * La colonne qui marque le travail commencé.
- *
- * Trois hooks s'en servent pour distinguer un ticket en vol d'un ticket que
- * personne n'a ouvert — `ovrsee-tool-edit` l'y met, `ovrsee-tool-stop` le
- * pousse plus loin, `ovrsee-post-commit` refuse de clore en deçà. Elle était
- * écrite en dur dans chacun, dont deux constantes locales identiques : trois
- * définitions d'une même chaîne finissent par diverger.
- */
-export const EN_COURS = 'en-cours'
-
 export const PRIORITES = ['haute', 'moyenne', 'basse']
 
 const DEFAULT_PRIORITE = 'moyenne'
@@ -667,14 +660,12 @@ export function avancerTicketsClos(ovrseeDir) {
   // Même règle qu'au commit : on ne solde que ce qui était en vol. Un ticket
   // jamais commencé n'est pas « fait », et clore le plan ne le rend pas vrai —
   // il reste visible, et rattachable à un autre plan.
-  const iEnCours = colonnes.findIndex(c => c.id === EN_COURS)
-  if (iEnCours === -1) return []
-  const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
+  const enVol = predicatEnVol(colonnes)
+  if (!enVol) return []
 
   const avances = []
   for (const ticket of readTickets(ovrseeDir, colonnes)) {
-    if (!plansFermes.has(ticket.meta.plan) || ticket.meta.colonne === finale) continue
-    if ((rangDe.get(ticket.meta.colonne) ?? -1) < iEnCours) continue
+    if (!plansFermes.has(ticket.meta.plan) || !enVol(ticket)) continue
 
     try {
       moveTicket(ovrseeDir, ticket.file, finale)

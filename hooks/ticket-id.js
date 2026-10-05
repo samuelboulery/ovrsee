@@ -28,6 +28,13 @@ export function nextTicketId(tickets, type = null) {
 /** Un identifiant de ticket : `T-` pour un ticket, `E-` pour un epic. */
 export const ID_TICKET = /^[TE]-\d+$/
 
+/**
+ * Un ticket ou un epic cité dans un message de commit. Borné au mot en tête,
+ * ce qui écarte `CVE-2024` ; `\d{4,}`, car `T-\d{4}` lisait `T-10000` comme
+ * `T-1000`. Globale — pour `match`/`matchAll`, jamais `test`/`exec`.
+ */
+export const CITATION_TICKET = /\b[TE]-\d{4,}/g
+
 const prefixe = type => (type === 'epic' ? 'E' : 'T')
 
 /** Le même numéro, sous le préfixe que le type impose. */

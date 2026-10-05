@@ -243,6 +243,10 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   fait avancer ses tickets en colonne finale — le plan de session n'a aucun pouvoir sur
   des tickets que personne n'a nommés. Un commit fait hors de Claude Code, sans ticket
   cité, alors que deux plans sont actifs, n'est rattaché nulle part — et le dit sur stderr.
+  Un ticket **sans plan** (ou dont le plan n'existe pas) n'a que la citation :
+  `avancerTicketsCites` le solde s'il est cité et en vol. **Citer un ticket ad hoc le
+  clôt** — et le gate bloque alors l'édition suivante. Un commit intermédiaire ne le cite
+  pas. Les tickets soldés au commit sont nommés sur stderr.
 - **Un plan ouvert sans commit ne se clôt pas, et il le dit maintenant.** La date de
   clôture se prend sur le dernier commit ; sans commit, `closeOpenPlans` passait son tour
   en silence et le plan restait ouvert pour toujours, en captant les commits de sa

@@ -23,8 +23,10 @@ import { parsePlan, readPlans, serializePlan, slugify, writeFileNoFollow } from 
 import { clearActive, readActive, withLock, writeActive } from './active.js'
 import {
   DEFAULT_COLUMNS,
+  EN_COURS,
   addColumn,
   colonneFinale,
+  predicatEnVol,
   readBoard,
   renameColumn,
   reorderColumn,
@@ -38,8 +40,10 @@ import {
  */
 export {
   DEFAULT_COLUMNS,
+  EN_COURS,
   addColumn,
   colonneFinale,
+  predicatEnVol,
   readBoard,
   renameColumn,
   reorderColumn,
@@ -49,36 +53,10 @@ export {
 
 /** De la plus urgente à la moins urgente. L'ordre du tableau est l'ordre du tri. */
 /**
- * La colonne qui marque le travail commencé.
- *
- * Trois hooks s'en servent pour distinguer un ticket en vol d'un ticket que
- * personne n'a ouvert — `ovrsee-tool-edit` l'y met, `ovrsee-tool-stop` le
- * pousse plus loin, `ovrsee-post-commit` refuse de clore en deçà. Elle était
- * écrite en dur dans chacun, dont deux constantes locales identiques : trois
- * définitions d'une même chaîne finissent par diverger.
- */
-export const EN_COURS = 'en-cours'
-
-/**
  * Un ticket cité dans un message de commit. `\d{4,}` : `T-\d{4}` lisait
  * `T-10000` comme `T-1000`. Globale — pour `match`/`matchAll`, jamais `test`/`exec`.
  */
 export const CITATION_TICKET = /\bT-\d{4,}/g
-
-/**
- * « En vol » : `en-cours` ou au-delà, hors colonne finale. Un commit clôt ce
- * qu'on a fait, pas ce qu'on a prévu. `null` sans finale ou sans `en-cours` :
- * rien ne distingue alors un ticket en vol d'un ticket jamais commencé, et ne
- * rien fermer est le défaut sûr — un tableau vidé tout seul ne se remarque pas.
- */
-export function predicatEnVol(colonnes) {
-  const finale = colonneFinale(colonnes)
-  const iEnCours = colonnes.findIndex(c => c.id === EN_COURS)
-  if (!finale || iEnCours === -1) return null
-
-  const rangDe = new Map(colonnes.map((c, i) => [c.id, i]))
-  return t => t.meta.colonne !== finale && (rangDe.get(t.meta.colonne) ?? -1) >= iEnCours
-}
 
 export const PRIORITES = ['haute', 'moyenne', 'basse']
 

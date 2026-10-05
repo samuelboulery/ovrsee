@@ -271,9 +271,14 @@ function projectAction(body) {
         // failed » et rien d'autre — un échec sans cause envoie chercher le
         // problème là où il n'est pas.
         const dit = String(err?.stderr ?? '').trim()
+        // Le refus vient de notre garde, pas du distant : le dire, sans quoi
+        // « transport 'file' not allowed » envoie chercher chez git.
+        const refus = /transport '[^']*' not allowed/.test(dit)
+          ? "l'ovrsee ne fetch qu'en https, http ou ssh — un distant local ou git:// est refusé. "
+          : ''
         return {
           status: 400,
-          json: { error: dit || String(err.message ?? err) },
+          json: { error: refus + (dit || String(err.message ?? err)) },
         }
       }
       return { json: { gitStatus: gitStatus(path) } }

@@ -18,7 +18,7 @@
  *   effets ticket(s) liés au plan actif, en `en-cours` : `colonne` → `revue`
  */
 
-import { execFileSync } from 'node:child_process'
+import { git } from './git.js'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
@@ -39,11 +39,12 @@ import { estPrincipal } from './principal.js'
  */
 export function aDuCodeNonCommite(root) {
   try {
-    const sortie = execFileSync(
-      'git',
-      ['status', '--porcelain', '--', '.', ':!ovrsee', ':!graphify-out'],
-      { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
-    )
+    // Par la garde : ce hook tourne dans tout dépôt qui porte un `ovrsee/`, y
+    // compris un dépôt reçu en archive avec son `.git/config`.
+    const sortie = git(root, ['status', '--porcelain', '--ignore-submodules=all', '--', '.', ':!ovrsee', ':!graphify-out'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
     return sortie.trim().length > 0
   } catch {
     return false // Lecture git en échec : on ne déclenche rien plutôt que de deviner.

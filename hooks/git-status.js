@@ -27,7 +27,7 @@ const git = (root, args) =>
  * fichier non suivi (`??`) n'est ni l'un ni l'autre — il a sa propre case.
  */
 function dirty(root) {
-  const lines = git(root, ['status', '--porcelain=v1']).split('\n').filter(Boolean)
+  const lines = git(root, ['status', '--porcelain=v1', '--ignore-submodules=all']).split('\n').filter(Boolean)
   let staged = 0
   let unstaged = 0
   let untracked = 0

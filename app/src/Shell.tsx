@@ -620,14 +620,21 @@ function ProjectRow({
             />
           </div>
         )}
-        <div
+        {/* Le nom est le bouton : la ligne entière reste cliquable à la souris
+            (le clic remonte jusqu'au `onClick` de la ligne), et le clavier y
+            trouve enfin un arrêt de tabulation activable par Entrée/Espace
+            (T-0300). Pas toute la ligne en `<button>` : le × y serait un bouton
+            dans un bouton. */}
+        <button
+          type="button"
+          aria-current={active ? 'true' : undefined}
           style={s(
-            `flex: 1; min-width: 0; font-size: 12.5px; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; ${active ? 'font-weight: 500; color: var(--color-text);' : 'color: var(--color-text-tertiary);'}`,
+            `flex: 1; min-width: 0; padding: 0; border: 0; background: none; font: inherit; text-align: left; cursor: pointer; font-size: 12.5px; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; ${active ? 'font-weight: 500; color: var(--color-text);' : 'color: var(--color-text-tertiary);'}`,
           )}
           title={project.path}
         >
           {project.name}
-        </div>
+        </button>
 
         {!confirming && typeof rang === 'number' && (
           <span

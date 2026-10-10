@@ -41,7 +41,7 @@ const git = (args, cwd) =>
  * garder ferait apparaître tous les plans comme touchant toutes les pages, et
  * la relation plan → fichiers → page ne voudrait plus rien dire.
  */
-const DERIVED = ['ovrsee/', 'graphify-out/']
+export const DERIVED = ['ovrsee/', 'graphify-out/']
 
 /** Fichiers sources du dernier commit. */
 function changedFiles(root) {

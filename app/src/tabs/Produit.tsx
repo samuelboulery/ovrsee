@@ -301,7 +301,7 @@ function CrawlButton({
 }) {
   const [copie, setCopie] = useState(false)
   const [configure, setConfigure] = useState(false)
-  const { enCours, ligne, demarrer, arreter } = useCrawl(snapshot.root, onReload)
+  const { enCours, ligne, erreur, demarrer, arreter } = useCrawl(snapshot.root, onReload)
 
   // 1. Navigateur : pas d'IPC, on copie.
   if (!crawlDisponible()) {
@@ -380,10 +380,21 @@ function CrawlButton({
 
   // 4. Prêt.
   return (
-    <button type="button" className="btn btn-primary" style={s('font-size: 12px;')} onClick={demarrer}>
-      <Compass size={14} weight="fill" aria-hidden="true" />
-      {t('produit.crawl')}
-    </button>
+    <div style={s('display: flex; align-items: center; gap: 8px; min-width: 0;')}>
+      {erreur && (
+        <span
+          role="alert"
+          title={erreur}
+          style={s('font-size: 11px; color: var(--color-err); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 40ch;')}
+        >
+          {erreur}
+        </span>
+      )}
+      <button type="button" className="btn btn-primary" style={s('font-size: 12px;')} onClick={demarrer}>
+        <Compass size={14} weight="fill" aria-hidden="true" />
+        {t('produit.crawl')}
+      </button>
+    </div>
   )
 }
 

@@ -209,6 +209,31 @@ test('le brief annonce les tickets restants, pas ceux de la dernière colonne', 
   assert.doesNotMatch(brief, /Déjà fait/)
 })
 
+test('le brief ne compte pas un epic qui a des enfants — son colonne est inerte (T-0298)', () => {
+  const brief = buildBrief(
+    {
+      name: 'projet',
+      plans: [],
+      pageCount: 0,
+      scan: null,
+      board: [
+        { id: 'backlog', titre: 'Backlog' },
+        { id: 'fait', titre: 'Fait' },
+      ],
+      tickets: [
+        { file: 'E-0001-a.md', id: 'E-0001', titre: 'Epic soldé', colonne: 'backlog', priorite: 'haute', type: 'epic' },
+        { file: 'T-0002-b.md', id: 'T-0002', titre: 'Enfant fait', colonne: 'fait', priorite: 'basse', epic: 'E-0001' },
+        { file: 'E-0003-c.md', id: 'E-0003', titre: 'Epic vide', colonne: 'backlog', priorite: 'basse', type: 'epic' },
+      ],
+    },
+    NOW,
+  )
+
+  assert.match(brief, /1 ticket\(s\) à faire/)
+  assert.doesNotMatch(brief, /Epic soldé/)
+  assert.match(brief, /Epic vide/)
+})
+
 test('un ovrsee sans plan ni page mais avec un ticket a quelque chose à dire', () => {
   const brief = buildBrief(
     {

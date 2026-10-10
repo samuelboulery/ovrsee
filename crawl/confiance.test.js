@@ -19,7 +19,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { approuver, cleProjet, decision, estApprouve, lireConfiance, trustPath } from './confiance.js'
+import { approuver, cleProjet, decision, estApprouve, lireConfiance, retenirServeur, serveurConnu, trustPath } from './confiance.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 
@@ -203,4 +203,32 @@ test('le crawler refuse une commande dev illisible, même déjà approuvée (T-0
   const dev = 'pnpm\u200b dev'
   approuver(root, dev)
   await assert.rejects(() => assurerConfiance(root, dev), /ASCII/)
+})
+
+// --- le serveur qu'on a lancé, retenu hors du dépôt (T-0281) ----------------
+
+test('le serveur lancé par le crawler se retient auprès de l’accord, hors du dépôt', () => {
+  magasinNeuf()
+  const projet = projetNeuf()
+  approuver(projet, 'pnpm dev')
+
+  retenirServeur(projet, 'http://localhost:5180', 'Ovrsee')
+  assert.deepEqual(serveurConnu(projet), { baseUrl: 'http://localhost:5180', titre: 'Ovrsee' })
+  assert.equal(estApprouve(projet, 'pnpm dev'), true, 'retenir le serveur ne touche pas à l’accord')
+})
+
+test('sans accord, aucun serveur ne se retient', () => {
+  magasinNeuf()
+  const projet = projetNeuf()
+  retenirServeur(projet, 'http://localhost:5180', 'Ovrsee')
+  assert.equal(serveurConnu(projet), null)
+})
+
+test('un nouvel accord oublie le serveur retenu : une autre commande sert peut-être autre chose', () => {
+  magasinNeuf()
+  const projet = projetNeuf()
+  approuver(projet, 'pnpm dev')
+  retenirServeur(projet, 'http://localhost:5180', 'Ovrsee')
+  approuver(projet, 'pnpm start')
+  assert.equal(serveurConnu(projet), null)
 })

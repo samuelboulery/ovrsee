@@ -198,3 +198,18 @@
 {"date":"2026-09-02","commit":"de18b7c","ok":true,"pages":7}
 {"date":"2026-09-02","commit":"dec5fd5","ok":false,"error":"http://localhost:5180 répond déjà — un autre serveur occupe le port. Arrêtez-le, ou donnez un baseUrl libre dans ovrsee.config.json."}
 {"date":"2026-10-05","commit":"67852cc","ok":false,"error":"commande dev non approuvée pour ce dépôt — cliquez sur « Crawler » pour l'autoriser"}
+{"date":"2026-10-10","commit":"6270a0e","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"6e27235","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"6e27235","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"f78dd60","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"5287191","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"0f69380","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"387cc11","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"db5bbde","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"db5bbde","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"d1ef472","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"ebd2ef1","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"d90110f","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"d90110f","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"d90110f","ok":true,"pages":7}
+{"date":"2026-10-10","commit":"4874bbf","ok":true,"pages":7}

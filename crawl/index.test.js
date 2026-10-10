@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 
-import { sanitizePageCapture } from './index.js'
+import { extraitDePage, sanitizePageCapture } from './index.js'
 
 // --- filtrage du titre et de l'extrait captés dans le DOM observé ----------
 
@@ -26,4 +26,24 @@ test('sanitizePageCapture masque aussi un titre pollué', () => {
 test('sanitizePageCapture tronque le texte à 400 caractères après filtrage', () => {
   const { text } = sanitizePageCapture('Titre', 'a'.repeat(500))
   assert.equal(text.length, 400)
+})
+
+// --- l'extrait d'une page (T-0294) ----------------------------------------
+
+test('l’extrait préfère la description de la page', () => {
+  assert.equal(
+    extraitDePage({ description: ' Suivi de projet. ', h1: 'Accueil', p: 'Bonjour', main: 'x', texte: 'tout' }),
+    'Suivi de projet.',
+  )
+})
+
+test('sans description, le titre et le premier paragraphe', () => {
+  assert.equal(extraitDePage({ description: '', h1: 'Accueil', p: 'Bonjour', main: 'x', texte: 'tout' }), 'Accueil\nBonjour')
+  assert.equal(extraitDePage({ h1: 'Accueil', texte: 'tout' }), 'Accueil')
+})
+
+test('sans rien de tout ça, le contenu principal plutôt que la page entière', () => {
+  assert.equal(extraitDePage({ main: ' Contenu ', texte: 'Rechercher… ⌘K VUES 7' }), 'Contenu')
+  assert.equal(extraitDePage({ texte: 'Rechercher… ⌘K VUES 7' }), 'Rechercher… ⌘K VUES 7')
+  assert.equal(extraitDePage({}), '')
 })

@@ -442,7 +442,11 @@ app.whenReady().then(() => {
       if (devEnQuestion.has(projectPath)) return crawlState()
       devEnQuestion.add(projectPath)
       try {
-        if (!(await demanderAccord(event.sender, projectPath, dev))) return crawlState()
+        // Un refus se dit : rendre l'état seul ne produisait aucune transition,
+        // et le clic sur « Crawler » semblait n'avoir rien fait (T-0282).
+        if (!(await demanderAccord(event.sender, projectPath, dev))) {
+          return { error: "commande dev non approuvée — le crawl restera bloqué tant qu'elle ne l'est pas" }
+        }
       } finally {
         devEnQuestion.delete(projectPath)
       }

@@ -14,6 +14,8 @@ import { FolderOpen, Gear, MagnifyingGlass, Terminal as TerminalIcon, Ticket as 
 
 import { TAB_ICONS, activeTabsInOrder, type TabId } from './views'
 import {
+  restant,
+  type Colonne,
   type Project,
   type SettingsType,
   type Ticket,
@@ -36,6 +38,7 @@ const RECENTS = 5
 export function CommandPalette({
   settings,
   tickets,
+  board,
   projects,
   current,
   onClose,
@@ -46,6 +49,7 @@ export function CommandPalette({
 }: {
   settings: SettingsType | null
   tickets: Ticket[]
+  board: Colonne[]
   projects: Project[]
   current: string | null
   onClose: () => void
@@ -90,7 +94,7 @@ export function CommandPalette({
             key: `project:${project.path}`,
             label: project.name,
             path: project.path,
-            badge: project.path === current ? tickets.length : null,
+            badge: project.path === current ? restant(tickets, board) : null,
           }) as const,
       )
 
@@ -135,7 +139,7 @@ export function CommandPalette({
       { title: t('palette.tickets'), items: ticketItems },
       { title: t('palette.commands'), items: commands },
     ].filter(group => group.items.length > 0)
-  }, [query, settings, tickets, projects, current])
+  }, [query, settings, tickets, board, projects, current])
 
   const flat = useMemo(() => groups.flatMap(group => group.items), [groups])
 

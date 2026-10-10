@@ -10,7 +10,7 @@ import { PassThrough } from 'node:stream'
 
 import { fetchHandler, nodeMiddleware, resolve } from './api.js'
 import { mediaPath, shotPath } from '../hooks/snapshot.js'
-import { registerProject } from '../hooks/plans.js'
+import { registerProject, serializePlan } from '../hooks/plans.js'
 
 const url = path => new URL(path, 'http://localhost')
 
@@ -926,4 +926,45 @@ test('un POST trop volumineux se solde, il ne reste pas pendu', async () => {
 
   req.emit('data', 'x'.repeat(1_500_001))
   assert.notEqual(await issue, 'pendue')
+})
+
+// --- clore un plan depuis l'interface (T-0288, T-0295) --------------------
+
+const postClose = body =>
+  resolve(url('/api/plans/close-active'), null, { method: 'POST', headers: { 'x-ovrsee': '1' }, body })
+
+/** Deux plans ouverts : l'un réalisé par un commit, l'autre sans aucun. */
+const projetAvecPlans = () => {
+  const dir = projetEnregistre()
+  mkdirSync(join(dir, 'ovrsee', 'plans'), { recursive: true })
+  const plan = (file, commits) =>
+    writeFileSync(
+      join(dir, 'ovrsee', 'plans', file),
+      serializePlan({ title: file, status: 'open', opened: '2026-10-01', commits }, '# Plan\n'),
+    )
+  plan('2026-10-01-fait.md', [{ sha: 'abc1234', date: '2026-10-02', message: 'feat: x' }])
+  plan('2026-10-01-autre.md', [{ sha: 'def5678', date: '2026-10-03', message: 'feat: y' }])
+  plan('2026-10-01-vide.md', [])
+  return dir
+}
+
+test('clore un plan sans commit dit pourquoi il reste ouvert', () => {
+  const dir = projetAvecPlans()
+  const result = postClose({ path: dir, plan: '2026-10-01-vide.md' })
+
+  assert.deepEqual(result.json.closed, [])
+  assert.match(result.json.log.join('\n'), /2026-10-01-vide\.md : aucun commit/)
+})
+
+test('clore un plan nommé ne clôt que lui', () => {
+  const dir = projetAvecPlans()
+  const result = postClose({ path: dir, plan: '2026-10-01-fait.md' })
+
+  assert.deepEqual(result.json.closed, ['2026-10-01-fait.md'])
+})
+
+test('un nom de plan qui sort du dossier est refusé', () => {
+  const dir = projetAvecPlans()
+  assert.equal(postClose({ path: dir, plan: '../board.json' }).status, 400)
+  assert.equal(postClose({ path: dir, plan: 42 }).status, 400)
 })

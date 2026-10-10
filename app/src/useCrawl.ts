@@ -40,11 +40,12 @@ function crawlBridge(): CrawlBridge | null {
  * native : ce que le formulaire a saisi n'y entre pas, un rendu compromis
  * pouvant affirmer n'importe quoi (T-0273).
  *
- * Sans IPC (mode navigateur), l'appel ne fait rien : aucun accord ne s'y donne,
- * et le crawl n'y est de toute façon pas lançable.
+ * Sans IPC (mode navigateur), l'appel ne fait rien et rend `null` : aucun
+ * accord ne s'y donne, et le crawl n'y est de toute façon pas lançable.
+ * `false` dit un refus — ou rien à approuver, faute de commande `dev`.
  */
-export function approuverCrawl(root: string): void {
-  void crawlBridge()?.approve?.(root)
+export async function approuverCrawl(root: string): Promise<boolean | null> {
+  return (await crawlBridge()?.approve?.(root)) ?? null
 }
 
 /** `true` quand le crawl est lançable d'un clic — donc seulement dans Electron. */
@@ -52,6 +53,9 @@ export const crawlDisponible = (): boolean => crawlBridge() !== null
 
 export function useCrawl(root: string, onFini: () => void) {
   const [etat, setEtat] = useState<CrawlState>(REPOS)
+  // Un refus au lancement (projet inconnu, accord refusé) ne produit aucune
+  // transition d'état : sans lui, le clic ne faisait rien de visible (T-0283).
+  const [erreur, setErreur] = useState<string | null>(null)
 
   useEffect(() => {
     const bridge = crawlBridge()
@@ -71,7 +75,13 @@ export function useCrawl(root: string, onFini: () => void) {
   }, [onFini])
 
   const demarrer = useCallback(() => {
-    crawlBridge()?.start(root)
+    setErreur(null)
+    crawlBridge()
+      ?.start(root)
+      .then(retour => {
+        if ('error' in retour) setErreur(retour.error)
+      })
+      .catch((err: unknown) => setErreur(String((err as Error)?.message ?? err)))
   }, [root])
 
   const arreter = useCallback(() => {
@@ -82,5 +92,5 @@ export function useCrawl(root: string, onFini: () => void) {
   // qu'on regarde, et son avancement n'a alors rien à dire ici.
   const enCours = etat.running && etat.project === root
 
-  return { enCours, ligne: enCours ? etat.line : null, demarrer, arreter }
+  return { enCours, ligne: enCours ? etat.line : null, erreur, demarrer, arreter }
 }

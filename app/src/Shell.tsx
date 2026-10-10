@@ -66,7 +66,7 @@ export async function openProject(
  * Date du dernier scan. Un scan échoué se dit — sans quoi la capture
  * précédente passerait pour fraîche.
  */
-export function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
+export function ScanBadge({ scan, perime = false }: { scan: ReturnType<typeof lastScan>; perime?: boolean }) {
   if (!scan) {
     return (
       <div style={s('font-size: 11.5px; color: var(--color-text-quaternary);')}>
@@ -76,15 +76,20 @@ export function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
   }
   return (
     <div
+      // La raison d'un échec se lit au survol, depuis n'importe quel onglet —
+      // pas seulement dans le bandeau de l'onglet Produit (T-0282).
+      // Périmé, la pastille passe en avertissement : la capture n'est pas
+      // fausse, mais elle ne montre plus le code d'aujourd'hui (T-0284).
+      title={scan.ok ? (perime ? t('scan.stale') : undefined) : scan.error}
       style={s(
         'display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-family: var(--font-mono); color: var(--color-text-quaternary);',
       )}
     >
       <span
         style={s(
-          scan.ok
-            ? 'width: 5px; height: 5px; border-radius: 50%; background: var(--color-ok); display: block;'
-            : 'width: 5px; height: 5px; border-radius: 50%; background: var(--color-err); display: block;',
+          `width: 5px; height: 5px; border-radius: 50%; display: block; background: ${
+            !scan.ok ? 'var(--color-err)' : perime ? 'var(--color-warn)' : 'var(--color-ok)'
+          };`,
         )}
       />
       {scan.ok ? t('scan.last') : t('scan.failed')} · {frDate(scan.date)} · {scan.commit}
@@ -92,7 +97,7 @@ export function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
   )
 }
 
-export function Message({ text }: { text: string }) {
+export function Message({ text, onRetry }: { text: string; onRetry?: () => void }) {
   return (
     // `role="status"` : c'est ici, et nulle part ailleurs, qu'une région vivante
     // a sa place. `<main>` en portait une qui couvrait tout l'onglet, et les
@@ -100,10 +105,39 @@ export function Message({ text }: { text: string }) {
     <div
       role="status"
       style={s(
-        'flex: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--color-neutral-500);',
+        'flex: 1; display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: center; font-size: 13px; color: var(--color-neutral-500);',
       )}
     >
       {text}
+      {onRetry && (
+        <button type="button" className="btn" onClick={onRetry}>
+          {t('msg.retry')}
+        </button>
+      )}
+    </div>
+  )
+}
+
+/**
+ * Une erreur qui n'empêche pas de lire : préférences non écrites, accent,
+ * projet non ouvert. Elle se dit au-dessus de l'onglet et se ferme — le
+ * plein écran est réservé à la lecture impossible du snapshot (T-0287).
+ */
+export function Bandeau({ text, onClose }: { text: string; onClose: () => void }) {
+  return (
+    <div
+      role="alert"
+      style={s(
+        'margin: 8px 10px 0; padding: 6px 8px 6px 12px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--color-err);' +
+          'border: 1px solid var(--color-err-border); border-radius: var(--radius-sm); background: var(--color-err-bg);',
+      )}
+    >
+      <span style={s('flex: 1; min-width: 0;')}>
+        {t('msg.action_error')} : {text}
+      </span>
+      <button type="button" className="btn btn-ghost" aria-label={t('msg.dismiss')} onClick={onClose}>
+        ×
+      </button>
     </div>
   )
 }
@@ -620,14 +654,21 @@ function ProjectRow({
             />
           </div>
         )}
-        <div
+        {/* Le nom est le bouton : la ligne entière reste cliquable à la souris
+            (le clic remonte jusqu'au `onClick` de la ligne), et le clavier y
+            trouve enfin un arrêt de tabulation activable par Entrée/Espace
+            (T-0300). Pas toute la ligne en `<button>` : le × y serait un bouton
+            dans un bouton. */}
+        <button
+          type="button"
+          aria-current={active ? 'true' : undefined}
           style={s(
-            `flex: 1; min-width: 0; font-size: 12.5px; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; ${active ? 'font-weight: 500; color: var(--color-text);' : 'color: var(--color-text-tertiary);'}`,
+            `flex: 1; min-width: 0; padding: 0; border: 0; background: none; font: inherit; text-align: left; cursor: pointer; font-size: 12.5px; line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; ${active ? 'font-weight: 500; color: var(--color-text);' : 'color: var(--color-text-tertiary);'}`,
           )}
           title={project.path}
         >
           {project.name}
-        </div>
+        </button>
 
         {!confirming && typeof rang === 'number' && (
           <span

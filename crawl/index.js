@@ -25,10 +25,11 @@ import { join, resolve } from 'node:path'
 // est le seul pilote qui gère l'attente du réseau, l'état d'authentification
 // et la capture pleine page sans embarquer son propre navigateur —
 // `playwright-core` utilise celui du système.
-import { chromium } from 'playwright-core'
+import { lancerChrome } from './chrome.js'
+import { memeServeur, titreServi } from './serveur.js'
 
 import { normalizeRoutes, pageSlug, routeDansBase, sameOrigin, urlLocale } from './routes.js'
-import { assurerConfiance, DEV_DEFAUT } from './confiance.js'
+import { assurerConfiance, DEV_DEFAUT, retenirServeur, serveurConnu } from './confiance.js'
 import { migrerSession, sessionPath } from './session.js'
 import { redige } from '../hooks/redaction.js'
 import { cleanEnv, killTree, shellRun } from '../hooks/shell.js'
@@ -332,6 +333,22 @@ function globCorrespond(motif, texte) {
 }
 
 /**
+ * Ce qui résume une page, du plus délibéré au plus brut (T-0294) : la
+ * description qu'elle déclare, son titre et son premier paragraphe, son
+ * contenu principal, et seulement en dernier recours tout `body` — qui
+ * emportait la barre latérale et les raccourcis (« Rechercher… ⌘K VUES 7 »).
+ *
+ * @param {{ description?: string, h1?: string, p?: string, main?: string, texte?: string }} lu
+ * @returns {string}
+ */
+export function extraitDePage({ description, h1, p, main, texte } = {}) {
+  const net = v => String(v ?? '').trim()
+  if (net(description)) return net(description)
+  const entete = [net(h1), net(p)].filter(Boolean).join('\n')
+  return entete || net(main) || net(texte)
+}
+
+/**
  * Filtre le titre et l'extrait captés dans le DOM de l'application observée,
  * au plus près de la source — avant qu'ils n'entrent dans `visited[]` — pour
  * que `pages.json`, versionné, et tout consommateur en aval (skill `ovrsee`,
@@ -402,10 +419,14 @@ async function visitAll(page, config) {
       ),
     ]
 
-    const { title, text } = sanitizePageCapture(
-      (await page.title()) || path,
-      await page.evaluate(() => document.body?.innerText ?? ''),
-    )
+    const lu = await page.evaluate(() => ({
+      description: document.querySelector('meta[name="description"]')?.getAttribute('content') ?? '',
+      h1: document.querySelector('h1')?.innerText ?? '',
+      p: (document.querySelector('main p, article p') ?? document.querySelector('p'))?.innerText ?? '',
+      main: document.querySelector('main')?.innerText ?? '',
+      texte: document.body?.innerText ?? '',
+    }))
+    const { title, text } = sanitizePageCapture((await page.title()) || path, extraitDePage(lu))
     visited.push({ path, title, text, links: outgoing })
 
     for (const link of outgoing) {
@@ -532,18 +553,32 @@ async function run() {
   // `startApp` — c'est elle qu'on compare à l'accord, et personne ne relit le
   // fichier entre les deux. Un `dev` changé depuis l'accord fait donc échouer
   // la comparaison, ce qui referme la course entre l'accord et le lancement.
+  //
+  // Même quand le serveur sera réutilisé : sans accord, un dépôt pourrait
+  // pointer `baseUrl` vers un autre service du poste et le faire photographier.
   await assurerConfiance(root, config.dev)
+
+  // Le serveur que nous avons lancé la dernière fois tourne encore ? On le
+  // photographie sans rien relancer (T-0281). La référence vient de
+  // `trust.json`, jamais du dépôt.
+  const reutilise = memeServeur(serveurConnu(root), config.baseUrl, await titreServi(config.baseUrl))
 
   const commit = shortSha()
   const date = new Date().toISOString().slice(0, 10)
 
-  log(`démarrage de « ${config.dev} »…`)
   const session = sessionARejouer(config)
-  const app = await startApp(config)
 
-  let browser
+  // Le navigateur avant le serveur : sans Chrome, inutile de démarrer le
+  // projet observé pour l'arrêter aussitôt (T-0283).
+  const browser = await lancerChrome({ headless: true })
+  let app = null
   try {
-    browser = await chromium.launch({ channel: 'chrome', headless: true })
+    if (reutilise) {
+      log('serveur déjà lancé, réutilisé')
+    } else {
+      log(`démarrage de « ${config.dev} »…`)
+      app = await startApp(config)
+    }
     const context = await browser.newContext({
       viewport: config.viewport,
       ...(session ? { storageState: session } : {}),
@@ -551,6 +586,13 @@ async function run() {
     const page = await context.newPage()
 
     const { visited, redirects } = await visitAll(page, config)
+
+    // Lu avant `stopApp` : c'est notre serveur, il répond encore. Retenu pour
+    // le reconnaître s'il tourne toujours au prochain crawl.
+    if (!reutilise) {
+      const titre = await titreServi(config.baseUrl)
+      if (titre) retenirServeur(root, config.baseUrl, titre)
+    }
     log(`${visited.length} chemin(s) visité(s)`)
 
     const { routeOf } = normalizeRoutes(visited.map(v => v.path))
@@ -615,7 +657,7 @@ async function run() {
     recordScan({ date, commit, ok: true, pages: pages.size })
     log(`${pages.size} page(s) écrite(s) dans ovrsee/pages/pages.json`)
   } finally {
-    if (browser) await browser.close().catch(() => {})
+    await browser.close().catch(() => {})
     stopApp(app)
   }
 }

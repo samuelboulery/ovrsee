@@ -275,6 +275,8 @@ export interface Snapshot {
     orphanShots?: string[]
   } | null
   scans: Scan[]
+  /** Du code a changé depuis le dernier scan réussi (T-0284). Absent d'un serveur antérieur. */
+  capturesPerimees?: boolean
   /** slug de page → captures successives, de la plus récente à la plus ancienne */
   shots: Record<string, string[]>
   /** Commits et plans mêlés, du plus récent au plus ancien. */
@@ -467,6 +469,17 @@ const compterTickets = (tickets: Ticket[], colonneCompte: (colonne: string) => b
       return true
     })
     .length
+}
+
+/**
+ * Tous les tickets du plan sont en colonne finale — de quoi proposer de le
+ * clore (T-0295). Un plan sans ticket n'est pas soldé : rien ne le dit fini.
+ * Les epics sont ignorés, leur `colonne` est inerte.
+ */
+export const planSolde = (plan: string, tickets: Ticket[], board: Colonne[]): boolean => {
+  const fini = colonneFinale(board)
+  const siens = tickets.filter(t => t.plan === plan && t.type !== 'epic')
+  return fini !== null && siens.length > 0 && siens.every(t => t.colonne === fini)
 }
 
 /** Ce qui reste à faire — tout ticket hors de la colonne finale. */

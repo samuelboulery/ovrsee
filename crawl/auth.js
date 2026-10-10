@@ -19,7 +19,7 @@ import { spawn } from 'node:child_process'
 import { createInterface } from 'node:readline/promises'
 import { join, resolve } from 'node:path'
 
-import { chromium } from 'playwright-core'
+import { lancerChrome } from './chrome.js'
 
 import { cleanEnv, killTree, shellRun } from '../hooks/shell.js'
 import { assurerConfiance, DEV_DEFAUT } from './confiance.js'
@@ -47,6 +47,10 @@ async function main() {
   const dev = config.dev ?? DEV_DEFAUT
   await assurerConfiance(root, dev)
 
+  // Avant `dev` : un Chrome absent ne doit pas laisser derrière lui un
+  // serveur lancé pour rien (T-0283).
+  const browser = await lancerChrome({ headless: false })
+
   // Même invocation que le crawl (`crawl/index.js`), et pour les mêmes deux
   // raisons : `sh -c` n'a pas le PATH de pnpm hors d'un terminal, et une
   // commande `dev` qui meurt sous `stdio: 'ignore'` ne laisse rien à lire — on
@@ -62,7 +66,6 @@ async function main() {
     // console à part — invisible pour l'humain qui attend devant celle-ci.
   })
   app.on('error', err => console.error(`commande dev : ${err?.message ?? err}`))
-  const browser = await chromium.launch({ channel: 'chrome', headless: false })
 
   try {
     const context = await browser.newContext({ viewport: config.viewport ?? null })

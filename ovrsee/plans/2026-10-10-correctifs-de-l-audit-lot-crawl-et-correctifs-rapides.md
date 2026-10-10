@@ -117,6 +117,18 @@
         "hooks/snapshot.js",
         "hooks/snapshot.test.js"
       ]
+    },
+    {
+      "sha": "4874bbf",
+      "date": "2026-10-10",
+      "files": [
+        "CLAUDE.md",
+        "crawl/confiance.js",
+        "crawl/confiance.test.js",
+        "crawl/index.js",
+        "crawl/serveur.js",
+        "crawl/serveur.test.js"
+      ]
     }
   ]
 }

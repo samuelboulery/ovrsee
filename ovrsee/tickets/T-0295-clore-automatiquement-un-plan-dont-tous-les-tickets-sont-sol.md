@@ -1,8 +1,8 @@
 ---
 {
   "id": "T-0295",
-  "titre": "Clore automatiquement un plan dont tous les tickets sont soldés ?",
-  "colonne": "a-specifier",
+  "titre": "Proposer de clore un plan dont tous les tickets sont soldés",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "plans",
@@ -11,7 +11,8 @@
   "cree": "2026-10-10",
   "maj": "2026-10-10",
   "plan": "2026-10-10-correctifs-de-l-audit-lot-crawl-et-correctifs-rapides.md",
-  "epic": "E-0290"
+  "epic": "E-0290",
+  "fait": "2026-10-10T15:07:08.424Z"
 }
 ---
 

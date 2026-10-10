@@ -2,7 +2,7 @@
 {
   "id": "T-0288",
   "titre": "Clore le plan depuis l'interface dit pourquoi il reste ouvert",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ux",
@@ -12,7 +12,8 @@
   "maj": "2026-10-10",
   "plan": "2026-10-10-correctifs-de-l-audit-lot-crawl-et-correctifs-rapides.md",
   "epic": "E-0285",
-  "charge": "xs"
+  "charge": "xs",
+  "fait": "2026-10-10T15:07:08.422Z"
 }
 ---
 

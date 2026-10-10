@@ -332,6 +332,22 @@ function globCorrespond(motif, texte) {
 }
 
 /**
+ * Ce qui résume une page, du plus délibéré au plus brut (T-0294) : la
+ * description qu'elle déclare, son titre et son premier paragraphe, son
+ * contenu principal, et seulement en dernier recours tout `body` — qui
+ * emportait la barre latérale et les raccourcis (« Rechercher… ⌘K VUES 7 »).
+ *
+ * @param {{ description?: string, h1?: string, p?: string, main?: string, texte?: string }} lu
+ * @returns {string}
+ */
+export function extraitDePage({ description, h1, p, main, texte } = {}) {
+  const net = v => String(v ?? '').trim()
+  if (net(description)) return net(description)
+  const entete = [net(h1), net(p)].filter(Boolean).join('\n')
+  return entete || net(main) || net(texte)
+}
+
+/**
  * Filtre le titre et l'extrait captés dans le DOM de l'application observée,
  * au plus près de la source — avant qu'ils n'entrent dans `visited[]` — pour
  * que `pages.json`, versionné, et tout consommateur en aval (skill `ovrsee`,
@@ -402,10 +418,14 @@ async function visitAll(page, config) {
       ),
     ]
 
-    const { title, text } = sanitizePageCapture(
-      (await page.title()) || path,
-      await page.evaluate(() => document.body?.innerText ?? ''),
-    )
+    const lu = await page.evaluate(() => ({
+      description: document.querySelector('meta[name="description"]')?.getAttribute('content') ?? '',
+      h1: document.querySelector('h1')?.innerText ?? '',
+      p: (document.querySelector('main p, article p') ?? document.querySelector('p'))?.innerText ?? '',
+      main: document.querySelector('main')?.innerText ?? '',
+      texte: document.body?.innerText ?? '',
+    }))
+    const { title, text } = sanitizePageCapture((await page.title()) || path, extraitDePage(lu))
     visited.push({ path, title, text, links: outgoing })
 
     for (const link of outgoing) {

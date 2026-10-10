@@ -2,7 +2,7 @@
 {
   "id": "T-0281",
   "titre": "Le crawl réutilise le serveur de dev déjà lancé",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "crawl"
@@ -11,7 +11,8 @@
   "maj": "2026-10-10",
   "plan": "2026-10-10-correctifs-de-l-audit-lot-crawl-et-correctifs-rapides.md",
   "epic": "E-0280",
-  "charge": "m"
+  "charge": "m",
+  "fait": "2026-10-10T15:11:10.199Z"
 }
 ---
 

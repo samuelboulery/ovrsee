@@ -276,8 +276,14 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   sur lui-même et l'écran de premier lancement ne paraissait jamais. Il faut donc
   inscrire le dépôt ovrsee une fois, comme n'importe quel autre. Cette liste sert aussi
   de liste blanche aux routes : rien d'implicite dedans.
-- **Le crawl refuse de démarrer si `baseUrl` répond déjà.** Voulu : rien dans une
-  réponse HTTP ne distingue son propre serveur de celui d'un autre projet.
+- **Le crawl réutilise le serveur qui répond déjà, si c'est celui du projet — et refuse
+  sinon.** Rien dans une réponse HTTP ne distingue un serveur d'un autre ; la preuve
+  retenue est le `<title>` servi, comparé à `titreHtml` du dernier `pages.json` réussi
+  (`crawl/serveur.js`, T-0281). Refuser tout port occupé faisait échouer un crawl sur
+  cinq : on travaillait, le serveur tournait. Réutiliser n'exécute rien, donc ne demande
+  pas l'accord de la commande `dev` — le seul geste fait avant la garde est un GET sur un
+  `baseUrl` déjà restreint à ce poste. Deux projets au même titre par défaut se
+  confondraient : captures fausses, sans exécution.
 - **Le stdin du serveur MCP est du texte venu d'ailleurs.** `JSON.parse` rend aussi
   bien `null`, un nombre ou un tableau : la déstructuration qui suivait était hors du
   `try`, et une seule ligne `null` tuait le processus. La session perdait tous ses

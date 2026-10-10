@@ -1,9 +1,9 @@
 ---
 {
-  "status": "open",
+  "status": "closed",
   "title": "Correctifs de l'audit : lot crawl et correctifs rapides",
   "opened": "2026-10-10",
-  "closed": null,
+  "closed": "2026-10-10",
   "commits": [
     {
       "sha": "7d10451",
@@ -132,6 +132,11 @@
     },
     {
       "sha": "c339b12",
+      "date": "2026-10-10",
+      "files": []
+    },
+    {
+      "sha": "808448b",
       "date": "2026-10-10",
       "files": []
     }

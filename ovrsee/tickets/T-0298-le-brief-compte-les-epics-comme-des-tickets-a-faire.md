@@ -2,7 +2,7 @@
 {
   "id": "T-0298",
   "titre": "Le brief compte les epics comme des tickets à faire",
-  "colonne": "en-cours",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "bug",
@@ -11,7 +11,8 @@
   "cree": "2026-10-10",
   "maj": "2026-10-10",
   "plan": "2026-10-10-correctifs-de-l-audit-lot-crawl-et-correctifs-rapides.md",
-  "charge": "xs"
+  "charge": "xs",
+  "fait": "2026-10-10T15:04:00.063Z"
 }
 ---
 

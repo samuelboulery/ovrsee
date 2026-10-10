@@ -885,6 +885,7 @@ export function App() {
         <CommandPalette
           settings={settings}
           tickets={snapshot?.tickets ?? []}
+          board={snapshot?.board ?? []}
           projects={projects}
           current={current}
           onClose={() => setPaletteOuverte(false)}

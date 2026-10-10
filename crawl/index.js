@@ -25,7 +25,7 @@ import { join, resolve } from 'node:path'
 // est le seul pilote qui gère l'attente du réseau, l'état d'authentification
 // et la capture pleine page sans embarquer son propre navigateur —
 // `playwright-core` utilise celui du système.
-import { chromium } from 'playwright-core'
+import { lancerChrome } from './chrome.js'
 
 import { normalizeRoutes, pageSlug, routeDansBase, sameOrigin, urlLocale } from './routes.js'
 import { assurerConfiance, DEV_DEFAUT } from './confiance.js'
@@ -557,13 +557,15 @@ async function run() {
   const commit = shortSha()
   const date = new Date().toISOString().slice(0, 10)
 
-  log(`démarrage de « ${config.dev} »…`)
   const session = sessionARejouer(config)
-  const app = await startApp(config)
 
-  let browser
+  // Le navigateur avant le serveur : sans Chrome, inutile de démarrer le
+  // projet observé pour l'arrêter aussitôt (T-0283).
+  const browser = await lancerChrome({ headless: true })
+  let app = null
   try {
-    browser = await chromium.launch({ channel: 'chrome', headless: true })
+    log(`démarrage de « ${config.dev} »…`)
+    app = await startApp(config)
     const context = await browser.newContext({
       viewport: config.viewport,
       ...(session ? { storageState: session } : {}),
@@ -635,7 +637,7 @@ async function run() {
     recordScan({ date, commit, ok: true, pages: pages.size })
     log(`${pages.size} page(s) écrite(s) dans ovrsee/pages/pages.json`)
   } finally {
-    if (browser) await browser.close().catch(() => {})
+    await browser.close().catch(() => {})
     stopApp(app)
   }
 }

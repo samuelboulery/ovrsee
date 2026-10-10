@@ -1,7 +1,6 @@
 {
   "date": "2026-10-10",
-  "commit": "db5bbde",
-  "titreHtml": "Ovrsee",
+  "commit": "d90110f",
   "pages": [
     {
       "route": "/",
@@ -17,7 +16,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/accueil/2026-10-10-db5bbde.png",
+      "shot": "shots/accueil/2026-10-10-d90110f.png",
       "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
@@ -38,7 +37,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/navigateur/2026-10-10-db5bbde.png",
+      "shot": "shots/navigateur/2026-10-10-d90110f.png",
       "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
@@ -59,7 +58,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/produit/2026-10-10-db5bbde.png",
+      "shot": "shots/produit/2026-10-10-d90110f.png",
       "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
@@ -80,7 +79,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/historique/2026-10-10-db5bbde.png",
+      "shot": "shots/historique/2026-10-10-d90110f.png",
       "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
@@ -101,7 +100,7 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/tableau/2026-10-10-db5bbde.png",
+      "shot": "shots/tableau/2026-10-10-d90110f.png",
       "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
@@ -122,7 +121,7 @@
         "/tableau",
         "/stack"
       ],
-      "shot": "shots/donnees/2026-10-10-db5bbde.png",
+      "shot": "shots/donnees/2026-10-10-d90110f.png",
       "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
@@ -143,7 +142,7 @@
         "/tableau",
         "/donnees"
       ],
-      "shot": "shots/stack/2026-10-10-db5bbde.png",
+      "shot": "shots/stack/2026-10-10-d90110f.png",
       "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,

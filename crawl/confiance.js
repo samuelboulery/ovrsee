@@ -133,8 +133,13 @@ export function estApprouve(root, dev) {
  */
 export function approuver(root, dev) {
   const magasin = lireConfiance()
+  // L'entrée est remplacée, pas fusionnée : un serveur retenu sous l'ancienne
+  // commande ne prouve rien de ce que sert la nouvelle.
   magasin.projets[cleProjet(root)] = { dev, le: new Date().toISOString() }
+  ecrireConfiance(magasin)
+}
 
+function ecrireConfiance(magasin) {
   const path = trustPath()
   writeFileNoFollow(path, JSON.stringify(magasin, null, 2) + '\n')
   try {
@@ -142,6 +147,38 @@ export function approuver(root, dev) {
   } catch {
     // Windows ne connaît pas ces bits. L'accord est écrit, c'est l'essentiel.
   }
+}
+
+/**
+ * Retient ce qu'a servi le serveur que le crawler vient de lancer lui-même,
+ * pour le reconnaître s'il tourne encore au prochain crawl (T-0281).
+ *
+ * Ici et pas dans `pages.json` : le dépôt observé n'a pas à dire lui-même à
+ * quoi ressemble son serveur, sans quoi il désignerait n'importe quel service
+ * du poste. Rien ne se retient sans accord — la référence ne vaut que pour une
+ * commande approuvée.
+ *
+ * @param {string} root
+ * @param {string} baseUrl
+ * @param {string} titre
+ */
+export function retenirServeur(root, baseUrl, titre) {
+  const magasin = lireConfiance()
+  const entree = magasin.projets[cleProjet(root)]
+  if (typeof entree?.dev !== 'string') return
+  magasin.projets[cleProjet(root)] = { ...entree, serveur: { baseUrl, titre } }
+  ecrireConfiance(magasin)
+}
+
+/**
+ * @param {string} root
+ * @returns {{ baseUrl: string, titre: string } | null}
+ */
+export function serveurConnu(root) {
+  const serveur = lireConfiance().projets[cleProjet(root)]?.serveur
+  return typeof serveur?.baseUrl === 'string' && typeof serveur?.titre === 'string'
+    ? { baseUrl: serveur.baseUrl, titre: serveur.titre }
+    : null
 }
 
 /**

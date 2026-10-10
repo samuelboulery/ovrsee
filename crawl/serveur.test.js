@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { createServer } from 'node:http'
 
-import { memeProjet, titreAttendu, titreHtml, titreServi } from './serveur.js'
+import { memeServeur, titreHtml, titreServi } from './serveur.js'
 
 // --- réutiliser le serveur déjà lancé (T-0281) -----------------------------
 
@@ -12,18 +12,14 @@ test('le titre se lit dans le HTML servi', () => {
   assert.equal(titreHtml('<html></html>'), '')
 })
 
-test('le titre attendu est celui servi au dernier crawl réussi, sinon celui de l’accueil', () => {
-  assert.equal(titreAttendu({ titreHtml: 'Servi', pages: [{ route: '/', title: 'Rendu' }] }), 'Servi')
-  assert.equal(titreAttendu({ pages: [{ route: '/x', title: 'X' }, { route: '/', title: ' Rendu ' }] }), 'Rendu')
-  assert.equal(titreAttendu(null), '')
-  assert.equal(titreAttendu({ pages: 'pas une liste' }), '')
-})
-
-test('même projet seulement sur un titre identique et non vide', () => {
-  assert.equal(memeProjet('Ovrsee', 'Ovrsee'), true)
-  assert.equal(memeProjet('Autre', 'Ovrsee'), false)
-  assert.equal(memeProjet('', ''), false, 'deux titres vides ne prouvent rien')
-  assert.equal(memeProjet(null, 'Ovrsee'), false)
+test('même serveur seulement sur le même baseUrl et le même titre non vide', () => {
+  const connu = { baseUrl: 'http://localhost:5180', titre: 'Ovrsee' }
+  assert.equal(memeServeur(connu, 'http://localhost:5180', 'Ovrsee'), true)
+  assert.equal(memeServeur(connu, 'http://localhost:5180', 'Autre'), false)
+  assert.equal(memeServeur(connu, 'http://localhost:3000', 'Ovrsee'), false, 'un baseUrl changé ne réutilise rien')
+  assert.equal(memeServeur({ baseUrl: 'http://localhost:5180', titre: '' }, 'http://localhost:5180', ''), false)
+  assert.equal(memeServeur(null, 'http://localhost:5180', 'Ovrsee'), false, 'sans crawl lancé par nous, rien de connu')
+  assert.equal(memeServeur(connu, 'http://localhost:5180', null), false)
 })
 
 test('titreServi lit le titre d’un serveur qui répond, et rend null sans serveur', async () => {
@@ -36,4 +32,19 @@ test('titreServi lit le titre d’un serveur qui répond, et rend null sans serv
     server.close()
   }
   assert.equal(await titreServi(`http://127.0.0.1:${port}/`), null)
+})
+
+test('titreServi ne suit pas une redirection', async () => {
+  const server = createServer((req, res) => {
+    if (req.url === '/') {
+      res.writeHead(302, { location: '/ailleurs' })
+      res.end()
+    } else res.end('<title>Ailleurs</title>')
+  })
+  await new Promise(ok => server.listen(0, '127.0.0.1', ok))
+  try {
+    assert.equal(await titreServi(`http://127.0.0.1:${server.address().port}/`), '')
+  } finally {
+    server.close()
+  }
 })

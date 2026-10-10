@@ -4,7 +4,13 @@
   "title": "Audit produit et UX d'Ovrsee — 10 oct. 2026",
   "opened": "2026-10-10",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "7d10451",
+      "date": "2026-10-10",
+      "files": []
+    }
+  ]
 }
 ---
 

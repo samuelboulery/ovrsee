@@ -276,14 +276,17 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   sur lui-même et l'écran de premier lancement ne paraissait jamais. Il faut donc
   inscrire le dépôt ovrsee une fois, comme n'importe quel autre. Cette liste sert aussi
   de liste blanche aux routes : rien d'implicite dedans.
-- **Le crawl réutilise le serveur qui répond déjà, si c'est celui du projet — et refuse
+- **Le crawl réutilise le serveur qui répond déjà, s'il le reconnaît — et refuse
   sinon.** Rien dans une réponse HTTP ne distingue un serveur d'un autre ; la preuve
-  retenue est le `<title>` servi, comparé à `titreHtml` du dernier `pages.json` réussi
-  (`crawl/serveur.js`, T-0281). Refuser tout port occupé faisait échouer un crawl sur
-  cinq : on travaillait, le serveur tournait. Réutiliser n'exécute rien, donc ne demande
-  pas l'accord de la commande `dev` — le seul geste fait avant la garde est un GET sur un
-  `baseUrl` déjà restreint à ce poste. Deux projets au même titre par défaut se
-  confondraient : captures fausses, sans exécution.
+  retenue est le `<title>` servi, comparé à celui qu'avait servi le dernier serveur que
+  le crawler a lancé lui-même, sur le même `baseUrl` (`crawl/serveur.js`, T-0281).
+  Refuser tout port occupé faisait échouer un crawl sur cinq : on travaillait, le
+  serveur tournait. Deux règles, et une revue de sécurité les a imposées : la référence
+  vit dans `trust.json` (`retenirServeur`), **jamais dans `pages.json`** — un dépôt
+  hostile y aurait écrit le titre d'un autre service du poste pour le faire photographier
+  —, et l'accord reste exigé même quand rien n'est lancé, pour la même raison. Il faut
+  donc un premier crawl port libre avant toute réutilisation. Deux projets au même titre
+  par défaut, sur le même port, se confondraient : captures fausses, sans exécution.
 - **Le stdin du serveur MCP est du texte venu d'ailleurs.** `JSON.parse` rend aussi
   bien `null`, un nombre ou un tableau : la déstructuration qui suivait était hors du
   `try`, et une seule ligne `null` tuait le processus. La session perdait tous ses

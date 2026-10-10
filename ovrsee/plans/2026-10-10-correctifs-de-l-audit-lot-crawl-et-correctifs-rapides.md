@@ -4,7 +4,121 @@
   "title": "Correctifs de l'audit : lot crawl et correctifs rapides",
   "opened": "2026-10-10",
   "closed": null,
-  "commits": []
+  "commits": [
+    {
+      "sha": "7d10451",
+      "date": "2026-10-10",
+      "files": []
+    },
+    {
+      "sha": "6270a0e",
+      "date": "2026-10-10",
+      "files": [
+        "hooks/brief.js",
+        "hooks/brief.test.js"
+      ]
+    },
+    {
+      "sha": "0096235",
+      "date": "2026-10-10",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/CommandPalette.tsx"
+      ]
+    },
+    {
+      "sha": "6e27235",
+      "date": "2026-10-10",
+      "files": [
+        "app/src/Shell.tsx"
+      ]
+    },
+    {
+      "sha": "f78dd60",
+      "date": "2026-10-10",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Shell.tsx",
+        "app/src/render.test.tsx",
+        "hooks/i18n.js"
+      ]
+    },
+    {
+      "sha": "5287191",
+      "date": "2026-10-10",
+      "files": [
+        "app/src/api.ts",
+        "app/src/data.test.ts",
+        "app/src/data.ts",
+        "app/src/tabs/Sante.tsx",
+        "hooks/i18n.js",
+        "server/api.js",
+        "server/api.test.js"
+      ]
+    },
+    {
+      "sha": "0f69380",
+      "date": "2026-10-10",
+      "files": [
+        "crawl/index.js",
+        "crawl/index.test.js"
+      ]
+    },
+    {
+      "sha": "387cc11",
+      "date": "2026-10-10",
+      "files": [
+        "app/src/tabs/Produit.tsx",
+        "app/src/useCrawl.ts",
+        "crawl/auth.js",
+        "crawl/chrome.js",
+        "crawl/chrome.test.js",
+        "crawl/index.js",
+        "hooks/i18n.js"
+      ]
+    },
+    {
+      "sha": "db5bbde",
+      "date": "2026-10-10",
+      "files": [
+        "app/src/EquipmentPanel.tsx",
+        "app/src/Shell.tsx",
+        "app/src/useCrawl.ts",
+        "electron/main.js",
+        "hooks/i18n.js"
+      ]
+    },
+    {
+      "sha": "d1ef472",
+      "date": "2026-10-10",
+      "files": [
+        "crawl/index.js",
+        "crawl/serveur.js",
+        "crawl/serveur.test.js"
+      ]
+    },
+    {
+      "sha": "ebd2ef1",
+      "date": "2026-10-10",
+      "files": [
+        "CLAUDE.md"
+      ]
+    },
+    {
+      "sha": "d90110f",
+      "date": "2026-10-10",
+      "files": [
+        "app/src/App.tsx",
+        "app/src/Shell.tsx",
+        "app/src/data.ts",
+        "app/src/render.test.tsx",
+        "hooks/i18n.js",
+        "hooks/ovrsee-post-commit.js",
+        "hooks/snapshot.js",
+        "hooks/snapshot.test.js"
+      ]
+    }
+  ]
 }
 ---
 

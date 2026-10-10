@@ -2,7 +2,7 @@
 {
   "id": "T-0284",
   "titre": "La pastille de scan signale des captures plus anciennes que le code",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "ux",
@@ -12,7 +12,8 @@
   "maj": "2026-10-10",
   "plan": "2026-10-10-correctifs-de-l-audit-lot-crawl-et-correctifs-rapides.md",
   "epic": "E-0280",
-  "charge": "s"
+  "charge": "s",
+  "fait": "2026-10-10T15:13:01.908Z"
 }
 ---
 

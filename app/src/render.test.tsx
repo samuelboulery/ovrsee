@@ -5,6 +5,7 @@ import test from 'node:test'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import { Garde, Panne, messageDe } from './Garde'
+import { Bandeau, Message } from './Shell'
 import { BandeauSignal, MenuBar, PEREMPTION_MS, ProjetCard, SessionCard } from './MenuBarPanel'
 import type { MenuBarSession } from './menubar'
 import type { Snapshot } from './data'
@@ -198,6 +199,18 @@ test('le panneau de panne nomme l’endroit et le message', () => {
   assert.match(html, /onglet Produit/)
   assert.match(html, /pages\.pages is not iterable/)
   assert.match(html, /role="alert"/)
+})
+
+test('une erreur secondaire se dit dans un bandeau fermable, pas en plein écran (T-0287)', () => {
+  const html = renderToStaticMarkup(<Bandeau text="EACCES settings.json" onClose={() => {}} />)
+  assert.match(html, /role="alert"/)
+  assert.match(html, /EACCES settings\.json/)
+  assert.match(html, /<button/)
+})
+
+test('la lecture impossible propose de réessayer quand on lui en donne le moyen', () => {
+  assert.match(renderToStaticMarkup(<Message text="Lecture impossible" onRetry={() => {}} />), /<button/)
+  assert.doesNotMatch(renderToStaticMarkup(<Message text="Lecture de ovrsee/…" />), /<button/)
 })
 
 test('un indice remplace le renvoi vers ovrsee/, il ne s’y ajoute pas', () => {

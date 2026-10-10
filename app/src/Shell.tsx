@@ -92,7 +92,7 @@ export function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
   )
 }
 
-export function Message({ text }: { text: string }) {
+export function Message({ text, onRetry }: { text: string; onRetry?: () => void }) {
   return (
     // `role="status"` : c'est ici, et nulle part ailleurs, qu'une région vivante
     // a sa place. `<main>` en portait une qui couvrait tout l'onglet, et les
@@ -100,10 +100,39 @@ export function Message({ text }: { text: string }) {
     <div
       role="status"
       style={s(
-        'flex: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--color-neutral-500);',
+        'flex: 1; display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: center; font-size: 13px; color: var(--color-neutral-500);',
       )}
     >
       {text}
+      {onRetry && (
+        <button type="button" className="btn" onClick={onRetry}>
+          {t('msg.retry')}
+        </button>
+      )}
+    </div>
+  )
+}
+
+/**
+ * Une erreur qui n'empêche pas de lire : préférences non écrites, accent,
+ * projet non ouvert. Elle se dit au-dessus de l'onglet et se ferme — le
+ * plein écran est réservé à la lecture impossible du snapshot (T-0287).
+ */
+export function Bandeau({ text, onClose }: { text: string; onClose: () => void }) {
+  return (
+    <div
+      role="alert"
+      style={s(
+        'margin: 8px 10px 0; padding: 6px 8px 6px 12px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--color-err);' +
+          'border: 1px solid var(--color-err-border); border-radius: var(--radius-sm); background: var(--color-err-bg);',
+      )}
+    >
+      <span style={s('flex: 1; min-width: 0;')}>
+        {t('msg.action_error')} : {text}
+      </span>
+      <button type="button" className="btn btn-ghost" aria-label={t('msg.dismiss')} onClick={onClose}>
+        ×
+      </button>
     </div>
   )
 }

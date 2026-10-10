@@ -54,7 +54,7 @@ const Terminal = lazy(() => import('./Terminal').then(m => ({ default: m.Termina
 import { Divider, useResizable } from './useResizable'
 import { activeTabsInOrder, type TabId } from './views'
 import { labelOf, projectFromUrl, pushUrl, routeFromUrl, tabForPath, ticketFromUrl } from './route'
-import { Message, ProjectSwitcher, ScanBadge, Sidebar, openProject } from './Shell'
+import { Bandeau, Message, ProjectSwitcher, ScanBadge, Sidebar, openProject } from './Shell'
 import type { MenuBarSession } from './menubar'
 
 
@@ -64,7 +64,10 @@ export function App() {
   const [current, setCurrent] = useState<string | null>(null)
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null)
   const [settings, setSettings] = useState<SettingsType | null>(null)
+  // Deux gravités, deux états (T-0287) : `error` empêche de lire et prend
+  // l'écran, `avis` se dit dans un bandeau et laisse l'onglet utilisable.
   const [error, setError] = useState<string | null>(null)
+  const [avis, setAvis] = useState<string | null>(null)
   /**
    * L'état des sessions Claude, publié par le panneau terminal.
    *
@@ -202,7 +205,7 @@ export function App() {
         setLayout(s.terminal.disposition as Layout)
         setTerminal(s.terminal.visible && !s.terminal.disabled)
       })
-      .catch(err => setError(String(err.message ?? err)))
+      .catch(err => setAvis(String(err.message ?? err)))
   }, [])
 
   /**
@@ -228,7 +231,7 @@ export function App() {
           hauteur: terminalHeight,
           largeur: terminalWidth,
         },
-      }).catch((err: unknown) => setError(String((err as Error).message ?? err)))
+      }).catch((err: unknown) => setAvis(String((err as Error).message ?? err)))
     }, 300)
     return () => clearTimeout(timer)
   }, [terminalHeight, terminalWidth, settings])
@@ -241,6 +244,7 @@ export function App() {
     const abandon = new AbortController()
     setSnapshot(null)
     setError(null)
+    setAvis(null)
     fetchSnapshot(current, abandon.signal)
       .then(setSnapshot)
       .catch(err => {
@@ -411,7 +415,7 @@ export function App() {
 
     return menu.on(command => {
       if (command === 'preferences:open') return setPreferencesOuvertes(true)
-      if (command === 'project:open') return void openProject(applyProjects, setError)
+      if (command === 'project:open') return void openProject(applyProjects, setAvis)
       if (command === 'project:reload') return reload()
       if (command === 'project:reveal') {
         if (current) window.ovrsee?.projects.reveal(current)
@@ -616,7 +620,7 @@ export function App() {
           sessions={sessions}
           onPick={onProjetPick}
           onProjects={applyProjects}
-          onError={setError}
+          onError={setAvis}
         />
         <div style={s('flex: 1;')} />
         <ScanBadge scan={scan} />
@@ -653,6 +657,7 @@ export function App() {
           )}
 
           <div style={s('flex: 1; display: flex; flex-direction: column; min-width: 0;')}>
+            {avis && <Bandeau text={avis} onClose={() => setAvis(null)} />}
             <div
               style={s(
                 layout === 'side'
@@ -669,19 +674,30 @@ export function App() {
                 <main
                   style={s('flex: 1; overflow: hidden; display: flex; min-height: 0; min-width: 0;')}
                 >
-                  {error && <Message text={`${t('msg.read_error')}: ${error}`} />}
+                  {error && (
+                    <Message
+                      text={`${t('msg.read_error')}: ${error}`}
+                      // Sans projet courant, c'est la liste qui n'a pas pu se
+                      // lire : rien à relire en place, la fenêtre recharge.
+                      onRetry={() => {
+                        setError(null)
+                        if (current) reload()
+                        else window.location.reload()
+                      }}
+                    />
+                  )}
                   {!error && projects.length === 0 && (
                     <Welcome
                       onAjouterProjet={
                         window.ovrsee?.projects
-                          ? () => void openProject(applyProjects, setError)
+                          ? () => void openProject(applyProjects, setAvis)
                           : undefined
                       }
                     />
                   )}
                   {!error && projects.length > 0 && !snapshot && <Message text={t('msg.loading')} />}
                   {!error && snapshot && unequipped && (
-                    <EquipmentPanel root={snapshot.root} onDone={reload} onError={setError} />
+                    <EquipmentPanel root={snapshot.root} onDone={reload} onError={setAvis} />
                   )}
                   {!error && snapshot && !unequipped && (
                     // Le garde-fou est remonté à chaque changement d'onglet et
@@ -843,10 +859,10 @@ export function App() {
           onFini={next => {
             setRevoirPresentation(false)
             appliquerReglages(next)
-            updateSettings(next).catch(err => setError(String(err.message ?? err)))
+            updateSettings(next).catch(err => setAvis(String(err.message ?? err)))
           }}
           onAjouterProjet={
-            window.ovrsee?.projects ? () => void openProject(applyProjects, setError) : undefined
+            window.ovrsee?.projects ? () => void openProject(applyProjects, setAvis) : undefined
           }
         />
       )}
@@ -874,7 +890,7 @@ export function App() {
             // qui repeint, via `accentCourant`. Rien à réécrire ici.
             projectAction('accent', current, { accent })
               .then(resultat => applyProjects(resultat.projects))
-              .catch(err => setError(String(err.message ?? err)))
+              .catch(err => setAvis(String(err.message ?? err)))
           }}
           initialSection={preferencesInitial?.section}
           initialProvider={preferencesInitial?.provider}

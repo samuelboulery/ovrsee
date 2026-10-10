@@ -2,7 +2,7 @@
 {
   "id": "T-0302",
   "titre": "La palette compte les tickets restants, comme le rail",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "basse",
   "tags": [
     "ux"
@@ -10,7 +10,8 @@
   "cree": "2026-10-10",
   "maj": "2026-10-10",
   "plan": "2026-10-10-correctifs-de-l-audit-lot-crawl-et-correctifs-rapides.md",
-  "charge": "xs"
+  "charge": "xs",
+  "fait": "2026-10-10T15:04:34.875Z"
 }
 ---
 

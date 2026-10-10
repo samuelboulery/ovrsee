@@ -179,6 +179,9 @@ const translations = {
     'msg.no_intention': 'Aucune intention écrite dans ce plan.',
     'msg.loading': 'Lecture de ovrsee/…',
     'msg.read_error': 'Lecture impossible',
+    'msg.retry': 'Réessayer',
+    'msg.action_error': 'Action impossible',
+    'msg.dismiss': 'Masquer ce message',
     // Welcome
     'welcome.title': 'Ovrsee',
     'welcome.description': 'Ovrsee tient le suivi de ce que vous construisez avec Claude Code.',
@@ -950,6 +953,9 @@ const translations = {
     'msg.no_intention': 'No intention written in this plan.',
     'msg.loading': 'Reading ovrsee/…',
     'msg.read_error': 'Unable to read',
+    'msg.retry': 'Try again',
+    'msg.action_error': 'Action failed',
+    'msg.dismiss': 'Dismiss this message',
     // Welcome
     'welcome.title': 'Ovrsee',
     'welcome.description': 'Ovrsee keeps track of what you build with Claude Code.',

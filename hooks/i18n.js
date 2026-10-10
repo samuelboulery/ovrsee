@@ -355,6 +355,8 @@ const translations = {
     'sante.no_open_plans': 'aucun plan ouvert',
     'sante.close_active_plan': 'Clore le plan actif',
     'sante.closing_plan': 'Clôture…',
+    'sante.close_plan': 'Clore',
+    'sante.close_plan_title': 'Tous les tickets de ce plan sont faits',
     'sante.see_all_plans': 'Tout voir',
     'sante.active_badge': 'actif',
     // Branches
@@ -1128,6 +1130,8 @@ const translations = {
     'sante.no_open_plans': 'no open plan',
     'sante.close_active_plan': 'Close active plan',
     'sante.closing_plan': 'Closing…',
+    'sante.close_plan': 'Close',
+    'sante.close_plan_title': 'Every ticket of this plan is done',
     'sante.see_all_plans': 'See all',
     'sante.active_badge': 'active',
     // Branches

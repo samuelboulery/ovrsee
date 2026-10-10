@@ -4,6 +4,7 @@ import test from 'node:test'
 
 import { setCurrentLanguage } from './i18n'
 import {
+  planSolde,
   childrenOf,
   colonneFinale,
   commitsDeLaFrise,
@@ -190,6 +191,24 @@ test('sortFaits met le dernier soldé en haut, avec maj puis l’id en repli', (
     t('T-0060', '2026-09-02', '2026-09-02T07:00:00.000Z'),
   ]).map(x => x.id)
   assert.deepEqual(ordre, ['T-0050', 'T-0060', 'T-0179', 'T-0178', 'T-0100'])
+})
+
+test('un plan est soldé quand tous ses tickets sont en colonne finale, et seulement s’il en a (T-0295)', () => {
+  const board = [
+    { id: 'backlog', titre: 'Backlog' },
+    { id: 'fait', titre: 'Fait' },
+  ] as Snapshot['board']
+  const tickets = [
+    { id: 'T-1', colonne: 'fait', plan: 'a.md' },
+    { id: 'T-2', colonne: 'fait', plan: 'a.md' },
+    { id: 'E-3', colonne: 'backlog', plan: 'a.md', type: 'epic' },
+    { id: 'T-4', colonne: 'fait', plan: 'b.md' },
+    { id: 'T-5', colonne: 'backlog', plan: 'b.md' },
+  ] as unknown as Ticket[]
+  assert.equal(planSolde('a.md', tickets, board), true, 'le colonne d’un epic est inerte')
+  assert.equal(planSolde('b.md', tickets, board), false)
+  assert.equal(planSolde('sans-ticket.md', tickets, board), false)
+  assert.equal(planSolde('a.md', tickets, [] as unknown as Snapshot['board']), false)
 })
 
 test('restant compte les tickets hors de la dernière colonne', () => {

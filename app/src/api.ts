@@ -59,11 +59,12 @@ export const fetchProjects = () => json<Project[]>('/api/projects')
 export const fetchUsername = () => json<{ username: string | null }>('/api/username')
 
 /**
- * Clore le plan actif, depuis l'UI — même geste que `pnpm ovrsee:close`.
- * Rend les fichiers de plan effectivement clos (vide si aucun n'avait de commit).
+ * Clore des plans, depuis l'UI — même geste que `pnpm ovrsee:close`. Sans
+ * `plan`, tous les plans ouverts ; avec, celui-là seul. Rend les fichiers
+ * effectivement clos, et dans `log` la raison de chaque plan laissé ouvert.
  */
-export async function closeActivePlans(path: string): Promise<{ closed: string[] }> {
-  return post('/api/plans/close-active', { path })
+export async function closeActivePlans(path: string, plan?: string): Promise<{ closed: string[]; log: string[] }> {
+  return post('/api/plans/close-active', plan ? { path, plan } : { path })
 }
 
 export type ProjectAction = 'accent' | 'vault' | 'add' | 'remove' | 'touch' | 'init' | 'export-obsidian'

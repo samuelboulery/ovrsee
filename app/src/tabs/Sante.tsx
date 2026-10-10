@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { closeActivePlans, humanAge, lastAudit, plansOuverts, type GitStatus, type Snapshot } from '../data'
+import { closeActivePlans, humanAge, lastAudit, planSolde, plansOuverts, type GitStatus, type Snapshot } from '../data'
 import { t } from '../i18n'
 import { s } from '../style'
 
@@ -36,12 +36,17 @@ export function Sante({
   const [clotureEnCours, setClotureEnCours] = useState(false)
   const [erreurCloture, setErreurCloture] = useState<string | null>(null)
 
-  const clorePlanActif = () => {
+  // Sans `plan`, tous les plans ouverts. Un plan que le serveur laisse ouvert
+  // (aucun commit) dit pourquoi : `closed` vide ne suffisait pas (T-0288).
+  const clore = (plan?: string) => {
     if (clotureEnCours) return
     setClotureEnCours(true)
     setErreurCloture(null)
-    closeActivePlans(snapshot.root)
-      .then(() => onReload())
+    closeActivePlans(snapshot.root, plan)
+      .then(({ closed, log }) => {
+        if (closed.length === 0 && log.length > 0) setErreurCloture(log.join('\n'))
+        onReload()
+      })
       .catch(err => setErreurCloture(String(err.message ?? err)))
       .finally(() => setClotureEnCours(false))
   }
@@ -89,7 +94,7 @@ export function Sante({
             <button
               type="button"
               disabled={clotureEnCours}
-              onClick={clorePlanActif}
+              onClick={() => clore()}
               style={s(
                 'cursor: pointer; font-size: 10.5px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--color-border-control); background: var(--color-surface-control); color: var(--color-text-secondary);',
               )}
@@ -111,7 +116,9 @@ export function Sante({
         </div>
 
         {erreurCloture && (
-          <div style={s('font-size: 11px; color: var(--color-err); margin-bottom: 8px;')}>{erreurCloture}</div>
+          <div role="alert" style={s('font-size: 11px; color: var(--color-err); margin-bottom: 8px; white-space: pre-line;')}>
+            {erreurCloture}
+          </div>
         )}
 
         {ouverts.length > 0 && (
@@ -146,6 +153,20 @@ export function Sante({
                     >
                       {t('sante.active_badge')}
                     </span>
+                  )}
+                  {/* Proposer, jamais clore seul : la clôture reste un geste (T-0295). */}
+                  {planSolde(plan.file, snapshot.tickets ?? [], snapshot.board ?? []) && (
+                    <button
+                      type="button"
+                      disabled={clotureEnCours}
+                      title={t('sante.close_plan_title')}
+                      onClick={() => clore(plan.file)}
+                      style={s(
+                        'flex: none; cursor: pointer; font-size: 10.5px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--color-border-control); background: var(--color-surface-control); color: var(--color-text-secondary);',
+                      )}
+                    >
+                      {t('sante.close_plan')}
+                    </button>
                   )}
                   <span style={s('flex: none; font-family: var(--font-mono); font-size: 10.5px; color: var(--color-text-quaternary);')}>
                     {humanAge(plan.opened)}

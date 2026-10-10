@@ -21,6 +21,7 @@ import { readConfigClaude } from '../hooks/config-claude.js'
 import { install } from '../hooks/install.js'
 import { exportVault } from '../hooks/obsidian.js'
 import {
+  isSafePlanFileName,
   closeOpenPlans,
   registerProject,
   setProjectAccent,
@@ -572,10 +573,12 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
       }
     }
 
-    // Clore le plan actif — même geste que `pnpm ovrsee:close` en CLI, juste
-    // déclenché depuis l'UI. `closeOpenPlans` refuse silencieusement de clore
-    // un plan sans commit ; `avancerTicketsClos` fait suivre les tickets liés,
-    // comme le CLI le fait déjà (hooks/ovrsee-cli.js).
+    // Clore des plans — même geste que `pnpm ovrsee:close` en CLI, juste
+    // déclenché depuis l'UI. Sans `plan`, tous les plans ouverts, comme le CLI
+    // sans argument ; avec, celui-là seul (T-0295). `closeOpenPlans` refuse de
+    // clore un plan sans commit : ses raisons partent dans `log`, sans quoi
+    // l'interface ne voyait qu'un `closed` vide (T-0288). `avancerTicketsClos`
+    // fait suivre les tickets liés, comme le CLI (hooks/ovrsee-cli.js).
     case '/api/plans/close-active': {
       if (method !== 'POST') return { status: 405, json: { error: 'méthode non permise' } }
       if (!enteteOk) {
@@ -583,11 +586,16 @@ export function resolve(url, cwd = process.cwd(), request = {}) {
       }
       const root = projects().find(p => p.path === body?.path)?.path ?? null
       if (!root) return { status: 404, json: { error: 'projet inconnu' } }
+      const plan = body?.plan ?? null
+      if (plan !== null && !isSafePlanFileName(plan)) {
+        return { status: 400, json: { error: 'nom de plan invalide' } }
+      }
 
       const ovrseeDir = join(root, 'ovrsee')
-      const closed = closeOpenPlans(ovrseeDir, () => {})
+      const log = []
+      const closed = closeOpenPlans(ovrseeDir, line => log.push(line), plan ? { only: plan } : undefined)
       if (closed.length > 0) avancerTicketsClos(ovrseeDir)
-      return { json: { closed } }
+      return { json: { closed, log } }
     }
 
     default:

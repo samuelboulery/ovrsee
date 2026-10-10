@@ -2,7 +2,7 @@
 {
   "id": "T-0283",
   "titre": "Un crawl qui ne démarre pas dit pourquoi : Chrome absent, lancement refusé",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "crawl",
@@ -12,7 +12,8 @@
   "maj": "2026-10-10",
   "plan": "2026-10-10-correctifs-de-l-audit-lot-crawl-et-correctifs-rapides.md",
   "epic": "E-0280",
-  "charge": "s"
+  "charge": "s",
+  "fait": "2026-10-10T15:08:40.724Z"
 }
 ---
 

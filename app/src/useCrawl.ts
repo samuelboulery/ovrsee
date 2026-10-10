@@ -40,11 +40,12 @@ function crawlBridge(): CrawlBridge | null {
  * native : ce que le formulaire a saisi n'y entre pas, un rendu compromis
  * pouvant affirmer n'importe quoi (T-0273).
  *
- * Sans IPC (mode navigateur), l'appel ne fait rien : aucun accord ne s'y donne,
- * et le crawl n'y est de toute façon pas lançable.
+ * Sans IPC (mode navigateur), l'appel ne fait rien et rend `null` : aucun
+ * accord ne s'y donne, et le crawl n'y est de toute façon pas lançable.
+ * `false` dit un refus — ou rien à approuver, faute de commande `dev`.
  */
-export function approuverCrawl(root: string): void {
-  void crawlBridge()?.approve?.(root)
+export async function approuverCrawl(root: string): Promise<boolean | null> {
+  return (await crawlBridge()?.approve?.(root)) ?? null
 }
 
 /** `true` quand le crawl est lançable d'un clic — donc seulement dans Electron. */

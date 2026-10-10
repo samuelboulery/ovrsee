@@ -76,6 +76,9 @@ export function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
   }
   return (
     <div
+      // La raison d'un échec se lit au survol, depuis n'importe quel onglet —
+      // pas seulement dans le bandeau de l'onglet Produit (T-0282).
+      title={scan.ok ? undefined : scan.error}
       style={s(
         'display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-family: var(--font-mono); color: var(--color-text-quaternary);',
       )}

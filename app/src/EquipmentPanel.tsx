@@ -190,7 +190,15 @@ export function EquipmentPanel({
         // surface est aussi servie par le dev server Vite, en HTTP local non
         // authentifié — mais par IPC, comme le terminal et les secrets
         // d'intégration. Le principal relit le disque et pose la question.
-        approuverCrawl(root)
+        // Un refus ne bloque rien ici, mais il bloquera le crawl du prochain
+        // commit : il se dit dans la liste, plutôt que de se découvrir plus
+        // tard dans un scan échoué (T-0282).
+        const configEcrite = form.ecrireConfig
+        void approuverCrawl(root).then(accord => {
+          if (accord === false && configEcrite) {
+            setDone(lignes => [...(lignes ?? []), t('equipment.crawl_not_approved')])
+          }
+        })
       })
       .catch(err => onError(String(err.message ?? err)))
       .finally(() => setBusy(false))

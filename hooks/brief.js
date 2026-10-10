@@ -186,7 +186,12 @@ export function buildBrief(state, now = new Date()) {
   const board = state.board ?? []
   const fini = colonneFinale(board)
   const titres = new Map(board.map(c => [c.id, c.titre]))
-  const restants = (state.tickets ?? []).filter(t => t.colonne !== fini)
+  // Un epic qui a des enfants ne compte pas : son `colonne` est inerte, ce sont
+  // ses enfants qui disent ce qui reste — même règle que `restant()` dans
+  // app/src/data.ts, sans quoi le brief et l'interface ne donnent pas le même total.
+  const tickets = state.tickets ?? []
+  const parents = new Set(tickets.map(t => t.epic).filter(Boolean))
+  const restants = tickets.filter(t => t.colonne !== fini && !(t.type === 'epic' && parents.has(t.id)))
 
   if (restants.length > 0) {
     lines.push(`${restants.length} ticket(s) à faire — tableau dans ovrsee/tickets/ :`)

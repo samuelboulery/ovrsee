@@ -20,6 +20,7 @@ import { timeline, ticketTimeline } from './timeline.js'
 import { readSettings, mergeSettings } from './settings.js'
 import { git } from './git.js'
 import { gitStatus } from './git-status.js'
+import { DERIVED } from './ovrsee-post-commit.js'
 import { readIntegrations } from './integrations.js'
 import { fichierDuDepot, inside, readJson } from './json.js'
 
@@ -184,6 +185,40 @@ function commits(root, limit = 300) {
       })
   } catch {
     return []
+  }
+}
+
+/**
+ * Les captures datent-elles d'avant le code ? (T-0284)
+ *
+ * Vrai quand du code — hors `ovrsee/` et `graphify-out/`, comme pour décider
+ * d'un crawl au commit — a changé entre le dernier scan réussi et HEAD. Un
+ * commit de tickets seul ne périme rien. L'interface affichait le commit du
+ * scan sans jamais le confronter au code ; le brief le disait, elle non.
+ *
+ * Le sha vient de `scans.jsonl`, un fichier versionné du dépôt observé : il
+ * ne part à git que s'il en a la forme, sans quoi `--output=…` y deviendrait
+ * une option. Un sha inconnu (historique réécrit) rend faux, pas une panne.
+ *
+ * @returns {boolean}
+ */
+export function capturesPerimees(
+  root,
+  scansDuDepot = scans(root),
+  pagesJson = lireDuDepot(root, join('ovrsee', 'pages', 'pages.json'), readJson),
+) {
+  const dernier = scansDuDepot.findLast(scan => scan?.ok === true)
+  if (!Array.isArray(pagesJson?.pages) || pagesJson.pages.length === 0) return false
+  if (typeof dernier?.commit !== 'string' || !/^[0-9a-f]{4,40}$/.test(dernier.commit)) return false
+  try {
+    return git(root, ['diff', '--name-only', dernier.commit, 'HEAD', '--'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+      .split('\n')
+      .some(file => file && !DERIVED.some(prefix => file.startsWith(prefix)))
+  } catch {
+    return false
   }
 }
 
@@ -414,6 +449,8 @@ export function snapshot(root) {
   const config = lireDuDepot(root, 'ovrsee.config.json', readJson)
 
   const tableauData = tableau(root, illisibles)
+  const pagesJson = lireDuDepot(root, join('ovrsee', 'pages', 'pages.json'), readJson)
+  const scansDuDepot = scans(root, illisibles)
 
   return {
     root,
@@ -434,8 +471,9 @@ export function snapshot(root) {
     // le projet fait. Le recopier dans `ovrsee/` en ferait une deuxième
     // version à maintenir, donc une version fausse en trois semaines.
     readme: lireDuDepot(root, 'README.md', readText),
-    pages: lireDuDepot(root, join('ovrsee', 'pages', 'pages.json'), readJson),
-    scans: scans(root, illisibles),
+    pages: pagesJson,
+    scans: scansDuDepot,
+    capturesPerimees: capturesPerimees(root, scansDuDepot, pagesJson),
     // Les raisons d'être des dépendances, lues dans le code : un commentaire
     // `WHY:` posé au-dessus d'un import. L'onglet Stack les affichait comme
     // s'il les lisait déjà ; il devinait à partir des plans.

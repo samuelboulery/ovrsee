@@ -623,7 +623,7 @@ export function App() {
           onError={setAvis}
         />
         <div style={s('flex: 1;')} />
-        <ScanBadge scan={scan} />
+        <ScanBadge scan={scan} perime={snapshot?.capturesPerimees === true} />
       </header>
 
       <div style={s('flex: 1; display: flex; flex-direction: column; min-height: 0;')}>

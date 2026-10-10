@@ -5,7 +5,7 @@ import test from 'node:test'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import { Garde, Panne, messageDe } from './Garde'
-import { Bandeau, Message } from './Shell'
+import { Bandeau, Message, ScanBadge } from './Shell'
 import { BandeauSignal, MenuBar, PEREMPTION_MS, ProjetCard, SessionCard } from './MenuBarPanel'
 import type { MenuBarSession } from './menubar'
 import type { Snapshot } from './data'
@@ -389,4 +389,11 @@ test('Produit — le nombre de plans n’est écrit qu’une fois', () => {
   )
 
   assert.doesNotMatch(html, /2\s+2\s+plans/, 'le compte était interpolé deux fois')
+})
+
+test('la pastille de scan passe en avertissement quand le code a changé depuis (T-0284)', () => {
+  const scan = { date: '2026-10-10', commit: 'abc1234', ok: true }
+  assert.match(renderToStaticMarkup(<ScanBadge scan={scan} perime />), /--color-warn/)
+  assert.match(renderToStaticMarkup(<ScanBadge scan={scan} />), /--color-ok/)
+  assert.match(renderToStaticMarkup(<ScanBadge scan={{ ...scan, ok: false, error: 'port' }} perime />), /--color-err/)
 })

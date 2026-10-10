@@ -275,6 +275,8 @@ export interface Snapshot {
     orphanShots?: string[]
   } | null
   scans: Scan[]
+  /** Du code a changé depuis le dernier scan réussi (T-0284). Absent d'un serveur antérieur. */
+  capturesPerimees?: boolean
   /** slug de page → captures successives, de la plus récente à la plus ancienne */
   shots: Record<string, string[]>
   /** Commits et plans mêlés, du plus récent au plus ancien. */

@@ -66,7 +66,7 @@ export async function openProject(
  * Date du dernier scan. Un scan échoué se dit — sans quoi la capture
  * précédente passerait pour fraîche.
  */
-export function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
+export function ScanBadge({ scan, perime = false }: { scan: ReturnType<typeof lastScan>; perime?: boolean }) {
   if (!scan) {
     return (
       <div style={s('font-size: 11.5px; color: var(--color-text-quaternary);')}>
@@ -78,16 +78,18 @@ export function ScanBadge({ scan }: { scan: ReturnType<typeof lastScan> }) {
     <div
       // La raison d'un échec se lit au survol, depuis n'importe quel onglet —
       // pas seulement dans le bandeau de l'onglet Produit (T-0282).
-      title={scan.ok ? undefined : scan.error}
+      // Périmé, la pastille passe en avertissement : la capture n'est pas
+      // fausse, mais elle ne montre plus le code d'aujourd'hui (T-0284).
+      title={scan.ok ? (perime ? t('scan.stale') : undefined) : scan.error}
       style={s(
         'display: flex; align-items: center; gap: 8px; font-size: 10.5px; font-family: var(--font-mono); color: var(--color-text-quaternary);',
       )}
     >
       <span
         style={s(
-          scan.ok
-            ? 'width: 5px; height: 5px; border-radius: 50%; background: var(--color-ok); display: block;'
-            : 'width: 5px; height: 5px; border-radius: 50%; background: var(--color-err); display: block;',
+          `width: 5px; height: 5px; border-radius: 50%; display: block; background: ${
+            !scan.ok ? 'var(--color-err)' : perime ? 'var(--color-warn)' : 'var(--color-ok)'
+          };`,
         )}
       />
       {scan.ok ? t('scan.last') : t('scan.failed')} · {frDate(scan.date)} · {scan.commit}

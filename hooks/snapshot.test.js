@@ -4,7 +4,8 @@ import { mkdirSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { readGraph, snapshot, vaultPath } from './snapshot.js'
+import { capturesPerimees, readGraph, snapshot, vaultPath } from './snapshot.js'
+import { execFileSync } from 'node:child_process'
 import { registerProject, setProjectVault } from './plans.js'
 import { readJson } from './json.js'
 import { DEFAULT_SETTINGS, writeSettings } from './settings.js'
@@ -354,4 +355,54 @@ test('le coffre du registre est rendu avec le graphe', () => {
   const dir = project()
   poserCoffre(dir, 'mon-coffre')
   assert.equal(graphe(dir).vault, 'mon-coffre')
+})
+
+// --- des captures plus anciennes que le code (T-0284) ----------------------
+
+const gitIn = (dir, ...args) =>
+  execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false', ...args], {
+    cwd: dir,
+    stdio: ['ignore', 'pipe', 'ignore'],
+    encoding: 'utf8',
+  }).trim()
+
+/** Un dépôt dont le dernier scan réussi date du premier commit. */
+const depotScanne = () => {
+  const dir = project()
+  gitIn(dir, 'init', '-q')
+  writeFileSync(join(dir, 'app.js'), 'v1\n')
+  mkdirSync(join(dir, 'ovrsee', 'pages'), { recursive: true })
+  writeFileSync(join(dir, 'ovrsee', 'pages', 'pages.json'), JSON.stringify({ pages: [{ route: '/', slug: 'accueil' }] }))
+  gitIn(dir, 'add', '-A')
+  gitIn(dir, 'commit', '-qm', 'init')
+  const sha = gitIn(dir, 'rev-parse', '--short', 'HEAD')
+  writeFileSync(join(dir, 'ovrsee', 'pages', 'scans.jsonl'), JSON.stringify({ date: '2026-10-10', commit: sha, ok: true }) + '\n')
+  return dir
+}
+
+test('des captures prises au dernier commit ne sont pas périmées', () => {
+  assert.equal(capturesPerimees(depotScanne()), false)
+})
+
+test('un commit qui ne touche que ovrsee/ ne périme pas les captures', () => {
+  const dir = depotScanne()
+  writeFileSync(join(dir, 'ovrsee', 'note.md'), 'x\n')
+  gitIn(dir, 'add', '-A')
+  gitIn(dir, 'commit', '-qm', 'ticket')
+  assert.equal(capturesPerimees(dir), false)
+})
+
+test('un commit de code après le scan périme les captures', () => {
+  const dir = depotScanne()
+  writeFileSync(join(dir, 'app.js'), 'v2\n')
+  gitIn(dir, 'commit', '-qam', 'code')
+  assert.equal(capturesPerimees(dir), true)
+})
+
+test('un commit cité par scans.jsonl qui n’est pas un sha ne part jamais à git', () => {
+  const dir = depotScanne()
+  writeFileSync(join(dir, 'app.js'), 'v2\n')
+  gitIn(dir, 'commit', '-qam', 'code')
+  writeFileSync(join(dir, 'ovrsee', 'pages', 'scans.jsonl'), JSON.stringify({ commit: '--output=/tmp/x', ok: true }) + '\n')
+  assert.equal(capturesPerimees(dir), false)
 })

@@ -26,6 +26,8 @@ import { join, resolve } from 'node:path'
 // et la capture pleine page sans embarquer son propre navigateur —
 // `playwright-core` utilise celui du système.
 import { lancerChrome } from './chrome.js'
+import { memeProjet, titreAttendu, titreServi } from './serveur.js'
+import { readJsonDuDepot } from '../hooks/json.js'
 
 import { normalizeRoutes, pageSlug, routeDansBase, sameOrigin, urlLocale } from './routes.js'
 import { assurerConfiance, DEV_DEFAUT } from './confiance.js'
@@ -547,12 +549,18 @@ function pruneShots(dir) {
 async function run() {
   const config = loadConfig()
 
-  // Avant tout le reste : aucun port sondé, aucun navigateur, aucune trace.
-  // `config.dev` est ici la chaîne exacte qui partira à `shellRun()` dans
-  // `startApp` — c'est elle qu'on compare à l'accord, et personne ne relit le
-  // fichier entre les deux. Un `dev` changé depuis l'accord fait donc échouer
-  // la comparaison, ce qui referme la course entre l'accord et le lancement.
-  await assurerConfiance(root, config.dev)
+  // Le serveur du projet tourne déjà ? On le photographie sans rien lancer
+  // (T-0281). Seule chose faite avant l'accord : un GET sur `baseUrl`, que
+  // `loadConfig` a restreint à ce poste — rien n'y est exécuté.
+  const servi = await titreServi(config.baseUrl)
+  const reutilise = memeProjet(servi, titreAttendu(readJsonDuDepot(root, join(pagesDir, 'pages.json'))))
+
+  // Sinon, avant tout le reste : aucun navigateur, aucune trace. `config.dev`
+  // est ici la chaîne exacte qui partira à `shellRun()` dans `startApp` —
+  // c'est elle qu'on compare à l'accord, et personne ne relit le fichier entre
+  // les deux. Un `dev` changé depuis l'accord fait donc échouer la
+  // comparaison, ce qui referme la course entre l'accord et le lancement.
+  if (!reutilise) await assurerConfiance(root, config.dev)
 
   const commit = shortSha()
   const date = new Date().toISOString().slice(0, 10)
@@ -564,8 +572,12 @@ async function run() {
   const browser = await lancerChrome({ headless: true })
   let app = null
   try {
-    log(`démarrage de « ${config.dev} »…`)
-    app = await startApp(config)
+    if (reutilise) {
+      log('serveur déjà lancé, réutilisé')
+    } else {
+      log(`démarrage de « ${config.dev} »…`)
+      app = await startApp(config)
+    }
     const context = await browser.newContext({
       viewport: config.viewport,
       ...(session ? { storageState: session } : {}),
@@ -629,7 +641,17 @@ async function run() {
     writeFileNoFollow(
       join(pagesDir, 'pages.json'),
       JSON.stringify(
-        { date, commit, pages: [...pages.values()], redirects: redirectRoutes, orphanShots: orphans },
+        {
+          date,
+          commit,
+          // Ce que le serveur servait : la preuve qu'on relira au prochain
+          // crawl pour reconnaître le serveur déjà lancé (T-0281).
+          // Versionné comme le reste : filtré comme les titres de page.
+          titreHtml: redige(String(servi ?? (await titreServi(config.baseUrl)) ?? '').slice(0, 2000)),
+          pages: [...pages.values()],
+          redirects: redirectRoutes,
+          orphanShots: orphans,
+        },
         null,
         2,
       ) + '\n',

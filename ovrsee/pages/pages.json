@@ -1,13 +1,14 @@
 {
-  "date": "2026-09-02",
-  "commit": "de18b7c",
+  "date": "2026-10-10",
+  "commit": "db5bbde",
+  "titreHtml": "Ovrsee",
   "pages": [
     {
       "route": "/",
       "slug": "accueil",
       "title": "Ovrsee",
       "sample": "/",
-      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…",
+      "excerpt": "Lecture de ovrsee/…",
       "links": [
         "/navigateur",
         "/produit",
@@ -16,8 +17,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/accueil/2026-09-02-de18b7c.png",
-      "shotDate": "2026-09-02",
+      "shot": "shots/accueil/2026-10-10-db5bbde.png",
+      "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -28,7 +29,7 @@
       "slug": "navigateur",
       "title": "Ovrsee",
       "sample": "/navigateur",
-      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…",
+      "excerpt": "Lecture de ovrsee/…",
       "links": [
         "/",
         "/produit",
@@ -37,8 +38,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/navigateur/2026-09-02-de18b7c.png",
-      "shotDate": "2026-09-02",
+      "shot": "shots/navigateur/2026-10-10-db5bbde.png",
+      "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -49,7 +50,7 @@
       "slug": "produit",
       "title": "Ovrsee",
       "sample": "/produit",
-      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…",
+      "excerpt": "Lecture de ovrsee/…",
       "links": [
         "/",
         "/navigateur",
@@ -58,8 +59,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/produit/2026-09-02-de18b7c.png",
-      "shotDate": "2026-09-02",
+      "shot": "shots/produit/2026-10-10-db5bbde.png",
+      "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -70,7 +71,7 @@
       "slug": "historique",
       "title": "Ovrsee",
       "sample": "/historique",
-      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…",
+      "excerpt": "Lecture de ovrsee/…",
       "links": [
         "/",
         "/navigateur",
@@ -79,8 +80,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/historique/2026-09-02-de18b7c.png",
-      "shotDate": "2026-09-02",
+      "shot": "shots/historique/2026-10-10-db5bbde.png",
+      "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -91,7 +92,7 @@
       "slug": "tableau",
       "title": "Ovrsee",
       "sample": "/tableau",
-      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…",
+      "excerpt": "Lecture de ovrsee/…",
       "links": [
         "/",
         "/navigateur",
@@ -100,8 +101,8 @@
         "/donnees",
         "/stack"
       ],
-      "shot": "shots/tableau/2026-09-02-de18b7c.png",
-      "shotDate": "2026-09-02",
+      "shot": "shots/tableau/2026-10-10-db5bbde.png",
+      "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -112,7 +113,7 @@
       "slug": "donnees",
       "title": "Ovrsee",
       "sample": "/donnees",
-      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…",
+      "excerpt": "Lecture de ovrsee/…",
       "links": [
         "/",
         "/navigateur",
@@ -121,8 +122,8 @@
         "/tableau",
         "/stack"
       ],
-      "shot": "shots/donnees/2026-09-02-de18b7c.png",
-      "shotDate": "2026-09-02",
+      "shot": "shots/donnees/2026-10-10-db5bbde.png",
+      "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
         "height": 800
@@ -133,7 +134,7 @@
       "slug": "stack",
       "title": "Ovrsee",
       "sample": "/stack",
-      "excerpt": "ovrsee\naucun scan enregistré\nRechercher, aller à…\n⌘K\nVUES\n7\nAperçu\n1\nNavigateur\n2\nProduit\n3\nHistorique\n4\nTableau\n5\nDonnées\n6\nStack\n7\nRéordonner, masquer…\nS\nsam\nLecture de ovrsee/…",
+      "excerpt": "Lecture de ovrsee/…",
       "links": [
         "/",
         "/navigateur",
@@ -142,8 +143,8 @@
         "/tableau",
         "/donnees"
       ],
-      "shot": "shots/stack/2026-09-02-de18b7c.png",
-      "shotDate": "2026-09-02",
+      "shot": "shots/stack/2026-10-10-db5bbde.png",
+      "shotDate": "2026-10-10",
       "shotSize": {
         "width": 1280,
         "height": 800

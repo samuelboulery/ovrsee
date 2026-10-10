@@ -2,7 +2,7 @@
 {
   "id": "T-0282",
   "titre": "L'accord de la commande dev se donne à l'équipement, et son absence se voit partout",
-  "colonne": "backlog",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "crawl",
@@ -12,7 +12,8 @@
   "maj": "2026-10-10",
   "plan": "2026-10-10-correctifs-de-l-audit-lot-crawl-et-correctifs-rapides.md",
   "epic": "E-0280",
-  "charge": "m"
+  "charge": "m",
+  "fait": "2026-10-10T15:09:14.756Z"
 }
 ---
 

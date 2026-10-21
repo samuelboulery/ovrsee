@@ -77,7 +77,7 @@ export function Deploiements({
   const [statuses, setStatuses] = useState<Record<string, IntegrationStatus>>({})
   const [checking, setChecking] = useState<string | null>(null)
   const [masque, setMasque] = useState(
-    () => typeof localStorage !== 'undefined' && localStorage.getItem(CLE_MASQUE) === '1',
+    () => typeof localStorage?.getItem === 'function' && localStorage.getItem(CLE_MASQUE) === '1',
   )
   const ovrsee = bridge()
 

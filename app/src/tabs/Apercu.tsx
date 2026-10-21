@@ -340,7 +340,7 @@ function Actions({ root, onTerminal }: { root: string; onTerminal?: () => void }
   const ovrsee = pont()
   const [copie, setCopie] = useState(false)
   const [editeur, setEditeur] = useState<Editeur>(() => {
-    if (typeof localStorage === 'undefined') return 'vscode'
+    if (typeof globalThis.localStorage?.getItem !== 'function') return 'vscode'
     const garde = localStorage.getItem('ovrsee.editor')
     return EDITEURS.some(([nom]) => nom === garde) ? (garde as Editeur) : 'vscode'
   })

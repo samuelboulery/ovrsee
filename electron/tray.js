@@ -305,14 +305,22 @@ export function destroyPopover() {
  *    réellement. L'état vient du rendu : le croire sur parole ferait décider
  *    d'après une liste qu'il a écrite lui-même.
  *
+ * Et la session doit **attendre encore** une réponse — la même, quand
+ * l'appelant sait laquelle. Une notification reste au Centre de
+ * notifications : cliquée en retard, son `Entrée` tomberait dans l'invite
+ * suivante, ou validerait un prompt à moitié tapé (T-0306).
+ *
  * @param {string} ptyId
  * @param {'allow'|'deny'} decision
+ * @param {string|null} [detailAttendu] le message de la question à laquelle on répond
  * @returns {boolean} vrai si une touche a été écrite
  */
-export function answer(ptyId, decision) {
+export function answer(ptyId, decision, detailAttendu) {
   const touche = Object.hasOwn(TOUCHE, decision) ? TOUCHE[decision] : null
   if (touche === null) return false
-  if (typeof ptyId !== 'string' || !etat.sessions.some(s => s?.ptyId === ptyId)) return false
+  const session = typeof ptyId === 'string' ? etat.sessions.find(s => s?.ptyId === ptyId) : null
+  if (!session || session.attention?.kind !== 'question') return false
+  if (detailAttendu !== undefined && (session.attention.detail ?? null) !== detailAttendu) return false
   if (!hasSession(ptyId)) return false
 
   writeTo(ptyId, touche)

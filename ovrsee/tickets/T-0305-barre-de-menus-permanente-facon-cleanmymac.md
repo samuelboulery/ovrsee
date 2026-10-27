@@ -2,7 +2,7 @@
 {
   "id": "T-0305",
   "titre": "Barre de menus permanente, façon CleanMyMac",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "electron"
@@ -10,7 +10,8 @@
   "cree": "2026-10-27",
   "maj": "2026-10-27",
   "plan": "2026-10-27-notifications-ovrsee-facon-cleanmymac-menage-des-copies-d-ov.md",
-  "charge": "l"
+  "charge": "l",
+  "fait": "2026-10-27T23:10:02.456Z"
 }
 ---
 

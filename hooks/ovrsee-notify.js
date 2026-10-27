@@ -422,6 +422,7 @@ const MAX_INBOX = 8 * 1024
 const MAX_PROJET = 200
 const MAX_TEXTE = 500
 const BUNDLE = /^[A-Za-z0-9.-]{1,100}$/
+const SESSION = /^[A-Za-z0-9-]{1,100}$/
 
 /**
  * Valide le contenu d'un fichier inbox, ou rend null.
@@ -448,7 +449,9 @@ export function validerInbox(brut) {
   const dureeOk = n.dureeMs === null || (typeof n.dureeMs === 'number' && Number.isFinite(n.dureeMs) && n.dureeMs >= 0)
   if (!dureeOk) return null
   const terminal = typeof n.terminal === 'string' && BUNDLE.test(n.terminal) ? n.terminal : null
-  return { genre: n.genre, projet: n.projet, texte: n.texte, dureeMs: n.dureeMs, terminal }
+  // La session sert de clé : une session qui renotifie remplace sa notification.
+  const session = typeof n.session === 'string' && SESSION.test(n.session) ? n.session : null
+  return { genre: n.genre, projet: n.projet, texte: n.texte, dureeMs: n.dureeMs, terminal, session }
 }
 
 /** Dépose la notification pour le principal. Écriture atomique : il ne lit que `*.json`. */
@@ -471,7 +474,9 @@ function osascript({ title, subtitle, body }, son) {
     'end run',
   ]
   const args = script.flatMap(l => ['-e', l])
-  spawn('osascript', [...args, body, title, subtitle, son ?? ''], { detached: true, stdio: 'ignore' }).unref()
+  // `--` : une dernière phrase qui commence par `-` (une liste markdown, ou
+  // `-e…` sous injection) serait sinon lue comme une option d'osascript.
+  spawn('osascript', [...args, '--', body, title, subtitle, son ?? ''], { detached: true, stdio: 'ignore' }).unref()
 }
 
 /* ————————————————————————————————————————————————————————————————
@@ -483,7 +488,9 @@ function richesse(genre, payload) {
   if (genre === 'question') return { texte: detailPour(payload), dureeMs: null }
   const tour = lireTour(payload.transcript_path)
   const dernier = typeof payload.last_assistant_message === 'string' ? payload.last_assistant_message : tour.dernier
-  return { texte: dernierePhrase(dernier), dureeMs: tour.debut === null ? null : Date.now() - tour.debut }
+  // Une durée négative est une horloge qui a bougé : inconnue, pas nulle.
+  const duree = tour.debut === null ? null : Date.now() - tour.debut
+  return { texte: dernierePhrase(dernier), dureeMs: duree !== null && duree >= 0 ? duree : null }
 }
 
 function main() {
@@ -533,7 +540,14 @@ function main() {
 
   const projet = basename(resolve(cwd))
   if (voie === 'inbox') {
-    ecrireInbox({ genre, projet, texte, dureeMs, terminal: process.env.__CFBundleIdentifier ?? null })
+    ecrireInbox({
+      genre,
+      projet,
+      texte,
+      dureeMs,
+      terminal: process.env.__CFBundleIdentifier ?? null,
+      session: typeof payload.session_id === 'string' ? payload.session_id : null,
+    })
     return
   }
   osascript(contenuNotification({ genre, projet, texte, dureeMs }, reglages.langue), sonPour(genre, reglages.notifications))

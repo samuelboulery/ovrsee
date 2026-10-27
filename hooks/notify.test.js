@@ -247,9 +247,10 @@ test('notify : la charge riche voyage en JSON, coupée à la même longueur', ()
 })
 
 test('notify : un fichier inbox malformé est refusé, pas deviné', () => {
-  const bon = { genre: 'stop', projet: 'site', texte: 'Fini.', dureeMs: 1, terminal: 'com.googlecode.iterm2' }
+  const bon = { genre: 'stop', projet: 'site', texte: 'Fini.', dureeMs: 1, terminal: 'com.googlecode.iterm2', session: 'abc-123' }
   assert.deepEqual(validerInbox(JSON.stringify(bon)), bon)
   assert.equal(validerInbox(JSON.stringify({ ...bon, terminal: 'x; rm -rf /' })).terminal, null)
+  assert.equal(validerInbox(JSON.stringify({ ...bon, session: '../x' })).session, null)
   for (const mauvais of [
     '{coupé',
     '[]',
@@ -269,7 +270,7 @@ test('notify : le fichier déposé dans l’inbox se relit tel quel par le princ
   const { ecrireInbox } = await import('./ovrsee-notify.js')
   const { readdirSync, readFileSync, statSync } = await import('node:fs')
   const dossier = join(tmp(), 'inbox')
-  const n = { genre: 'question', projet: 'site', texte: 'besoin de Bash', dureeMs: null, terminal: null }
+  const n = { genre: 'question', projet: 'site', texte: 'besoin de Bash', dureeMs: null, terminal: null, session: null }
   ecrireInbox(n, dossier)
   const [nom] = readdirSync(dossier)
   assert.match(nom, /^[0-9a-f-]{36}\.json$/)

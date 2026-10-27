@@ -152,13 +152,19 @@ export function demarrerBarreDeMenus({ origin, preload, getPrincipale, nouvelleF
   app.on('activate', () => {
     if (!getPrincipale()) ouvrir()
   })
-  app.on('second-instance', ouvrir)
+  // La LaunchAgent relancée alors que l'app tourne déjà ne doit pas rouvrir la fenêtre.
+  app.on('second-instance', (_event, argv) => {
+    if (!argv.includes(SANS_FENETRE)) ouvrir()
+  })
 
   // Dernière fenêtre fermée : les sessions Claude de l'app partent avec elle,
   // comme avant. Sous macOS l'app reste — dans le Dock si la barre de menus
   // n'est pas permanente, dans la barre de menus seule sinon.
   app.on('window-all-closed', () => {
     closeAll()
+    // Les ptys partent sans que le rendu le rapporte : le badge repart de zéro.
+    suivreSessions([])
+    marquerVues()
     if (!mac) app.quit()
     else if (barrePermanente()) app.dock?.hide()
   })

@@ -20,9 +20,22 @@
  * clic — ne vise qu'un bundle de la liste `TERMINAUX`, par `open -b`.
  */
 
-import { app, Notification } from 'electron'
+import { app, BrowserWindow, Notification } from 'electron'
 import { execFile } from 'node:child_process'
-import { lstatSync, mkdirSync, readdirSync, readFileSync, unlinkSync, watch, writeFileSync } from 'node:fs'
+import {
+  chmodSync,
+  closeSync,
+  constants,
+  fstatSync,
+  mkdirSync,
+  openSync,
+  readdirSync,
+  readFileSync,
+  readSync,
+  unlinkSync,
+  watch,
+  writeFileSync,
+} from 'node:fs'
 import { join } from 'node:path'
 
 import { t } from '../hooks/i18n.js'
@@ -36,6 +49,19 @@ import {
 } from '../hooks/ovrsee-notify.js'
 import { readSettings } from '../hooks/settings.js'
 import { answer, reveal, setCompte } from './tray.js'
+
+/** Taille maximale lue d'un fichier inbox, comme `validerInbox`. */
+const MAX_INBOX = 8 * 1024
+
+/**
+ * Débit maximal de l'inbox, en fichiers par seconde. Au-delà, le fichier est
+ * effacé sans être affiché : un processus qui inonde le dossier ne doit pas
+ * inonder l'écran.
+ */
+const DEBIT_INBOX = 10
+
+/** Au-delà, la plus ancienne notification retenue est oubliée (macOS n'émet pas toujours `close`). */
+const MAX_VIVANTES = 50
 
 /**
  * Les terminaux qu'un clic sur une notification inbox sait réactiver, par
@@ -62,11 +88,17 @@ const MAX_CLE = 1000
 const MAX_DETAIL = 500
 
 /**
- * Notifications affichées, par clé. Retenues parce qu'une `Notification` que
- * plus rien ne référence est ramassée — et ses écouteurs de clic avec elle.
- * Une session qui renotifie remplace la sienne au lieu d'en empiler.
+ * Notifications affichées, par clé, avec leur genre. Retenues parce qu'une
+ * `Notification` que plus rien ne référence est ramassée — et ses écouteurs de
+ * clic avec elle. Une session qui renotifie remplace la sienne au lieu d'en
+ * empiler.
+ *
+ * @type {Map<string, {notification: Electron.Notification, genre: string}>}
  */
 const vivantes = new Map()
+
+/** Fenêtre de débit de l'inbox : `[début en ms, fichiers traités]`. */
+let debit = [0, 0]
 
 /** Ce qui a notifié sans être vu depuis — le badge (T-0306). */
 const nonVues = new Set()
@@ -101,11 +133,22 @@ export function suivreSessions(sessions) {
       .filter(s => s?.attention?.kind === 'question' && typeof s.sessionKey === 'string')
       .map(s => s.sessionKey),
   )
+  // Une question résolue ailleurs — au terminal, au popover — retire sa
+  // notification : ses boutons ne répondraient plus à rien de visible.
+  for (const [cle, { notification, genre }] of vivantes) {
+    if (genre !== 'question' || cle.startsWith('inbox:') || questions.has(cle)) continue
+    vivantes.delete(cle)
+    nonVues.delete(cle)
+    notification.close()
+  }
   majBadge()
 }
 
 function afficher(cle, { genre, projet, texte, dureeMs }, { actions = [], onAction, onClick }) {
-  if (!Notification.isSupported()) return
+  if (!Notification.isSupported()) {
+    process.stderr.write(`[ovrsee] notifications non prises en charge, ${genre} de ${projet} perdu\n`)
+    return
+  }
   const { notifications: reglages, langue } = readSettings()
   if (!aNotifier(genre, dureeMs, reglages)) return
 
@@ -118,7 +161,7 @@ function afficher(cle, { genre, projet, texte, dureeMs }, { actions = [], onActi
   })
 
   const oublier = () => {
-    if (vivantes.get(cle) === notification) vivantes.delete(cle)
+    if (vivantes.get(cle)?.notification === notification) vivantes.delete(cle)
   }
   notification.on('click', () => {
     oublier()
@@ -132,9 +175,12 @@ function afficher(cle, { genre, projet, texte, dureeMs }, { actions = [], onActi
   })
   notification.on('close', oublier)
 
-  vivantes.get(cle)?.close()
-  vivantes.set(cle, notification)
-  nonVues.add(cle)
+  vivantes.get(cle)?.notification.close()
+  vivantes.delete(cle)
+  vivantes.set(cle, { notification, genre })
+  if (vivantes.size > MAX_VIVANTES) vivantes.delete(vivantes.keys().next().value)
+  // Fenêtre au premier plan : la notification est vue en arrivant.
+  if (!BrowserWindow.getFocusedWindow()) nonVues.add(cle)
   notification.show()
   majBadge()
 }
@@ -163,44 +209,77 @@ export function depuisRendu(n) {
 
   afficher(sessionKey, { genre: kind, projet, texte, dureeMs: duree }, {
     actions: kind === 'question' ? ['menubar.allow', 'menubar.deny'] : [],
+    // `texte` : `answer()` refuse si la session ne pose plus *cette* question.
     onAction: index => {
-      if (index === 0) answer(ptyId, 'allow')
-      if (index === 1) answer(ptyId, 'deny')
+      if (index === 0) answer(ptyId, 'allow', texte)
+      if (index === 1) answer(ptyId, 'deny', texte)
     },
     onClick: () => reveal(sessionKey),
   })
 }
 
 /**
+ * Lit au plus `MAX_INBOX` octets d'un fichier ordinaire, sans suivre de lien
+ * ni bloquer : ouvert puis vérifié sur le descripteur, pas sur le chemin — un
+ * `lstat` suivi d'un `readFile` laissait le temps de remplacer le fichier par
+ * une FIFO, qui aurait gelé le processus principal.
+ *
+ * @returns {string|null} null si ce n'est pas un fichier ordinaire assez petit
+ */
+function lireBorne(fichier) {
+  const fd = openSync(fichier, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK)
+  try {
+    const info = fstatSync(fd)
+    if (!info.isFile() || info.size > MAX_INBOX) return null
+    const tampon = Buffer.alloc(MAX_INBOX + 1)
+    const lus = readSync(fd, tampon, 0, tampon.length, 0)
+    return lus > MAX_INBOX ? null : tampon.toString('utf8', 0, lus)
+  } finally {
+    closeSync(fd)
+  }
+}
+
+/**
  * Source 2 : un fichier déposé par le hook d'une session hors de l'app.
  *
  * Lu, effacé, puis seulement validé : un fichier refusé ne doit pas revenir à
- * chaque redémarrage. Un lien symbolique ou un fichier trop gros n'est pas lu.
+ * chaque redémarrage. Un lien symbolique, une FIFO ou un fichier trop gros
+ * n'est pas lu.
  */
 function traiterInbox(fichier) {
   let brut
   try {
-    const info = lstatSync(fichier)
-    if (!info.isFile() || info.size > 8 * 1024) {
-      unlinkSync(fichier)
-      return
-    }
-    brut = readFileSync(fichier, 'utf8')
+    brut = lireBorne(fichier)
     unlinkSync(fichier)
   } catch (err) {
     // `fs.watch` signale plusieurs fois le même fichier : le second passage le
     // trouve déjà effacé, c'est normal.
     if (err?.code !== 'ENOENT') process.stderr.write(`[ovrsee] inbox illisible : ${err?.message ?? err}\n`)
+    if (err?.code === 'ELOOP') {
+      try {
+        unlinkSync(fichier)
+      } catch {
+        // Le lien est déjà parti.
+      }
+    }
     return
   }
 
-  const n = validerInbox(brut)
+  const maintenant = Date.now()
+  if (maintenant - debit[0] >= 1000) debit = [maintenant, 0]
+  debit[1] += 1
+  if (debit[1] > DEBIT_INBOX) {
+    process.stderr.write(`[ovrsee] inbox : débit dépassé, ${fichier} ignoré\n`)
+    return
+  }
+
+  const n = brut === null ? null : validerInbox(brut)
   if (!n) {
     process.stderr.write(`[ovrsee] inbox ignorée, contenu invalide : ${fichier}\n`)
     return
   }
   const terminal = n.terminal && TERMINAUX.has(n.terminal) ? n.terminal : null
-  afficher(`inbox:${fichier}`, n, {
+  afficher(`inbox:${n.session ?? fichier}`, n, {
     onClick: () => {
       if (terminal) execFile('open', ['-b', terminal], () => {})
     },
@@ -215,6 +294,9 @@ export function demarrerNotifications() {
   const dossier = inboxDir()
   try {
     mkdirSync(dossier, { recursive: true, mode: 0o700 })
+    // `mkdirSync` ne touche pas aux droits d'un dossier déjà là — que le hook
+    // a pu créer le premier.
+    chmodSync(dossier, 0o700)
     writeFileSync(pidPath(), String(process.pid))
   } catch (err) {
     process.stderr.write(`[ovrsee] inbox indisponible : ${err?.message ?? err}\n`)

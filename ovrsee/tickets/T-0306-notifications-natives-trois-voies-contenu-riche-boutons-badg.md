@@ -2,7 +2,7 @@
 {
   "id": "T-0306",
   "titre": "Notifications natives : trois voies, contenu riche, boutons, badge et son",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "notifications",
@@ -11,7 +11,8 @@
   "cree": "2026-10-27",
   "maj": "2026-10-27",
   "plan": "2026-10-27-notifications-ovrsee-facon-cleanmymac-menage-des-copies-d-ov.md",
-  "charge": "l"
+  "charge": "l",
+  "fait": "2026-10-27T23:09:54.028Z"
 }
 ---
 

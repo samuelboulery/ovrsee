@@ -40,7 +40,11 @@ L'écriture, elle, se lit en trois classes — « seulement `tickets/` et `board
 2. **Hors du dépôt observé**, parce que c'est une préférence de poste ou un secret :
    `~/.claude/ovrsee/{projects,settings,integrations,trust}.json`,
    `~/.claude/settings.json`, `~/.claude/skills/`. Un dépôt cloné ne livre jamais sa
-   propre approbation.
+   propre approbation. S'y ajoutent, pour la barre de menus permanente (T-0305,
+   T-0306) : `~/.claude/ovrsee/menubar.pid` et `~/.claude/ovrsee/inbox/` (le hook y
+   dépose une notification, le principal la lit puis l'efface — de quoi *afficher*,
+   jamais une commande ; le seul geste qui en découle est `open -b` sur un terminal
+   d'une liste blanche), et `~/Library/LaunchAgents/com.ovrsee.menubar.plist`.
 3. **Par les hooks, jamais par l'interface** : `ovrsee/pages/` au crawl,
    `ovrsee/plans/` à la capture, `.gitignore` à chaque commit.
 

@@ -335,6 +335,23 @@ export function MenuBar() {
           </ul>
         )}
       </div>
+
+      {/* La fenêtre fermée, le popover est la seule porte d'Ovrsee : il faut
+          pouvoir la rouvrir, et quitter pour de bon — ⌘Q ne fait que passer en
+          barre de menus (T-0305). */}
+      <footer
+        style={s(
+          'display:flex;justify-content:space-between;gap:6px;padding:10px 14px;' +
+            'border-top:1px solid var(--color-divider)',
+        )}
+      >
+        <button type="button" onClick={() => void window.ovrsee?.menubar?.ouvrir?.()} style={s(BOUTON)}>
+          {t('menubar.open_app')}
+        </button>
+        <button type="button" onClick={() => void window.ovrsee?.menubar?.quitter?.()} style={s(BOUTON)}>
+          {t('menubar.quit_app')}
+        </button>
+      </footer>
     </div>
   )
 }

@@ -17,6 +17,8 @@ graphify-out/graph.html
 # relevé de coût et manifeste d'exécution. Rien ne les lit ici, et ils
 # apparaissaient en non-suivis à chaque `git status`.
 graphify-out/.graphify_python
+# État interne de graphify 0.9 (build, libellés, racine).
+graphify-out/.graphify_*
 graphify-out/cost.json
 graphify-out/manifest.json
 

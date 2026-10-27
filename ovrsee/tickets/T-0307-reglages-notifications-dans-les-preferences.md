@@ -2,7 +2,7 @@
 {
   "id": "T-0307",
   "titre": "Réglages Notifications dans les préférences",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "moyenne",
   "tags": [
     "notifications",
@@ -11,7 +11,8 @@
   "cree": "2026-10-27",
   "maj": "2026-10-27",
   "plan": "2026-10-27-notifications-ovrsee-facon-cleanmymac-menage-des-copies-d-ov.md",
-  "charge": "m"
+  "charge": "m",
+  "fait": "2026-10-27T23:09:44.127Z"
 }
 ---
 

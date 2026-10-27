@@ -29,6 +29,12 @@ export interface AttentionEvent {
    * charge illisible.
    */
   detail: string | null
+  /**
+   * Durée du tour en millisecondes, jointe par le hook à un `stop` (T-0306) —
+   * c'est elle que le seuil des réglages compare. Null partout ailleurs, et sur
+   * la forme héritée en texte brut.
+   */
+  dureeMs: number | null
 }
 
 // Construits par code de caractère, et pas écrits en clair : un octet de
@@ -54,11 +60,13 @@ const COMPLETE = new RegExp(`^${ESC}\\]777;ovrsee;([a-z-]+)(?:;([A-Za-z0-9+/=]*)
  * terminateur qui ne viendra jamais.
  *
  * Dimensionné sur la séquence la plus longue que le hook puisse produire :
- * 120 caractères de détail font au plus 480 octets UTF-8, donc 640 de base64,
- * plus le préfixe. Retenir un peu trop est sans conséquence — la condition
+ * 120 caractères de détail, enveloppés en JSON (`{"texte":…,"duree":…}`), font
+ * au pire 720 octets — six par caractère pour un contrôle échappé en `\uXXXX` —
+ * plus une quarantaine d'enveloppe, donc un peu plus de 1 000 de base64, plus
+ * le préfixe. Retenir un peu trop est sans conséquence — la condition
  * ci-dessous exige que le morceau ressemble déjà à notre préfixe.
  */
-const MAX_CARRY = 700
+const MAX_CARRY = 1100
 
 const isKind = (value: string): value is AttentionKind =>
   value === 'stop' || value === 'question' || value === 'busy' || value === 'reset'
@@ -78,6 +86,30 @@ function decode(charge: string | undefined): string | null {
     return texte === '' ? null : texte
   } catch {
     return null
+  }
+}
+
+/**
+ * Le détail et la durée d'une charge décodée.
+ *
+ * Deux formes : un objet JSON `{ texte, duree }` (stop et question, T-0306),
+ * ou le texte brut d'avant — la demande d'un `busy`, et toute séquence émise
+ * par un hook pas encore mis à jour. Ce qui ne se lit pas comme l'objet attendu
+ * reste du texte : une demande qui serait elle-même du JSON s'affiche telle
+ * quelle plutôt que de disparaître.
+ */
+function lireCharge(texte: string | null): { detail: string | null; dureeMs: number | null } {
+  if (texte === null || !texte.startsWith('{')) return { detail: texte, dureeMs: null }
+  try {
+    const objet: unknown = JSON.parse(texte)
+    if (!objet || typeof objet !== 'object' || !('texte' in objet)) return { detail: texte, dureeMs: null }
+    const { texte: brut, duree } = objet as { texte: unknown; duree?: unknown }
+    return {
+      detail: typeof brut === 'string' && brut !== '' ? brut : null,
+      dureeMs: typeof duree === 'number' && Number.isFinite(duree) && duree >= 0 ? duree : null,
+    }
+  } catch {
+    return { detail: texte, dureeMs: null }
   }
 }
 
@@ -113,7 +145,7 @@ export function extractAttention(carry: string, chunk: string): AttentionScan {
 
     const complete = COMPLETE.exec(rest)
     if (complete) {
-      if (isKind(complete[1])) events.push({ kind: complete[1], detail: decode(complete[2]) })
+      if (isKind(complete[1])) events.push({ kind: complete[1], ...lireCharge(decode(complete[2])) })
       // Un genre inconnu est consommé quand même : mieux vaut le retirer que
       // le laisser s'afficher.
       i = start + complete[0].length

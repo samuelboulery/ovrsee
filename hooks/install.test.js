@@ -356,3 +356,31 @@ test('un binaire lancé depuis le DMG ou une translocation n’est pas inscrit d
     assert.equal(emplacementEphemere(chemin), false, chemin)
   }
 })
+
+test('installClaudeHooks : UserPromptSubmit et SessionStart ne lancent node que dans le terminal de l’app', () => {
+  const path = settingsJetable()
+  installClaudeHooks([], path)
+  const settings = JSON.parse(readFileSync(path, 'utf8'))
+  const notify = event =>
+    settings.hooks[event].flatMap(e => e.hooks).find(h => h.command.includes('ovrsee-notify')).command
+
+  assert.ok(notify('UserPromptSubmit').startsWith('[ -z "$OVRSEE_TERMINAL" ] || '))
+  assert.ok(notify('SessionStart').startsWith('[ -z "$OVRSEE_TERMINAL" ] || '))
+  // Ceux-là notifient depuis iTerm : pas de garde.
+  assert.ok(!notify('Stop').includes('OVRSEE_TERMINAL'))
+  assert.ok(!notify('Notification').includes('OVRSEE_TERMINAL'))
+})
+
+test('installClaudeHooks pose la garde sur une entrée d’avant, sans la dupliquer', () => {
+  const path = settingsJetable({
+    hooks: {
+      UserPromptSubmit: [{ hooks: [{ type: 'command', command: 'node /x/ovrsee-notify.js', timeout: 5 }] }],
+    },
+  })
+  installClaudeHooks([], path)
+  const entrees = JSON.parse(readFileSync(path, 'utf8')).hooks.UserPromptSubmit
+    .flatMap(e => e.hooks)
+    .filter(h => h.command.includes('ovrsee-notify'))
+  assert.equal(entrees.length, 1)
+  assert.ok(entrees[0].command.startsWith('[ -z "$OVRSEE_TERMINAL" ] || '))
+})

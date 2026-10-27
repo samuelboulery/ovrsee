@@ -24,7 +24,7 @@ const genres = (events: readonly { kind: string }[]) => events.map(e => e.kind)
 test('attention : une séquence entière donne un événement et disparaît du flux', () => {
   const { clean, carry, events } = extractAttention('', `avant${seq('stop')}après`)
 
-  assert.deepEqual(events, [{ kind: 'stop', detail: null }])
+  assert.deepEqual(events, [{ kind: 'stop', detail: null, dureeMs: null }])
   assert.equal(clean, 'avantaprès')
   assert.equal(carry, '')
 })
@@ -81,7 +81,8 @@ test('attention : un ESC isolé en fin de morceau ne bloque pas le flux suivant'
 })
 
 test('attention : un ESC sans terminateur au-delà de la retenue ne mange pas le flux', () => {
-  const long = `${ESC}]777;ovrsee;${'x'.repeat(800)}`
+  // Au-delà de `MAX_CARRY` (1 100 depuis la charge JSON de T-0306).
+  const long = `${ESC}]777;ovrsee;${'x'.repeat(1200)}`
   const { clean, carry, events } = extractAttention('', long)
 
   assert.deepEqual(events, [])
@@ -93,7 +94,7 @@ test('attention : le détail encodé ressort décodé', () => {
   const message = 'Claude needs your permission to use Bash'
   const { clean, events } = extractAttention('', `a${seqDetail('question', message)}b`)
 
-  assert.deepEqual(events, [{ kind: 'question', detail: message }])
+  assert.deepEqual(events, [{ kind: 'question', detail: message, dureeMs: null }])
   assert.equal(clean, 'ab')
 })
 
@@ -103,7 +104,7 @@ test('attention : un détail non-ASCII survit à l’aller-retour', () => {
   const message = 'Autoriser « rm » — vraiment ?'
   const { events } = extractAttention('', seqDetail('question', message))
 
-  assert.deepEqual(events, [{ kind: 'question', detail: message }])
+  assert.deepEqual(events, [{ kind: 'question', detail: message, dureeMs: null }])
 })
 
 test('attention : un base64 illisible laisse le signal sans détail', () => {
@@ -111,7 +112,7 @@ test('attention : un base64 illisible laisse le signal sans détail', () => {
   // son détail, et un résidu s'afficherait dans le terminal.
   const { clean, events } = extractAttention('', `a${ESC}]777;ovrsee;question;=====${BEL}b`)
 
-  assert.deepEqual(events, [{ kind: 'question', detail: null }])
+  assert.deepEqual(events, [{ kind: 'question', detail: null, dureeMs: null }])
   assert.equal(clean, 'ab')
 })
 
@@ -125,14 +126,14 @@ test('attention : une séquence avec détail coupée en deux est recollée', () 
   assert.equal(premier.clean, 'debut')
 
   const second = extractAttention(premier.carry, entier.slice(coupure))
-  assert.deepEqual(second.events, [{ kind: 'question', detail: 'permission to use Bash' }])
+  assert.deepEqual(second.events, [{ kind: 'question', detail: 'permission to use Bash', dureeMs: null }])
   assert.equal(premier.clean + second.clean, 'debutfin')
 })
 
 test('attention : un « busy » porte la demande envoyée', () => {
   const { events } = extractAttention('', seqDetail('busy', 'sortir les epics du Kanban'))
 
-  assert.deepEqual(events, [{ kind: 'busy', detail: 'sortir les epics du Kanban' }])
+  assert.deepEqual(events, [{ kind: 'busy', detail: 'sortir les epics du Kanban', dureeMs: null }])
 })
 
 test('etiquetteDe : une demande courte passe telle quelle', () => {
@@ -159,4 +160,31 @@ test('etiquetteDe : un mot unique plus long que la coupe est tranché net', () =
 test('etiquetteDe : une demande vide ne donne pas de nom', () => {
   assert.equal(etiquetteDe('   \n  '), '')
   assert.equal(etiquetteDe(''), '')
+})
+
+test('attention : la charge JSON porte la dernière phrase et la durée (T-0306)', () => {
+  const { events } = extractAttention('', seqDetail('stop', JSON.stringify({ texte: 'Tout passe.', duree: 192000 })))
+  assert.deepEqual(events, [{ kind: 'stop', detail: 'Tout passe.', dureeMs: 192000 }])
+})
+
+test('attention : une charge JSON sans texte ni durée valable rend des null', () => {
+  const { events } = extractAttention('', seqDetail('question', JSON.stringify({ texte: null, duree: -3 })))
+  assert.deepEqual(events, [{ kind: 'question', detail: null, dureeMs: null }])
+})
+
+test('attention : le texte brut d’avant reste du texte, même s’il ressemble à du JSON', () => {
+  for (const brut of ['permission to use Bash', '{pas du json', '{"autre":1}']) {
+    const { events } = extractAttention('', seqDetail('question', brut))
+    assert.deepEqual(events, [{ kind: 'question', detail: brut, dureeMs: null }])
+  }
+})
+
+test('attention : la séquence riche la plus longue, coupée en deux, se recolle', () => {
+  const texte = '\u0001'.repeat(120)
+  const longue = seqDetail('stop', JSON.stringify({ texte, duree: 1 }))
+  const moitie = Math.floor(longue.length / 2)
+  const premier = extractAttention('', longue.slice(0, moitie))
+  assert.equal(premier.clean, '')
+  const second = extractAttention(premier.carry, longue.slice(moitie))
+  assert.deepEqual(second.events, [{ kind: 'stop', detail: texte, dureeMs: 1 }])
 })

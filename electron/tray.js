@@ -13,11 +13,15 @@
  *                                     ▲                      │
  *                                     └────── answer ────────┘
  *
- * L'application reste une application normale : `app.dock.hide()` n'est pas
- * appelé. L'item s'ajoute à la fenêtre, il ne la remplace pas.
+ * L'item survit à la fenêtre (T-0305, modèle CleanMyMac). Tant qu'elle est
+ * ouverte, l'application est une application normale, Dock compris ; fermée
+ * — ⌘Q ou dernière fenêtre —, `electron/barre-de-menus.js` appelle
+ * `app.dock.hide()` et il ne reste que cet item, qui relaie alors les
+ * notifications des sessions lancées hors de l'app. Son titre prend le relais
+ * du badge du Dock, caché avec lui.
  */
 
-import { BrowserWindow, Tray, nativeImage, nativeTheme, screen } from 'electron'
+import { app, BrowserWindow, Tray, nativeImage, nativeTheme, screen } from 'electron'
 
 import { signalInstalle } from '../hooks/install.js'
 import { hasSession, writeTo } from './pty.js'
@@ -57,6 +61,12 @@ let etat = { sessions: [], projet: null }
 
 /** Fenêtre principale, pour la ramener au premier plan sur « ouvrir ». */
 let principale = null
+
+/** Prévenu à chaque ouverture du popover : ce qu'il montre est vu. */
+let surOuverture = null
+
+/** Le décompte du badge, que le titre reprend quand le Dock est caché. */
+let compte = 0
 
 /**
  * Icône de la barre de menu, dessinée plutôt que versionnée.
@@ -190,6 +200,7 @@ function basculer(origin, preload) {
   // Relu à chaque ouverture, pas au démarrage : l'utilisateur peut lancer
   // l'installateur entre deux, et le bandeau doit disparaître sans redémarrer.
   publier()
+  surOuverture?.()
 
   positionner(fenetre)
   // `showInactive` et pas `show` : montrer sans donner le focus, donc sans
@@ -202,12 +213,13 @@ function basculer(origin, preload) {
 /**
  * Crée l'item de barre de menu.
  *
- * @param {{origin: string, preload: string, getMainWindow: () => Electron.BrowserWindow|null}} options
+ * @param {{origin: string, preload: string, getMainWindow: () => Electron.BrowserWindow|null, onOpen?: () => void}} options
  */
-export function createTray({ origin, preload, getMainWindow }) {
+export function createTray({ origin, preload, getMainWindow, onOpen }) {
   if (tray) return tray
 
   principale = getMainWindow
+  surOuverture = onOpen ?? null
   tray = new Tray(icone())
   tray.setToolTip('Ovrsee — sessions Claude')
   tray.on('click', () => basculer(origin, preload))
@@ -232,8 +244,22 @@ function publier() {
   // `app/src/menubar.ts`, où elle est testée, et ne sert qu'à griser les
   // boutons. Une session qui a posé une question reste signalée jusqu'à son
   // prochain `stop` — c'est-à-dire jusqu'à ce qu'elle reprenne la main.
+  //
+  // Dock caché, le Dock ne peut plus porter le badge : le titre en reprend le
+  // nombre (T-0306).
   const attend = etat.sessions.some(s => s?.attention?.kind === 'question')
-  if (tray) tray.setTitle(attend ? ' ●' : '')
+  const dockCache = app.dock ? !app.dock.isVisible() : false
+  if (tray) tray.setTitle(dockCache && compte > 0 ? ` ${compte}` : attend ? ' ●' : '')
+}
+
+/**
+ * Le décompte du badge, posé par `electron/notifications.js`.
+ *
+ * @param {number} n
+ */
+export function setCompte(n) {
+  compte = n
+  publier()
 }
 
 /**

@@ -75,6 +75,11 @@ mac:
     - target: dmg
       arch: [arm64]
   darkModeSupport: true
+  # Les boutons Autoriser/Refuser d'une notification (T-0306) n'apparaissent
+  # que si l'app est signée — l'ad hoc de `resetAdHocDarwinSignature` est à
+  # éprouver — et déclare le style « alerte » (doc Electron, NotificationAction).
+  extendInfo:
+    NSUserNotificationAlertStyle: alert
   # Pas de signature ni de notarisation, et le dépôt est public depuis la
   # 1.0.0-beta : ce n'est donc plus « en attendant la distribution publique »,
   # c'est une dette assumée, suivie par T-0192. Ce qui la rend tenable est

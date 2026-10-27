@@ -72,6 +72,10 @@ function sessionEnv() {
     TERM: 'xterm-256color',
     COLORTERM: 'truecolor',
     LANG: process.env.LANG ?? 'fr_FR.UTF-8',
+    // Dit à `hooks/ovrsee-notify.js` que la séquence OSC sera lue : hors de
+    // l'app, il passe par l'inbox ou osascript (T-0306). Seul ce terminal-ci
+    // la pose — un shell ouvert ailleurs n'en hérite pas.
+    OVRSEE_TERMINAL: '1',
   }
 }
 

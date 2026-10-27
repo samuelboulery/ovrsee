@@ -275,5 +275,6 @@ test('notify : le fichier déposé dans l’inbox se relit tel quel par le princ
   const [nom] = readdirSync(dossier)
   assert.match(nom, /^[0-9a-f-]{36}\.json$/)
   assert.deepEqual(validerInbox(readFileSync(join(dossier, nom), 'utf8')), n)
-  assert.equal(statSync(join(dossier, nom)).mode & 0o777, 0o600)
+  // Les droits POSIX n'ont pas de sens sous Windows, qui rend 0o666.
+  if (process.platform !== 'win32') assert.equal(statSync(join(dossier, nom)).mode & 0o777, 0o600)
 })

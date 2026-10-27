@@ -41,6 +41,7 @@
     "icon": "node scripts/make-icon.js",
     "package:mac": "pnpm build:ui && electron-builder --mac",
     "package:win": "pnpm build:ui && electron-builder --win",
+    "install:mac": "pnpm package:mac && ditto release.noindex/mac-arm64/Ovrsee.app /Applications/Ovrsee.app",
     "screenshots": "node scripts/screenshots.js"
   },
   "devDependencies": {

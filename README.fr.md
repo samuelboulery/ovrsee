@@ -179,8 +179,9 @@ pnpm ovrsee:brief                       # lire l'état en texte
 Empaqueter en local, sans publier :
 
 ```bash
-pnpm package:mac    # DMG dans release/ (arm64)
-pnpm package:win    # installeur NSIS dans release/ (x64, depuis Windows uniquement)
+pnpm package:mac    # DMG dans release.noindex/ (arm64)
+pnpm install:mac    # le même build, copié dans /Applications (quitter Ovrsee avant)
+pnpm package:win    # installeur NSIS dans release.noindex/ (x64, depuis Windows uniquement)
 ```
 
 Les releases, elles, sont construites par `.github/workflows/release.yml` à chaque tag

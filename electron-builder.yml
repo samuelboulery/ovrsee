@@ -3,7 +3,7 @@ productName: Ovrsee
 copyright: © 2026 Samuel Boulery
 
 directories:
-  output: release
+  output: release.noindex
   buildResources: build
 
 files:

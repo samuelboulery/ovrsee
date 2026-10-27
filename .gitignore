@@ -44,7 +44,10 @@ app/dist/
 # Traduction de app/src en JavaScript, refaite à chaque `pnpm test`.
 app/.test-build/
 
-# Applications empaquetées, reconstruites à la demande.
+# Applications empaquetées, reconstruites à la demande. `.noindex` : Spotlight
+# et Launchpad ignorent le dossier, et seule `/Applications/Ovrsee.app` y
+# apparaît (`pnpm install:mac`). `release/` reste pour les anciens checkouts.
+release.noindex/
 release/
 
 # Icône engendrée par scripts/make-icon.js.

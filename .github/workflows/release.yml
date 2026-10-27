@@ -83,10 +83,10 @@ jobs:
         with:
           name: binaires-${{ matrix.nom }}
           path: |
-            release/*.dmg
-            release/*.exe
-            release/*.blockmap
-            release/latest*.yml
+            release.noindex/*.dmg
+            release.noindex/*.exe
+            release.noindex/*.blockmap
+            release.noindex/latest*.yml
           if-no-files-found: error
 
   # Seul job à écrire, et seulement pour un tag : un `workflow_dispatch` lancé

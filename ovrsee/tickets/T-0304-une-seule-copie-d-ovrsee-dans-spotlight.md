@@ -2,7 +2,7 @@
 {
   "id": "T-0304",
   "titre": "Une seule copie d'Ovrsee dans Spotlight",
-  "colonne": "revue",
+  "colonne": "fait",
   "priorite": "haute",
   "tags": [
     "build"
@@ -10,7 +10,8 @@
   "cree": "2026-10-27",
   "maj": "2026-10-27",
   "plan": "2026-10-27-notifications-ovrsee-facon-cleanmymac-menage-des-copies-d-ov.md",
-  "charge": "s"
+  "charge": "s",
+  "fait": "2026-10-27T22:57:19.665Z"
 }
 ---
 

@@ -243,6 +243,15 @@ export interface SettingsType {
   gitignoreShots?: boolean
   /** `ovrsee/plans/` et `ovrsee/tickets/` doivent-ils être gitignorés ? */
   gitignorePlans?: boolean
+  /** Barre de menus permanente et notifications — voir `hooks/settings.js` (T-0307). */
+  notifications?: {
+    barreDeMenus: boolean
+    lancerAuDemarrage: boolean
+    finDeTourApresMin: number
+    sonFin: string
+    sonQuestion: string
+    badge: boolean
+  }
 }
 
 export interface Snapshot {

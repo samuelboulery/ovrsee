@@ -74,7 +74,34 @@ export const DEFAULT_SETTINGS = {
   // ce réglage : captures ignorées, plans/tickets versionnés.
   gitignoreShots: true,
   gitignorePlans: false,
+  // Le modèle CleanMyMac (T-0305, T-0307) : fermer la fenêtre laisse l'item de
+  // barre de menus, et c'est lui qui relaie les notifications des sessions
+  // lancées hors de l'app. Le seuil vient du mod `notif` de claude-config, qui
+  // le portait en dur : une fin de tour plus courte que lui n'est pas une
+  // attente, c'est une réponse qu'on regardait arriver.
+  notifications: {
+    barreDeMenus: true,
+    lancerAuDemarrage: true,
+    finDeTourApresMin: 2,
+    sonFin: 'Glass',
+    sonQuestion: 'Ping',
+    badge: true,
+  },
 }
+
+/**
+ * Les sons système de macOS (`/System/Library/Sounds`), plus `aucun`.
+ *
+ * Une liste fermée parce que le nom part tel quel à `Notification({ sound })`
+ * et à `osascript` : un nom inconnu y serait muet sans le dire.
+ */
+export const SONS = [
+  'aucun', 'Basso', 'Blow', 'Bottle', 'Frog', 'Funk', 'Glass', 'Hero',
+  'Morse', 'Ping', 'Pop', 'Purr', 'Sosumi', 'Submarine', 'Tink',
+]
+
+/** Au-delà d'une heure, un seuil ne filtre plus rien d'utile. */
+const SEUIL_MAX_MIN = 60
 
 /**
  * Chemin du fichier de préférences globales.
@@ -145,6 +172,19 @@ function validerTerminal(input, out) {
  * pas explicite au clic. Même prédicat pour les actions globales et celles
  * d'un projet — les deux finissent dans le même terminal.
  */
+function validerNotifications(input, out) {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return
+  for (const cle of ['barreDeMenus', 'lancerAuDemarrage', 'badge']) {
+    if (typeof input[cle] === 'boolean') out[cle] = input[cle]
+  }
+  const seuil = input.finDeTourApresMin
+  if (typeof seuil === 'number' && Number.isFinite(seuil) && seuil >= 0 && seuil <= SEUIL_MAX_MIN) {
+    out.finDeTourApresMin = seuil
+  }
+  validerEnum(out, 'sonFin', input.sonFin, SONS)
+  validerEnum(out, 'sonQuestion', input.sonQuestion, SONS)
+}
+
 function actionValide(action) {
   if (!action || typeof action !== 'object') return false
   if (typeof action.label !== 'string' || !action.label.trim()) return false
@@ -227,6 +267,8 @@ export function validateSettings(partial, defaults = DEFAULT_SETTINGS) {
   if (typeof partial.gitignorePlans === 'boolean') {
     out.gitignorePlans = partial.gitignorePlans
   }
+
+  validerNotifications(partial.notifications, out.notifications)
 
   return out
 }

@@ -173,12 +173,8 @@ export function Terminal({
     claudeKey,
     available,
     ptyIds,
-  } = useTerminals(snapshot?.root ?? null, themeMode, (sessionKey, event) => {
-    const { kind, detail } = event
-    const projet = sessionKey.slice(0, Math.max(0, sessionKey.lastIndexOf('#')))
-    // Le nom du dossier plutôt que celui du registre : la notification peut
-    // venir d'un projet qui n'est pas l'affiché, dont le snapshot n'est pas là.
-    const nom = projet.split('/').filter(Boolean).pop() ?? projet
+  } = useTerminals(snapshot?.root ?? null, themeMode, (sessionKey, event, ptyId) => {
+    const { kind, detail, dureeMs } = event
 
     // La barre de menu reçoit tout, y compris ce qui est sous les yeux : elle
     // affiche un état, pas un événement, et une session en attente doit y
@@ -212,23 +208,12 @@ export function Terminal({
     // Rien à signaler si la session est sous les yeux : la notification
     // doublonnerait ce que l'utilisateur est déjà en train de regarder.
     if (sessionKey === etat.current.active && document.hasFocus()) return
-    if (typeof Notification === 'undefined') return
 
-    const titre = t(kind === 'question' ? 'terminal.notify_question' : 'terminal.notify_stop')
-
-    // `tag` : une session qui signale deux fois remplace sa notification au
-    // lieu d'en empiler une seconde. Le détail, quand le hook en a joint un,
-    // dit *quelle* permission est demandée — « une question » ne suffit pas
-    // pour décider sans revenir à la fenêtre.
-    const notification = new Notification(titre, {
-      body: detail ? `${nom} — ${detail}` : nom,
-      tag: sessionKey,
-    })
-    notification.onclick = () => {
-      window.ovrsee?.app.focus()
-      etat.current.cibler(sessionKey)
-      if (projet) onProjet(projet)
-    }
+    // La notification elle-même naît dans le principal (`electron/notifications.js`) :
+    // c'est lui qui porte Autoriser/Refuser, le son, le badge et le seuil de fin
+    // de tour — une `Notification` web n'a rien de tout ça. Le clic revient par
+    // `menubar:reveal`, le même chemin que le popover.
+    void window.ovrsee?.notifications?.show({ sessionKey, kind, detail, dureeMs, ptyId })
   },
   // Une frappe dans une session qui attendait une réponse *est* la réponse :
   // l'invite de permission se referme et Claude repart. Aucun signal ne le dit

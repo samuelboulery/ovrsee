@@ -4,7 +4,23 @@ import test from 'node:test'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { detailPour, genrePour, projetEquipe, sequence } from './ovrsee-notify.js'
+import { mkdtempSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+
+import {
+  aNotifier,
+  contenuNotification,
+  dernierePhrase,
+  detailPour,
+  formatDuree,
+  genrePour,
+  lireTour,
+  pidVivant,
+  projetEquipe,
+  sequence,
+  validerInbox,
+  voiePour,
+} from './ovrsee-notify.js'
 
 const RACINE = dirname(dirname(fileURLToPath(import.meta.url)))
 
@@ -143,4 +159,122 @@ test('notify : reprendre une conversation ne réinitialise pas son onglet', () =
   for (const source of ['resume', 'compact', undefined]) {
     assert.equal(genrePour({ hook_event_name: 'SessionStart', source }), null, String(source))
   }
+})
+
+const tmp = () => mkdtempSync(join(tmpdir(), 'ovrsee-notify-'))
+
+test('notify : la voie suit OVRSEE_TERMINAL, puis le pid de la barre de menus, puis osascript', () => {
+  const dir = tmp()
+  const vivant = join(dir, 'vivant.pid')
+  const mort = join(dir, 'mort.pid')
+  writeFileSync(vivant, String(process.pid))
+  // Un pid au-delà de tout ce que le noyau attribue : jamais vivant.
+  writeFileSync(mort, '2147483646')
+
+  assert.equal(voiePour({ OVRSEE_TERMINAL: '1' }, vivant, 'darwin'), 'osc')
+  assert.equal(voiePour({}, vivant, 'darwin'), 'inbox')
+  assert.equal(voiePour({}, mort, 'darwin'), 'osascript')
+  assert.equal(voiePour({}, join(dir, 'absent.pid'), 'darwin'), 'osascript')
+  // Hors macOS, pas de filet osascript : rien plutôt qu'une erreur.
+  assert.equal(voiePour({}, mort, 'linux'), null)
+})
+
+test('notify : un fichier pid illisible ne passe pas pour vivant', () => {
+  const dir = tmp()
+  for (const contenu of ['', 'abc', '-4', '0']) {
+    const f = join(dir, `p${contenu}.pid`)
+    writeFileSync(f, contenu)
+    assert.equal(pidVivant(f), false, contenu)
+  }
+})
+
+test('notify : une question notifie toujours, une fin de tour au-delà du seuil seulement', () => {
+  const reglages = { finDeTourApresMin: 2 }
+  assert.equal(aNotifier('question', 1000, reglages), true)
+  assert.equal(aNotifier('stop', 119_000, reglages), false)
+  assert.equal(aNotifier('stop', 120_000, reglages), true)
+  // Durée inconnue : une notification de trop plutôt qu'un tour long muet.
+  assert.equal(aNotifier('stop', null, reglages), true)
+  assert.equal(aNotifier('stop', 0, { finDeTourApresMin: 0 }), true)
+  assert.equal(aNotifier('busy', 999_999, reglages), false)
+})
+
+test('notify : le tour se lit à la fin du transcript — dernière vraie demande, dernier texte', () => {
+  const f = join(tmp(), 't.jsonl')
+  const lignes = [
+    { type: 'user', timestamp: '2026-10-27T10:00:00.000Z', message: { content: 'ancienne demande' } },
+    { type: 'user', timestamp: '2026-10-27T10:05:00.000Z', message: { content: 'nouvelle demande' } },
+    { type: 'assistant', timestamp: '2026-10-27T10:05:10.000Z', message: { content: [{ type: 'text', text: 'Je regarde.' }] } },
+    // Un résultat d'outil est une ligne `user`, pas une demande.
+    { type: 'user', timestamp: '2026-10-27T10:06:00.000Z', message: { content: [{ type: 'tool_result', content: 'ok' }] } },
+    { type: 'assistant', timestamp: '2026-10-27T10:08:00.000Z', message: { content: [{ type: 'tool_use' }] } },
+    { type: 'assistant', timestamp: '2026-10-27T10:09:00.000Z', message: { content: [{ type: 'text', text: 'Fini. Tout passe.' }] } },
+  ]
+  writeFileSync(f, lignes.map(l => JSON.stringify(l)).join('\n') + '\n{coupé')
+  const tour = lireTour(f)
+  assert.equal(tour.debut, Date.parse('2026-10-27T10:05:00.000Z'))
+  assert.equal(tour.dernier, 'Fini. Tout passe.')
+  assert.deepEqual(lireTour(join(tmp(), 'absent.jsonl')), { debut: null, dernier: null })
+  assert.deepEqual(lireTour(undefined), { debut: null, dernier: null })
+})
+
+test('notify : la dernière phrase, sans markdown ni bloc de code', () => {
+  assert.equal(dernierePhrase('Premier point.\n\n**Tout est vert.** Dis-moi si tu veux la PR.'), 'Dis-moi si tu veux la PR.')
+  assert.equal(dernierePhrase('Voici :\n```js\nconst a = 1.\n```'), 'Voici :')
+  assert.equal(dernierePhrase('Voir [le ticket](https://x.y).'), 'Voir le ticket.')
+  assert.equal(dernierePhrase('   '), null)
+  assert.equal(dernierePhrase(42), null)
+  assert.equal(dernierePhrase('x'.repeat(300)).length, 120)
+})
+
+test('notify : durée et contenu affichés', () => {
+  assert.equal(formatDuree(42_000), '42 s')
+  assert.equal(formatDuree(192_000), '3 min 12')
+  assert.equal(formatDuree(3_900_000), '1 h 05')
+  assert.deepEqual(
+    contenuNotification({ genre: 'stop', projet: 'site', texte: 'Tout passe.', dureeMs: 192_000 }, 'fr'),
+    { title: 'site', subtitle: 'Session terminée', body: 'Tout passe. · 3 min 12' },
+  )
+  assert.equal(
+    contenuNotification({ genre: 'question', projet: 'site', texte: null, dureeMs: null }, 'fr').body,
+    'Claude attend une réponse',
+  )
+})
+
+test('notify : la charge riche voyage en JSON, coupée à la même longueur', () => {
+  const encode = sequence('stop', { texte: 'y'.repeat(500), duree: 1234 }).match(/;stop;([A-Za-z0-9+/=]+)/)[1]
+  assert.deepEqual(JSON.parse(Buffer.from(encode, 'base64').toString('utf8')), { texte: 'y'.repeat(120), duree: 1234 })
+})
+
+test('notify : un fichier inbox malformé est refusé, pas deviné', () => {
+  const bon = { genre: 'stop', projet: 'site', texte: 'Fini.', dureeMs: 1, terminal: 'com.googlecode.iterm2', session: 'abc-123' }
+  assert.deepEqual(validerInbox(JSON.stringify(bon)), bon)
+  assert.equal(validerInbox(JSON.stringify({ ...bon, terminal: 'x; rm -rf /' })).terminal, null)
+  assert.equal(validerInbox(JSON.stringify({ ...bon, session: '../x' })).session, null)
+  for (const mauvais of [
+    '{coupé',
+    '[]',
+    'null',
+    JSON.stringify({ ...bon, genre: 'busy' }),
+    JSON.stringify({ ...bon, projet: 3 }),
+    JSON.stringify({ ...bon, texte: 'x'.repeat(501) }),
+    JSON.stringify({ ...bon, dureeMs: -1 }),
+    JSON.stringify({ ...bon, dureeMs: '1' }),
+    'x'.repeat(9000),
+  ]) {
+    assert.equal(validerInbox(mauvais), null, mauvais.slice(0, 40))
+  }
+})
+
+test('notify : le fichier déposé dans l’inbox se relit tel quel par le principal', async () => {
+  const { ecrireInbox } = await import('./ovrsee-notify.js')
+  const { readdirSync, readFileSync, statSync } = await import('node:fs')
+  const dossier = join(tmp(), 'inbox')
+  const n = { genre: 'question', projet: 'site', texte: 'besoin de Bash', dureeMs: null, terminal: null, session: null }
+  ecrireInbox(n, dossier)
+  const [nom] = readdirSync(dossier)
+  assert.match(nom, /^[0-9a-f-]{36}\.json$/)
+  assert.deepEqual(validerInbox(readFileSync(join(dossier, nom), 'utf8')), n)
+  // Les droits POSIX n'ont pas de sens sous Windows, qui rend 0o666.
+  if (process.platform !== 'win32') assert.equal(statSync(join(dossier, nom)).mode & 0o777, 0o600)
 })

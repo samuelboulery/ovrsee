@@ -179,6 +179,20 @@ function installGitHook(root, hookName, scriptName, description, done) {
  */
 const SIGNAL_EVENTS = ['Stop', 'Notification', 'UserPromptSubmit', 'SessionStart']
 
+/**
+ * Les événements du signal qui ne servent que dans le terminal de l'app.
+ *
+ * `busy` nomme un onglet, `reset` en efface le nom : hors de l'app, il n'y a
+ * pas d'onglet, et lancer node deux fois par tour pour rien coûte (T-0306).
+ * La garde est dans la commande, donc dans le shell, avant tout démarrage de
+ * node. `[ -z … ] ||` et non `[ -n … ] &&` : la seconde forme rend 1 quand la
+ * variable manque, et Claude Code afficherait une erreur de hook à chaque tour.
+ * `Stop` et `Notification` restent sans garde — ce sont eux qui notifient
+ * depuis iTerm.
+ */
+const SIGNAL_APP_SEULE = new Set(['UserPromptSubmit', 'SessionStart'])
+const GARDE_TERMINAL = '[ -z "$OVRSEE_TERMINAL" ] || '
+
 /** Une entrée est-elle déjà celle de l'ovrsee ? */
 const isOvrsee = (entry, script) => JSON.stringify(entry).includes(script)
 
@@ -337,11 +351,21 @@ export function installClaudeHooks(done, settingsPath = SETTINGS) {
   // de formes différentes.
   for (const event of SIGNAL_EVENTS) {
     const entries = (hooks[event] ??= [])
-    if (entries.some(e => isOvrsee(e, 'ovrsee-notify'))) continue
-    entries.push({
-      hooks: [{ type: 'command', command: commandFor('ovrsee-notify.js'), timeout: 5 }],
-    })
-    added.push(`${event} — signal de session vers le panneau terminal`)
+    const command = (SIGNAL_APP_SEULE.has(event) ? GARDE_TERMINAL : '') + commandFor('ovrsee-notify.js')
+    const existante = entries.find(e => isOvrsee(e, 'ovrsee-notify'))
+    if (!existante) {
+      entries.push({ hooks: [{ type: 'command', command, timeout: 5 }] })
+      added.push(`${event} — signal de session vers le panneau terminal`)
+      continue
+    }
+    // Une machine équipée avant la garde : l'entrée existe, sans elle.
+    // Seule la commande de l'ovrsee est réécrite, le reste de l'entrée reste.
+    for (const hook of existante.hooks ?? []) {
+      if (!String(hook.command).includes('ovrsee-notify') || hook.command === command) continue
+      if (!SIGNAL_APP_SEULE.has(event) || hook.command.startsWith(GARDE_TERMINAL)) continue
+      hook.command = command
+      added.push(`${event} — signal limité au terminal de l'app`)
+    }
   }
 
   if (added.length === 0) {

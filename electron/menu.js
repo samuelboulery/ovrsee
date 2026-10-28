@@ -50,9 +50,12 @@ const TAB_IDS = ['apercu', 'navigateur', 'produit', 'historique', 'tableau', 'do
  * @param {() => Electron.BrowserWindow} createWindow ouvre une nouvelle
  *   fenêtre. Passé en paramètre plutôt qu'importé de `main.js` : `main.js`
  *   importe déjà `buildMenu` d'ici, et l'import réciproque bouclerait.
+ * @param {() => void} [quitter] le ⌘Q : passe en barre de menus seule quand
+ *   le réglage le veut (`electron/barre-de-menus.js`). Sans lui, le rôle
+ *   `quit` natif.
  * @returns {Electron.Menu}
  */
-export function buildMenu(lang = 'fr', createWindow) {
+export function buildMenu(lang = 'fr', createWindow, quitter) {
   const m = (key, params) => t(key, lang, params)
   const mac = process.platform === 'darwin'
 
@@ -79,7 +82,9 @@ export function buildMenu(lang = 'fr', createWindow) {
               { role: 'hideOthers', label: m('menu.hide_others') },
               { role: 'unhide', label: m('menu.unhide') },
               { type: 'separator' },
-              { role: 'quit', label: m('menu.quit') },
+              quitter
+                ? { label: m('menu.quit'), accelerator: 'Command+Q', click: quitter }
+                : { role: 'quit', label: m('menu.quit') },
             ],
           },
         ]

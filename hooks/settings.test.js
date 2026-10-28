@@ -431,3 +431,41 @@ test('mergeSettings : le projet ne surcharge pas le thème', () => {
   const global = { ...DEFAULT_SETTINGS, theme: 'light' }
   assert.equal(mergeSettings(global, { theme: 'dark' }).theme, 'light')
 })
+
+test('notifications : défauts du modèle CleanMyMac (T-0307)', () => {
+  assert.deepEqual(validateSettings({}).notifications, {
+    barreDeMenus: true,
+    lancerAuDemarrage: true,
+    finDeTourApresMin: 2,
+    sonFin: 'Glass',
+    sonQuestion: 'Ping',
+    badge: true,
+  })
+})
+
+test('notifications : valeurs valides retenues, invalides rendues au défaut, clé par clé', () => {
+  const out = validateSettings({
+    notifications: {
+      barreDeMenus: false,
+      lancerAuDemarrage: 'oui',
+      finDeTourApresMin: 5,
+      sonFin: 'aucun',
+      sonQuestion: '../../etc/passwd',
+      badge: 0,
+    },
+  }).notifications
+  assert.equal(out.barreDeMenus, false)
+  assert.equal(out.lancerAuDemarrage, true)
+  assert.equal(out.finDeTourApresMin, 5)
+  assert.equal(out.sonFin, 'aucun')
+  assert.equal(out.sonQuestion, 'Ping')
+  assert.equal(out.badge, true)
+})
+
+test('notifications : seuil hors bornes ou non fini ignoré', () => {
+  for (const finDeTourApresMin of [-1, 61, Number.NaN, Infinity, '2']) {
+    assert.equal(validateSettings({ notifications: { finDeTourApresMin } }).notifications.finDeTourApresMin, 2)
+  }
+  assert.equal(validateSettings({ notifications: { finDeTourApresMin: 0 } }).notifications.finDeTourApresMin, 0)
+  assert.equal(validateSettings({ notifications: [] }).notifications.badge, true)
+})

@@ -244,6 +244,23 @@ contextBridge.exposeInMainWorld('ovrsee', {
       ipcRenderer.on('menubar:reveal', relais)
       return () => ipcRenderer.off('menubar:reveal', relais)
     },
+
+    /** Rouvre la fenêtre principale, recréée au besoin. Aucun argument. */
+    ouvrir: () => ipcRenderer.invoke('menubar:open'),
+
+    /** Quitte vraiment — le ⌘Q de la fenêtre ne fait que passer en barre de menus. */
+    quitter: () => ipcRenderer.invoke('menubar:quit'),
+  },
+
+  /**
+   * Notification d'une session du terminal de l'app (T-0306).
+   *
+   * Le rendu ne transmet que ce qu'il a lu dans le flux du pty ; le principal
+   * valide chaque champ, n'accepte que de la fenêtre principale, et décide
+   * seul de ce qu'un bouton tape — `allow` ou `deny`, via `tray.js`.
+   */
+  notifications: {
+    show: n => ipcRenderer.invoke('notif:show', n),
   },
 
   integrations: {

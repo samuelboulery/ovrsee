@@ -37,6 +37,7 @@ import { readSettings } from '../hooks/settings.js'
 import { readIntegrations, writeIntegrations } from '../hooks/integrations.js'
 import { checkVercel, checkNetlify, checkSupabase, fetchSupabaseSchema } from '../hooks/integrationProviders.js'
 import { openSession, writeTo, resize, closeSession, closeAll } from './pty.js'
+import { demarrerBarreDeMenus, quitter, SANS_FENETRE, synchroniserLancement } from './barre-de-menus.js'
 import {
   accordRequis,
   crawlState,
@@ -50,14 +51,7 @@ import {
 import { approuver, devApprouve } from '../crawl/confiance.js'
 import { ouvrable } from './lien-externe.js'
 import { durcirWebview, garderInvite, poserPermissions } from './permissions.js'
-import {
-  answer as menubarAnswer,
-  createTray,
-  currentState,
-  destroyPopover,
-  reveal as menubarReveal,
-  setState,
-} from './tray.js'
+import { destroyPopover } from './tray.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const UI = join(HERE, '..', 'app', 'dist')
@@ -79,6 +73,11 @@ const MIME = {
 // dialogues du système porteraient ce nom-là. Le paquet, lui, tient son nom de
 // `productName` — les poser tous les deux rend les deux modes identiques.
 app.setName('Ovrsee')
+
+// Une seule instance de l'app livrée : la seconde réveille la première
+// (`second-instance`, `barre-de-menus.js`) et s'en va. Pas en développement, où
+// `pnpm electron` doit pouvoir tourner à côté de l'app installée.
+if (app.isPackaged && !app.requestSingleInstanceLock()) app.exit(0)
 
 /**
  * Les éditeurs qu'on sait ouvrir, par leur schéma d'URL.
@@ -331,7 +330,7 @@ app.whenReady().then(() => {
   // Le menu se construit une fois, dans la langue des préférences : le
   // reconstruire à chaud coûte plus qu'il ne rapporte, et l'écran des
   // préférences prévient que le changement prend effet au prochain lancement.
-  Menu.setApplicationMenu(buildMenu(readSettings().langue, createWindow))
+  Menu.setApplicationMenu(buildMenu(readSettings().langue, createWindow, quitter))
 
   protocol.handle(SCHEME, async request => {
     const url = new URL(request.url)
@@ -341,7 +340,10 @@ app.whenReady().then(() => {
     //
     // `await` avant le `??` : une promesse est toujours vraie, et sans lui
     // l'interface ne serait plus jamais servie.
-    return (await fetchHandler(url, null, request)) ?? serveUi(url.pathname)
+    const reponse = (await fetchHandler(url, null, request)) ?? serveUi(url.pathname)
+    // « Lancer au démarrage » vient d'être basculé, peut-être : la LaunchAgent suit.
+    if (url.pathname === '/api/settings' && request.method === 'POST') synchroniserLancement()
+    return reponse
   })
 
   // Surface du terminal. Elle n'accepte jamais de nom de programme : le
@@ -754,39 +756,17 @@ app.whenReady().then(() => {
     return true
   })
 
-  // Surface de la barre de menu. Le principal ne calcule rien : il retient
-  // l'état que le rendu principal publie et le republie au popover — voir
-  // l'en-tête de `tray.js` pour pourquoi le calcul n'est pas ici.
-  //
-  // `report` n'est accepté que de la fenêtre principale. Le popover est un
-  // rendu de la même origine : sans cette garde, il pourrait se réécrire son
-  // propre état, donc se fabriquer une session et un identifiant de pty.
-  ipcMain.handle('menubar:report', (event, etat) => {
-    if (event.sender !== principale?.webContents) return
-    setState(etat)
-  })
-  ipcMain.handle('menubar:pull', () => currentState())
-  ipcMain.handle('menubar:answer', (_event, ptyId, decision) => menubarAnswer(ptyId, decision))
-  ipcMain.handle('menubar:reveal', (_event, sessionKey) => {
-    if (typeof sessionKey === 'string') menubarReveal(sessionKey)
-  })
+  // `--barre-de-menus` : lancé par la LaunchAgent à l'ouverture de session,
+  // sans fenêtre ni Dock (T-0305).
+  if (process.argv.includes(SANS_FENETRE)) app.dock?.hide()
+  else principale = createWindow()
 
-  principale = createWindow()
-
-  createTray({
+  demarrerBarreDeMenus({
     origin: ORIGIN,
     preload: join(HERE, 'preload.cjs'),
-    getMainWindow: () => principale,
+    getPrincipale: () => (principale && !principale.isDestroyed() ? principale : null),
+    nouvelleFenetre: () => (principale = createWindow()),
   })
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) principale = createWindow()
-  })
-})
-
-app.on('window-all-closed', () => {
-  closeAll()
-  if (process.platform !== 'darwin') app.quit()
 })
 
 app.on('before-quit', () => {

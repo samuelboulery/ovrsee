@@ -105,6 +105,24 @@ declare global {
         reveal: (sessionKey: string) => Promise<void>
         /** Côté fenêtre principale : le popover demande cette session. */
         onReveal: (handler: (sessionKey: string) => void) => () => void
+        /** Rouvre la fenêtre — recréée si l'app était en barre de menus seule. */
+        ouvrir?: () => Promise<void>
+        /** Le seul vrai « Quitter » quand la barre de menus est permanente (T-0305). */
+        quitter?: () => Promise<void>
+      }
+      /**
+       * Notifications natives — voir `electron/notifications.js`. Le rendu dit
+       * ce qui s'est passé ; le principal décide du seuil, du son et des
+       * boutons, et ne tape dans le pty que via `tray.js`.
+       */
+      notifications?: {
+        show: (n: {
+          sessionKey: string
+          kind: 'stop' | 'question'
+          detail: string | null
+          dureeMs: number | null
+          ptyId: string
+        }) => Promise<void>
       }
       /** Onglet Navigateur — voir `electron/preload.cjs`. */
       preview: {

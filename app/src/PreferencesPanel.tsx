@@ -19,6 +19,7 @@ import {
   Switch,
 } from './PreferencesControls'
 import { TAB_KEYS } from './PreferencesPreview'
+import { SectionNotifications } from './PreferencesNotifications'
 import { SectionProfils } from './PreferencesProfils'
 import { BlocActions, BlocAvance, BlocDemarrage, SectionProjet } from './PreferencesProjet'
 import { s } from './style'
@@ -45,12 +46,13 @@ import { TAB_ICONS, type TabId } from './views'
  * et Claude Code dans `ClaudeConfigPanel.tsx`.
  */
 
-export type SectionId = 'general' | 'interface' | 'claude' | 'projet'
+export type SectionId = 'general' | 'interface' | 'notifications' | 'claude' | 'projet'
 
 /** Les sections, dans l'ordre de la barre latérale. */
 const SECTIONS: Array<{ id: SectionId; cle: TranslationKey }> = [
   { id: 'interface', cle: 'pref.interface' },
   { id: 'general', cle: 'pref.general' },
+  { id: 'notifications', cle: 'pref.notifications' },
   { id: 'claude', cle: 'pref.claude' },
   { id: 'projet', cle: 'pref.project' },
 ]
@@ -631,6 +633,7 @@ export function PreferencesModal({
           </div>
         </>
       )
+    if (section === 'notifications') return <SectionNotifications {...props} />
     if (section === 'claude') return <SectionClaude />
     return (
       <SectionProjet
@@ -660,7 +663,7 @@ export function PreferencesModal({
           'width: min(1100px, 100%); height: min(700px, 100%); display: flex; overflow: hidden; background: var(--color-surface-panel); border: 1px solid var(--color-divider); border-radius: 12px; box-shadow: var(--shadow-lg);',
         )}
       >
-        {/* La barre de navigation. Quatre entrées visibles d'un coup : elles ne
+        {/* La barre de navigation. Cinq entrées visibles d'un coup : elles ne
             se regroupent plus, un intitulé de groupe par entrée n'aiderait
             personne. */}
         <nav

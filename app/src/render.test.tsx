@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 
 import { Garde, Panne, messageDe } from './Garde'
 import { Bandeau, Message, ScanBadge } from './Shell'
-import { BandeauSignal, MenuBar, PEREMPTION_MS, ProjetCard, SessionCard } from './MenuBarPanel'
+import { BandeauSignal, ExterneCard, MenuBar, PEREMPTION_MS, ProjetCard, SessionCard } from './MenuBarPanel'
 import type { MenuBarSession } from './menubar'
 import type { Snapshot } from './data'
 import { Apercu } from './tabs/Apercu'
@@ -298,6 +298,27 @@ test('barre de menu — une session muette paraît, sans rien à décider', () =
   assert.match(html, /projet/)
   assert.match(html, /En cours|Running/)
   assert.doesNotMatch(html, /Autoriser|Allow/)
+})
+
+test('barre de menu — une session hors de l’app porte son terminal et ne décide de rien', () => {
+  const html = renderToStaticMarkup(
+    <ExterneCard
+      externe={{ session: 's1', projet: 'site', terminal: 'com.googlecode.iterm2', etat: 'question', detail: 'needs Bash', at: Date.now() }}
+      now={Date.now()}
+    />,
+  )
+  assert.match(html, /iTerm/)
+  assert.match(html, /Ouvrir iTerm|Open iTerm/)
+  assert.match(html, /dashed/, 'distincte des sessions de l’app')
+  assert.doesNotMatch(html, /Autoriser|Allow/)
+
+  // Terminal inconnu : la pastille dit « Terminal », et pas de bouton mort.
+  const sans = renderToStaticMarkup(
+    <ExterneCard externe={{ session: 's2', projet: 'x', terminal: null, etat: 'idle', detail: null, at: Date.now() }} now={Date.now()} />,
+  )
+  assert.match(sans, /Terminal/)
+  assert.match(sans, /Inactive|Idle/)
+  assert.doesNotMatch(sans, /<button/)
 })
 
 test('barre de menu — le bloc projet dit où en est le dépôt', () => {

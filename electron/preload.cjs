@@ -234,6 +234,15 @@ contextBridge.exposeInMainWorld('ovrsee', {
     reveal: sessionKey => ipcRenderer.invoke('menubar:reveal', sessionKey),
 
     /**
+     * Ramène le terminal d'une session lancée hors de l'app (T-0309). Le
+     * principal retrouve le bundle dans sa propre liste : on ne lui donne
+     * jamais que l'identifiant de session.
+     *
+     * @param {string} session
+     */
+    activate: session => ipcRenderer.invoke('menubar:activate', session),
+
+    /**
      * Côté fenêtre principale : « le popover demande cette session ».
      *
      * @param {(sessionKey: string) => void} handler

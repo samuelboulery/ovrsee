@@ -59,6 +59,13 @@ let popover = null
 /** Dernier état publié par le rendu principal. */
 let etat = { sessions: [], projet: null }
 
+/**
+ * Les sessions lancées hors de l'app, lues sur le disque par
+ * `electron/sessions-externes.js` (T-0309). À part de `etat` : elles ne
+ * viennent pas du rendu, et ne partent pas avec sa fenêtre (`destroyPopover`).
+ */
+let externes = []
+
 /** Fenêtre principale, pour la ramener au premier plan sur « ouvrir ». */
 let principale = null
 
@@ -232,9 +239,10 @@ export function createTray({ origin, preload, getMainWindow, onOpen }) {
 
 /**
  * La vue envoyée au popover : ce que le rendu publie, plus ce que seul ce
- * processus sait — l'état d'installation du hook, qui se lit sur le disque.
+ * processus sait — l'état d'installation du hook et les sessions hors de
+ * l'app, qui se lisent sur le disque.
  */
-const vue = () => ({ ...etat, signalInstalle: signalInstalle() })
+const vue = () => ({ ...etat, externes, signalInstalle: signalInstalle() })
 
 /** Pousse la vue au popover et met l'icône à jour. */
 function publier() {
@@ -247,7 +255,8 @@ function publier() {
   //
   // Dock caché, le Dock ne peut plus porter le badge : le titre en reprend le
   // nombre (T-0306).
-  const attend = etat.sessions.some(s => s?.attention?.kind === 'question')
+  const attend =
+    etat.sessions.some(s => s?.attention?.kind === 'question') || externes.some(s => s.etat === 'question')
   const dockCache = app.dock ? !app.dock.isVisible() : false
   if (tray) tray.setTitle(dockCache && compte > 0 ? ` ${compte}` : attend ? ' ●' : '')
 }
@@ -260,6 +269,21 @@ function publier() {
 export function setCompte(n) {
   compte = n
   publier()
+}
+
+/**
+ * Les sessions hors de l'app, déjà validées par `sessions-externes.js`.
+ *
+ * @param {Array<{session: string, projet: string, terminal: string|null, etat: string, detail: string|null, at: number}>} liste
+ */
+export function setExternes(liste) {
+  externes = liste
+  publier()
+}
+
+/** Referme le popover — après « Ouvrir <terminal> », le geste qui clôt la visite. */
+export function cacherPopover() {
+  if (popover && !popover.isDestroyed()) popover.hide()
 }
 
 /**

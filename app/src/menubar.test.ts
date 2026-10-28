@@ -9,8 +9,11 @@ import {
   composer,
   estDecidable,
   estPerime,
+  nomTerminal,
   resumeProjet,
+  trierExternes,
   type MenuBarAttention,
+  type MenuBarExterne,
   type MenuBarOuverte,
 } from './menubar'
 
@@ -238,4 +241,44 @@ test('menubar : filtrer par projet donne l\'état de ce projet seul', () => {
 
   assert.equal(agregerEtat(sessions.filter(s => s.projet === '/p/un')), 'stop')
   assert.equal(agregerEtat(sessions.filter(s => s.projet === '/p/trois')), null)
+})
+
+/* ——— Sessions hors de l'app (T-0309) ——— */
+
+const externe = (over: Partial<MenuBarExterne> = {}): MenuBarExterne => ({
+  session: 's1',
+  projet: 'site',
+  terminal: 'com.googlecode.iterm2',
+  etat: 'busy',
+  detail: null,
+  at: T0,
+  ...over,
+})
+
+test('menubar : les sessions hors de l’app trient comme les autres, l’inactive en dernier', () => {
+  const tries = trierExternes([
+    externe({ session: 'inactive', etat: 'idle', at: T0 + 9 }),
+    externe({ session: 'fini', etat: 'stop', at: T0 + 5 }),
+    externe({ session: 'vieux', etat: 'busy', at: T0 }),
+    externe({ session: 'recent', etat: 'busy', at: T0 + 1 }),
+    externe({ session: 'attend', etat: 'question', at: T0 }),
+  ])
+  assert.deepEqual(
+    tries.map(e => e.session),
+    ['attend', 'recent', 'vieux', 'fini', 'inactive'],
+  )
+  // Même instant, même état : l'identifiant tranche, l'ordre ne saute pas.
+  const egaux = [externe({ session: 'b' }), externe({ session: 'a' })]
+  assert.deepEqual(trierExternes(egaux).map(e => e.session), ['a', 'b'])
+  assert.deepEqual(trierExternes([...egaux].reverse()).map(e => e.session), ['a', 'b'])
+})
+
+test('menubar : le nom du terminal se lit, un inconnu reste « Terminal »', () => {
+  assert.equal(nomTerminal('com.googlecode.iterm2'), 'iTerm')
+  assert.equal(nomTerminal('com.todesktop.230313mzl4w4u92'), 'Cursor')
+  assert.equal(nomTerminal('com.microsoft.VSCode'), 'VS Code')
+  assert.equal(nomTerminal('org.inconnu.Term'), 'Terminal')
+  assert.equal(nomTerminal(null), 'Terminal')
+  // Un objet littéral répond à `constructor` : la table ne doit pas.
+  assert.equal(nomTerminal('constructor'), 'Terminal')
 })

@@ -69,7 +69,7 @@ const MAX_VIVANTES = 50
  * `TERM_PROGRAM` ne suffisait pas : Cursor et VS Code y écrivent tous deux
  * `vscode`.
  */
-const TERMINAUX = new Set([
+export const TERMINAUX = new Set([
   'com.apple.Terminal',
   'com.googlecode.iterm2',
   'com.mitchellh.ghostty',
@@ -219,21 +219,21 @@ export function depuisRendu(n) {
 }
 
 /**
- * Lit au plus `MAX_INBOX` octets d'un fichier ordinaire, sans suivre de lien
+ * Lit au plus `max` octets (`MAX_INBOX` par défaut) d'un fichier ordinaire, sans suivre de lien
  * ni bloquer : ouvert puis vérifié sur le descripteur, pas sur le chemin — un
  * `lstat` suivi d'un `readFile` laissait le temps de remplacer le fichier par
  * une FIFO, qui aurait gelé le processus principal.
  *
  * @returns {string|null} null si ce n'est pas un fichier ordinaire assez petit
  */
-function lireBorne(fichier) {
+export function lireBorne(fichier, max = MAX_INBOX) {
   const fd = openSync(fichier, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK)
   try {
     const info = fstatSync(fd)
-    if (!info.isFile() || info.size > MAX_INBOX) return null
-    const tampon = Buffer.alloc(MAX_INBOX + 1)
+    if (!info.isFile() || info.size > max) return null
+    const tampon = Buffer.alloc(max + 1)
     const lus = readSync(fd, tampon, 0, tampon.length, 0)
-    return lus > MAX_INBOX ? null : tampon.toString('utf8', 0, lus)
+    return lus > max ? null : tampon.toString('utf8', 0, lus)
   } finally {
     closeSync(fd)
   }

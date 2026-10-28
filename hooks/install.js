@@ -176,21 +176,29 @@ function installGitHook(root, hookName, scriptName, description, done) {
  * découper par événement dupliquerait la table des types de notification pour
  * rien. Même liste à l'enregistrement et à la vérification, sans quoi on
  * installerait ce qu'on ne contrôle pas.
+ *
+ * `SessionEnd` s'enregistre mais n'est pas exigé par `signalInstalle` : il ne
+ * fait qu'effacer la carte d'une session hors de l'app (T-0309), et sans lui
+ * la carte expire seule au bout de 24 h. Le déclarer manquant allumerait le
+ * bandeau d'alerte sur toutes les machines équipées avant lui, pour une panne
+ * qui se répare toute seule.
  */
 const SIGNAL_EVENTS = ['Stop', 'Notification', 'UserPromptSubmit', 'SessionStart']
+const SIGNAL_ENREGISTRE = [...SIGNAL_EVENTS, 'SessionEnd']
 
 /**
- * Les événements du signal qui ne servent que dans le terminal de l'app.
+ * L'ancienne garde de `UserPromptSubmit` et `SessionStart`, retirée en T-0309.
  *
- * `busy` nomme un onglet, `reset` en efface le nom : hors de l'app, il n'y a
- * pas d'onglet, et lancer node deux fois par tour pour rien coûte (T-0306).
- * La garde est dans la commande, donc dans le shell, avant tout démarrage de
- * node. `[ -z … ] ||` et non `[ -n … ] &&` : la seconde forme rend 1 quand la
- * variable manque, et Claude Code afficherait une erreur de hook à chaque tour.
- * `Stop` et `Notification` restent sans garde — ce sont eux qui notifient
- * depuis iTerm.
+ * Elle ne lançait node que dans le terminal de l'app, faute d'usage ailleurs.
+ * Les sessions hors de l'app ont maintenant leur carte dans le popover, et
+ * sans ces deux événements elle ne dirait jamais « au travail » ni « inactive ».
+ * Le prix : un démarrage de node de plus par tour hors de l'app (quelques
+ * dizaines de millisecondes, au départ du tour), plus un au lancement et un à
+ * la fin de session.
+ *
+ * Gardée ici pour la migration : une installation précédente l'a posée, et
+ * l'installateur doit savoir la retirer.
  */
-const SIGNAL_APP_SEULE = new Set(['UserPromptSubmit', 'SessionStart'])
 const GARDE_TERMINAL = '[ -z "$OVRSEE_TERMINAL" ] || '
 
 /** Une entrée est-elle déjà celle de l'ovrsee ? */
@@ -349,22 +357,25 @@ export function installClaudeHooks(done, settingsPath = SETTINGS) {
   // `ovrsee-session-start` : les entrées s'ajoutent au tableau, elles ne
   // s'écrasent pas, et deux hooks du même événement peuvent avoir des sorties
   // de formes différentes.
-  for (const event of SIGNAL_EVENTS) {
+  //
+  // `SessionEnd` porte déjà `ovrsee-session-end` : même règle, les deux
+  // s'ajoutent.
+  for (const event of SIGNAL_ENREGISTRE) {
     const entries = (hooks[event] ??= [])
-    const command = (SIGNAL_APP_SEULE.has(event) ? GARDE_TERMINAL : '') + commandFor('ovrsee-notify.js')
     const existante = entries.find(e => isOvrsee(e, 'ovrsee-notify'))
     if (!existante) {
-      entries.push({ hooks: [{ type: 'command', command, timeout: 5 }] })
+      entries.push({ hooks: [{ type: 'command', command: commandFor('ovrsee-notify.js'), timeout: 5 }] })
       added.push(`${event} — signal de session vers le panneau terminal`)
       continue
     }
-    // Une machine équipée avant la garde : l'entrée existe, sans elle.
-    // Seule la commande de l'ovrsee est réécrite, le reste de l'entrée reste.
+    // Une machine équipée entre T-0306 et T-0309 : l'entrée porte la garde.
+    // On ne retire que le préfixe — le chemin du script reste celui qu'elle
+    // avait, et le reste de l'entrée ne bouge pas.
     for (const hook of existante.hooks ?? []) {
-      if (!String(hook.command).includes('ovrsee-notify') || hook.command === command) continue
-      if (!SIGNAL_APP_SEULE.has(event) || hook.command.startsWith(GARDE_TERMINAL)) continue
-      hook.command = command
-      added.push(`${event} — signal limité au terminal de l'app`)
+      if (typeof hook.command !== 'string' || !hook.command.startsWith(GARDE_TERMINAL)) continue
+      if (!hook.command.includes('ovrsee-notify')) continue
+      hook.command = hook.command.slice(GARDE_TERMINAL.length)
+      added.push(`${event} — signal étendu aux sessions hors de l'app`)
     }
   }
 

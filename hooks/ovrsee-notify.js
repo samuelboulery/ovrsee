@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Hooks Stop, Notification, UserPromptSubmit et SessionStart : signalent au
+ * Hooks Stop, Notification, UserPromptSubmit, SessionStart et SessionEnd : signalent au
  * terminal qui entoure la session ce que Claude est en train de faire — au
  * travail, en attente d'une réponse, rendu la main, ou reparti de zéro.
  *
@@ -29,7 +29,9 @@
  *
  * Les deux dernières n'écrivent rien dans le dépôt observé : `inbox/` et
  * `menubar.pid` sont des fichiers de poste, sous `~/.claude/ovrsee/`, comme
- * `settings.json`. Le fichier ne porte que de quoi *afficher* — le principal ne
+ * `settings.json`. Hors de l'app, chaque événement tient en plus la carte de
+ * sa session dans `~/.claude/ovrsee/sessions/` (T-0309) — le popover y lit
+ * les sessions qui tournent ailleurs ; `SessionEnd` ne sert qu'à l'effacer. Le fichier ne porte que de quoi *afficher* — le principal ne
  * l'interprète jamais comme une commande (`validerInbox`).
  *
  * Contrat (calqué sur les autres hooks ovrsee) : JSON sur stdin, exit 0
@@ -54,7 +56,7 @@
 
 import { spawn } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
-import { closeSync, existsSync, fstatSync, openSync, readFileSync, readSync } from 'node:fs'
+import { closeSync, existsSync, fstatSync, openSync, readFileSync, readSync, unlinkSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { basename, dirname, join, resolve } from 'node:path'
 
@@ -375,6 +377,9 @@ export const pidPath = () => process.env.OVRSEE_MENUBAR_PID ?? join(dossierOvrse
 
 export const inboxDir = () => process.env.OVRSEE_INBOX ?? join(dossierOvrsee(), 'inbox')
 
+/** Une carte par session lancée hors de l'app — voir `suivreSessionExterne`. */
+export const sessionsDir = () => process.env.OVRSEE_SESSIONS ?? join(dossierOvrsee(), 'sessions')
+
 /**
  * Le processus nommé par le fichier pid vit-il ?
  *
@@ -460,6 +465,120 @@ export function ecrireInbox(notification, dossier = inboxDir()) {
   writeFileNoFollow(join(dossier, `${randomUUID()}.json`), JSON.stringify(notification), { mode: 0o600 })
 }
 
+/* ————————————————————————————————————————————————————————————————
+ * Les sessions hors de l'app, pour le popover (T-0309)
+ * ———————————————————————————————————————————————————————————————— */
+
+/**
+ * Une notification dit qu'il s'est passé quelque chose ; le popover veut savoir
+ * ce qui *tourne*. Une session lancée dans iTerm n'a pas de pty dans l'app, donc
+ * pas de place dans la liste que publie le rendu : c'est le hook qui tient sa
+ * carte, un fichier par session sous `~/.claude/ovrsee/sessions/`.
+ *
+ * Indépendant de `menubar.pid`, contrairement à l'inbox : une notification
+ * déposée sans lecteur serait affichée en retard, hors de propos, alors qu'une
+ * carte décrit un état — l'app qui démarre relit le dossier et montre ce qui
+ * tourne *maintenant*. Le `SessionEnd` efface la carte ; une session tuée sans
+ * lui laisse un fichier que le principal oublie au bout de 24 h
+ * (`electron/sessions-externes.js`).
+ *
+ * Même contrat que l'inbox : de quoi *afficher*, rien qui se lise comme une
+ * commande (`validerSessionExterne`).
+ */
+const ETATS_EXTERNES = new Set(['idle', 'busy', 'stop', 'question'])
+const MAX_SESSION_EXTERNE = 4 * 1024
+const MAX_CHEMIN = 1000
+
+/**
+ * L'état qu'une charge utile donne à la carte de sa session, `'fin'` pour
+ * l'effacer, ou null pour n'y rien changer.
+ *
+ * `SessionStart` vaut « inactive » quelle que soit sa source : une reprise
+ * (`resume`, `compact`) ne garde pas son onglet ici, il n'y en a pas — elle
+ * n'a juste encore rien fait. Le reste suit `genrePour`, y compris le `busy`
+ * d'une fin de tour qui laisse du travail de fond en vol.
+ *
+ * @param {unknown} payload
+ * @returns {'idle'|'busy'|'stop'|'question'|'fin'|null}
+ */
+export function etatExternePour(payload) {
+  if (!payload || typeof payload !== 'object') return null
+  if (payload.hook_event_name === 'SessionEnd') return 'fin'
+  if (payload.hook_event_name === 'SessionStart') return 'idle'
+  const genre = genrePour(payload)
+  return genre === 'reset' ? 'idle' : genre
+}
+
+/**
+ * Tient la carte de la session : l'écrit, la remplace, ou l'efface.
+ *
+ * L'identifiant de session devient un nom de fichier : il passe la même
+ * expression que `validerInbox` avant de toucher au disque — `../x` n'en sort pas.
+ *
+ * @param {unknown} payload
+ * @param {{cwd: string, detail: string|null, terminal: string|null}} contexte
+ * @param {string} [dossier]
+ */
+export function suivreSessionExterne(payload, { cwd, detail, terminal }, dossier = sessionsDir()) {
+  const etat = etatExternePour(payload)
+  const session = payload?.session_id
+  if (!etat || typeof session !== 'string' || !SESSION.test(session)) return
+  const fichier = join(dossier, `${session}.json`)
+
+  if (etat === 'fin') {
+    try {
+      unlinkSync(fichier)
+    } catch (err) {
+      if (err?.code !== 'ENOENT') throw err
+    }
+    return
+  }
+
+  const carte = {
+    session,
+    cwd: resolve(cwd),
+    projet: basename(resolve(cwd)),
+    terminal: typeof terminal === 'string' && BUNDLE.test(terminal) ? terminal : null,
+    etat,
+    detail: etat === 'idle' ? null : (detail?.slice(0, MAX_DETAIL) ?? null),
+    at: Date.now(),
+  }
+  // 0600 sous un dossier 0700, comme l'inbox : le détail cite la demande.
+  writeFileNoFollow(fichier, JSON.stringify(carte), { mode: 0o600 })
+}
+
+/**
+ * Valide le contenu d'une carte de session, ou rend null.
+ *
+ * Même rigueur que `validerInbox`, pour la même raison : n'importe quel
+ * processus du compte peut écrire dans ce dossier. Une carte ne fait
+ * qu'afficher, et son terminal n'est qu'un identifiant que le principal
+ * confronte encore à `TERMINAUX` avant d'en faire un `open -b`.
+ *
+ * Un terminal malformé tombe à null au lieu de refuser la carte : la session
+ * existe, on ne saura simplement pas la réactiver.
+ *
+ * @param {string} brut
+ */
+export function validerSessionExterne(brut) {
+  if (typeof brut !== 'string' || brut.length > MAX_SESSION_EXTERNE) return null
+  let n
+  try {
+    n = JSON.parse(brut)
+  } catch {
+    return null
+  }
+  if (!n || typeof n !== 'object' || Array.isArray(n)) return null
+  if (typeof n.session !== 'string' || !SESSION.test(n.session)) return null
+  if (typeof n.cwd !== 'string' || n.cwd.length > MAX_CHEMIN) return null
+  if (typeof n.projet !== 'string' || n.projet.length > MAX_PROJET) return null
+  if (!ETATS_EXTERNES.has(n.etat)) return null
+  if (n.detail !== null && (typeof n.detail !== 'string' || n.detail.length > MAX_TEXTE)) return null
+  if (typeof n.at !== 'number' || !Number.isFinite(n.at) || n.at <= 0) return null
+  const terminal = typeof n.terminal === 'string' && BUNDLE.test(n.terminal) ? n.terminal : null
+  return { session: n.session, cwd: n.cwd, projet: n.projet, terminal, etat: n.etat, detail: n.detail, at: n.at }
+}
+
 /**
  * Le filet : une notification macOS sans Ovrsee.
  *
@@ -510,12 +629,11 @@ function main() {
   }
 
   const genre = genrePour(payload)
-  if (!genre) return
-
   const voie = voiePour(process.env, pidPath())
   const cwd = payload?.cwd || process.cwd()
 
   if (voie === 'osc') {
+    if (!genre) return
     // La garde de projet ne vaut que pour la séquence : c'est elle qui
     // atterrirait dans le terminal d'un projet étranger.
     if (!projetEquipe(cwd)) return
@@ -529,13 +647,28 @@ function main() {
     return
   }
 
-  // Hors de l'app, seuls ces deux-là appellent l'humain : `busy` et `reset`
-  // ne décrivent qu'un onglet qui n'existe pas ici.
-  if (genre !== 'stop' && genre !== 'question') return
-  if (!voie) return
+  // Hors de l'app, la carte de session d'abord (T-0309) : tous les événements
+  // la tiennent, `SessionEnd` compris, pour le popover. Pas de garde de projet
+  // — comme l'inbox, elle ne touche que `~/.claude/ovrsee/`. Une écriture
+  // ratée ne coûte que la carte : la notification part quand même.
+  const notifie = genre === 'stop' || genre === 'question'
+  const riche = notifie ? richesse(genre, payload) : null
+  try {
+    suivreSessionExterne(payload, {
+      cwd,
+      detail: riche ? riche.texte : detailPour(payload),
+      terminal: process.env.__CFBundleIdentifier ?? null,
+    })
+  } catch (err) {
+    process.stderr.write(`[ovrsee] carte de session non écrite : ${err?.message ?? err}\n`)
+  }
+
+  // Seuls ces deux-là appellent l'humain : `busy` et `reset` ne décrivent
+  // qu'un état, que la carte vient de porter.
+  if (!riche || !voie) return
 
   const reglages = readSettings()
-  const { texte, dureeMs } = richesse(genre, payload)
+  const { texte, dureeMs } = riche
   if (!aNotifier(genre, dureeMs, reglages.notifications)) return
 
   const projet = basename(resolve(cwd))

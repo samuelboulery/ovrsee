@@ -44,7 +44,9 @@ L'écriture, elle, se lit en trois classes — « seulement `tickets/` et `board
    T-0306) : `~/.claude/ovrsee/menubar.pid` et `~/.claude/ovrsee/inbox/` (le hook y
    dépose une notification, le principal la lit puis l'efface — de quoi *afficher*,
    jamais une commande ; le seul geste qui en découle est `open -b` sur un terminal
-   d'une liste blanche), et `~/Library/LaunchAgents/com.ovrsee.menubar.plist`.
+   d'une liste blanche), `~/.claude/ovrsee/sessions/` (une carte par session lancée
+   hors de l'app, tenue par le hook, lue sans être effacée par le principal — même
+   contrat, T-0309) et `~/Library/LaunchAgents/com.ovrsee.menubar.plist`.
 3. **Par les hooks, jamais par l'interface** : `ovrsee/pages/` au crawl,
    `ovrsee/plans/` à la capture, `.gitignore` à chaque commit.
 
@@ -377,7 +379,10 @@ l'app **sans terminal**, seul `pnpm electron` le donne.
   s'y ajoute : c'est lui qui émet `busy` (avec la demande dont l'onglet tire son nom) et
   `reset` (sur `/clear`, qui rend son nom d'origine à l'onglet). Les entrées s'ajoutent au
   tableau du fichier de réglages, elles ne s'écrasent pas, et deux hooks du même événement
-  peuvent rendre des sorties de formes différentes.
+  peuvent rendre des sorties de formes différentes. `SessionEnd` aussi, à côté
+  d'`ovrsee-session-end.js` : il efface la carte d'une session hors de l'app (T-0309).
+  Aucun de ces hooks n'est plus gardé par `OVRSEE_TERMINAL` — hors de l'app, ils tiennent
+  la carte du popover ; `install.js` retire la garde posée par une installation d'avant.
 - **`site/fr/` est engendré, pas écrit.** `build-site-fr.js` dérive la page française de
   `site/index.html` — **en anglais**, la langue source — et de `site/dict.json` au
   déploiement ; le dossier est gitignoré. Le texte français se corrige donc dans

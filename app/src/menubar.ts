@@ -90,7 +90,73 @@ export interface MenuBarVue extends MenuBarEtat {
    * ça, la panne est parfaitement silencieuse.
    */
   signalInstalle: boolean
+  /** Les sessions lancées hors de l'app, lues sur le disque par le principal (T-0309). */
+  externes: MenuBarExterne[]
 }
+
+/**
+ * L'état d'une session hors de l'app. `idle` n'existe qu'ici : une session de
+ * l'app qui n'a rien signalé n'a pas d'attention du tout, une session d'iTerm
+ * vient d'envoyer `SessionStart` — on sait qu'elle est là et n'a rien fait.
+ */
+export type EtatExterne = 'idle' | 'busy' | 'stop' | 'question'
+
+/**
+ * Une session lancée hors de l'app — iTerm, Terminal, VS Code…
+ *
+ * Écrite par `hooks/ovrsee-notify.js` (`suivreSessionExterne`), validée par le
+ * principal avant de venir ici. Pas de `ptyId` : on n'y répond pas d'ici, on
+ * ramène son terminal (`menubar.activate`, qui ne prend que `session`).
+ */
+export interface MenuBarExterne {
+  /** `session_id` de Claude Code. */
+  session: string
+  /** Nom du dossier de travail. */
+  projet: string
+  /** Identifiant de bundle du terminal d'origine, ou null s'il est inconnu. */
+  terminal: string | null
+  etat: EtatExterne
+  /** La demande, la question ou la dernière phrase, selon l'état. */
+  detail: string | null
+  /** Dernier événement, en millisecondes. */
+  at: number
+}
+
+/**
+ * Noms lisibles des terminaux, par bundle — les mêmes que la liste blanche
+ * `TERMINAUX` d'`electron/notifications.js`. Cursor se cache derrière un
+ * identifiant ToDesktop.
+ */
+const NOMS_TERMINAUX: Readonly<Record<string, string>> = {
+  'com.apple.Terminal': 'Terminal',
+  'com.googlecode.iterm2': 'iTerm',
+  'com.mitchellh.ghostty': 'Ghostty',
+  'com.github.wez.wezterm': 'WezTerm',
+  'dev.warp.Warp-Stable': 'Warp',
+  'net.kovidgoyal.kitty': 'kitty',
+  'org.alacritty': 'Alacritty',
+  'com.microsoft.VSCode': 'VS Code',
+  'com.todesktop.230313mzl4w4u92': 'Cursor',
+  'dev.zed.Zed': 'Zed',
+  'com.exafunction.windsurf': 'Windsurf',
+}
+
+/** Le nom à afficher d'un terminal. Inconnu ou absent : « Terminal », générique. */
+export const nomTerminal = (bundle: string | null): string =>
+  (bundle !== null && Object.hasOwn(NOMS_TERMINAUX, bundle) ? NOMS_TERMINAUX[bundle] : null) ?? 'Terminal'
+
+/** Même ordre que `composer` : ce qui attend quelqu'un d'abord, l'inactif en dernier. */
+const RANG_EXTERNE: Readonly<Record<EtatExterne, number>> = { question: 0, busy: 1, stop: 2, idle: 3 }
+
+/**
+ * Trie les sessions hors de l'app : par état, puis la plus récente d'abord,
+ * puis par identifiant — deux cartes du même instant ne doivent pas échanger
+ * leur place d'un rendu à l'autre.
+ */
+export const trierExternes = (externes: readonly MenuBarExterne[]): MenuBarExterne[] =>
+  [...externes].sort(
+    (a, b) => RANG_EXTERNE[a.etat] - RANG_EXTERNE[b.etat] || b.at - a.at || a.session.localeCompare(b.session),
+  )
 
 /**
  * Au-delà, une attente n'est plus décidable à distance.

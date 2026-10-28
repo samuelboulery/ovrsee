@@ -8,6 +8,7 @@
  * `menubar.ts`.
  */
 
+import { TerminalWindow } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 
 import { fetchSettings } from './data'
@@ -16,7 +17,10 @@ import {
   PEREMPTION_MS,
   estDecidable,
   estPerime,
+  nomTerminal,
+  trierExternes,
   type MenuBarDecision,
+  type MenuBarExterne,
   type MenuBarProjet,
   type MenuBarSession,
   type MenuBarVue,
@@ -59,6 +63,8 @@ const TITRE_SECTION =
   'text-transform:uppercase;color:var(--color-text-tertiary)'
 
 const LIGNE = 'display:flex;justify-content:space-between;gap:10px;font-size:12px'
+
+const LISTE = 'margin:0;padding:10px;display:flex;flex-direction:column;gap:8px'
 
 /**
  * Une session dans le popover.
@@ -150,6 +156,71 @@ export function SessionCard({
 }
 
 /**
+ * La carte d'une session hors de l'app (T-0309).
+ *
+ * Distincte d'un coup d'œil : bordure en pointillés — elle ne vit pas ici —,
+ * et une pastille au nom de son terminal. Pas d'Autoriser/Refuser : on n'a pas
+ * son pty, il n'y a rien où taper. Le seul geste est de ramener son terminal,
+ * et le principal choisit lequel d'après sa propre liste.
+ *
+ * Exportée pour `render.test.tsx`, comme `SessionCard`.
+ */
+export function ExterneCard({ externe, now }: { externe: MenuBarExterne; now: number }) {
+  const terminal = nomTerminal(externe.terminal)
+  const attente = externe.etat === 'question'
+
+  return (
+    <li style={s(CARTE.replace('border:1px solid', 'border:1px dashed'))}>
+      <div style={s('display:flex;align-items:center;justify-content:space-between;gap:8px')}>
+        <span style={s('display:flex;align-items:center;gap:8px;min-width:0')}>
+          <span style={s('font-size:13px;font-weight:600;color:var(--color-text)')}>{externe.projet}</span>
+          <span
+            style={s(
+              'display:inline-flex;align-items:center;gap:4px;padding:1px 6px;' +
+                'border:1px solid var(--color-border-control);border-radius:var(--radius-sm);' +
+                'font-size:10px;color:var(--color-text-secondary);white-space:nowrap',
+            )}
+          >
+            <TerminalWindow size={11} aria-hidden="true" />
+            {terminal}
+          </span>
+        </span>
+        <span style={s('font-size:11px;color:var(--color-text-tertiary);white-space:nowrap')}>
+          {age(externe.at, now)}
+        </span>
+      </div>
+
+      <div
+        style={s(
+          'font-size:11px;color:' + (attente ? 'var(--color-accent)' : 'var(--color-text-tertiary)'),
+        )}
+      >
+        {t(`menubar.external_${externe.etat}`)}
+      </div>
+
+      {externe.detail ? (
+        <p style={s('margin:0;font-size:12px;color:var(--color-text-secondary);line-height:1.4')}>
+          {externe.detail}
+        </p>
+      ) : null}
+
+      {/* Sans terminal connu, le principal refuserait : pas de bouton qui ne fait rien. */}
+      {externe.terminal ? (
+        <div style={s('display:flex;gap:6px;margin-top:2px')}>
+          <button
+            type="button"
+            onClick={() => void window.ovrsee?.menubar?.activate?.(externe.session)}
+            style={s(BOUTON)}
+          >
+            {t('menubar.activate', { terminal })}
+          </button>
+        </div>
+      ) : null}
+    </li>
+  )
+}
+
+/**
  * Le projet affiché, quand aucune session ne tourne.
  *
  * Un popover vide n'apprend rien. Celui-ci dit au moins où en est le projet
@@ -231,7 +302,7 @@ export function BandeauSignal() {
   )
 }
 
-const VIDE: MenuBarVue = { sessions: [], projet: null, signalInstalle: true }
+const VIDE: MenuBarVue = { sessions: [], projet: null, signalInstalle: true, externes: [] }
 
 export function MenuBar() {
   const [vue, setVue] = useState<MenuBarVue>(VIDE)
@@ -272,6 +343,8 @@ export function MenuBar() {
     return () => clearInterval(battement)
   }, [])
 
+  const externes = trierExternes(vue.externes)
+
   const repondre = (ptyId: string, decision: MenuBarDecision) => {
     // Optimiste, et pas par confort : le principal éteint l'attente de son
     // côté dès la touche écrite, mais le popover doit cesser d'offrir un
@@ -306,7 +379,7 @@ export function MenuBar() {
       <div style={s('overflow-y:auto;flex:1')}>
         {vue.signalInstalle ? null : <BandeauSignal />}
 
-        {vue.sessions.length === 0 ? (
+        {vue.sessions.length === 0 && externes.length === 0 ? (
           <>
             <div style={s('padding:16px 14px 4px;font-size:13px;color:var(--color-text-secondary)')}>
               {t('menubar.empty')}
@@ -323,16 +396,32 @@ export function MenuBar() {
             )}
           </>
         ) : (
-          <ul style={s('margin:0;padding:10px;display:flex;flex-direction:column;gap:8px')}>
-            {vue.sessions.map(session => (
-              <SessionCard
-                key={session.sessionKey}
-                session={session}
-                now={now}
-                onAnswer={repondre}
-              />
-            ))}
-          </ul>
+          <>
+            {vue.sessions.length > 0 ? (
+              <ul style={s(LISTE)}>
+                {vue.sessions.map(session => (
+                  <SessionCard
+                    key={session.sessionKey}
+                    session={session}
+                    now={now}
+                    onAnswer={repondre}
+                  />
+                ))}
+              </ul>
+            ) : null}
+            {/* Sous les sessions de l'app, jamais mêlées : on ne répond pas
+                d'ici à une session dont on n'a pas le pty. */}
+            {externes.length > 0 ? (
+              <>
+                <div style={s(TITRE_SECTION)}>{t('menubar.external')}</div>
+                <ul style={s(LISTE.replace('padding:10px', 'padding:0 10px 10px'))}>
+                  {externes.map(externe => (
+                    <ExterneCard key={externe.session} externe={externe} now={now} />
+                  ))}
+                </ul>
+              </>
+            ) : null}
+          </>
         )}
       </div>
 

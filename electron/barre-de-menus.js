@@ -33,7 +33,8 @@ import { emplacementEphemere } from '../hooks/install.js'
 import { readSettings } from '../hooks/settings.js'
 import { arreterNotifications, demarrerNotifications, depuisRendu, marquerVues, suivreSessions } from './notifications.js'
 import { closeAll } from './pty.js'
-import { answer, createTray, currentState, reveal, setState } from './tray.js'
+import { activer, arreterSessionsExternes, demarrerSessionsExternes } from './sessions-externes.js'
+import { answer, cacherPopover, createTray, currentState, reveal, setState } from './tray.js'
 
 /** L'argument que pose la LaunchAgent : démarrer sans fenêtre. */
 export const SANS_FENETRE = '--barre-de-menus'
@@ -136,6 +137,13 @@ export function demarrerBarreDeMenus({ origin, preload, getPrincipale, nouvelleF
   ipcMain.handle('menubar:reveal', (_event, sessionKey) => {
     if (typeof sessionKey === 'string') reveal(sessionKey)
   })
+  // Une session hors de l'app (T-0309) : le rendu ne nomme que la session, le
+  // bundle à activer est retrouvé et vérifié dans `sessions-externes.js`.
+  ipcMain.handle('menubar:activate', (_event, session) => {
+    const fait = activer(session)
+    if (fait) cacherPopover()
+    return fait
+  })
   ipcMain.handle('menubar:open', () => ouvrir())
   ipcMain.handle('menubar:quit', () => app.quit())
   ipcMain.handle('notif:show', (event, n) => {
@@ -144,6 +152,7 @@ export function demarrerBarreDeMenus({ origin, preload, getPrincipale, nouvelleF
 
   createTray({ origin, preload, getMainWindow: getPrincipale, onOpen: marquerVues })
   demarrerNotifications()
+  demarrerSessionsExternes()
   synchroniserLancement()
 
   app.on('browser-window-focus', (_event, fenetre) => {
@@ -168,5 +177,8 @@ export function demarrerBarreDeMenus({ origin, preload, getPrincipale, nouvelleF
     if (!mac) app.quit()
     else if (barrePermanente()) app.dock?.hide()
   })
-  app.on('will-quit', arreterNotifications)
+  app.on('will-quit', () => {
+    arreterNotifications()
+    arreterSessionsExternes()
+  })
 }

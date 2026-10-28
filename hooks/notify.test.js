@@ -278,3 +278,89 @@ test('notify : le fichier déposé dans l’inbox se relit tel quel par le princ
   // Les droits POSIX n'ont pas de sens sous Windows, qui rend 0o666.
   if (process.platform !== 'win32') assert.equal(statSync(join(dossier, nom)).mode & 0o777, 0o600)
 })
+
+/* ——— Sessions hors de l'app (T-0309) ——— */
+
+test('notify : une carte de session malformée est refusée, pas devinée', async () => {
+  const { validerSessionExterne } = await import('./ovrsee-notify.js')
+  const bonne = {
+    session: 'abc-123',
+    cwd: '/Users/x/site',
+    projet: 'site',
+    terminal: 'com.googlecode.iterm2',
+    etat: 'busy',
+    detail: 'corrige le menu',
+    at: 1_700_000_000_000,
+  }
+  assert.deepEqual(validerSessionExterne(JSON.stringify(bonne)), bonne)
+  // Un terminal suspect ne refuse pas la carte : il ne sera juste pas réactivable.
+  assert.equal(validerSessionExterne(JSON.stringify({ ...bonne, terminal: 'x; open /' })).terminal, null)
+  for (const mauvaise of [
+    '{coupé',
+    '[]',
+    'null',
+    JSON.stringify({ ...bonne, session: '../x' }),
+    JSON.stringify({ ...bonne, etat: 'reset' }),
+    JSON.stringify({ ...bonne, projet: 3 }),
+    JSON.stringify({ ...bonne, cwd: 'x'.repeat(1001) }),
+    JSON.stringify({ ...bonne, detail: 'x'.repeat(501) }),
+    JSON.stringify({ ...bonne, at: 'hier' }),
+    JSON.stringify({ ...bonne, at: -1 }),
+    'x'.repeat(5000),
+  ]) {
+    assert.equal(validerSessionExterne(mauvaise), null, mauvaise.slice(0, 40))
+  }
+})
+
+test('notify : hors de l’app, le hook tient la carte de sa session jusqu’au SessionEnd', async () => {
+  const { spawnSync } = await import('node:child_process')
+  const { existsSync, readdirSync, readFileSync, statSync } = await import('node:fs')
+  const { validerSessionExterne } = await import('./ovrsee-notify.js')
+
+  const racine = tmp()
+  const sessions = join(racine, 'sessions')
+  const pid = join(racine, 'menubar.pid')
+  // L'app « vivante » est ce processus de test : la fin de tour part dans une
+  // inbox jetable plutôt qu'en osascript, qui afficherait une vraie notification.
+  writeFileSync(pid, String(process.pid))
+  const env = { ...process.env, OVRSEE_SESSIONS: sessions, OVRSEE_INBOX: join(racine, 'inbox'), OVRSEE_MENUBAR_PID: pid }
+  delete env.OVRSEE_TERMINAL
+  env.__CFBundleIdentifier = 'com.googlecode.iterm2'
+
+  const hook = join(RACINE, 'hooks', 'ovrsee-notify.js')
+  const base = { session_id: 'sess-1', cwd: join(racine, 'site') }
+  const tour = payload => {
+    const r = spawnSync(process.execPath, [hook], { input: JSON.stringify({ ...base, ...payload }), env, encoding: 'utf8' })
+    assert.equal(r.status, 0, r.stderr)
+    assert.equal(r.stdout, '', 'hors de l’app, rien sur stdout')
+  }
+  const carte = () => validerSessionExterne(readFileSync(join(sessions, 'sess-1.json'), 'utf8'))
+
+  tour({ hook_event_name: 'SessionStart', source: 'resume' })
+  assert.equal(carte().etat, 'idle')
+  assert.equal(carte().projet, 'site')
+  assert.equal(carte().terminal, 'com.googlecode.iterm2')
+  if (process.platform !== 'win32') assert.equal(statSync(join(sessions, 'sess-1.json')).mode & 0o777, 0o600)
+
+  tour({ hook_event_name: 'UserPromptSubmit', prompt: 'corrige le menu' })
+  assert.deepEqual([carte().etat, carte().detail], ['busy', 'corrige le menu'])
+
+  tour({ hook_event_name: 'Stop', background_tasks: [{ id: 'a' }] })
+  assert.equal(carte().etat, 'busy', 'du travail de fond en vol : toujours au travail')
+
+  tour({ hook_event_name: 'Stop', last_assistant_message: 'Le menu est corrigé.' })
+  assert.deepEqual([carte().etat, carte().detail], ['stop', 'Le menu est corrigé.'])
+  // La notification existante part toujours, inchangée.
+  assert.equal(readdirSync(join(racine, 'inbox')).length, 1)
+
+  tour({ hook_event_name: 'Notification', notification_type: 'permission_prompt', message: 'needs Bash' })
+  assert.deepEqual([carte().etat, carte().detail], ['question', 'needs Bash'])
+  // Une notification qui n'attend rien ne touche pas à la carte.
+  tour({ hook_event_name: 'Notification', notification_type: 'idle_prompt', message: 'idle' })
+  assert.equal(carte().etat, 'question')
+
+  tour({ hook_event_name: 'SessionEnd', reason: 'prompt_input_exit' })
+  assert.equal(existsSync(join(sessions, 'sess-1.json')), false)
+  // Une seconde fin ne lève pas.
+  tour({ hook_event_name: 'SessionEnd' })
+})

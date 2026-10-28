@@ -103,6 +103,11 @@ declare global {
         answer: (ptyId: string, decision: MenuBarDecision) => Promise<boolean>
         /** Ramène la fenêtre sur cette session, puis referme le popover. */
         reveal: (sessionKey: string) => Promise<void>
+        /**
+         * Ramène le terminal d'une session hors de l'app. Le principal choisit
+         * le bundle d'après sa propre liste — le rendu ne nomme que la session.
+         */
+        activate?: (session: string) => Promise<boolean>
         /** Côté fenêtre principale : le popover demande cette session. */
         onReveal: (handler: (sessionKey: string) => void) => () => void
         /** Rouvre la fenêtre — recréée si l'app était en barre de menus seule. */

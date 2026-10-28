@@ -357,30 +357,46 @@ test('un binaire lancé depuis le DMG ou une translocation n’est pas inscrit d
   }
 })
 
-test('installClaudeHooks : UserPromptSubmit et SessionStart ne lancent node que dans le terminal de l’app', () => {
+test('installClaudeHooks : le signal tourne partout, SessionEnd compris (T-0309)', () => {
   const path = settingsJetable()
   installClaudeHooks([], path)
   const settings = JSON.parse(readFileSync(path, 'utf8'))
   const notify = event =>
-    settings.hooks[event].flatMap(e => e.hooks).find(h => h.command.includes('ovrsee-notify')).command
+    settings.hooks[event].flatMap(e => e.hooks).find(h => h.command.includes('ovrsee-notify'))?.command
 
-  assert.ok(notify('UserPromptSubmit').startsWith('[ -z "$OVRSEE_TERMINAL" ] || '))
-  assert.ok(notify('SessionStart').startsWith('[ -z "$OVRSEE_TERMINAL" ] || '))
-  // Ceux-là notifient depuis iTerm : pas de garde.
-  assert.ok(!notify('Stop').includes('OVRSEE_TERMINAL'))
-  assert.ok(!notify('Notification').includes('OVRSEE_TERMINAL'))
+  // Hors de l'app, `busy` et `idle` tiennent la carte de session du popover :
+  // plus de garde sur aucun événement.
+  for (const event of ['Stop', 'Notification', 'UserPromptSubmit', 'SessionStart', 'SessionEnd']) {
+    assert.ok(notify(event), `${event} porte ovrsee-notify`)
+    assert.ok(!notify(event).includes('OVRSEE_TERMINAL'), `${event} sans garde`)
+  }
+  // Et `SessionEnd` garde le hook qui rend le plan actif.
+  assert.match(scriptsDe(settings, 'SessionEnd'), /ovrsee-session-end\.js/)
 })
 
-test('installClaudeHooks pose la garde sur une entrée d’avant, sans la dupliquer', () => {
+test('installClaudeHooks retire la garde d’une installation d’avant, sans dupliquer ni toucher au reste', () => {
+  const garde = `[ -z "$OVRSEE_TERMINAL" ] || node '/x/ovrsee-notify.js'`
   const path = settingsJetable({
     hooks: {
-      UserPromptSubmit: [{ hooks: [{ type: 'command', command: 'node /x/ovrsee-notify.js', timeout: 5 }] }],
+      UserPromptSubmit: [{ hooks: [{ type: 'command', command: garde, timeout: 5 }] }],
+      SessionStart: [{ hooks: [{ type: 'command', command: garde, timeout: 5 }] }],
+      Stop: [{ hooks: [{ type: 'command', command: 'node /autre/hook.js' }] }],
     },
   })
-  installClaudeHooks([], path)
-  const entrees = JSON.parse(readFileSync(path, 'utf8')).hooks.UserPromptSubmit
-    .flatMap(e => e.hooks)
-    .filter(h => h.command.includes('ovrsee-notify'))
-  assert.equal(entrees.length, 1)
-  assert.ok(entrees[0].command.startsWith('[ -z "$OVRSEE_TERMINAL" ] || '))
+  const journal = []
+  installClaudeHooks(journal, path)
+  const hooks = JSON.parse(readFileSync(path, 'utf8')).hooks
+  for (const event of ['UserPromptSubmit', 'SessionStart']) {
+    const entrees = hooks[event].flatMap(e => e.hooks).filter(h => h.command.includes('ovrsee-notify'))
+    assert.equal(entrees.length, 1, event)
+    // Le chemin d'origine reste : seul le préfixe part.
+    assert.equal(entrees[0].command, `node '/x/ovrsee-notify.js'`)
+  }
+  assert.ok(journal.some(l => /étendu aux sessions hors de l'app/.test(l)))
+  assert.match(scriptsDe({ hooks }, 'Stop'), /\/autre\/hook\.js/)
+
+  // Réexécuté : plus rien à migrer.
+  const second = []
+  installClaudeHooks(second, path)
+  assert.ok(second.some(l => /déjà installés/.test(l)))
 })
